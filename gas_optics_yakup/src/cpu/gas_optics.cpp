@@ -48551,19 +48551,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     ztaur_0 = new double DACE_ALIGN(64)[((((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + ((15 * sym_klev_var_2181_0) * ((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + 1))) + ((sym_klev_var_2181_0 - 1) * ((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + 1))) + 1)];
     zsflxzen_0 = new double DACE_ALIGN(64)[(((16 * sym_kfdia_var_2180_0) - (16 * sym_kidia_var_2179_0)) + 16)];
     i_laysolfr_var_2275_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
-    i_laysolfr_var_2233_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2210_0_0 - sym_kidia_var_2209_0_0) + 1)];
-    i_laysolfr_var_624_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_604_0_0 - sym_kidia_var_603_0_0) + 1)];
-    i_laysolfr_var_641_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_631_0_0 - sym_kidia_var_630_0_0) + 1)];
-    i_laysolfr_var_753_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_732_0_0 - sym_kidia_var_731_0_0) + 1)];
-    i_laysolfr_var_721_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_689_0_0 - sym_kidia_var_688_0_0) + 1)];
-    i_laysolfr_var_950_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_922_0_0 - sym_kidia_var_921_0_0) + 1)];
-    i_laysolfr_var_911_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_880_0_0 - sym_kidia_var_879_0_0) + 1)];
-    i_laysolfr_var_833_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_802_0_0 - sym_kidia_var_801_0_0) + 1)];
-    i_laysolfr_var_873_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_844_0_0 - sym_kidia_var_843_0_0) + 1)];
-    i_laysolfr_var_791_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_760_0_0 - sym_kidia_var_759_0_0) + 1)];
-    i_laysolfr_var_678_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_647_0_0 - sym_kidia_var_646_0_0) + 1)];
-    i_laysolfr_var_2311_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2280_0_0 - sym_kidia_var_2279_0_0) + 1)];
-    i_laysolfr_var_2403_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2372_0_0 - sym_kidia_var_2371_0_0) + 1)];
+    i_laysolfr_var_2233_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_624_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_641_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_753_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_721_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_950_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_911_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_833_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_873_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_791_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_678_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_2311_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
+    i_laysolfr_var_2403_0_0 = new int DACE_ALIGN(64)[((sym_kfdia_var_2244_0_0 - sym_kidia_var_2243_0_0) + 1)];
 
     if (((icount_0 != 0) == 1)) {
         for (_for_it_349_0 = 16; (_for_it_349_0 <= 29); _for_it_349_0 = (_for_it_349_0 + 1)) {
