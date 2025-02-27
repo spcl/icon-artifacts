@@ -5,6 +5,32 @@
 #include <dace/dace.h>
 
 
+struct thermodynamics_type {
+    double* pressure_fl = {};
+double* pressure_hl = {};
+double* temperature_fl = {};
+double* temperature_hl = {};
+};
+
+
+struct single_level_type {
+    double* cos_sza = {};
+double* skin_temperature = {};
+double* spectral_solar_scaling = {};
+};
+
+
+struct config_type {
+    int* i_band_from_g_lw = {};
+int* i_band_from_reordered_g_sw = {};
+};
+
+
+struct gas_type {
+    double* mixing_ratio = {};
+};
+
+
 struct global_data_type {
     double* absa_var_109 = {};
 double* absa_var_116 = {};
@@ -236,32 +262,6 @@ double strrat_var_301 = {};
 double* totplnk = {};
 double* tref_var_215 = {};
 double* tref_var_316 = {};
-};
-
-
-struct thermodynamics_type {
-    double* pressure_fl = {};
-double* pressure_hl = {};
-double* temperature_fl = {};
-double* temperature_hl = {};
-};
-
-
-struct gas_type {
-    double* mixing_ratio = {};
-};
-
-
-struct single_level_type {
-    double* cos_sza = {};
-double* skin_temperature = {};
-double* spectral_solar_scaling = {};
-};
-
-
-struct config_type {
-    int* i_band_from_g_lw = {};
-int* i_band_from_reordered_g_sw = {};
 };
 
 

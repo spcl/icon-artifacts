@@ -2,6 +2,28 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
+struct thermodynamics_type {
+    double* pressure_fl = {};
+    double* pressure_hl = {};
+    double* temperature_fl = {};
+    double* temperature_hl = {};
+};
+
+struct single_level_type {
+    double* cos_sza = {};
+    double* skin_temperature = {};
+    double* spectral_solar_scaling = {};
+};
+
+struct config_type {
+    int* i_band_from_g_lw = {};
+    int* i_band_from_reordered_g_sw = {};
+};
+
+struct gas_type {
+    double* mixing_ratio = {};
+};
+
 struct global_data_type {
     double* absa_var_109 = {};
     double* absa_var_116 = {};
@@ -233,28 +255,6 @@ struct global_data_type {
     double* totplnk = {};
     double* tref_var_215 = {};
     double* tref_var_316 = {};
-};
-
-struct thermodynamics_type {
-    double* pressure_fl = {};
-    double* pressure_hl = {};
-    double* temperature_fl = {};
-    double* temperature_hl = {};
-};
-
-struct gas_type {
-    double* mixing_ratio = {};
-};
-
-struct single_level_type {
-    double* cos_sza = {};
-    double* skin_temperature = {};
-    double* spectral_solar_scaling = {};
-};
-
-struct config_type {
-    int* i_band_from_g_lw = {};
-    int* i_band_from_reordered_g_sw = {};
 };
 
 struct gas_optics_state_t {
@@ -733,9 +733,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     global_data_var_14_0 = &global_data;
     double* v_global_data_var_14_tref_var_316;
     v_global_data_var_14_tref_var_316 = (double*)(&((*global_data_var_14_0)->tref_var_316)[0]);
+    double z_stpfac_var_1077_0;
     double z_fp_var_1079_0;
     double z_ft_var_1080_0;
     double z_ft1_var_1081_0;
+    double z_water_var_1082_0;
+    double z_scalefac_var_1083_0;
     int _if_cond_67_0;
     int _if_cond_69_0;
     int _if_cond_71_0;
@@ -1627,57 +1630,57 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     v_single_level_var_458_skin_temperature = (double*)(&(single_level_var_458->skin_temperature)[0]);
     int istartlev_var_477;
     int sym_kidia_var_1888_0;
-    int sym_klev_var_1890_0;
     int sym_kfdia_var_1889_0;
+    int sym_klev_var_1890_0;
+    int sym_kfdia_var_1459_0_0;
     int laytrop_min_var_1496_0_0;
     int sym_klev_var_1460_0_0;
-    int sym_kfdia_var_1459_0_0;
     int laytrop_max_var_1497_0_0;
     int laytrop_min_var_1447_0_0;
     int sym_kfdia_var_1415_0_0;
     int sym_klev_var_1416_0_0;
     int laytrop_max_var_1448_0_0;
     int sym_klev_var_1318_0_0;
-    int laytrop_min_var_1403_0_0;
     int sym_kfdia_var_1317_0_0;
+    int laytrop_min_var_1403_0_0;
     int laytrop_max_var_1404_0_0;
     int _if_cond_167_0_0;
-    int sym_kfdia_var_1088_0_0;
     int sym_klev_var_1089_0_0;
+    int sym_kfdia_var_1088_0_0;
     int laytrop_min_var_1159_0_0;
     int laytrop_max_var_1160_0_0;
     int _if_cond_121_0_0;
+    int sym_klev_var_958_0_0;
     int sym_kfdia_var_957_0_0;
     int laytrop_min_var_1034_0_0;
-    int sym_klev_var_958_0_0;
     int laytrop_max_var_1035_0_0;
     int _if_cond_57_0_0;
-    int sym_kfdia_var_1171_0_0;
     int laytrop_min_var_1210_0_0;
     int sym_klev_var_1172_0_0;
+    int sym_kfdia_var_1171_0_0;
     int laytrop_max_var_1211_0_0;
     int _if_cond_132_0_0;
-    int sym_kfdia_var_1222_0_0;
     int laytrop_min_var_1305_0_0;
+    int sym_kfdia_var_1222_0_0;
     int sym_klev_var_1223_0_0;
     int laytrop_max_var_1306_0_0;
     int _if_cond_145_0_0;
-    int laytrop_min_var_2158_0_0;
-    int sym_klev_var_2116_0_0;
     int sym_kfdia_var_2115_0_0;
+    int sym_klev_var_2116_0_0;
+    int laytrop_min_var_2158_0_0;
     int laytrop_max_var_2159_0_0;
     int _if_cond_289_0_0;
-    int sym_kfdia_var_1932_0_0;
     int sym_klev_var_1933_0_0;
+    int sym_kfdia_var_1932_0_0;
     int laytrop_min_var_2019_0_0;
     int laytrop_max_var_2020_0_0;
     int _if_cond_271_0_0;
     int sym_kfdia_var_2075_0_0;
-    int sym_klev_var_2076_0_0;
     int laytrop_min_var_2103_0_0;
+    int sym_klev_var_2076_0_0;
     int laytrop_max_var_2104_0_0;
-    int sym_kfdia_var_2031_0_0;
     int laytrop_min_var_2063_0_0;
+    int sym_kfdia_var_2031_0_0;
     int sym_klev_var_2032_0_0;
     int laytrop_max_var_2064_0_0;
     int sym_kfdia_var_1713_0_0;
@@ -1685,24 +1688,24 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int laytrop_min_var_1780_0_0;
     int laytrop_max_var_1781_0_0;
     int _if_cond_231_0_0;
-    int sym_kidia_var_1791_0_0;
     int sym_klev_var_1793_0_0;
+    int sym_kidia_var_1791_0_0;
     int sym_kfdia_var_1792_0_0;
     int laytrop_min_var_1877_0_0;
     int laytrop_max_var_1878_0_0;
     int _if_cond_250_0_0;
+    int laytrop_min_var_1536_0_0;
     int sym_klev_var_1509_0_0;
     int sym_kfdia_var_1508_0_0;
-    int laytrop_min_var_1536_0_0;
     int laytrop_max_var_1537_0_0;
-    int sym_klev_var_1549_0_0;
     int laytrop_min_var_1622_0_0;
     int sym_kfdia_var_1548_0_0;
+    int sym_klev_var_1549_0_0;
     int laytrop_max_var_1623_0_0;
     int _if_cond_195_0_0;
-    int sym_kfdia_var_1634_0_0;
     int laytrop_min_var_1701_0_0;
     int sym_klev_var_1635_0_0;
+    int sym_kfdia_var_1634_0_0;
     int laytrop_max_var_1702_0_0;
     int _if_cond_213_0_0;
     int sym_iendcol_var_484_0;
@@ -1710,8 +1713,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int ilevoffset_0;
     int sym_iendcol_var_501_0;
     int sym_istartcol_var_500_0;
-    int i_nlayers_var_1073_0;
+    int goto_1_0;
     int goto_0_0;
+    int i_nlayers_var_1073_0;
     int sym_kidia_var_2179_0;
     int sym_kfdia_var_2180_0;
     int sym_klev_var_2181_0;
@@ -1762,24 +1766,47 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_11734;
     int tmp_index_11735;
     int _for_it_422;
-    int tmp_index_10094_0;
-    double _if_cond_292_0;
-    int _for_it_348_0;
-    int tmp_index_10095_0;
     int igt_0;
     int _for_it_349_0;
-    int sym_kfdia_var_2372_0_0;
-    int sym_kidia_var_2371_0_0;
     int laytrop_min_var_2406_0_0;
+    int sym_kidia_var_2371_0_0;
+    int sym_kfdia_var_2372_0_0;
     int laytrop_max_var_2407_0_0;
     int i_nlayers_var_2404_0_0;
-    int tmp_index_11406_0_0;
-    int tmp_index_11407_0_0;
-    int tmp_parfor_29_0_0;
-    int tmp_index_11404_0_0;
-    int tmp_index_11405_0_0;
-    int tmp_index_11408_0_0;
-    int _for_it_389_0_0;
+    int _for_it_390_0_0;
+    int tmp_index_11415_0_0;
+    int tmp_index_11411_0_0;
+    int tmp_index_11409_0_0;
+    int tmp_index_11413_0_0;
+    int tmp_index_11423_0_0;
+    int tmp_index_11418_0_0;
+    int tmp_index_11430_0_0;
+    int tmp_index_11426_0_0;
+    int tmp_index_11421_0_0;
+    int tmp_call_290_0_0;
+    int tmp_index_11416_0_0;
+    int tmp_index_11428_0_0;
+    int ind0_var_2397_0_0;
+    int indf_var_2400_0_0;
+    int inds_var_2399_0_0;
+    int ind1_var_2398_0_0;
+    int _for_it_391_0_0;
+    int tmp_index_11465_0_0;
+    int tmp_index_11441_0_0;
+    int tmp_index_11445_0_0;
+    int tmp_index_11449_0_0;
+    int tmp_index_11469_0_0;
+    int tmp_index_11479_0_0;
+    int tmp_index_11457_0_0;
+    int tmp_index_11483_0_0;
+    int tmp_index_11473_0_0;
+    int tmp_index_11437_0_0;
+    int tmp_index_11432_0_0;
+    int tmp_index_11461_0_0;
+    int tmp_index_11453_0_0;
+    int tmp_index_11489_0_0;
+    int tmp_index_11467_0_0;
+    int _for_it_392_0_0;
     int _for_it_397_0_0;
     int tmp_index_11623_0_0;
     int tmp_index_11621_0_0;
@@ -1788,1307 +1815,1280 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_11626_0_0;
     int tmp_index_11631_0_0;
     int tmp_index_11633_0_0;
-    int ind0_var_2397_0_0;
     int tmp_index_11636_0_0;
-    int ind1_var_2398_0_0;
     int _for_it_398_0_0;
     int tmp_index_11625_0_0;
     int tmp_index_11659_0_0;
-    int tmp_index_11647_0_0;
-    int tmp_index_11643_0_0;
     int tmp_index_11641_0_0;
-    int tmp_index_11651_0_0;
     int tmp_index_11638_0_0;
+    int tmp_index_11651_0_0;
+    int tmp_index_11643_0_0;
     int tmp_index_11655_0_0;
+    int tmp_index_11647_0_0;
     int _if_cond_329_0_0;
     int tmp_index_11663_0_0;
     int _for_it_399_0_0;
     int tmp_index_11660_0_0;
-    int _for_it_390_0_0;
-    int tmp_index_11415_0_0;
-    int tmp_index_11409_0_0;
-    int tmp_index_11411_0_0;
-    int tmp_index_11413_0_0;
-    int tmp_index_11416_0_0;
-    int tmp_index_11430_0_0;
-    int tmp_index_11426_0_0;
-    int tmp_index_11428_0_0;
-    int tmp_index_11418_0_0;
-    int tmp_call_290_0_0;
-    int tmp_index_11423_0_0;
-    int tmp_index_11421_0_0;
-    int indf_var_2400_0_0;
-    int inds_var_2399_0_0;
-    int _for_it_391_0_0;
-    int tmp_index_11469_0_0;
-    int tmp_index_11483_0_0;
-    int tmp_index_11453_0_0;
-    int tmp_index_11465_0_0;
-    int tmp_index_11461_0_0;
-    int tmp_index_11441_0_0;
-    int tmp_index_11457_0_0;
-    int tmp_index_11473_0_0;
-    int tmp_index_11445_0_0;
-    int tmp_index_11449_0_0;
-    int tmp_index_11489_0_0;
-    int tmp_index_11432_0_0;
-    int tmp_index_11467_0_0;
-    int tmp_index_11479_0_0;
-    int tmp_index_11437_0_0;
-    int _for_it_392_0_0;
+    int tmp_index_11407_0_0;
+    int tmp_index_11406_0_0;
+    int tmp_parfor_29_0_0;
+    int tmp_index_11405_0_0;
+    int tmp_index_11404_0_0;
+    int tmp_index_11408_0_0;
+    int _for_it_389_0_0;
     int _for_it_393_0_0;
     int tmp_index_11492_0_0;
     int _if_cond_325_0_0;
     int _for_it_394_0_0;
-    int tmp_index_11493_0_0;
-    int tmp_index_11495_0_0;
     int tmp_index_11499_0_0;
+    int tmp_index_11495_0_0;
+    int tmp_index_11493_0_0;
     int tmp_index_11497_0_0;
     int tmp_index_11512_0_0;
-    int tmp_index_11507_0_0;
-    int tmp_index_11500_0_0;
     int tmp_call_292_0_0;
     int tmp_index_11505_0_0;
     int tmp_index_11502_0_0;
-    int tmp_index_11510_0_0;
+    int tmp_index_11507_0_0;
+    int tmp_index_11500_0_0;
     int tmp_index_11514_0_0;
-    int tmp_index_11553_0_0;
-    int tmp_index_11521_0_0;
+    int tmp_index_11510_0_0;
     int tmp_index_11573_0_0;
-    int tmp_index_11529_0_0;
     int tmp_index_11533_0_0;
-    int tmp_index_11557_0_0;
-    int tmp_index_11516_0_0;
-    int tmp_index_11525_0_0;
-    int tmp_index_11567_0_0;
-    int tmp_index_11563_0_0;
     int tmp_index_11551_0_0;
+    int tmp_index_11525_0_0;
+    int tmp_index_11516_0_0;
+    int tmp_index_11563_0_0;
+    int tmp_index_11553_0_0;
+    int tmp_index_11529_0_0;
     int tmp_index_11537_0_0;
+    int tmp_index_11567_0_0;
+    int tmp_index_11521_0_0;
     int tmp_index_11541_0_0;
-    int tmp_index_11545_0_0;
     int tmp_index_11549_0_0;
+    int tmp_index_11557_0_0;
+    int tmp_index_11545_0_0;
     int _for_it_395_0_0;
-    int tmp_index_11576_0_0;
     int tmp_index_11578_0_0;
-    int tmp_index_11586_0_0;
+    int tmp_index_11576_0_0;
+    int tmp_index_11588_0_0;
     int tmp_index_11583_0_0;
     int tmp_index_11581_0_0;
-    int tmp_index_11588_0_0;
+    int tmp_index_11586_0_0;
     int tmp_index_11591_0_0;
     int tmp_index_11580_0_0;
-    int tmp_index_11610_0_0;
-    int tmp_index_11602_0_0;
-    int tmp_index_11598_0_0;
-    int tmp_index_11596_0_0;
+    int tmp_index_11606_0_0;
     int tmp_index_11614_0_0;
     int tmp_index_11593_0_0;
-    int tmp_index_11606_0_0;
+    int tmp_index_11598_0_0;
+    int tmp_index_11610_0_0;
+    int tmp_index_11596_0_0;
+    int tmp_index_11602_0_0;
     int _if_cond_326_0_0;
     int tmp_index_11618_0_0;
     int _for_it_396_0_0;
     int tmp_index_11615_0_0;
     int laytrop_min_var_2314_0_0;
-    int sym_kidia_var_2279_0_0;
     int sym_kfdia_var_2280_0_0;
+    int sym_kidia_var_2279_0_0;
     int laytrop_max_var_2315_0_0;
     int i_nlayers_var_2312_0_0;
-    int tmp_index_10620_0_0;
-    int tmp_index_10619_0_0;
-    int tmp_parfor_28_0_0;
-    int _for_it_377_0_0;
-    int tmp_index_10626_0_0;
-    int tmp_index_10624_0_0;
-    int tmp_index_10628_0_0;
-    int tmp_index_10622_0_0;
-    int tmp_index_10643_0_0;
-    int tmp_index_10639_0_0;
-    int tmp_index_10636_0_0;
-    int tmp_index_10631_0_0;
-    int tmp_call_258_0_0;
-    int tmp_index_10641_0_0;
-    int tmp_index_10634_0_0;
-    int tmp_index_10629_0_0;
-    int indf_var_2308_0_0;
-    int ind0_var_2305_0_0;
-    int inds_var_2307_0_0;
-    int ind1_var_2306_0_0;
-    int _for_it_378_0_0;
-    int tmp_index_10662_0_0;
-    int tmp_index_10702_0_0;
-    int tmp_index_10670_0_0;
-    int tmp_index_10645_0_0;
-    int tmp_index_10654_0_0;
-    int tmp_index_10686_0_0;
-    int tmp_index_10692_0_0;
-    int tmp_index_10674_0_0;
-    int tmp_index_10650_0_0;
-    int tmp_index_10680_0_0;
-    int tmp_index_10658_0_0;
-    int tmp_index_10696_0_0;
-    int tmp_index_10682_0_0;
-    int tmp_index_10678_0_0;
-    int tmp_index_10666_0_0;
-    int _for_it_379_0_0;
-    int _for_it_380_0_0;
-    int tmp_index_10705_0_0;
-    int _if_cond_306_0_0;
-    int _for_it_381_0_0;
-    int tmp_index_10712_0_0;
-    int tmp_index_10710_0_0;
-    int tmp_index_10708_0_0;
-    int tmp_index_10706_0_0;
-    int tmp_index_10720_0_0;
-    int tmp_index_10727_0_0;
-    int tmp_index_10723_0_0;
-    int tmp_index_10715_0_0;
-    int tmp_index_10725_0_0;
-    int tmp_index_10713_0_0;
-    int tmp_index_10718_0_0;
-    int tmp_call_260_0_0;
-    int tmp_index_10780_0_0;
-    int tmp_index_10786_0_0;
-    int tmp_index_10746_0_0;
-    int tmp_index_10729_0_0;
-    int tmp_index_10758_0_0;
-    int tmp_index_10754_0_0;
-    int tmp_index_10776_0_0;
-    int tmp_index_10750_0_0;
-    int tmp_index_10766_0_0;
-    int tmp_index_10770_0_0;
-    int tmp_index_10738_0_0;
-    int tmp_index_10742_0_0;
-    int tmp_index_10734_0_0;
-    int tmp_index_10764_0_0;
-    int tmp_index_10762_0_0;
-    int _for_it_382_0_0;
-    int tmp_index_10791_0_0;
-    int tmp_index_10789_0_0;
-    int tmp_index_10800_0_0;
-    int tmp_index_10796_0_0;
-    int tmp_index_10794_0_0;
-    int tmp_index_10798_0_0;
-    int tmp_index_10813_0_0;
-    int tmp_index_10811_0_0;
-    int tmp_index_10803_0_0;
-    int tmp_index_10808_0_0;
-    int tmp_call_262_0_0;
-    int tmp_index_10806_0_0;
-    int tmp_index_10801_0_0;
-    int tmp_index_10793_0_0;
-    int tmp_index_10848_0_0;
-    int tmp_index_10850_0_0;
-    int tmp_index_10862_0_0;
-    int tmp_index_10836_0_0;
-    int tmp_index_10844_0_0;
-    int tmp_index_10852_0_0;
-    int tmp_index_10840_0_0;
-    int tmp_index_10856_0_0;
-    int tmp_index_10824_0_0;
-    int tmp_index_10828_0_0;
-    int tmp_index_10832_0_0;
-    int tmp_index_10815_0_0;
-    int tmp_index_10820_0_0;
-    int _if_cond_307_0_0;
-    int tmp_index_10871_0_0;
-    int _for_it_383_0_0;
-    int tmp_index_10863_0_0;
-    int tmp_index_10621_0_0;
-    int _for_it_376_0_0;
     int tmp_index_10617_0_0;
     int tmp_index_10618_0_0;
+    int tmp_parfor_28_0_0;
+    int tmp_index_10621_0_0;
+    int _for_it_376_0_0;
     int _for_it_384_0_0;
-    int tmp_index_10876_0_0;
     int tmp_index_10874_0_0;
+    int tmp_index_10876_0_0;
     int _if_cond_309_0_0;
-    int tmp_index_10879_0_0;
-    int tmp_index_10881_0_0;
     int tmp_index_10883_0_0;
+    int tmp_index_10879_0_0;
     int tmp_index_10885_0_0;
-    int tmp_index_10891_0_0;
-    int tmp_call_264_0_0;
-    int tmp_index_10898_0_0;
+    int tmp_index_10881_0_0;
     int tmp_index_10893_0_0;
+    int tmp_index_10898_0_0;
     int tmp_index_10886_0_0;
-    int tmp_index_10888_0_0;
+    int tmp_index_10891_0_0;
     int tmp_index_10896_0_0;
+    int tmp_index_10888_0_0;
+    int tmp_call_264_0_0;
+    int indf_var_2308_0_0;
+    int ind0_var_2305_0_0;
+    int ind1_var_2306_0_0;
     int _for_it_385_0_0;
     int tmp_index_10878_0_0;
-    int tmp_index_10905_0_0;
-    int tmp_index_10917_0_0;
-    int tmp_index_10900_0_0;
-    int tmp_index_10941_0_0;
-    int tmp_index_10921_0_0;
     int tmp_index_10947_0_0;
-    int tmp_index_10913_0_0;
-    int tmp_index_10933_0_0;
-    int tmp_index_10937_0_0;
+    int tmp_index_10909_0_0;
     int tmp_index_10929_0_0;
     int tmp_index_10925_0_0;
-    int tmp_index_10909_0_0;
+    int tmp_index_10921_0_0;
+    int tmp_index_10913_0_0;
+    int tmp_index_10917_0_0;
+    int tmp_index_10937_0_0;
+    int tmp_index_10933_0_0;
+    int tmp_index_10900_0_0;
+    int tmp_index_10905_0_0;
+    int tmp_index_10941_0_0;
     int tmp_index_10935_0_0;
     int _if_cond_310_0_0;
     int tmp_index_10956_0_0;
     int _for_it_386_0_0;
     int tmp_index_10948_0_0;
+    int _for_it_380_0_0;
+    int tmp_index_10705_0_0;
+    int _if_cond_306_0_0;
+    int _for_it_381_0_0;
+    int tmp_index_10712_0_0;
+    int tmp_index_10708_0_0;
+    int tmp_index_10706_0_0;
+    int tmp_index_10710_0_0;
+    int tmp_index_10727_0_0;
+    int tmp_index_10715_0_0;
+    int tmp_index_10720_0_0;
+    int tmp_index_10718_0_0;
+    int tmp_index_10725_0_0;
+    int tmp_index_10713_0_0;
+    int tmp_index_10723_0_0;
+    int tmp_call_260_0_0;
+    int inds_var_2307_0_0;
+    int tmp_index_10729_0_0;
+    int tmp_index_10738_0_0;
+    int tmp_index_10786_0_0;
+    int tmp_index_10766_0_0;
+    int tmp_index_10734_0_0;
+    int tmp_index_10750_0_0;
+    int tmp_index_10758_0_0;
+    int tmp_index_10754_0_0;
+    int tmp_index_10764_0_0;
+    int tmp_index_10762_0_0;
+    int tmp_index_10746_0_0;
+    int tmp_index_10780_0_0;
+    int tmp_index_10776_0_0;
+    int tmp_index_10770_0_0;
+    int tmp_index_10742_0_0;
+    int _for_it_382_0_0;
+    int tmp_index_10791_0_0;
+    int tmp_index_10789_0_0;
+    int tmp_index_10794_0_0;
+    int tmp_index_10796_0_0;
+    int tmp_index_10798_0_0;
+    int tmp_index_10800_0_0;
+    int tmp_call_262_0_0;
+    int tmp_index_10811_0_0;
+    int tmp_index_10803_0_0;
+    int tmp_index_10801_0_0;
+    int tmp_index_10808_0_0;
+    int tmp_index_10813_0_0;
+    int tmp_index_10806_0_0;
+    int tmp_index_10793_0_0;
+    int tmp_index_10815_0_0;
+    int tmp_index_10856_0_0;
+    int tmp_index_10862_0_0;
+    int tmp_index_10850_0_0;
+    int tmp_index_10848_0_0;
+    int tmp_index_10836_0_0;
+    int tmp_index_10852_0_0;
+    int tmp_index_10832_0_0;
+    int tmp_index_10840_0_0;
+    int tmp_index_10844_0_0;
+    int tmp_index_10824_0_0;
+    int tmp_index_10828_0_0;
+    int tmp_index_10820_0_0;
+    int _if_cond_307_0_0;
+    int tmp_index_10871_0_0;
+    int _for_it_383_0_0;
+    int tmp_index_10863_0_0;
+    int _for_it_377_0_0;
+    int tmp_index_10622_0_0;
+    int tmp_index_10628_0_0;
+    int tmp_index_10626_0_0;
+    int tmp_index_10624_0_0;
+    int tmp_call_258_0_0;
+    int tmp_index_10634_0_0;
+    int tmp_index_10639_0_0;
+    int tmp_index_10636_0_0;
+    int tmp_index_10643_0_0;
+    int tmp_index_10631_0_0;
+    int tmp_index_10629_0_0;
+    int tmp_index_10641_0_0;
+    int _for_it_378_0_0;
+    int tmp_index_10702_0_0;
+    int tmp_index_10682_0_0;
+    int tmp_index_10696_0_0;
+    int tmp_index_10658_0_0;
+    int tmp_index_10666_0_0;
+    int tmp_index_10670_0_0;
+    int tmp_index_10692_0_0;
+    int tmp_index_10674_0_0;
+    int tmp_index_10678_0_0;
+    int tmp_index_10654_0_0;
+    int tmp_index_10645_0_0;
+    int tmp_index_10662_0_0;
+    int tmp_index_10686_0_0;
+    int tmp_index_10680_0_0;
+    int tmp_index_10650_0_0;
+    int _for_it_379_0_0;
+    int tmp_index_10619_0_0;
+    int tmp_index_10620_0_0;
+    int sym_kidia_var_646_0_0;
     int sym_kfdia_var_647_0_0;
     int laytrop_min_var_681_0_0;
-    int sym_kidia_var_646_0_0;
     int laytrop_max_var_682_0_0;
     int i_nlayers_var_679_0_0;
+    int tmp_index_227_0_0;
+    int tmp_index_228_0_0;
+    int _for_it_22_0_0;
     int tmp_index_225_0_0;
     int tmp_index_226_0_0;
     int tmp_parfor_2_0_0;
+    int tmp_index_223_0_0;
+    int tmp_index_224_0_0;
+    int _for_it_23_0_0;
+    int tmp_index_229_0_0;
+    int tmp_index_231_0_0;
+    int _if_cond_8_0_0;
+    int tmp_index_239_0_0;
+    int tmp_index_237_0_0;
+    int tmp_index_241_0_0;
+    int tmp_index_235_0_0;
+    int tmp_index_244_0_0;
+    int tmp_index_242_0_0;
+    int tmp_index_252_0_0;
+    int tmp_index_254_0_0;
+    int tmp_index_256_0_0;
+    int tmp_index_247_0_0;
+    int tmp_index_249_0_0;
+    int tmp_call_1_0_0;
+    int inds_var_674_0_0;
+    int ind0_var_672_0_0;
+    int indf_var_675_0_0;
+    int ind1_var_673_0_0;
+    int _for_it_24_0_0;
+    int tmp_index_233_0_0;
+    int tmp_index_234_0_0;
+    int tmp_call_0_0_0;
+    int tmp_index_279_0_0;
+    int tmp_index_305_0_0;
+    int tmp_index_293_0_0;
+    int tmp_index_287_0_0;
+    int tmp_index_275_0_0;
+    int tmp_index_263_0_0;
+    int tmp_index_283_0_0;
+    int tmp_index_309_0_0;
+    int tmp_index_295_0_0;
+    int tmp_index_291_0_0;
+    int tmp_index_267_0_0;
+    int tmp_index_299_0_0;
+    int tmp_index_258_0_0;
+    int tmp_index_271_0_0;
+    int tmp_index_315_0_0;
+    int _if_cond_9_0_0;
+    int tmp_index_324_0_0;
+    int _for_it_25_0_0;
+    int tmp_index_316_0_0;
+    int _for_it_30_0_0;
+    int tmp_index_467_0_0;
+    int tmp_index_469_0_0;
+    int tmp_index_462_0_0;
+    int tmp_index_464_0_0;
+    int tmp_index_472_0_0;
+    int _for_it_31_0_0;
+    int tmp_index_474_0_0;
+    int tmp_index_495_0_0;
+    int tmp_index_483_0_0;
+    int tmp_index_479_0_0;
+    int tmp_index_477_0_0;
+    int tmp_index_487_0_0;
+    int tmp_index_491_0_0;
+    int _for_it_32_0_0;
     int _for_it_26_0_0;
     int tmp_index_327_0_0;
     int _if_cond_10_0_0;
     int _for_it_27_0_0;
     int tmp_index_328_0_0;
     int tmp_index_330_0_0;
-    int tmp_index_340_0_0;
-    int tmp_index_336_0_0;
-    int tmp_index_334_0_0;
     int tmp_index_338_0_0;
-    int tmp_index_346_0_0;
-    int tmp_index_355_0_0;
-    int tmp_index_348_0_0;
-    int tmp_index_341_0_0;
+    int tmp_index_340_0_0;
+    int tmp_index_334_0_0;
+    int tmp_index_336_0_0;
     int tmp_call_4_0_0;
+    int tmp_index_346_0_0;
     int tmp_index_343_0_0;
+    int tmp_index_348_0_0;
     int tmp_index_353_0_0;
+    int tmp_index_355_0_0;
+    int tmp_index_341_0_0;
     int tmp_index_351_0_0;
-    int ind0_var_672_0_0;
-    int indf_var_675_0_0;
-    int inds_var_674_0_0;
-    int ind1_var_673_0_0;
     int tmp_index_333_0_0;
     int tmp_index_332_0_0;
     int tmp_call_3_0_0;
-    int tmp_index_378_0_0;
-    int tmp_index_392_0_0;
-    int tmp_index_366_0_0;
     int tmp_index_394_0_0;
+    int tmp_index_398_0_0;
     int tmp_index_408_0_0;
+    int tmp_index_378_0_0;
     int tmp_index_404_0_0;
     int tmp_index_390_0_0;
     int tmp_index_374_0_0;
-    int tmp_index_370_0_0;
-    int tmp_index_398_0_0;
-    int tmp_index_414_0_0;
-    int tmp_index_357_0_0;
     int tmp_index_386_0_0;
-    int tmp_index_362_0_0;
+    int tmp_index_366_0_0;
     int tmp_index_382_0_0;
+    int tmp_index_362_0_0;
+    int tmp_index_392_0_0;
+    int tmp_index_357_0_0;
+    int tmp_index_414_0_0;
+    int tmp_index_370_0_0;
     int _if_cond_11_0_0;
     int tmp_index_423_0_0;
     int _for_it_28_0_0;
     int tmp_index_415_0_0;
-    int tmp_index_426_0_0;
     int tmp_index_428_0_0;
-    int tmp_index_431_0_0;
     int tmp_index_433_0_0;
+    int tmp_index_431_0_0;
+    int tmp_index_426_0_0;
     int tmp_index_436_0_0;
     int tmp_index_438_0_0;
+    int tmp_index_455_0_0;
     int tmp_index_451_0_0;
     int tmp_index_447_0_0;
     int tmp_index_441_0_0;
-    int tmp_index_443_0_0;
-    int tmp_index_455_0_0;
     int tmp_index_459_0_0;
+    int tmp_index_443_0_0;
     int _for_it_29_0_0;
-    int tmp_index_224_0_0;
-    int tmp_index_223_0_0;
-    int _for_it_30_0_0;
-    int tmp_index_464_0_0;
-    int tmp_index_469_0_0;
-    int tmp_index_467_0_0;
-    int tmp_index_462_0_0;
-    int tmp_index_472_0_0;
-    int _for_it_31_0_0;
-    int tmp_index_474_0_0;
-    int tmp_index_479_0_0;
-    int tmp_index_491_0_0;
-    int tmp_index_487_0_0;
-    int tmp_index_495_0_0;
-    int tmp_index_483_0_0;
-    int tmp_index_477_0_0;
-    int _for_it_32_0_0;
-    int _for_it_23_0_0;
-    int tmp_index_231_0_0;
-    int tmp_index_229_0_0;
-    int _if_cond_8_0_0;
-    int tmp_index_241_0_0;
-    int tmp_index_237_0_0;
-    int tmp_index_235_0_0;
-    int tmp_index_239_0_0;
-    int tmp_index_244_0_0;
-    int tmp_index_242_0_0;
-    int tmp_call_1_0_0;
-    int tmp_index_254_0_0;
-    int tmp_index_252_0_0;
-    int tmp_index_249_0_0;
-    int tmp_index_256_0_0;
-    int tmp_index_247_0_0;
-    int _for_it_24_0_0;
-    int tmp_index_233_0_0;
-    int tmp_index_234_0_0;
-    int tmp_call_0_0_0;
-    int tmp_index_291_0_0;
-    int tmp_index_267_0_0;
-    int tmp_index_287_0_0;
-    int tmp_index_271_0_0;
-    int tmp_index_299_0_0;
-    int tmp_index_275_0_0;
-    int tmp_index_309_0_0;
-    int tmp_index_295_0_0;
-    int tmp_index_283_0_0;
-    int tmp_index_258_0_0;
-    int tmp_index_293_0_0;
-    int tmp_index_263_0_0;
-    int tmp_index_305_0_0;
-    int tmp_index_315_0_0;
-    int tmp_index_279_0_0;
-    int _if_cond_9_0_0;
-    int tmp_index_324_0_0;
-    int _for_it_25_0_0;
-    int tmp_index_316_0_0;
-    int tmp_index_227_0_0;
-    int tmp_index_228_0_0;
-    int _for_it_22_0_0;
-    int sym_kidia_var_759_0_0;
     int sym_kfdia_var_760_0_0;
+    int sym_kidia_var_759_0_0;
     int laytrop_min_var_794_0_0;
     int laytrop_max_var_795_0_0;
     int i_nlayers_var_792_0_0;
-    int tmp_index_933_0_0;
-    int tmp_index_932_0_0;
-    int tmp_parfor_5_0_0;
     int _for_it_63_0_0;
-    int tmp_index_1169_0_0;
-    int tmp_index_1176_0_0;
-    int tmp_index_1171_0_0;
     int tmp_index_1174_0_0;
+    int tmp_index_1176_0_0;
+    int tmp_index_1169_0_0;
+    int tmp_index_1171_0_0;
     int tmp_index_1179_0_0;
     int ind0_var_785_0_0;
     int ind1_var_786_0_0;
     int _for_it_64_0_0;
-    int tmp_index_1181_0_0;
-    int tmp_index_1198_0_0;
-    int tmp_index_1184_0_0;
     int tmp_index_1202_0_0;
-    int tmp_index_1194_0_0;
+    int tmp_index_1181_0_0;
     int tmp_index_1190_0_0;
     int tmp_index_1186_0_0;
+    int tmp_index_1184_0_0;
+    int tmp_index_1198_0_0;
+    int tmp_index_1194_0_0;
     int _for_it_65_0_0;
     int tmp_index_931_0_0;
     int tmp_index_930_0_0;
-    int _for_it_59_0_0;
-    int tmp_index_1034_0_0;
-    int _if_cond_25_0_0;
-    int _for_it_60_0_0;
-    int tmp_index_1035_0_0;
-    int tmp_index_1037_0_0;
-    int tmp_index_1045_0_0;
-    int tmp_index_1043_0_0;
-    int tmp_index_1047_0_0;
-    int tmp_index_1041_0_0;
-    int tmp_index_1058_0_0;
-    int tmp_call_18_0_0;
-    int tmp_index_1050_0_0;
-    int tmp_index_1062_0_0;
-    int tmp_index_1048_0_0;
-    int tmp_index_1055_0_0;
-    int tmp_index_1060_0_0;
-    int tmp_index_1053_0_0;
-    int inds_var_787_0_0;
-    int indf_var_788_0_0;
-    int tmp_index_1040_0_0;
-    int tmp_index_1039_0_0;
-    int tmp_call_17_0_0;
-    int tmp_index_1115_0_0;
-    int tmp_index_1093_0_0;
-    int tmp_index_1111_0_0;
-    int tmp_index_1085_0_0;
-    int tmp_index_1121_0_0;
-    int tmp_index_1064_0_0;
-    int tmp_index_1105_0_0;
-    int tmp_index_1081_0_0;
-    int tmp_index_1101_0_0;
-    int tmp_index_1099_0_0;
-    int tmp_index_1077_0_0;
-    int tmp_index_1097_0_0;
-    int tmp_index_1089_0_0;
-    int tmp_index_1073_0_0;
-    int tmp_index_1069_0_0;
-    int _if_cond_26_0_0;
-    int tmp_index_1130_0_0;
-    int _for_it_61_0_0;
-    int tmp_index_1122_0_0;
-    int tmp_index_1140_0_0;
-    int tmp_index_1138_0_0;
-    int tmp_index_1135_0_0;
-    int tmp_index_1133_0_0;
-    int tmp_index_1143_0_0;
-    int tmp_index_1145_0_0;
-    int tmp_index_1150_0_0;
-    int tmp_index_1166_0_0;
-    int tmp_index_1158_0_0;
-    int tmp_index_1148_0_0;
-    int tmp_index_1154_0_0;
-    int tmp_index_1162_0_0;
-    int _for_it_62_0_0;
+    int tmp_parfor_5_0_0;
     int _for_it_56_0_0;
-    int tmp_index_936_0_0;
     int tmp_index_938_0_0;
+    int tmp_index_936_0_0;
     int _if_cond_23_0_0;
-    int tmp_index_948_0_0;
     int tmp_index_944_0_0;
     int tmp_index_942_0_0;
+    int tmp_index_948_0_0;
     int tmp_index_946_0_0;
-    int tmp_index_949_0_0;
-    int tmp_index_963_0_0;
-    int tmp_index_951_0_0;
-    int tmp_index_961_0_0;
     int tmp_index_954_0_0;
-    int tmp_index_956_0_0;
-    int tmp_call_15_0_0;
+    int tmp_index_963_0_0;
+    int tmp_index_961_0_0;
+    int tmp_index_949_0_0;
     int tmp_index_959_0_0;
+    int tmp_call_15_0_0;
+    int tmp_index_956_0_0;
+    int tmp_index_951_0_0;
+    int inds_var_787_0_0;
+    int indf_var_788_0_0;
     int _for_it_57_0_0;
     int tmp_index_940_0_0;
     int tmp_index_941_0_0;
     int tmp_call_14_0_0;
-    int tmp_index_1006_0_0;
+    int tmp_index_974_0_0;
     int tmp_index_1002_0_0;
-    int tmp_index_1012_0_0;
-    int tmp_index_1016_0_0;
     int tmp_index_970_0_0;
+    int tmp_index_982_0_0;
     int tmp_index_1022_0_0;
     int tmp_index_978_0_0;
-    int tmp_index_990_0_0;
-    int tmp_index_982_0_0;
-    int tmp_index_974_0_0;
-    int tmp_index_1000_0_0;
-    int tmp_index_994_0_0;
+    int tmp_index_1006_0_0;
+    int tmp_index_1016_0_0;
     int tmp_index_998_0_0;
+    int tmp_index_1012_0_0;
+    int tmp_index_1000_0_0;
+    int tmp_index_990_0_0;
+    int tmp_index_994_0_0;
     int tmp_index_965_0_0;
     int tmp_index_986_0_0;
     int _if_cond_24_0_0;
     int tmp_index_1031_0_0;
     int _for_it_58_0_0;
     int tmp_index_1023_0_0;
-    int tmp_index_935_0_0;
+    int _for_it_59_0_0;
+    int tmp_index_1034_0_0;
+    int _if_cond_25_0_0;
+    int _for_it_60_0_0;
+    int tmp_index_1037_0_0;
+    int tmp_index_1035_0_0;
+    int tmp_index_1045_0_0;
+    int tmp_index_1043_0_0;
+    int tmp_index_1047_0_0;
+    int tmp_index_1041_0_0;
+    int tmp_index_1062_0_0;
+    int tmp_index_1048_0_0;
+    int tmp_index_1060_0_0;
+    int tmp_index_1050_0_0;
+    int tmp_index_1055_0_0;
+    int tmp_index_1053_0_0;
+    int tmp_call_18_0_0;
+    int tmp_index_1058_0_0;
+    int tmp_index_1040_0_0;
+    int tmp_index_1039_0_0;
+    int tmp_call_17_0_0;
+    int tmp_index_1089_0_0;
+    int tmp_index_1069_0_0;
+    int tmp_index_1093_0_0;
+    int tmp_index_1121_0_0;
+    int tmp_index_1105_0_0;
+    int tmp_index_1099_0_0;
+    int tmp_index_1115_0_0;
+    int tmp_index_1101_0_0;
+    int tmp_index_1081_0_0;
+    int tmp_index_1097_0_0;
+    int tmp_index_1064_0_0;
+    int tmp_index_1111_0_0;
+    int tmp_index_1073_0_0;
+    int tmp_index_1077_0_0;
+    int tmp_index_1085_0_0;
+    int _if_cond_26_0_0;
+    int tmp_index_1130_0_0;
+    int _for_it_61_0_0;
+    int tmp_index_1122_0_0;
+    int tmp_index_1140_0_0;
+    int tmp_index_1138_0_0;
+    int tmp_index_1133_0_0;
+    int tmp_index_1135_0_0;
+    int tmp_index_1143_0_0;
+    int tmp_index_1150_0_0;
+    int tmp_index_1148_0_0;
+    int tmp_index_1154_0_0;
+    int tmp_index_1162_0_0;
+    int tmp_index_1158_0_0;
+    int tmp_index_1145_0_0;
+    int tmp_index_1166_0_0;
+    int _for_it_62_0_0;
     int tmp_index_934_0_0;
+    int tmp_index_935_0_0;
     int _for_it_55_0_0;
-    int sym_kfdia_var_844_0_0;
+    int tmp_index_933_0_0;
+    int tmp_index_932_0_0;
     int sym_kidia_var_843_0_0;
+    int sym_kfdia_var_844_0_0;
     int laytrop_min_var_876_0_0;
     int laytrop_max_var_877_0_0;
     int i_nlayers_var_874_0_0;
-    int _for_it_85_0_0;
-    int tmp_index_1761_0_0;
-    int tmp_index_1766_0_0;
-    int tmp_index_1764_0_0;
-    int tmp_index_1756_0_0;
-    int tmp_index_1754_0_0;
-    int tmp_index_1759_0_0;
-    int indf_var_871_0_0;
-    int ind0_var_868_0_0;
-    int ind1_var_869_0_0;
-    int _for_it_86_0_0;
-    int tmp_index_1793_0_0;
-    int tmp_index_1768_0_0;
-    int tmp_index_1771_0_0;
-    int tmp_index_1785_0_0;
-    int tmp_index_1789_0_0;
-    int tmp_index_1777_0_0;
-    int tmp_index_1781_0_0;
-    int tmp_index_1799_0_0;
-    int tmp_index_1802_0_0;
-    int tmp_index_1773_0_0;
-    int _for_it_87_0_0;
-    int tmp_index_1553_0_0;
-    int tmp_index_1552_0_0;
+    int tmp_index_1550_0_0;
+    int tmp_index_1551_0_0;
     int tmp_parfor_7_0_0;
     int _for_it_78_0_0;
-    int tmp_index_1556_0_0;
     int tmp_index_1558_0_0;
+    int tmp_index_1556_0_0;
     int _if_cond_33_0_0;
-    int tmp_index_1569_0_0;
-    int tmp_index_1562_0_0;
-    int tmp_index_1572_0_0;
-    int tmp_index_1576_0_0;
     int tmp_index_1564_0_0;
+    int tmp_index_1569_0_0;
     int tmp_index_1574_0_0;
     int tmp_index_1567_0_0;
+    int tmp_index_1576_0_0;
+    int tmp_index_1572_0_0;
+    int tmp_index_1562_0_0;
+    int indf_var_871_0_0;
     int inds_var_870_0_0;
+    int ind0_var_868_0_0;
+    int ind1_var_869_0_0;
     int _for_it_79_0_0;
-    int tmp_index_1561_0_0;
     int tmp_index_1560_0_0;
+    int tmp_index_1561_0_0;
     int tmp_call_30_0_0;
-    int tmp_index_1581_0_0;
-    int tmp_index_1599_0_0;
     int tmp_index_1587_0_0;
-    int tmp_index_1603_0_0;
-    int tmp_index_1622_0_0;
-    int tmp_index_1583_0_0;
     int tmp_index_1625_0_0;
+    int tmp_index_1599_0_0;
+    int tmp_index_1603_0_0;
+    int tmp_index_1581_0_0;
     int tmp_index_1619_0_0;
     int tmp_index_1613_0_0;
+    int tmp_index_1622_0_0;
+    int tmp_index_1595_0_0;
     int tmp_index_1609_0_0;
     int tmp_index_1591_0_0;
-    int tmp_index_1595_0_0;
     int tmp_index_1578_0_0;
+    int tmp_index_1583_0_0;
     int _if_cond_34_0_0;
     int _for_it_80_0_0;
     int tmp_index_1626_0_0;
-    int tmp_index_1551_0_0;
-    int tmp_index_1550_0_0;
-    int tmp_index_1554_0_0;
-    int tmp_index_1555_0_0;
-    int _for_it_77_0_0;
+    int tmp_index_1553_0_0;
+    int tmp_index_1552_0_0;
     int _for_it_81_0_0;
     int tmp_index_1629_0_0;
     int _if_cond_35_0_0;
     int _for_it_82_0_0;
-    int tmp_index_1630_0_0;
     int tmp_index_1632_0_0;
-    int tmp_index_1641_0_0;
-    int tmp_index_1648_0_0;
-    int tmp_index_1643_0_0;
-    int tmp_index_1636_0_0;
-    int tmp_index_1650_0_0;
+    int tmp_index_1630_0_0;
     int tmp_index_1638_0_0;
     int tmp_index_1646_0_0;
-    int tmp_index_1635_0_0;
+    int tmp_index_1648_0_0;
+    int tmp_index_1650_0_0;
+    int tmp_index_1641_0_0;
+    int tmp_index_1636_0_0;
+    int tmp_index_1643_0_0;
     int tmp_index_1634_0_0;
+    int tmp_index_1635_0_0;
     int tmp_call_31_0_0;
-    int tmp_index_1693_0_0;
-    int tmp_index_1683_0_0;
-    int tmp_index_1696_0_0;
+    int tmp_index_1655_0_0;
     int tmp_index_1657_0_0;
     int tmp_index_1661_0_0;
-    int tmp_index_1673_0_0;
     int tmp_index_1699_0_0;
+    int tmp_index_1696_0_0;
     int tmp_index_1687_0_0;
-    int tmp_index_1677_0_0;
+    int tmp_index_1683_0_0;
     int tmp_index_1665_0_0;
+    int tmp_index_1673_0_0;
+    int tmp_index_1693_0_0;
     int tmp_index_1669_0_0;
-    int tmp_index_1655_0_0;
     int tmp_index_1652_0_0;
+    int tmp_index_1677_0_0;
     int _if_cond_36_0_0;
     int _for_it_83_0_0;
     int tmp_index_1700_0_0;
     int tmp_index_1708_0_0;
-    int tmp_index_1703_0_0;
     int tmp_index_1705_0_0;
     int tmp_index_1713_0_0;
     int tmp_index_1715_0_0;
+    int tmp_index_1703_0_0;
     int tmp_index_1710_0_0;
-    int tmp_index_1742_0_0;
     int tmp_index_1722_0_0;
-    int tmp_index_1726_0_0;
-    int tmp_index_1748_0_0;
-    int tmp_index_1734_0_0;
-    int tmp_index_1738_0_0;
-    int tmp_index_1717_0_0;
-    int tmp_index_1751_0_0;
-    int tmp_index_1720_0_0;
     int tmp_index_1730_0_0;
+    int tmp_index_1751_0_0;
+    int tmp_index_1726_0_0;
+    int tmp_index_1738_0_0;
+    int tmp_index_1720_0_0;
+    int tmp_index_1717_0_0;
+    int tmp_index_1742_0_0;
+    int tmp_index_1734_0_0;
+    int tmp_index_1748_0_0;
     int _for_it_84_0_0;
-    int laytrop_min_var_836_0_0;
+    int _for_it_85_0_0;
+    int tmp_index_1756_0_0;
+    int tmp_index_1754_0_0;
+    int tmp_index_1764_0_0;
+    int tmp_index_1766_0_0;
+    int tmp_index_1761_0_0;
+    int tmp_index_1759_0_0;
+    int _for_it_86_0_0;
+    int tmp_index_1777_0_0;
+    int tmp_index_1799_0_0;
+    int tmp_index_1802_0_0;
+    int tmp_index_1771_0_0;
+    int tmp_index_1785_0_0;
+    int tmp_index_1773_0_0;
+    int tmp_index_1781_0_0;
+    int tmp_index_1768_0_0;
+    int tmp_index_1793_0_0;
+    int tmp_index_1789_0_0;
+    int _for_it_87_0_0;
+    int tmp_index_1554_0_0;
+    int tmp_index_1555_0_0;
+    int _for_it_77_0_0;
     int sym_kfdia_var_802_0_0;
+    int laytrop_min_var_836_0_0;
     int sym_kidia_var_801_0_0;
     int laytrop_max_var_837_0_0;
     int i_nlayers_var_834_0_0;
-    int tmp_index_1209_0_0;
     int tmp_index_1210_0_0;
+    int tmp_index_1209_0_0;
     int _for_it_66_0_0;
-    int _for_it_67_0_0;
-    int tmp_index_1211_0_0;
-    int tmp_index_1213_0_0;
-    int _if_cond_28_0_0;
-    int tmp_index_1217_0_0;
-    int tmp_index_1223_0_0;
-    int tmp_index_1221_0_0;
-    int tmp_index_1219_0_0;
-    int tmp_index_1236_0_0;
-    int tmp_index_1229_0_0;
-    int tmp_index_1231_0_0;
-    int tmp_index_1234_0_0;
-    int tmp_index_1224_0_0;
-    int tmp_index_1238_0_0;
-    int tmp_call_21_0_0;
-    int tmp_index_1226_0_0;
+    int _for_it_74_0_0;
+    int tmp_index_1481_0_0;
+    int tmp_index_1485_0_0;
+    int tmp_index_1479_0_0;
+    int tmp_index_1483_0_0;
+    int tmp_index_1498_0_0;
+    int tmp_index_1493_0_0;
+    int tmp_index_1486_0_0;
+    int tmp_index_1491_0_0;
+    int tmp_call_28_0_0;
+    int tmp_index_1496_0_0;
+    int tmp_index_1488_0_0;
     int indf_var_830_0_0;
     int ind0_var_827_0_0;
-    int inds_var_829_0_0;
     int ind1_var_828_0_0;
+    int _for_it_75_0_0;
+    int tmp_index_1547_0_0;
+    int tmp_index_1525_0_0;
+    int tmp_index_1521_0_0;
+    int tmp_index_1533_0_0;
+    int tmp_index_1513_0_0;
+    int tmp_index_1537_0_0;
+    int tmp_index_1505_0_0;
+    int tmp_index_1529_0_0;
+    int tmp_index_1500_0_0;
+    int tmp_index_1517_0_0;
+    int tmp_index_1509_0_0;
+    int tmp_index_1541_0_0;
+    int tmp_index_1535_0_0;
+    int _for_it_76_0_0;
+    int tmp_index_1206_0_0;
+    int tmp_index_1205_0_0;
+    int tmp_parfor_6_0_0;
+    int _for_it_67_0_0;
+    int tmp_index_1213_0_0;
+    int tmp_index_1211_0_0;
+    int _if_cond_28_0_0;
+    int tmp_index_1219_0_0;
+    int tmp_index_1217_0_0;
+    int tmp_index_1221_0_0;
+    int tmp_index_1223_0_0;
+    int tmp_index_1224_0_0;
+    int tmp_index_1229_0_0;
+    int tmp_index_1226_0_0;
+    int tmp_index_1236_0_0;
+    int tmp_index_1238_0_0;
+    int tmp_call_21_0_0;
+    int tmp_index_1234_0_0;
+    int tmp_index_1231_0_0;
+    int inds_var_829_0_0;
     int _for_it_68_0_0;
-    int tmp_index_1215_0_0;
     int tmp_index_1216_0_0;
+    int tmp_index_1215_0_0;
     int tmp_call_20_0_0;
-    int tmp_index_1253_0_0;
-    int tmp_index_1265_0_0;
     int tmp_index_1261_0_0;
-    int tmp_index_1269_0_0;
-    int tmp_index_1277_0_0;
-    int tmp_index_1240_0_0;
-    int tmp_index_1281_0_0;
-    int tmp_index_1249_0_0;
-    int tmp_index_1287_0_0;
-    int tmp_index_1291_0_0;
-    int tmp_index_1297_0_0;
-    int tmp_index_1257_0_0;
     int tmp_index_1245_0_0;
+    int tmp_index_1277_0_0;
+    int tmp_index_1253_0_0;
+    int tmp_index_1269_0_0;
+    int tmp_index_1257_0_0;
+    int tmp_index_1287_0_0;
+    int tmp_index_1265_0_0;
+    int tmp_index_1281_0_0;
+    int tmp_index_1291_0_0;
+    int tmp_index_1249_0_0;
     int tmp_index_1275_0_0;
     int tmp_index_1273_0_0;
+    int tmp_index_1240_0_0;
+    int tmp_index_1297_0_0;
     int _if_cond_29_0_0;
     int tmp_index_1306_0_0;
     int _for_it_69_0_0;
     int tmp_index_1298_0_0;
+    int tmp_index_1207_0_0;
+    int tmp_index_1208_0_0;
     int _for_it_70_0_0;
     int tmp_index_1309_0_0;
     int _if_cond_30_0_0;
     int _for_it_71_0_0;
-    int tmp_index_1310_0_0;
     int tmp_index_1312_0_0;
-    int tmp_index_1320_0_0;
+    int tmp_index_1310_0_0;
     int tmp_index_1316_0_0;
     int tmp_index_1322_0_0;
     int tmp_index_1318_0_0;
-    int tmp_index_1323_0_0;
-    int tmp_index_1328_0_0;
+    int tmp_index_1320_0_0;
+    int tmp_call_24_0_0;
     int tmp_index_1325_0_0;
+    int tmp_index_1333_0_0;
     int tmp_index_1330_0_0;
     int tmp_index_1337_0_0;
+    int tmp_index_1323_0_0;
     int tmp_index_1335_0_0;
-    int tmp_call_24_0_0;
-    int tmp_index_1333_0_0;
+    int tmp_index_1328_0_0;
     int tmp_index_1315_0_0;
     int tmp_index_1314_0_0;
     int tmp_call_23_0_0;
     int tmp_index_1380_0_0;
     int tmp_index_1396_0_0;
-    int tmp_index_1372_0_0;
-    int tmp_index_1364_0_0;
-    int tmp_index_1360_0_0;
-    int tmp_index_1348_0_0;
-    int tmp_index_1376_0_0;
-    int tmp_index_1386_0_0;
-    int tmp_index_1352_0_0;
-    int tmp_index_1344_0_0;
     int tmp_index_1374_0_0;
+    int tmp_index_1352_0_0;
+    int tmp_index_1376_0_0;
+    int tmp_index_1344_0_0;
     int tmp_index_1390_0_0;
-    int tmp_index_1339_0_0;
-    int tmp_index_1356_0_0;
+    int tmp_index_1386_0_0;
+    int tmp_index_1348_0_0;
+    int tmp_index_1364_0_0;
+    int tmp_index_1372_0_0;
     int tmp_index_1368_0_0;
+    int tmp_index_1356_0_0;
+    int tmp_index_1360_0_0;
+    int tmp_index_1339_0_0;
     int _if_cond_31_0_0;
     int tmp_index_1405_0_0;
     int _for_it_72_0_0;
     int tmp_index_1397_0_0;
     int tmp_index_1410_0_0;
     int tmp_index_1414_0_0;
-    int tmp_index_1412_0_0;
     int tmp_index_1408_0_0;
+    int tmp_index_1412_0_0;
+    int tmp_index_1425_0_0;
+    int tmp_index_1417_0_0;
     int tmp_index_1422_0_0;
+    int tmp_index_1415_0_0;
+    int tmp_index_1427_0_0;
     int tmp_call_26_0_0;
     int tmp_index_1420_0_0;
-    int tmp_index_1417_0_0;
-    int tmp_index_1415_0_0;
-    int tmp_index_1425_0_0;
-    int tmp_index_1427_0_0;
-    int tmp_index_1476_0_0;
     int tmp_index_1442_0_0;
-    int tmp_index_1434_0_0;
-    int tmp_index_1466_0_0;
+    int tmp_index_1446_0_0;
+    int tmp_index_1462_0_0;
+    int tmp_index_1464_0_0;
     int tmp_index_1438_0_0;
     int tmp_index_1429_0_0;
+    int tmp_index_1466_0_0;
+    int tmp_index_1476_0_0;
+    int tmp_index_1454_0_0;
+    int tmp_index_1434_0_0;
     int tmp_index_1450_0_0;
-    int tmp_index_1462_0_0;
     int tmp_index_1470_0_0;
     int tmp_index_1458_0_0;
-    int tmp_index_1454_0_0;
-    int tmp_index_1464_0_0;
-    int tmp_index_1446_0_0;
     int _for_it_73_0_0;
-    int tmp_index_1206_0_0;
-    int tmp_index_1205_0_0;
-    int tmp_parfor_6_0_0;
-    int _for_it_74_0_0;
-    int tmp_index_1485_0_0;
-    int tmp_index_1481_0_0;
-    int tmp_index_1483_0_0;
-    int tmp_index_1479_0_0;
-    int tmp_index_1488_0_0;
-    int tmp_index_1498_0_0;
-    int tmp_index_1493_0_0;
-    int tmp_index_1486_0_0;
-    int tmp_index_1496_0_0;
-    int tmp_call_28_0_0;
-    int tmp_index_1491_0_0;
-    int _for_it_75_0_0;
-    int tmp_index_1505_0_0;
-    int tmp_index_1500_0_0;
-    int tmp_index_1533_0_0;
-    int tmp_index_1535_0_0;
-    int tmp_index_1529_0_0;
-    int tmp_index_1541_0_0;
-    int tmp_index_1521_0_0;
-    int tmp_index_1513_0_0;
-    int tmp_index_1509_0_0;
-    int tmp_index_1517_0_0;
-    int tmp_index_1547_0_0;
-    int tmp_index_1537_0_0;
-    int tmp_index_1525_0_0;
-    int _for_it_76_0_0;
-    int tmp_index_1207_0_0;
-    int tmp_index_1208_0_0;
+    int sym_kfdia_var_880_0_0;
     int laytrop_min_var_914_0_0;
     int sym_kidia_var_879_0_0;
-    int sym_kfdia_var_880_0_0;
     int laytrop_max_var_915_0_0;
     int i_nlayers_var_912_0_0;
+    int tmp_index_1810_0_0;
+    int tmp_index_1809_0_0;
+    int _for_it_88_0_0;
     int tmp_index_1807_0_0;
     int tmp_index_1808_0_0;
     int tmp_parfor_8_0_0;
-    int tmp_index_1809_0_0;
-    int tmp_index_1810_0_0;
-    int _for_it_88_0_0;
-    int _for_it_92_0_0;
-    int tmp_index_1911_0_0;
-    int _if_cond_40_0_0;
-    int _for_it_93_0_0;
-    int tmp_index_1914_0_0;
-    int tmp_index_1912_0_0;
-    int tmp_index_1922_0_0;
-    int tmp_index_1920_0_0;
-    int tmp_index_1924_0_0;
-    int tmp_index_1926_0_0;
-    int tmp_index_1918_0_0;
-    int tmp_index_1932_0_0;
-    int tmp_index_1927_0_0;
-    int tmp_index_1939_0_0;
-    int tmp_call_36_0_0;
-    int tmp_index_1929_0_0;
-    int tmp_index_1937_0_0;
-    int tmp_index_1934_0_0;
-    int tmp_index_1941_0_0;
-    int inds_var_907_0_0;
-    int indf_var_908_0_0;
-    int ind0_var_905_0_0;
-    int ind1_var_906_0_0;
-    int tmp_index_1916_0_0;
-    int tmp_index_1917_0_0;
-    int tmp_call_35_0_0;
-    int tmp_index_1972_0_0;
-    int tmp_index_1960_0_0;
-    int tmp_index_1964_0_0;
-    int tmp_index_1956_0_0;
-    int tmp_index_1994_0_0;
-    int tmp_index_1990_0_0;
-    int tmp_index_1968_0_0;
-    int tmp_index_1980_0_0;
-    int tmp_index_1943_0_0;
-    int tmp_index_1952_0_0;
-    int tmp_index_1976_0_0;
-    int tmp_index_1948_0_0;
-    int tmp_index_2000_0_0;
-    int tmp_index_1984_0_0;
-    int tmp_index_1978_0_0;
-    int _if_cond_41_0_0;
-    int tmp_index_2009_0_0;
-    int _for_it_94_0_0;
-    int tmp_index_2001_0_0;
-    int tmp_index_2016_0_0;
-    int tmp_index_2014_0_0;
-    int tmp_index_2012_0_0;
-    int tmp_index_2021_0_0;
-    int tmp_index_2019_0_0;
-    int tmp_index_2024_0_0;
-    int tmp_index_2047_0_0;
-    int tmp_index_2029_0_0;
-    int tmp_index_2026_0_0;
-    int tmp_index_2031_0_0;
-    int tmp_index_2043_0_0;
-    int tmp_index_2039_0_0;
-    int tmp_index_2035_0_0;
-    int _for_it_95_0_0;
-    int tmp_index_1805_0_0;
-    int tmp_index_1806_0_0;
     int _for_it_96_0_0;
-    int tmp_index_2054_0_0;
-    int tmp_index_2059_0_0;
     int tmp_index_2052_0_0;
     int tmp_index_2057_0_0;
     int tmp_index_2050_0_0;
+    int tmp_index_2054_0_0;
+    int tmp_index_2059_0_0;
+    int ind0_var_905_0_0;
     int tmp_index_2062_0_0;
+    int ind1_var_906_0_0;
     int _for_it_97_0_0;
-    int tmp_index_2067_0_0;
-    int tmp_index_2064_0_0;
-    int tmp_index_2085_0_0;
     int tmp_index_2077_0_0;
+    int tmp_index_2085_0_0;
     int tmp_index_2069_0_0;
     int tmp_index_2073_0_0;
     int tmp_index_2081_0_0;
+    int tmp_index_2064_0_0;
+    int tmp_index_2067_0_0;
     int _for_it_98_0_0;
     int _for_it_89_0_0;
-    int tmp_index_1811_0_0;
     int tmp_index_1813_0_0;
+    int tmp_index_1811_0_0;
     int _if_cond_38_0_0;
     int tmp_index_1823_0_0;
-    int tmp_index_1821_0_0;
     int tmp_index_1825_0_0;
     int tmp_index_1819_0_0;
     int tmp_index_1817_0_0;
-    int tmp_index_1828_0_0;
+    int tmp_index_1821_0_0;
     int tmp_index_1833_0_0;
     int tmp_index_1831_0_0;
+    int tmp_index_1828_0_0;
     int tmp_index_1840_0_0;
-    int tmp_call_33_0_0;
-    int tmp_index_1838_0_0;
     int tmp_index_1826_0_0;
+    int tmp_index_1838_0_0;
     int tmp_index_1836_0_0;
+    int tmp_call_33_0_0;
+    int indf_var_908_0_0;
+    int inds_var_907_0_0;
     int _for_it_90_0_0;
     int tmp_index_1815_0_0;
     int tmp_index_1816_0_0;
     int tmp_call_32_0_0;
-    int tmp_index_1883_0_0;
+    int tmp_index_1847_0_0;
+    int tmp_index_1893_0_0;
+    int tmp_index_1842_0_0;
     int tmp_index_1889_0_0;
+    int tmp_index_1883_0_0;
     int tmp_index_1875_0_0;
+    int tmp_index_1867_0_0;
+    int tmp_index_1859_0_0;
+    int tmp_index_1871_0_0;
     int tmp_index_1863_0_0;
     int tmp_index_1855_0_0;
-    int tmp_index_1859_0_0;
-    int tmp_index_1851_0_0;
-    int tmp_index_1893_0_0;
-    int tmp_index_1847_0_0;
-    int tmp_index_1842_0_0;
-    int tmp_index_1871_0_0;
-    int tmp_index_1867_0_0;
-    int tmp_index_1899_0_0;
     int tmp_index_1879_0_0;
+    int tmp_index_1851_0_0;
+    int tmp_index_1899_0_0;
     int tmp_index_1877_0_0;
     int _if_cond_39_0_0;
     int tmp_index_1908_0_0;
     int _for_it_91_0_0;
     int tmp_index_1900_0_0;
+    int _for_it_92_0_0;
+    int tmp_index_1911_0_0;
+    int _if_cond_40_0_0;
+    int _for_it_93_0_0;
+    int tmp_index_1912_0_0;
+    int tmp_index_1914_0_0;
+    int tmp_index_1920_0_0;
+    int tmp_index_1926_0_0;
+    int tmp_index_1918_0_0;
+    int tmp_index_1924_0_0;
+    int tmp_index_1922_0_0;
+    int tmp_call_36_0_0;
+    int tmp_index_1929_0_0;
+    int tmp_index_1934_0_0;
+    int tmp_index_1941_0_0;
+    int tmp_index_1932_0_0;
+    int tmp_index_1939_0_0;
+    int tmp_index_1927_0_0;
+    int tmp_index_1937_0_0;
+    int tmp_index_1917_0_0;
+    int tmp_index_1916_0_0;
+    int tmp_call_35_0_0;
+    int tmp_index_1990_0_0;
+    int tmp_index_1956_0_0;
+    int tmp_index_1960_0_0;
+    int tmp_index_1980_0_0;
+    int tmp_index_1978_0_0;
+    int tmp_index_1972_0_0;
+    int tmp_index_1968_0_0;
+    int tmp_index_1952_0_0;
+    int tmp_index_2000_0_0;
+    int tmp_index_1948_0_0;
+    int tmp_index_1943_0_0;
+    int tmp_index_1994_0_0;
+    int tmp_index_1976_0_0;
+    int tmp_index_1984_0_0;
+    int tmp_index_1964_0_0;
+    int _if_cond_41_0_0;
+    int tmp_index_2009_0_0;
+    int _for_it_94_0_0;
+    int tmp_index_2001_0_0;
+    int tmp_index_2019_0_0;
+    int tmp_index_2014_0_0;
+    int tmp_index_2021_0_0;
+    int tmp_index_2012_0_0;
+    int tmp_index_2016_0_0;
+    int tmp_index_2024_0_0;
+    int tmp_index_2026_0_0;
+    int tmp_index_2047_0_0;
+    int tmp_index_2039_0_0;
+    int tmp_index_2035_0_0;
+    int tmp_index_2043_0_0;
+    int tmp_index_2031_0_0;
+    int tmp_index_2029_0_0;
+    int _for_it_95_0_0;
+    int tmp_index_1806_0_0;
+    int tmp_index_1805_0_0;
+    int sym_kidia_var_921_0_0;
     int laytrop_min_var_953_0_0;
     int sym_kfdia_var_922_0_0;
-    int sym_kidia_var_921_0_0;
     int laytrop_max_var_954_0_0;
     int i_nlayers_var_951_0_0;
-    int tmp_index_2090_0_0;
-    int tmp_index_2091_0_0;
+    int _for_it_107_0_0;
+    int _for_it_108_0_0;
+    int tmp_index_2246_0_0;
+    int tmp_index_2252_0_0;
+    int tmp_index_2249_0_0;
+    int _for_it_109_0_0;
+    int tmp_index_2089_0_0;
+    int tmp_index_2088_0_0;
     int tmp_parfor_9_0_0;
     int _for_it_103_0_0;
     int tmp_index_2165_0_0;
     int _if_cond_45_0_0;
     int _for_it_104_0_0;
-    int tmp_index_2168_0_0;
     int tmp_index_2166_0_0;
-    int tmp_index_2179_0_0;
+    int tmp_index_2168_0_0;
     int tmp_index_2172_0_0;
-    int tmp_index_2182_0_0;
-    int tmp_index_2184_0_0;
-    int tmp_index_2177_0_0;
+    int tmp_index_2179_0_0;
     int tmp_index_2174_0_0;
+    int tmp_index_2184_0_0;
+    int tmp_index_2182_0_0;
+    int tmp_index_2177_0_0;
+    int ind0_var_945_0_0;
     int indf_var_948_0_0;
     int inds_var_947_0_0;
-    int ind0_var_945_0_0;
     int ind1_var_946_0_0;
     int tmp_index_2171_0_0;
     int tmp_index_2170_0_0;
     int tmp_call_39_0_0;
-    int tmp_index_2224_0_0;
-    int tmp_index_2220_0_0;
-    int tmp_index_2186_0_0;
-    int tmp_index_2194_0_0;
-    int tmp_index_2202_0_0;
-    int tmp_index_2206_0_0;
-    int tmp_index_2189_0_0;
-    int tmp_index_2192_0_0;
-    int tmp_index_2198_0_0;
+    int tmp_index_2210_0_0;
     int tmp_index_2230_0_0;
     int tmp_index_2214_0_0;
-    int tmp_index_2210_0_0;
+    int tmp_index_2198_0_0;
+    int tmp_index_2206_0_0;
+    int tmp_index_2220_0_0;
+    int tmp_index_2192_0_0;
+    int tmp_index_2189_0_0;
+    int tmp_index_2202_0_0;
+    int tmp_index_2224_0_0;
+    int tmp_index_2186_0_0;
+    int tmp_index_2194_0_0;
     int _if_cond_46_0_0;
     int tmp_index_2234_0_0;
     int _for_it_105_0_0;
     int tmp_index_2231_0_0;
-    int tmp_index_2240_0_0;
     int tmp_index_2243_0_0;
     int tmp_index_2237_0_0;
+    int tmp_index_2240_0_0;
     int _for_it_106_0_0;
-    int tmp_index_2093_0_0;
-    int tmp_index_2092_0_0;
-    int _for_it_99_0_0;
-    int tmp_index_2089_0_0;
-    int tmp_index_2088_0_0;
-    int _for_it_107_0_0;
-    int _for_it_108_0_0;
-    int tmp_index_2252_0_0;
-    int tmp_index_2249_0_0;
-    int tmp_index_2246_0_0;
-    int _for_it_109_0_0;
     int _for_it_100_0_0;
-    int tmp_index_2094_0_0;
     int tmp_index_2096_0_0;
+    int tmp_index_2094_0_0;
     int _if_cond_43_0_0;
-    int tmp_index_2110_0_0;
     int tmp_index_2105_0_0;
-    int tmp_index_2102_0_0;
-    int tmp_index_2112_0_0;
     int tmp_index_2107_0_0;
+    int tmp_index_2110_0_0;
     int tmp_index_2100_0_0;
+    int tmp_index_2112_0_0;
+    int tmp_index_2102_0_0;
     int _for_it_101_0_0;
-    int tmp_index_2099_0_0;
     int tmp_index_2098_0_0;
+    int tmp_index_2099_0_0;
     int tmp_call_38_0_0;
-    int tmp_index_2158_0_0;
-    int tmp_index_2130_0_0;
-    int tmp_index_2114_0_0;
-    int tmp_index_2138_0_0;
-    int tmp_index_2152_0_0;
-    int tmp_index_2126_0_0;
     int tmp_index_2120_0_0;
     int tmp_index_2142_0_0;
     int tmp_index_2117_0_0;
-    int tmp_index_2122_0_0;
-    int tmp_index_2148_0_0;
     int tmp_index_2134_0_0;
+    int tmp_index_2114_0_0;
+    int tmp_index_2138_0_0;
+    int tmp_index_2130_0_0;
+    int tmp_index_2122_0_0;
+    int tmp_index_2126_0_0;
+    int tmp_index_2152_0_0;
+    int tmp_index_2148_0_0;
+    int tmp_index_2158_0_0;
     int _if_cond_44_0_0;
     int tmp_index_2162_0_0;
     int _for_it_102_0_0;
     int tmp_index_2159_0_0;
-    int sym_kidia_var_688_0_0;
+    int tmp_index_2090_0_0;
+    int tmp_index_2091_0_0;
+    int tmp_index_2092_0_0;
+    int tmp_index_2093_0_0;
+    int _for_it_99_0_0;
     int laytrop_min_var_724_0_0;
+    int sym_kidia_var_688_0_0;
     int sym_kfdia_var_689_0_0;
     int laytrop_max_var_725_0_0;
     int i_nlayers_var_722_0_0;
-    int tmp_index_501_0_0;
-    int tmp_index_500_0_0;
-    int tmp_parfor_3_0_0;
-    int _for_it_34_0_0;
-    int tmp_index_506_0_0;
-    int tmp_index_504_0_0;
-    int _if_cond_13_0_0;
-    int tmp_index_514_0_0;
-    int tmp_index_516_0_0;
-    int tmp_index_512_0_0;
-    int tmp_index_510_0_0;
-    int tmp_index_524_0_0;
-    int tmp_index_529_0_0;
-    int tmp_index_519_0_0;
-    int tmp_index_517_0_0;
-    int tmp_index_522_0_0;
-    int tmp_call_7_0_0;
-    int tmp_index_527_0_0;
-    int inds_var_717_0_0;
-    int indf_var_718_0_0;
-    int ind0_var_715_0_0;
-    int ind1_var_716_0_0;
-    int _for_it_35_0_0;
-    int tmp_index_508_0_0;
-    int tmp_index_509_0_0;
-    int tmp_call_6_0_0;
-    int tmp_index_593_0_0;
-    int tmp_index_556_0_0;
-    int tmp_index_599_0_0;
-    int tmp_index_577_0_0;
-    int tmp_index_560_0_0;
-    int tmp_index_572_0_0;
-    int tmp_index_579_0_0;
-    int tmp_index_544_0_0;
-    int tmp_index_574_0_0;
-    int tmp_index_564_0_0;
-    int tmp_index_539_0_0;
-    int tmp_index_531_0_0;
-    int tmp_index_548_0_0;
-    int tmp_index_583_0_0;
-    int tmp_index_552_0_0;
-    int tmp_index_589_0_0;
-    int tmp_index_568_0_0;
-    int _if_cond_14_0_0;
-    int tmp_index_608_0_0;
-    int _for_it_36_0_0;
-    int tmp_index_600_0_0;
-    int tmp_index_503_0_0;
-    int tmp_index_502_0_0;
-    int _for_it_33_0_0;
     int _for_it_37_0_0;
     int tmp_index_611_0_0;
     int _if_cond_15_0_0;
     int _for_it_38_0_0;
-    int tmp_index_614_0_0;
     int tmp_index_612_0_0;
-    int tmp_index_622_0_0;
-    int tmp_index_624_0_0;
+    int tmp_index_614_0_0;
     int tmp_index_618_0_0;
+    int tmp_index_624_0_0;
+    int tmp_index_622_0_0;
     int tmp_index_620_0_0;
-    int tmp_index_632_0_0;
-    int tmp_index_635_0_0;
-    int tmp_index_637_0_0;
-    int tmp_call_10_0_0;
     int tmp_index_627_0_0;
-    int tmp_index_630_0_0;
+    int tmp_index_632_0_0;
+    int tmp_call_10_0_0;
+    int tmp_index_637_0_0;
+    int tmp_index_635_0_0;
     int tmp_index_625_0_0;
-    int tmp_index_616_0_0;
+    int tmp_index_630_0_0;
+    int ind0_var_715_0_0;
+    int indf_var_718_0_0;
+    int inds_var_717_0_0;
+    int ind1_var_716_0_0;
     int tmp_index_617_0_0;
+    int tmp_index_616_0_0;
     int tmp_call_9_0_0;
+    int tmp_index_701_0_0;
+    int tmp_index_647_0_0;
+    int tmp_index_664_0_0;
+    int tmp_index_685_0_0;
+    int tmp_index_707_0_0;
     int tmp_index_672_0_0;
     int tmp_index_691_0_0;
-    int tmp_index_697_0_0;
-    int tmp_index_707_0_0;
-    int tmp_index_682_0_0;
-    int tmp_index_676_0_0;
-    int tmp_index_660_0_0;
-    int tmp_index_685_0_0;
-    int tmp_index_664_0_0;
     int tmp_index_680_0_0;
-    int tmp_index_639_0_0;
     int tmp_index_668_0_0;
-    int tmp_index_652_0_0;
-    int tmp_index_656_0_0;
-    int tmp_index_647_0_0;
+    int tmp_index_682_0_0;
+    int tmp_index_639_0_0;
+    int tmp_index_660_0_0;
     int tmp_index_687_0_0;
-    int tmp_index_701_0_0;
+    int tmp_index_697_0_0;
+    int tmp_index_676_0_0;
+    int tmp_index_656_0_0;
+    int tmp_index_652_0_0;
     int _if_cond_16_0_0;
     int tmp_index_716_0_0;
     int _for_it_39_0_0;
     int tmp_index_708_0_0;
     int tmp_index_724_0_0;
-    int tmp_index_719_0_0;
     int tmp_index_721_0_0;
+    int tmp_index_719_0_0;
     int tmp_index_726_0_0;
-    int tmp_index_749_0_0;
-    int tmp_index_745_0_0;
-    int tmp_index_756_0_0;
     int tmp_index_735_0_0;
     int tmp_index_737_0_0;
+    int tmp_index_729_0_0;
     int tmp_index_732_0_0;
     int tmp_index_741_0_0;
     int tmp_index_753_0_0;
-    int tmp_index_729_0_0;
+    int tmp_index_745_0_0;
+    int tmp_index_756_0_0;
+    int tmp_index_749_0_0;
     int _for_it_40_0_0;
-    int tmp_index_498_0_0;
-    int tmp_index_499_0_0;
+    int tmp_index_502_0_0;
+    int tmp_index_503_0_0;
+    int _for_it_33_0_0;
     int _for_it_41_0_0;
     int tmp_index_761_0_0;
     int tmp_index_764_0_0;
     int tmp_index_759_0_0;
     int tmp_index_766_0_0;
     int _for_it_42_0_0;
-    int tmp_index_772_0_0;
-    int tmp_index_769_0_0;
-    int tmp_index_775_0_0;
     int tmp_index_796_0_0;
-    int tmp_index_789_0_0;
+    int tmp_index_772_0_0;
     int tmp_index_785_0_0;
-    int tmp_index_781_0_0;
+    int tmp_index_789_0_0;
     int tmp_index_777_0_0;
+    int tmp_index_775_0_0;
+    int tmp_index_769_0_0;
     int tmp_index_793_0_0;
+    int tmp_index_781_0_0;
     int _for_it_43_0_0;
-    int sym_kfdia_var_732_0_0;
+    int tmp_index_501_0_0;
+    int tmp_index_500_0_0;
+    int tmp_parfor_3_0_0;
+    int tmp_index_499_0_0;
+    int tmp_index_498_0_0;
+    int _for_it_34_0_0;
+    int tmp_index_504_0_0;
+    int tmp_index_506_0_0;
+    int _if_cond_13_0_0;
+    int tmp_index_510_0_0;
+    int tmp_index_512_0_0;
+    int tmp_index_516_0_0;
+    int tmp_index_514_0_0;
+    int tmp_index_522_0_0;
+    int tmp_index_527_0_0;
+    int tmp_index_529_0_0;
+    int tmp_index_524_0_0;
+    int tmp_index_517_0_0;
+    int tmp_call_7_0_0;
+    int tmp_index_519_0_0;
+    int _for_it_35_0_0;
+    int tmp_index_509_0_0;
+    int tmp_index_508_0_0;
+    int tmp_call_6_0_0;
+    int tmp_index_552_0_0;
+    int tmp_index_564_0_0;
+    int tmp_index_560_0_0;
+    int tmp_index_589_0_0;
+    int tmp_index_556_0_0;
+    int tmp_index_548_0_0;
+    int tmp_index_577_0_0;
+    int tmp_index_593_0_0;
+    int tmp_index_531_0_0;
+    int tmp_index_544_0_0;
+    int tmp_index_579_0_0;
+    int tmp_index_539_0_0;
+    int tmp_index_599_0_0;
+    int tmp_index_574_0_0;
+    int tmp_index_568_0_0;
+    int tmp_index_583_0_0;
+    int tmp_index_572_0_0;
+    int _if_cond_14_0_0;
+    int tmp_index_608_0_0;
+    int _for_it_36_0_0;
+    int tmp_index_600_0_0;
     int sym_kidia_var_731_0_0;
+    int sym_kfdia_var_732_0_0;
     int laytrop_min_var_756_0_0;
     int laytrop_max_var_757_0_0;
     int i_nlayers_var_754_0_0;
-    int tmp_index_800_0_0;
-    int tmp_index_799_0_0;
-    int tmp_parfor_4_0_0;
-    int tmp_index_802_0_0;
-    int tmp_index_801_0_0;
-    int _for_it_48_0_0;
-    int tmp_index_855_0_0;
-    int _if_cond_20_0_0;
-    int _for_it_49_0_0;
-    int tmp_index_856_0_0;
-    int tmp_index_858_0_0;
-    int tmp_index_867_0_0;
-    int tmp_index_862_0_0;
-    int tmp_index_864_0_0;
-    int ind0_var_750_0_0;
-    int tmp_index_869_0_0;
-    int ind1_var_751_0_0;
-    int tmp_index_860_0_0;
-    int tmp_index_861_0_0;
-    int tmp_call_13_0_0;
-    int tmp_index_878_0_0;
-    int tmp_index_875_0_0;
-    int tmp_index_892_0_0;
-    int tmp_index_884_0_0;
-    int tmp_index_872_0_0;
-    int tmp_index_888_0_0;
-    int tmp_index_880_0_0;
-    int tmp_index_896_0_0;
-    int tmp_index_899_0_0;
-    int _if_cond_21_0_0;
-    int tmp_index_903_0_0;
-    int _for_it_50_0_0;
-    int tmp_index_900_0_0;
-    int tmp_index_915_0_0;
-    int tmp_index_912_0_0;
-    int tmp_index_909_0_0;
-    int tmp_index_906_0_0;
-    int _for_it_51_0_0;
-    int _for_it_52_0_0;
-    int _for_it_53_0_0;
-    int tmp_index_927_0_0;
-    int tmp_index_918_0_0;
-    int tmp_index_924_0_0;
-    int tmp_index_921_0_0;
-    int _for_it_54_0_0;
-    int tmp_index_804_0_0;
-    int tmp_index_803_0_0;
-    int _for_it_44_0_0;
     int _for_it_45_0_0;
     int tmp_index_805_0_0;
     int tmp_index_807_0_0;
     int _if_cond_18_0_0;
-    int tmp_index_811_0_0;
-    int tmp_index_816_0_0;
     int tmp_index_813_0_0;
+    int tmp_index_816_0_0;
+    int tmp_index_811_0_0;
     int tmp_index_818_0_0;
+    int ind0_var_750_0_0;
+    int ind1_var_751_0_0;
     int _for_it_46_0_0;
-    int tmp_index_810_0_0;
     int tmp_index_809_0_0;
+    int tmp_index_810_0_0;
     int tmp_call_12_0_0;
+    int tmp_index_837_0_0;
+    int tmp_index_841_0_0;
+    int tmp_index_827_0_0;
     int tmp_index_824_0_0;
     int tmp_index_833_0_0;
     int tmp_index_821_0_0;
-    int tmp_index_837_0_0;
     int tmp_index_848_0_0;
-    int tmp_index_827_0_0;
     int tmp_index_829_0_0;
-    int tmp_index_841_0_0;
     int tmp_index_845_0_0;
     int _if_cond_19_0_0;
     int tmp_index_852_0_0;
     int _for_it_47_0_0;
     int tmp_index_849_0_0;
+    int tmp_index_804_0_0;
+    int tmp_index_803_0_0;
+    int _for_it_44_0_0;
+    int tmp_index_802_0_0;
+    int tmp_index_801_0_0;
+    int tmp_parfor_4_0_0;
+    int _for_it_52_0_0;
+    int _for_it_53_0_0;
+    int tmp_index_918_0_0;
+    int tmp_index_921_0_0;
+    int tmp_index_924_0_0;
+    int tmp_index_927_0_0;
+    int _for_it_54_0_0;
+    int tmp_index_800_0_0;
+    int tmp_index_799_0_0;
+    int _for_it_48_0_0;
+    int tmp_index_855_0_0;
+    int _if_cond_20_0_0;
+    int _for_it_49_0_0;
+    int tmp_index_858_0_0;
+    int tmp_index_856_0_0;
+    int tmp_index_867_0_0;
+    int tmp_index_864_0_0;
+    int tmp_index_862_0_0;
+    int tmp_index_869_0_0;
+    int tmp_index_860_0_0;
+    int tmp_index_861_0_0;
+    int tmp_call_13_0_0;
+    int tmp_index_878_0_0;
+    int tmp_index_880_0_0;
+    int tmp_index_875_0_0;
+    int tmp_index_892_0_0;
+    int tmp_index_884_0_0;
+    int tmp_index_899_0_0;
+    int tmp_index_888_0_0;
+    int tmp_index_896_0_0;
+    int tmp_index_872_0_0;
+    int _if_cond_21_0_0;
+    int tmp_index_903_0_0;
+    int _for_it_50_0_0;
+    int tmp_index_900_0_0;
+    int tmp_index_906_0_0;
+    int tmp_index_909_0_0;
+    int tmp_index_915_0_0;
+    int tmp_index_912_0_0;
+    int _for_it_51_0_0;
+    int laytrop_min_var_644_0_0;
     int sym_kidia_var_630_0_0;
     int sym_kfdia_var_631_0_0;
-    int laytrop_min_var_644_0_0;
     int laytrop_max_var_645_0_0;
     int i_nlayers_var_642_0_0;
-    int _for_it_19_0_0;
-    int _for_it_20_0_0;
-    int tmp_index_214_0_0;
-    int tmp_index_220_0_0;
-    int tmp_index_217_0_0;
-    int _for_it_21_0_0;
-    int tmp_index_173_0_0;
-    int tmp_index_172_0_0;
-    int tmp_parfor_1_0_0;
     int _for_it_12_0_0;
     int _for_it_13_0_0;
     int tmp_index_178_0_0;
     int _if_cond_5_0_0;
-    int tmp_index_182_0_0;
-    int tmp_index_185_0_0;
     int tmp_index_188_0_0;
+    int tmp_index_185_0_0;
+    int tmp_index_182_0_0;
     int _for_it_14_0_0;
     int tmp_index_179_0_0;
-    int tmp_index_176_0_0;
+    int tmp_index_174_0_0;
+    int tmp_index_175_0_0;
+    int tmp_parfor_1_0_0;
+    int tmp_index_173_0_0;
+    int tmp_index_172_0_0;
     int tmp_index_177_0_0;
+    int tmp_index_176_0_0;
     int _for_it_11_0_0;
+    int _for_it_19_0_0;
+    int _for_it_20_0_0;
+    int tmp_index_217_0_0;
+    int tmp_index_214_0_0;
+    int tmp_index_220_0_0;
+    int _for_it_21_0_0;
     int _for_it_15_0_0;
     int tmp_index_191_0_0;
     int _if_cond_6_0_0;
     int _for_it_16_0_0;
     int tmp_index_192_0_0;
-    int tmp_index_196_0_0;
-    int tmp_index_199_0_0;
     int tmp_index_202_0_0;
+    int tmp_index_199_0_0;
+    int tmp_index_196_0_0;
     int _for_it_17_0_0;
     int tmp_index_193_0_0;
-    int tmp_index_208_0_0;
     int tmp_index_211_0_0;
+    int tmp_index_208_0_0;
     int tmp_index_205_0_0;
     int _for_it_18_0_0;
-    int tmp_index_174_0_0;
-    int tmp_index_175_0_0;
-    int sym_kidia_var_603_0_0;
     int sym_kfdia_var_604_0_0;
+    int sym_kidia_var_603_0_0;
     int laytrop_min_var_627_0_0;
     int laytrop_max_var_628_0_0;
     int i_nlayers_var_625_0_0;
+    int tmp_index_2_0_0;
+    int tmp_index_3_0_0;
+    int tmp_parfor_0_0_0;
     int _for_it_4_0_0;
     int tmp_index_42_0_0;
     int _if_cond_0_0_0;
     int _for_it_5_0_0;
+    int tmp_index_43_0_0;
     int tmp_index_45_0_0;
     int tmp_index_48_0_0;
-    int tmp_index_43_0_0;
     int ind0_var_621_0_0;
     int tmp_index_50_0_0;
     int ind1_var_622_0_0;
-    int tmp_index_56_0_0;
-    int tmp_index_61_0_0;
-    int tmp_index_65_0_0;
-    int tmp_index_69_0_0;
     int tmp_index_73_0_0;
-    int tmp_index_59_0_0;
-    int tmp_index_77_0_0;
     int tmp_index_53_0_0;
+    int tmp_index_69_0_0;
+    int tmp_index_65_0_0;
+    int tmp_index_77_0_0;
+    int tmp_index_61_0_0;
+    int tmp_index_59_0_0;
+    int tmp_index_56_0_0;
     int _for_it_6_0_0;
-    int tmp_index_80_0_0;
     int tmp_index_82_0_0;
+    int tmp_index_80_0_0;
     int tmp_index_85_0_0;
     int tmp_index_90_0_0;
     int tmp_index_87_0_0;
     int tmp_index_92_0_0;
     int tmp_index_84_0_0;
     int tmp_index_111_0_0;
-    int tmp_index_107_0_0;
-    int tmp_index_101_0_0;
-    int tmp_index_115_0_0;
     int tmp_index_98_0_0;
-    int tmp_index_95_0_0;
+    int tmp_index_101_0_0;
     int tmp_index_119_0_0;
+    int tmp_index_115_0_0;
+    int tmp_index_107_0_0;
     int tmp_index_103_0_0;
+    int tmp_index_95_0_0;
     int _if_cond_1_0_0;
     int tmp_index_123_0_0;
     int _for_it_7_0_0;
     int tmp_index_120_0_0;
     int tmp_index_0_0_0;
     int tmp_index_1_0_0;
-    int tmp_parfor_0_0_0;
     int _for_it_1_0_0;
     int tmp_index_10_0_0;
     int tmp_index_5_0_0;
     int tmp_index_7_0_0;
     int tmp_index_12_0_0;
     int _for_it_2_0_0;
-    int tmp_index_21_0_0;
-    int tmp_index_39_0_0;
+    int tmp_index_15_0_0;
     int tmp_index_31_0_0;
     int tmp_index_35_0_0;
-    int tmp_index_18_0_0;
     int tmp_index_23_0_0;
-    int tmp_index_15_0_0;
     int tmp_index_27_0_0;
+    int tmp_index_21_0_0;
+    int tmp_index_39_0_0;
+    int tmp_index_18_0_0;
     int _for_it_3_0_0;
-    int tmp_index_2_0_0;
-    int tmp_index_3_0_0;
     int tmp_index_4_0_0;
     int _for_it_0_0_0;
     int _for_it_8_0_0;
-    int tmp_index_128_0_0;
     int tmp_index_126_0_0;
+    int tmp_index_128_0_0;
     int _if_cond_3_0_0;
-    int tmp_index_133_0_0;
     int tmp_index_131_0_0;
+    int tmp_index_133_0_0;
     int tmp_index_136_0_0;
     int tmp_index_138_0_0;
     int _for_it_9_0_0;
     int tmp_index_130_0_0;
     int tmp_index_165_0_0;
     int tmp_index_153_0_0;
-    int tmp_index_161_0_0;
-    int tmp_index_157_0_0;
     int tmp_index_147_0_0;
-    int tmp_index_144_0_0;
     int tmp_index_141_0_0;
     int tmp_index_149_0_0;
+    int tmp_index_161_0_0;
+    int tmp_index_157_0_0;
+    int tmp_index_144_0_0;
     int _if_cond_4_0_0;
     int tmp_index_169_0_0;
     int _for_it_10_0_0;
@@ -3098,123 +3098,123 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int sym_kidia_var_2209_0_0;
     int laytrop_max_var_2237_0_0;
     int i_nlayers_var_2234_0_0;
-    int _for_it_355_0_0;
-    int tmp_index_10138_0_0;
-    int tmp_index_10132_0_0;
-    int tmp_index_10136_0_0;
-    int tmp_index_10134_0_0;
-    int tmp_index_10144_0_0;
-    int tmp_index_10141_0_0;
-    int tmp_index_10139_0_0;
-    int tmp_call_250_0_0;
-    int tmp_index_10146_0_0;
-    int tmp_index_10149_0_0;
-    int ind0_var_2229_0_0;
-    int ind1_var_2230_0_0;
-    int _for_it_356_0_0;
-    int tmp_index_10176_0_0;
-    int tmp_index_10168_0_0;
-    int tmp_index_10164_0_0;
-    int tmp_index_10186_0_0;
-    int tmp_index_10172_0_0;
-    int tmp_index_10180_0_0;
-    int tmp_index_10156_0_0;
-    int tmp_index_10151_0_0;
-    int tmp_index_10184_0_0;
-    int tmp_index_10160_0_0;
-    int _for_it_357_0_0;
-    int tmp_index_10127_0_0;
-    int tmp_index_10128_0_0;
+    int tmp_index_10129_0_0;
+    int tmp_index_10130_0_0;
     int tmp_parfor_26_0_0;
     int _for_it_362_0_0;
-    int tmp_index_10320_0_0;
     int tmp_index_10318_0_0;
+    int tmp_index_10320_0_0;
     int _if_cond_299_0_0;
-    int tmp_index_10329_0_0;
     int tmp_index_10325_0_0;
     int tmp_index_10323_0_0;
     int tmp_index_10327_0_0;
-    int tmp_index_10335_0_0;
-    int tmp_index_10330_0_0;
+    int tmp_index_10329_0_0;
     int tmp_index_10337_0_0;
-    int tmp_index_10332_0_0;
+    int tmp_index_10330_0_0;
+    int tmp_index_10335_0_0;
     int tmp_call_256_0_0;
+    int tmp_index_10332_0_0;
     int tmp_index_10340_0_0;
+    int ind0_var_2229_0_0;
+    int ind1_var_2230_0_0;
     int _for_it_363_0_0;
     int tmp_index_10322_0_0;
+    int tmp_index_10347_0_0;
+    int tmp_index_10363_0_0;
+    int tmp_index_10375_0_0;
+    int tmp_index_10355_0_0;
     int tmp_index_10371_0_0;
-    int tmp_index_10342_0_0;
     int tmp_index_10359_0_0;
     int tmp_index_10351_0_0;
-    int tmp_index_10363_0_0;
     int tmp_index_10367_0_0;
-    int tmp_index_10347_0_0;
-    int tmp_index_10355_0_0;
     int tmp_index_10377_0_0;
-    int tmp_index_10375_0_0;
+    int tmp_index_10342_0_0;
     int _if_cond_300_0_0;
     int tmp_index_10386_0_0;
     int _for_it_364_0_0;
     int tmp_index_10378_0_0;
-    int tmp_index_10129_0_0;
-    int tmp_index_10130_0_0;
+    int tmp_index_10131_0_0;
+    int _for_it_354_0_0;
     int _for_it_358_0_0;
     int tmp_index_10189_0_0;
     int _if_cond_296_0_0;
     int _for_it_359_0_0;
     int tmp_index_10196_0_0;
-    int tmp_index_10190_0_0;
-    int tmp_index_10192_0_0;
     int tmp_index_10194_0_0;
+    int tmp_index_10192_0_0;
+    int tmp_index_10190_0_0;
     int tmp_index_10199_0_0;
     int tmp_call_252_0_0;
     int tmp_index_10204_0_0;
     int tmp_index_10202_0_0;
     int tmp_index_10197_0_0;
     int tmp_index_10207_0_0;
-    int tmp_index_10209_0_0;
     int tmp_index_10214_0_0;
-    int tmp_index_10222_0_0;
-    int tmp_index_10230_0_0;
-    int tmp_index_10244_0_0;
+    int tmp_index_10218_0_0;
     int tmp_index_10238_0_0;
     int tmp_index_10226_0_0;
-    int tmp_index_10234_0_0;
-    int tmp_index_10218_0_0;
     int tmp_index_10242_0_0;
+    int tmp_index_10222_0_0;
+    int tmp_index_10230_0_0;
+    int tmp_index_10209_0_0;
+    int tmp_index_10244_0_0;
+    int tmp_index_10234_0_0;
     int _for_it_360_0_0;
     int tmp_index_10249_0_0;
     int tmp_index_10247_0_0;
-    int tmp_index_10252_0_0;
     int tmp_index_10258_0_0;
     int tmp_index_10254_0_0;
     int tmp_index_10256_0_0;
-    int tmp_index_10266_0_0;
-    int tmp_index_10261_0_0;
-    int tmp_call_254_0_0;
+    int tmp_index_10252_0_0;
     int tmp_index_10259_0_0;
     int tmp_index_10264_0_0;
+    int tmp_index_10261_0_0;
+    int tmp_index_10266_0_0;
+    int tmp_call_254_0_0;
     int tmp_index_10269_0_0;
     int tmp_index_10251_0_0;
-    int tmp_index_10306_0_0;
-    int tmp_index_10280_0_0;
-    int tmp_index_10276_0_0;
-    int tmp_index_10292_0_0;
-    int tmp_index_10288_0_0;
-    int tmp_index_10284_0_0;
-    int tmp_index_10304_0_0;
-    int tmp_index_10296_0_0;
-    int tmp_index_10271_0_0;
     int tmp_index_10300_0_0;
+    int tmp_index_10276_0_0;
+    int tmp_index_10284_0_0;
+    int tmp_index_10296_0_0;
+    int tmp_index_10280_0_0;
+    int tmp_index_10288_0_0;
+    int tmp_index_10304_0_0;
+    int tmp_index_10271_0_0;
+    int tmp_index_10306_0_0;
+    int tmp_index_10292_0_0;
     int _if_cond_297_0_0;
     int tmp_index_10315_0_0;
     int _for_it_361_0_0;
     int tmp_index_10307_0_0;
-    int tmp_index_10131_0_0;
-    int _for_it_354_0_0;
+    int _for_it_355_0_0;
+    int tmp_index_10132_0_0;
+    int tmp_index_10136_0_0;
+    int tmp_index_10134_0_0;
+    int tmp_index_10138_0_0;
+    int tmp_index_10146_0_0;
+    int tmp_index_10144_0_0;
+    int tmp_call_250_0_0;
+    int tmp_index_10139_0_0;
+    int tmp_index_10141_0_0;
+    int tmp_index_10149_0_0;
+    int _for_it_356_0_0;
+    int tmp_index_10184_0_0;
+    int tmp_index_10176_0_0;
+    int tmp_index_10172_0_0;
+    int tmp_index_10156_0_0;
+    int tmp_index_10186_0_0;
+    int tmp_index_10151_0_0;
+    int tmp_index_10180_0_0;
+    int tmp_index_10160_0_0;
+    int tmp_index_10168_0_0;
+    int tmp_index_10164_0_0;
+    int _for_it_357_0_0;
+    int tmp_index_10127_0_0;
+    int tmp_index_10128_0_0;
     int laytrop_min_var_2263_0_0;
-    int sym_kidia_var_2243_0_0;
     int sym_kfdia_var_2244_0_0;
+    int sym_kidia_var_2243_0_0;
     int laytrop_max_var_2264_0_0;
     int i_nlayers_var_2276_0_0;
     int tmp_index_10390_0_0;
@@ -3224,123 +3224,130 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_10569_0_0;
     int tmp_index_10571_0_0;
     int _if_cond_304_0_0;
-    int tmp_index_10576_0_0;
-    int tmp_index_10574_0_0;
     int tmp_index_10581_0_0;
+    int tmp_index_10574_0_0;
     int tmp_index_10579_0_0;
+    int tmp_index_10576_0_0;
     int ind0_var_2270_0_0;
     int tmp_index_10584_0_0;
     int ind1_var_2271_0_0;
     int _for_it_374_0_0;
     int tmp_index_10573_0_0;
-    int tmp_index_10591_0_0;
-    int tmp_index_10595_0_0;
-    int tmp_index_10603_0_0;
-    int tmp_index_10599_0_0;
-    int tmp_index_10610_0_0;
-    int tmp_index_10589_0_0;
-    int tmp_index_10607_0_0;
     int tmp_index_10586_0_0;
+    int tmp_index_10599_0_0;
+    int tmp_index_10589_0_0;
+    int tmp_index_10595_0_0;
+    int tmp_index_10607_0_0;
+    int tmp_index_10591_0_0;
+    int tmp_index_10603_0_0;
+    int tmp_index_10610_0_0;
     int _if_cond_305_0_0;
     int tmp_index_10614_0_0;
     int _for_it_375_0_0;
     int tmp_index_10611_0_0;
-    int tmp_index_10392_0_0;
-    int tmp_index_10391_0_0;
+    int tmp_index_10393_0_0;
+    int _for_it_365_0_0;
+    int _for_it_366_0_0;
+    int tmp_index_10408_0_0;
+    int tmp_index_10399_0_0;
+    int tmp_index_10406_0_0;
+    int tmp_index_10394_0_0;
+    int tmp_index_10404_0_0;
+    int tmp_index_10396_0_0;
+    int tmp_index_10401_0_0;
+    int inds_var_2272_0_0;
+    int indf_var_2273_0_0;
+    int _for_it_367_0_0;
+    int tmp_index_10415_0_0;
+    int tmp_index_10423_0_0;
+    int tmp_index_10431_0_0;
+    int tmp_index_10445_0_0;
+    int tmp_index_10451_0_0;
+    int tmp_index_10419_0_0;
+    int tmp_index_10435_0_0;
+    int tmp_index_10410_0_0;
+    int tmp_index_10413_0_0;
+    int tmp_index_10441_0_0;
+    int tmp_index_10454_0_0;
+    int tmp_index_10427_0_0;
+    int _for_it_368_0_0;
     int _for_it_369_0_0;
     int tmp_index_10457_0_0;
     int _if_cond_301_0_0;
     int _for_it_370_0_0;
-    int tmp_index_10463_0_0;
-    int tmp_index_10460_0_0;
-    int tmp_index_10465_0_0;
-    int tmp_index_10458_0_0;
-    int tmp_index_10468_0_0;
     int tmp_index_10472_0_0;
+    int tmp_index_10458_0_0;
+    int tmp_index_10463_0_0;
+    int tmp_index_10465_0_0;
     int tmp_index_10470_0_0;
-    int inds_var_2272_0_0;
-    int indf_var_2273_0_0;
-    int tmp_index_10483_0_0;
+    int tmp_index_10468_0_0;
+    int tmp_index_10460_0_0;
+    int tmp_index_10487_0_0;
+    int tmp_index_10499_0_0;
+    int tmp_index_10495_0_0;
+    int tmp_index_10509_0_0;
+    int tmp_index_10479_0_0;
+    int tmp_index_10515_0_0;
     int tmp_index_10474_0_0;
     int tmp_index_10477_0_0;
-    int tmp_index_10479_0_0;
-    int tmp_index_10499_0_0;
-    int tmp_index_10515_0_0;
-    int tmp_index_10509_0_0;
-    int tmp_index_10505_0_0;
-    int tmp_index_10518_0_0;
+    int tmp_index_10483_0_0;
     int tmp_index_10491_0_0;
-    int tmp_index_10495_0_0;
-    int tmp_index_10487_0_0;
+    int tmp_index_10518_0_0;
+    int tmp_index_10505_0_0;
     int _for_it_371_0_0;
-    int tmp_index_10523_0_0;
     int tmp_index_10521_0_0;
+    int tmp_index_10523_0_0;
+    int tmp_index_10533_0_0;
     int tmp_index_10531_0_0;
     int tmp_index_10528_0_0;
     int tmp_index_10526_0_0;
-    int tmp_index_10533_0_0;
     int tmp_index_10536_0_0;
     int tmp_index_10525_0_0;
-    int tmp_index_10562_0_0;
-    int tmp_index_10551_0_0;
     int tmp_index_10555_0_0;
-    int tmp_index_10559_0_0;
+    int tmp_index_10547_0_0;
+    int tmp_index_10551_0_0;
+    int tmp_index_10562_0_0;
     int tmp_index_10543_0_0;
     int tmp_index_10538_0_0;
-    int tmp_index_10547_0_0;
     int tmp_index_10541_0_0;
+    int tmp_index_10559_0_0;
     int _if_cond_302_0_0;
     int tmp_index_10566_0_0;
     int _for_it_372_0_0;
     int tmp_index_10563_0_0;
-    int tmp_index_10393_0_0;
-    int _for_it_365_0_0;
-    int _for_it_366_0_0;
-    int tmp_index_10401_0_0;
-    int tmp_index_10396_0_0;
-    int tmp_index_10408_0_0;
-    int tmp_index_10406_0_0;
-    int tmp_index_10394_0_0;
-    int tmp_index_10404_0_0;
-    int tmp_index_10399_0_0;
-    int _for_it_367_0_0;
-    int tmp_index_10451_0_0;
-    int tmp_index_10431_0_0;
-    int tmp_index_10415_0_0;
-    int tmp_index_10427_0_0;
-    int tmp_index_10445_0_0;
-    int tmp_index_10435_0_0;
-    int tmp_index_10410_0_0;
-    int tmp_index_10413_0_0;
-    int tmp_index_10419_0_0;
-    int tmp_index_10441_0_0;
-    int tmp_index_10454_0_0;
-    int tmp_index_10423_0_0;
-    int _for_it_368_0_0;
+    int tmp_index_10392_0_0;
+    int tmp_index_10391_0_0;
     int _for_it_350_0;
     int tmp_index_10097_0;
     int _for_it_351_0;
+    int tmp_index_10100_0;
+    int tmp_index_10101_0;
+    int tmp_index_10103_0;
     int tmp_index_10098_0;
     int tmp_index_10099_0;
-    int tmp_index_10103_0;
-    int tmp_index_10101_0;
-    int tmp_index_10100_0;
     int _for_it_352_0;
     int tmp_index_10105_0;
     double _if_cond_294_0;
     int _for_it_353_0;
-    int tmp_index_10113_0;
-    int tmp_index_10117_0;
-    int tmp_index_10120_0;
-    int tmp_index_10106_0;
-    int tmp_index_10123_0;
+    int tmp_index_10116_0;
+    int tmp_index_10124_0;
     int tmp_index_10110_0;
     int tmp_index_10107_0;
-    int tmp_index_10124_0;
-    int tmp_index_10116_0;
+    int tmp_index_10113_0;
+    int tmp_index_10123_0;
+    int tmp_index_10120_0;
+    int tmp_index_10106_0;
+    int tmp_index_10117_0;
+    int tmp_index_10109_0;
     int tmp_index_10119_0;
     int tmp_index_10126_0;
-    int tmp_index_10109_0;
+    int tmp_index_10094_0;
+    double _if_cond_292_0;
+    int _for_it_348_0;
+    int tmp_index_10095_0;
+    int _for_it_123_0;
+    int tmp_index_2923_0;
+    int _for_it_124_0;
     int _for_it_126_0;
     int tmp_index_2927_0;
     int _for_it_127_0;
@@ -3348,18 +3355,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_2932_0;
     int tmp_index_2930_0;
     double z_plog_var_1078_0;
-    int tmp_index_2940_0;
     int tmp_index_2947_0;
     int tmp_index_2942_0;
     int tmp_index_2945_0;
+    int tmp_index_2940_0;
     int jp1_var_1076_0;
-    int tmp_index_2949_0;
     int tmp_index_2944_0;
+    int tmp_index_2949_0;
     double tmp_arg_45_0;
-    int tmp_index_2952_0;
     int tmp_index_2950_0;
-    int tmp_index_2962_0;
+    int tmp_index_2952_0;
     int tmp_index_2960_0;
+    int tmp_index_2962_0;
     int tmp_index_2967_0;
     int tmp_index_2964_0;
     int tmp_arg_46_0;
@@ -3368,7 +3375,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_2972_0;
     int tmp_index_2970_0;
     int tmp_index_2980_0;
+    int tmp_index_2992_0;
     int tmp_index_2982_0;
+    int tmp_index_2990_0;
+    int tmp_index_2985_0;
+    int tmp_index_2988_0;
     int tmp_arg_48_0;
     int tmp_index_3049_0;
     double _if_cond_89_0;
@@ -3383,8 +3394,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_3120_0;
     double _if_cond_106_0;
     int tmp_index_3140_0;
-    int tmp_index_3136_0;
     int tmp_index_3134_0;
+    int tmp_index_3136_0;
     int tmp_index_3138_0;
     int tmp_index_2934_0;
     int tmp_index_2936_0;
@@ -3395,515 +3406,189 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_2974_0;
     int tmp_index_2976_0;
     int tmp_index_2978_0;
-    int tmp_index_3051_0;
+    int tmp_index_2994_0;
+    int tmp_index_2995_0;
+    int tmp_index_2996_0;
+    int tmp_index_2998_0;
+    double z_factor_var_1084_0;
+    int tmp_index_3000_0;
+    int tmp_index_3004_0;
+    int tmp_index_3002_0;
+    int tmp_index_3006_0;
+    int tmp_index_3008_0;
+    int tmp_index_3010_0;
+    int tmp_index_3012_0;
+    int tmp_index_3014_0;
+    int tmp_index_3016_0;
+    int tmp_arg_50_0;
+    int tmp_index_3018_0;
+    int tmp_index_3020_0;
+    int tmp_index_3023_0;
+    int tmp_index_3025_0;
+    int tmp_index_3028_0;
+    int tmp_index_3030_0;
+    int tmp_index_3033_0;
+    int tmp_index_3035_0;
+    int tmp_index_3038_0;
+    int tmp_index_3040_0;
+    int tmp_index_3045_0;
+    int tmp_index_3043_0;
+    int tmp_index_3047_0;
     int tmp_index_3053_0;
+    int tmp_index_3051_0;
     int tmp_index_3059_0;
     int tmp_index_3057_0;
-    int tmp_index_3063_0;
     int tmp_index_3065_0;
+    int tmp_index_3063_0;
+    int tmp_index_3069_0;
+    int tmp_index_3071_0;
+    int tmp_index_3073_0;
+    int tmp_index_3075_0;
+    int tmp_index_3079_0;
+    int tmp_index_3077_0;
+    int tmp_index_3082_0;
+    int tmp_index_3084_0;
+    int tmp_index_3087_0;
+    int tmp_index_3089_0;
+    int tmp_index_3094_0;
+    int tmp_index_3092_0;
+    int tmp_index_3099_0;
+    int tmp_index_3097_0;
+    int tmp_index_3104_0;
+    int tmp_index_3106_0;
+    int tmp_index_3102_0;
     int tmp_index_3112_0;
     int tmp_index_3110_0;
-    int tmp_index_3118_0;
     int tmp_index_3116_0;
-    int tmp_index_3124_0;
+    int tmp_index_3118_0;
     int tmp_index_3122_0;
+    int tmp_index_3124_0;
+    int tmp_index_3128_0;
+    int tmp_index_3130_0;
+    int tmp_index_3132_0;
     int tmp_index_2925_0;
     double _if_cond_66_0;
     int _for_it_125_0;
     int tmp_index_2926_0;
-    int _for_it_123_0;
-    int tmp_index_2923_0;
-    int _for_it_124_0;
-    double tsurf_0;
-    int _for_it_433_0;
-    int tmp_index_11782_0;
-    int tmp_index_11781_0;
-    int tmp_index_11783_0;
-    int tmp_index_11784_0;
-    int tmp_index_11786_0;
-    int tmp_index_11785_0;
     int _for_it_434_0;
-    int tmp_index_11797_0;
-    int tmp_index_11793_0;
-    int tmp_index_11788_0;
     int tmp_index_11790_0;
+    int tmp_index_11788_0;
+    int tmp_index_11797_0;
     int tmp_index_11794_0;
+    int tmp_index_11793_0;
     int tmp_index_11795_0;
     int tmp_index_11798_0;
     int tmp_index_11791_0;
     int _for_it_435_0;
     int iband_var_511_0;
     int _for_it_436_0;
-    int tmp_index_11802_0;
     int tmp_index_11803_0;
+    int tmp_index_11802_0;
     int tmp_index_11805_0;
     int _for_it_437_0;
+    double tsurf_0;
+    int _for_it_433_0;
+    int tmp_index_11782_0;
+    int tmp_index_11781_0;
+    int tmp_index_11783_0;
+    int tmp_index_11784_0;
+    int tmp_index_11785_0;
+    int tmp_index_11786_0;
     int _for_it_423_0;
     double temperature_var_492_0;
     int _for_it_424_0;
-    int tmp_index_11739_0;
     int tmp_index_11740_0;
+    int tmp_index_11739_0;
     int tmp_index_11742_0;
     int tmp_index_11741_0;
     int tmp_index_11743_0;
     int tmp_index_11744_0;
     int _for_it_425_0;
-    int tmp_index_11748_0;
-    int tmp_index_11751_0;
-    int tmp_index_11755_0;
-    int tmp_index_11746_0;
     int tmp_index_11752_0;
+    int tmp_index_11746_0;
+    int tmp_index_11755_0;
+    int tmp_index_11751_0;
+    int tmp_index_11748_0;
     int tmp_index_11753_0;
     int tmp_index_11756_0;
     int tmp_index_11749_0;
     int _for_it_426_0;
     int iband_var_497_0;
     int _for_it_427_0;
-    int tmp_index_11766_0;
-    int tmp_index_11764_0;
-    int tmp_index_11762_0;
     int tmp_index_11761_0;
+    int tmp_index_11764_0;
+    int tmp_index_11766_0;
+    int tmp_index_11762_0;
     int _for_it_428_0;
     int _for_it_429_0;
-    int tmp_index_11768_0;
     int tmp_index_11772_0;
-    int tmp_index_11774_0;
+    int tmp_index_11768_0;
     int tmp_index_11770_0;
+    int tmp_index_11774_0;
     int _for_it_430_0;
     int _for_it_431_0;
     int tmp_index_11778_0;
     int tmp_index_11777_0;
     int _for_it_432_0;
-    int tmp_parfor_126_0_0;
-    int ixc0_var_1708_0_0;
-    int _for_it_246_0_0;
-    int jl_var_1711_0_0;
-    int tmp_index_7087_0_0;
-    int tmp_index_7085_0_0;
-    int tmp_index_7081_0_0;
-    int tmp_index_7083_0_0;
-    int tmp_index_7095_0_0;
-    int tmp_call_185_0_0;
-    int tmp_index_7093_0_0;
-    int tmp_index_7089_0_0;
-    int tmp_index_7091_0_0;
-    int tmp_index_7097_0_0;
-    int tmp_index_7101_0_0;
-    int tmp_call_187_0_0;
-    int tmp_index_7099_0_0;
-    int tmp_index_7105_0_0;
-    int tmp_index_7110_0_0;
-    int tmp_index_7108_0_0;
-    int tmp_index_7103_0_0;
-    int tmp_index_7113_0_0;
-    int tmp_call_189_0_0;
-    int tmp_index_7115_0_0;
-    int inds_var_1661_0_0;
-    int ind0_var_1659_0_0;
-    int indf_var_1662_0_0;
-    int ind1_var_1660_0_0;
-    int _if_cond_215_0_0;
-    int _if_cond_217_0_0;
-    int _if_cond_219_0_0;
-    int _for_it_247_0_0;
-    int tmp_index_7121_0_0;
-    int tmp_index_7127_0_0;
-    int tmp_index_7117_0_0;
-    int tmp_index_7119_0_0;
-    int tmp_index_7123_0_0;
-    int tmp_index_7125_0_0;
-    int tmp_index_7139_0_0;
-    int tmp_index_7133_0_0;
-    int tmp_index_7137_0_0;
-    int tmp_index_7131_0_0;
-    int tmp_index_7129_0_0;
-    int tmp_index_7135_0_0;
-    int tmp_index_7145_0_0;
-    int tmp_index_7147_0_0;
-    int tmp_index_7141_0_0;
-    int tmp_index_7143_0_0;
-    int tmp_index_7149_0_0;
-    int tmp_index_7155_0_0;
-    int tmp_index_7157_0_0;
-    int tmp_index_7153_0_0;
-    int tmp_index_7151_0_0;
-    int tmp_index_7159_0_0;
-    int tmp_index_7167_0_0;
-    int tmp_index_7165_0_0;
-    int tmp_index_7169_0_0;
-    int tmp_index_7171_0_0;
-    int tmp_index_7163_0_0;
-    int tmp_index_7161_0_0;
-    int tmp_index_7175_0_0;
-    int tmp_index_7177_0_0;
-    int tmp_index_7173_0_0;
-    int tmp_index_7179_0_0;
-    int tmp_parfor_116_0_0;
-    int tmp_parfor_117_0_0;
-    int tmp_parfor_118_0_0;
-    int tmp_parfor_119_0_0;
-    int tmp_parfor_120_0_0;
-    int tmp_parfor_121_0_0;
-    int tmp_index_7276_0_0;
-    int tmp_index_7255_0_0;
-    int tmp_index_7261_0_0;
-    int tmp_index_7265_0_0;
-    int tmp_index_7251_0_0;
-    int tmp_index_7271_0_0;
-    int _for_it_248_0_0;
-    int tmp_index_7287_0_0;
-    int tmp_index_7289_0_0;
-    int tmp_index_7292_0_0;
-    int tmp_index_7294_0_0;
-    int _for_it_249_0_0;
-    int tmp_index_7302_0_0;
-    int tmp_index_7314_0_0;
-    int tmp_index_7310_0_0;
-    int tmp_index_7297_0_0;
-    int tmp_index_7306_0_0;
-    int tmp_index_7318_0_0;
-    int tmp_index_7300_0_0;
-    int _for_it_250_0_0;
-    int ixc0_var_1543_0_0;
-    int _for_it_220_0_0;
-    int jl_var_1546_0_0;
-    int tmp_index_6224_0_0;
-    int tmp_index_6222_0_0;
-    int tmp_index_6214_0_0;
-    int tmp_index_6212_0_0;
-    int tmp_index_6219_0_0;
-    int tmp_index_6217_0_0;
-    int ind0_var_1529_0_0;
-    int indf_var_1532_0_0;
-    int inds_var_1531_0_0;
-    int ind1_var_1530_0_0;
-    int _for_it_221_0_0;
-    int tmp_index_6255_0_0;
-    int tmp_index_6226_0_0;
-    int tmp_index_6246_0_0;
-    int tmp_index_6263_0_0;
-    int tmp_index_6251_0_0;
-    int tmp_index_6230_0_0;
-    int tmp_index_6249_0_0;
-    int tmp_index_6267_0_0;
-    int tmp_index_6259_0_0;
-    int tmp_index_6236_0_0;
-    int tmp_index_6240_0_0;
-    int _for_it_222_0_0;
-    int tmp_index_6273_0_0;
-    int tmp_index_6278_0_0;
-    int tmp_index_6275_0_0;
-    int tmp_index_6280_0_0;
-    int _for_it_223_0_0;
-    int tmp_index_6300_0_0;
-    int tmp_index_6286_0_0;
-    int tmp_index_6283_0_0;
-    int tmp_index_6288_0_0;
-    int tmp_index_6304_0_0;
-    int tmp_index_6292_0_0;
-    int tmp_index_6296_0_0;
-    int _for_it_224_0_0;
-    int tmp_parfor_140_0_0;
-    int tmp_parfor_139_0_0;
-    int _for_it_271_0_0;
-    int tmp_index_8063_0_0;
-    int indm_var_1827_0_0;
-    int _for_it_272_0_0;
-    int tmp_index_8067_0_0;
-    int tmp_index_8078_0_0;
-    int tmp_index_8073_0_0;
-    int tmp_index_8076_0_0;
-    int _for_it_273_0_0;
-    int tmp_index_7323_0_0;
-    int tmp_index_7322_0_0;
-    int tmp_parfor_20_0_0;
-    int tmp_index_2258_0_0;
-    int tmp_index_2257_0_0;
-    int tmp_parfor_10_0_0;
-    int icl_var_1165_0_0;
-    int ich_var_1164_0_0;
-    int _for_it_128_0_0;
-    int tmp_index_3151_0_0;
-    int _if_cond_112_0_0;
-    int _for_it_129_0_0;
-    int _for_it_175_0_0;
-    int tmp_index_4803_0_0;
-    int tmp_index_4805_0_0;
-    int tmp_index_4809_0_0;
-    int tmp_index_4807_0_0;
-    int tmp_index_4813_0_0;
-    int tmp_index_4817_0_0;
-    int tmp_call_127_0_0;
-    int tmp_index_4815_0_0;
-    int tmp_index_4811_0_0;
-    int tmp_index_4821_0_0;
-    int tmp_call_129_0_0;
-    int tmp_index_4819_0_0;
-    int tmp_index_4823_0_0;
-    int tmp_index_4825_0_0;
-    int tmp_index_4829_0_0;
-    int tmp_index_4827_0_0;
-    int tmp_call_131_0_0;
-    int tmp_index_4832_0_0;
-    double _if_cond_157_0_0;
-    int tmp_index_4841_0_0;
-    int tmp_index_4843_0_0;
-    int tmp_index_4845_0_0;
-    int tmp_index_4847_0_0;
-    int tmp_call_134_0_0;
-    int tmp_index_4849_0_0;
-    int tmp_index_4861_0_0;
-    int tmp_index_4854_0_0;
-    int tmp_index_4852_0_0;
-    int tmp_index_4859_0_0;
-    int tmp_index_4857_0_0;
-    int inds_var_1354_0_0;
-    int ind0_var_1352_0_0;
-    int indf_var_1355_0_0;
-    int indm_var_1356_0_0;
-    int _if_cond_158_0_0;
-    int ind1_var_1353_0_0;
-    int _if_cond_160_0_0;
-    int _if_cond_162_0_0;
-    int _if_cond_164_0_0;
-    int _for_it_176_0_0;
-    int tmp_index_4837_0_0;
-    int tmp_index_4833_0_0;
-    int tmp_index_4836_0_0;
-    int tmp_index_4839_0_0;
-    int tmp_index_4865_0_0;
-    int tmp_index_4869_0_0;
-    int tmp_index_4871_0_0;
-    int tmp_index_4873_0_0;
-    int tmp_index_4863_0_0;
-    int tmp_index_4867_0_0;
-    int tmp_index_4879_0_0;
-    int tmp_index_4877_0_0;
-    int tmp_index_4885_0_0;
-    int tmp_index_4883_0_0;
-    int tmp_index_4875_0_0;
-    int tmp_index_4881_0_0;
-    int tmp_index_4889_0_0;
-    int tmp_index_4891_0_0;
-    int tmp_index_4887_0_0;
-    int tmp_index_4893_0_0;
-    int tmp_index_4905_0_0;
-    int tmp_index_4895_0_0;
-    int tmp_index_4903_0_0;
-    int tmp_index_4897_0_0;
-    int tmp_index_4899_0_0;
-    int tmp_index_4901_0_0;
-    int tmp_index_4913_0_0;
-    int tmp_index_4917_0_0;
-    int tmp_index_4909_0_0;
-    int tmp_index_4907_0_0;
-    int tmp_index_4915_0_0;
-    int tmp_index_4911_0_0;
-    int tmp_index_4921_0_0;
-    int tmp_index_4919_0_0;
-    int tmp_index_4925_0_0;
-    int tmp_index_4923_0_0;
-    int tmp_parfor_61_0_0;
-    int tmp_parfor_62_0_0;
-    int tmp_parfor_63_0_0;
-    int tmp_parfor_64_0_0;
-    int tmp_parfor_65_0_0;
-    int tmp_parfor_66_0_0;
-    int tmp_index_4997_0_0;
-    int tmp_index_5007_0_0;
-    int tmp_index_5011_0_0;
-    int tmp_index_5001_0_0;
-    int tmp_index_5042_0_0;
-    int tmp_index_5035_0_0;
-    int tmp_index_5037_0_0;
-    int _for_it_177_0_0;
-    int ixc0_var_1454_0_0;
-    int _for_it_194_0_0;
-    int jl_var_1457_0_0;
-    int tmp_index_5701_0_0;
-    int tmp_index_5694_0_0;
-    int tmp_index_5706_0_0;
-    int tmp_index_5704_0_0;
-    int tmp_index_5696_0_0;
-    int tmp_index_5708_0_0;
-    int tmp_index_5699_0_0;
-    int indf_var_1440_0_0;
-    int ind0_var_1437_0_0;
-    int inds_var_1439_0_0;
-    int ind1_var_1438_0_0;
-    int _for_it_195_0_0;
-    int tmp_index_5739_0_0;
-    int tmp_index_5743_0_0;
-    int tmp_index_5730_0_0;
-    int tmp_index_5714_0_0;
-    int tmp_index_5733_0_0;
-    int tmp_index_5724_0_0;
-    int tmp_index_5735_0_0;
-    int tmp_index_5751_0_0;
-    int tmp_index_5747_0_0;
-    int tmp_index_5720_0_0;
-    int tmp_index_5710_0_0;
-    int _for_it_196_0_0;
-    int tmp_index_5757_0_0;
-    int tmp_index_5762_0_0;
-    int tmp_index_5767_0_0;
-    int tmp_index_5764_0_0;
-    int tmp_index_5759_0_0;
-    int _for_it_197_0_0;
-    int tmp_index_5800_0_0;
-    int tmp_index_5769_0_0;
-    int tmp_index_5773_0_0;
-    int tmp_index_5788_0_0;
-    int tmp_index_5792_0_0;
-    int tmp_index_5796_0_0;
-    int tmp_index_5782_0_0;
-    int tmp_index_5784_0_0;
-    int tmp_index_5779_0_0;
-    int _for_it_198_0_0;
-    int tmp_parfor_158_0;
-    int tmp_parfor_157_0;
-    int tmp_index_8374_0;
-    int tmp_parfor_156_0;
-    int ich_var_1215_0_0;
-    int icl_var_1216_0_0;
-    int _for_it_144_0_0;
-    int tmp_index_3825_0_0;
-    int _if_cond_130_0_0;
-    int _for_it_145_0_0;
-    int _for_it_217_0_0;
-    int tmp_index_6174_0_0;
-    int tmp_index_6179_0_0;
-    int tmp_index_6176_0_0;
-    int tmp_index_6181_0_0;
-    int _for_it_218_0_0;
-    int tmp_index_6205_0_0;
-    int tmp_index_6184_0_0;
-    int tmp_index_6187_0_0;
-    int tmp_index_6197_0_0;
-    int tmp_index_6201_0_0;
-    int tmp_index_6193_0_0;
-    int tmp_index_6189_0_0;
-    int _for_it_219_0_0;
-    int ixc0_var_1217_0_0;
-    int _for_it_152_0_0;
-    int jl_var_1220_0_0;
-    int tmp_index_3944_0_0;
-    int tmp_index_3946_0_0;
-    int tmp_index_3942_0_0;
-    int tmp_index_3949_0_0;
-    int tmp_index_3960_0_0;
-    int tmp_index_3968_0_0;
-    int tmp_index_3965_0_0;
-    int tmp_index_3972_0_0;
-    int tmp_index_3970_0_0;
-    int tmp_index_3958_0_0;
-    int tmp_index_3963_0_0;
-    int indf_var_1199_0_0;
-    int inds_var_1198_0_0;
-    int ind0_var_1196_0_0;
-    int indm_var_1200_0_0;
-    int ind1_var_1197_0_0;
-    int _for_it_153_0_0;
-    int tmp_index_3954_0_0;
-    int tmp_index_3950_0_0;
-    int tmp_index_3953_0_0;
-    int tmp_index_3956_0_0;
-    int tmp_index_4002_0_0;
-    int tmp_index_4027_0_0;
-    int tmp_index_4023_0_0;
-    int tmp_index_3974_0_0;
-    int tmp_index_3996_0_0;
-    int tmp_index_4011_0_0;
-    int tmp_index_3984_0_0;
-    int tmp_index_4015_0_0;
-    int tmp_index_4007_0_0;
-    int tmp_index_4019_0_0;
-    int tmp_index_4031_0_0;
-    int tmp_index_4005_0_0;
-    int tmp_index_3978_0_0;
-    int tmp_index_3988_0_0;
-    int _for_it_154_0_0;
-    int _for_it_155_0_0;
-    int tmp_index_4048_0_0;
-    int tmp_index_4040_0_0;
-    int tmp_index_4037_0_0;
-    int tmp_index_4044_0_0;
-    int _for_it_156_0_0;
-    int _for_it_136_0_0;
-    int tmp_index_3475_0_0;
-    int tmp_index_3454_0_0;
-    int tmp_index_3466_0_0;
-    int tmp_index_3457_0_0;
-    int tmp_index_3478_0_0;
-    int tmp_index_3445_0_0;
-    int tmp_index_3472_0_0;
-    int tmp_index_3463_0_0;
-    int tmp_index_3481_0_0;
-    int tmp_index_3484_0_0;
-    int tmp_index_3451_0_0;
-    int tmp_index_3448_0_0;
-    int tmp_index_3460_0_0;
-    int tmp_index_3469_0_0;
-    int _for_it_137_0_0;
     int ixc0_var_1787_0_0;
     int _for_it_259_0_0;
     int jl_var_1790_0_0;
-    int tmp_index_7556_0_0;
-    int tmp_index_7554_0_0;
     int tmp_index_7558_0_0;
     int tmp_index_7560_0_0;
-    int tmp_index_7566_0_0;
-    int tmp_index_7564_0_0;
+    int tmp_index_7554_0_0;
+    int tmp_index_7556_0_0;
+    int tmp_call_197_0_0;
     int tmp_index_7568_0_0;
     int tmp_index_7562_0_0;
-    int tmp_call_197_0_0;
-    int tmp_index_7570_0_0;
+    int tmp_index_7566_0_0;
+    int tmp_index_7564_0_0;
     int tmp_index_7572_0_0;
-    int tmp_index_7574_0_0;
     int tmp_call_199_0_0;
-    int tmp_index_7578_0_0;
-    int tmp_index_7581_0_0;
-    int tmp_index_7586_0_0;
-    int tmp_call_201_0_0;
-    int tmp_index_7583_0_0;
-    int tmp_index_7588_0_0;
+    int tmp_index_7574_0_0;
+    int tmp_index_7570_0_0;
     int tmp_index_7576_0_0;
+    int tmp_index_7583_0_0;
+    int tmp_call_201_0_0;
+    int tmp_index_7581_0_0;
+    int tmp_index_7588_0_0;
+    int tmp_index_7586_0_0;
+    int tmp_index_7578_0_0;
+    int ind0_var_1740_0_0;
     int indf_var_1743_0_0;
     int inds_var_1742_0_0;
-    int ind0_var_1740_0_0;
     int ind1_var_1741_0_0;
     int _if_cond_233_0_0;
     int _if_cond_235_0_0;
     int _if_cond_237_0_0;
     int _for_it_260_0_0;
-    int tmp_index_7590_0_0;
+    int tmp_index_7600_0_0;
+    int tmp_index_7596_0_0;
+    int tmp_index_7592_0_0;
     int tmp_index_7594_0_0;
     int tmp_index_7598_0_0;
-    int tmp_index_7600_0_0;
-    int tmp_index_7592_0_0;
-    int tmp_index_7596_0_0;
+    int tmp_index_7590_0_0;
     int tmp_index_7606_0_0;
+    int tmp_index_7604_0_0;
     int tmp_index_7608_0_0;
+    int tmp_index_7602_0_0;
     int tmp_index_7610_0_0;
     int tmp_index_7612_0_0;
-    int tmp_index_7602_0_0;
-    int tmp_index_7604_0_0;
-    int tmp_index_7614_0_0;
-    int tmp_index_7620_0_0;
     int tmp_index_7616_0_0;
+    int tmp_index_7614_0_0;
     int tmp_index_7618_0_0;
-    int tmp_index_7630_0_0;
-    int tmp_index_7626_0_0;
-    int tmp_index_7624_0_0;
+    int tmp_index_7620_0_0;
     int tmp_index_7628_0_0;
-    int tmp_index_7632_0_0;
+    int tmp_index_7630_0_0;
     int tmp_index_7622_0_0;
-    int tmp_index_7638_0_0;
-    int tmp_index_7636_0_0;
-    int tmp_index_7642_0_0;
+    int tmp_index_7626_0_0;
+    int tmp_index_7632_0_0;
+    int tmp_index_7624_0_0;
     int tmp_index_7644_0_0;
     int tmp_index_7640_0_0;
+    int tmp_index_7642_0_0;
+    int tmp_index_7636_0_0;
     int tmp_index_7634_0_0;
+    int tmp_index_7638_0_0;
     int tmp_index_7648_0_0;
     int tmp_index_7650_0_0;
     int tmp_index_7646_0_0;
@@ -3914,547 +3599,646 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_parfor_136_0_0;
     int tmp_parfor_137_0_0;
     int tmp_parfor_138_0_0;
-    int tmp_index_7749_0_0;
     int tmp_index_7744_0_0;
-    int tmp_index_7734_0_0;
+    int tmp_index_7728_0_0;
+    int tmp_index_7749_0_0;
     int tmp_index_7724_0_0;
     int tmp_index_7738_0_0;
-    int tmp_index_7728_0_0;
+    int tmp_index_7734_0_0;
     int _for_it_261_0_0;
     int _for_it_262_0_0;
-    int tmp_index_7763_0_0;
     int tmp_index_7760_0_0;
+    int tmp_index_7763_0_0;
     int _for_it_263_0_0;
-    int tmp_index_8383_0_0;
-    int tmp_index_8384_0_0;
-    int tmp_parfor_22_0_0;
-    int tmp_parfor_3_0_1;
-    int tmp_parfor_2_0_1;
-    int tmp_index_4053_0_0;
-    int tmp_index_4052_0_0;
-    int tmp_parfor_13_0_0;
-    int tmp_index_3817_0_0;
-    int tmp_index_3816_0_0;
-    int tmp_parfor_12_0_0;
-    int ixc0_var_1041_0_0;
-    int _for_it_118_0_0;
-    int jl_var_1044_0_0;
-    int tmp_index_2605_0_0;
-    int tmp_index_2603_0_0;
-    int tmp_index_2607_0_0;
-    int tmp_index_2609_0_0;
-    int tmp_index_2617_0_0;
-    int tmp_index_2613_0_0;
-    int tmp_index_2611_0_0;
-    int tmp_call_54_0_0;
-    int tmp_index_2615_0_0;
-    int tmp_index_2623_0_0;
-    int tmp_index_2619_0_0;
-    int tmp_index_2621_0_0;
-    int tmp_call_56_0_0;
-    int tmp_index_2629_0_0;
-    int tmp_call_58_0_0;
-    int tmp_index_2625_0_0;
-    int tmp_index_2627_0_0;
-    int tmp_index_2636_0_0;
-    int tmp_call_60_0_0;
-    int tmp_index_2643_0_0;
-    int tmp_index_2633_0_0;
-    int tmp_index_2641_0_0;
-    int tmp_index_2645_0_0;
-    int tmp_index_2631_0_0;
-    int tmp_index_2638_0_0;
-    int indm_var_994_0_0;
-    int indf_var_993_0_0;
-    int inds_var_992_0_0;
-    int ind0_var_990_0_0;
-    int ind1_var_991_0_0;
-    int _if_cond_59_0_0;
-    int _if_cond_61_0_0;
-    int _if_cond_63_0_0;
-    int _for_it_119_0_0;
-    int tmp_index_2657_0_0;
-    int tmp_index_2647_0_0;
-    int tmp_index_2655_0_0;
-    int tmp_index_2649_0_0;
-    int tmp_index_2653_0_0;
-    int tmp_index_2651_0_0;
-    int tmp_index_2659_0_0;
-    int tmp_index_2663_0_0;
-    int tmp_index_2665_0_0;
-    int tmp_index_2661_0_0;
-    int tmp_index_2667_0_0;
-    int tmp_index_2669_0_0;
-    int tmp_index_2673_0_0;
-    int tmp_index_2675_0_0;
-    int tmp_index_2677_0_0;
-    int tmp_index_2671_0_0;
-    int tmp_index_2679_0_0;
-    int tmp_index_2685_0_0;
-    int tmp_index_2681_0_0;
-    int tmp_index_2683_0_0;
-    int tmp_index_2689_0_0;
-    int tmp_index_2687_0_0;
-    int tmp_index_2691_0_0;
-    int tmp_index_2697_0_0;
-    int tmp_index_2699_0_0;
-    int tmp_index_2693_0_0;
-    int tmp_index_2701_0_0;
-    int tmp_index_2695_0_0;
-    int tmp_index_2709_0_0;
-    int tmp_index_2703_0_0;
-    int tmp_index_2705_0_0;
-    int tmp_index_2707_0_0;
-    int tmp_parfor_11_0_0;
-    int tmp_parfor_12_1_0;
-    int tmp_parfor_13_1_0;
-    int tmp_parfor_14_0_0;
-    int tmp_parfor_15_0_0;
-    int tmp_parfor_16_0_0;
-    int tmp_index_2785_0_0;
-    int tmp_index_2791_0_0;
-    int tmp_index_2781_0_0;
-    int tmp_index_2795_0_0;
-    int tmp_index_2821_0_0;
-    int tmp_index_2826_0_0;
-    int tmp_index_2828_0_0;
-    int tmp_index_2819_0_0;
-    int tmp_index_2832_0_0;
-    int _for_it_120_0_0;
-    int tmp_index_2849_0_0;
-    int tmp_index_2847_0_0;
-    int tmp_index_2843_0_0;
-    int tmp_index_2845_0_0;
-    int tmp_call_62_0_0;
-    int tmp_index_2857_0_0;
-    int tmp_index_2855_0_0;
-    int tmp_index_2853_0_0;
-    int tmp_index_2851_0_0;
-    int tmp_index_2879_0_0;
-    int tmp_index_2859_0_0;
-    int tmp_index_2875_0_0;
-    int tmp_index_2869_0_0;
-    int tmp_index_2865_0_0;
-    int tmp_index_2867_0_0;
-    int tmp_index_2873_0_0;
-    int tmp_index_2863_0_0;
-    int tmp_call_64_0_0;
-    int tmp_index_2871_0_0;
-    int tmp_index_2877_0_0;
-    int tmp_index_2861_0_0;
-    int tmp_call_66_0_0;
-    int tmp_index_2883_0_0;
-    int tmp_index_2886_0_0;
-    int tmp_index_2881_0_0;
-    int tmp_index_2888_0_0;
-    int _for_it_121_0_0;
-    int tmp_index_2891_0_0;
-    int tmp_index_2914_0_0;
-    int tmp_index_2910_0_0;
-    int _for_it_122_0_0;
-    int tmp_parfor_142_0_0;
-    int tmp_parfor_141_0_0;
-    int tmp_parfor_189_0_0;
-    int tmp_parfor_188_0_0;
-    int _for_it_300_0_0;
-    int tmp_index_9124_0_0;
-    int tmp_index_9119_0_0;
-    int tmp_index_9117_0_0;
-    int tmp_index_9133_0_0;
-    int tmp_index_9129_0_0;
-    int tmp_index_9127_0_0;
-    int tmp_index_9122_0_0;
-    int tmp_index_9131_0_0;
-    int ind0_var_2054_0_0;
-    int indf_var_2057_0_0;
-    int indm_var_2058_0_0;
-    int ind1_var_2055_0_0;
-    int _for_it_301_0_0;
-    int tmp_index_9162_0_0;
-    int tmp_index_9156_0_0;
-    int tmp_index_9158_0_0;
-    int tmp_index_9139_0_0;
-    int tmp_index_9135_0_0;
-    int tmp_index_9174_0_0;
-    int tmp_index_9166_0_0;
-    int tmp_index_9153_0_0;
-    int tmp_index_9147_0_0;
-    int tmp_index_9170_0_0;
-    int _for_it_302_0_0;
-    int tmp_index_5806_0_0;
-    int tmp_index_5807_0_0;
-    int tmp_parfor_16_1_0;
-    int _for_it_264_0_0;
-    int tmp_index_7766_0_0;
-    int _for_it_265_0_0;
-    int tmp_parfor_79_0_0;
-    int tmp_parfor_78_0_0;
-    int _for_it_115_0_0;
-    int tmp_index_2520_0_0;
-    int tmp_index_2522_0_0;
-    int tmp_index_2526_0_0;
-    int tmp_index_2524_0_0;
-    int tmp_index_2532_0_0;
-    int tmp_index_2530_0_0;
-    int tmp_index_2534_0_0;
-    int tmp_index_2528_0_0;
-    int tmp_call_48_0_0;
-    int tmp_index_2554_0_0;
-    int tmp_index_2548_0_0;
-    int tmp_index_2556_0_0;
-    int tmp_index_2552_0_0;
-    int tmp_index_2542_0_0;
-    int tmp_index_2540_0_0;
-    int tmp_index_2536_0_0;
-    int tmp_call_50_0_0;
-    int tmp_index_2544_0_0;
-    int tmp_index_2546_0_0;
-    int tmp_index_2538_0_0;
-    int tmp_index_2550_0_0;
-    int tmp_call_52_0_0;
-    int tmp_index_2563_0_0;
-    int tmp_index_2558_0_0;
-    int tmp_index_2560_0_0;
-    int tmp_index_2565_0_0;
-    int _for_it_116_0_0;
-    int tmp_index_2568_0_0;
-    int tmp_index_2587_0_0;
-    int tmp_index_2591_0_0;
-    int _for_it_117_0_0;
-    int ixc0_var_1166_0_0;
-    int _for_it_138_0_0;
-    int jl_var_1169_0_0;
-    int tmp_index_3492_0_0;
-    int tmp_index_3490_0_0;
-    int tmp_index_3494_0_0;
-    int tmp_index_3496_0_0;
-    int tmp_index_3498_0_0;
-    int tmp_index_3502_0_0;
-    int tmp_index_3500_0_0;
-    int tmp_index_3504_0_0;
-    int tmp_call_93_0_0;
-    int tmp_index_3508_0_0;
-    int tmp_index_3510_0_0;
-    int tmp_call_95_0_0;
-    int tmp_index_3506_0_0;
-    int tmp_index_3519_0_0;
-    int tmp_index_3512_0_0;
-    int tmp_index_3517_0_0;
-    int tmp_call_97_0_0;
-    int tmp_index_3522_0_0;
-    int tmp_index_3524_0_0;
-    int tmp_index_3514_0_0;
-    int indf_var_1121_0_0;
-    int ind0_var_1118_0_0;
-    int inds_var_1120_0_0;
-    int ind1_var_1119_0_0;
-    int _if_cond_123_0_0;
-    int _if_cond_125_0_0;
-    int _if_cond_127_0_0;
-    int _for_it_139_0_0;
-    int tmp_index_3528_0_0;
-    int tmp_index_3536_0_0;
-    int tmp_index_3532_0_0;
-    int tmp_index_3534_0_0;
-    int tmp_index_3526_0_0;
-    int tmp_index_3530_0_0;
-    int tmp_index_3540_0_0;
-    int tmp_index_3546_0_0;
-    int tmp_index_3548_0_0;
-    int tmp_index_3544_0_0;
-    int tmp_index_3542_0_0;
-    int tmp_index_3538_0_0;
-    int tmp_index_3554_0_0;
-    int tmp_index_3552_0_0;
-    int tmp_index_3550_0_0;
-    int tmp_index_3556_0_0;
-    int tmp_index_3558_0_0;
-    int tmp_index_3562_0_0;
-    int tmp_index_3566_0_0;
-    int tmp_index_3568_0_0;
-    int tmp_index_3564_0_0;
-    int tmp_index_3560_0_0;
-    int tmp_index_3580_0_0;
-    int tmp_index_3576_0_0;
-    int tmp_index_3574_0_0;
-    int tmp_index_3570_0_0;
-    int tmp_index_3572_0_0;
-    int tmp_index_3578_0_0;
-    int tmp_index_3582_0_0;
-    int tmp_index_3586_0_0;
-    int tmp_index_3588_0_0;
-    int tmp_index_3584_0_0;
-    int tmp_parfor_28_0_1;
-    int tmp_parfor_29_0_1;
-    int tmp_parfor_30_0_0;
-    int tmp_parfor_31_0_0;
-    int tmp_parfor_32_0_0;
-    int tmp_parfor_33_0_0;
-    int tmp_index_3685_0_0;
-    int tmp_index_3664_0_0;
-    int tmp_index_3670_0_0;
-    int tmp_index_3660_0_0;
-    int tmp_index_3680_0_0;
-    int tmp_index_3674_0_0;
-    int _for_it_140_0_0;
-    int tmp_index_3700_0_0;
-    int tmp_index_3702_0_0;
-    int tmp_index_3696_0_0;
-    int tmp_index_3698_0_0;
-    int tmp_index_3710_0_0;
-    int tmp_index_3704_0_0;
-    int tmp_call_99_0_0;
-    int tmp_index_3706_0_0;
-    int tmp_index_3708_0_0;
-    int tmp_index_3726_0_0;
-    int tmp_index_3724_0_0;
-    int tmp_index_3728_0_0;
-    int tmp_index_3720_0_0;
-    int tmp_index_3722_0_0;
-    int tmp_index_3730_0_0;
-    int tmp_index_3732_0_0;
-    int tmp_index_3718_0_0;
-    int tmp_index_3714_0_0;
-    int tmp_call_101_0_0;
-    int tmp_index_3712_0_0;
-    int tmp_index_3716_0_0;
-    int tmp_call_103_0_0;
-    int tmp_index_3734_0_0;
-    int tmp_index_3739_0_0;
-    int tmp_index_3736_0_0;
-    int tmp_index_3741_0_0;
-    int _for_it_141_0_0;
-    int tmp_index_3744_0_0;
-    int tmp_index_3763_0_0;
-    int _for_it_142_0_0;
-    int tmp_index_3780_0_0;
-    int tmp_index_3792_0_0;
-    int tmp_index_3789_0_0;
-    int tmp_index_3774_0_0;
-    int tmp_index_3783_0_0;
-    int tmp_index_3801_0_0;
-    int tmp_index_3798_0_0;
-    int tmp_index_3813_0_0;
-    int tmp_index_3807_0_0;
-    int tmp_index_3810_0_0;
-    int tmp_index_3795_0_0;
-    int tmp_index_3804_0_0;
-    int tmp_index_3777_0_0;
-    int tmp_index_3786_0_0;
-    int _for_it_143_0_0;
-    int tmp_index_5568_0_0;
-    int tmp_index_5569_0_0;
-    int tmp_parfor_15_1_0;
-    int tmp_index_5570_0_0;
-    int tmp_index_5571_0_0;
-    int icl_var_2109_0_0;
-    int ich_var_2108_0_0;
-    int _for_it_308_0_0;
-    int tmp_index_9326_0_0;
-    int _if_cond_284_0_0;
-    int _for_it_309_0_0;
-    int tmp_index_6311_0_0;
-    int tmp_index_6310_0_0;
-    int tmp_parfor_18_0_0;
-    int tmp_index_4055_0_0;
-    int tmp_index_4054_0_0;
-    int _for_it_149_0_0;
-    int _for_it_150_0_0;
-    int tmp_index_3927_0_0;
-    int tmp_index_3935_0_0;
-    int tmp_index_3931_0_0;
-    int tmp_index_3924_0_0;
-    int _for_it_151_0_0;
-    int _for_it_310_0_0;
-    int tmp_index_9334_0_0;
-    int tmp_index_9339_0_0;
-    int tmp_index_9337_0_0;
-    int tmp_index_9342_0_0;
-    int tmp_index_9332_0_0;
-    int tmp_index_9344_0_0;
-    int ind0_var_2095_0_0;
-    int inds_var_2097_0_0;
-    int indf_var_2098_0_0;
-    int ind1_var_2096_0_0;
-    int _for_it_311_0_0;
-    int tmp_index_9379_0_0;
-    int tmp_index_9387_0_0;
-    int tmp_index_9366_0_0;
-    int tmp_index_9360_0_0;
-    int tmp_index_9346_0_0;
-    int tmp_index_9350_0_0;
-    int tmp_index_9375_0_0;
-    int tmp_index_9371_0_0;
-    int tmp_index_9383_0_0;
-    int tmp_index_9369_0_0;
-    int tmp_index_9356_0_0;
-    int _for_it_312_0_0;
-    int ixc0_var_2026_0_0;
-    int _for_it_290_0_0;
-    int jl_var_2029_0_0;
-    int tmp_index_8722_0_0;
-    int tmp_index_8720_0_0;
-    int tmp_index_8718_0_0;
-    int tmp_index_8724_0_0;
-    int tmp_index_8726_0_0;
-    int tmp_call_235_0_0;
-    int tmp_index_8730_0_0;
-    int tmp_index_8728_0_0;
-    int tmp_index_8732_0_0;
-    int tmp_call_237_0_0;
-    int tmp_index_8736_0_0;
-    int tmp_index_8738_0_0;
-    int tmp_index_8734_0_0;
-    int tmp_index_8742_0_0;
-    int tmp_index_8744_0_0;
-    int tmp_call_239_0_0;
-    int tmp_index_8740_0_0;
-    int tmp_index_8747_0_0;
-    int tmp_index_8760_0_0;
-    int tmp_index_8758_0_0;
-    int tmp_index_8756_0_0;
-    int tmp_index_8772_0_0;
-    int tmp_index_8764_0_0;
-    int tmp_index_8776_0_0;
-    int tmp_index_8762_0_0;
-    int tmp_call_242_0_0;
-    int tmp_index_8769_0_0;
-    int tmp_index_8767_0_0;
-    int tmp_index_8774_0_0;
-    int indf_var_1965_0_0;
-    int ind0_var_1962_0_0;
-    int indm_var_1966_0_0;
-    int inds_var_1964_0_0;
-    int ind1_var_1963_0_0;
-    int _if_cond_272_0_0;
-    int _if_cond_274_0_0;
-    int _if_cond_276_0_0;
-    int _if_cond_278_0_0;
-    int _for_it_291_0_0;
-    int tmp_index_8752_0_0;
-    int tmp_index_8748_0_0;
-    int tmp_index_8751_0_0;
-    int tmp_index_8754_0_0;
-    int tmp_index_8784_0_0;
-    int tmp_index_8786_0_0;
-    int tmp_index_8780_0_0;
-    int tmp_index_8782_0_0;
-    int tmp_index_8788_0_0;
-    int tmp_index_8778_0_0;
-    int tmp_index_8792_0_0;
-    int tmp_index_8794_0_0;
-    int tmp_index_8790_0_0;
-    int tmp_index_8800_0_0;
-    int tmp_index_8798_0_0;
-    int tmp_index_8796_0_0;
-    int tmp_index_8806_0_0;
-    int tmp_index_8804_0_0;
-    int tmp_index_8802_0_0;
-    int tmp_index_8808_0_0;
-    int tmp_index_8814_0_0;
-    int tmp_index_8816_0_0;
-    int tmp_index_8812_0_0;
-    int tmp_index_8810_0_0;
-    int tmp_index_8820_0_0;
-    int tmp_index_8818_0_0;
-    int tmp_index_8822_0_0;
-    int tmp_index_8826_0_0;
-    int tmp_index_8832_0_0;
-    int tmp_index_8824_0_0;
-    int tmp_index_8830_0_0;
-    int tmp_index_8828_0_0;
-    int tmp_index_8840_0_0;
-    int tmp_index_8838_0_0;
-    int tmp_index_8834_0_0;
-    int tmp_index_8836_0_0;
-    int tmp_parfor_170_0_0;
-    int tmp_parfor_171_0_0;
-    int tmp_parfor_172_0_0;
-    int tmp_parfor_173_0_0;
-    int tmp_parfor_174_0_0;
-    int tmp_parfor_175_0_0;
-    int tmp_index_8916_0_0;
-    int tmp_index_8922_0_0;
-    int tmp_index_8912_0_0;
-    int tmp_index_8926_0_0;
-    int tmp_index_8950_0_0;
-    int tmp_index_8952_0_0;
-    int tmp_index_8957_0_0;
-    int _for_it_292_0_0;
-    int tmp_index_8970_0_0;
-    int tmp_index_8972_0_0;
-    int tmp_index_8968_0_0;
-    int tmp_index_8975_0_0;
-    double _if_cond_280_0_0;
-    int tmp_index_8986_0_0;
-    int tmp_index_8989_0_0;
-    int tmp_index_8991_0_0;
-    int tmp_index_8994_0_0;
-    int tmp_index_8984_0_0;
-    int _for_it_293_0_0;
-    int tmp_index_8980_0_0;
-    int tmp_index_8976_0_0;
-    int tmp_index_8979_0_0;
-    int tmp_index_8982_0_0;
-    int tmp_index_8998_0_0;
-    int tmp_index_9007_0_0;
-    int tmp_index_9021_0_0;
-    int tmp_index_9025_0_0;
-    int tmp_index_9017_0_0;
-    int tmp_index_9013_0_0;
-    int tmp_index_9009_0_0;
-    int tmp_index_9004_0_0;
-    int _for_it_294_0_0;
-    int _for_it_204_0_0;
-    int tmp_index_5894_0_0;
-    int tmp_index_5896_0_0;
-    int tmp_index_5908_0_0;
-    int tmp_index_5901_0_0;
-    int tmp_index_5906_0_0;
-    int tmp_index_5912_0_0;
-    int tmp_index_5910_0_0;
-    int tmp_index_5899_0_0;
-    int tmp_index_5904_0_0;
+    int ixc0_var_1454_0_0;
+    int _for_it_194_0_0;
+    int jl_var_1457_0_0;
+    int tmp_index_5706_0_0;
+    int tmp_index_5704_0_0;
+    int tmp_index_5699_0_0;
+    int tmp_index_5694_0_0;
+    int tmp_index_5701_0_0;
+    int tmp_index_5708_0_0;
+    int tmp_index_5696_0_0;
+    int indf_var_1440_0_0;
+    int ind0_var_1437_0_0;
+    int inds_var_1439_0_0;
+    int ind1_var_1438_0_0;
+    int _for_it_195_0_0;
+    int tmp_index_5720_0_0;
+    int tmp_index_5724_0_0;
+    int tmp_index_5710_0_0;
+    int tmp_index_5743_0_0;
+    int tmp_index_5733_0_0;
+    int tmp_index_5730_0_0;
+    int tmp_index_5735_0_0;
+    int tmp_index_5714_0_0;
+    int tmp_index_5747_0_0;
+    int tmp_index_5739_0_0;
+    int tmp_index_5751_0_0;
+    int _for_it_196_0_0;
+    int tmp_index_5764_0_0;
+    int tmp_index_5762_0_0;
+    int tmp_index_5767_0_0;
+    int tmp_index_5759_0_0;
+    int tmp_index_5757_0_0;
+    int _for_it_197_0_0;
+    int tmp_index_5792_0_0;
+    int tmp_index_5773_0_0;
+    int tmp_index_5769_0_0;
+    int tmp_index_5784_0_0;
+    int tmp_index_5796_0_0;
+    int tmp_index_5779_0_0;
+    int tmp_index_5788_0_0;
+    int tmp_index_5782_0_0;
+    int tmp_index_5800_0_0;
+    int _for_it_198_0_0;
+    int ixc0_var_1503_0_0;
+    int _for_it_207_0_0;
+    int jl_var_1506_0_0;
+    int tmp_index_5976_0_0;
+    int tmp_index_5972_0_0;
+    int tmp_index_5960_0_0;
+    int tmp_index_5967_0_0;
+    int tmp_index_5970_0_0;
+    int tmp_index_5962_0_0;
+    int tmp_index_5974_0_0;
+    int tmp_index_5965_0_0;
     int ind0_var_1483_0_0;
-    double pp_var_1493_0_0;
-    int indm_var_1487_0_0;
+    int inds_var_1485_0_0;
     int indf_var_1486_0_0;
+    int indm_var_1487_0_0;
+    double pp_var_1493_0_0;
     int ind1_var_1484_0_0;
-    int _for_it_205_0_0;
-    int tmp_index_5953_0_0;
-    int tmp_index_5932_0_0;
-    int tmp_index_5945_0_0;
-    int tmp_index_5918_0_0;
-    int tmp_index_5914_0_0;
-    int tmp_index_5941_0_0;
-    int tmp_index_5926_0_0;
-    int tmp_index_5935_0_0;
-    int tmp_index_5937_0_0;
-    int tmp_index_5949_0_0;
-    int _for_it_206_0_0;
-    int tmp_parfor_109_0_0;
+    int tmp_index_5980_0_0;
+    int tmp_index_5978_0_0;
+    int _for_it_208_0_0;
+    int tmp_index_6015_0_0;
+    int tmp_index_5996_0_0;
+    int tmp_index_5986_0_0;
+    int tmp_index_6019_0_0;
+    int tmp_index_6027_0_0;
+    int tmp_index_6031_0_0;
+    int tmp_index_6013_0_0;
+    int tmp_index_5992_0_0;
+    int tmp_index_6004_0_0;
+    int tmp_index_6010_0_0;
+    int tmp_index_6023_0_0;
+    int tmp_index_5982_0_0;
+    int _for_it_209_0_0;
+    int tmp_index_6053_0_0;
+    int tmp_index_6051_0_0;
+    int tmp_index_6055_0_0;
+    int tmp_index_6047_0_0;
+    int tmp_index_6039_0_0;
+    int tmp_index_6049_0_0;
+    int tmp_index_6044_0_0;
+    int tmp_index_6037_0_0;
+    int tmp_index_6042_0_0;
+    int _for_it_210_0_0;
+    int tmp_index_6084_0_0;
+    int tmp_index_6069_0_0;
+    int tmp_index_6088_0_0;
+    int tmp_index_6075_0_0;
+    int tmp_index_6080_0_0;
+    int tmp_index_6096_0_0;
+    int tmp_index_6092_0_0;
+    int tmp_index_6061_0_0;
+    int tmp_index_6057_0_0;
+    int tmp_index_6078_0_0;
+    int _for_it_211_0_0;
     int icl_var_1707_0_0;
     int ich_var_1706_0_0;
     int _for_it_238_0_0;
     int tmp_index_6829_0_0;
     int _if_cond_204_0_0;
     int _for_it_239_0_0;
-    int tmp_index_9030_0_0;
-    int tmp_index_9029_0_0;
-    int tmp_parfor_23_0_0;
+    int tmp_parfor_60_0_0;
+    int _for_it_279_0;
+    int _for_it_280_0;
+    int tmp_index_8379_0;
+    int tmp_index_8380_0;
+    int _for_it_281_0;
+    int _for_it_240_0_0;
+    int tmp_index_6843_0_0;
+    int tmp_index_6841_0_0;
+    int tmp_index_6845_0_0;
+    int tmp_index_6839_0_0;
+    int tmp_call_179_0_0;
+    int tmp_index_6853_0_0;
+    int tmp_index_6851_0_0;
+    int tmp_index_6849_0_0;
+    int tmp_index_6847_0_0;
+    int tmp_index_6859_0_0;
+    int tmp_index_6857_0_0;
+    int tmp_index_6855_0_0;
+    int tmp_call_181_0_0;
+    int tmp_index_6863_0_0;
+    int tmp_index_6868_0_0;
+    int tmp_index_6861_0_0;
+    int tmp_call_183_0_0;
+    int tmp_index_6871_0_0;
+    int tmp_index_6873_0_0;
+    int tmp_index_6866_0_0;
+    int ind0_var_1659_0_0;
+    int inds_var_1661_0_0;
+    int indf_var_1662_0_0;
+    int ind1_var_1660_0_0;
+    int _if_cond_205_0_0;
+    int _if_cond_207_0_0;
+    int _if_cond_209_0_0;
+    int _if_cond_211_0_0;
+    int _for_it_241_0_0;
+    int tmp_index_6883_0_0;
+    int tmp_index_6879_0_0;
+    int tmp_index_6875_0_0;
+    int tmp_index_6877_0_0;
+    int tmp_index_6885_0_0;
+    int tmp_index_6881_0_0;
+    int tmp_index_6893_0_0;
+    int tmp_index_6897_0_0;
+    int tmp_index_6895_0_0;
+    int tmp_index_6887_0_0;
+    int tmp_index_6889_0_0;
+    int tmp_index_6891_0_0;
+    int tmp_index_6905_0_0;
+    int tmp_index_6899_0_0;
+    int tmp_index_6903_0_0;
+    int tmp_index_6901_0_0;
+    int tmp_index_6909_0_0;
+    int tmp_index_6915_0_0;
+    int tmp_index_6913_0_0;
+    int tmp_index_6917_0_0;
+    int tmp_index_6907_0_0;
+    int tmp_index_6911_0_0;
+    int tmp_index_6921_0_0;
+    int tmp_index_6925_0_0;
+    int tmp_index_6929_0_0;
+    int tmp_index_6919_0_0;
+    int tmp_index_6923_0_0;
+    int tmp_index_6927_0_0;
+    int tmp_index_6933_0_0;
+    int tmp_index_6937_0_0;
+    int tmp_index_6931_0_0;
+    int tmp_index_6935_0_0;
+    int tmp_parfor_110_0_0;
+    int tmp_parfor_111_0_0;
+    int tmp_parfor_112_0_0;
+    int tmp_parfor_113_0_0;
+    int tmp_parfor_114_0_0;
+    int tmp_parfor_115_0_0;
+    int tmp_index_7034_0_0;
+    int tmp_index_7019_0_0;
+    int tmp_index_7029_0_0;
+    int tmp_index_7013_0_0;
+    int tmp_index_7009_0_0;
+    int tmp_index_7023_0_0;
+    int _for_it_242_0_0;
+    int _for_it_287_0_0;
+    int tmp_index_8658_0_0;
+    int tmp_index_8656_0_0;
+    int tmp_index_8654_0_0;
+    int tmp_index_8661_0_0;
+    double _if_cond_270_0_0;
+    int tmp_index_8677_0_0;
+    int tmp_index_8672_0_0;
+    int tmp_index_8680_0_0;
+    int tmp_index_8670_0_0;
+    int tmp_index_8675_0_0;
+    int indm_var_1966_0_0;
+    int ind0_var_1962_0_0;
+    int ind1_var_1963_0_0;
+    int _for_it_288_0_0;
+    int tmp_index_8662_0_0;
+    int tmp_index_8666_0_0;
+    int tmp_index_8665_0_0;
+    int tmp_index_8668_0_0;
+    int tmp_index_8707_0_0;
+    int tmp_index_8690_0_0;
+    int tmp_index_8693_0_0;
+    int tmp_index_8699_0_0;
+    int tmp_index_8711_0_0;
+    int tmp_index_8684_0_0;
+    int tmp_index_8703_0_0;
+    int tmp_index_8695_0_0;
+    int _for_it_289_0_0;
+    int _for_it_165_0_0;
+    int tmp_index_4396_0_0;
+    int tmp_index_4402_0_0;
+    int tmp_index_4411_0_0;
+    int tmp_index_4390_0_0;
+    int tmp_index_4387_0_0;
+    int tmp_index_4417_0_0;
+    int tmp_index_4405_0_0;
+    int tmp_index_4408_0_0;
+    int tmp_index_4414_0_0;
+    int tmp_index_4393_0_0;
+    int tmp_index_4399_0_0;
+    int tmp_index_4384_0_0;
+    int _for_it_166_0_0;
+    int _for_it_136_0_0;
+    int tmp_index_3454_0_0;
+    int tmp_index_3451_0_0;
+    int tmp_index_3472_0_0;
+    int tmp_index_3463_0_0;
+    int tmp_index_3484_0_0;
+    int tmp_index_3469_0_0;
+    int tmp_index_3475_0_0;
+    int tmp_index_3448_0_0;
+    int tmp_index_3478_0_0;
+    int tmp_index_3481_0_0;
+    int tmp_index_3466_0_0;
+    int tmp_index_3457_0_0;
+    int tmp_index_3445_0_0;
+    int tmp_index_3460_0_0;
+    int _for_it_137_0_0;
+    int _for_it_178_0_0;
+    int tmp_index_5051_0_0;
+    int tmp_index_5055_0_0;
+    int tmp_index_5053_0_0;
+    int tmp_index_5057_0_0;
+    int tmp_index_5061_0_0;
+    int tmp_index_5063_0_0;
+    int tmp_call_136_0_0;
+    int tmp_index_5059_0_0;
+    int tmp_index_5065_0_0;
+    int tmp_index_5087_0_0;
+    int tmp_index_5081_0_0;
+    int tmp_index_5077_0_0;
+    int tmp_index_5085_0_0;
+    int tmp_index_5083_0_0;
+    int tmp_index_5067_0_0;
+    int tmp_index_5069_0_0;
+    int tmp_call_138_0_0;
+    int tmp_index_5071_0_0;
+    int tmp_index_5073_0_0;
+    int tmp_index_5075_0_0;
+    int tmp_index_5079_0_0;
+    int tmp_call_140_0_0;
+    int tmp_index_5089_0_0;
+    int tmp_index_5091_0_0;
+    int tmp_index_5093_0_0;
+    int tmp_index_5096_0_0;
+    double _if_cond_166_0_0;
+    int tmp_index_5107_0_0;
+    int tmp_index_5105_0_0;
+    int tmp_index_5109_0_0;
+    int tmp_index_5118_0_0;
+    int tmp_index_5121_0_0;
+    int tmp_index_5111_0_0;
+    int tmp_index_5113_0_0;
+    int tmp_index_5123_0_0;
+    int tmp_index_5116_0_0;
+    int tmp_call_143_0_0;
+    int indm_var_1356_0_0;
+    int ind0_var_1352_0_0;
+    int indf_var_1355_0_0;
+    int ind1_var_1353_0_0;
+    int _for_it_179_0_0;
+    int tmp_index_5101_0_0;
+    int tmp_index_5097_0_0;
+    int tmp_index_5100_0_0;
+    int tmp_index_5103_0_0;
+    int tmp_index_5125_0_0;
+    int tmp_index_5129_0_0;
+    int tmp_index_5174_0_0;
+    int tmp_index_5153_0_0;
+    int tmp_index_5155_0_0;
+    int _for_it_180_0_0;
+    int tmp_parfor_4_0_1;
+    int tmp_index_3145_0_0;
+    int tmp_index_3144_0_0;
+    int tmp_parfor_11_1_0;
+    int tmp_parfor_187_0_0;
+    int tmp_parfor_186_0_0;
+    int _for_it_201_0_0;
+    int tmp_index_5829_0_0;
+    int tmp_index_5831_0_0;
+    int tmp_index_5826_0_0;
+    int tmp_index_5833_0_0;
+    int tmp_index_5821_0_0;
+    int tmp_index_5824_0_0;
+    int tmp_index_5819_0_0;
+    int tmp_index_5835_0_0;
+    int tmp_index_5837_0_0;
+    int tmp_index_5839_0_0;
+    int _for_it_202_0_0;
+    int tmp_index_5851_0_0;
+    int tmp_index_5841_0_0;
+    int tmp_index_5863_0_0;
+    int tmp_index_5869_0_0;
+    int tmp_index_5855_0_0;
+    int tmp_index_5845_0_0;
+    int tmp_index_5886_0_0;
+    int tmp_index_5874_0_0;
+    int tmp_index_5872_0_0;
+    int tmp_index_5890_0_0;
+    int tmp_index_5882_0_0;
+    int tmp_index_5878_0_0;
+    int _for_it_203_0_0;
+    int icl_var_1542_0_0;
+    int ich_var_1541_0_0;
+    int _for_it_212_0_0;
+    int tmp_index_6109_0_0;
+    int _if_cond_184_0_0;
+    int _for_it_213_0_0;
+    int _for_it_268_0_0;
+    int tmp_index_7795_0_0;
+    int tmp_index_7801_0_0;
+    int tmp_index_7799_0_0;
+    int tmp_index_7797_0_0;
+    int tmp_index_7809_0_0;
+    int tmp_call_203_0_0;
+    int tmp_index_7807_0_0;
+    int tmp_index_7803_0_0;
+    int tmp_index_7805_0_0;
+    int tmp_index_7815_0_0;
+    int tmp_call_205_0_0;
+    int tmp_index_7811_0_0;
+    int tmp_index_7813_0_0;
+    int tmp_call_207_0_0;
+    int tmp_index_7819_0_0;
+    int tmp_index_7817_0_0;
+    double _if_cond_241_0_0;
+    int tmp_index_7825_0_0;
+    int tmp_index_7829_0_0;
+    int tmp_index_7827_0_0;
+    int tmp_index_7831_0_0;
+    int tmp_index_7833_0_0;
+    int tmp_index_7835_0_0;
+    int tmp_call_210_0_0;
+    int tmp_index_7839_0_0;
+    int tmp_index_7851_0_0;
+    int tmp_index_7837_0_0;
+    int tmp_index_7842_0_0;
+    int tmp_call_212_0_0;
+    int tmp_index_7847_0_0;
+    int tmp_index_7844_0_0;
+    int tmp_index_7849_0_0;
+    int ind0_var_1823_0_0;
+    int indf_var_1826_0_0;
+    int inds_var_1825_0_0;
+    int indm_var_1827_0_0;
+    int ind1_var_1824_0_0;
+    int _if_cond_242_0_0;
+    int _if_cond_244_0_0;
+    int _if_cond_246_0_0;
+    int _if_cond_248_0_0;
+    int _for_it_269_0_0;
+    int tmp_index_7821_0_0;
+    int tmp_index_7823_0_0;
+    int tmp_index_7859_0_0;
+    int tmp_index_7855_0_0;
+    int tmp_index_7863_0_0;
+    int tmp_index_7857_0_0;
+    int tmp_index_7861_0_0;
+    int tmp_index_7853_0_0;
+    int tmp_index_7865_0_0;
+    int tmp_index_7867_0_0;
+    int tmp_index_7869_0_0;
+    int tmp_index_7873_0_0;
+    int tmp_index_7871_0_0;
+    int tmp_index_7875_0_0;
+    int tmp_index_7879_0_0;
+    int tmp_index_7877_0_0;
+    int tmp_index_7883_0_0;
+    int tmp_index_7881_0_0;
+    int tmp_index_7885_0_0;
+    int tmp_index_7895_0_0;
+    int tmp_index_7887_0_0;
+    int tmp_index_7891_0_0;
+    int tmp_index_7893_0_0;
+    int tmp_index_7889_0_0;
+    int tmp_index_7901_0_0;
+    int tmp_index_7905_0_0;
+    int tmp_index_7907_0_0;
+    int tmp_index_7903_0_0;
+    int tmp_index_7897_0_0;
+    int tmp_index_7899_0_0;
+    int tmp_index_7909_0_0;
+    int tmp_index_7911_0_0;
+    int tmp_index_7915_0_0;
+    int tmp_index_7913_0_0;
+    int tmp_parfor_144_0_0;
+    int tmp_parfor_145_0_0;
+    int tmp_parfor_146_0_0;
+    int tmp_parfor_147_0_0;
+    int tmp_parfor_148_0_0;
+    int tmp_parfor_149_0_0;
+    int tmp_index_7997_0_0;
+    int tmp_index_7987_0_0;
+    int tmp_index_8001_0_0;
+    int tmp_index_7991_0_0;
+    int tmp_index_8025_0_0;
+    int tmp_index_8045_0_0;
+    int tmp_index_8047_0_0;
+    int tmp_index_8054_0_0;
+    int tmp_index_8052_0_0;
+    int _for_it_270_0_0;
+    int tmp_index_8383_0_0;
+    int tmp_index_8384_0_0;
+    int tmp_parfor_22_0_0;
+    int tmp_index_4052_0_0;
+    int tmp_index_4053_0_0;
+    int tmp_parfor_13_0_0;
+    int tmp_index_9320_0_0;
+    int tmp_index_9319_0_0;
+    int tmp_parfor_24_0_0;
+    int tmp_parfor_106_0_0;
+    int tmp_parfor_105_0_0;
+    int _for_it_146_0_0;
+    int tmp_index_3831_0_0;
+    int tmp_index_3835_0_0;
+    int tmp_index_3833_0_0;
+    int tmp_index_3838_0_0;
+    double _if_cond_131_0_0;
+    int tmp_index_3847_0_0;
+    int tmp_index_3854_0_0;
+    int tmp_index_3849_0_0;
+    int tmp_index_3857_0_0;
+    int tmp_index_3861_0_0;
+    int tmp_index_3852_0_0;
+    int tmp_index_3859_0_0;
+    int ind0_var_1196_0_0;
+    int indm_var_1200_0_0;
+    int inds_var_1198_0_0;
+    int indf_var_1199_0_0;
+    int ind1_var_1197_0_0;
+    int _for_it_147_0_0;
+    int tmp_index_3839_0_0;
+    int tmp_index_3843_0_0;
+    int tmp_index_3842_0_0;
+    int tmp_index_3845_0_0;
+    int tmp_index_3867_0_0;
+    int tmp_index_3912_0_0;
+    int tmp_index_3908_0_0;
+    int tmp_index_3916_0_0;
+    int tmp_index_3877_0_0;
+    int tmp_index_3891_0_0;
+    int tmp_index_3920_0_0;
+    int tmp_index_3896_0_0;
+    int tmp_index_3900_0_0;
+    int tmp_index_3904_0_0;
+    int tmp_index_3873_0_0;
+    int tmp_index_3885_0_0;
+    int tmp_index_3863_0_0;
+    int tmp_index_3894_0_0;
+    int _for_it_148_0_0;
+    int _for_it_256_0_0;
+    int _for_it_257_0_0;
+    int tmp_index_7545_0_0;
+    int tmp_index_7548_0_0;
+    int _for_it_258_0_0;
+    int _for_it_284_0_0;
+    int tmp_index_8406_0_0;
+    int tmp_index_8412_0_0;
+    int tmp_index_8408_0_0;
+    int tmp_index_8410_0_0;
+    int tmp_call_225_0_0;
+    int tmp_index_8420_0_0;
+    int tmp_index_8418_0_0;
+    int tmp_index_8416_0_0;
+    int tmp_index_8414_0_0;
+    int tmp_index_8426_0_0;
+    int tmp_index_8424_0_0;
+    int tmp_call_227_0_0;
+    int tmp_index_8422_0_0;
+    int tmp_index_8428_0_0;
+    int tmp_call_229_0_0;
+    int tmp_index_8432_0_0;
+    int tmp_index_8430_0_0;
+    int tmp_index_8435_0_0;
+    double _if_cond_261_0_0;
+    int tmp_index_8444_0_0;
+    int tmp_index_8446_0_0;
+    int tmp_index_8448_0_0;
+    int tmp_call_232_0_0;
+    int tmp_index_8452_0_0;
+    int tmp_index_8460_0_0;
+    int tmp_index_8462_0_0;
+    int tmp_index_8457_0_0;
+    int tmp_index_8464_0_0;
+    int tmp_index_8450_0_0;
+    int tmp_index_8455_0_0;
+    int inds_var_1964_0_0;
+    int indf_var_1965_0_0;
+    int _if_cond_262_0_0;
+    int _if_cond_264_0_0;
+    int _if_cond_266_0_0;
+    int _if_cond_268_0_0;
+    int _for_it_285_0_0;
+    int tmp_index_8436_0_0;
+    int tmp_index_8440_0_0;
+    int tmp_index_8439_0_0;
+    int tmp_index_8442_0_0;
+    int tmp_index_8474_0_0;
+    int tmp_index_8466_0_0;
+    int tmp_index_8468_0_0;
+    int tmp_index_8476_0_0;
+    int tmp_index_8470_0_0;
+    int tmp_index_8472_0_0;
+    int tmp_index_8484_0_0;
+    int tmp_index_8482_0_0;
+    int tmp_index_8480_0_0;
+    int tmp_index_8486_0_0;
+    int tmp_index_8478_0_0;
+    int tmp_index_8488_0_0;
+    int tmp_index_8494_0_0;
+    int tmp_index_8496_0_0;
+    int tmp_index_8490_0_0;
+    int tmp_index_8492_0_0;
+    int tmp_index_8498_0_0;
+    int tmp_index_8508_0_0;
+    int tmp_index_8506_0_0;
+    int tmp_index_8504_0_0;
+    int tmp_index_8502_0_0;
+    int tmp_index_8500_0_0;
+    int tmp_index_8518_0_0;
+    int tmp_index_8516_0_0;
+    int tmp_index_8510_0_0;
+    int tmp_index_8520_0_0;
+    int tmp_index_8512_0_0;
+    int tmp_index_8514_0_0;
+    int tmp_index_8524_0_0;
+    int tmp_index_8522_0_0;
+    int tmp_index_8528_0_0;
+    int tmp_index_8526_0_0;
+    int tmp_parfor_164_0_0;
+    int tmp_parfor_165_0_0;
+    int tmp_parfor_166_0_0;
+    int tmp_parfor_167_0_0;
+    int tmp_parfor_168_0_0;
+    int tmp_parfor_169_0_0;
+    int tmp_index_8614_0_0;
+    int tmp_index_8604_0_0;
+    int tmp_index_8600_0_0;
+    int tmp_index_8610_0_0;
+    int tmp_index_8638_0_0;
+    int tmp_index_8640_0_0;
+    int tmp_index_8645_0_0;
+    int _for_it_286_0_0;
+    int _for_it_323_0_0;
+    int tmp_index_9566_0_0;
+    int tmp_index_9564_0_0;
+    int tmp_index_9568_0_0;
+    int tmp_index_9571_0_0;
+    double _if_cond_287_0_0;
+    int tmp_index_9580_0_0;
+    int tmp_index_9592_0_0;
+    int tmp_index_9594_0_0;
+    int tmp_index_9587_0_0;
+    int tmp_index_9582_0_0;
+    int tmp_index_9590_0_0;
+    int tmp_index_9585_0_0;
+    int ind0_var_2142_0_0;
+    int inds_var_2144_0_0;
+    int indm_var_2146_0_0;
+    int indf_var_2145_0_0;
+    int ind1_var_2143_0_0;
+    int _for_it_324_0_0;
+    int tmp_index_9572_0_0;
+    int tmp_index_9576_0_0;
+    int tmp_index_9575_0_0;
+    int tmp_index_9578_0_0;
+    int tmp_index_9663_0_0;
+    int tmp_index_9649_0_0;
+    int tmp_index_9661_0_0;
+    int tmp_index_9634_0_0;
+    int tmp_index_9626_0_0;
+    int tmp_index_9640_0_0;
+    int tmp_index_9643_0_0;
+    int tmp_index_9610_0_0;
+    int tmp_index_9657_0_0;
+    int tmp_index_9665_0_0;
+    int tmp_index_9673_0_0;
+    int tmp_index_9618_0_0;
+    int tmp_index_9600_0_0;
+    int tmp_index_9653_0_0;
+    int tmp_index_9669_0_0;
+    int tmp_index_9606_0_0;
+    int tmp_index_9645_0_0;
+    int tmp_index_9596_0_0;
+    int _for_it_325_0_0;
+    int tmp_parfor_43_0_0;
+    int ich_var_1310_0_0;
+    int icl_var_1311_0_0;
+    int _for_it_157_0_0;
+    int tmp_index_4061_0_0;
+    int _if_cond_134_0_0;
+    int _for_it_158_0_0;
     int _for_it_162_0_0;
     int tmp_index_4327_0_0;
-    int tmp_index_4323_0_0;
     int tmp_index_4325_0_0;
+    int tmp_index_4323_0_0;
     int tmp_index_4330_0_0;
     double _if_cond_144_0_0;
-    int tmp_index_4344_0_0;
     int tmp_index_4346_0_0;
-    int tmp_index_4349_0_0;
     int tmp_index_4341_0_0;
     int tmp_index_4339_0_0;
-    int ind0_var_1252_0_0;
+    int tmp_index_4344_0_0;
+    int tmp_index_4349_0_0;
     int indm_var_1256_0_0;
+    int ind0_var_1252_0_0;
     int ind1_var_1253_0_0;
     int _for_it_163_0_0;
     int tmp_index_4335_0_0;
@@ -4462,165 +4246,293 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_4334_0_0;
     int tmp_index_4337_0_0;
     int tmp_index_4376_0_0;
+    int tmp_index_4368_0_0;
     int tmp_index_4353_0_0;
-    int tmp_index_4364_0_0;
     int tmp_index_4359_0_0;
+    int tmp_index_4362_0_0;
     int tmp_index_4372_0_0;
     int tmp_index_4380_0_0;
-    int tmp_index_4368_0_0;
-    int tmp_index_4362_0_0;
+    int tmp_index_4364_0_0;
     int _for_it_164_0_0;
-    int ixc0_var_1503_0_0;
-    int _for_it_207_0_0;
-    int jl_var_1506_0_0;
-    int tmp_index_5967_0_0;
-    int tmp_index_5960_0_0;
-    int tmp_index_5970_0_0;
-    int tmp_index_5965_0_0;
-    int tmp_index_5974_0_0;
-    int tmp_index_5962_0_0;
-    int tmp_index_5972_0_0;
-    int tmp_index_5976_0_0;
-    int inds_var_1485_0_0;
-    int tmp_index_5978_0_0;
-    int tmp_index_5980_0_0;
-    int _for_it_208_0_0;
-    int tmp_index_5992_0_0;
-    int tmp_index_6013_0_0;
-    int tmp_index_6023_0_0;
-    int tmp_index_6019_0_0;
-    int tmp_index_5982_0_0;
-    int tmp_index_6004_0_0;
-    int tmp_index_6031_0_0;
-    int tmp_index_6010_0_0;
-    int tmp_index_6027_0_0;
-    int tmp_index_6015_0_0;
-    int tmp_index_5996_0_0;
-    int tmp_index_5986_0_0;
-    int _for_it_209_0_0;
-    int tmp_index_6042_0_0;
-    int tmp_index_6037_0_0;
-    int tmp_index_6044_0_0;
-    int tmp_index_6047_0_0;
-    int tmp_index_6055_0_0;
-    int tmp_index_6049_0_0;
-    int tmp_index_6051_0_0;
-    int tmp_index_6039_0_0;
-    int tmp_index_6053_0_0;
-    int _for_it_210_0_0;
-    int tmp_index_6096_0_0;
-    int tmp_index_6092_0_0;
-    int tmp_index_6057_0_0;
-    int tmp_index_6084_0_0;
-    int tmp_index_6069_0_0;
-    int tmp_index_6080_0_0;
-    int tmp_index_6078_0_0;
-    int tmp_index_6075_0_0;
-    int tmp_index_6088_0_0;
-    int tmp_index_6061_0_0;
-    int _for_it_211_0_0;
-    int tmp_index_9318_0_0;
-    int tmp_index_9317_0_0;
-    int tmp_parfor_24_0_0;
+    int tmp_parfor_87_0_0;
     int tmp_index_4772_0_0;
     int tmp_index_4773_0_0;
     int tmp_parfor_14_1_0;
-    int _for_it_256_0_0;
-    int _for_it_257_0_0;
-    int tmp_index_7548_0_0;
-    int tmp_index_7545_0_0;
-    int _for_it_258_0_0;
-    int tmp_parfor_187_0_0;
-    int tmp_parfor_186_0_0;
-    int tmp_index_6102_0_0;
-    int tmp_index_6103_0_0;
+    int tmp_parfor_77_0_0;
+    int tmp_index_5568_0_0;
+    int tmp_index_5569_0_0;
+    int tmp_parfor_15_1_0;
+    int tmp_index_3816_0_0;
+    int tmp_index_3817_0_0;
+    int tmp_parfor_12_0_0;
+    int _for_it_191_0_0;
+    int tmp_index_5644_0_0;
+    int tmp_index_5649_0_0;
+    int tmp_index_5646_0_0;
+    int tmp_index_5651_0_0;
+    int tmp_index_5654_0_0;
+    int _for_it_192_0_0;
+    int tmp_index_5671_0_0;
+    int tmp_index_5666_0_0;
+    int tmp_index_5675_0_0;
+    int tmp_index_5660_0_0;
+    int tmp_index_5669_0_0;
+    int tmp_index_5679_0_0;
+    int tmp_index_5687_0_0;
+    int tmp_index_5683_0_0;
+    int tmp_index_5656_0_0;
+    int _for_it_193_0_0;
+    int tmp_index_7325_0_0;
+    int tmp_index_7324_0_0;
+    int tmp_parfor_20_0_0;
+    int tmp_index_6101_0_0;
+    int tmp_index_6100_0_0;
     int tmp_parfor_17_0_0;
-    int tmp_index_7771_0_0;
+    int icl_var_2109_0_0;
+    int ich_var_2108_0_0;
+    int _for_it_308_0_0;
+    int tmp_index_9326_0_0;
+    int _if_cond_284_0_0;
+    int _for_it_309_0_0;
+    int tmp_index_4054_0_0;
+    int tmp_index_4055_0_0;
+    int tmp_index_3143_0_0;
+    int tmp_index_3142_0_0;
+    int tmp_index_5571_0_0;
+    int tmp_index_5570_0_0;
+    int tmp_parfor_74_0_0;
+    int tmp_parfor_73_0_0;
     int tmp_index_7770_0_0;
+    int tmp_index_7771_0_0;
     int tmp_parfor_21_0_0;
-    int _for_it_243_0_0;
-    int tmp_index_7043_0_0;
-    int tmp_index_7045_0_0;
-    int tmp_index_7048_0_0;
-    int tmp_index_7050_0_0;
-    int _for_it_244_0_0;
-    int tmp_index_7070_0_0;
-    int tmp_index_7056_0_0;
-    int tmp_index_7053_0_0;
-    int tmp_index_7066_0_0;
-    int tmp_index_7058_0_0;
-    int tmp_index_7074_0_0;
-    int tmp_index_7062_0_0;
-    int _for_it_245_0_0;
+    int _for_it_133_0_0;
+    int tmp_index_3371_0_0;
+    int tmp_index_3369_0_0;
+    int tmp_index_3373_0_0;
+    int tmp_index_3375_0_0;
+    int tmp_index_3379_0_0;
+    int tmp_index_3383_0_0;
+    int tmp_call_87_0_0;
+    int tmp_index_3381_0_0;
+    int tmp_index_3377_0_0;
+    int tmp_index_3399_0_0;
+    int tmp_index_3403_0_0;
+    int tmp_index_3385_0_0;
+    int tmp_index_3391_0_0;
+    int tmp_index_3389_0_0;
+    int tmp_index_3397_0_0;
+    int tmp_call_89_0_0;
+    int tmp_index_3387_0_0;
+    int tmp_index_3395_0_0;
+    int tmp_index_3405_0_0;
+    int tmp_index_3401_0_0;
+    int tmp_index_3393_0_0;
+    int tmp_index_3409_0_0;
+    int tmp_index_3407_0_0;
+    int tmp_index_3412_0_0;
+    int tmp_call_91_0_0;
+    int ind0_var_1118_0_0;
+    int tmp_index_3414_0_0;
+    int ind1_var_1119_0_0;
+    int _for_it_134_0_0;
+    int tmp_index_3417_0_0;
+    int tmp_index_3436_0_0;
+    int _for_it_135_0_0;
+    int tmp_index_2255_0_0;
+    int tmp_index_2256_0_0;
+    int tmp_parfor_10_0_0;
+    int tmp_parfor_162_0_0;
+    int tmp_parfor_161_0_0;
+    int tmp_index_9552_0_0;
+    int tmp_index_9551_0_0;
+    int tmp_parfor_25_0_0;
+    int icl_var_1502_0_0;
+    int ich_var_1501_0_0;
+    int _for_it_199_0_0;
+    int tmp_index_5813_0_0;
+    int _if_cond_180_0_0;
+    int _for_it_200_0_0;
+    int tmp_parfor_163_0_0;
+    int tmp_parfor_3_0_1;
+    int tmp_parfor_2_0_1;
+    int _for_it_217_0_0;
+    int tmp_index_6176_0_0;
+    int tmp_index_6179_0_0;
+    int tmp_index_6174_0_0;
+    int ind0_var_1529_0_0;
+    int tmp_index_6181_0_0;
+    int ind1_var_1530_0_0;
+    int _for_it_218_0_0;
+    int tmp_index_6197_0_0;
+    int tmp_index_6201_0_0;
+    int tmp_index_6205_0_0;
+    int tmp_index_6187_0_0;
+    int tmp_index_6184_0_0;
+    int tmp_index_6193_0_0;
+    int tmp_index_6189_0_0;
+    int _for_it_219_0_0;
+    int icl_var_1409_0_0;
+    int ich_var_1408_0_0;
+    int _for_it_173_0_0;
+    int tmp_index_4781_0_0;
+    int _if_cond_156_0_0;
+    int _for_it_174_0_0;
+    int ixc0_var_1708_0_0;
+    int _for_it_246_0_0;
+    int jl_var_1711_0_0;
+    int tmp_index_7083_0_0;
+    int tmp_index_7087_0_0;
+    int tmp_index_7081_0_0;
+    int tmp_index_7085_0_0;
+    int tmp_index_7093_0_0;
+    int tmp_index_7091_0_0;
+    int tmp_index_7089_0_0;
+    int tmp_call_185_0_0;
+    int tmp_index_7095_0_0;
+    int tmp_index_7101_0_0;
+    int tmp_index_7097_0_0;
+    int tmp_call_187_0_0;
+    int tmp_index_7099_0_0;
+    int tmp_index_7110_0_0;
+    int tmp_index_7113_0_0;
+    int tmp_index_7103_0_0;
+    int tmp_index_7115_0_0;
+    int tmp_index_7108_0_0;
+    int tmp_call_189_0_0;
+    int tmp_index_7105_0_0;
+    int _if_cond_215_0_0;
+    int _if_cond_217_0_0;
+    int _if_cond_219_0_0;
+    int _for_it_247_0_0;
+    int tmp_index_7125_0_0;
+    int tmp_index_7121_0_0;
+    int tmp_index_7127_0_0;
+    int tmp_index_7123_0_0;
+    int tmp_index_7119_0_0;
+    int tmp_index_7117_0_0;
+    int tmp_index_7129_0_0;
+    int tmp_index_7135_0_0;
+    int tmp_index_7139_0_0;
+    int tmp_index_7131_0_0;
+    int tmp_index_7137_0_0;
+    int tmp_index_7133_0_0;
+    int tmp_index_7147_0_0;
+    int tmp_index_7143_0_0;
+    int tmp_index_7145_0_0;
+    int tmp_index_7141_0_0;
+    int tmp_index_7159_0_0;
+    int tmp_index_7153_0_0;
+    int tmp_index_7155_0_0;
+    int tmp_index_7149_0_0;
+    int tmp_index_7151_0_0;
+    int tmp_index_7157_0_0;
+    int tmp_index_7167_0_0;
+    int tmp_index_7163_0_0;
+    int tmp_index_7161_0_0;
+    int tmp_index_7165_0_0;
+    int tmp_index_7169_0_0;
+    int tmp_index_7171_0_0;
+    int tmp_index_7177_0_0;
+    int tmp_index_7175_0_0;
+    int tmp_index_7173_0_0;
+    int tmp_index_7179_0_0;
+    int tmp_parfor_116_0_0;
+    int tmp_parfor_117_0_0;
+    int tmp_parfor_118_0_0;
+    int tmp_parfor_119_0_0;
+    int tmp_parfor_120_0_0;
+    int tmp_parfor_121_0_0;
+    int tmp_index_7255_0_0;
+    int tmp_index_7271_0_0;
+    int tmp_index_7251_0_0;
+    int tmp_index_7261_0_0;
+    int tmp_index_7265_0_0;
+    int tmp_index_7276_0_0;
+    int _for_it_248_0_0;
+    int tmp_index_7292_0_0;
+    int tmp_index_7287_0_0;
+    int tmp_index_7289_0_0;
+    int tmp_index_7294_0_0;
+    int _for_it_249_0_0;
+    int tmp_index_7300_0_0;
+    int tmp_index_7310_0_0;
+    int tmp_index_7302_0_0;
+    int tmp_index_7297_0_0;
+    int tmp_index_7306_0_0;
+    int tmp_index_7314_0_0;
+    int tmp_index_7318_0_0;
+    int _for_it_250_0_0;
+    int tmp_parfor_92_0_0;
+    int tmp_parfor_180_0_0;
     int _for_it_159_0_0;
-    int tmp_index_4077_0_0;
     int tmp_index_4075_0_0;
-    int tmp_index_4081_0_0;
     int tmp_index_4079_0_0;
-    int tmp_index_4083_0_0;
-    int tmp_index_4085_0_0;
+    int tmp_index_4077_0_0;
+    int tmp_index_4081_0_0;
     int tmp_index_4087_0_0;
-    int tmp_index_4089_0_0;
+    int tmp_index_4085_0_0;
     int tmp_call_107_0_0;
-    int tmp_index_4095_0_0;
+    int tmp_index_4083_0_0;
+    int tmp_index_4089_0_0;
     int tmp_call_109_0_0;
-    int tmp_index_4091_0_0;
     int tmp_index_4093_0_0;
-    int tmp_index_4101_0_0;
-    int tmp_index_4097_0_0;
+    int tmp_index_4091_0_0;
+    int tmp_index_4095_0_0;
     int tmp_index_4099_0_0;
     int tmp_call_111_0_0;
+    int tmp_index_4097_0_0;
+    int tmp_index_4101_0_0;
     int tmp_index_4104_0_0;
     double _if_cond_135_0_0;
+    int tmp_index_4117_0_0;
     int tmp_index_4115_0_0;
     int tmp_index_4113_0_0;
-    int tmp_index_4117_0_0;
     int tmp_index_4126_0_0;
-    int tmp_call_114_0_0;
-    int tmp_index_4121_0_0;
-    int tmp_index_4133_0_0;
-    int tmp_index_4129_0_0;
-    int tmp_index_4131_0_0;
-    int tmp_index_4119_0_0;
     int tmp_index_4124_0_0;
-    int indf_var_1255_0_0;
+    int tmp_index_4119_0_0;
+    int tmp_index_4121_0_0;
+    int tmp_index_4129_0_0;
+    int tmp_index_4133_0_0;
+    int tmp_index_4131_0_0;
+    int tmp_call_114_0_0;
     int inds_var_1254_0_0;
+    int indf_var_1255_0_0;
     int _if_cond_136_0_0;
     int _if_cond_138_0_0;
     int _if_cond_140_0_0;
     int _if_cond_142_0_0;
     int _for_it_160_0_0;
-    int tmp_index_4109_0_0;
     int tmp_index_4105_0_0;
+    int tmp_index_4109_0_0;
     int tmp_index_4108_0_0;
     int tmp_index_4111_0_0;
-    int tmp_index_4143_0_0;
-    int tmp_index_4135_0_0;
-    int tmp_index_4139_0_0;
     int tmp_index_4137_0_0;
+    int tmp_index_4135_0_0;
     int tmp_index_4145_0_0;
+    int tmp_index_4143_0_0;
+    int tmp_index_4139_0_0;
     int tmp_index_4141_0_0;
-    int tmp_index_4155_0_0;
-    int tmp_index_4147_0_0;
     int tmp_index_4153_0_0;
-    int tmp_index_4149_0_0;
+    int tmp_index_4147_0_0;
     int tmp_index_4151_0_0;
+    int tmp_index_4149_0_0;
+    int tmp_index_4155_0_0;
     int tmp_index_4157_0_0;
-    int tmp_index_4165_0_0;
-    int tmp_index_4163_0_0;
     int tmp_index_4159_0_0;
     int tmp_index_4161_0_0;
-    int tmp_index_4171_0_0;
+    int tmp_index_4165_0_0;
+    int tmp_index_4163_0_0;
     int tmp_index_4167_0_0;
-    int tmp_index_4169_0_0;
     int tmp_index_4173_0_0;
-    int tmp_index_4175_0_0;
     int tmp_index_4177_0_0;
-    int tmp_index_4187_0_0;
-    int tmp_index_4181_0_0;
+    int tmp_index_4171_0_0;
+    int tmp_index_4175_0_0;
+    int tmp_index_4169_0_0;
     int tmp_index_4183_0_0;
-    int tmp_index_4185_0_0;
+    int tmp_index_4181_0_0;
+    int tmp_index_4187_0_0;
     int tmp_index_4189_0_0;
+    int tmp_index_4185_0_0;
     int tmp_index_4179_0_0;
     int tmp_index_4197_0_0;
     int tmp_index_4195_0_0;
@@ -4633,128 +4545,446 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_parfor_48_0_0;
     int tmp_parfor_49_0_0;
     int tmp_index_4279_0_0;
+    int tmp_index_4283_0_0;
     int tmp_index_4273_0_0;
     int tmp_index_4269_0_0;
-    int tmp_index_4283_0_0;
-    int tmp_index_4309_0_0;
-    int tmp_index_4307_0_0;
     int tmp_index_4314_0_0;
+    int tmp_index_4307_0_0;
+    int tmp_index_4309_0_0;
     int _for_it_161_0_0;
-    int _for_it_112_0_0;
-    int tmp_index_2282_0_0;
-    int tmp_index_2288_0_0;
-    int tmp_index_2284_0_0;
-    int tmp_index_2286_0_0;
-    int tmp_index_2290_0_0;
-    int tmp_index_2296_0_0;
-    int tmp_call_40_0_0;
-    int tmp_index_2292_0_0;
-    int tmp_index_2294_0_0;
-    int tmp_index_2298_0_0;
-    int tmp_index_2300_0_0;
-    int tmp_call_42_0_0;
-    int tmp_index_2302_0_0;
-    int tmp_index_2304_0_0;
-    int tmp_index_2308_0_0;
-    int tmp_call_44_0_0;
-    int tmp_index_2306_0_0;
-    int tmp_index_2312_0_0;
-    int tmp_index_2320_0_0;
-    int tmp_index_2324_0_0;
-    int tmp_index_2315_0_0;
-    int tmp_call_46_0_0;
-    int tmp_index_2322_0_0;
-    int tmp_index_2310_0_0;
-    int tmp_index_2317_0_0;
-    int _if_cond_49_0_0;
-    int _if_cond_51_0_0;
-    int _if_cond_53_0_0;
-    int _if_cond_55_0_0;
-    int _for_it_113_0_0;
-    int tmp_index_2326_0_0;
-    int tmp_index_2332_0_0;
-    int tmp_index_2328_0_0;
-    int tmp_index_2336_0_0;
-    int tmp_index_2330_0_0;
-    int tmp_index_2334_0_0;
-    int tmp_index_2348_0_0;
-    int tmp_index_2346_0_0;
-    int tmp_index_2342_0_0;
-    int tmp_index_2344_0_0;
-    int tmp_index_2340_0_0;
-    int tmp_index_2338_0_0;
-    int tmp_index_2350_0_0;
-    int tmp_index_2352_0_0;
-    int tmp_index_2356_0_0;
-    int tmp_index_2354_0_0;
-    int tmp_index_2362_0_0;
-    int tmp_index_2368_0_0;
-    int tmp_index_2358_0_0;
-    int tmp_index_2364_0_0;
-    int tmp_index_2360_0_0;
-    int tmp_index_2366_0_0;
-    int tmp_index_2376_0_0;
-    int tmp_index_2378_0_0;
-    int tmp_index_2372_0_0;
-    int tmp_index_2370_0_0;
-    int tmp_index_2380_0_0;
-    int tmp_index_2374_0_0;
-    int tmp_index_2384_0_0;
-    int tmp_index_2388_0_0;
-    int tmp_index_2386_0_0;
-    int tmp_index_2382_0_0;
-    int tmp_parfor_5_0_1;
-    int tmp_parfor_6_0_1;
-    int tmp_parfor_7_0_1;
-    int tmp_parfor_8_0_1;
-    int tmp_parfor_9_0_1;
-    int tmp_index_2460_0_0;
-    int tmp_index_2474_0_0;
-    int tmp_index_2464_0_0;
-    int tmp_index_2470_0_0;
-    int tmp_index_2505_0_0;
-    int tmp_index_2511_0_0;
-    int tmp_index_2500_0_0;
-    int tmp_index_2498_0_0;
-    int tmp_index_2507_0_0;
-    int _for_it_114_0_0;
-    int tmp_index_3142_0_0;
-    int tmp_index_3143_0_0;
-    int tmp_parfor_11_1_0;
-    int tmp_parfor_18_1_0;
-    int tmp_parfor_17_1_0;
+    int _for_it_115_0_0;
+    int tmp_index_2522_0_0;
+    int tmp_index_2524_0_0;
+    int tmp_index_2526_0_0;
+    int tmp_index_2520_0_0;
+    int tmp_call_48_0_0;
+    int tmp_index_2530_0_0;
+    int tmp_index_2534_0_0;
+    int tmp_index_2532_0_0;
+    int tmp_index_2528_0_0;
+    int tmp_index_2546_0_0;
+    int tmp_call_50_0_0;
+    int tmp_index_2538_0_0;
+    int tmp_index_2552_0_0;
+    int tmp_index_2540_0_0;
+    int tmp_index_2548_0_0;
+    int tmp_index_2544_0_0;
+    int tmp_index_2554_0_0;
+    int tmp_index_2550_0_0;
+    int tmp_index_2536_0_0;
+    int tmp_index_2542_0_0;
+    int tmp_index_2556_0_0;
+    int tmp_index_2560_0_0;
+    int tmp_index_2563_0_0;
+    int tmp_index_2558_0_0;
+    int tmp_call_52_0_0;
+    int tmp_index_2565_0_0;
+    int ind0_var_990_0_0;
+    int ind1_var_991_0_0;
+    int _for_it_116_0_0;
+    int tmp_index_2587_0_0;
+    int tmp_index_2591_0_0;
+    int tmp_index_2568_0_0;
+    int _for_it_117_0_0;
+    int tmp_parfor_160_0_0;
+    int tmp_parfor_159_0_0;
+    int tmp_index_3818_0_0;
+    int tmp_index_3819_0_0;
+    int tmp_parfor_86_0_0;
+    int tmp_parfor_85_0_0;
+    int _for_it_130_0_0;
+    int tmp_index_3171_0_0;
+    int tmp_index_3165_0_0;
+    int tmp_index_3167_0_0;
+    int tmp_index_3169_0_0;
+    int tmp_index_3179_0_0;
+    int tmp_index_3177_0_0;
+    int tmp_call_81_0_0;
+    int tmp_index_3175_0_0;
+    int tmp_index_3173_0_0;
+    int tmp_index_3183_0_0;
+    int tmp_index_3185_0_0;
+    int tmp_call_83_0_0;
+    int tmp_index_3181_0_0;
+    int tmp_call_85_0_0;
+    int tmp_index_3187_0_0;
+    int tmp_index_3197_0_0;
+    int tmp_index_3192_0_0;
+    int tmp_index_3194_0_0;
+    int tmp_index_3199_0_0;
+    int tmp_index_3189_0_0;
+    int indf_var_1121_0_0;
+    int inds_var_1120_0_0;
+    int _if_cond_113_0_0;
+    int _if_cond_115_0_0;
+    int _if_cond_117_0_0;
+    int _if_cond_119_0_0;
+    int _for_it_131_0_0;
+    int tmp_index_3209_0_0;
+    int tmp_index_3203_0_0;
+    int tmp_index_3205_0_0;
+    int tmp_index_3207_0_0;
+    int tmp_index_3211_0_0;
+    int tmp_index_3201_0_0;
+    int tmp_index_3217_0_0;
+    int tmp_index_3219_0_0;
+    int tmp_index_3221_0_0;
+    int tmp_index_3213_0_0;
+    int tmp_index_3215_0_0;
+    int tmp_index_3223_0_0;
+    int tmp_index_3227_0_0;
+    int tmp_index_3231_0_0;
+    int tmp_index_3229_0_0;
+    int tmp_index_3225_0_0;
+    int tmp_index_3237_0_0;
+    int tmp_index_3243_0_0;
+    int tmp_index_3233_0_0;
+    int tmp_index_3241_0_0;
+    int tmp_index_3235_0_0;
+    int tmp_index_3239_0_0;
+    int tmp_index_3245_0_0;
+    int tmp_index_3255_0_0;
+    int tmp_index_3249_0_0;
+    int tmp_index_3253_0_0;
+    int tmp_index_3247_0_0;
+    int tmp_index_3251_0_0;
+    int tmp_index_3259_0_0;
+    int tmp_index_3257_0_0;
+    int tmp_index_3263_0_0;
+    int tmp_index_3261_0_0;
+    int tmp_parfor_22_1_0;
+    int tmp_parfor_23_1_0;
+    int tmp_parfor_24_1_0;
+    int tmp_parfor_25_1_0;
+    int tmp_parfor_26_0_1;
+    int tmp_parfor_27_0_1;
+    int tmp_index_3335_0_0;
+    int tmp_index_3355_0_0;
+    int tmp_index_3360_0_0;
+    int tmp_index_3345_0_0;
+    int tmp_index_3349_0_0;
+    int tmp_index_3339_0_0;
+    int _for_it_132_0_0;
+    int _for_it_326_0_0;
+    int tmp_index_9679_0_0;
+    int tmp_index_9677_0_0;
+    int tmp_index_9681_0_0;
+    int tmp_index_9684_0_0;
+    double _if_cond_288_0_0;
+    int tmp_index_9703_0_0;
+    int tmp_index_9693_0_0;
+    int tmp_index_9695_0_0;
+    int tmp_index_9698_0_0;
+    int tmp_index_9700_0_0;
+    int _for_it_327_0_0;
+    int tmp_index_9685_0_0;
+    int tmp_index_9689_0_0;
+    int tmp_index_9688_0_0;
+    int tmp_index_9691_0_0;
+    int tmp_index_9715_0_0;
+    int tmp_index_9724_0_0;
+    int tmp_index_9734_0_0;
+    int tmp_index_9742_0_0;
+    int tmp_index_9730_0_0;
+    int tmp_index_9738_0_0;
+    int tmp_index_9726_0_0;
+    int tmp_index_9752_0_0;
+    int tmp_index_9721_0_0;
+    int tmp_index_9748_0_0;
+    int tmp_index_9707_0_0;
+    int tmp_index_9744_0_0;
+    int _for_it_328_0_0;
+    int tmp_index_6823_0_0;
+    int tmp_index_6822_0_0;
+    int tmp_parfor_19_0_0;
+    int tmp_index_7769_0_0;
+    int tmp_index_7768_0_0;
+    int _for_it_188_0_0;
+    int tmp_index_5590_0_0;
+    int tmp_index_5585_0_0;
+    int tmp_index_5595_0_0;
+    int tmp_index_5597_0_0;
+    int tmp_index_5588_0_0;
+    int tmp_index_5583_0_0;
+    int tmp_index_5593_0_0;
+    int _for_it_189_0_0;
+    int tmp_index_5632_0_0;
+    int tmp_index_5636_0_0;
+    int tmp_index_5622_0_0;
+    int tmp_index_5640_0_0;
+    int tmp_index_5628_0_0;
+    int tmp_index_5613_0_0;
+    int tmp_index_5609_0_0;
+    int tmp_index_5599_0_0;
+    int tmp_index_5624_0_0;
+    int tmp_index_5603_0_0;
+    int tmp_index_5619_0_0;
+    int _for_it_190_0_0;
+    int tmp_parfor_1_0_1;
+    int tmp_parfor_0_0_1;
+    int tmp_parfor_109_0_0;
+    int tmp_parfor_76_0_0;
+    int tmp_parfor_75_0_0;
+    int tmp_parfor_57_0_0;
+    int tmp_parfor_56_0_0;
+    int _for_it_204_0_0;
+    int tmp_index_5906_0_0;
+    int tmp_index_5894_0_0;
+    int tmp_index_5901_0_0;
+    int tmp_index_5896_0_0;
+    int tmp_index_5908_0_0;
+    int tmp_index_5904_0_0;
+    int tmp_index_5899_0_0;
+    int tmp_index_5912_0_0;
+    int tmp_index_5910_0_0;
+    int _for_it_205_0_0;
+    int tmp_index_5918_0_0;
+    int tmp_index_5935_0_0;
+    int tmp_index_5914_0_0;
+    int tmp_index_5926_0_0;
+    int tmp_index_5941_0_0;
+    int tmp_index_5937_0_0;
+    int tmp_index_5949_0_0;
+    int tmp_index_5945_0_0;
+    int tmp_index_5953_0_0;
+    int tmp_index_5932_0_0;
+    int _for_it_206_0_0;
+    int _for_it_243_0_0;
+    int tmp_index_7043_0_0;
+    int tmp_index_7045_0_0;
+    int tmp_index_7048_0_0;
+    int tmp_index_7050_0_0;
+    int _for_it_244_0_0;
+    int tmp_index_7070_0_0;
+    int tmp_index_7066_0_0;
+    int tmp_index_7058_0_0;
+    int tmp_index_7056_0_0;
+    int tmp_index_7053_0_0;
+    int tmp_index_7062_0_0;
+    int tmp_index_7074_0_0;
+    int _for_it_245_0_0;
+    int tmp_parfor_20_1_0;
+    int tmp_parfor_19_1_0;
+    int ich_var_1039_0_0;
+    int icl_var_1040_0_0;
+    int _for_it_110_0_0;
+    int tmp_index_2264_0_0;
+    int _if_cond_48_0_0;
+    int _for_it_111_0_0;
+    int tmp_parfor_179_0_0;
+    int tmp_parfor_178_0_0;
+    int _for_it_253_0_0;
+    int tmp_index_7343_0_0;
+    int tmp_index_7341_0_0;
+    int tmp_index_7345_0_0;
+    int tmp_index_7347_0_0;
+    int tmp_call_191_0_0;
+    int tmp_index_7349_0_0;
+    int tmp_index_7355_0_0;
+    int tmp_index_7353_0_0;
+    int tmp_index_7351_0_0;
+    int tmp_call_193_0_0;
+    int tmp_index_7357_0_0;
+    int tmp_index_7361_0_0;
+    int tmp_index_7359_0_0;
+    int tmp_index_7373_0_0;
+    int tmp_index_7365_0_0;
+    int tmp_index_7368_0_0;
+    int tmp_call_195_0_0;
+    int tmp_index_7375_0_0;
+    int tmp_index_7363_0_0;
+    int tmp_index_7370_0_0;
+    int _if_cond_223_0_0;
+    int _if_cond_225_0_0;
+    int _if_cond_227_0_0;
+    int _if_cond_229_0_0;
+    int _for_it_254_0_0;
+    int tmp_index_7381_0_0;
+    int tmp_index_7377_0_0;
+    int tmp_index_7383_0_0;
+    int tmp_index_7387_0_0;
+    int tmp_index_7385_0_0;
+    int tmp_index_7379_0_0;
+    int tmp_index_7397_0_0;
+    int tmp_index_7395_0_0;
+    int tmp_index_7391_0_0;
+    int tmp_index_7393_0_0;
+    int tmp_index_7389_0_0;
+    int tmp_index_7399_0_0;
+    int tmp_index_7407_0_0;
+    int tmp_index_7401_0_0;
+    int tmp_index_7403_0_0;
+    int tmp_index_7405_0_0;
+    int tmp_index_7409_0_0;
+    int tmp_index_7419_0_0;
+    int tmp_index_7413_0_0;
+    int tmp_index_7411_0_0;
+    int tmp_index_7415_0_0;
+    int tmp_index_7417_0_0;
+    int tmp_index_7431_0_0;
+    int tmp_index_7427_0_0;
+    int tmp_index_7423_0_0;
+    int tmp_index_7425_0_0;
+    int tmp_index_7421_0_0;
+    int tmp_index_7429_0_0;
+    int tmp_index_7437_0_0;
+    int tmp_index_7433_0_0;
+    int tmp_index_7435_0_0;
+    int tmp_index_7439_0_0;
+    int tmp_parfor_127_0_0;
+    int tmp_parfor_128_0_0;
+    int tmp_parfor_129_0_0;
+    int tmp_parfor_130_0_0;
+    int tmp_parfor_131_0_0;
+    int tmp_parfor_132_0_0;
+    int tmp_index_7525_0_0;
+    int tmp_index_7511_0_0;
+    int tmp_index_7515_0_0;
+    int tmp_index_7536_0_0;
+    int tmp_index_7521_0_0;
+    int tmp_index_7531_0_0;
+    int _for_it_255_0_0;
+    int _for_it_300_0_0;
+    int tmp_index_9133_0_0;
+    int tmp_index_9119_0_0;
+    int tmp_index_9131_0_0;
+    int tmp_index_9124_0_0;
+    int tmp_index_9117_0_0;
+    int tmp_index_9127_0_0;
+    int tmp_index_9129_0_0;
+    int tmp_index_9122_0_0;
+    int indf_var_2057_0_0;
+    int ind0_var_2054_0_0;
+    int indm_var_2058_0_0;
+    int ind1_var_2055_0_0;
+    int _for_it_301_0_0;
+    int tmp_index_9147_0_0;
+    int tmp_index_9170_0_0;
+    int tmp_index_9158_0_0;
+    int tmp_index_9162_0_0;
+    int tmp_index_9174_0_0;
+    int tmp_index_9139_0_0;
+    int tmp_index_9135_0_0;
+    int tmp_index_9166_0_0;
+    int tmp_index_9156_0_0;
+    int tmp_index_9153_0_0;
+    int _for_it_302_0_0;
+    int icl_var_2164_0_0;
+    int ich_var_2163_0_0;
+    int _for_it_321_0_0;
+    int tmp_index_9558_0_0;
+    int _if_cond_286_0_0;
+    int _for_it_322_0_0;
+    int _for_it_214_0_0;
+    int tmp_index_6120_0_0;
+    int tmp_index_6127_0_0;
+    int tmp_index_6122_0_0;
+    int tmp_index_6117_0_0;
+    int tmp_index_6115_0_0;
+    int tmp_index_6125_0_0;
+    int indf_var_1532_0_0;
+    int inds_var_1531_0_0;
+    int _for_it_215_0_0;
+    int tmp_index_6143_0_0;
+    int tmp_index_6154_0_0;
+    int tmp_index_6166_0_0;
+    int tmp_index_6162_0_0;
+    int tmp_index_6139_0_0;
+    int tmp_index_6152_0_0;
+    int tmp_index_6170_0_0;
+    int tmp_index_6133_0_0;
+    int tmp_index_6158_0_0;
+    int tmp_index_6149_0_0;
+    int tmp_index_6129_0_0;
+    int _for_it_216_0_0;
+    int tmp_index_5806_0_0;
+    int tmp_index_5807_0_0;
+    int tmp_parfor_16_1_0;
+    int _for_it_230_0_0;
+    int _for_it_231_0_0;
+    int tmp_index_6570_0_0;
+    int tmp_index_6567_0_0;
+    int _for_it_232_0_0;
+    int ixc0_var_1543_0_0;
+    int _for_it_220_0_0;
+    int jl_var_1546_0_0;
+    int tmp_index_6224_0_0;
+    int tmp_index_6219_0_0;
+    int tmp_index_6212_0_0;
+    int tmp_index_6214_0_0;
+    int tmp_index_6222_0_0;
+    int tmp_index_6217_0_0;
+    int _for_it_221_0_0;
+    int tmp_index_6249_0_0;
+    int tmp_index_6246_0_0;
+    int tmp_index_6259_0_0;
+    int tmp_index_6236_0_0;
+    int tmp_index_6267_0_0;
+    int tmp_index_6263_0_0;
+    int tmp_index_6240_0_0;
+    int tmp_index_6255_0_0;
+    int tmp_index_6226_0_0;
+    int tmp_index_6230_0_0;
+    int tmp_index_6251_0_0;
+    int _for_it_222_0_0;
+    int tmp_index_6275_0_0;
+    int tmp_index_6273_0_0;
+    int tmp_index_6278_0_0;
+    int tmp_index_6280_0_0;
+    int _for_it_223_0_0;
+    int tmp_index_6283_0_0;
+    int tmp_index_6292_0_0;
+    int tmp_index_6304_0_0;
+    int tmp_index_6296_0_0;
+    int tmp_index_6300_0_0;
+    int tmp_index_6286_0_0;
+    int tmp_index_6288_0_0;
+    int _for_it_224_0_0;
+    int tmp_parfor_177_0_0;
+    int tmp_parfor_176_0_0;
+    int tmp_index_6311_0_0;
+    int tmp_index_6310_0_0;
+    int tmp_parfor_18_0_0;
+    int _for_it_149_0_0;
+    int _for_it_150_0_0;
+    int tmp_index_3931_0_0;
+    int tmp_index_3924_0_0;
+    int tmp_index_3927_0_0;
+    int tmp_index_3935_0_0;
+    int _for_it_151_0_0;
     int ixc0_var_1410_0_0;
     int _for_it_181_0_0;
     int jl_var_1413_0_0;
-    int tmp_index_5192_0_0;
     int tmp_index_5190_0_0;
-    int tmp_index_5186_0_0;
     int tmp_index_5188_0_0;
-    int tmp_index_5200_0_0;
-    int tmp_index_5194_0_0;
+    int tmp_index_5186_0_0;
+    int tmp_index_5192_0_0;
     int tmp_index_5198_0_0;
-    int tmp_call_145_0_0;
+    int tmp_index_5194_0_0;
     int tmp_index_5196_0_0;
+    int tmp_index_5200_0_0;
+    int tmp_call_145_0_0;
     int tmp_index_5204_0_0;
-    int tmp_index_5202_0_0;
-    int tmp_call_147_0_0;
     int tmp_index_5206_0_0;
-    int tmp_call_149_0_0;
-    int tmp_index_5212_0_0;
-    int tmp_index_5210_0_0;
+    int tmp_call_147_0_0;
+    int tmp_index_5202_0_0;
     int tmp_index_5208_0_0;
+    int tmp_call_149_0_0;
+    int tmp_index_5210_0_0;
+    int tmp_index_5212_0_0;
     int tmp_index_5215_0_0;
-    int tmp_index_5226_0_0;
-    int tmp_index_5224_0_0;
     int tmp_index_5228_0_0;
-    int tmp_index_5237_0_0;
-    int tmp_index_5232_0_0;
-    int tmp_index_5242_0_0;
-    int tmp_call_152_0_0;
+    int tmp_index_5224_0_0;
+    int tmp_index_5226_0_0;
     int tmp_index_5240_0_0;
     int tmp_index_5235_0_0;
+    int tmp_index_5237_0_0;
+    int tmp_index_5242_0_0;
     int tmp_index_5244_0_0;
+    int tmp_call_152_0_0;
+    int tmp_index_5232_0_0;
     int tmp_index_5230_0_0;
+    int inds_var_1354_0_0;
     int _if_cond_168_0_0;
     int _if_cond_170_0_0;
     int _if_cond_172_0_0;
@@ -4764,1031 +4994,254 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_5216_0_0;
     int tmp_index_5219_0_0;
     int tmp_index_5222_0_0;
-    int tmp_index_5254_0_0;
-    int tmp_index_5248_0_0;
+    int tmp_index_5250_0_0;
     int tmp_index_5256_0_0;
     int tmp_index_5246_0_0;
-    int tmp_index_5250_0_0;
     int tmp_index_5252_0_0;
+    int tmp_index_5248_0_0;
+    int tmp_index_5254_0_0;
     int tmp_index_5258_0_0;
-    int tmp_index_5268_0_0;
-    int tmp_index_5260_0_0;
-    int tmp_index_5266_0_0;
     int tmp_index_5262_0_0;
+    int tmp_index_5268_0_0;
     int tmp_index_5264_0_0;
-    int tmp_index_5270_0_0;
-    int tmp_index_5274_0_0;
+    int tmp_index_5266_0_0;
+    int tmp_index_5260_0_0;
     int tmp_index_5272_0_0;
+    int tmp_index_5274_0_0;
     int tmp_index_5276_0_0;
-    int tmp_index_5282_0_0;
-    int tmp_index_5286_0_0;
+    int tmp_index_5270_0_0;
     int tmp_index_5288_0_0;
-    int tmp_index_5280_0_0;
-    int tmp_index_5284_0_0;
     int tmp_index_5278_0_0;
-    int tmp_index_5290_0_0;
-    int tmp_index_5298_0_0;
+    int tmp_index_5286_0_0;
+    int tmp_index_5284_0_0;
+    int tmp_index_5282_0_0;
+    int tmp_index_5280_0_0;
     int tmp_index_5294_0_0;
     int tmp_index_5300_0_0;
-    int tmp_index_5292_0_0;
     int tmp_index_5296_0_0;
+    int tmp_index_5298_0_0;
+    int tmp_index_5290_0_0;
+    int tmp_index_5292_0_0;
+    int tmp_index_5302_0_0;
+    int tmp_index_5304_0_0;
     int tmp_index_5308_0_0;
     int tmp_index_5306_0_0;
-    int tmp_index_5304_0_0;
-    int tmp_index_5302_0_0;
     int tmp_parfor_67_0_0;
     int tmp_parfor_68_0_0;
     int tmp_parfor_69_0_0;
     int tmp_parfor_70_0_0;
     int tmp_parfor_71_0_0;
     int tmp_parfor_72_0_0;
-    int tmp_index_5384_0_0;
     int tmp_index_5380_0_0;
     int tmp_index_5394_0_0;
     int tmp_index_5390_0_0;
-    int tmp_index_5420_0_0;
+    int tmp_index_5384_0_0;
     int tmp_index_5418_0_0;
+    int tmp_index_5420_0_0;
     int tmp_index_5425_0_0;
     int _for_it_183_0_0;
-    int tmp_index_5440_0_0;
-    int tmp_index_5438_0_0;
-    int tmp_index_5442_0_0;
     int tmp_index_5436_0_0;
-    int tmp_index_5446_0_0;
-    int tmp_index_5448_0_0;
-    int tmp_call_154_0_0;
+    int tmp_index_5440_0_0;
+    int tmp_index_5442_0_0;
+    int tmp_index_5438_0_0;
     int tmp_index_5450_0_0;
+    int tmp_index_5448_0_0;
     int tmp_index_5444_0_0;
-    int tmp_index_5466_0_0;
-    int tmp_index_5472_0_0;
-    int tmp_index_5452_0_0;
-    int tmp_index_5470_0_0;
-    int tmp_index_5454_0_0;
-    int tmp_index_5468_0_0;
+    int tmp_index_5446_0_0;
+    int tmp_call_154_0_0;
     int tmp_index_5464_0_0;
     int tmp_index_5462_0_0;
-    int tmp_index_5460_0_0;
-    int tmp_call_156_0_0;
+    int tmp_index_5470_0_0;
+    int tmp_index_5466_0_0;
+    int tmp_index_5468_0_0;
     int tmp_index_5458_0_0;
+    int tmp_index_5452_0_0;
+    int tmp_index_5472_0_0;
+    int tmp_index_5454_0_0;
+    int tmp_index_5460_0_0;
     int tmp_index_5456_0_0;
+    int tmp_call_156_0_0;
+    int tmp_index_5474_0_0;
     int tmp_index_5478_0_0;
     int tmp_index_5476_0_0;
-    int tmp_index_5474_0_0;
     int tmp_call_158_0_0;
     int tmp_index_5481_0_0;
     double _if_cond_176_0_0;
     int tmp_index_5494_0_0;
     int tmp_index_5490_0_0;
     int tmp_index_5492_0_0;
-    int tmp_index_5501_0_0;
     int tmp_index_5498_0_0;
-    int tmp_index_5496_0_0;
-    int tmp_call_161_0_0;
     int tmp_index_5508_0_0;
-    int tmp_index_5503_0_0;
+    int tmp_index_5501_0_0;
+    int tmp_call_161_0_0;
     int tmp_index_5506_0_0;
+    int tmp_index_5503_0_0;
+    int tmp_index_5496_0_0;
     int _for_it_184_0_0;
     int tmp_index_5482_0_0;
     int tmp_index_5486_0_0;
     int tmp_index_5485_0_0;
     int tmp_index_5488_0_0;
-    int tmp_index_5514_0_0;
     int tmp_index_5510_0_0;
-    int tmp_index_5559_0_0;
-    int tmp_index_5540_0_0;
+    int tmp_index_5514_0_0;
     int tmp_index_5538_0_0;
+    int tmp_index_5540_0_0;
+    int tmp_index_5559_0_0;
     int _for_it_185_0_0;
-    int tmp_index_6822_0_0;
-    int tmp_index_6823_0_0;
-    int tmp_parfor_19_0_0;
-    int tmp_parfor_20_1_0;
-    int tmp_parfor_19_1_0;
-    int icl_var_1542_0_0;
-    int ich_var_1541_0_0;
-    int _for_it_212_0_0;
-    int tmp_index_6109_0_0;
-    int _if_cond_184_0_0;
-    int _for_it_213_0_0;
-    int ixc0_var_2070_0_0;
-    int _for_it_303_0_0;
-    int jl_var_2073_0_0;
-    int tmp_index_9197_0_0;
-    int tmp_index_9193_0_0;
-    int tmp_index_9188_0_0;
-    int tmp_index_9199_0_0;
-    int tmp_index_9181_0_0;
-    int tmp_index_9191_0_0;
-    int tmp_index_9186_0_0;
-    int tmp_index_9183_0_0;
-    int tmp_index_9195_0_0;
-    int inds_var_2056_0_0;
-    int _for_it_304_0_0;
-    int tmp_index_9234_0_0;
-    int tmp_index_9223_0_0;
-    int tmp_index_9215_0_0;
-    int tmp_index_9232_0_0;
-    int tmp_index_9250_0_0;
-    int tmp_index_9238_0_0;
-    int tmp_index_9229_0_0;
-    int tmp_index_9211_0_0;
-    int tmp_index_9246_0_0;
-    int tmp_index_9242_0_0;
-    int tmp_index_9201_0_0;
-    int tmp_index_9205_0_0;
-    int _for_it_305_0_0;
-    int tmp_index_9270_0_0;
-    int tmp_index_9268_0_0;
-    int tmp_index_9266_0_0;
-    int tmp_index_9272_0_0;
-    int tmp_index_9256_0_0;
-    int tmp_index_9258_0_0;
-    int tmp_index_9261_0_0;
-    int tmp_index_9263_0_0;
-    int _for_it_306_0_0;
-    int tmp_index_9309_0_0;
-    int tmp_index_9301_0_0;
-    int tmp_index_9295_0_0;
-    int tmp_index_9274_0_0;
-    int tmp_index_9286_0_0;
-    int tmp_index_9292_0_0;
-    int tmp_index_9313_0_0;
-    int tmp_index_9278_0_0;
-    int tmp_index_9305_0_0;
-    int tmp_index_9297_0_0;
-    int _for_it_307_0_0;
-    int _for_it_326_0_0;
-    int tmp_index_9681_0_0;
-    int tmp_index_9679_0_0;
-    int tmp_index_9677_0_0;
-    int tmp_index_9684_0_0;
-    double _if_cond_288_0_0;
-    int tmp_index_9695_0_0;
-    int tmp_index_9698_0_0;
-    int tmp_index_9703_0_0;
-    int tmp_index_9693_0_0;
-    int tmp_index_9700_0_0;
-    int ind0_var_2142_0_0;
-    int indm_var_2146_0_0;
-    int ind1_var_2143_0_0;
-    int _for_it_327_0_0;
-    int tmp_index_9689_0_0;
-    int tmp_index_9685_0_0;
-    int tmp_index_9688_0_0;
-    int tmp_index_9691_0_0;
-    int tmp_index_9742_0_0;
-    int tmp_index_9707_0_0;
-    int tmp_index_9715_0_0;
-    int tmp_index_9748_0_0;
-    int tmp_index_9724_0_0;
-    int tmp_index_9726_0_0;
-    int tmp_index_9734_0_0;
-    int tmp_index_9721_0_0;
-    int tmp_index_9738_0_0;
-    int tmp_index_9730_0_0;
-    int tmp_index_9744_0_0;
-    int tmp_index_9752_0_0;
-    int _for_it_328_0_0;
-    int tmp_parfor_40_0_0;
-    int tmp_parfor_39_0_0;
-    int tmp_index_2255_0_0;
-    int tmp_index_2256_0_0;
-    int _for_it_268_0_0;
-    int tmp_index_7799_0_0;
-    int tmp_index_7801_0_0;
-    int tmp_index_7795_0_0;
-    int tmp_index_7797_0_0;
-    int tmp_index_7809_0_0;
-    int tmp_index_7803_0_0;
-    int tmp_index_7807_0_0;
-    int tmp_call_203_0_0;
-    int tmp_index_7805_0_0;
-    int tmp_index_7811_0_0;
-    int tmp_index_7815_0_0;
-    int tmp_index_7813_0_0;
-    int tmp_call_205_0_0;
-    int tmp_index_7819_0_0;
-    int tmp_call_207_0_0;
-    int tmp_index_7817_0_0;
-    double _if_cond_241_0_0;
-    int tmp_index_7825_0_0;
-    int tmp_index_7827_0_0;
-    int tmp_index_7829_0_0;
-    int tmp_index_7835_0_0;
-    int tmp_index_7833_0_0;
-    int tmp_call_210_0_0;
-    int tmp_index_7831_0_0;
-    int tmp_index_7849_0_0;
-    int tmp_index_7851_0_0;
-    int tmp_index_7847_0_0;
-    int tmp_index_7842_0_0;
-    int tmp_index_7844_0_0;
-    int tmp_call_212_0_0;
-    int tmp_index_7837_0_0;
-    int tmp_index_7839_0_0;
-    int ind0_var_1823_0_0;
-    int inds_var_1825_0_0;
-    int indf_var_1826_0_0;
-    int ind1_var_1824_0_0;
-    int _if_cond_242_0_0;
-    int _if_cond_244_0_0;
-    int _if_cond_246_0_0;
-    int _if_cond_248_0_0;
-    int _for_it_269_0_0;
-    int tmp_index_7821_0_0;
-    int tmp_index_7823_0_0;
-    int tmp_index_7859_0_0;
-    int tmp_index_7861_0_0;
-    int tmp_index_7863_0_0;
-    int tmp_index_7855_0_0;
-    int tmp_index_7853_0_0;
-    int tmp_index_7857_0_0;
-    int tmp_index_7875_0_0;
-    int tmp_index_7867_0_0;
-    int tmp_index_7871_0_0;
-    int tmp_index_7869_0_0;
-    int tmp_index_7865_0_0;
-    int tmp_index_7873_0_0;
-    int tmp_index_7881_0_0;
-    int tmp_index_7883_0_0;
-    int tmp_index_7877_0_0;
-    int tmp_index_7879_0_0;
-    int tmp_index_7885_0_0;
-    int tmp_index_7891_0_0;
-    int tmp_index_7887_0_0;
-    int tmp_index_7895_0_0;
-    int tmp_index_7889_0_0;
-    int tmp_index_7893_0_0;
-    int tmp_index_7897_0_0;
-    int tmp_index_7899_0_0;
-    int tmp_index_7901_0_0;
-    int tmp_index_7907_0_0;
-    int tmp_index_7903_0_0;
-    int tmp_index_7905_0_0;
-    int tmp_index_7915_0_0;
-    int tmp_index_7909_0_0;
-    int tmp_index_7911_0_0;
-    int tmp_index_7913_0_0;
-    int tmp_parfor_144_0_0;
-    int tmp_parfor_145_0_0;
-    int tmp_parfor_146_0_0;
-    int tmp_parfor_147_0_0;
-    int tmp_parfor_148_0_0;
-    int tmp_parfor_149_0_0;
-    int tmp_index_7987_0_0;
-    int tmp_index_7991_0_0;
-    int tmp_index_8001_0_0;
-    int tmp_index_7997_0_0;
-    int tmp_index_8025_0_0;
-    int tmp_index_8054_0_0;
-    int tmp_index_8047_0_0;
-    int tmp_index_8052_0_0;
-    int tmp_index_8045_0_0;
-    int _for_it_270_0_0;
-    int ixc0_var_1629_0_0;
-    int _for_it_233_0_0;
-    int jl_var_1632_0_0;
-    int tmp_index_6580_0_0;
-    int tmp_index_6578_0_0;
-    int tmp_index_6576_0_0;
-    int tmp_index_6582_0_0;
-    int tmp_index_6588_0_0;
-    int tmp_index_6590_0_0;
-    int tmp_index_6584_0_0;
-    int tmp_index_6586_0_0;
-    int tmp_call_171_0_0;
-    int tmp_index_6594_0_0;
-    int tmp_index_6596_0_0;
-    int tmp_index_6592_0_0;
-    int tmp_call_173_0_0;
-    int tmp_index_6600_0_0;
-    int tmp_index_6602_0_0;
-    int tmp_index_6598_0_0;
-    int tmp_call_175_0_0;
-    int tmp_index_6609_0_0;
-    int tmp_index_6611_0_0;
-    int tmp_index_6606_0_0;
-    int tmp_index_6604_0_0;
-    int tmp_index_6614_0_0;
-    int tmp_index_6618_0_0;
-    int tmp_index_6620_0_0;
-    int tmp_index_6616_0_0;
-    int tmp_index_6622_0_0;
-    int tmp_call_177_0_0;
-    int indf_var_1579_0_0;
-    int ind0_var_1576_0_0;
-    int indm_var_1580_0_0;
-    int inds_var_1578_0_0;
-    int ind1_var_1577_0_0;
-    int _if_cond_197_0_0;
-    int _if_cond_199_0_0;
-    int _if_cond_201_0_0;
-    int _for_it_234_0_0;
-    int tmp_index_6628_0_0;
-    int tmp_index_6630_0_0;
-    int tmp_index_6624_0_0;
-    int tmp_index_6632_0_0;
-    int tmp_index_6626_0_0;
-    int tmp_index_6634_0_0;
-    int tmp_index_6640_0_0;
-    int tmp_index_6638_0_0;
-    int tmp_index_6646_0_0;
-    int tmp_index_6644_0_0;
-    int tmp_index_6636_0_0;
-    int tmp_index_6642_0_0;
-    int tmp_index_6652_0_0;
-    int tmp_index_6650_0_0;
-    int tmp_index_6648_0_0;
-    int tmp_index_6654_0_0;
-    int tmp_index_6662_0_0;
-    int tmp_index_6658_0_0;
-    int tmp_index_6656_0_0;
-    int tmp_index_6664_0_0;
-    int tmp_index_6666_0_0;
-    int tmp_index_6660_0_0;
-    int tmp_index_6676_0_0;
-    int tmp_index_6678_0_0;
-    int tmp_index_6670_0_0;
-    int tmp_index_6668_0_0;
-    int tmp_index_6672_0_0;
-    int tmp_index_6674_0_0;
-    int tmp_index_6682_0_0;
-    int tmp_index_6680_0_0;
-    int tmp_index_6684_0_0;
-    int tmp_index_6686_0_0;
-    int tmp_parfor_99_0_0;
-    int tmp_parfor_100_0_0;
-    int tmp_parfor_101_0_0;
-    int tmp_parfor_102_0_0;
-    int tmp_parfor_103_0_0;
-    int tmp_parfor_104_0_0;
-    int tmp_index_6772_0_0;
-    int tmp_index_6762_0_0;
-    int tmp_index_6758_0_0;
-    int tmp_index_6768_0_0;
-    int tmp_index_6803_0_0;
-    int tmp_index_6796_0_0;
-    int tmp_index_6798_0_0;
-    int _for_it_235_0_0;
-    int _for_it_236_0_0;
-    int tmp_index_6817_0_0;
-    int tmp_index_6814_0_0;
-    int _for_it_237_0_0;
-    int ich_var_1408_0_0;
-    int icl_var_1409_0_0;
-    int _for_it_173_0_0;
-    int tmp_index_4781_0_0;
-    int _if_cond_156_0_0;
-    int _for_it_174_0_0;
-    int tmp_parfor_77_0_0;
-    int tmp_parfor_1_0_1;
-    int tmp_parfor_0_0_1;
-    int tmp_parfor_59_0_0;
-    int tmp_parfor_58_0_0;
-    int tmp_index_8385_0_0;
-    int tmp_index_8386_0_0;
-    int tmp_parfor_84_0_0;
-    int tmp_parfor_83_0_0;
-    int ixc0_var_2110_0_0;
-    int _for_it_316_0_0;
-    int jl_var_2113_0_0;
-    int tmp_index_9446_0_0;
-    int tmp_index_9448_0_0;
-    int tmp_index_9441_0_0;
-    int tmp_index_9451_0_0;
-    int tmp_index_9443_0_0;
-    int tmp_index_9453_0_0;
-    int _for_it_317_0_0;
-    int tmp_index_9465_0_0;
-    int tmp_index_9475_0_0;
-    int tmp_index_9480_0_0;
-    int tmp_index_9492_0_0;
-    int tmp_index_9469_0_0;
-    int tmp_index_9478_0_0;
-    int tmp_index_9455_0_0;
-    int tmp_index_9488_0_0;
-    int tmp_index_9484_0_0;
-    int tmp_index_9496_0_0;
-    int tmp_index_9459_0_0;
-    int _for_it_318_0_0;
-    int tmp_index_9502_0_0;
-    int tmp_index_9512_0_0;
-    int tmp_index_9504_0_0;
-    int tmp_index_9507_0_0;
-    int tmp_index_9509_0_0;
-    int _for_it_319_0_0;
-    int tmp_index_9527_0_0;
-    int tmp_index_9518_0_0;
-    int tmp_index_9514_0_0;
-    int tmp_index_9537_0_0;
-    int tmp_index_9529_0_0;
-    int tmp_index_9545_0_0;
-    int tmp_index_9541_0_0;
-    int tmp_index_9524_0_0;
-    int tmp_index_9533_0_0;
-    int _for_it_320_0_0;
-    int ich_var_1310_0_0;
-    int icl_var_1311_0_0;
-    int _for_it_157_0_0;
-    int tmp_index_4061_0_0;
-    int _if_cond_134_0_0;
-    int _for_it_158_0_0;
-    int ich_var_1627_0_0;
-    int icl_var_1628_0_0;
-    int _for_it_225_0_0;
-    int tmp_index_6317_0_0;
-    int _if_cond_186_0_0;
-    int _for_it_226_0_0;
-    int tmp_parfor_21_1_0;
-    int tmp_parfor_43_0_0;
-    int ich_var_1785_0_0;
-    int icl_var_1786_0_0;
-    int _for_it_251_0_0;
-    int tmp_index_7331_0_0;
-    int _if_cond_222_0_0;
-    int _for_it_252_0_0;
-    int ich_var_1039_0_0;
-    int icl_var_1040_0_0;
-    int _for_it_110_0_0;
-    int tmp_index_2264_0_0;
-    int _if_cond_48_0_0;
-    int _for_it_111_0_0;
-    int tmp_parfor_37_0_0;
-    int tmp_parfor_36_0_0;
-    int ich_var_1452_0_0;
-    int icl_var_1453_0_0;
-    int _for_it_186_0_0;
-    int tmp_index_5577_0_0;
-    int _if_cond_178_0_0;
-    int _for_it_187_0_0;
-    int tmp_parfor_179_0_0;
-    int tmp_parfor_178_0_0;
-    int tmp_index_7324_0_0;
-    int tmp_index_7325_0_0;
-    int tmp_index_4774_0_0;
-    int tmp_index_4775_0_0;
-    int tmp_index_6309_0_0;
-    int tmp_index_6308_0_0;
-    int ixc0_var_1884_0_0;
-    int _for_it_274_0_0;
-    int jl_var_1887_0_0;
-    int tmp_index_8091_0_0;
-    int tmp_index_8085_0_0;
-    int tmp_index_8087_0_0;
-    int tmp_index_8089_0_0;
-    int tmp_index_8095_0_0;
-    int tmp_index_8093_0_0;
-    int tmp_index_8097_0_0;
-    int tmp_index_8099_0_0;
-    int tmp_call_214_0_0;
-    int tmp_index_8105_0_0;
-    int tmp_index_8103_0_0;
-    int tmp_index_8101_0_0;
-    int tmp_call_216_0_0;
-    int tmp_index_8107_0_0;
-    int tmp_call_218_0_0;
-    int tmp_index_8109_0_0;
-    int tmp_index_8117_0_0;
-    int tmp_index_8115_0_0;
-    int tmp_index_8119_0_0;
-    int tmp_index_8123_0_0;
-    int tmp_call_221_0_0;
-    int tmp_index_8125_0_0;
-    int tmp_index_8121_0_0;
-    int tmp_index_8141_0_0;
-    int tmp_index_8132_0_0;
-    int tmp_index_8134_0_0;
-    int tmp_call_223_0_0;
-    int tmp_index_8137_0_0;
-    int tmp_index_8139_0_0;
-    int tmp_index_8127_0_0;
-    int tmp_index_8129_0_0;
-    int _if_cond_251_0_0;
-    int _if_cond_253_0_0;
-    int _if_cond_255_0_0;
-    int _if_cond_257_0_0;
-    int _for_it_275_0_0;
-    int tmp_index_8111_0_0;
-    int tmp_index_8113_0_0;
-    int tmp_index_8145_0_0;
-    int tmp_index_8153_0_0;
-    int tmp_index_8149_0_0;
-    int tmp_index_8143_0_0;
-    int tmp_index_8151_0_0;
-    int tmp_index_8147_0_0;
-    int tmp_index_8159_0_0;
-    int tmp_index_8157_0_0;
-    int tmp_index_8165_0_0;
-    int tmp_index_8163_0_0;
-    int tmp_index_8161_0_0;
-    int tmp_index_8155_0_0;
-    int tmp_index_8171_0_0;
-    int tmp_index_8169_0_0;
-    int tmp_index_8167_0_0;
-    int tmp_index_8173_0_0;
-    int tmp_index_8181_0_0;
-    int tmp_index_8177_0_0;
-    int tmp_index_8183_0_0;
-    int tmp_index_8175_0_0;
-    int tmp_index_8179_0_0;
-    int tmp_index_8185_0_0;
-    int tmp_index_8193_0_0;
-    int tmp_index_8197_0_0;
-    int tmp_index_8195_0_0;
-    int tmp_index_8191_0_0;
-    int tmp_index_8187_0_0;
-    int tmp_index_8189_0_0;
-    int tmp_index_8201_0_0;
-    int tmp_index_8205_0_0;
-    int tmp_index_8203_0_0;
-    int tmp_index_8199_0_0;
-    int tmp_parfor_150_0_0;
-    int tmp_parfor_151_0_0;
-    int tmp_parfor_152_0_0;
-    int tmp_parfor_153_0_0;
-    int tmp_parfor_154_0_0;
-    int tmp_parfor_155_0_0;
-    int tmp_index_8281_0_0;
-    int tmp_index_8287_0_0;
-    int tmp_index_8291_0_0;
-    int tmp_index_8277_0_0;
-    int tmp_index_8315_0_0;
-    int tmp_index_8337_0_0;
-    int tmp_index_8342_0_0;
-    int tmp_index_8344_0_0;
-    int tmp_index_8335_0_0;
-    int _for_it_276_0_0;
-    int tmp_index_8355_0_0;
-    int _for_it_277_0_0;
-    int tmp_index_8365_0_0;
-    int tmp_index_8359_0_0;
-    int tmp_index_8368_0_0;
-    int tmp_index_8370_0_0;
-    int _for_it_278_0_0;
-    int tmp_index_7768_0_0;
-    int tmp_index_7769_0_0;
-    int tmp_parfor_184_0_0;
-    int tmp_parfor_183_0_0;
-    int tmp_parfor_190_0_0;
-    int tmp_index_5805_0_0;
-    int tmp_index_5804_0_0;
-    int icl_var_2025_0_0;
-    int ich_var_2024_0_0;
-    int _for_it_282_0_0;
-    int tmp_index_8392_0_0;
-    int _if_cond_260_0_0;
-    int _for_it_283_0_0;
-    int _for_it_284_0_0;
-    int tmp_index_8406_0_0;
-    int tmp_index_8410_0_0;
-    int tmp_index_8408_0_0;
-    int tmp_index_8412_0_0;
-    int tmp_call_225_0_0;
-    int tmp_index_8418_0_0;
-    int tmp_index_8420_0_0;
-    int tmp_index_8416_0_0;
-    int tmp_index_8414_0_0;
-    int tmp_call_227_0_0;
-    int tmp_index_8424_0_0;
-    int tmp_index_8422_0_0;
-    int tmp_index_8426_0_0;
-    int tmp_index_8430_0_0;
-    int tmp_index_8432_0_0;
-    int tmp_call_229_0_0;
-    int tmp_index_8428_0_0;
-    int tmp_index_8435_0_0;
-    double _if_cond_261_0_0;
-    int tmp_index_8446_0_0;
-    int tmp_index_8448_0_0;
-    int tmp_index_8444_0_0;
-    int tmp_index_8460_0_0;
-    int tmp_index_8464_0_0;
-    int tmp_index_8455_0_0;
-    int tmp_index_8452_0_0;
-    int tmp_call_232_0_0;
-    int tmp_index_8450_0_0;
-    int tmp_index_8457_0_0;
-    int tmp_index_8462_0_0;
-    int _if_cond_262_0_0;
-    int _if_cond_264_0_0;
-    int _if_cond_266_0_0;
-    int _if_cond_268_0_0;
-    int _for_it_285_0_0;
-    int tmp_index_8436_0_0;
-    int tmp_index_8440_0_0;
-    int tmp_index_8439_0_0;
-    int tmp_index_8442_0_0;
-    int tmp_index_8468_0_0;
-    int tmp_index_8474_0_0;
-    int tmp_index_8470_0_0;
-    int tmp_index_8476_0_0;
-    int tmp_index_8472_0_0;
-    int tmp_index_8466_0_0;
-    int tmp_index_8486_0_0;
-    int tmp_index_8480_0_0;
-    int tmp_index_8482_0_0;
-    int tmp_index_8484_0_0;
-    int tmp_index_8488_0_0;
-    int tmp_index_8478_0_0;
-    int tmp_index_8492_0_0;
-    int tmp_index_8494_0_0;
-    int tmp_index_8490_0_0;
-    int tmp_index_8496_0_0;
-    int tmp_index_8500_0_0;
-    int tmp_index_8508_0_0;
-    int tmp_index_8498_0_0;
-    int tmp_index_8506_0_0;
-    int tmp_index_8502_0_0;
-    int tmp_index_8504_0_0;
-    int tmp_index_8518_0_0;
-    int tmp_index_8510_0_0;
-    int tmp_index_8512_0_0;
-    int tmp_index_8520_0_0;
-    int tmp_index_8516_0_0;
-    int tmp_index_8514_0_0;
-    int tmp_index_8528_0_0;
-    int tmp_index_8522_0_0;
-    int tmp_index_8526_0_0;
-    int tmp_index_8524_0_0;
-    int tmp_parfor_164_0_0;
-    int tmp_parfor_165_0_0;
-    int tmp_parfor_166_0_0;
-    int tmp_parfor_167_0_0;
-    int tmp_parfor_168_0_0;
-    int tmp_parfor_169_0_0;
-    int tmp_index_8610_0_0;
-    int tmp_index_8604_0_0;
-    int tmp_index_8614_0_0;
-    int tmp_index_8600_0_0;
-    int tmp_index_8645_0_0;
-    int tmp_index_8640_0_0;
-    int tmp_index_8638_0_0;
-    int _for_it_286_0_0;
-    int tmp_index_9031_0_0;
-    int tmp_index_9032_0_0;
-    int tmp_parfor_125_0_0;
-    int tmp_parfor_124_0_0;
-    int tmp_index_9320_0_0;
-    int tmp_index_9319_0_0;
-    int tmp_index_6821_0_0;
-    int tmp_index_6820_0_0;
-    int tmp_parfor_92_0_0;
-    int tmp_parfor_81_0_0;
-    int tmp_parfor_80_0_0;
-    int tmp_parfor_86_0_0;
-    int tmp_parfor_85_0_0;
-    int _for_it_188_0_0;
-    int tmp_index_5593_0_0;
-    int tmp_index_5590_0_0;
-    int tmp_index_5585_0_0;
-    int tmp_index_5588_0_0;
-    int tmp_index_5583_0_0;
-    int tmp_index_5595_0_0;
-    int tmp_index_5597_0_0;
-    int _for_it_189_0_0;
-    int tmp_index_5622_0_0;
-    int tmp_index_5632_0_0;
-    int tmp_index_5613_0_0;
-    int tmp_index_5640_0_0;
-    int tmp_index_5628_0_0;
-    int tmp_index_5603_0_0;
-    int tmp_index_5609_0_0;
-    int tmp_index_5599_0_0;
-    int tmp_index_5619_0_0;
-    int tmp_index_5636_0_0;
-    int tmp_index_5624_0_0;
-    int _for_it_190_0_0;
-    int _for_it_230_0_0;
-    int _for_it_231_0_0;
-    int tmp_index_6567_0_0;
-    int tmp_index_6570_0_0;
-    int _for_it_232_0_0;
+    int ich_var_1882_0_0;
+    int icl_var_1883_0_0;
+    int _for_it_266_0_0;
+    int tmp_index_7777_0_0;
+    int _if_cond_240_0_0;
+    int _for_it_267_0_0;
+    int tmp_parfor_185_0_0;
     int _for_it_297_0_0;
-    int tmp_index_9051_0_0;
-    int tmp_index_9058_0_0;
-    int tmp_index_9056_0_0;
     int tmp_index_9060_0_0;
     int tmp_index_9049_0_0;
-    int tmp_index_9044_0_0;
     int tmp_index_9054_0_0;
-    int tmp_index_9062_0_0;
+    int tmp_index_9051_0_0;
     int tmp_index_9046_0_0;
+    int tmp_index_9044_0_0;
+    int tmp_index_9062_0_0;
+    int tmp_index_9058_0_0;
+    int tmp_index_9056_0_0;
+    int inds_var_2056_0_0;
     int _for_it_298_0_0;
-    int tmp_index_9068_0_0;
-    int tmp_index_9109_0_0;
-    int tmp_index_9086_0_0;
-    int tmp_index_9113_0_0;
-    int tmp_index_9064_0_0;
     int tmp_index_9074_0_0;
+    int tmp_index_9109_0_0;
+    int tmp_index_9068_0_0;
+    int tmp_index_9064_0_0;
     int tmp_index_9078_0_0;
-    int tmp_index_9092_0_0;
-    int tmp_index_9105_0_0;
-    int tmp_index_9101_0_0;
     int tmp_index_9097_0_0;
+    int tmp_index_9092_0_0;
+    int tmp_index_9113_0_0;
+    int tmp_index_9101_0_0;
     int tmp_index_9095_0_0;
+    int tmp_index_9105_0_0;
+    int tmp_index_9086_0_0;
     int _for_it_299_0_0;
-    int _for_it_165_0_0;
-    int tmp_index_4396_0_0;
-    int tmp_index_4411_0_0;
-    int tmp_index_4393_0_0;
-    int tmp_index_4390_0_0;
-    int tmp_index_4408_0_0;
-    int tmp_index_4417_0_0;
-    int tmp_index_4384_0_0;
-    int tmp_index_4414_0_0;
-    int tmp_index_4402_0_0;
-    int tmp_index_4399_0_0;
-    int tmp_index_4387_0_0;
-    int tmp_index_4405_0_0;
-    int _for_it_166_0_0;
+    int tmp_parfor_18_1_0;
+    int tmp_parfor_17_1_0;
+    int tmp_parfor_84_0_0;
+    int tmp_parfor_83_0_0;
+    int tmp_parfor_123_0_0;
+    int tmp_parfor_122_0_0;
     int _for_it_227_0_0;
     int tmp_index_6337_0_0;
     int tmp_index_6333_0_0;
     int tmp_index_6335_0_0;
     int tmp_index_6331_0_0;
-    int tmp_index_6343_0_0;
-    int tmp_index_6345_0_0;
-    int tmp_index_6339_0_0;
     int tmp_index_6341_0_0;
+    int tmp_index_6339_0_0;
+    int tmp_index_6345_0_0;
     int tmp_call_163_0_0;
-    int tmp_call_165_0_0;
+    int tmp_index_6343_0_0;
     int tmp_index_6349_0_0;
-    int tmp_index_6351_0_0;
     int tmp_index_6347_0_0;
-    int tmp_index_6357_0_0;
-    int tmp_index_6355_0_0;
+    int tmp_call_165_0_0;
+    int tmp_index_6351_0_0;
     int tmp_index_6353_0_0;
+    int tmp_index_6355_0_0;
     int tmp_call_167_0_0;
-    int tmp_index_6361_0_0;
-    int tmp_index_6373_0_0;
-    int tmp_index_6369_0_0;
-    int tmp_index_6366_0_0;
+    int tmp_index_6357_0_0;
     int tmp_call_169_0_0;
     int tmp_index_6364_0_0;
+    int tmp_index_6359_0_0;
+    int tmp_index_6361_0_0;
+    int tmp_index_6373_0_0;
+    int tmp_index_6371_0_0;
+    int tmp_index_6366_0_0;
     int tmp_index_6377_0_0;
     int tmp_index_6375_0_0;
-    int tmp_index_6359_0_0;
-    int tmp_index_6371_0_0;
+    int tmp_index_6369_0_0;
+    int indm_var_1580_0_0;
+    int indf_var_1579_0_0;
+    int inds_var_1578_0_0;
+    int ind0_var_1576_0_0;
+    int ind1_var_1577_0_0;
     int _if_cond_187_0_0;
     int _if_cond_189_0_0;
     int _if_cond_191_0_0;
     int _if_cond_193_0_0;
     int _for_it_228_0_0;
-    int tmp_index_6389_0_0;
     int tmp_index_6379_0_0;
+    int tmp_index_6389_0_0;
     int tmp_index_6385_0_0;
     int tmp_index_6381_0_0;
     int tmp_index_6383_0_0;
     int tmp_index_6387_0_0;
-    int tmp_index_6397_0_0;
     int tmp_index_6391_0_0;
-    int tmp_index_6393_0_0;
     int tmp_index_6395_0_0;
+    int tmp_index_6397_0_0;
     int tmp_index_6401_0_0;
     int tmp_index_6399_0_0;
-    int tmp_index_6407_0_0;
+    int tmp_index_6393_0_0;
     int tmp_index_6403_0_0;
     int tmp_index_6405_0_0;
     int tmp_index_6409_0_0;
+    int tmp_index_6407_0_0;
     int tmp_index_6419_0_0;
-    int tmp_index_6417_0_0;
-    int tmp_index_6411_0_0;
     int tmp_index_6413_0_0;
+    int tmp_index_6411_0_0;
+    int tmp_index_6417_0_0;
     int tmp_index_6421_0_0;
     int tmp_index_6415_0_0;
-    int tmp_index_6433_0_0;
-    int tmp_index_6423_0_0;
-    int tmp_index_6431_0_0;
-    int tmp_index_6427_0_0;
-    int tmp_index_6425_0_0;
     int tmp_index_6429_0_0;
+    int tmp_index_6427_0_0;
+    int tmp_index_6433_0_0;
+    int tmp_index_6425_0_0;
+    int tmp_index_6431_0_0;
+    int tmp_index_6423_0_0;
+    int tmp_index_6435_0_0;
     int tmp_index_6441_0_0;
     int tmp_index_6437_0_0;
     int tmp_index_6439_0_0;
-    int tmp_index_6435_0_0;
     int tmp_parfor_93_0_0;
     int tmp_parfor_94_0_0;
     int tmp_parfor_95_0_0;
     int tmp_parfor_96_0_0;
     int tmp_parfor_97_0_0;
     int tmp_parfor_98_0_0;
-    int tmp_index_6527_0_0;
-    int tmp_index_6517_0_0;
-    int tmp_index_6523_0_0;
     int tmp_index_6513_0_0;
-    int tmp_index_6551_0_0;
-    int tmp_index_6553_0_0;
+    int tmp_index_6527_0_0;
+    int tmp_index_6523_0_0;
+    int tmp_index_6517_0_0;
     int tmp_index_6558_0_0;
+    int tmp_index_6553_0_0;
+    int tmp_index_6551_0_0;
     int _for_it_229_0_0;
-    int tmp_parfor_108_0_0;
-    int tmp_parfor_107_0_0;
-    int _for_it_240_0_0;
-    int tmp_index_6845_0_0;
-    int tmp_index_6841_0_0;
-    int tmp_index_6843_0_0;
-    int tmp_index_6839_0_0;
-    int tmp_index_6853_0_0;
-    int tmp_index_6847_0_0;
-    int tmp_call_179_0_0;
-    int tmp_index_6849_0_0;
-    int tmp_index_6851_0_0;
-    int tmp_index_6857_0_0;
-    int tmp_index_6855_0_0;
-    int tmp_index_6859_0_0;
-    int tmp_call_181_0_0;
-    int tmp_index_6871_0_0;
-    int tmp_index_6863_0_0;
-    int tmp_index_6866_0_0;
-    int tmp_index_6873_0_0;
-    int tmp_call_183_0_0;
-    int tmp_index_6861_0_0;
-    int tmp_index_6868_0_0;
-    int _if_cond_205_0_0;
-    int _if_cond_207_0_0;
-    int _if_cond_209_0_0;
-    int _if_cond_211_0_0;
-    int _for_it_241_0_0;
-    int tmp_index_6881_0_0;
-    int tmp_index_6885_0_0;
-    int tmp_index_6877_0_0;
-    int tmp_index_6879_0_0;
-    int tmp_index_6883_0_0;
-    int tmp_index_6875_0_0;
-    int tmp_index_6889_0_0;
-    int tmp_index_6897_0_0;
-    int tmp_index_6895_0_0;
-    int tmp_index_6887_0_0;
-    int tmp_index_6893_0_0;
-    int tmp_index_6891_0_0;
-    int tmp_index_6905_0_0;
-    int tmp_index_6901_0_0;
-    int tmp_index_6899_0_0;
-    int tmp_index_6903_0_0;
-    int tmp_index_6913_0_0;
-    int tmp_index_6915_0_0;
-    int tmp_index_6909_0_0;
-    int tmp_index_6917_0_0;
-    int tmp_index_6907_0_0;
-    int tmp_index_6911_0_0;
-    int tmp_index_6929_0_0;
-    int tmp_index_6921_0_0;
-    int tmp_index_6919_0_0;
-    int tmp_index_6925_0_0;
-    int tmp_index_6927_0_0;
-    int tmp_index_6923_0_0;
-    int tmp_index_6933_0_0;
-    int tmp_index_6937_0_0;
-    int tmp_index_6931_0_0;
-    int tmp_index_6935_0_0;
-    int tmp_parfor_110_0_0;
-    int tmp_parfor_111_0_0;
-    int tmp_parfor_112_0_0;
-    int tmp_parfor_113_0_0;
-    int tmp_parfor_114_0_0;
-    int tmp_parfor_115_0_0;
-    int tmp_index_7009_0_0;
-    int tmp_index_7013_0_0;
-    int tmp_index_7019_0_0;
-    int tmp_index_7023_0_0;
-    int tmp_index_7034_0_0;
-    int tmp_index_7029_0_0;
-    int _for_it_242_0_0;
-    int _for_it_253_0_0;
-    int tmp_index_7347_0_0;
-    int tmp_index_7345_0_0;
-    int tmp_index_7341_0_0;
-    int tmp_index_7343_0_0;
-    int tmp_index_7355_0_0;
-    int tmp_call_191_0_0;
-    int tmp_index_7349_0_0;
-    int tmp_index_7351_0_0;
-    int tmp_index_7353_0_0;
-    int tmp_index_7357_0_0;
-    int tmp_call_193_0_0;
-    int tmp_index_7359_0_0;
-    int tmp_index_7361_0_0;
-    int tmp_index_7365_0_0;
-    int tmp_call_195_0_0;
-    int tmp_index_7373_0_0;
-    int tmp_index_7368_0_0;
-    int tmp_index_7375_0_0;
-    int tmp_index_7370_0_0;
-    int tmp_index_7363_0_0;
-    int _if_cond_223_0_0;
-    int _if_cond_225_0_0;
-    int _if_cond_227_0_0;
-    int _if_cond_229_0_0;
-    int _for_it_254_0_0;
-    int tmp_index_7383_0_0;
-    int tmp_index_7377_0_0;
-    int tmp_index_7379_0_0;
-    int tmp_index_7381_0_0;
-    int tmp_index_7385_0_0;
-    int tmp_index_7387_0_0;
-    int tmp_index_7399_0_0;
-    int tmp_index_7391_0_0;
-    int tmp_index_7393_0_0;
-    int tmp_index_7389_0_0;
-    int tmp_index_7395_0_0;
-    int tmp_index_7397_0_0;
-    int tmp_index_7401_0_0;
-    int tmp_index_7403_0_0;
-    int tmp_index_7405_0_0;
-    int tmp_index_7407_0_0;
-    int tmp_index_7415_0_0;
-    int tmp_index_7409_0_0;
-    int tmp_index_7411_0_0;
-    int tmp_index_7417_0_0;
-    int tmp_index_7413_0_0;
-    int tmp_index_7419_0_0;
-    int tmp_index_7429_0_0;
-    int tmp_index_7423_0_0;
-    int tmp_index_7427_0_0;
-    int tmp_index_7425_0_0;
-    int tmp_index_7431_0_0;
-    int tmp_index_7421_0_0;
-    int tmp_index_7439_0_0;
-    int tmp_index_7437_0_0;
-    int tmp_index_7433_0_0;
-    int tmp_index_7435_0_0;
-    int tmp_parfor_127_0_0;
-    int tmp_parfor_128_0_0;
-    int tmp_parfor_129_0_0;
-    int tmp_parfor_130_0_0;
-    int tmp_parfor_131_0_0;
-    int tmp_parfor_132_0_0;
-    int tmp_index_7521_0_0;
-    int tmp_index_7525_0_0;
-    int tmp_index_7536_0_0;
-    int tmp_index_7515_0_0;
-    int tmp_index_7531_0_0;
-    int tmp_index_7511_0_0;
-    int _for_it_255_0_0;
-    int _for_it_146_0_0;
-    int tmp_index_3835_0_0;
-    int tmp_index_3833_0_0;
-    int tmp_index_3831_0_0;
-    int tmp_index_3838_0_0;
-    double _if_cond_131_0_0;
-    int tmp_index_3859_0_0;
-    int tmp_index_3857_0_0;
-    int tmp_index_3854_0_0;
-    int tmp_index_3847_0_0;
-    int tmp_index_3852_0_0;
-    int tmp_index_3861_0_0;
-    int tmp_index_3849_0_0;
-    int _for_it_147_0_0;
-    int tmp_index_3843_0_0;
-    int tmp_index_3839_0_0;
-    int tmp_index_3842_0_0;
-    int tmp_index_3845_0_0;
-    int tmp_index_3877_0_0;
-    int tmp_index_3908_0_0;
-    int tmp_index_3863_0_0;
-    int tmp_index_3916_0_0;
-    int tmp_index_3873_0_0;
-    int tmp_index_3896_0_0;
-    int tmp_index_3894_0_0;
-    int tmp_index_3912_0_0;
-    int tmp_index_3867_0_0;
-    int tmp_index_3900_0_0;
-    int tmp_index_3885_0_0;
-    int tmp_index_3904_0_0;
-    int tmp_index_3891_0_0;
-    int tmp_index_3920_0_0;
-    int _for_it_148_0_0;
-    int tmp_parfor_163_0_0;
     int ixc0_var_1312_0_0;
     int _for_it_167_0_0;
     int jl_var_1315_0_0;
-    int tmp_index_4427_0_0;
-    int tmp_index_4423_0_0;
     int tmp_index_4425_0_0;
     int tmp_index_4429_0_0;
-    int tmp_call_117_0_0;
+    int tmp_index_4427_0_0;
+    int tmp_index_4423_0_0;
     int tmp_index_4431_0_0;
+    int tmp_index_4437_0_0;
     int tmp_index_4433_0_0;
     int tmp_index_4435_0_0;
-    int tmp_index_4437_0_0;
-    int tmp_index_4439_0_0;
-    int tmp_index_4441_0_0;
+    int tmp_call_117_0_0;
     int tmp_call_119_0_0;
     int tmp_index_4443_0_0;
+    int tmp_index_4439_0_0;
+    int tmp_index_4441_0_0;
+    int tmp_call_121_0_0;
     int tmp_index_4445_0_0;
     int tmp_index_4447_0_0;
     int tmp_index_4449_0_0;
-    int tmp_call_121_0_0;
     int tmp_index_4452_0_0;
-    int tmp_index_4461_0_0;
     int tmp_index_4463_0_0;
+    int tmp_index_4461_0_0;
     int tmp_index_4465_0_0;
-    int tmp_index_4472_0_0;
-    int tmp_index_4467_0_0;
+    int tmp_index_4474_0_0;
     int tmp_index_4477_0_0;
     int tmp_index_4469_0_0;
+    int tmp_index_4467_0_0;
+    int tmp_index_4479_0_0;
     int tmp_call_124_0_0;
     int tmp_index_4481_0_0;
-    int tmp_index_4479_0_0;
-    int tmp_index_4474_0_0;
+    int tmp_index_4472_0_0;
     int _if_cond_146_0_0;
     int _if_cond_148_0_0;
     int _if_cond_150_0_0;
@@ -5798,12 +5251,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_4453_0_0;
     int tmp_index_4456_0_0;
     int tmp_index_4459_0_0;
-    int tmp_index_4487_0_0;
     int tmp_index_4491_0_0;
-    int tmp_index_4493_0_0;
+    int tmp_index_4483_0_0;
+    int tmp_index_4487_0_0;
     int tmp_index_4485_0_0;
     int tmp_index_4489_0_0;
-    int tmp_index_4483_0_0;
+    int tmp_index_4493_0_0;
     int tmp_index_4495_0_0;
     int tmp_index_4499_0_0;
     int tmp_index_4497_0_0;
@@ -5811,510 +5264,1113 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_4501_0_0;
     int tmp_index_4505_0_0;
     int tmp_index_4507_0_0;
-    int tmp_index_4513_0_0;
     int tmp_index_4511_0_0;
     int tmp_index_4509_0_0;
-    int tmp_index_4517_0_0;
-    int tmp_index_4521_0_0;
-    int tmp_index_4525_0_0;
-    int tmp_index_4519_0_0;
-    int tmp_index_4515_0_0;
+    int tmp_index_4513_0_0;
     int tmp_index_4523_0_0;
-    int tmp_index_4537_0_0;
-    int tmp_index_4531_0_0;
-    int tmp_index_4527_0_0;
-    int tmp_index_4535_0_0;
+    int tmp_index_4517_0_0;
+    int tmp_index_4515_0_0;
+    int tmp_index_4521_0_0;
+    int tmp_index_4519_0_0;
+    int tmp_index_4525_0_0;
     int tmp_index_4533_0_0;
     int tmp_index_4529_0_0;
-    int tmp_index_4545_0_0;
-    int tmp_index_4539_0_0;
+    int tmp_index_4531_0_0;
+    int tmp_index_4537_0_0;
+    int tmp_index_4527_0_0;
+    int tmp_index_4535_0_0;
     int tmp_index_4541_0_0;
     int tmp_index_4543_0_0;
+    int tmp_index_4539_0_0;
+    int tmp_index_4545_0_0;
     int tmp_parfor_50_0_0;
     int tmp_parfor_51_0_0;
     int tmp_parfor_52_0_0;
     int tmp_parfor_53_0_0;
     int tmp_parfor_54_0_0;
     int tmp_parfor_55_0_0;
+    int tmp_index_4631_0_0;
     int tmp_index_4617_0_0;
     int tmp_index_4621_0_0;
-    int tmp_index_4631_0_0;
     int tmp_index_4627_0_0;
     int tmp_index_4655_0_0;
-    int tmp_index_4657_0_0;
     int tmp_index_4662_0_0;
+    int tmp_index_4657_0_0;
     int _for_it_169_0_0;
     int tmp_index_4675_0_0;
-    int tmp_index_4677_0_0;
     int tmp_index_4673_0_0;
+    int tmp_index_4677_0_0;
     int tmp_index_4680_0_0;
     double _if_cond_154_0_0;
-    int tmp_index_4691_0_0;
-    int tmp_index_4696_0_0;
-    int tmp_index_4694_0_0;
-    int tmp_index_4689_0_0;
     int tmp_index_4699_0_0;
+    int tmp_index_4694_0_0;
+    int tmp_index_4696_0_0;
+    int tmp_index_4689_0_0;
+    int tmp_index_4691_0_0;
     int _for_it_170_0_0;
-    int tmp_index_4685_0_0;
     int tmp_index_4681_0_0;
+    int tmp_index_4685_0_0;
     int tmp_index_4684_0_0;
     int tmp_index_4687_0_0;
-    int tmp_index_4726_0_0;
-    int tmp_index_4709_0_0;
-    int tmp_index_4714_0_0;
-    int tmp_index_4722_0_0;
-    int tmp_index_4703_0_0;
-    int tmp_index_4718_0_0;
-    int tmp_index_4730_0_0;
     int tmp_index_4712_0_0;
+    int tmp_index_4709_0_0;
+    int tmp_index_4730_0_0;
+    int tmp_index_4714_0_0;
+    int tmp_index_4718_0_0;
+    int tmp_index_4726_0_0;
+    int tmp_index_4703_0_0;
+    int tmp_index_4722_0_0;
     int _for_it_171_0_0;
-    int tmp_index_4739_0_0;
-    int tmp_index_4751_0_0;
-    int tmp_index_4748_0_0;
-    int tmp_index_4754_0_0;
     int tmp_index_4763_0_0;
     int tmp_index_4742_0_0;
-    int tmp_index_4766_0_0;
     int tmp_index_4760_0_0;
-    int tmp_index_4757_0_0;
-    int tmp_index_4736_0_0;
     int tmp_index_4745_0_0;
+    int tmp_index_4754_0_0;
+    int tmp_index_4739_0_0;
+    int tmp_index_4748_0_0;
+    int tmp_index_4736_0_0;
     int tmp_index_4769_0_0;
+    int tmp_index_4766_0_0;
+    int tmp_index_4751_0_0;
+    int tmp_index_4757_0_0;
     int _for_it_172_0_0;
-    int tmp_parfor_76_0_0;
-    int tmp_parfor_75_0_0;
-    int tmp_parfor_106_0_0;
-    int tmp_parfor_105_0_0;
-    int _for_it_279_0;
-    int _for_it_280_0;
-    int tmp_index_8380_0;
-    int tmp_index_8379_0;
-    int _for_it_281_0;
-    int tmp_parfor_35_0_0;
-    int tmp_parfor_34_0_0;
-    int tmp_parfor_60_0_0;
+    int tmp_parfor_42_0_0;
+    int tmp_parfor_41_0_0;
+    int tmp_index_6103_0_0;
+    int tmp_index_6102_0_0;
+    int _for_it_310_0_0;
+    int tmp_index_9334_0_0;
+    int tmp_index_9332_0_0;
+    int tmp_index_9342_0_0;
+    int tmp_index_9337_0_0;
+    int tmp_index_9339_0_0;
+    int tmp_index_9344_0_0;
+    int indf_var_2098_0_0;
+    int ind0_var_2095_0_0;
+    int inds_var_2097_0_0;
+    int ind1_var_2096_0_0;
+    int _for_it_311_0_0;
+    int tmp_index_9356_0_0;
+    int tmp_index_9387_0_0;
+    int tmp_index_9366_0_0;
+    int tmp_index_9379_0_0;
+    int tmp_index_9371_0_0;
+    int tmp_index_9383_0_0;
+    int tmp_index_9346_0_0;
+    int tmp_index_9360_0_0;
+    int tmp_index_9350_0_0;
+    int tmp_index_9369_0_0;
+    int tmp_index_9375_0_0;
+    int _for_it_312_0_0;
+    int tmp_parfor_38_0_0;
+    int tmp_index_6309_0_0;
+    int tmp_index_6308_0_0;
+    int _for_it_264_0_0;
+    int tmp_index_7766_0_0;
+    int _for_it_265_0_0;
+    int tmp_index_9030_0_0;
+    int tmp_index_9029_0_0;
+    int tmp_parfor_23_0_0;
+    int tmp_index_9031_0_0;
+    int tmp_index_9032_0_0;
     int tmp_parfor_89_0_0;
     int tmp_parfor_88_0_0;
-    int _for_it_323_0_0;
-    int tmp_index_9568_0_0;
-    int tmp_index_9564_0_0;
-    int tmp_index_9566_0_0;
-    int tmp_index_9571_0_0;
-    double _if_cond_287_0_0;
-    int tmp_index_9590_0_0;
-    int tmp_index_9587_0_0;
-    int tmp_index_9592_0_0;
-    int tmp_index_9580_0_0;
-    int tmp_index_9582_0_0;
-    int tmp_index_9594_0_0;
-    int tmp_index_9585_0_0;
-    int indf_var_2145_0_0;
-    int inds_var_2144_0_0;
-    int _for_it_324_0_0;
-    int tmp_index_9576_0_0;
-    int tmp_index_9572_0_0;
-    int tmp_index_9575_0_0;
-    int tmp_index_9578_0_0;
-    int tmp_index_9653_0_0;
-    int tmp_index_9640_0_0;
-    int tmp_index_9645_0_0;
-    int tmp_index_9606_0_0;
-    int tmp_index_9643_0_0;
-    int tmp_index_9661_0_0;
-    int tmp_index_9626_0_0;
-    int tmp_index_9634_0_0;
-    int tmp_index_9669_0_0;
-    int tmp_index_9610_0_0;
-    int tmp_index_9649_0_0;
-    int tmp_index_9665_0_0;
-    int tmp_index_9673_0_0;
-    int tmp_index_9596_0_0;
-    int tmp_index_9663_0_0;
-    int tmp_index_9618_0_0;
-    int tmp_index_9600_0_0;
-    int tmp_index_9657_0_0;
-    int _for_it_325_0_0;
-    int tmp_parfor_91_0_0;
-    int tmp_parfor_90_0_0;
-    int tmp_parfor_38_0_0;
-    int _for_it_178_0_0;
-    int tmp_index_5055_0_0;
-    int tmp_index_5051_0_0;
-    int tmp_index_5053_0_0;
-    int tmp_index_5057_0_0;
-    int tmp_index_5065_0_0;
-    int tmp_index_5059_0_0;
-    int tmp_call_136_0_0;
-    int tmp_index_5063_0_0;
-    int tmp_index_5061_0_0;
-    int tmp_index_5087_0_0;
-    int tmp_index_5067_0_0;
-    int tmp_index_5075_0_0;
-    int tmp_call_138_0_0;
-    int tmp_index_5077_0_0;
-    int tmp_index_5071_0_0;
-    int tmp_index_5073_0_0;
-    int tmp_index_5081_0_0;
-    int tmp_index_5085_0_0;
-    int tmp_index_5083_0_0;
-    int tmp_index_5079_0_0;
-    int tmp_index_5069_0_0;
-    int tmp_index_5093_0_0;
-    int tmp_call_140_0_0;
-    int tmp_index_5089_0_0;
-    int tmp_index_5091_0_0;
-    int tmp_index_5096_0_0;
-    double _if_cond_166_0_0;
-    int tmp_index_5105_0_0;
-    int tmp_index_5109_0_0;
-    int tmp_index_5107_0_0;
-    int tmp_index_5118_0_0;
-    int tmp_call_143_0_0;
-    int tmp_index_5113_0_0;
-    int tmp_index_5111_0_0;
-    int tmp_index_5116_0_0;
-    int tmp_index_5121_0_0;
-    int tmp_index_5123_0_0;
-    int _for_it_179_0_0;
-    int tmp_index_5101_0_0;
-    int tmp_index_5097_0_0;
-    int tmp_index_5100_0_0;
-    int tmp_index_5103_0_0;
-    int tmp_index_5129_0_0;
-    int tmp_index_5125_0_0;
-    int tmp_index_5174_0_0;
-    int tmp_index_5155_0_0;
-    int tmp_index_5153_0_0;
-    int _for_it_180_0_0;
-    int tmp_index_3819_0_0;
-    int tmp_index_3818_0_0;
+    int tmp_parfor_190_0_0;
+    int tmp_parfor_126_0_0;
+    int tmp_index_8385_0_0;
+    int tmp_index_8386_0_0;
+    int tmp_index_5804_0_0;
+    int tmp_index_5805_0_0;
+    int icl_var_1216_0_0;
+    int ich_var_1215_0_0;
+    int _for_it_144_0_0;
+    int tmp_index_3825_0_0;
+    int _if_cond_130_0_0;
+    int _for_it_145_0_0;
+    int ich_var_1164_0_0;
+    int icl_var_1165_0_0;
+    int _for_it_128_0_0;
+    int tmp_index_3151_0_0;
+    int _if_cond_112_0_0;
+    int _for_it_129_0_0;
     int ich_var_2068_0_0;
     int icl_var_2069_0_0;
     int _for_it_295_0_0;
     int tmp_index_9038_0_0;
     int _if_cond_282_0_0;
     int _for_it_296_0_0;
-    int ich_var_1882_0_0;
-    int icl_var_1883_0_0;
-    int _for_it_266_0_0;
-    int tmp_index_7777_0_0;
-    int _if_cond_240_0_0;
-    int _for_it_267_0_0;
-    int tmp_parfor_57_0_0;
-    int tmp_parfor_56_0_0;
-    int _for_it_130_0_0;
-    int tmp_index_3169_0_0;
-    int tmp_index_3167_0_0;
-    int tmp_index_3171_0_0;
-    int tmp_index_3165_0_0;
-    int tmp_index_3177_0_0;
-    int tmp_call_81_0_0;
-    int tmp_index_3175_0_0;
-    int tmp_index_3179_0_0;
-    int tmp_index_3173_0_0;
-    int tmp_index_3181_0_0;
-    int tmp_index_3183_0_0;
-    int tmp_call_83_0_0;
-    int tmp_index_3185_0_0;
-    int tmp_index_3199_0_0;
-    int tmp_index_3187_0_0;
-    int tmp_index_3189_0_0;
-    int tmp_call_85_0_0;
-    int tmp_index_3197_0_0;
-    int tmp_index_3192_0_0;
-    int tmp_index_3194_0_0;
-    int _if_cond_113_0_0;
-    int _if_cond_115_0_0;
-    int _if_cond_117_0_0;
-    int _if_cond_119_0_0;
-    int _for_it_131_0_0;
-    int tmp_index_3205_0_0;
-    int tmp_index_3211_0_0;
-    int tmp_index_3201_0_0;
-    int tmp_index_3203_0_0;
-    int tmp_index_3209_0_0;
-    int tmp_index_3207_0_0;
-    int tmp_index_3217_0_0;
-    int tmp_index_3219_0_0;
-    int tmp_index_3223_0_0;
-    int tmp_index_3221_0_0;
-    int tmp_index_3215_0_0;
-    int tmp_index_3213_0_0;
-    int tmp_index_3225_0_0;
-    int tmp_index_3231_0_0;
-    int tmp_index_3229_0_0;
-    int tmp_index_3227_0_0;
-    int tmp_index_3233_0_0;
-    int tmp_index_3237_0_0;
-    int tmp_index_3243_0_0;
-    int tmp_index_3239_0_0;
-    int tmp_index_3241_0_0;
-    int tmp_index_3235_0_0;
-    int tmp_index_3245_0_0;
-    int tmp_index_3253_0_0;
-    int tmp_index_3249_0_0;
-    int tmp_index_3247_0_0;
-    int tmp_index_3255_0_0;
-    int tmp_index_3251_0_0;
-    int tmp_index_3257_0_0;
-    int tmp_index_3261_0_0;
-    int tmp_index_3259_0_0;
-    int tmp_index_3263_0_0;
-    int tmp_parfor_22_1_0;
-    int tmp_parfor_23_1_0;
-    int tmp_parfor_24_1_0;
-    int tmp_parfor_25_1_0;
-    int tmp_parfor_26_0_1;
-    int tmp_parfor_27_0_1;
-    int tmp_index_3335_0_0;
-    int tmp_index_3360_0_0;
-    int tmp_index_3339_0_0;
-    int tmp_index_3345_0_0;
-    int tmp_index_3355_0_0;
-    int tmp_index_3349_0_0;
-    int _for_it_132_0_0;
-    int tmp_index_9550_0_0;
-    int tmp_index_9549_0_0;
-    int tmp_parfor_25_0_0;
-    int _for_it_133_0_0;
-    int tmp_index_3375_0_0;
-    int tmp_index_3371_0_0;
-    int tmp_index_3369_0_0;
-    int tmp_index_3373_0_0;
-    int tmp_index_3383_0_0;
-    int tmp_index_3377_0_0;
-    int tmp_index_3381_0_0;
-    int tmp_call_87_0_0;
-    int tmp_index_3379_0_0;
-    int tmp_index_3403_0_0;
-    int tmp_index_3395_0_0;
-    int tmp_index_3405_0_0;
-    int tmp_call_89_0_0;
-    int tmp_index_3385_0_0;
-    int tmp_index_3391_0_0;
-    int tmp_index_3401_0_0;
-    int tmp_index_3389_0_0;
-    int tmp_index_3397_0_0;
-    int tmp_index_3399_0_0;
-    int tmp_index_3393_0_0;
-    int tmp_index_3387_0_0;
-    int tmp_index_3407_0_0;
-    int tmp_index_3412_0_0;
-    int tmp_index_3409_0_0;
-    int tmp_call_91_0_0;
-    int tmp_index_3414_0_0;
-    int _for_it_134_0_0;
-    int tmp_index_3436_0_0;
-    int tmp_index_3417_0_0;
-    int _for_it_135_0_0;
-    int ich_var_2163_0_0;
-    int icl_var_2164_0_0;
-    int _for_it_321_0_0;
-    int tmp_index_9558_0_0;
-    int _if_cond_286_0_0;
-    int _for_it_322_0_0;
-    int tmp_parfor_42_0_0;
-    int tmp_parfor_41_0_0;
-    int tmp_parfor_162_0_0;
-    int tmp_parfor_161_0_0;
-    int tmp_parfor_123_0_0;
-    int tmp_parfor_122_0_0;
-    int _for_it_191_0_0;
-    int tmp_index_5649_0_0;
-    int tmp_index_5646_0_0;
-    int tmp_index_5644_0_0;
-    int tmp_index_5654_0_0;
-    int tmp_index_5651_0_0;
-    int _for_it_192_0_0;
-    int tmp_index_5687_0_0;
-    int tmp_index_5675_0_0;
-    int tmp_index_5679_0_0;
-    int tmp_index_5669_0_0;
-    int tmp_index_5671_0_0;
-    int tmp_index_5666_0_0;
-    int tmp_index_5656_0_0;
-    int tmp_index_5660_0_0;
-    int tmp_index_5683_0_0;
-    int _for_it_193_0_0;
-    int tmp_index_9552_0_0;
-    int tmp_index_9551_0_0;
-    int _for_it_287_0_0;
-    int tmp_index_8658_0_0;
-    int tmp_index_8654_0_0;
-    int tmp_index_8656_0_0;
-    int tmp_index_8661_0_0;
-    double _if_cond_270_0_0;
-    int tmp_index_8670_0_0;
-    int tmp_index_8680_0_0;
-    int tmp_index_8677_0_0;
-    int tmp_index_8675_0_0;
-    int tmp_index_8672_0_0;
-    int _for_it_288_0_0;
-    int tmp_index_8662_0_0;
-    int tmp_index_8666_0_0;
-    int tmp_index_8665_0_0;
-    int tmp_index_8668_0_0;
-    int tmp_index_8707_0_0;
-    int tmp_index_8684_0_0;
-    int tmp_index_8711_0_0;
-    int tmp_index_8695_0_0;
-    int tmp_index_8703_0_0;
-    int tmp_index_8693_0_0;
-    int tmp_index_8690_0_0;
-    int tmp_index_8699_0_0;
-    int _for_it_289_0_0;
-    int tmp_parfor_182_0_0;
-    int tmp_parfor_181_0_0;
-    int _for_it_201_0_0;
-    int tmp_index_5829_0_0;
-    int tmp_index_5821_0_0;
-    int tmp_index_5833_0_0;
-    int tmp_index_5835_0_0;
-    int tmp_index_5831_0_0;
-    int tmp_index_5826_0_0;
-    int tmp_index_5824_0_0;
-    int tmp_index_5819_0_0;
-    int tmp_index_5839_0_0;
-    int tmp_index_5837_0_0;
-    int _for_it_202_0_0;
-    int tmp_index_5845_0_0;
-    int tmp_index_5855_0_0;
-    int tmp_index_5890_0_0;
-    int tmp_index_5869_0_0;
-    int tmp_index_5886_0_0;
-    int tmp_index_5872_0_0;
-    int tmp_index_5851_0_0;
-    int tmp_index_5882_0_0;
-    int tmp_index_5841_0_0;
-    int tmp_index_5878_0_0;
-    int tmp_index_5863_0_0;
-    int tmp_index_5874_0_0;
-    int _for_it_203_0_0;
+    int tmp_index_4775_0_0;
+    int tmp_index_4774_0_0;
+    int tmp_parfor_189_0_0;
+    int tmp_parfor_188_0_0;
+    int icl_var_1786_0_0;
+    int ich_var_1785_0_0;
+    int _for_it_251_0_0;
+    int tmp_index_7331_0_0;
+    int _if_cond_222_0_0;
+    int _for_it_252_0_0;
+    int tmp_parfor_108_0_0;
+    int tmp_parfor_107_0_0;
+    int _for_it_175_0_0;
+    int tmp_index_4805_0_0;
+    int tmp_index_4803_0_0;
+    int tmp_index_4807_0_0;
+    int tmp_index_4809_0_0;
+    int tmp_call_127_0_0;
+    int tmp_index_4813_0_0;
+    int tmp_index_4811_0_0;
+    int tmp_index_4815_0_0;
+    int tmp_index_4817_0_0;
+    int tmp_index_4823_0_0;
+    int tmp_index_4821_0_0;
+    int tmp_index_4819_0_0;
+    int tmp_call_129_0_0;
+    int tmp_call_131_0_0;
+    int tmp_index_4827_0_0;
+    int tmp_index_4825_0_0;
+    int tmp_index_4829_0_0;
+    int tmp_index_4832_0_0;
+    double _if_cond_157_0_0;
+    int tmp_index_4845_0_0;
+    int tmp_index_4843_0_0;
+    int tmp_index_4841_0_0;
+    int tmp_index_4849_0_0;
+    int tmp_call_134_0_0;
+    int tmp_index_4854_0_0;
+    int tmp_index_4852_0_0;
+    int tmp_index_4859_0_0;
+    int tmp_index_4857_0_0;
+    int tmp_index_4861_0_0;
+    int tmp_index_4847_0_0;
+    int _if_cond_158_0_0;
+    int _if_cond_160_0_0;
+    int _if_cond_162_0_0;
+    int _if_cond_164_0_0;
+    int _for_it_176_0_0;
+    int tmp_index_4837_0_0;
+    int tmp_index_4833_0_0;
+    int tmp_index_4836_0_0;
+    int tmp_index_4839_0_0;
+    int tmp_index_4867_0_0;
+    int tmp_index_4871_0_0;
+    int tmp_index_4873_0_0;
+    int tmp_index_4869_0_0;
+    int tmp_index_4865_0_0;
+    int tmp_index_4863_0_0;
+    int tmp_index_4881_0_0;
+    int tmp_index_4875_0_0;
+    int tmp_index_4877_0_0;
+    int tmp_index_4879_0_0;
+    int tmp_index_4885_0_0;
+    int tmp_index_4883_0_0;
+    int tmp_index_4893_0_0;
+    int tmp_index_4891_0_0;
+    int tmp_index_4889_0_0;
+    int tmp_index_4887_0_0;
+    int tmp_index_4905_0_0;
+    int tmp_index_4897_0_0;
+    int tmp_index_4899_0_0;
+    int tmp_index_4901_0_0;
+    int tmp_index_4903_0_0;
+    int tmp_index_4895_0_0;
+    int tmp_index_4911_0_0;
+    int tmp_index_4915_0_0;
+    int tmp_index_4913_0_0;
+    int tmp_index_4909_0_0;
+    int tmp_index_4917_0_0;
+    int tmp_index_4907_0_0;
+    int tmp_index_4921_0_0;
+    int tmp_index_4925_0_0;
+    int tmp_index_4923_0_0;
+    int tmp_index_4919_0_0;
+    int tmp_parfor_61_0_0;
+    int tmp_parfor_62_0_0;
+    int tmp_parfor_63_0_0;
+    int tmp_parfor_64_0_0;
+    int tmp_parfor_65_0_0;
+    int tmp_parfor_66_0_0;
+    int tmp_index_5011_0_0;
+    int tmp_index_5001_0_0;
+    int tmp_index_5007_0_0;
+    int tmp_index_4997_0_0;
+    int tmp_index_5035_0_0;
+    int tmp_index_5037_0_0;
+    int tmp_index_5042_0_0;
+    int _for_it_177_0_0;
+    int ich_var_2024_0_0;
+    int icl_var_2025_0_0;
+    int _for_it_282_0_0;
+    int tmp_index_8392_0_0;
+    int _if_cond_260_0_0;
+    int _for_it_283_0_0;
+    int tmp_index_6820_0_0;
+    int tmp_index_6821_0_0;
+    int tmp_parfor_91_0_0;
+    int tmp_parfor_90_0_0;
+    int ixc0_var_2110_0_0;
+    int _for_it_316_0_0;
+    int jl_var_2113_0_0;
+    int tmp_index_9448_0_0;
+    int tmp_index_9451_0_0;
+    int tmp_index_9453_0_0;
+    int tmp_index_9443_0_0;
+    int tmp_index_9446_0_0;
+    int tmp_index_9441_0_0;
+    int _for_it_317_0_0;
+    int tmp_index_9459_0_0;
+    int tmp_index_9465_0_0;
+    int tmp_index_9488_0_0;
+    int tmp_index_9478_0_0;
+    int tmp_index_9469_0_0;
+    int tmp_index_9455_0_0;
+    int tmp_index_9496_0_0;
+    int tmp_index_9484_0_0;
+    int tmp_index_9475_0_0;
+    int tmp_index_9492_0_0;
+    int tmp_index_9480_0_0;
+    int _for_it_318_0_0;
+    int tmp_index_9509_0_0;
+    int tmp_index_9507_0_0;
+    int tmp_index_9502_0_0;
+    int tmp_index_9512_0_0;
+    int tmp_index_9504_0_0;
+    int _for_it_319_0_0;
+    int tmp_index_9541_0_0;
+    int tmp_index_9529_0_0;
+    int tmp_index_9524_0_0;
+    int tmp_index_9537_0_0;
+    int tmp_index_9518_0_0;
+    int tmp_index_9533_0_0;
+    int tmp_index_9545_0_0;
+    int tmp_index_9527_0_0;
+    int tmp_index_9514_0_0;
+    int _for_it_320_0_0;
+    int icl_var_1628_0_0;
+    int ich_var_1627_0_0;
+    int _for_it_225_0_0;
+    int tmp_index_6317_0_0;
+    int _if_cond_186_0_0;
+    int _for_it_226_0_0;
+    int tmp_parfor_35_0_0;
+    int tmp_parfor_34_0_0;
+    int ixc0_var_1041_0_0;
+    int _for_it_118_0_0;
+    int jl_var_1044_0_0;
+    int tmp_index_2603_0_0;
+    int tmp_index_2605_0_0;
+    int tmp_index_2609_0_0;
+    int tmp_index_2607_0_0;
+    int tmp_index_2611_0_0;
+    int tmp_index_2615_0_0;
+    int tmp_call_54_0_0;
+    int tmp_index_2617_0_0;
+    int tmp_index_2613_0_0;
+    int tmp_call_56_0_0;
+    int tmp_index_2619_0_0;
+    int tmp_index_2621_0_0;
+    int tmp_index_2623_0_0;
+    int tmp_index_2625_0_0;
+    int tmp_index_2627_0_0;
+    int tmp_index_2629_0_0;
+    int tmp_call_58_0_0;
+    int tmp_index_2641_0_0;
+    int tmp_index_2631_0_0;
+    int tmp_index_2638_0_0;
+    int tmp_index_2636_0_0;
+    int tmp_index_2643_0_0;
+    int tmp_call_60_0_0;
+    int tmp_index_2645_0_0;
+    int tmp_index_2633_0_0;
+    int indm_var_994_0_0;
+    int inds_var_992_0_0;
+    int indf_var_993_0_0;
+    int _if_cond_59_0_0;
+    int _if_cond_61_0_0;
+    int _if_cond_63_0_0;
+    int _for_it_119_0_0;
+    int tmp_index_2649_0_0;
+    int tmp_index_2655_0_0;
+    int tmp_index_2647_0_0;
+    int tmp_index_2651_0_0;
+    int tmp_index_2653_0_0;
+    int tmp_index_2657_0_0;
+    int tmp_index_2665_0_0;
+    int tmp_index_2669_0_0;
+    int tmp_index_2667_0_0;
+    int tmp_index_2659_0_0;
+    int tmp_index_2663_0_0;
+    int tmp_index_2661_0_0;
+    int tmp_index_2671_0_0;
+    int tmp_index_2673_0_0;
+    int tmp_index_2675_0_0;
+    int tmp_index_2677_0_0;
+    int tmp_index_2687_0_0;
+    int tmp_index_2681_0_0;
+    int tmp_index_2689_0_0;
+    int tmp_index_2679_0_0;
+    int tmp_index_2683_0_0;
+    int tmp_index_2685_0_0;
+    int tmp_index_2695_0_0;
+    int tmp_index_2691_0_0;
+    int tmp_index_2699_0_0;
+    int tmp_index_2701_0_0;
+    int tmp_index_2693_0_0;
+    int tmp_index_2697_0_0;
+    int tmp_index_2707_0_0;
+    int tmp_index_2709_0_0;
+    int tmp_index_2705_0_0;
+    int tmp_index_2703_0_0;
+    int tmp_parfor_11_0_0;
+    int tmp_parfor_12_1_0;
+    int tmp_parfor_13_1_0;
+    int tmp_parfor_14_0_0;
+    int tmp_parfor_15_0_0;
+    int tmp_parfor_16_0_0;
+    int tmp_index_2785_0_0;
+    int tmp_index_2795_0_0;
+    int tmp_index_2781_0_0;
+    int tmp_index_2791_0_0;
+    int tmp_index_2819_0_0;
+    int tmp_index_2828_0_0;
+    int tmp_index_2826_0_0;
+    int tmp_index_2832_0_0;
+    int tmp_index_2821_0_0;
+    int _for_it_120_0_0;
+    int tmp_index_2845_0_0;
+    int tmp_index_2847_0_0;
+    int tmp_index_2843_0_0;
+    int tmp_index_2849_0_0;
+    int tmp_index_2857_0_0;
+    int tmp_index_2853_0_0;
+    int tmp_index_2851_0_0;
+    int tmp_index_2855_0_0;
+    int tmp_call_62_0_0;
+    int tmp_index_2861_0_0;
+    int tmp_index_2875_0_0;
+    int tmp_index_2867_0_0;
+    int tmp_index_2871_0_0;
+    int tmp_index_2877_0_0;
+    int tmp_index_2865_0_0;
+    int tmp_index_2869_0_0;
+    int tmp_index_2879_0_0;
+    int tmp_call_64_0_0;
+    int tmp_index_2873_0_0;
+    int tmp_index_2859_0_0;
+    int tmp_index_2863_0_0;
+    int tmp_index_2881_0_0;
+    int tmp_call_66_0_0;
+    int tmp_index_2883_0_0;
+    int tmp_index_2886_0_0;
+    int tmp_index_2888_0_0;
+    int _for_it_121_0_0;
+    int tmp_index_2914_0_0;
+    int tmp_index_2891_0_0;
+    int tmp_index_2910_0_0;
+    int _for_it_122_0_0;
+    int tmp_parfor_79_0_0;
+    int tmp_parfor_78_0_0;
+    int ixc0_var_1629_0_0;
+    int _for_it_233_0_0;
+    int jl_var_1632_0_0;
+    int tmp_index_6580_0_0;
+    int tmp_index_6576_0_0;
+    int tmp_index_6578_0_0;
+    int tmp_index_6582_0_0;
+    int tmp_index_6584_0_0;
+    int tmp_call_171_0_0;
+    int tmp_index_6590_0_0;
+    int tmp_index_6586_0_0;
+    int tmp_index_6588_0_0;
+    int tmp_index_6596_0_0;
+    int tmp_index_6592_0_0;
+    int tmp_call_173_0_0;
+    int tmp_index_6594_0_0;
+    int tmp_call_175_0_0;
+    int tmp_index_6598_0_0;
+    int tmp_index_6600_0_0;
+    int tmp_index_6602_0_0;
+    int tmp_index_6620_0_0;
+    int tmp_call_177_0_0;
+    int tmp_index_6611_0_0;
+    int tmp_index_6616_0_0;
+    int tmp_index_6618_0_0;
+    int tmp_index_6614_0_0;
+    int tmp_index_6622_0_0;
+    int tmp_index_6604_0_0;
+    int tmp_index_6609_0_0;
+    int tmp_index_6606_0_0;
+    int _if_cond_197_0_0;
+    int _if_cond_199_0_0;
+    int _if_cond_201_0_0;
+    int _for_it_234_0_0;
+    int tmp_index_6630_0_0;
+    int tmp_index_6632_0_0;
+    int tmp_index_6628_0_0;
+    int tmp_index_6634_0_0;
+    int tmp_index_6626_0_0;
+    int tmp_index_6624_0_0;
+    int tmp_index_6638_0_0;
+    int tmp_index_6640_0_0;
+    int tmp_index_6644_0_0;
+    int tmp_index_6636_0_0;
+    int tmp_index_6646_0_0;
+    int tmp_index_6642_0_0;
+    int tmp_index_6652_0_0;
+    int tmp_index_6654_0_0;
+    int tmp_index_6648_0_0;
+    int tmp_index_6650_0_0;
+    int tmp_index_6656_0_0;
+    int tmp_index_6658_0_0;
+    int tmp_index_6660_0_0;
+    int tmp_index_6666_0_0;
+    int tmp_index_6664_0_0;
+    int tmp_index_6662_0_0;
+    int tmp_index_6668_0_0;
+    int tmp_index_6674_0_0;
+    int tmp_index_6670_0_0;
+    int tmp_index_6678_0_0;
+    int tmp_index_6672_0_0;
+    int tmp_index_6676_0_0;
+    int tmp_index_6684_0_0;
+    int tmp_index_6686_0_0;
+    int tmp_index_6682_0_0;
+    int tmp_index_6680_0_0;
+    int tmp_parfor_99_0_0;
+    int tmp_parfor_100_0_0;
+    int tmp_parfor_101_0_0;
+    int tmp_parfor_102_0_0;
+    int tmp_parfor_103_0_0;
+    int tmp_parfor_104_0_0;
+    int tmp_index_6762_0_0;
+    int tmp_index_6768_0_0;
+    int tmp_index_6772_0_0;
+    int tmp_index_6758_0_0;
+    int tmp_index_6803_0_0;
+    int tmp_index_6796_0_0;
+    int tmp_index_6798_0_0;
+    int _for_it_235_0_0;
+    int _for_it_236_0_0;
+    int tmp_index_6814_0_0;
+    int tmp_index_6817_0_0;
+    int _for_it_237_0_0;
+    int ixc0_var_1884_0_0;
+    int _for_it_274_0_0;
+    int jl_var_1887_0_0;
+    int tmp_index_8085_0_0;
+    int tmp_index_8089_0_0;
+    int tmp_index_8087_0_0;
+    int tmp_index_8091_0_0;
+    int tmp_index_8095_0_0;
+    int tmp_call_214_0_0;
+    int tmp_index_8097_0_0;
+    int tmp_index_8099_0_0;
+    int tmp_index_8093_0_0;
+    int tmp_index_8105_0_0;
+    int tmp_index_8103_0_0;
+    int tmp_call_216_0_0;
+    int tmp_index_8101_0_0;
+    int tmp_call_218_0_0;
+    int tmp_index_8109_0_0;
+    int tmp_index_8107_0_0;
+    int tmp_index_8117_0_0;
+    int tmp_index_8115_0_0;
+    int tmp_index_8119_0_0;
+    int tmp_index_8125_0_0;
+    int tmp_index_8123_0_0;
+    int tmp_index_8121_0_0;
+    int tmp_call_221_0_0;
+    int tmp_index_8132_0_0;
+    int tmp_index_8137_0_0;
+    int tmp_call_223_0_0;
+    int tmp_index_8127_0_0;
+    int tmp_index_8139_0_0;
+    int tmp_index_8129_0_0;
+    int tmp_index_8141_0_0;
+    int tmp_index_8134_0_0;
+    int _if_cond_251_0_0;
+    int _if_cond_253_0_0;
+    int _if_cond_255_0_0;
+    int _if_cond_257_0_0;
+    int _for_it_275_0_0;
+    int tmp_index_8111_0_0;
+    int tmp_index_8113_0_0;
+    int tmp_index_8145_0_0;
+    int tmp_index_8149_0_0;
+    int tmp_index_8153_0_0;
+    int tmp_index_8143_0_0;
+    int tmp_index_8147_0_0;
+    int tmp_index_8151_0_0;
+    int tmp_index_8165_0_0;
+    int tmp_index_8159_0_0;
+    int tmp_index_8155_0_0;
+    int tmp_index_8161_0_0;
+    int tmp_index_8163_0_0;
+    int tmp_index_8157_0_0;
+    int tmp_index_8167_0_0;
+    int tmp_index_8169_0_0;
+    int tmp_index_8173_0_0;
+    int tmp_index_8171_0_0;
+    int tmp_index_8179_0_0;
+    int tmp_index_8177_0_0;
+    int tmp_index_8175_0_0;
+    int tmp_index_8183_0_0;
+    int tmp_index_8181_0_0;
+    int tmp_index_8185_0_0;
+    int tmp_index_8187_0_0;
+    int tmp_index_8195_0_0;
+    int tmp_index_8197_0_0;
+    int tmp_index_8191_0_0;
+    int tmp_index_8193_0_0;
+    int tmp_index_8189_0_0;
+    int tmp_index_8201_0_0;
+    int tmp_index_8199_0_0;
+    int tmp_index_8203_0_0;
+    int tmp_index_8205_0_0;
+    int tmp_parfor_150_0_0;
+    int tmp_parfor_151_0_0;
+    int tmp_parfor_152_0_0;
+    int tmp_parfor_153_0_0;
+    int tmp_parfor_154_0_0;
+    int tmp_parfor_155_0_0;
+    int tmp_index_8277_0_0;
+    int tmp_index_8281_0_0;
+    int tmp_index_8291_0_0;
+    int tmp_index_8287_0_0;
+    int tmp_index_8315_0_0;
+    int tmp_index_8342_0_0;
+    int tmp_index_8344_0_0;
+    int tmp_index_8337_0_0;
+    int tmp_index_8335_0_0;
+    int _for_it_276_0_0;
+    int tmp_index_8355_0_0;
+    int _for_it_277_0_0;
+    int tmp_index_8365_0_0;
+    int tmp_index_8368_0_0;
+    int tmp_index_8370_0_0;
+    int tmp_index_8359_0_0;
+    int _for_it_278_0_0;
+    int ixc0_var_2070_0_0;
+    int _for_it_303_0_0;
+    int jl_var_2073_0_0;
+    int tmp_index_9193_0_0;
+    int tmp_index_9195_0_0;
+    int tmp_index_9188_0_0;
+    int tmp_index_9191_0_0;
+    int tmp_index_9186_0_0;
+    int tmp_index_9183_0_0;
+    int tmp_index_9199_0_0;
+    int tmp_index_9197_0_0;
+    int tmp_index_9181_0_0;
+    int _for_it_304_0_0;
+    int tmp_index_9242_0_0;
+    int tmp_index_9201_0_0;
+    int tmp_index_9232_0_0;
+    int tmp_index_9234_0_0;
+    int tmp_index_9246_0_0;
+    int tmp_index_9229_0_0;
+    int tmp_index_9211_0_0;
+    int tmp_index_9238_0_0;
+    int tmp_index_9223_0_0;
+    int tmp_index_9250_0_0;
+    int tmp_index_9215_0_0;
+    int tmp_index_9205_0_0;
+    int _for_it_305_0_0;
+    int tmp_index_9256_0_0;
+    int tmp_index_9270_0_0;
+    int tmp_index_9263_0_0;
+    int tmp_index_9266_0_0;
+    int tmp_index_9258_0_0;
+    int tmp_index_9272_0_0;
+    int tmp_index_9268_0_0;
+    int tmp_index_9261_0_0;
+    int _for_it_306_0_0;
+    int tmp_index_9305_0_0;
+    int tmp_index_9286_0_0;
+    int tmp_index_9274_0_0;
+    int tmp_index_9297_0_0;
+    int tmp_index_9292_0_0;
+    int tmp_index_9309_0_0;
+    int tmp_index_9313_0_0;
+    int tmp_index_9278_0_0;
+    int tmp_index_9301_0_0;
+    int tmp_index_9295_0_0;
+    int _for_it_307_0_0;
+    int tmp_index_9317_0_0;
+    int tmp_index_9318_0_0;
+    int ixc0_var_2026_0_0;
+    int _for_it_290_0_0;
+    int jl_var_2029_0_0;
+    int tmp_index_8724_0_0;
+    int tmp_index_8718_0_0;
+    int tmp_index_8722_0_0;
+    int tmp_index_8720_0_0;
+    int tmp_index_8730_0_0;
+    int tmp_call_235_0_0;
+    int tmp_index_8728_0_0;
+    int tmp_index_8732_0_0;
+    int tmp_index_8726_0_0;
+    int tmp_call_237_0_0;
+    int tmp_index_8736_0_0;
+    int tmp_index_8734_0_0;
+    int tmp_index_8738_0_0;
+    int tmp_index_8744_0_0;
+    int tmp_call_239_0_0;
+    int tmp_index_8740_0_0;
+    int tmp_index_8742_0_0;
+    int tmp_index_8747_0_0;
+    int tmp_index_8760_0_0;
+    int tmp_index_8758_0_0;
+    int tmp_index_8756_0_0;
+    int tmp_index_8767_0_0;
+    int tmp_index_8776_0_0;
+    int tmp_index_8764_0_0;
+    int tmp_index_8774_0_0;
+    int tmp_index_8762_0_0;
+    int tmp_call_242_0_0;
+    int tmp_index_8772_0_0;
+    int tmp_index_8769_0_0;
+    int _if_cond_272_0_0;
+    int _if_cond_274_0_0;
+    int _if_cond_276_0_0;
+    int _if_cond_278_0_0;
+    int _for_it_291_0_0;
+    int tmp_index_8748_0_0;
+    int tmp_index_8752_0_0;
+    int tmp_index_8751_0_0;
+    int tmp_index_8754_0_0;
+    int tmp_index_8788_0_0;
+    int tmp_index_8782_0_0;
+    int tmp_index_8786_0_0;
+    int tmp_index_8784_0_0;
+    int tmp_index_8780_0_0;
+    int tmp_index_8778_0_0;
+    int tmp_index_8794_0_0;
+    int tmp_index_8796_0_0;
+    int tmp_index_8798_0_0;
+    int tmp_index_8800_0_0;
+    int tmp_index_8792_0_0;
+    int tmp_index_8790_0_0;
+    int tmp_index_8806_0_0;
+    int tmp_index_8802_0_0;
+    int tmp_index_8808_0_0;
+    int tmp_index_8804_0_0;
+    int tmp_index_8814_0_0;
+    int tmp_index_8818_0_0;
+    int tmp_index_8810_0_0;
+    int tmp_index_8820_0_0;
+    int tmp_index_8816_0_0;
+    int tmp_index_8812_0_0;
+    int tmp_index_8826_0_0;
+    int tmp_index_8822_0_0;
+    int tmp_index_8824_0_0;
+    int tmp_index_8830_0_0;
+    int tmp_index_8828_0_0;
+    int tmp_index_8832_0_0;
+    int tmp_index_8840_0_0;
+    int tmp_index_8836_0_0;
+    int tmp_index_8838_0_0;
+    int tmp_index_8834_0_0;
+    int tmp_parfor_170_0_0;
+    int tmp_parfor_171_0_0;
+    int tmp_parfor_172_0_0;
+    int tmp_parfor_173_0_0;
+    int tmp_parfor_174_0_0;
+    int tmp_parfor_175_0_0;
+    int tmp_index_8916_0_0;
+    int tmp_index_8912_0_0;
+    int tmp_index_8926_0_0;
+    int tmp_index_8922_0_0;
+    int tmp_index_8950_0_0;
+    int tmp_index_8952_0_0;
+    int tmp_index_8957_0_0;
+    int _for_it_292_0_0;
+    int tmp_index_8972_0_0;
+    int tmp_index_8970_0_0;
+    int tmp_index_8968_0_0;
+    int tmp_index_8975_0_0;
+    double _if_cond_280_0_0;
+    int tmp_index_8986_0_0;
+    int tmp_index_8994_0_0;
+    int tmp_index_8984_0_0;
+    int tmp_index_8989_0_0;
+    int tmp_index_8991_0_0;
+    int _for_it_293_0_0;
+    int tmp_index_8980_0_0;
+    int tmp_index_8976_0_0;
+    int tmp_index_8979_0_0;
+    int tmp_index_8982_0_0;
+    int tmp_index_9009_0_0;
+    int tmp_index_9017_0_0;
+    int tmp_index_9013_0_0;
+    int tmp_index_9025_0_0;
+    int tmp_index_9004_0_0;
+    int tmp_index_9021_0_0;
+    int tmp_index_9007_0_0;
+    int tmp_index_8998_0_0;
+    int _for_it_294_0_0;
     int ixc0_var_2165_0_0;
     int _for_it_329_0_0;
     int jl_var_2168_0_0;
-    int tmp_index_9759_0_0;
     int tmp_index_9763_0_0;
     int tmp_index_9761_0_0;
+    int tmp_index_9759_0_0;
     int tmp_index_9766_0_0;
-    int tmp_index_9775_0_0;
+    int tmp_index_9787_0_0;
     int tmp_index_9785_0_0;
+    int tmp_index_9782_0_0;
     int tmp_index_9780_0_0;
     int tmp_index_9789_0_0;
-    int tmp_index_9787_0_0;
-    int tmp_index_9782_0_0;
+    int tmp_index_9775_0_0;
     int tmp_index_9777_0_0;
     int _for_it_330_0_0;
-    int tmp_index_9771_0_0;
     int tmp_index_9767_0_0;
+    int tmp_index_9771_0_0;
     int tmp_index_9770_0_0;
     int tmp_index_9773_0_0;
-    int tmp_index_9801_0_0;
-    int tmp_index_9868_0_0;
-    int tmp_index_9840_0_0;
-    int tmp_index_9829_0_0;
-    int tmp_index_9835_0_0;
-    int tmp_index_9791_0_0;
-    int tmp_index_9858_0_0;
-    int tmp_index_9813_0_0;
-    int tmp_index_9848_0_0;
-    int tmp_index_9838_0_0;
     int tmp_index_9805_0_0;
-    int tmp_index_9821_0_0;
-    int tmp_index_9852_0_0;
-    int tmp_index_9795_0_0;
-    int tmp_index_9860_0_0;
-    int tmp_index_9856_0_0;
-    int tmp_index_9864_0_0;
+    int tmp_index_9848_0_0;
     int tmp_index_9844_0_0;
+    int tmp_index_9858_0_0;
+    int tmp_index_9835_0_0;
+    int tmp_index_9840_0_0;
+    int tmp_index_9864_0_0;
+    int tmp_index_9795_0_0;
+    int tmp_index_9868_0_0;
+    int tmp_index_9821_0_0;
+    int tmp_index_9801_0_0;
+    int tmp_index_9860_0_0;
+    int tmp_index_9813_0_0;
+    int tmp_index_9838_0_0;
+    int tmp_index_9791_0_0;
+    int tmp_index_9829_0_0;
+    int tmp_index_9852_0_0;
+    int tmp_index_9856_0_0;
     int _for_it_331_0_0;
     int tmp_index_9878_0_0;
     int tmp_index_9874_0_0;
     int tmp_index_9876_0_0;
     int tmp_index_9881_0_0;
     double _if_cond_290_0_0;
-    int tmp_index_9890_0_0;
-    int tmp_index_9900_0_0;
-    int tmp_index_9895_0_0;
-    int tmp_index_9897_0_0;
     int tmp_index_9892_0_0;
+    int tmp_index_9897_0_0;
+    int tmp_index_9895_0_0;
+    int tmp_index_9900_0_0;
+    int tmp_index_9890_0_0;
     int _for_it_332_0_0;
     int tmp_index_9882_0_0;
     int tmp_index_9886_0_0;
     int tmp_index_9885_0_0;
     int tmp_index_9888_0_0;
-    int tmp_index_9904_0_0;
     int tmp_index_9931_0_0;
-    int tmp_index_9939_0_0;
+    int tmp_index_9912_0_0;
+    int tmp_index_9921_0_0;
     int tmp_index_9918_0_0;
     int tmp_index_9941_0_0;
     int tmp_index_9945_0_0;
-    int tmp_index_9912_0_0;
-    int tmp_index_9927_0_0;
-    int tmp_index_9923_0_0;
-    int tmp_index_9921_0_0;
+    int tmp_index_9939_0_0;
     int tmp_index_9935_0_0;
+    int tmp_index_9923_0_0;
     int tmp_index_9949_0_0;
+    int tmp_index_9904_0_0;
+    int tmp_index_9927_0_0;
     int _for_it_333_0_0;
-    int tmp_index_6101_0_0;
-    int tmp_index_6100_0_0;
+    int tmp_parfor_184_0_0;
+    int tmp_parfor_183_0_0;
+    int tmp_parfor_37_0_0;
+    int tmp_parfor_36_0_0;
+    int tmp_parfor_21_1_0;
     int tmp_parfor_82_0_0;
-    int tmp_parfor_185_0_0;
-    int tmp_parfor_74_0_0;
-    int tmp_parfor_73_0_0;
+    int tmp_index_2258_0_0;
+    int tmp_index_2257_0_0;
+    int ixc0_var_1166_0_0;
+    int _for_it_138_0_0;
+    int jl_var_1169_0_0;
+    int tmp_index_3490_0_0;
+    int tmp_index_3494_0_0;
+    int tmp_index_3496_0_0;
+    int tmp_index_3492_0_0;
+    int tmp_index_3500_0_0;
+    int tmp_index_3502_0_0;
+    int tmp_index_3504_0_0;
+    int tmp_call_93_0_0;
+    int tmp_index_3498_0_0;
+    int tmp_call_95_0_0;
+    int tmp_index_3510_0_0;
+    int tmp_index_3506_0_0;
+    int tmp_index_3508_0_0;
+    int tmp_index_3512_0_0;
+    int tmp_index_3519_0_0;
+    int tmp_index_3522_0_0;
+    int tmp_call_97_0_0;
+    int tmp_index_3524_0_0;
+    int tmp_index_3514_0_0;
+    int tmp_index_3517_0_0;
+    int _if_cond_123_0_0;
+    int _if_cond_125_0_0;
+    int _if_cond_127_0_0;
+    int _for_it_139_0_0;
+    int tmp_index_3526_0_0;
+    int tmp_index_3528_0_0;
+    int tmp_index_3536_0_0;
+    int tmp_index_3534_0_0;
+    int tmp_index_3530_0_0;
+    int tmp_index_3532_0_0;
+    int tmp_index_3548_0_0;
+    int tmp_index_3538_0_0;
+    int tmp_index_3546_0_0;
+    int tmp_index_3544_0_0;
+    int tmp_index_3540_0_0;
+    int tmp_index_3542_0_0;
+    int tmp_index_3550_0_0;
+    int tmp_index_3556_0_0;
+    int tmp_index_3552_0_0;
+    int tmp_index_3554_0_0;
+    int tmp_index_3566_0_0;
+    int tmp_index_3562_0_0;
+    int tmp_index_3560_0_0;
+    int tmp_index_3568_0_0;
+    int tmp_index_3558_0_0;
+    int tmp_index_3564_0_0;
+    int tmp_index_3574_0_0;
+    int tmp_index_3572_0_0;
+    int tmp_index_3576_0_0;
+    int tmp_index_3580_0_0;
+    int tmp_index_3570_0_0;
+    int tmp_index_3578_0_0;
+    int tmp_index_3586_0_0;
+    int tmp_index_3584_0_0;
+    int tmp_index_3582_0_0;
+    int tmp_index_3588_0_0;
+    int tmp_parfor_28_0_1;
+    int tmp_parfor_29_0_1;
+    int tmp_parfor_30_0_0;
+    int tmp_parfor_31_0_0;
+    int tmp_parfor_32_0_0;
+    int tmp_parfor_33_0_0;
+    int tmp_index_3660_0_0;
+    int tmp_index_3674_0_0;
+    int tmp_index_3685_0_0;
+    int tmp_index_3680_0_0;
+    int tmp_index_3664_0_0;
+    int tmp_index_3670_0_0;
+    int _for_it_140_0_0;
+    int tmp_index_3696_0_0;
+    int tmp_index_3702_0_0;
+    int tmp_index_3700_0_0;
+    int tmp_index_3698_0_0;
+    int tmp_index_3704_0_0;
+    int tmp_index_3708_0_0;
+    int tmp_index_3706_0_0;
+    int tmp_call_99_0_0;
+    int tmp_index_3710_0_0;
+    int tmp_index_3728_0_0;
+    int tmp_index_3724_0_0;
+    int tmp_index_3732_0_0;
+    int tmp_index_3720_0_0;
+    int tmp_index_3722_0_0;
+    int tmp_index_3716_0_0;
+    int tmp_index_3712_0_0;
+    int tmp_index_3718_0_0;
+    int tmp_index_3730_0_0;
+    int tmp_index_3714_0_0;
+    int tmp_index_3726_0_0;
+    int tmp_call_101_0_0;
+    int tmp_call_103_0_0;
+    int tmp_index_3734_0_0;
+    int tmp_index_3739_0_0;
+    int tmp_index_3736_0_0;
+    int tmp_index_3741_0_0;
+    int _for_it_141_0_0;
+    int tmp_index_3763_0_0;
+    int tmp_index_3744_0_0;
+    int _for_it_142_0_0;
+    int tmp_index_3810_0_0;
+    int tmp_index_3780_0_0;
+    int tmp_index_3777_0_0;
+    int tmp_index_3789_0_0;
+    int tmp_index_3813_0_0;
+    int tmp_index_3804_0_0;
+    int tmp_index_3807_0_0;
+    int tmp_index_3786_0_0;
+    int tmp_index_3801_0_0;
+    int tmp_index_3798_0_0;
+    int tmp_index_3774_0_0;
+    int tmp_index_3783_0_0;
+    int tmp_index_3792_0_0;
+    int tmp_index_3795_0_0;
+    int _for_it_143_0_0;
+    int tmp_parfor_142_0_0;
+    int tmp_parfor_141_0_0;
     int _for_it_313_0_0;
-    int tmp_index_9391_0_0;
     int tmp_index_9401_0_0;
-    int tmp_index_9393_0_0;
-    int tmp_index_9396_0_0;
     int tmp_index_9398_0_0;
+    int tmp_index_9396_0_0;
+    int tmp_index_9393_0_0;
+    int tmp_index_9391_0_0;
     int _for_it_314_0_0;
-    int tmp_index_9434_0_0;
-    int tmp_index_9426_0_0;
     int tmp_index_9422_0_0;
+    int tmp_index_9426_0_0;
     int tmp_index_9407_0_0;
-    int tmp_index_9418_0_0;
-    int tmp_index_9413_0_0;
-    int tmp_index_9416_0_0;
     int tmp_index_9430_0_0;
+    int tmp_index_9416_0_0;
+    int tmp_index_9413_0_0;
+    int tmp_index_9434_0_0;
+    int tmp_index_9418_0_0;
     int tmp_index_9403_0_0;
     int _for_it_315_0_0;
-    int tmp_parfor_4_0_1;
+    int tmp_parfor_125_0_0;
+    int tmp_parfor_124_0_0;
+    int tmp_index_9550_0_0;
+    int tmp_index_9549_0_0;
+    int tmp_parfor_59_0_0;
+    int tmp_parfor_58_0_0;
+    int tmp_parfor_158_0;
+    int tmp_parfor_157_0;
+    int tmp_index_8374_0;
+    int tmp_parfor_156_0;
+    int tmp_parfor_81_0_0;
+    int tmp_parfor_80_0_0;
+    int tmp_index_7323_0_0;
+    int tmp_index_7322_0_0;
+    int tmp_parfor_140_0_0;
+    int tmp_parfor_139_0_0;
+    int tmp_parfor_40_0_0;
+    int tmp_parfor_39_0_0;
+    int ich_var_1452_0_0;
+    int icl_var_1453_0_0;
+    int _for_it_186_0_0;
+    int tmp_index_5577_0_0;
+    int _if_cond_178_0_0;
+    int _for_it_187_0_0;
     int tmp_parfor_143_0_0;
-    int tmp_parfor_180_0_0;
-    int ich_var_1501_0_0;
-    int icl_var_1502_0_0;
-    int _for_it_199_0_0;
-    int tmp_index_5813_0_0;
-    int _if_cond_180_0_0;
-    int _for_it_200_0_0;
-    int _for_it_214_0_0;
-    int tmp_index_6127_0_0;
-    int tmp_index_6120_0_0;
-    int tmp_index_6115_0_0;
-    int tmp_index_6117_0_0;
-    int tmp_index_6125_0_0;
-    int tmp_index_6122_0_0;
-    int _for_it_215_0_0;
-    int tmp_index_6143_0_0;
-    int tmp_index_6154_0_0;
-    int tmp_index_6158_0_0;
-    int tmp_index_6129_0_0;
-    int tmp_index_6152_0_0;
-    int tmp_index_6166_0_0;
-    int tmp_index_6139_0_0;
-    int tmp_index_6162_0_0;
-    int tmp_index_6149_0_0;
-    int tmp_index_6170_0_0;
-    int tmp_index_6133_0_0;
-    int _for_it_216_0_0;
-    int tmp_parfor_177_0_0;
-    int tmp_parfor_176_0_0;
-    int tmp_parfor_87_0_0;
-    int tmp_parfor_160_0_0;
-    int tmp_parfor_159_0_0;
-    int tmp_index_3144_0_0;
-    int tmp_index_3145_0_0;
+    int _for_it_271_0_0;
+    int tmp_index_8063_0_0;
+    int _for_it_272_0_0;
+    int tmp_index_8076_0_0;
+    int tmp_index_8078_0_0;
+    int tmp_index_8073_0_0;
+    int tmp_index_8067_0_0;
+    int _for_it_273_0_0;
+    int tmp_parfor_182_0_0;
+    int tmp_parfor_181_0_0;
+    int ixc0_var_1217_0_0;
+    int _for_it_152_0_0;
+    int jl_var_1220_0_0;
+    int tmp_index_3944_0_0;
+    int tmp_index_3942_0_0;
+    int tmp_index_3946_0_0;
+    int tmp_index_3949_0_0;
+    int tmp_index_3965_0_0;
+    int tmp_index_3968_0_0;
+    int tmp_index_3960_0_0;
+    int tmp_index_3970_0_0;
+    int tmp_index_3972_0_0;
+    int tmp_index_3958_0_0;
+    int tmp_index_3963_0_0;
+    int _for_it_153_0_0;
+    int tmp_index_3954_0_0;
+    int tmp_index_3950_0_0;
+    int tmp_index_3953_0_0;
+    int tmp_index_3956_0_0;
+    int tmp_index_4002_0_0;
+    int tmp_index_4031_0_0;
+    int tmp_index_3984_0_0;
+    int tmp_index_4019_0_0;
+    int tmp_index_4011_0_0;
+    int tmp_index_4023_0_0;
+    int tmp_index_3988_0_0;
+    int tmp_index_4015_0_0;
+    int tmp_index_3974_0_0;
+    int tmp_index_4027_0_0;
+    int tmp_index_3978_0_0;
+    int tmp_index_4005_0_0;
+    int tmp_index_3996_0_0;
+    int tmp_index_4007_0_0;
+    int _for_it_154_0_0;
+    int _for_it_155_0_0;
+    int tmp_index_4037_0_0;
+    int tmp_index_4044_0_0;
+    int tmp_index_4048_0_0;
+    int tmp_index_4040_0_0;
+    int _for_it_156_0_0;
+    int _for_it_112_0_0;
+    int tmp_index_2284_0_0;
+    int tmp_index_2286_0_0;
+    int tmp_index_2288_0_0;
+    int tmp_index_2282_0_0;
+    int tmp_index_2292_0_0;
+    int tmp_index_2290_0_0;
+    int tmp_index_2296_0_0;
+    int tmp_call_40_0_0;
+    int tmp_index_2294_0_0;
+    int tmp_index_2302_0_0;
+    int tmp_index_2298_0_0;
+    int tmp_index_2300_0_0;
+    int tmp_call_42_0_0;
+    int tmp_index_2306_0_0;
+    int tmp_index_2308_0_0;
+    int tmp_call_44_0_0;
+    int tmp_index_2304_0_0;
+    int tmp_index_2315_0_0;
+    int tmp_index_2317_0_0;
+    int tmp_index_2310_0_0;
+    int tmp_index_2320_0_0;
+    int tmp_call_46_0_0;
+    int tmp_index_2312_0_0;
+    int tmp_index_2322_0_0;
+    int tmp_index_2324_0_0;
+    int _if_cond_49_0_0;
+    int _if_cond_51_0_0;
+    int _if_cond_53_0_0;
+    int _if_cond_55_0_0;
+    int _for_it_113_0_0;
+    int tmp_index_2330_0_0;
+    int tmp_index_2332_0_0;
+    int tmp_index_2328_0_0;
+    int tmp_index_2334_0_0;
+    int tmp_index_2326_0_0;
+    int tmp_index_2336_0_0;
+    int tmp_index_2346_0_0;
+    int tmp_index_2338_0_0;
+    int tmp_index_2340_0_0;
+    int tmp_index_2342_0_0;
+    int tmp_index_2344_0_0;
+    int tmp_index_2348_0_0;
+    int tmp_index_2356_0_0;
+    int tmp_index_2352_0_0;
+    int tmp_index_2350_0_0;
+    int tmp_index_2354_0_0;
+    int tmp_index_2360_0_0;
+    int tmp_index_2366_0_0;
+    int tmp_index_2368_0_0;
+    int tmp_index_2358_0_0;
+    int tmp_index_2364_0_0;
+    int tmp_index_2362_0_0;
+    int tmp_index_2378_0_0;
+    int tmp_index_2376_0_0;
+    int tmp_index_2370_0_0;
+    int tmp_index_2372_0_0;
+    int tmp_index_2380_0_0;
+    int tmp_index_2374_0_0;
+    int tmp_index_2384_0_0;
+    int tmp_index_2388_0_0;
+    int tmp_index_2382_0_0;
+    int tmp_index_2386_0_0;
+    int tmp_parfor_5_0_1;
+    int tmp_parfor_6_0_1;
+    int tmp_parfor_7_0_1;
+    int tmp_parfor_8_0_1;
+    int tmp_parfor_9_0_1;
+    int tmp_index_2474_0_0;
+    int tmp_index_2460_0_0;
+    int tmp_index_2470_0_0;
+    int tmp_index_2464_0_0;
+    int tmp_index_2500_0_0;
+    int tmp_index_2507_0_0;
+    int tmp_index_2498_0_0;
+    int tmp_index_2505_0_0;
+    int tmp_index_2511_0_0;
+    int _for_it_114_0_0;
     int tmp_index_10961_0;
     int tmp_index_10959_0;
     int tmp_index_11402_0;
@@ -6324,42 +6380,42 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_10964_0;
     int tmp_call_266_0;
     int tmp_index_10966_0;
-    int tmp_index_10974_0;
     int tmp_index_10979_0;
     int tmp_index_10976_0;
     int tmp_index_10981_0;
-    int jp1_var_2359_0;
-    int tmp_index_10983_0;
+    int tmp_index_10974_0;
     int tmp_index_10978_0;
+    int tmp_index_10983_0;
+    int jp1_var_2359_0;
     double tmp_arg_221_0;
-    int tmp_index_10984_0;
     int tmp_index_10986_0;
-    int tmp_index_10998_0;
+    int tmp_index_10984_0;
     int tmp_index_10996_0;
-    int tmp_index_10994_0;
+    int tmp_index_10998_0;
     int tmp_index_11001_0;
+    int tmp_index_10994_0;
     int tmp_arg_222_0;
     int tmp_index_11000_0;
     double tmp_arg_223_0;
     int tmp_index_11004_0;
     int tmp_index_11006_0;
-    int tmp_index_11022_0;
-    int tmp_index_11019_0;
-    int tmp_index_11026_0;
-    int tmp_index_11016_0;
     int tmp_index_11024_0;
+    int tmp_index_11016_0;
+    int tmp_index_11026_0;
+    int tmp_index_11019_0;
     int tmp_index_11014_0;
+    int tmp_index_11022_0;
     int tmp_arg_224_0;
-    int tmp_index_11384_0;
-    int tmp_index_11400_0;
-    int tmp_index_11392_0;
     int tmp_index_11388_0;
     int tmp_index_11382_0;
-    int tmp_index_11394_0;
     int tmp_index_11390_0;
-    int tmp_index_11398_0;
     int tmp_index_11396_0;
     int tmp_index_11386_0;
+    int tmp_index_11392_0;
+    int tmp_index_11398_0;
+    int tmp_index_11384_0;
+    int tmp_index_11400_0;
+    int tmp_index_11394_0;
     int _for_it_388_0;
     int tmp_index_10968_0;
     int tmp_index_10970_0;
@@ -6370,161 +6426,161 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_11008_0;
     int tmp_index_11010_0;
     int tmp_index_11012_0;
-    int tmp_index_11029_0;
-    int tmp_index_11028_0;
     int tmp_index_11032_0;
     int tmp_index_11030_0;
-    int tmp_index_11034_0;
-    int tmp_index_11042_0;
-    int tmp_index_11036_0;
+    int tmp_index_11029_0;
+    int tmp_index_11028_0;
     int tmp_index_11038_0;
-    int tmp_index_11044_0;
+    int tmp_index_11042_0;
     double z_factor_var_2363_0;
+    int tmp_index_11034_0;
+    int tmp_index_11044_0;
     int tmp_index_11040_0;
-    int tmp_index_11052_0;
-    int tmp_index_11071_0;
-    int tmp_index_11046_0;
-    int tmp_index_11064_0;
+    int tmp_index_11036_0;
+    int tmp_index_11058_0;
     int tmp_index_11060_0;
-    int tmp_index_11054_0;
+    int tmp_index_11071_0;
+    int tmp_index_11064_0;
+    int tmp_index_11068_0;
+    int tmp_index_11066_0;
+    int tmp_index_11046_0;
+    int tmp_index_11052_0;
     int tmp_index_11056_0;
     int tmp_index_11050_0;
-    int tmp_index_11062_0;
-    int tmp_index_11066_0;
-    int tmp_index_11058_0;
     int tmp_index_11048_0;
-    int tmp_index_11068_0;
+    int tmp_index_11054_0;
+    int tmp_index_11062_0;
     int tmp_index_11081_0;
-    int tmp_index_11073_0;
     int tmp_index_11075_0;
     int tmp_index_11079_0;
     int tmp_index_11077_0;
     int tmp_index_11085_0;
-    int tmp_index_11088_0;
+    int tmp_index_11073_0;
+    int tmp_index_11091_0;
     int tmp_index_11089_0;
+    int tmp_index_11088_0;
     int tmp_index_11095_0;
     int tmp_index_11084_0;
-    int tmp_index_11091_0;
-    int tmp_index_11099_0;
+    int tmp_index_11098_0;
     int tmp_index_11094_0;
     int tmp_index_11101_0;
+    int tmp_index_11099_0;
     int tmp_index_11105_0;
-    int tmp_index_11098_0;
+    int tmp_index_11115_0;
     int tmp_index_11104_0;
     int tmp_index_11109_0;
     int tmp_index_11108_0;
-    int tmp_index_11115_0;
     int tmp_index_11111_0;
-    int tmp_index_11114_0;
     int tmp_index_11119_0;
-    int tmp_index_11118_0;
     int tmp_index_11125_0;
+    int tmp_index_11114_0;
+    int tmp_index_11118_0;
     int tmp_index_11121_0;
+    int tmp_index_11135_0;
+    int tmp_index_11131_0;
+    int tmp_index_11128_0;
     int tmp_index_11124_0;
     int tmp_index_11129_0;
-    int tmp_index_11131_0;
-    int tmp_index_11135_0;
-    int tmp_index_11128_0;
     int tmp_index_11134_0;
-    int tmp_index_11145_0;
     int tmp_index_11139_0;
     int tmp_index_11138_0;
     int tmp_index_11141_0;
-    int tmp_index_11148_0;
+    int tmp_index_11145_0;
     int tmp_index_11149_0;
     int tmp_index_11155_0;
-    int tmp_index_11144_0;
     int tmp_index_11151_0;
+    int tmp_index_11144_0;
+    int tmp_index_11148_0;
     int tmp_index_11161_0;
     int tmp_index_11159_0;
-    int tmp_index_11165_0;
     int tmp_index_11158_0;
     int tmp_index_11154_0;
-    int tmp_index_11164_0;
+    int tmp_index_11165_0;
     int tmp_index_11168_0;
-    int tmp_index_11169_0;
-    int tmp_index_11171_0;
+    int tmp_index_11164_0;
     int tmp_index_11175_0;
-    int tmp_index_11178_0;
+    int tmp_index_11171_0;
+    int tmp_index_11169_0;
     int tmp_index_11174_0;
-    int tmp_index_11181_0;
-    int tmp_index_11191_0;
-    int tmp_index_11189_0;
-    int tmp_index_11206_0;
-    int tmp_index_11211_0;
-    int tmp_index_11209_0;
+    int tmp_index_11178_0;
     int tmp_index_11201_0;
-    int tmp_index_11204_0;
-    int tmp_index_11196_0;
-    int tmp_index_11184_0;
-    int tmp_index_11179_0;
+    int tmp_index_11209_0;
     int tmp_index_11213_0;
-    int tmp_index_11194_0;
+    int tmp_index_11211_0;
     int tmp_index_11199_0;
+    int tmp_index_11184_0;
+    int tmp_index_11191_0;
+    int tmp_index_11196_0;
+    int tmp_index_11194_0;
+    int tmp_index_11181_0;
+    int tmp_index_11206_0;
+    int tmp_index_11189_0;
+    int tmp_index_11204_0;
     int tmp_index_11186_0;
+    int tmp_index_11179_0;
     int tmp_index_11219_0;
     double _if_cond_318_0;
     int tmp_index_11225_0;
     double _if_cond_319_0;
-    int tmp_index_11217_0;
     int tmp_index_11215_0;
-    int tmp_index_11221_0;
+    int tmp_index_11217_0;
     int tmp_index_11223_0;
+    int tmp_index_11221_0;
     int tmp_index_11229_0;
     int tmp_index_11227_0;
     int tmp_index_11241_0;
-    int tmp_index_11247_0;
-    int tmp_index_11251_0;
-    int tmp_index_11249_0;
     int tmp_index_11243_0;
+    int tmp_index_11247_0;
+    int tmp_index_11249_0;
+    int tmp_index_11251_0;
     int tmp_index_11245_0;
     int tmp_index_11267_0;
-    int tmp_index_11269_0;
+    int tmp_index_11255_0;
     int tmp_index_11257_0;
+    int tmp_index_11259_0;
+    int tmp_index_11269_0;
     int tmp_index_11263_0;
     int tmp_index_11261_0;
-    int tmp_index_11272_0;
     int tmp_index_11265_0;
-    int tmp_index_11259_0;
-    int tmp_index_11255_0;
     int tmp_index_11253_0;
+    int tmp_index_11272_0;
     int tmp_index_11274_0;
-    int tmp_index_11280_0;
-    int tmp_index_11286_0;
     int tmp_index_11276_0;
-    int tmp_index_11278_0;
+    int tmp_index_11286_0;
+    int tmp_index_11280_0;
     int tmp_index_11282_0;
+    int tmp_index_11278_0;
     int tmp_index_11289_0;
-    int tmp_index_11285_0;
     int tmp_index_11290_0;
-    int tmp_index_11292_0;
     int tmp_index_11296_0;
-    int tmp_index_11299_0;
+    int tmp_index_11285_0;
+    int tmp_index_11292_0;
     int tmp_index_11306_0;
-    int tmp_index_11295_0;
     int tmp_index_11300_0;
+    int tmp_index_11295_0;
     int tmp_index_11302_0;
+    int tmp_index_11299_0;
+    int tmp_index_11309_0;
+    int tmp_index_11312_0;
+    int tmp_index_11310_0;
     int tmp_index_11305_0;
     int tmp_index_11316_0;
-    int tmp_index_11312_0;
-    int tmp_index_11309_0;
-    int tmp_index_11310_0;
-    int tmp_index_11315_0;
     int tmp_index_11319_0;
-    int tmp_index_11327_0;
-    int tmp_index_11345_0;
-    int tmp_index_11342_0;
-    int tmp_index_11354_0;
+    int tmp_index_11315_0;
     int tmp_index_11325_0;
-    int tmp_index_11332_0;
-    int tmp_index_11347_0;
-    int tmp_index_11335_0;
-    int tmp_index_11340_0;
-    int tmp_index_11350_0;
-    int tmp_index_11337_0;
     int tmp_index_11352_0;
-    int tmp_index_11330_0;
+    int tmp_index_11350_0;
+    int tmp_index_11354_0;
+    int tmp_index_11337_0;
+    int tmp_index_11347_0;
     int tmp_index_11320_0;
+    int tmp_index_11335_0;
+    int tmp_index_11327_0;
+    int tmp_index_11340_0;
+    int tmp_index_11345_0;
+    int tmp_index_11332_0;
+    int tmp_index_11342_0;
+    int tmp_index_11330_0;
     int tmp_index_11322_0;
     int tmp_index_11360_0;
     double _if_cond_321_0;
@@ -6537,64 +6593,6 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int tmp_index_11370_0;
     int tmp_index_11368_0;
     int tmp_index_11403_0;
-    int tmp_index_9957_0;
-    int tmp_index_9960_0;
-    int _for_it_338_0;
-    int _for_it_339_0;
-    int tmp_index_10012_0;
-    int tmp_index_9968_0;
-    int tmp_index_9969_0;
-    int tmp_index_10009_0;
-    int tmp_index_9972_0;
-    int tmp_index_9996_0;
-    int tmp_index_9991_0;
-    int tmp_index_10019_0;
-    int tmp_index_10001_0;
-    int tmp_index_9982_0;
-    int tmp_index_9965_0;
-    int tmp_index_10021_0;
-    int tmp_index_9976_0;
-    int tmp_index_9983_0;
-    int tmp_index_10000_0;
-    int tmp_index_10006_0;
-    int tmp_index_9990_0;
-    int tmp_index_10015_0;
-    int tmp_index_10017_0;
-    int tmp_index_9973_0;
-    int tmp_index_9995_0;
-    int tmp_index_9986_0;
-    int tmp_index_10005_0;
-    int _for_it_340_0;
-    int _for_it_344_0;
-    int tmp_index_10031_0;
-    int tmp_index_10037_0;
-    int tmp_index_10027_0;
-    int tmp_index_10032_0;
-    int tmp_index_10041_0;
-    int tmp_index_10042_0;
-    int tmp_index_10036_0;
-    int tmp_index_10050_0;
-    int tmp_index_10047_0;
-    int tmp_index_10076_0;
-    int tmp_index_10066_0;
-    int tmp_index_10058_0;
-    int tmp_index_10068_0;
-    int tmp_index_10060_0;
-    int tmp_index_10055_0;
-    int tmp_index_10046_0;
-    int tmp_index_10074_0;
-    int tmp_index_10052_0;
-    int tmp_index_10071_0;
-    int tmp_index_10063_0;
-    int tmp_index_10082_0;
-    int tmp_index_10084_0;
-    int _for_it_345_0;
-    int tmp_index_10079_0;
-    int _for_it_346_0;
-    int tmp_index_10089_0;
-    int tmp_index_10091_0;
-    int tmp_index_10086_0;
-    int _for_it_347_0;
     int _for_it_335_0;
     int _for_it_336_0;
     int tmp_index_9954_0;
@@ -6603,6 +6601,64 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     int _for_it_342_0;
     int tmp_index_10024_0;
     int _for_it_343_0;
+    int _for_it_344_0;
+    int tmp_index_10027_0;
+    int tmp_index_10036_0;
+    int tmp_index_10037_0;
+    int tmp_index_10041_0;
+    int tmp_index_10042_0;
+    int tmp_index_10031_0;
+    int tmp_index_10032_0;
+    int tmp_index_10074_0;
+    int tmp_index_10046_0;
+    int tmp_index_10058_0;
+    int tmp_index_10050_0;
+    int tmp_index_10055_0;
+    int tmp_index_10071_0;
+    int tmp_index_10068_0;
+    int tmp_index_10060_0;
+    int tmp_index_10052_0;
+    int tmp_index_10047_0;
+    int tmp_index_10066_0;
+    int tmp_index_10063_0;
+    int tmp_index_10076_0;
+    int tmp_index_10084_0;
+    int tmp_index_10082_0;
+    int _for_it_345_0;
+    int tmp_index_10079_0;
+    int _for_it_346_0;
+    int tmp_index_10086_0;
+    int tmp_index_10091_0;
+    int tmp_index_10089_0;
+    int _for_it_347_0;
+    int _for_it_339_0;
+    int tmp_index_10015_0;
+    int tmp_index_10006_0;
+    int tmp_index_9965_0;
+    int tmp_index_9969_0;
+    int tmp_index_10000_0;
+    int tmp_index_9976_0;
+    int tmp_index_10017_0;
+    int tmp_index_9986_0;
+    int tmp_index_9982_0;
+    int tmp_index_9968_0;
+    int tmp_index_9995_0;
+    int tmp_index_9996_0;
+    int tmp_index_9990_0;
+    int tmp_index_10021_0;
+    int tmp_index_9983_0;
+    int tmp_index_9972_0;
+    int tmp_index_10012_0;
+    int tmp_index_10019_0;
+    int tmp_index_9973_0;
+    int tmp_index_10009_0;
+    int tmp_index_10001_0;
+    int tmp_index_10005_0;
+    int tmp_index_9991_0;
+    int _for_it_340_0;
+    int tmp_index_9957_0;
+    int tmp_index_9960_0;
+    int _for_it_338_0;
 
 
 
@@ -6857,29 +6913,29 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_339_0 = 1; (_for_it_339_0 <= nlev_var_454); _for_it_339_0 = (_for_it_339_0 + 1)) {
         for (_for_it_340_0 = istartcol_var_455; (_for_it_340_0 <= iendcol_var_456); _for_it_340_0 = (_for_it_340_0 + 1)) {
 
-            tmp_index_10012_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9968_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
-            tmp_index_9969_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_10009_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9972_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
-            tmp_index_9996_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9991_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_10019_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_10001_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9982_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
-            tmp_index_9965_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_10021_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9976_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
-            tmp_index_9983_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_10000_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
-            tmp_index_10006_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9990_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
             tmp_index_10015_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_10006_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9965_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9969_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_10000_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_9976_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
             tmp_index_10017_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9973_0 = (_for_it_340_0 - istartcol_var_455);
-            tmp_index_9995_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
             tmp_index_9986_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9982_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_9968_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_9995_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_9996_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9990_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_10021_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9983_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9972_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_10012_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_10019_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_9973_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_10009_0 = (_for_it_340_0 - istartcol_var_455);
+            tmp_index_10001_0 = (_for_it_340_0 - istartcol_var_455);
             tmp_index_10005_0 = (((nlev_var_454 - _for_it_339_0) + 1) - 1);
+            tmp_index_9991_0 = (_for_it_340_0 - istartcol_var_455);
             {
                 double* gas_var_460_mixing_ratio_3;
                 gas_var_460_mixing_ratio_3 = (double*)(&(gas_var_460->mixing_ratio)[0]);
@@ -7079,13 +7135,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_344_0 = 1; (_for_it_344_0 <= nlev_var_454); _for_it_344_0 = (_for_it_344_0 + 1)) {
         for (_for_it_345_0 = istartcol_var_455; (_for_it_345_0 <= iendcol_var_456); _for_it_345_0 = (_for_it_345_0 + 1)) {
 
-            tmp_index_10031_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
-            tmp_index_10037_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10027_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10032_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10036_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
+            tmp_index_10037_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10041_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
             tmp_index_10042_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10036_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
+            tmp_index_10031_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
+            tmp_index_10032_0 = (_for_it_345_0 - istartcol_var_455);
             {
                 double* gas_var_460_mixing_ratio_8;
                 gas_var_460_mixing_ratio_8 = (double*)(&(gas_var_460->mixing_ratio)[0]);
@@ -7135,19 +7191,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_10050_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10047_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10076_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10066_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10074_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10046_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
             tmp_index_10058_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10050_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10055_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10071_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10068_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10060_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10055_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10046_0 = (((nlev_var_454 - _for_it_344_0) + 1) - 1);
-            tmp_index_10074_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10052_0 = (_for_it_345_0 - istartcol_var_455);
-            tmp_index_10071_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10047_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10066_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10063_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10076_0 = (_for_it_345_0 - istartcol_var_455);
             {
                 double* gas_var_460_mixing_ratio_10;
                 gas_var_460_mixing_ratio_10 = (double*)(&(gas_var_460->mixing_ratio)[0]);
@@ -7246,8 +7302,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_10082_0 = (_for_it_345_0 - istartcol_var_455);
             tmp_index_10084_0 = (_for_it_345_0 - istartcol_var_455);
+            tmp_index_10082_0 = (_for_it_345_0 - istartcol_var_455);
             {
 
                 {
@@ -7266,9 +7322,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_347_0 = 1; (_for_it_347_0 <= 7); _for_it_347_0 = (_for_it_347_0 + 1)) {
 
-                tmp_index_10089_0 = (_for_it_345_0 - istartcol_var_455);
-                tmp_index_10091_0 = (_for_it_345_0 - istartcol_var_455);
                 tmp_index_10086_0 = (_for_it_345_0 - istartcol_var_455);
+                tmp_index_10091_0 = (_for_it_345_0 - istartcol_var_455);
+                tmp_index_10089_0 = (_for_it_345_0 - istartcol_var_455);
                 {
 
                     {
@@ -7444,21 +7500,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 }
             }
-            tmp_index_10974_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_10979_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_10976_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_10981_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_10974_0 = (_for_it_387_0 - istartcol_var_455);
 
-            jp1_var_2359_0 = (jp_var_471[(tmp_index_10974_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1);
-            tmp_index_10983_0 = (jp_var_471[(tmp_index_10981_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
             tmp_index_10978_0 = (jp_var_471[(tmp_index_10976_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+            tmp_index_10983_0 = (jp_var_471[(tmp_index_10981_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+            jp1_var_2359_0 = (jp_var_471[(tmp_index_10974_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1);
             {
 
 
             }
             tmp_arg_221_0 = (3.0 + ((ztavel[(tmp_index_10979_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - v_global_data_var_36_tref_var_215[tmp_index_10983_0]) / 15.0));
-            tmp_index_10984_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_10986_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_10984_0 = (_for_it_387_0 - istartcol_var_455);
             {
                 double* v_global_data_var_36_preflog_var_214;
                 v_global_data_var_36_preflog_var_214 = (double*)(&((*global_data_var_36_0)->preflog_var_214)[0]);
@@ -7587,10 +7643,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 }
             }
-            tmp_index_10998_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_10996_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_10994_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_10998_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11001_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_10994_0 = (_for_it_387_0 - istartcol_var_455);
 
             tmp_arg_222_0 = (jt_var_472[(tmp_index_10994_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 3);
             tmp_index_11000_0 = (jp_var_471[(tmp_index_10998_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
@@ -7708,12 +7764,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 }
             }
-            tmp_index_11022_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11019_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11026_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11016_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11024_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11016_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11026_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11019_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11014_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11022_0 = (_for_it_387_0 - istartcol_var_455);
 
             tmp_arg_224_0 = (jt1_var_473[(tmp_index_11014_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 3);
             {
@@ -7782,18 +7838,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             if ((_if_cond_317_0 == 1)) {
 
-                tmp_index_11029_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11028_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11032_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11030_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11029_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11028_0 = (_for_it_387_0 - istartcol_var_455);
 
-                tmp_index_11034_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11042_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11036_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11038_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11044_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11042_0 = (_for_it_387_0 - istartcol_var_455);
                 z_factor_var_2363_0 = ((332.0 - ztavel[(tmp_index_11032_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))]) / 36.0);
+                tmp_index_11034_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11044_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11040_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11036_0 = (_for_it_387_0 - istartcol_var_455);
                 {
                     float tmp_call_273_0;
 
@@ -7854,20 +7910,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11052_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11071_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11046_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11064_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11058_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11060_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11054_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11071_0 = (_for_it_387_0 - istartcol_var_455);
+                z_factor_var_2363_0 = ((ztavel[(tmp_index_11044_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 188.0) / 7.2);
+                tmp_index_11064_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11068_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11066_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11046_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11052_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11056_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11050_0 = (_for_it_387_0 - istartcol_var_455);
-                z_factor_var_2363_0 = ((ztavel[(tmp_index_11044_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 188.0) / 7.2);
-                tmp_index_11062_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11066_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11058_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11048_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11068_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11054_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11062_0 = (_for_it_387_0 - istartcol_var_455);
                 {
                     float tmp_call_275_0;
                     int tmp_arg_226_0;
@@ -7942,12 +7998,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_11081_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11073_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11075_0 = (_for_it_387_0 - istartcol_var_455);
-                z_factor_var_2363_0 = ((ztavel[(tmp_index_11071_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 180.8) / 7.2);
                 tmp_index_11079_0 = (_for_it_387_0 - istartcol_var_455);
+                z_factor_var_2363_0 = ((ztavel[(tmp_index_11071_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 180.8) / 7.2);
                 tmp_index_11077_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11085_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11073_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -7967,11 +8023,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11088_0 = (jp_var_471[(tmp_index_11085_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+                tmp_index_11091_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11089_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11088_0 = (jp_var_471[(tmp_index_11085_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11095_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11084_0 = (jp_var_471[(tmp_index_11081_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
-                tmp_index_11091_0 = (_for_it_387_0 - istartcol_var_455);
                 {
                     float tmp_call_277_0;
 
@@ -8009,11 +8065,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11099_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11098_0 = ((jp_var_471[(tmp_index_11095_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11094_0 = ((jp_var_471[(tmp_index_11091_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11101_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11099_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11105_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11098_0 = ((jp_var_471[(tmp_index_11095_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
 
                     {
@@ -8030,10 +8086,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_11115_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11104_0 = (jp_var_471[(tmp_index_11101_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11109_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11108_0 = (jp_var_471[(tmp_index_11105_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
-                tmp_index_11115_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11111_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
@@ -8051,10 +8107,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11114_0 = ((jp_var_471[(tmp_index_11111_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11119_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11118_0 = ((jp_var_471[(tmp_index_11115_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11125_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11114_0 = ((jp_var_471[(tmp_index_11111_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
+                tmp_index_11118_0 = ((jp_var_471[(tmp_index_11115_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11121_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
@@ -8072,11 +8128,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_11135_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11131_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11128_0 = (jp_var_471[(tmp_index_11125_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11124_0 = (jp_var_471[(tmp_index_11121_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11129_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11131_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11135_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11128_0 = (jp_var_471[(tmp_index_11125_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 {
 
                     {
@@ -8094,10 +8150,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_11134_0 = ((jp_var_471[(tmp_index_11131_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
-                tmp_index_11145_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11139_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11138_0 = ((jp_var_471[(tmp_index_11135_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11141_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11145_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8114,11 +8170,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11148_0 = (jp_var_471[(tmp_index_11145_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11149_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11155_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11144_0 = (jp_var_471[(tmp_index_11141_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11151_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11144_0 = (jp_var_471[(tmp_index_11141_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+                tmp_index_11148_0 = (jp_var_471[(tmp_index_11145_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 {
 
                     {
@@ -8137,9 +8193,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_index_11161_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11159_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11165_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11158_0 = ((jp_var_471[(tmp_index_11155_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11154_0 = ((jp_var_471[(tmp_index_11151_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
+                tmp_index_11165_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8156,11 +8212,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11164_0 = (jp_var_471[(tmp_index_11161_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11168_0 = (jp_var_471[(tmp_index_11165_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
-                tmp_index_11169_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11171_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11164_0 = (jp_var_471[(tmp_index_11161_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11175_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11171_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11169_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8177,8 +8233,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11178_0 = ((jp_var_471[(tmp_index_11175_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11174_0 = ((jp_var_471[(tmp_index_11171_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
+                tmp_index_11178_0 = ((jp_var_471[(tmp_index_11175_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
 
                     {
@@ -8195,21 +8251,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11181_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11191_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11189_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11206_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11211_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11209_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11201_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11204_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11196_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11184_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11179_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11209_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11213_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11194_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11211_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11199_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11184_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11191_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11196_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11194_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11181_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11206_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11189_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11204_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11186_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11179_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8316,8 +8372,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 if ((_if_cond_317_0 == 1)) {
 
-                    tmp_index_11217_0 = (_for_it_387_0 - istartcol_var_455);
                     tmp_index_11215_0 = (_for_it_387_0 - istartcol_var_455);
+                    tmp_index_11217_0 = (_for_it_387_0 - istartcol_var_455);
                     {
 
                         {
@@ -8339,8 +8395,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 _if_cond_318_0 = (zcoln2o[(tmp_index_11219_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0);
                 if ((_if_cond_318_0 == 1)) {
 
-                    tmp_index_11221_0 = (_for_it_387_0 - istartcol_var_455);
                     tmp_index_11223_0 = (_for_it_387_0 - istartcol_var_455);
+                    tmp_index_11221_0 = (_for_it_387_0 - istartcol_var_455);
                     {
 
                         {
@@ -8383,23 +8439,23 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             } else {
 
                 tmp_index_11241_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11247_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11251_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11249_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11243_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11247_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11249_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11251_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11245_0 = (_for_it_387_0 - istartcol_var_455);
 
                 tmp_index_11267_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11255_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11257_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11259_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11269_0 = (_for_it_387_0 - istartcol_var_455);
                 z_factor_var_2363_0 = ((ztavel[(tmp_index_11243_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 188.0) / 36.0);
-                tmp_index_11257_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11263_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11261_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11272_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11265_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11259_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11255_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11253_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11272_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8437,12 +8493,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_11274_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11280_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11286_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11276_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11286_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11280_0 = (_for_it_387_0 - istartcol_var_455);
                 z_factor_var_2363_0 = ((ztavel[(tmp_index_11272_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 180.8) / 7.2);
-                tmp_index_11278_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11282_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11278_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8487,10 +8543,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_11289_0 = (jp_var_471[(tmp_index_11286_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
-                tmp_index_11285_0 = (jp_var_471[(tmp_index_11282_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11290_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11292_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11296_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11285_0 = (jp_var_471[(tmp_index_11282_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+                tmp_index_11292_0 = (_for_it_387_0 - istartcol_var_455);
                 {
                     float tmp_call_286_0;
 
@@ -8528,11 +8584,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11299_0 = ((jp_var_471[(tmp_index_11296_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11306_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11295_0 = ((jp_var_471[(tmp_index_11292_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11300_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11295_0 = ((jp_var_471[(tmp_index_11292_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11302_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11299_0 = ((jp_var_471[(tmp_index_11296_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
 
                     {
@@ -8549,11 +8605,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_11309_0 = (jp_var_471[(tmp_index_11306_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+                tmp_index_11312_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11310_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11305_0 = (jp_var_471[(tmp_index_11302_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_11316_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11312_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11309_0 = (jp_var_471[(tmp_index_11306_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
-                tmp_index_11310_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
                     {
@@ -8570,8 +8626,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11315_0 = ((jp_var_471[(tmp_index_11312_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 tmp_index_11319_0 = ((jp_var_471[(tmp_index_11316_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
+                tmp_index_11315_0 = ((jp_var_471[(tmp_index_11312_0 + ((_for_it_388_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
 
                     {
@@ -8588,20 +8644,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_11327_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11345_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11342_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11354_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11325_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11332_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11347_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11335_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11340_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11350_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11337_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11352_0 = (_for_it_387_0 - istartcol_var_455);
-                tmp_index_11330_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11350_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11354_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11337_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11347_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11320_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11335_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11327_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11340_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11345_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11332_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11342_0 = (_for_it_387_0 - istartcol_var_455);
+                tmp_index_11330_0 = (_for_it_387_0 - istartcol_var_455);
                 tmp_index_11322_0 = (_for_it_387_0 - istartcol_var_455);
                 {
 
@@ -8774,16 +8830,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 }
             }
-            tmp_index_11384_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11400_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11392_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11388_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11382_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11394_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11390_0 = (_for_it_387_0 - istartcol_var_455);
-            tmp_index_11398_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11396_0 = (_for_it_387_0 - istartcol_var_455);
             tmp_index_11386_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11392_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11398_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11384_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11400_0 = (_for_it_387_0 - istartcol_var_455);
+            tmp_index_11394_0 = (_for_it_387_0 - istartcol_var_455);
             {
                 double z_compfp_var_2362_0;
 
@@ -8898,8 +8954,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     }
     sym_kidia_var_1888_0 = istartcol_var_455;
-    sym_klev_var_1890_0 = nlev_var_454;
     sym_kfdia_var_1889_0 = iendcol_var_456;
+    sym_klev_var_1890_0 = nlev_var_454;
 
     for (tmp_parfor_158_0 = 1; (tmp_parfor_158_0 <= sym_nlev_var_454); tmp_parfor_158_0 = (tmp_parfor_158_0 + 1)) {
         for (tmp_parfor_157_0 = 1; (tmp_parfor_157_0 <= 140); tmp_parfor_157_0 = (tmp_parfor_157_0 + 1)) {
@@ -8926,14 +8982,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         }
 
     }
+    sym_kfdia_var_1459_0_0 = iendcol_var_456;
     laytrop_min_var_1496_0_0 = 2147483647;
     sym_klev_var_1460_0_0 = nlev_var_454;
-    sym_kfdia_var_1459_0_0 = iendcol_var_456;
 
     for (tmp_parfor_16_1_0 = istartcol_var_455; (tmp_parfor_16_1_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_16_1_0 = (tmp_parfor_16_1_0 + 1)) {
 
-        tmp_index_5805_0_0 = (tmp_parfor_16_1_0 - istartcol_var_455);
         tmp_index_5804_0_0 = (tmp_parfor_16_1_0 - istartcol_var_455);
+        tmp_index_5805_0_0 = (tmp_parfor_16_1_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_5804_0_0] < laytrop_min_var_1496_0_0)) {
 
             laytrop_min_var_1496_0_0 = ilaytrop[tmp_index_5805_0_0];
@@ -9020,8 +9076,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_199_0_0 = (laytrop_min_var_1496_0_0 + 1); (_for_it_199_0_0 <= laytrop_max_var_1497_0_0); _for_it_199_0_0 = (_for_it_199_0_0 + 1)) {
 
-        ich_var_1501_0_0 = 0;
         icl_var_1502_0_0 = 0;
+        ich_var_1501_0_0 = 0;
         for (_for_it_200_0_0 = istartcol_var_455; (_for_it_200_0_0 <= iendcol_var_456); _for_it_200_0_0 = (_for_it_200_0_0 + 1)) {
 
             tmp_index_5813_0_0 = (_for_it_200_0_0 - istartcol_var_455);
@@ -9086,22 +9142,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_202_0_0 = istartcol_var_455; (_for_it_202_0_0 <= iendcol_var_456); _for_it_202_0_0 = (_for_it_202_0_0 + 1)) {
 
             tmp_index_5829_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-            tmp_index_5821_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-            tmp_index_5833_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-            tmp_index_5835_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             tmp_index_5831_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             tmp_index_5826_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+            tmp_index_5833_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+            tmp_index_5821_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             tmp_index_5824_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             tmp_index_5819_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+            tmp_index_5835_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             {
 
 
             }
             ind0_var_1483_0_0 = (((((jp_var_471[(tmp_index_5819_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_5821_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_20_nspa_var_216[0]) + 1);
-            pp_var_1493_0_0 = zpavel[(tmp_index_5835_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indm_var_1487_0_0 = indminor_var_470[(tmp_index_5833_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indf_var_1486_0_0 = indfor_var_469[(tmp_index_5831_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_1485_0_0 = indself_var_474[(tmp_index_5829_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indf_var_1486_0_0 = indfor_var_469[(tmp_index_5831_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indm_var_1487_0_0 = indminor_var_470[(tmp_index_5833_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            pp_var_1493_0_0 = zpavel[(tmp_index_5835_0_0 + ((_for_it_201_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
 
 
@@ -9137,8 +9193,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_5839_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             tmp_index_5837_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+            tmp_index_5839_0_0 = (_for_it_202_0_0 - istartcol_var_455);
             {
 
                 {
@@ -9157,18 +9213,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_203_0_0 = 1; (_for_it_203_0_0 <= 10); _for_it_203_0_0 = (_for_it_203_0_0 + 1)) {
 
-                tmp_index_5845_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5855_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5890_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5869_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5886_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5872_0_0 = (_for_it_202_0_0 - istartcol_var_455);
                 tmp_index_5851_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5882_0_0 = (_for_it_202_0_0 - istartcol_var_455);
                 tmp_index_5841_0_0 = (_for_it_202_0_0 - istartcol_var_455);
-                tmp_index_5878_0_0 = (_for_it_202_0_0 - istartcol_var_455);
                 tmp_index_5863_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5869_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5855_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5845_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5886_0_0 = (_for_it_202_0_0 - istartcol_var_455);
                 tmp_index_5874_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5872_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5890_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5882_0_0 = (_for_it_202_0_0 - istartcol_var_455);
+                tmp_index_5878_0_0 = (_for_it_202_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -9262,23 +9318,23 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_204_0_0 = (laytrop_max_var_1497_0_0 + 1); (_for_it_204_0_0 <= nlev_var_454); _for_it_204_0_0 = (_for_it_204_0_0 + 1)) {
         for (_for_it_205_0_0 = istartcol_var_455; (_for_it_205_0_0 <= iendcol_var_456); _for_it_205_0_0 = (_for_it_205_0_0 + 1)) {
 
+            tmp_index_5906_0_0 = (_for_it_205_0_0 - istartcol_var_455);
             tmp_index_5894_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+            tmp_index_5901_0_0 = (_for_it_205_0_0 - istartcol_var_455);
             tmp_index_5896_0_0 = (_for_it_205_0_0 - istartcol_var_455);
             tmp_index_5908_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-            tmp_index_5901_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-            tmp_index_5906_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+            tmp_index_5904_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+            tmp_index_5899_0_0 = (_for_it_205_0_0 - istartcol_var_455);
             tmp_index_5912_0_0 = (_for_it_205_0_0 - istartcol_var_455);
             tmp_index_5910_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-            tmp_index_5899_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-            tmp_index_5904_0_0 = (_for_it_205_0_0 - istartcol_var_455);
             {
 
 
             }
             ind0_var_1483_0_0 = (((((jp_var_471[(tmp_index_5894_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_5896_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_20_nspb_var_217[0]) + 1);
-            pp_var_1493_0_0 = zpavel[(tmp_index_5908_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indm_var_1487_0_0 = indminor_var_470[(tmp_index_5906_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             indf_var_1486_0_0 = indfor_var_469[(tmp_index_5904_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indm_var_1487_0_0 = indminor_var_470[(tmp_index_5906_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            pp_var_1493_0_0 = zpavel[(tmp_index_5908_0_0 + ((_for_it_204_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
 
 
@@ -9312,16 +9368,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_206_0_0 = 1; (_for_it_206_0_0 <= 10); _for_it_206_0_0 = (_for_it_206_0_0 + 1)) {
 
-                tmp_index_5953_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-                tmp_index_5932_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-                tmp_index_5945_0_0 = (_for_it_205_0_0 - istartcol_var_455);
                 tmp_index_5918_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-                tmp_index_5914_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-                tmp_index_5941_0_0 = (_for_it_205_0_0 - istartcol_var_455);
-                tmp_index_5926_0_0 = (_for_it_205_0_0 - istartcol_var_455);
                 tmp_index_5935_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+                tmp_index_5914_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+                tmp_index_5926_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+                tmp_index_5941_0_0 = (_for_it_205_0_0 - istartcol_var_455);
                 tmp_index_5937_0_0 = (_for_it_205_0_0 - istartcol_var_455);
                 tmp_index_5949_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+                tmp_index_5945_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+                tmp_index_5953_0_0 = (_for_it_205_0_0 - istartcol_var_455);
+                tmp_index_5932_0_0 = (_for_it_205_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -9404,23 +9460,23 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1506_0_0 = ixlow_var_1499_0_0[((_for_it_208_0_0 + (sym_kfdia_var_1459_0_0 * (_for_it_207_0_0 - 1))) - 1)];
 
-                tmp_index_5967_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_5960_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_5970_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_5965_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_5974_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_5962_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_5972_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                 tmp_index_5976_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5972_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5960_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5967_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5970_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5962_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5974_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5965_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                 {
 
 
                 }
                 ind0_var_1483_0_0 = (((((jp_var_471[(tmp_index_5960_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_5962_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_20_nspa_var_216[0]) + 1);
-                pp_var_1493_0_0 = zpavel[(tmp_index_5976_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indm_var_1487_0_0 = indminor_var_470[(tmp_index_5974_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indf_var_1486_0_0 = indfor_var_469[(tmp_index_5972_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_1485_0_0 = indself_var_474[(tmp_index_5970_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indf_var_1486_0_0 = indfor_var_469[(tmp_index_5972_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indm_var_1487_0_0 = indminor_var_470[(tmp_index_5974_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                pp_var_1493_0_0 = zpavel[(tmp_index_5976_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
 
 
@@ -9456,8 +9512,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_5978_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                 tmp_index_5980_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_5978_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -9476,18 +9532,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_209_0_0 = 1; (_for_it_209_0_0 <= 10); _for_it_209_0_0 = (_for_it_209_0_0 + 1)) {
 
-                    tmp_index_5992_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6013_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6023_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6019_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_5982_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6004_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6031_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6010_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6027_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_6015_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_5996_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_5986_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6019_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6027_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6031_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6013_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_5992_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6004_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6010_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6023_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_5982_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -9580,23 +9636,23 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1506_0_0 = ixhigh_var_1500_0_0[((_for_it_210_0_0 + (sym_kfdia_var_1459_0_0 * (_for_it_207_0_0 - 1))) - 1)];
 
-                tmp_index_6042_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6037_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6044_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6047_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6055_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6049_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6051_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                tmp_index_6039_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                 tmp_index_6053_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6051_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6055_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6047_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6039_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6049_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6044_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6037_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                tmp_index_6042_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                 {
 
 
                 }
                 ind0_var_1483_0_0 = (((((jp_var_471[(tmp_index_6037_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_6039_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_20_nspb_var_217[0]) + 1);
-                pp_var_1493_0_0 = zpavel[(tmp_index_6051_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indm_var_1487_0_0 = indminor_var_470[(tmp_index_6049_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 indf_var_1486_0_0 = indfor_var_469[(tmp_index_6047_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indm_var_1487_0_0 = indminor_var_470[(tmp_index_6049_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                pp_var_1493_0_0 = zpavel[(tmp_index_6051_0_0 + ((_for_it_207_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
 
 
@@ -9630,16 +9686,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_211_0_0 = 1; (_for_it_211_0_0 <= 10); _for_it_211_0_0 = (_for_it_211_0_0 + 1)) {
 
-                    tmp_index_6096_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6092_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6057_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_6084_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_6069_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6080_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6078_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
-                    tmp_index_6075_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_6088_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6075_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6080_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6096_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6092_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     tmp_index_6061_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6057_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
+                    tmp_index_6078_0_0 = (jl_var_1506_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -9736,8 +9792,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_15_1_0 = istartcol_var_455; (tmp_parfor_15_1_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_15_1_0 = (tmp_parfor_15_1_0 + 1)) {
 
-        tmp_index_5570_0_0 = (tmp_parfor_15_1_0 - istartcol_var_455);
         tmp_index_5571_0_0 = (tmp_parfor_15_1_0 - istartcol_var_455);
+        tmp_index_5570_0_0 = (tmp_parfor_15_1_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_5570_0_0] > laytrop_max_var_1448_0_0)) {
 
             laytrop_max_var_1448_0_0 = ilaytrop[tmp_index_5571_0_0];
@@ -9875,13 +9931,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_188_0_0 = 1; (_for_it_188_0_0 <= laytrop_min_var_1447_0_0); _for_it_188_0_0 = (_for_it_188_0_0 + 1)) {
         for (_for_it_189_0_0 = istartcol_var_455; (_for_it_189_0_0 <= iendcol_var_456); _for_it_189_0_0 = (_for_it_189_0_0 + 1)) {
 
-            tmp_index_5593_0_0 = (_for_it_189_0_0 - istartcol_var_455);
             tmp_index_5590_0_0 = (_for_it_189_0_0 - istartcol_var_455);
             tmp_index_5585_0_0 = (_for_it_189_0_0 - istartcol_var_455);
-            tmp_index_5588_0_0 = (_for_it_189_0_0 - istartcol_var_455);
-            tmp_index_5583_0_0 = (_for_it_189_0_0 - istartcol_var_455);
             tmp_index_5595_0_0 = (_for_it_189_0_0 - istartcol_var_455);
             tmp_index_5597_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+            tmp_index_5588_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+            tmp_index_5583_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+            tmp_index_5593_0_0 = (_for_it_189_0_0 - istartcol_var_455);
             {
 
 
@@ -9922,17 +9978,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_190_0_0 = 1; (_for_it_190_0_0 <= 12); _for_it_190_0_0 = (_for_it_190_0_0 + 1)) {
 
-                tmp_index_5622_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 tmp_index_5632_0_0 = (_for_it_189_0_0 - istartcol_var_455);
-                tmp_index_5613_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+                tmp_index_5636_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+                tmp_index_5622_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 tmp_index_5640_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 tmp_index_5628_0_0 = (_for_it_189_0_0 - istartcol_var_455);
-                tmp_index_5603_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+                tmp_index_5613_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 tmp_index_5609_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 tmp_index_5599_0_0 = (_for_it_189_0_0 - istartcol_var_455);
-                tmp_index_5619_0_0 = (_for_it_189_0_0 - istartcol_var_455);
-                tmp_index_5636_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 tmp_index_5624_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+                tmp_index_5603_0_0 = (_for_it_189_0_0 - istartcol_var_455);
+                tmp_index_5619_0_0 = (_for_it_189_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -10010,11 +10066,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_191_0_0 = (laytrop_max_var_1448_0_0 + 1); (_for_it_191_0_0 <= nlev_var_454); _for_it_191_0_0 = (_for_it_191_0_0 + 1)) {
         for (_for_it_192_0_0 = istartcol_var_455; (_for_it_192_0_0 <= iendcol_var_456); _for_it_192_0_0 = (_for_it_192_0_0 + 1)) {
 
+            tmp_index_5644_0_0 = (_for_it_192_0_0 - istartcol_var_455);
             tmp_index_5649_0_0 = (_for_it_192_0_0 - istartcol_var_455);
             tmp_index_5646_0_0 = (_for_it_192_0_0 - istartcol_var_455);
-            tmp_index_5644_0_0 = (_for_it_192_0_0 - istartcol_var_455);
-            tmp_index_5654_0_0 = (_for_it_192_0_0 - istartcol_var_455);
             tmp_index_5651_0_0 = (_for_it_192_0_0 - istartcol_var_455);
+            tmp_index_5654_0_0 = (_for_it_192_0_0 - istartcol_var_455);
             {
 
 
@@ -10028,15 +10084,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_1438_0_0 = (((((jp_var_471[(tmp_index_5649_0_0 + ((_for_it_191_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_5651_0_0 + ((_for_it_191_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_19_nspb_var_217[1]) + 1);
             for (_for_it_193_0_0 = 1; (_for_it_193_0_0 <= 12); _for_it_193_0_0 = (_for_it_193_0_0 + 1)) {
 
-                tmp_index_5687_0_0 = (_for_it_192_0_0 - istartcol_var_455);
-                tmp_index_5675_0_0 = (_for_it_192_0_0 - istartcol_var_455);
-                tmp_index_5679_0_0 = (_for_it_192_0_0 - istartcol_var_455);
-                tmp_index_5669_0_0 = (_for_it_192_0_0 - istartcol_var_455);
                 tmp_index_5671_0_0 = (_for_it_192_0_0 - istartcol_var_455);
                 tmp_index_5666_0_0 = (_for_it_192_0_0 - istartcol_var_455);
-                tmp_index_5656_0_0 = (_for_it_192_0_0 - istartcol_var_455);
+                tmp_index_5675_0_0 = (_for_it_192_0_0 - istartcol_var_455);
                 tmp_index_5660_0_0 = (_for_it_192_0_0 - istartcol_var_455);
+                tmp_index_5669_0_0 = (_for_it_192_0_0 - istartcol_var_455);
+                tmp_index_5679_0_0 = (_for_it_192_0_0 - istartcol_var_455);
+                tmp_index_5687_0_0 = (_for_it_192_0_0 - istartcol_var_455);
                 tmp_index_5683_0_0 = (_for_it_192_0_0 - istartcol_var_455);
+                tmp_index_5656_0_0 = (_for_it_192_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -10102,13 +10158,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1457_0_0 = ixlow_var_1450_0_0[((_for_it_195_0_0 + (sym_kfdia_var_1415_0_0 * (_for_it_194_0_0 - 1))) - 1)];
 
-                tmp_index_5701_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                tmp_index_5694_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 tmp_index_5706_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 tmp_index_5704_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                tmp_index_5696_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                tmp_index_5708_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 tmp_index_5699_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                tmp_index_5694_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                tmp_index_5701_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                tmp_index_5708_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                tmp_index_5696_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 {
 
 
@@ -10149,17 +10205,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_196_0_0 = 1; (_for_it_196_0_0 <= 12); _for_it_196_0_0 = (_for_it_196_0_0 + 1)) {
 
-                    tmp_index_5739_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5743_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5730_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5714_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5733_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5724_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5735_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5751_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5747_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     tmp_index_5720_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5724_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     tmp_index_5710_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5743_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5733_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5730_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5735_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5714_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5747_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5739_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5751_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -10236,11 +10292,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1457_0_0 = ixhigh_var_1451_0_0[((_for_it_197_0_0 + (sym_kfdia_var_1415_0_0 * (_for_it_194_0_0 - 1))) - 1)];
 
-                tmp_index_5757_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                tmp_index_5764_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 tmp_index_5762_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 tmp_index_5767_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                tmp_index_5764_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 tmp_index_5759_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                tmp_index_5757_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                 {
 
 
@@ -10254,15 +10310,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1438_0_0 = (((((jp_var_471[(tmp_index_5762_0_0 + ((_for_it_194_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_5764_0_0 + ((_for_it_194_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_19_nspb_var_217[1]) + 1);
                 for (_for_it_198_0_0 = 1; (_for_it_198_0_0 <= 12); _for_it_198_0_0 = (_for_it_198_0_0 + 1)) {
 
-                    tmp_index_5800_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5769_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5773_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5788_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     tmp_index_5792_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5796_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
-                    tmp_index_5782_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5773_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5769_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     tmp_index_5784_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5796_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     tmp_index_5779_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5788_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5782_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
+                    tmp_index_5800_0_0 = (jl_var_1457_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -10321,8 +10377,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         }
     }
     sym_klev_var_1318_0_0 = nlev_var_454;
-    laytrop_min_var_1403_0_0 = 2147483647;
     sym_kfdia_var_1317_0_0 = iendcol_var_456;
+    laytrop_min_var_1403_0_0 = 2147483647;
 
     delete[] ixc_var_1449_0_0;
     delete[] ixlow_var_1450_0_0;
@@ -10342,8 +10398,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_14_1_0 = istartcol_var_455; (tmp_parfor_14_1_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_14_1_0 = (tmp_parfor_14_1_0 + 1)) {
 
-        tmp_index_4774_0_0 = (tmp_parfor_14_1_0 - istartcol_var_455);
         tmp_index_4775_0_0 = (tmp_parfor_14_1_0 - istartcol_var_455);
+        tmp_index_4774_0_0 = (tmp_parfor_14_1_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_4774_0_0] > laytrop_max_var_1404_0_0)) {
 
             laytrop_max_var_1404_0_0 = ilaytrop[tmp_index_4775_0_0];
@@ -10417,8 +10473,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_173_0_0 = (laytrop_min_var_1403_0_0 + 1); (_for_it_173_0_0 <= laytrop_max_var_1404_0_0); _for_it_173_0_0 = (_for_it_173_0_0 + 1)) {
 
-        ich_var_1408_0_0 = 0;
         icl_var_1409_0_0 = 0;
+        ich_var_1408_0_0 = 0;
         for (_for_it_174_0_0 = istartcol_var_455; (_for_it_174_0_0 <= iendcol_var_456); _for_it_174_0_0 = (_for_it_174_0_0 + 1)) {
 
             tmp_index_4781_0_0 = (_for_it_174_0_0 - istartcol_var_455);
@@ -10549,10 +10605,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_175_0_0 = 1; (_for_it_175_0_0 <= laytrop_min_var_1403_0_0); _for_it_175_0_0 = (_for_it_175_0_0 + 1)) {
         for (_for_it_176_0_0 = istartcol_var_455; (_for_it_176_0_0 <= iendcol_var_456); _for_it_176_0_0 = (_for_it_176_0_0 + 1)) {
 
-            tmp_index_4803_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4805_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_index_4809_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4803_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4807_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4809_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             {
                 double tmp_arg_97_0_0;
 
@@ -10605,11 +10661,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_4813_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_index_4817_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_call_127_0_0 = int(specmult_var_1364_0_0);
-            tmp_index_4815_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4813_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4811_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4815_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4817_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             {
                 double tmp_call_128_0_0;
                 double tmp_arg_98_0_0;
@@ -10698,10 +10754,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_4821_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_call_129_0_0 = int(specmult1_var_1367_0_0);
-            tmp_index_4819_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4823_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4821_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4819_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_call_129_0_0 = int(specmult1_var_1367_0_0);
             {
                 double tmp_call_130_0_0;
                 double tmp_arg_100_0_0;
@@ -10790,10 +10846,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_call_131_0_0 = int(specmult_mn2o_var_1370_0_0);
+            tmp_index_4827_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4825_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4829_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_index_4827_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_call_131_0_0 = int(specmult_mn2o_var_1370_0_0);
 
             tmp_index_4832_0_0 = ((jp_var_471[(tmp_index_4829_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -10941,9 +10997,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_4841_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_index_4843_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4845_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4843_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4841_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             {
                 double tmp_arg_104_0_0;
 
@@ -10996,22 +11052,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_4847_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_call_134_0_0 = int(specmult_planck_var_1373_0_0);
             tmp_index_4849_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-            tmp_index_4861_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_call_134_0_0 = int(specmult_planck_var_1373_0_0);
             tmp_index_4854_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4852_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4859_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             tmp_index_4857_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4861_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+            tmp_index_4847_0_0 = (_for_it_176_0_0 - istartcol_var_455);
             {
 
 
             }
             inds_var_1354_0_0 = indself_var_474[(tmp_index_4857_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indm_var_1356_0_0 = indminor_var_470[(tmp_index_4861_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_1352_0_0 = (((((jp_var_471[(tmp_index_4847_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_4849_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_18_nspa_var_216[2]) + (1 + tmp_call_127_0_0));
             indf_var_1355_0_0 = indfor_var_469[(tmp_index_4859_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indm_var_1356_0_0 = indminor_var_470[(tmp_index_4861_0_0 + ((_for_it_175_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_135_0_0;
                 double tmp_arg_105_0_0;
@@ -11104,12 +11160,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4865_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                tmp_index_4869_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_4867_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_4871_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_4873_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_4869_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_4865_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_4863_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                tmp_index_4867_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -11251,12 +11307,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4879_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4881_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4875_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4877_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4879_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4885_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4883_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4875_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4881_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -11347,10 +11403,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_4889_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4891_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4887_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4893_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4891_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4889_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4887_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -11477,11 +11533,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_4905_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                tmp_index_4895_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                tmp_index_4903_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_4897_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_4899_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_4901_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_4903_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_4895_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -11623,12 +11679,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4913_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4917_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4909_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4907_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4915_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4911_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4915_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4913_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4909_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4917_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4907_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -11720,9 +11776,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 } else {
 
                     tmp_index_4921_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                    tmp_index_4919_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4925_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     tmp_index_4923_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                    tmp_index_4919_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -11989,10 +12045,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_177_0_0 = 1; (_for_it_177_0_0 <= 16); _for_it_177_0_0 = (_for_it_177_0_0 + 1)) {
 
-                tmp_index_4997_0_0 = (_for_it_176_0_0 - istartcol_var_455);
-                tmp_index_5007_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_5011_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_5001_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_5007_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_4997_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -12041,9 +12097,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_5042_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_5035_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 tmp_index_5037_0_0 = (_for_it_176_0_0 - istartcol_var_455);
+                tmp_index_5042_0_0 = (_for_it_176_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -12116,8 +12172,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_178_0_0 = (laytrop_max_var_1404_0_0 + 1); (_for_it_178_0_0 <= nlev_var_454); _for_it_178_0_0 = (_for_it_178_0_0 + 1)) {
         for (_for_it_179_0_0 = istartcol_var_455; (_for_it_179_0_0 <= iendcol_var_456); _for_it_179_0_0 = (_for_it_179_0_0 + 1)) {
 
-            tmp_index_5055_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5051_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5055_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5053_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5057_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             {
@@ -12172,11 +12228,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_5065_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5059_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_call_136_0_0 = int(specmult_var_1364_0_0);
-            tmp_index_5063_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5061_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5063_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_call_136_0_0 = int(specmult_var_1364_0_0);
+            tmp_index_5059_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5065_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             {
                 double tmp_call_137_0_0;
                 double tmp_arg_107_0_0;
@@ -12266,17 +12322,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
             }
             tmp_index_5087_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5067_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5075_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_call_138_0_0 = int(specmult1_var_1367_0_0);
-            tmp_index_5077_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5071_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5073_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5081_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5077_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5085_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5083_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5079_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5067_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5069_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_call_138_0_0 = int(specmult1_var_1367_0_0);
+            tmp_index_5071_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5073_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5075_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5079_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             {
                 double tmp_call_139_0_0;
                 double tmp_arg_109_0_0;
@@ -12461,10 +12517,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_5093_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_call_140_0_0 = int(specmult_mn2o_var_1370_0_0);
             tmp_index_5089_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5091_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5093_0_0 = (_for_it_179_0_0 - istartcol_var_455);
 
             tmp_index_5096_0_0 = ((jp_var_471[(tmp_index_5093_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -12612,9 +12668,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
+            tmp_index_5107_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5105_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5109_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5107_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             {
                 double tmp_arg_113_0_0;
 
@@ -12668,19 +12724,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
             }
             tmp_index_5118_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_call_143_0_0 = int(specmult_planck_var_1373_0_0);
-            tmp_index_5113_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5111_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-            tmp_index_5116_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5121_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5111_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5113_0_0 = (_for_it_179_0_0 - istartcol_var_455);
             tmp_index_5123_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_index_5116_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+            tmp_call_143_0_0 = int(specmult_planck_var_1373_0_0);
             {
 
 
             }
+            indm_var_1356_0_0 = indminor_var_470[(tmp_index_5123_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_1352_0_0 = (((((jp_var_471[(tmp_index_5111_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_5113_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_18_nspb_var_217[2]) + (1 + tmp_call_136_0_0));
             indf_var_1355_0_0 = indfor_var_469[(tmp_index_5121_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indm_var_1356_0_0 = indminor_var_470[(tmp_index_5123_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_144_0_0;
                 double tmp_arg_114_0_0;
@@ -12724,8 +12780,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_1353_0_0 = (((((jp_var_471[(tmp_index_5116_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_5118_0_0 + ((_for_it_178_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_18_nspb_var_217[2]) + (1 + tmp_call_138_0_0));
             for (_for_it_180_0_0 = 1; (_for_it_180_0_0 <= 16); _for_it_180_0_0 = (_for_it_180_0_0 + 1)) {
 
-                tmp_index_5129_0_0 = (_for_it_179_0_0 - istartcol_var_455);
                 tmp_index_5125_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+                tmp_index_5129_0_0 = (_for_it_179_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -12760,8 +12816,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_5174_0_0 = (_for_it_179_0_0 - istartcol_var_455);
-                tmp_index_5155_0_0 = (_for_it_179_0_0 - istartcol_var_455);
                 tmp_index_5153_0_0 = (_for_it_179_0_0 - istartcol_var_455);
+                tmp_index_5155_0_0 = (_for_it_179_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -12855,10 +12911,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1413_0_0 = ixlow_var_1406_0_0[((_for_it_182_0_0 + (sym_kfdia_var_1317_0_0 * (_for_it_181_0_0 - 1))) - 1)];
 
-                tmp_index_5192_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5190_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5186_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5188_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5186_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5192_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_115_0_0;
 
@@ -12911,11 +12967,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_5200_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5194_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5198_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_call_145_0_0 = int(specmult_var_1364_0_0);
+                tmp_index_5194_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5196_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5200_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_145_0_0 = int(specmult_var_1364_0_0);
                 {
                     double tmp_call_146_0_0;
                     double tmp_arg_116_0_0;
@@ -13005,9 +13061,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_5204_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5202_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_call_147_0_0 = int(specmult1_var_1367_0_0);
                 tmp_index_5206_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_147_0_0 = int(specmult1_var_1367_0_0);
+                tmp_index_5202_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 {
                     double tmp_call_148_0_0;
                     double tmp_arg_118_0_0;
@@ -13096,10 +13152,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_call_149_0_0 = int(specmult_mn2o_var_1370_0_0);
-                tmp_index_5212_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5210_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5208_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_149_0_0 = int(specmult_mn2o_var_1370_0_0);
+                tmp_index_5210_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5212_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
 
                 tmp_index_5215_0_0 = ((jp_var_471[(tmp_index_5212_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -13247,9 +13303,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_5226_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5224_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5228_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5224_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5226_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_122_0_0;
 
@@ -13302,22 +13358,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_5237_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5232_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5242_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_call_152_0_0 = int(specmult_planck_var_1373_0_0);
                 tmp_index_5240_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5235_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5237_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5242_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5244_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_152_0_0 = int(specmult_planck_var_1373_0_0);
+                tmp_index_5232_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5230_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 {
 
 
                 }
                 inds_var_1354_0_0 = indself_var_474[(tmp_index_5240_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indm_var_1356_0_0 = indminor_var_470[(tmp_index_5244_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_1352_0_0 = (((((jp_var_471[(tmp_index_5230_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_5232_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_18_nspa_var_216[2]) + (1 + tmp_call_145_0_0));
                 indf_var_1355_0_0 = indfor_var_469[(tmp_index_5242_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indm_var_1356_0_0 = indminor_var_470[(tmp_index_5244_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_153_0_0;
                     double tmp_arg_123_0_0;
@@ -13410,12 +13466,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_5254_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                    tmp_index_5248_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5250_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5256_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5246_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                    tmp_index_5250_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5252_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5248_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5254_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -13558,11 +13614,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                         }
                         tmp_index_5258_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5268_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5260_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5266_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5262_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5268_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5264_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5266_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5260_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -13653,10 +13709,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_5270_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5274_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5272_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5274_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5276_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5270_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -13782,12 +13838,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_5282_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                    tmp_index_5286_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5288_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                    tmp_index_5280_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                    tmp_index_5284_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5278_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5286_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5284_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5282_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5280_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -13929,12 +13985,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_5290_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5298_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5294_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5300_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5292_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5296_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5298_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5290_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5292_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -14025,10 +14081,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
+                        tmp_index_5302_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                        tmp_index_5304_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5308_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         tmp_index_5306_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5304_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                        tmp_index_5302_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -14295,10 +14351,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_183_0_0 = 1; (_for_it_183_0_0 <= 16); _for_it_183_0_0 = (_for_it_183_0_0 + 1)) {
 
-                    tmp_index_5384_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5380_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5394_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5390_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5384_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -14347,8 +14403,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_5420_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5418_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5420_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5425_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     {
 
@@ -14421,10 +14477,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1413_0_0 = ixhigh_var_1407_0_0[((_for_it_184_0_0 + (sym_kfdia_var_1317_0_0 * (_for_it_181_0_0 - 1))) - 1)];
 
-                tmp_index_5440_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5438_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5442_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5436_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5440_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5442_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5438_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_124_0_0;
 
@@ -14477,11 +14533,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_5446_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5448_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_call_154_0_0 = int(specmult_var_1364_0_0);
                 tmp_index_5450_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5448_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5444_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5446_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_154_0_0 = int(specmult_var_1364_0_0);
                 {
                     double tmp_call_155_0_0;
                     double tmp_arg_125_0_0;
@@ -14570,18 +14626,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_5466_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5472_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5452_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5470_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5454_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5468_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5464_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5462_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5460_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_call_156_0_0 = int(specmult1_var_1367_0_0);
+                tmp_index_5470_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5466_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5468_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5458_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5452_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5472_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5454_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5460_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5456_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_156_0_0 = int(specmult1_var_1367_0_0);
                 {
                     double tmp_call_157_0_0;
                     double tmp_arg_127_0_0;
@@ -14766,9 +14822,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_5474_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5478_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5476_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5474_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_call_158_0_0 = int(specmult_mn2o_var_1370_0_0);
 
                 tmp_index_5481_0_0 = ((jp_var_471[(tmp_index_5478_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
@@ -14972,20 +15028,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_5501_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 tmp_index_5498_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5496_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_call_161_0_0 = int(specmult_planck_var_1373_0_0);
                 tmp_index_5508_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                tmp_index_5503_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5501_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_call_161_0_0 = int(specmult_planck_var_1373_0_0);
                 tmp_index_5506_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5503_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                tmp_index_5496_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                 {
 
 
                 }
+                indm_var_1356_0_0 = indminor_var_470[(tmp_index_5508_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_1352_0_0 = (((((jp_var_471[(tmp_index_5496_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_5498_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_18_nspb_var_217[2]) + (1 + tmp_call_154_0_0));
                 indf_var_1355_0_0 = indfor_var_469[(tmp_index_5506_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indm_var_1356_0_0 = indminor_var_470[(tmp_index_5508_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_162_0_0;
                     double tmp_arg_132_0_0;
@@ -15029,8 +15085,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1353_0_0 = (((((jp_var_471[(tmp_index_5501_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_5503_0_0 + ((_for_it_181_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_18_nspb_var_217[2]) + (1 + tmp_call_156_0_0));
                 for (_for_it_185_0_0 = 1; (_for_it_185_0_0 <= 16); _for_it_185_0_0 = (_for_it_185_0_0 + 1)) {
 
-                    tmp_index_5514_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5510_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5514_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -15064,9 +15120,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_5559_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
-                    tmp_index_5540_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     tmp_index_5538_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5540_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
+                    tmp_index_5559_0_0 = (jl_var_1413_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -15151,8 +15207,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kfdia_var_1088_0_0 = iendcol_var_456;
     sym_klev_var_1089_0_0 = nlev_var_454;
+    sym_kfdia_var_1088_0_0 = iendcol_var_456;
     laytrop_min_var_1159_0_0 = 2147483647;
 
     delete[] ixc_var_1405_0_0;
@@ -15160,8 +15216,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     delete[] ixhigh_var_1407_0_0;
     for (tmp_parfor_11_1_0 = istartcol_var_455; (tmp_parfor_11_1_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_11_1_0 = (tmp_parfor_11_1_0 + 1)) {
 
-        tmp_index_3142_0_0 = (tmp_parfor_11_1_0 - istartcol_var_455);
         tmp_index_3143_0_0 = (tmp_parfor_11_1_0 - istartcol_var_455);
+        tmp_index_3142_0_0 = (tmp_parfor_11_1_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_3142_0_0] < laytrop_min_var_1159_0_0)) {
 
             laytrop_min_var_1159_0_0 = ilaytrop[tmp_index_3143_0_0];
@@ -15173,8 +15229,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_11_1_0 = istartcol_var_455; (tmp_parfor_11_1_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_11_1_0 = (tmp_parfor_11_1_0 + 1)) {
 
-        tmp_index_3144_0_0 = (tmp_parfor_11_1_0 - istartcol_var_455);
         tmp_index_3145_0_0 = (tmp_parfor_11_1_0 - istartcol_var_455);
+        tmp_index_3144_0_0 = (tmp_parfor_11_1_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_3144_0_0] > laytrop_max_var_1160_0_0)) {
 
             laytrop_max_var_1160_0_0 = ilaytrop[tmp_index_3145_0_0];
@@ -15248,8 +15304,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_128_0_0 = (laytrop_min_var_1159_0_0 + 1); (_for_it_128_0_0 <= laytrop_max_var_1160_0_0); _for_it_128_0_0 = (_for_it_128_0_0 + 1)) {
 
-        icl_var_1165_0_0 = 0;
         ich_var_1164_0_0 = 0;
+        icl_var_1165_0_0 = 0;
         for (_for_it_129_0_0 = istartcol_var_455; (_for_it_129_0_0 <= iendcol_var_456); _for_it_129_0_0 = (_for_it_129_0_0 + 1)) {
 
             tmp_index_3151_0_0 = (_for_it_129_0_0 - istartcol_var_455);
@@ -15346,10 +15402,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_130_0_0 = 1; (_for_it_130_0_0 <= laytrop_min_var_1159_0_0); _for_it_130_0_0 = (_for_it_130_0_0 + 1)) {
         for (_for_it_131_0_0 = istartcol_var_455; (_for_it_131_0_0 <= iendcol_var_456); _for_it_131_0_0 = (_for_it_131_0_0 + 1)) {
 
-            tmp_index_3169_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-            tmp_index_3167_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3171_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3165_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+            tmp_index_3167_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+            tmp_index_3169_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             {
                 double tmp_arg_51_0_0;
 
@@ -15402,10 +15458,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_index_3179_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3177_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_call_81_0_0 = int(specmult_var_1151_0_0);
             tmp_index_3175_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-            tmp_index_3179_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3173_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             {
                 double tmp_call_82_0_0;
@@ -15495,10 +15551,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_3181_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3183_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-            tmp_call_83_0_0 = int(specmult1_var_1154_0_0);
             tmp_index_3185_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+            tmp_call_83_0_0 = int(specmult1_var_1154_0_0);
+            tmp_index_3181_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             {
                 double tmp_call_84_0_0;
                 double tmp_arg_54_0_0;
@@ -15587,19 +15643,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_3199_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-            tmp_index_3187_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-            tmp_index_3189_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_call_85_0_0 = int(specmult_planck_var_1157_0_0);
+            tmp_index_3187_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3197_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3192_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             tmp_index_3194_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+            tmp_index_3199_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+            tmp_index_3189_0_0 = (_for_it_131_0_0 - istartcol_var_455);
             {
 
 
             }
-            indf_var_1121_0_0 = indfor_var_469[(tmp_index_3199_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_1118_0_0 = (((((jp_var_471[(tmp_index_3187_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_3189_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspa_var_216[3]) + (1 + tmp_call_81_0_0));
+            indf_var_1121_0_0 = indfor_var_469[(tmp_index_3199_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_1120_0_0 = indself_var_474[(tmp_index_3197_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_86_0_0;
@@ -15641,8 +15697,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            ind1_var_1119_0_0 = ((((jp_var_471[(tmp_index_3192_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_3194_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspa_var_216[3]) + (1 + tmp_call_83_0_0));
             _if_cond_113_0_0 = (specparm_var_1152_0_0 < 0.125);
+            ind1_var_1119_0_0 = ((((jp_var_471[(tmp_index_3192_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_3194_0_0 + ((_for_it_130_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspa_var_216[3]) + (1 + tmp_call_83_0_0));
             if ((_if_cond_113_0_0 == 1)) {
                 {
 
@@ -15693,12 +15749,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_3209_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3203_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3205_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3207_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3211_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3201_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3203_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3209_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3207_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -15842,10 +15898,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                     tmp_index_3217_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3219_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3223_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3221_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3215_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3213_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3215_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3223_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -15936,10 +15992,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_3225_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3227_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3231_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3229_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3227_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3225_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -16065,12 +16121,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3233_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3237_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3243_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3239_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3233_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3241_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3235_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3239_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -16213,10 +16269,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                     tmp_index_3245_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3253_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3249_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3247_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3255_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3249_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3253_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3247_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3251_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     {
 
@@ -16308,10 +16364,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_3257_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                    tmp_index_3261_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3259_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3257_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     tmp_index_3263_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                    tmp_index_3261_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -16579,11 +16635,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             for (_for_it_132_0_0 = 1; (_for_it_132_0_0 <= 14); _for_it_132_0_0 = (_for_it_132_0_0 + 1)) {
 
                 tmp_index_3335_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3360_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3339_0_0 = (_for_it_131_0_0 - istartcol_var_455);
-                tmp_index_3345_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3355_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3360_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3345_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 tmp_index_3349_0_0 = (_for_it_131_0_0 - istartcol_var_455);
+                tmp_index_3339_0_0 = (_for_it_131_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -16656,10 +16712,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_133_0_0 = (laytrop_max_var_1160_0_0 + 1); (_for_it_133_0_0 <= nlev_var_454); _for_it_133_0_0 = (_for_it_133_0_0 + 1)) {
         for (_for_it_134_0_0 = istartcol_var_455; (_for_it_134_0_0 <= iendcol_var_456); _for_it_134_0_0 = (_for_it_134_0_0 + 1)) {
 
-            tmp_index_3375_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3371_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3369_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3373_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3375_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             {
                 double tmp_arg_57_0_0;
 
@@ -16712,11 +16768,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_3383_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3377_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3381_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_call_87_0_0 = int(specmult_var_1151_0_0);
             tmp_index_3379_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3383_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_call_87_0_0 = int(specmult_var_1151_0_0);
+            tmp_index_3381_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3377_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             {
                 double tmp_call_88_0_0;
                 double tmp_arg_58_0_0;
@@ -16805,18 +16861,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_index_3399_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3403_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3395_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3405_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_call_89_0_0 = int(specmult1_var_1154_0_0);
             tmp_index_3385_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3391_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3401_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3389_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3397_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3399_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3393_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_call_89_0_0 = int(specmult1_var_1154_0_0);
             tmp_index_3387_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3395_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3405_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3401_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+            tmp_index_3393_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             {
                 double tmp_call_90_0_0;
                 double tmp_arg_60_0_0;
@@ -17001,9 +17057,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_index_3409_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3407_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_index_3412_0_0 = (_for_it_134_0_0 - istartcol_var_455);
-            tmp_index_3409_0_0 = (_for_it_134_0_0 - istartcol_var_455);
             tmp_call_91_0_0 = int(specmult_planck_var_1157_0_0);
             {
 
@@ -17054,8 +17110,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_1119_0_0 = (((((jp_var_471[(tmp_index_3412_0_0 + ((_for_it_133_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_3414_0_0 + ((_for_it_133_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspb_var_217[3]) + (1 + tmp_call_89_0_0));
             for (_for_it_135_0_0 = 1; (_for_it_135_0_0 <= 14); _for_it_135_0_0 = (_for_it_135_0_0 + 1)) {
 
-                tmp_index_3436_0_0 = (_for_it_134_0_0 - istartcol_var_455);
                 tmp_index_3417_0_0 = (_for_it_134_0_0 - istartcol_var_455);
+                tmp_index_3436_0_0 = (_for_it_134_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -17112,20 +17168,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_136_0_0 = (laytrop_max_var_1160_0_0 + 1); (_for_it_136_0_0 <= nlev_var_454); _for_it_136_0_0 = (_for_it_136_0_0 + 1)) {
         for (_for_it_137_0_0 = istartcol_var_455; (_for_it_137_0_0 <= iendcol_var_456); _for_it_137_0_0 = (_for_it_137_0_0 + 1)) {
 
-            tmp_index_3475_0_0 = (_for_it_137_0_0 - istartcol_var_455);
             tmp_index_3454_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3466_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3457_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3478_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3445_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3451_0_0 = (_for_it_137_0_0 - istartcol_var_455);
             tmp_index_3472_0_0 = (_for_it_137_0_0 - istartcol_var_455);
             tmp_index_3463_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3481_0_0 = (_for_it_137_0_0 - istartcol_var_455);
             tmp_index_3484_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3451_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3448_0_0 = (_for_it_137_0_0 - istartcol_var_455);
-            tmp_index_3460_0_0 = (_for_it_137_0_0 - istartcol_var_455);
             tmp_index_3469_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3475_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3448_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3478_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3481_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3466_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3457_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3445_0_0 = (_for_it_137_0_0 - istartcol_var_455);
+            tmp_index_3460_0_0 = (_for_it_137_0_0 - istartcol_var_455);
             {
 
                 {
@@ -17221,10 +17277,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1169_0_0 = ixlow_var_1162_0_0[((_for_it_139_0_0 + (sym_kfdia_var_1088_0_0 * (_for_it_138_0_0 - 1))) - 1)];
 
-                tmp_index_3492_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3490_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3494_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3496_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3492_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_63_0_0;
 
@@ -17277,11 +17333,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3498_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3502_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3500_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3502_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3504_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_call_93_0_0 = int(specmult_var_1151_0_0);
+                tmp_index_3498_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
                     double tmp_call_94_0_0;
                     double tmp_arg_64_0_0;
@@ -17370,10 +17426,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3508_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3510_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_call_95_0_0 = int(specmult1_var_1154_0_0);
+                tmp_index_3510_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3506_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3508_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
                     double tmp_call_96_0_0;
                     double tmp_arg_66_0_0;
@@ -17462,19 +17518,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3519_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3512_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3517_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_call_97_0_0 = int(specmult_planck_var_1157_0_0);
+                tmp_index_3519_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3522_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_call_97_0_0 = int(specmult_planck_var_1157_0_0);
                 tmp_index_3524_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3514_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3517_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                indf_var_1121_0_0 = indfor_var_469[(tmp_index_3524_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_1118_0_0 = (((((jp_var_471[(tmp_index_3512_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_3514_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspa_var_216[3]) + (1 + tmp_call_93_0_0));
+                indf_var_1121_0_0 = indfor_var_469[(tmp_index_3524_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_1120_0_0 = indself_var_474[(tmp_index_3522_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_98_0_0;
@@ -17516,8 +17572,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                ind1_var_1119_0_0 = ((((jp_var_471[(tmp_index_3517_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_3519_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspa_var_216[3]) + (1 + tmp_call_95_0_0));
                 _if_cond_121_0_0 = (specparm_var_1152_0_0 < 0.125);
+                ind1_var_1119_0_0 = ((((jp_var_471[(tmp_index_3517_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_3519_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspa_var_216[3]) + (1 + tmp_call_95_0_0));
                 if ((_if_cond_121_0_0 == 1)) {
                     {
 
@@ -17568,12 +17624,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
+                    tmp_index_3526_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3528_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3536_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3532_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3534_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3526_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3530_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3532_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -17715,12 +17771,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_3540_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3546_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3548_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3544_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3542_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3538_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3546_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3544_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3540_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3542_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -17811,10 +17867,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_3554_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3552_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3550_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3556_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3552_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3554_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -17940,12 +17996,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_3558_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3562_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3566_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3568_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3564_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3562_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3560_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3568_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3558_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3564_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -18087,11 +18143,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_3580_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3576_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3574_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3570_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3572_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3576_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3580_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3570_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3578_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         {
 
@@ -18183,10 +18239,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_3582_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3586_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                        tmp_index_3588_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         tmp_index_3584_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3582_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                        tmp_index_3588_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -18453,12 +18509,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_140_0_0 = 1; (_for_it_140_0_0 <= 14); _for_it_140_0_0 = (_for_it_140_0_0 + 1)) {
 
+                    tmp_index_3660_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3674_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3685_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3680_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3664_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3670_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3660_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3680_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                    tmp_index_3674_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -18530,9 +18586,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1169_0_0 = ixhigh_var_1163_0_0[((_for_it_141_0_0 + (sym_kfdia_var_1088_0_0 * (_for_it_138_0_0 - 1))) - 1)];
 
-                tmp_index_3700_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3702_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3696_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3702_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3700_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3698_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_69_0_0;
@@ -18586,11 +18642,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3710_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3704_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_call_99_0_0 = int(specmult_var_1151_0_0);
-                tmp_index_3706_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3708_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3706_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_call_99_0_0 = int(specmult_var_1151_0_0);
+                tmp_index_3710_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
                     double tmp_call_100_0_0;
                     double tmp_arg_70_0_0;
@@ -18679,18 +18735,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3726_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3724_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3728_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3724_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3732_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3720_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3722_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3730_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3732_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3718_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3714_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_call_101_0_0 = int(specmult1_var_1154_0_0);
-                tmp_index_3712_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3716_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3712_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3718_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3730_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3714_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3726_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_call_101_0_0 = int(specmult1_var_1154_0_0);
                 {
                     double tmp_call_102_0_0;
                     double tmp_arg_72_0_0;
@@ -18883,8 +18939,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
 
                 }
-                tmp_index_3741_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 ind0_var_1118_0_0 = (((((jp_var_471[(tmp_index_3734_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_3736_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspb_var_217[3]) + (1 + tmp_call_99_0_0));
+                tmp_index_3741_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
                     double tmp_call_104_0_0;
                     double tmp_arg_74_0_0;
@@ -18928,8 +18984,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1119_0_0 = (((((jp_var_471[(tmp_index_3739_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_3741_0_0 + ((_for_it_138_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_15_nspb_var_217[3]) + (1 + tmp_call_101_0_0));
                 for (_for_it_142_0_0 = 1; (_for_it_142_0_0 <= 14); _for_it_142_0_0 = (_for_it_142_0_0 + 1)) {
 
-                    tmp_index_3744_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     tmp_index_3763_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                    tmp_index_3744_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -18984,20 +19040,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1169_0_0 = ixhigh_var_1163_0_0[((_for_it_143_0_0 + (sym_kfdia_var_1088_0_0 * (_for_it_138_0_0 - 1))) - 1)];
 
+                tmp_index_3810_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3780_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3792_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3777_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3789_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3774_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3783_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3813_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3804_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3807_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3786_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3801_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3798_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3813_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3807_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3810_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3774_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3783_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
+                tmp_index_3792_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 tmp_index_3795_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3804_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3777_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
-                tmp_index_3786_0_0 = (jl_var_1169_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -19084,9 +19140,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
+    sym_klev_var_958_0_0 = nlev_var_454;
     sym_kfdia_var_957_0_0 = iendcol_var_456;
     laytrop_min_var_1034_0_0 = 2147483647;
-    sym_klev_var_958_0_0 = nlev_var_454;
 
     delete[] ixc_var_1161_0_0;
     delete[] ixlow_var_1162_0_0;
@@ -19296,10 +19352,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_112_0_0 = 1; (_for_it_112_0_0 <= laytrop_min_var_1034_0_0); _for_it_112_0_0 = (_for_it_112_0_0 + 1)) {
         for (_for_it_113_0_0 = istartcol_var_455; (_for_it_113_0_0 <= iendcol_var_456); _for_it_113_0_0 = (_for_it_113_0_0 + 1)) {
 
-            tmp_index_2282_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-            tmp_index_2288_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2284_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2286_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2288_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2282_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             {
                 double tmp_arg_16_0_0;
 
@@ -19352,10 +19408,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_index_2292_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2290_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2296_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_call_40_0_0 = int(specmult_var_1026_0_0);
-            tmp_index_2292_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2294_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             {
                 double tmp_call_41_0_0;
@@ -19445,10 +19501,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_index_2302_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2298_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2300_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_call_42_0_0 = int(specmult1_var_1029_0_0);
-            tmp_index_2302_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             {
                 double tmp_call_43_0_0;
                 double tmp_arg_19_0_0;
@@ -19537,10 +19593,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_2304_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2306_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2308_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_call_44_0_0 = int(specmult_mo3_0_0);
-            tmp_index_2306_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2304_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             {
                 double tmp_call_45_0_0;
                 double tmp_arg_21_0_0;
@@ -19629,22 +19685,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_2312_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-            tmp_index_2320_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-            tmp_index_2324_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2315_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-            tmp_call_46_0_0 = int(specmult_planck_var_1032_0_0);
-            tmp_index_2322_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-            tmp_index_2310_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             tmp_index_2317_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2310_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2320_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_call_46_0_0 = int(specmult_planck_var_1032_0_0);
+            tmp_index_2312_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2322_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+            tmp_index_2324_0_0 = (_for_it_113_0_0 - istartcol_var_455);
             {
 
 
             }
             indm_var_994_0_0 = indminor_var_470[(tmp_index_2324_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indf_var_993_0_0 = indfor_var_469[(tmp_index_2322_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            inds_var_992_0_0 = indself_var_474[(tmp_index_2320_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_990_0_0 = (((((jp_var_471[(tmp_index_2310_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_2312_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_13_nspa_var_216[4]) + (1 + tmp_call_40_0_0));
+            inds_var_992_0_0 = indself_var_474[(tmp_index_2320_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indf_var_993_0_0 = indfor_var_469[(tmp_index_2322_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_47_0_0;
                 double tmp_arg_23_0_0;
@@ -19685,8 +19741,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            _if_cond_49_0_0 = (specparm_var_1027_0_0 < 0.125);
             ind1_var_991_0_0 = ((((jp_var_471[(tmp_index_2315_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_2317_0_0 + ((_for_it_112_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_13_nspa_var_216[4]) + (1 + tmp_call_42_0_0));
+            _if_cond_49_0_0 = (specparm_var_1027_0_0 < 0.125);
             if ((_if_cond_49_0_0 == 1)) {
                 {
 
@@ -19737,12 +19793,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_2326_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2330_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2332_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2328_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2336_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2330_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2334_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2326_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2336_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -19884,12 +19940,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_2348_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2346_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2338_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2340_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2342_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2344_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                    tmp_index_2340_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                    tmp_index_2338_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2348_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -19980,9 +20036,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_2350_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                    tmp_index_2352_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2356_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2352_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2350_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2354_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     {
 
@@ -20109,12 +20165,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_2362_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2360_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2366_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2368_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2358_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2364_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2360_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2366_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2362_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -20256,10 +20312,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_2376_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2378_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                    tmp_index_2372_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2376_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2370_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2372_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2380_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2374_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     {
@@ -20354,8 +20410,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     tmp_index_2384_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2388_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                    tmp_index_2386_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     tmp_index_2382_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                    tmp_index_2386_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -20622,10 +20678,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_114_0_0 = 1; (_for_it_114_0_0 <= 16); _for_it_114_0_0 = (_for_it_114_0_0 + 1)) {
 
-                tmp_index_2460_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2474_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2464_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2460_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2470_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2464_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -20674,11 +20730,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_2500_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2507_0_0 = (_for_it_113_0_0 - istartcol_var_455);
+                tmp_index_2498_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2505_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 tmp_index_2511_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2500_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2498_0_0 = (_for_it_113_0_0 - istartcol_var_455);
-                tmp_index_2507_0_0 = (_for_it_113_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -20753,10 +20809,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_115_0_0 = (laytrop_max_var_1035_0_0 + 1); (_for_it_115_0_0 <= nlev_var_454); _for_it_115_0_0 = (_for_it_115_0_0 + 1)) {
         for (_for_it_116_0_0 = istartcol_var_455; (_for_it_116_0_0 <= iendcol_var_456); _for_it_116_0_0 = (_for_it_116_0_0 + 1)) {
 
-            tmp_index_2520_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2522_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2526_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2524_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2526_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2520_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             {
                 double tmp_arg_24_0_0;
 
@@ -20809,11 +20865,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_2532_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_call_48_0_0 = int(specmult_var_1026_0_0);
             tmp_index_2530_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2534_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2532_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2528_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_call_48_0_0 = int(specmult_var_1026_0_0);
             {
                 double tmp_call_49_0_0;
                 double tmp_arg_25_0_0;
@@ -20902,18 +20958,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_2554_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2548_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2556_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2552_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2542_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2540_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2536_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_call_50_0_0 = int(specmult1_var_1029_0_0);
-            tmp_index_2544_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2546_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_call_50_0_0 = int(specmult1_var_1029_0_0);
             tmp_index_2538_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2552_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2540_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2548_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2544_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2554_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2550_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2536_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2542_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_index_2556_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             {
                 double tmp_call_51_0_0;
                 double tmp_arg_27_0_0;
@@ -21098,10 +21154,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_call_52_0_0 = int(specmult_planck_var_1032_0_0);
+            tmp_index_2560_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2563_0_0 = (_for_it_116_0_0 - istartcol_var_455);
             tmp_index_2558_0_0 = (_for_it_116_0_0 - istartcol_var_455);
-            tmp_index_2560_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+            tmp_call_52_0_0 = int(specmult_planck_var_1032_0_0);
             {
 
 
@@ -21151,9 +21207,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_991_0_0 = (((((jp_var_471[(tmp_index_2563_0_0 + ((_for_it_115_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_2565_0_0 + ((_for_it_115_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_13_nspb_var_217[4]) + (1 + tmp_call_50_0_0));
             for (_for_it_117_0_0 = 1; (_for_it_117_0_0 <= 16); _for_it_117_0_0 = (_for_it_117_0_0 + 1)) {
 
-                tmp_index_2568_0_0 = (_for_it_116_0_0 - istartcol_var_455);
                 tmp_index_2587_0_0 = (_for_it_116_0_0 - istartcol_var_455);
                 tmp_index_2591_0_0 = (_for_it_116_0_0 - istartcol_var_455);
+                tmp_index_2568_0_0 = (_for_it_116_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -21218,10 +21274,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1044_0_0 = ixlow_var_1037_0_0[((_for_it_119_0_0 + (sym_kfdia_var_957_0_0 * (_for_it_118_0_0 - 1))) - 1)];
 
-                tmp_index_2605_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2603_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2607_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2605_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2609_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2607_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_30_0_0;
 
@@ -21274,11 +21330,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_2611_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2615_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_call_54_0_0 = int(specmult_var_1026_0_0);
                 tmp_index_2617_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2613_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2611_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_call_54_0_0 = int(specmult_var_1026_0_0);
-                tmp_index_2615_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
                     double tmp_call_55_0_0;
                     double tmp_arg_31_0_0;
@@ -21367,10 +21423,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_2623_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_call_56_0_0 = int(specmult1_var_1029_0_0);
                 tmp_index_2619_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2621_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_call_56_0_0 = int(specmult1_var_1029_0_0);
+                tmp_index_2623_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
                     double tmp_call_57_0_0;
                     double tmp_arg_33_0_0;
@@ -21459,10 +21515,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_2629_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_call_58_0_0 = int(specmult_mo3_0_0);
                 tmp_index_2625_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2627_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2629_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_call_58_0_0 = int(specmult_mo3_0_0);
                 {
                     double tmp_call_59_0_0;
                     double tmp_arg_35_0_0;
@@ -21551,22 +21607,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_2636_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_call_60_0_0 = int(specmult_planck_var_1032_0_0);
-                tmp_index_2643_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2633_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2641_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2645_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2631_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2638_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2636_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2643_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_call_60_0_0 = int(specmult_planck_var_1032_0_0);
+                tmp_index_2645_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2633_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
 
 
                 }
                 indm_var_994_0_0 = indminor_var_470[(tmp_index_2645_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indf_var_993_0_0 = indfor_var_469[(tmp_index_2643_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                inds_var_992_0_0 = indself_var_474[(tmp_index_2641_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_990_0_0 = (((((jp_var_471[(tmp_index_2631_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_2633_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_13_nspa_var_216[4]) + (1 + tmp_call_54_0_0));
+                inds_var_992_0_0 = indself_var_474[(tmp_index_2641_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indf_var_993_0_0 = indfor_var_469[(tmp_index_2643_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_61_0_0;
                     double tmp_arg_37_0_0;
@@ -21607,8 +21663,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                _if_cond_57_0_0 = (specparm_var_1027_0_0 < 0.125);
                 ind1_var_991_0_0 = ((((jp_var_471[(tmp_index_2636_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_2638_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_13_nspa_var_216[4]) + (1 + tmp_call_56_0_0));
+                _if_cond_57_0_0 = (specparm_var_1027_0_0 < 0.125);
                 if ((_if_cond_57_0_0 == 1)) {
                     {
 
@@ -21659,12 +21715,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_2657_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2647_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2655_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2649_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2653_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2655_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2647_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2651_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2653_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2657_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -21806,12 +21862,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
+                        tmp_index_2665_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2669_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2667_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2659_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2663_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2665_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2661_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2667_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2669_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -21902,10 +21958,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
+                        tmp_index_2671_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2673_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2675_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2677_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2671_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -22031,12 +22087,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_2679_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2685_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2681_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2683_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2689_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2687_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2681_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2689_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2679_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2683_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2685_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -22178,12 +22234,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_2691_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2697_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2699_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2693_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2701_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2695_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2691_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2699_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2701_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2693_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2697_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -22274,10 +22330,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_2709_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2703_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                        tmp_index_2705_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         tmp_index_2707_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2709_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2705_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                        tmp_index_2703_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -22545,9 +22601,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_120_0_0 = 1; (_for_it_120_0_0 <= 16); _for_it_120_0_0 = (_for_it_120_0_0 + 1)) {
 
                     tmp_index_2785_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2791_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2781_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2795_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2781_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2791_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -22596,11 +22652,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_2821_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2826_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                    tmp_index_2828_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2819_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2828_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2826_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2832_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2821_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -22674,10 +22730,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1044_0_0 = ixhigh_var_1038_0_0[((_for_it_121_0_0 + (sym_kfdia_var_957_0_0 * (_for_it_118_0_0 - 1))) - 1)];
 
-                tmp_index_2849_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2845_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2847_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2843_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2845_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2849_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_38_0_0;
 
@@ -22730,11 +22786,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_call_62_0_0 = int(specmult_var_1026_0_0);
                 tmp_index_2857_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2855_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2853_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2851_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2855_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_call_62_0_0 = int(specmult_var_1026_0_0);
                 {
                     double tmp_call_63_0_0;
                     double tmp_arg_39_0_0;
@@ -22823,18 +22879,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_2879_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2859_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2861_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2875_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2869_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2865_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2867_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2873_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2863_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_call_64_0_0 = int(specmult1_var_1029_0_0);
                 tmp_index_2871_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2877_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2861_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2865_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2869_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2879_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_call_64_0_0 = int(specmult1_var_1029_0_0);
+                tmp_index_2873_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2859_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                tmp_index_2863_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
                     double tmp_call_65_0_0;
                     double tmp_arg_41_0_0;
@@ -23019,10 +23075,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_index_2881_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_call_66_0_0 = int(specmult_planck_var_1032_0_0);
                 tmp_index_2883_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 tmp_index_2886_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
-                tmp_index_2881_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                 {
 
 
@@ -23072,8 +23128,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_991_0_0 = (((((jp_var_471[(tmp_index_2886_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_2888_0_0 + ((_for_it_118_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_13_nspb_var_217[4]) + (1 + tmp_call_64_0_0));
                 for (_for_it_122_0_0 = 1; (_for_it_122_0_0 <= 16); _for_it_122_0_0 = (_for_it_122_0_0 + 1)) {
 
-                    tmp_index_2891_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2914_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
+                    tmp_index_2891_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     tmp_index_2910_0_0 = (jl_var_1044_0_0 - istartcol_var_455);
                     {
 
@@ -23130,17 +23186,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kfdia_var_1171_0_0 = iendcol_var_456;
     laytrop_min_var_1210_0_0 = 2147483647;
     sym_klev_var_1172_0_0 = nlev_var_454;
+    sym_kfdia_var_1171_0_0 = iendcol_var_456;
 
     delete[] ixc_var_1036_0_0;
     delete[] ixlow_var_1037_0_0;
     delete[] ixhigh_var_1038_0_0;
     for (tmp_parfor_12_0_0 = istartcol_var_455; (tmp_parfor_12_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_12_0_0 = (tmp_parfor_12_0_0 + 1)) {
 
-        tmp_index_3817_0_0 = (tmp_parfor_12_0_0 - istartcol_var_455);
         tmp_index_3816_0_0 = (tmp_parfor_12_0_0 - istartcol_var_455);
+        tmp_index_3817_0_0 = (tmp_parfor_12_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_3816_0_0] < laytrop_min_var_1210_0_0)) {
 
             laytrop_min_var_1210_0_0 = ilaytrop[tmp_index_3817_0_0];
@@ -23152,8 +23208,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_12_0_0 = istartcol_var_455; (tmp_parfor_12_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_12_0_0 = (tmp_parfor_12_0_0 + 1)) {
 
-        tmp_index_3819_0_0 = (tmp_parfor_12_0_0 - istartcol_var_455);
         tmp_index_3818_0_0 = (tmp_parfor_12_0_0 - istartcol_var_455);
+        tmp_index_3819_0_0 = (tmp_parfor_12_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_3818_0_0] > laytrop_max_var_1211_0_0)) {
 
             laytrop_max_var_1211_0_0 = ilaytrop[tmp_index_3819_0_0];
@@ -23227,8 +23283,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_144_0_0 = (laytrop_min_var_1210_0_0 + 1); (_for_it_144_0_0 <= laytrop_max_var_1211_0_0); _for_it_144_0_0 = (_for_it_144_0_0 + 1)) {
 
-        ich_var_1215_0_0 = 0;
         icl_var_1216_0_0 = 0;
+        ich_var_1215_0_0 = 0;
         for (_for_it_145_0_0 = istartcol_var_455; (_for_it_145_0_0 <= iendcol_var_456); _for_it_145_0_0 = (_for_it_145_0_0 + 1)) {
 
             tmp_index_3825_0_0 = (_for_it_145_0_0 - istartcol_var_455);
@@ -23291,9 +23347,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_146_0_0 = 1; (_for_it_146_0_0 <= laytrop_min_var_1210_0_0); _for_it_146_0_0 = (_for_it_146_0_0 + 1)) {
         for (_for_it_147_0_0 = istartcol_var_455; (_for_it_147_0_0 <= iendcol_var_456); _for_it_147_0_0 = (_for_it_147_0_0 + 1)) {
 
+            tmp_index_3831_0_0 = (_for_it_147_0_0 - istartcol_var_455);
             tmp_index_3835_0_0 = (_for_it_147_0_0 - istartcol_var_455);
             tmp_index_3833_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-            tmp_index_3831_0_0 = (_for_it_147_0_0 - istartcol_var_455);
 
             tmp_index_3838_0_0 = ((jp_var_471[(tmp_index_3835_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -23365,8 +23421,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_3843_0_0 = (_for_it_147_0_0 - istartcol_var_455);
                 tmp_index_3839_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3843_0_0 = (_for_it_147_0_0 - istartcol_var_455);
 
                 tmp_index_3842_0_0 = ((jp_var_471[(tmp_index_3839_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -23405,21 +23461,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_3859_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-            tmp_index_3857_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-            tmp_index_3854_0_0 = (_for_it_147_0_0 - istartcol_var_455);
             tmp_index_3847_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-            tmp_index_3852_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-            tmp_index_3861_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+            tmp_index_3854_0_0 = (_for_it_147_0_0 - istartcol_var_455);
             tmp_index_3849_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+            tmp_index_3857_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+            tmp_index_3861_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+            tmp_index_3852_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+            tmp_index_3859_0_0 = (_for_it_147_0_0 - istartcol_var_455);
             {
 
 
             }
-            indf_var_1199_0_0 = indfor_var_469[(tmp_index_3859_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            inds_var_1198_0_0 = indself_var_474[(tmp_index_3857_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_1196_0_0 = (((((jp_var_471[(tmp_index_3847_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_3849_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_16_nspa_var_216[5]) + 1);
             indm_var_1200_0_0 = indminor_var_470[(tmp_index_3861_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            inds_var_1198_0_0 = indself_var_474[(tmp_index_3857_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indf_var_1199_0_0 = indfor_var_469[(tmp_index_3859_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
 
 
@@ -23427,20 +23483,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_1197_0_0 = ((((jp_var_471[(tmp_index_3852_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_3854_0_0 + ((_for_it_146_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_16_nspa_var_216[5]) + 1);
             for (_for_it_148_0_0 = 1; (_for_it_148_0_0 <= 8); _for_it_148_0_0 = (_for_it_148_0_0 + 1)) {
 
-                tmp_index_3877_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3908_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3863_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3916_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3873_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3896_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3894_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3912_0_0 = (_for_it_147_0_0 - istartcol_var_455);
                 tmp_index_3867_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3900_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3885_0_0 = (_for_it_147_0_0 - istartcol_var_455);
-                tmp_index_3904_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3912_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3908_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3916_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3877_0_0 = (_for_it_147_0_0 - istartcol_var_455);
                 tmp_index_3891_0_0 = (_for_it_147_0_0 - istartcol_var_455);
                 tmp_index_3920_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3896_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3900_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3904_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3873_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3885_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3863_0_0 = (_for_it_147_0_0 - istartcol_var_455);
+                tmp_index_3894_0_0 = (_for_it_147_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -23538,10 +23594,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_150_0_0 = (laytrop_max_var_1211_0_0 + 1); (_for_it_150_0_0 <= nlev_var_454); _for_it_150_0_0 = (_for_it_150_0_0 + 1)) {
             for (_for_it_151_0_0 = istartcol_var_455; (_for_it_151_0_0 <= iendcol_var_456); _for_it_151_0_0 = (_for_it_151_0_0 + 1)) {
 
-                tmp_index_3927_0_0 = (_for_it_151_0_0 - istartcol_var_455);
-                tmp_index_3935_0_0 = (_for_it_151_0_0 - istartcol_var_455);
                 tmp_index_3931_0_0 = (_for_it_151_0_0 - istartcol_var_455);
                 tmp_index_3924_0_0 = (_for_it_151_0_0 - istartcol_var_455);
+                tmp_index_3927_0_0 = (_for_it_151_0_0 - istartcol_var_455);
+                tmp_index_3935_0_0 = (_for_it_151_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -23588,8 +23644,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 jl_var_1220_0_0 = ixlow_var_1213_0_0[((_for_it_153_0_0 + (sym_kfdia_var_1171_0_0 * (_for_it_152_0_0 - 1))) - 1)];
 
                 tmp_index_3944_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                tmp_index_3946_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                 tmp_index_3942_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                tmp_index_3946_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
 
                 tmp_index_3949_0_0 = ((jp_var_471[(tmp_index_3946_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -23701,21 +23757,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_3960_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                tmp_index_3968_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                 tmp_index_3965_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                tmp_index_3972_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                tmp_index_3968_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                tmp_index_3960_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                 tmp_index_3970_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                tmp_index_3972_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                 tmp_index_3958_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                 tmp_index_3963_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                indf_var_1199_0_0 = indfor_var_469[(tmp_index_3970_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                inds_var_1198_0_0 = indself_var_474[(tmp_index_3968_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_1196_0_0 = (((((jp_var_471[(tmp_index_3958_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_3960_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_16_nspa_var_216[5]) + 1);
                 indm_var_1200_0_0 = indminor_var_470[(tmp_index_3972_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                inds_var_1198_0_0 = indself_var_474[(tmp_index_3968_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indf_var_1199_0_0 = indfor_var_469[(tmp_index_3970_0_0 + ((_for_it_152_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
 
 
@@ -23724,19 +23780,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_154_0_0 = 1; (_for_it_154_0_0 <= 8); _for_it_154_0_0 = (_for_it_154_0_0 + 1)) {
 
                     tmp_index_4002_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4027_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4023_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_3974_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_3996_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4011_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_3984_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4015_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4007_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4019_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                     tmp_index_4031_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4005_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_3978_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_3984_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4019_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4011_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4023_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                     tmp_index_3988_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4015_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_3974_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4027_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_3978_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4005_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_3996_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4007_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -23833,10 +23889,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     jl_var_1220_0_0 = ixhigh_var_1214_0_0[((_for_it_156_0_0 + (sym_kfdia_var_1171_0_0 * (_for_it_152_0_0 - 1))) - 1)];
 
-                    tmp_index_4048_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
-                    tmp_index_4040_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                     tmp_index_4037_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                     tmp_index_4044_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4048_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
+                    tmp_index_4040_0_0 = (jl_var_1220_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -23873,8 +23929,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kfdia_var_1222_0_0 = iendcol_var_456;
     laytrop_min_var_1305_0_0 = 2147483647;
+    sym_kfdia_var_1222_0_0 = iendcol_var_456;
     sym_klev_var_1223_0_0 = nlev_var_454;
 
     delete[] ixc_var_1212_0_0;
@@ -23882,8 +23938,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     delete[] ixhigh_var_1214_0_0;
     for (tmp_parfor_13_0_0 = istartcol_var_455; (tmp_parfor_13_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_13_0_0 = (tmp_parfor_13_0_0 + 1)) {
 
-        tmp_index_4053_0_0 = (tmp_parfor_13_0_0 - istartcol_var_455);
         tmp_index_4052_0_0 = (tmp_parfor_13_0_0 - istartcol_var_455);
+        tmp_index_4053_0_0 = (tmp_parfor_13_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_4052_0_0] < laytrop_min_var_1305_0_0)) {
 
             laytrop_min_var_1305_0_0 = ilaytrop[tmp_index_4053_0_0];
@@ -23895,8 +23951,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_13_0_0 = istartcol_var_455; (tmp_parfor_13_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_13_0_0 = (tmp_parfor_13_0_0 + 1)) {
 
-        tmp_index_4055_0_0 = (tmp_parfor_13_0_0 - istartcol_var_455);
         tmp_index_4054_0_0 = (tmp_parfor_13_0_0 - istartcol_var_455);
+        tmp_index_4055_0_0 = (tmp_parfor_13_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_4054_0_0] > laytrop_max_var_1306_0_0)) {
 
             laytrop_max_var_1306_0_0 = ilaytrop[tmp_index_4055_0_0];
@@ -24068,10 +24124,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_159_0_0 = 1; (_for_it_159_0_0 <= laytrop_min_var_1305_0_0); _for_it_159_0_0 = (_for_it_159_0_0 + 1)) {
         for (_for_it_160_0_0 = istartcol_var_455; (_for_it_160_0_0 <= iendcol_var_456); _for_it_160_0_0 = (_for_it_160_0_0 + 1)) {
 
-            tmp_index_4077_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4075_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4081_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4079_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4077_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4081_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             {
                 double tmp_arg_77_0_0;
 
@@ -24124,11 +24180,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_4083_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4085_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4087_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4089_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4085_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_call_107_0_0 = int(specmult_var_1294_0_0);
+            tmp_index_4083_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4089_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             {
                 double tmp_call_108_0_0;
                 double tmp_arg_78_0_0;
@@ -24217,10 +24273,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_4095_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_call_109_0_0 = int(specmult1_var_1297_0_0);
-            tmp_index_4091_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4093_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4091_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4095_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             {
                 double tmp_call_110_0_0;
                 double tmp_arg_80_0_0;
@@ -24309,10 +24365,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_4101_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4097_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4099_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_call_111_0_0 = int(specmult_mco2_var_1303_0_0);
+            tmp_index_4097_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4101_0_0 = (_for_it_160_0_0 - istartcol_var_455);
 
             tmp_index_4104_0_0 = ((jp_var_471[(tmp_index_4101_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -24420,8 +24476,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4109_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4105_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4109_0_0 = (_for_it_160_0_0 - istartcol_var_455);
 
                 tmp_index_4108_0_0 = ((jp_var_471[(tmp_index_4105_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -24460,9 +24516,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
+            tmp_index_4117_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4115_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4113_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4117_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             {
                 double tmp_arg_84_0_0;
 
@@ -24516,21 +24572,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
             }
             tmp_index_4126_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_call_114_0_0 = int(specmult_planck_var_1300_0_0);
-            tmp_index_4121_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4133_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4129_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4131_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-            tmp_index_4119_0_0 = (_for_it_160_0_0 - istartcol_var_455);
             tmp_index_4124_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4119_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4121_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4129_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4133_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_index_4131_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+            tmp_call_114_0_0 = int(specmult_planck_var_1300_0_0);
             {
 
 
             }
-            ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4119_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_4121_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspa_var_216[6]) + (1 + tmp_call_107_0_0));
+            inds_var_1254_0_0 = indself_var_474[(tmp_index_4129_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             indf_var_1255_0_0 = indfor_var_469[(tmp_index_4131_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             indm_var_1256_0_0 = indminor_var_470[(tmp_index_4133_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            inds_var_1254_0_0 = indself_var_474[(tmp_index_4129_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4119_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_4121_0_0 + ((_for_it_159_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspa_var_216[6]) + (1 + tmp_call_107_0_0));
             {
                 double tmp_call_115_0_0;
                 double tmp_arg_85_0_0;
@@ -24623,11 +24679,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4143_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                tmp_index_4135_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                tmp_index_4139_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4137_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4135_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4145_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4143_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4139_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4141_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 {
 
@@ -24770,11 +24826,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4155_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                    tmp_index_4147_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4153_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                    tmp_index_4149_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4147_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4151_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4149_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4155_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4157_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     {
 
@@ -24866,10 +24922,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_4165_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                    tmp_index_4163_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4159_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4161_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4165_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4163_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -24995,12 +25051,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4171_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4167_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                tmp_index_4169_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4173_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                tmp_index_4175_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4177_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4171_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4175_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4169_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -25142,11 +25198,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4187_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                    tmp_index_4181_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4183_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                    tmp_index_4185_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4181_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4187_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4189_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                    tmp_index_4185_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     tmp_index_4179_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                     {
 
@@ -25509,9 +25565,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             for (_for_it_161_0_0 = 1; (_for_it_161_0_0 <= 12); _for_it_161_0_0 = (_for_it_161_0_0 + 1)) {
 
                 tmp_index_4279_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4283_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4273_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4269_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                tmp_index_4283_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -25560,9 +25616,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4309_0_0 = (_for_it_160_0_0 - istartcol_var_455);
-                tmp_index_4307_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 tmp_index_4314_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4307_0_0 = (_for_it_160_0_0 - istartcol_var_455);
+                tmp_index_4309_0_0 = (_for_it_160_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -25636,8 +25692,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_163_0_0 = istartcol_var_455; (_for_it_163_0_0 <= iendcol_var_456); _for_it_163_0_0 = (_for_it_163_0_0 + 1)) {
 
             tmp_index_4327_0_0 = (_for_it_163_0_0 - istartcol_var_455);
-            tmp_index_4323_0_0 = (_for_it_163_0_0 - istartcol_var_455);
             tmp_index_4325_0_0 = (_for_it_163_0_0 - istartcol_var_455);
+            tmp_index_4323_0_0 = (_for_it_163_0_0 - istartcol_var_455);
 
             tmp_index_4330_0_0 = ((jp_var_471[(tmp_index_4327_0_0 + ((_for_it_162_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -25749,17 +25805,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_4344_0_0 = (_for_it_163_0_0 - istartcol_var_455);
             tmp_index_4346_0_0 = (_for_it_163_0_0 - istartcol_var_455);
-            tmp_index_4349_0_0 = (_for_it_163_0_0 - istartcol_var_455);
             tmp_index_4341_0_0 = (_for_it_163_0_0 - istartcol_var_455);
             tmp_index_4339_0_0 = (_for_it_163_0_0 - istartcol_var_455);
+            tmp_index_4344_0_0 = (_for_it_163_0_0 - istartcol_var_455);
+            tmp_index_4349_0_0 = (_for_it_163_0_0 - istartcol_var_455);
             {
 
 
             }
-            ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4339_0_0 + ((_for_it_162_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_4341_0_0 + ((_for_it_162_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspb_var_217[6]) + 1);
             indm_var_1256_0_0 = indminor_var_470[(tmp_index_4349_0_0 + ((_for_it_162_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4339_0_0 + ((_for_it_162_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_4341_0_0 + ((_for_it_162_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspb_var_217[6]) + 1);
             {
 
 
@@ -25768,13 +25824,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             for (_for_it_164_0_0 = 1; (_for_it_164_0_0 <= 12); _for_it_164_0_0 = (_for_it_164_0_0 + 1)) {
 
                 tmp_index_4376_0_0 = (_for_it_163_0_0 - istartcol_var_455);
+                tmp_index_4368_0_0 = (_for_it_163_0_0 - istartcol_var_455);
                 tmp_index_4353_0_0 = (_for_it_163_0_0 - istartcol_var_455);
-                tmp_index_4364_0_0 = (_for_it_163_0_0 - istartcol_var_455);
                 tmp_index_4359_0_0 = (_for_it_163_0_0 - istartcol_var_455);
+                tmp_index_4362_0_0 = (_for_it_163_0_0 - istartcol_var_455);
                 tmp_index_4372_0_0 = (_for_it_163_0_0 - istartcol_var_455);
                 tmp_index_4380_0_0 = (_for_it_163_0_0 - istartcol_var_455);
-                tmp_index_4368_0_0 = (_for_it_163_0_0 - istartcol_var_455);
-                tmp_index_4362_0_0 = (_for_it_163_0_0 - istartcol_var_455);
+                tmp_index_4364_0_0 = (_for_it_163_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -25836,17 +25892,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_166_0_0 = istartcol_var_455; (_for_it_166_0_0 <= iendcol_var_456); _for_it_166_0_0 = (_for_it_166_0_0 + 1)) {
 
             tmp_index_4396_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4411_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4393_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4390_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4408_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4417_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4384_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4414_0_0 = (_for_it_166_0_0 - istartcol_var_455);
             tmp_index_4402_0_0 = (_for_it_166_0_0 - istartcol_var_455);
-            tmp_index_4399_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4411_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4390_0_0 = (_for_it_166_0_0 - istartcol_var_455);
             tmp_index_4387_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4417_0_0 = (_for_it_166_0_0 - istartcol_var_455);
             tmp_index_4405_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4408_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4414_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4393_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4399_0_0 = (_for_it_166_0_0 - istartcol_var_455);
+            tmp_index_4384_0_0 = (_for_it_166_0_0 - istartcol_var_455);
             {
 
                 {
@@ -25931,10 +25987,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1315_0_0 = ixlow_var_1308_0_0[((_for_it_168_0_0 + (sym_kfdia_var_1222_0_0 * (_for_it_167_0_0 - 1))) - 1)];
 
-                tmp_index_4427_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4423_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4425_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4429_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4427_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4423_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_87_0_0;
 
@@ -25987,11 +26043,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_call_117_0_0 = int(specmult_var_1294_0_0);
                 tmp_index_4431_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4437_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4433_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4435_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4437_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_call_117_0_0 = int(specmult_var_1294_0_0);
                 {
                     double tmp_call_118_0_0;
                     double tmp_arg_88_0_0;
@@ -26080,10 +26136,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4439_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4441_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_call_119_0_0 = int(specmult1_var_1297_0_0);
                 tmp_index_4443_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4439_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4441_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 {
                     double tmp_call_120_0_0;
                     double tmp_arg_90_0_0;
@@ -26172,10 +26228,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_call_121_0_0 = int(specmult_mco2_var_1303_0_0);
                 tmp_index_4445_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4447_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4449_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_call_121_0_0 = int(specmult_mco2_var_1303_0_0);
 
                 tmp_index_4452_0_0 = ((jp_var_471[(tmp_index_4449_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -26323,8 +26379,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_4461_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4463_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4461_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4465_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_94_0_0;
@@ -26378,22 +26434,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_4472_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4467_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4474_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4477_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4469_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4467_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4479_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_call_124_0_0 = int(specmult_planck_var_1300_0_0);
                 tmp_index_4481_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4479_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4474_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4472_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4467_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_4469_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspa_var_216[6]) + (1 + tmp_call_117_0_0));
+                inds_var_1254_0_0 = indself_var_474[(tmp_index_4477_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 indf_var_1255_0_0 = indfor_var_469[(tmp_index_4479_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 indm_var_1256_0_0 = indminor_var_470[(tmp_index_4481_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                inds_var_1254_0_0 = indself_var_474[(tmp_index_4477_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4467_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_4469_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspa_var_216[6]) + (1 + tmp_call_117_0_0));
                 {
                     double tmp_call_125_0_0;
                     double tmp_arg_95_0_0;
@@ -26486,12 +26542,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4487_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4491_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4493_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4483_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4487_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4485_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4489_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4483_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4493_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -26730,9 +26786,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     } else {
 
                         tmp_index_4507_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                        tmp_index_4513_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         tmp_index_4511_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         tmp_index_4509_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4513_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -26858,12 +26914,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4517_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4521_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4525_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4519_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4515_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4523_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4517_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4515_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4521_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4519_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4525_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -27005,12 +27061,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_4537_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                        tmp_index_4531_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                        tmp_index_4527_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                        tmp_index_4535_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         tmp_index_4533_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         tmp_index_4529_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4531_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4537_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4527_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4535_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -27101,10 +27157,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_4545_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                        tmp_index_4539_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         tmp_index_4541_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         tmp_index_4543_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4539_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                        tmp_index_4545_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -27371,9 +27427,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_169_0_0 = 1; (_for_it_169_0_0 <= 12); _for_it_169_0_0 = (_for_it_169_0_0 + 1)) {
 
+                    tmp_index_4631_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4617_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4621_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4631_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4627_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     {
 
@@ -27424,8 +27480,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                     tmp_index_4655_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4657_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4662_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4657_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -27498,8 +27554,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 jl_var_1315_0_0 = ixhigh_var_1309_0_0[((_for_it_170_0_0 + (sym_kfdia_var_1222_0_0 * (_for_it_167_0_0 - 1))) - 1)];
 
                 tmp_index_4675_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4677_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4673_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4677_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
 
                 tmp_index_4680_0_0 = ((jp_var_471[(tmp_index_4677_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -27571,8 +27627,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_4685_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4681_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4685_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
 
                     tmp_index_4684_0_0 = ((jp_var_471[(tmp_index_4681_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                     {
@@ -27611,17 +27667,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_4691_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4696_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4694_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4689_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4699_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4694_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4696_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4689_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4691_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4689_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_4691_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspb_var_217[6]) + 1);
                 indm_var_1256_0_0 = indminor_var_470[(tmp_index_4699_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_1252_0_0 = (((((jp_var_471[(tmp_index_4689_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_4691_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspb_var_217[6]) + 1);
                 {
 
 
@@ -27629,14 +27685,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1253_0_0 = (((((jp_var_471[(tmp_index_4694_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_4696_0_0 + ((_for_it_167_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_17_nspb_var_217[6]) + 1);
                 for (_for_it_171_0_0 = 1; (_for_it_171_0_0 <= 12); _for_it_171_0_0 = (_for_it_171_0_0 + 1)) {
 
-                    tmp_index_4726_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4709_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4714_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4722_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4703_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4718_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                    tmp_index_4730_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     tmp_index_4712_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4709_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4730_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4714_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4718_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4726_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4703_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                    tmp_index_4722_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -27695,18 +27751,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1315_0_0 = ixhigh_var_1309_0_0[((_for_it_172_0_0 + (sym_kfdia_var_1222_0_0 * (_for_it_167_0_0 - 1))) - 1)];
 
-                tmp_index_4739_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4751_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4748_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4754_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4763_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4742_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4766_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4760_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4757_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
-                tmp_index_4736_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4745_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4754_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4739_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4748_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4736_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 tmp_index_4769_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4766_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4751_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
+                tmp_index_4757_0_0 = (jl_var_1315_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -27782,9 +27838,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    laytrop_min_var_2158_0_0 = 2147483647;
-    sym_klev_var_2116_0_0 = nlev_var_454;
     sym_kfdia_var_2115_0_0 = iendcol_var_456;
+    sym_klev_var_2116_0_0 = nlev_var_454;
+    laytrop_min_var_2158_0_0 = 2147483647;
 
     delete[] ixc_var_1307_0_0;
     delete[] ixlow_var_1308_0_0;
@@ -27879,8 +27935,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_321_0_0 = (laytrop_min_var_2158_0_0 + 1); (_for_it_321_0_0 <= laytrop_max_var_2159_0_0); _for_it_321_0_0 = (_for_it_321_0_0 + 1)) {
 
-        ich_var_2163_0_0 = 0;
         icl_var_2164_0_0 = 0;
+        ich_var_2163_0_0 = 0;
         for (_for_it_322_0_0 = istartcol_var_455; (_for_it_322_0_0 <= iendcol_var_456); _for_it_322_0_0 = (_for_it_322_0_0 + 1)) {
 
             tmp_index_9558_0_0 = (_for_it_322_0_0 - istartcol_var_455);
@@ -27943,9 +27999,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_323_0_0 = 1; (_for_it_323_0_0 <= laytrop_min_var_2158_0_0); _for_it_323_0_0 = (_for_it_323_0_0 + 1)) {
         for (_for_it_324_0_0 = istartcol_var_455; (_for_it_324_0_0 <= iendcol_var_456); _for_it_324_0_0 = (_for_it_324_0_0 + 1)) {
 
-            tmp_index_9568_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-            tmp_index_9564_0_0 = (_for_it_324_0_0 - istartcol_var_455);
             tmp_index_9566_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+            tmp_index_9564_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+            tmp_index_9568_0_0 = (_for_it_324_0_0 - istartcol_var_455);
 
             tmp_index_9571_0_0 = ((jp_var_471[(tmp_index_9568_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -28017,8 +28073,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_9576_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 tmp_index_9572_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9576_0_0 = (_for_it_324_0_0 - istartcol_var_455);
 
                 tmp_index_9575_0_0 = ((jp_var_471[(tmp_index_9572_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -28057,21 +28113,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_9590_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-            tmp_index_9587_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-            tmp_index_9592_0_0 = (_for_it_324_0_0 - istartcol_var_455);
             tmp_index_9580_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-            tmp_index_9582_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+            tmp_index_9592_0_0 = (_for_it_324_0_0 - istartcol_var_455);
             tmp_index_9594_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+            tmp_index_9587_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+            tmp_index_9582_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+            tmp_index_9590_0_0 = (_for_it_324_0_0 - istartcol_var_455);
             tmp_index_9585_0_0 = (_for_it_324_0_0 - istartcol_var_455);
             {
 
 
             }
-            indf_var_2145_0_0 = indfor_var_469[(tmp_index_9592_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_2142_0_0 = (((((jp_var_471[(tmp_index_9580_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9582_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_30_nspa_var_216[7]) + 1);
-            indm_var_2146_0_0 = indminor_var_470[(tmp_index_9594_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_2144_0_0 = indself_var_474[(tmp_index_9590_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indm_var_2146_0_0 = indminor_var_470[(tmp_index_9594_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indf_var_2145_0_0 = indfor_var_469[(tmp_index_9592_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
 
 
@@ -28079,24 +28135,24 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_2143_0_0 = ((((jp_var_471[(tmp_index_9585_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_9587_0_0 + ((_for_it_323_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_30_nspa_var_216[7]) + 1);
             for (_for_it_325_0_0 = 1; (_for_it_325_0_0 <= 8); _for_it_325_0_0 = (_for_it_325_0_0 + 1)) {
 
-                tmp_index_9653_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9640_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9645_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9606_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9643_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9661_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9626_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9634_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9669_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9610_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9663_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 tmp_index_9649_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9661_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9634_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9626_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9640_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9643_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9610_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9657_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 tmp_index_9665_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 tmp_index_9673_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9596_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9663_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 tmp_index_9618_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 tmp_index_9600_0_0 = (_for_it_324_0_0 - istartcol_var_455);
-                tmp_index_9657_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9653_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9669_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9606_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9645_0_0 = (_for_it_324_0_0 - istartcol_var_455);
+                tmp_index_9596_0_0 = (_for_it_324_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -28225,9 +28281,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_326_0_0 = (laytrop_max_var_2159_0_0 + 1); (_for_it_326_0_0 <= nlev_var_454); _for_it_326_0_0 = (_for_it_326_0_0 + 1)) {
         for (_for_it_327_0_0 = istartcol_var_455; (_for_it_327_0_0 <= iendcol_var_456); _for_it_327_0_0 = (_for_it_327_0_0 + 1)) {
 
-            tmp_index_9681_0_0 = (_for_it_327_0_0 - istartcol_var_455);
             tmp_index_9679_0_0 = (_for_it_327_0_0 - istartcol_var_455);
             tmp_index_9677_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+            tmp_index_9681_0_0 = (_for_it_327_0_0 - istartcol_var_455);
 
             tmp_index_9684_0_0 = ((jp_var_471[(tmp_index_9681_0_0 + ((_for_it_326_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -28299,8 +28355,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_9689_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 tmp_index_9685_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9689_0_0 = (_for_it_327_0_0 - istartcol_var_455);
 
                 tmp_index_9688_0_0 = ((jp_var_471[(tmp_index_9685_0_0 + ((_for_it_326_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -28339,10 +28395,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_9695_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-            tmp_index_9698_0_0 = (_for_it_327_0_0 - istartcol_var_455);
             tmp_index_9703_0_0 = (_for_it_327_0_0 - istartcol_var_455);
             tmp_index_9693_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+            tmp_index_9695_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+            tmp_index_9698_0_0 = (_for_it_327_0_0 - istartcol_var_455);
             tmp_index_9700_0_0 = (_for_it_327_0_0 - istartcol_var_455);
             {
 
@@ -28357,18 +28413,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_2143_0_0 = (((((jp_var_471[(tmp_index_9698_0_0 + ((_for_it_326_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_9700_0_0 + ((_for_it_326_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_30_nspb_var_217[7]) + 1);
             for (_for_it_328_0_0 = 1; (_for_it_328_0_0 <= 8); _for_it_328_0_0 = (_for_it_328_0_0 + 1)) {
 
-                tmp_index_9742_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-                tmp_index_9707_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 tmp_index_9715_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-                tmp_index_9748_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 tmp_index_9724_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-                tmp_index_9726_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 tmp_index_9734_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-                tmp_index_9721_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-                tmp_index_9738_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9742_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 tmp_index_9730_0_0 = (_for_it_327_0_0 - istartcol_var_455);
-                tmp_index_9744_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9738_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9726_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 tmp_index_9752_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9721_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9748_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9707_0_0 = (_for_it_327_0_0 - istartcol_var_455);
+                tmp_index_9744_0_0 = (_for_it_327_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -28455,9 +28511,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2168_0_0 = ixlow_var_2161_0_0[((_for_it_330_0_0 + (sym_kfdia_var_2115_0_0 * (_for_it_329_0_0 - 1))) - 1)];
 
-                tmp_index_9759_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9763_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9761_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9759_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
 
                 tmp_index_9766_0_0 = ((jp_var_471[(tmp_index_9763_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -28529,8 +28585,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_9771_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9767_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9771_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
 
                     tmp_index_9770_0_0 = ((jp_var_471[(tmp_index_9767_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                     {
@@ -28569,21 +28625,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_9775_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9787_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9785_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9782_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9780_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9789_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                tmp_index_9787_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                tmp_index_9782_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9775_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9777_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                indf_var_2145_0_0 = indfor_var_469[(tmp_index_9787_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_2142_0_0 = (((((jp_var_471[(tmp_index_9775_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9777_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_30_nspa_var_216[7]) + 1);
-                indm_var_2146_0_0 = indminor_var_470[(tmp_index_9789_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_2144_0_0 = indself_var_474[(tmp_index_9785_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indm_var_2146_0_0 = indminor_var_470[(tmp_index_9789_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indf_var_2145_0_0 = indfor_var_469[(tmp_index_9787_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
 
 
@@ -28591,24 +28647,24 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_2143_0_0 = ((((jp_var_471[(tmp_index_9780_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_9782_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_30_nspa_var_216[7]) + 1);
                 for (_for_it_331_0_0 = 1; (_for_it_331_0_0 <= 8); _for_it_331_0_0 = (_for_it_331_0_0 + 1)) {
 
-                    tmp_index_9801_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9868_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9840_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9829_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9835_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9791_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9858_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9813_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9848_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9838_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9805_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9821_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9852_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9795_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9860_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9856_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9864_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9848_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9844_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9858_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9835_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9840_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9864_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9795_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9868_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9821_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9801_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9860_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9813_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9838_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9791_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9829_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9852_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9856_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -28850,11 +28906,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
-                tmp_index_9890_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                tmp_index_9900_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                tmp_index_9895_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                tmp_index_9897_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 tmp_index_9892_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9897_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9895_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9900_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                tmp_index_9890_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                 {
 
 
@@ -28868,18 +28924,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_2143_0_0 = (((((jp_var_471[(tmp_index_9895_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_9897_0_0 + ((_for_it_329_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_30_nspb_var_217[7]) + 1);
                 for (_for_it_333_0_0 = 1; (_for_it_333_0_0 <= 8); _for_it_333_0_0 = (_for_it_333_0_0 + 1)) {
 
-                    tmp_index_9904_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9931_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9939_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9912_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9921_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9918_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9941_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9945_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9912_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9927_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9923_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
-                    tmp_index_9921_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9939_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9935_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9923_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     tmp_index_9949_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9904_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
+                    tmp_index_9927_0_0 = (jl_var_2168_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -28957,8 +29013,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kfdia_var_1932_0_0 = iendcol_var_456;
     sym_klev_var_1933_0_0 = nlev_var_454;
+    sym_kfdia_var_1932_0_0 = iendcol_var_456;
     laytrop_min_var_2019_0_0 = 2147483647;
 
     delete[] ixc_var_2160_0_0;
@@ -29054,8 +29110,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_282_0_0 = (laytrop_min_var_2019_0_0 + 1); (_for_it_282_0_0 <= laytrop_max_var_2020_0_0); _for_it_282_0_0 = (_for_it_282_0_0 + 1)) {
 
-        icl_var_2025_0_0 = 0;
         ich_var_2024_0_0 = 0;
+        icl_var_2025_0_0 = 0;
         for (_for_it_283_0_0 = istartcol_var_455; (_for_it_283_0_0 <= iendcol_var_456); _for_it_283_0_0 = (_for_it_283_0_0 + 1)) {
 
             tmp_index_8392_0_0 = (_for_it_283_0_0 - istartcol_var_455);
@@ -29153,9 +29209,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_285_0_0 = istartcol_var_455; (_for_it_285_0_0 <= iendcol_var_456); _for_it_285_0_0 = (_for_it_285_0_0 + 1)) {
 
             tmp_index_8406_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8410_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8408_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8412_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8408_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8410_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             {
                 double tmp_arg_195_0_0;
 
@@ -29209,8 +29265,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
             }
             tmp_call_225_0_0 = int(specmult_var_1980_0_0);
-            tmp_index_8418_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8420_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8418_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8416_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8414_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             {
@@ -29301,10 +29357,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_call_227_0_0 = int(specmult1_var_1983_0_0);
-            tmp_index_8424_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8422_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8426_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8424_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_call_227_0_0 = int(specmult1_var_1983_0_0);
+            tmp_index_8422_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             {
                 double tmp_call_228_0_0;
                 double tmp_arg_198_0_0;
@@ -29393,10 +29449,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_8430_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8432_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_call_229_0_0 = int(specmult_mn2o_var_1986_0_0);
             tmp_index_8428_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_call_229_0_0 = int(specmult_mn2o_var_1986_0_0);
+            tmp_index_8432_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8430_0_0 = (_for_it_285_0_0 - istartcol_var_455);
 
             tmp_index_8435_0_0 = ((jp_var_471[(tmp_index_8432_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -29544,9 +29600,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
+            tmp_index_8444_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8446_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8448_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8444_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             {
                 double tmp_arg_202_0_0;
 
@@ -29599,22 +29655,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_8460_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8464_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8455_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8452_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_call_232_0_0 = int(specmult_planck_var_1989_0_0);
-            tmp_index_8450_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-            tmp_index_8457_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8452_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8460_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             tmp_index_8462_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8457_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8464_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8450_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+            tmp_index_8455_0_0 = (_for_it_285_0_0 - istartcol_var_455);
             {
 
 
             }
-            indf_var_1965_0_0 = indfor_var_469[(tmp_index_8462_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8450_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_8452_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspa_var_216[8]) + (1 + tmp_call_225_0_0));
             indm_var_1966_0_0 = indminor_var_470[(tmp_index_8464_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_1964_0_0 = indself_var_474[(tmp_index_8460_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8450_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_8452_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspa_var_216[8]) + (1 + tmp_call_225_0_0));
+            indf_var_1965_0_0 = indfor_var_469[(tmp_index_8462_0_0 + ((_for_it_284_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_233_0_0;
                 double tmp_arg_203_0_0;
@@ -29707,12 +29763,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8468_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8474_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8470_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8476_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8472_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8466_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8468_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8476_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8470_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8472_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -29854,12 +29910,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_8486_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8480_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8482_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8484_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8488_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8482_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8480_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8486_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8478_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8488_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -29950,10 +30006,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_8492_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8494_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8490_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8496_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8490_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8492_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -30079,12 +30135,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8500_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8508_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8498_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8508_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8506_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8502_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8504_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8502_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8500_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -30227,10 +30283,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                     tmp_index_8518_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8510_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8512_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8520_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8516_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8510_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8520_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8512_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8514_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     {
 
@@ -30322,10 +30378,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_8528_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8522_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                    tmp_index_8526_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     tmp_index_8524_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8522_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8528_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                    tmp_index_8526_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -30592,10 +30648,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_286_0_0 = 1; (_for_it_286_0_0 <= 12); _for_it_286_0_0 = (_for_it_286_0_0 + 1)) {
 
-                tmp_index_8610_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8604_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8614_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8604_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8600_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8610_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -30644,9 +30700,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8645_0_0 = (_for_it_285_0_0 - istartcol_var_455);
-                tmp_index_8640_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 tmp_index_8638_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8640_0_0 = (_for_it_285_0_0 - istartcol_var_455);
+                tmp_index_8645_0_0 = (_for_it_285_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -30720,8 +30776,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_288_0_0 = istartcol_var_455; (_for_it_288_0_0 <= iendcol_var_456); _for_it_288_0_0 = (_for_it_288_0_0 + 1)) {
 
             tmp_index_8658_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-            tmp_index_8654_0_0 = (_for_it_288_0_0 - istartcol_var_455);
             tmp_index_8656_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+            tmp_index_8654_0_0 = (_for_it_288_0_0 - istartcol_var_455);
 
             tmp_index_8661_0_0 = ((jp_var_471[(tmp_index_8658_0_0 + ((_for_it_287_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
             {
@@ -30833,17 +30889,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
             }
-            tmp_index_8670_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-            tmp_index_8680_0_0 = (_for_it_288_0_0 - istartcol_var_455);
             tmp_index_8677_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-            tmp_index_8675_0_0 = (_for_it_288_0_0 - istartcol_var_455);
             tmp_index_8672_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+            tmp_index_8680_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+            tmp_index_8670_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+            tmp_index_8675_0_0 = (_for_it_288_0_0 - istartcol_var_455);
             {
 
 
             }
-            ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8670_0_0 + ((_for_it_287_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_8672_0_0 + ((_for_it_287_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspb_var_217[8]) + 1);
             indm_var_1966_0_0 = indminor_var_470[(tmp_index_8680_0_0 + ((_for_it_287_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8670_0_0 + ((_for_it_287_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_8672_0_0 + ((_for_it_287_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspb_var_217[8]) + 1);
             {
 
 
@@ -30852,13 +30908,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             for (_for_it_289_0_0 = 1; (_for_it_289_0_0 <= 12); _for_it_289_0_0 = (_for_it_289_0_0 + 1)) {
 
                 tmp_index_8707_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-                tmp_index_8684_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-                tmp_index_8711_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-                tmp_index_8695_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-                tmp_index_8703_0_0 = (_for_it_288_0_0 - istartcol_var_455);
-                tmp_index_8693_0_0 = (_for_it_288_0_0 - istartcol_var_455);
                 tmp_index_8690_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+                tmp_index_8693_0_0 = (_for_it_288_0_0 - istartcol_var_455);
                 tmp_index_8699_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+                tmp_index_8711_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+                tmp_index_8684_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+                tmp_index_8703_0_0 = (_for_it_288_0_0 - istartcol_var_455);
+                tmp_index_8695_0_0 = (_for_it_288_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -30925,10 +30981,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2029_0_0 = ixlow_var_2022_0_0[((_for_it_291_0_0 + (sym_kfdia_var_1932_0_0 * (_for_it_290_0_0 - 1))) - 1)];
 
+                tmp_index_8724_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8718_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8722_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8720_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8718_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8724_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_205_0_0;
 
@@ -30981,11 +31037,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8726_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_call_235_0_0 = int(specmult_var_1980_0_0);
                 tmp_index_8730_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_call_235_0_0 = int(specmult_var_1980_0_0);
                 tmp_index_8728_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8732_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8726_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 {
                     double tmp_call_236_0_0;
                     double tmp_arg_206_0_0;
@@ -31076,8 +31132,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_call_237_0_0 = int(specmult1_var_1983_0_0);
                 tmp_index_8736_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8738_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8734_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8738_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 {
                     double tmp_call_238_0_0;
                     double tmp_arg_208_0_0;
@@ -31166,10 +31222,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8742_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8744_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_call_239_0_0 = int(specmult_mn2o_var_1986_0_0);
                 tmp_index_8740_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8742_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
 
                 tmp_index_8747_0_0 = ((jp_var_471[(tmp_index_8744_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                 {
@@ -31277,8 +31333,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_8752_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8748_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8752_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
 
                     tmp_index_8751_0_0 = ((jp_var_471[(tmp_index_8748_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
                     {
@@ -31372,22 +31428,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8772_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8764_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8767_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8776_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8764_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8774_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8762_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_call_242_0_0 = int(specmult_planck_var_1989_0_0);
+                tmp_index_8772_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8769_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8767_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8774_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                indf_var_1965_0_0 = indfor_var_469[(tmp_index_8774_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8762_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_8764_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspa_var_216[8]) + (1 + tmp_call_235_0_0));
                 indm_var_1966_0_0 = indminor_var_470[(tmp_index_8776_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_1964_0_0 = indself_var_474[(tmp_index_8772_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8762_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_8764_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspa_var_216[8]) + (1 + tmp_call_235_0_0));
+                indf_var_1965_0_0 = indfor_var_469[(tmp_index_8774_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_243_0_0;
                     double tmp_arg_213_0_0;
@@ -31428,8 +31484,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                ind1_var_1963_0_0 = ((((jp_var_471[(tmp_index_8767_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_8769_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspa_var_216[8]) + (1 + tmp_call_237_0_0));
                 _if_cond_272_0_0 = (specparm_var_1981_0_0 < 0.125);
+                ind1_var_1963_0_0 = ((((jp_var_471[(tmp_index_8767_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_8769_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspa_var_216[8]) + (1 + tmp_call_237_0_0));
                 if ((_if_cond_272_0_0 == 1)) {
                     {
 
@@ -31480,11 +31536,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_8784_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8786_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8780_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8782_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8788_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8782_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8786_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8784_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8780_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8778_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     {
 
@@ -31627,12 +31683,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_8792_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8794_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                        tmp_index_8790_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                        tmp_index_8800_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                        tmp_index_8798_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8796_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8798_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8800_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8792_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8790_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -31724,9 +31780,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     } else {
 
                         tmp_index_8806_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                        tmp_index_8804_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8802_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8808_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8804_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -31853,11 +31909,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                     tmp_index_8814_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8816_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8812_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8818_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8810_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8820_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8818_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8816_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8812_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -31999,12 +32055,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_8822_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8826_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                        tmp_index_8832_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8822_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8824_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8830_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8828_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8832_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -32096,9 +32152,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     } else {
 
                         tmp_index_8840_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                        tmp_index_8836_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8838_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         tmp_index_8834_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                        tmp_index_8836_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -32366,9 +32422,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_292_0_0 = 1; (_for_it_292_0_0 <= 12); _for_it_292_0_0 = (_for_it_292_0_0 + 1)) {
 
                     tmp_index_8916_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_8922_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8912_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_8926_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8922_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -32491,8 +32547,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2029_0_0 = ixhigh_var_2023_0_0[((_for_it_293_0_0 + (sym_kfdia_var_1932_0_0 * (_for_it_290_0_0 - 1))) - 1)];
 
-                tmp_index_8970_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8972_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8970_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8968_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
 
                 tmp_index_8975_0_0 = ((jp_var_471[(tmp_index_8972_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1) - 1);
@@ -32606,16 +32662,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 }
                 tmp_index_8986_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8989_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                tmp_index_8991_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8994_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 tmp_index_8984_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8989_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                tmp_index_8991_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8984_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_8986_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspb_var_217[8]) + 1);
                 indm_var_1966_0_0 = indminor_var_470[(tmp_index_8994_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_1962_0_0 = (((((jp_var_471[(tmp_index_8984_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_8986_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspb_var_217[8]) + 1);
                 {
 
 
@@ -32623,14 +32679,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1963_0_0 = (((((jp_var_471[(tmp_index_8989_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_8991_0_0 + ((_for_it_290_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_27_nspb_var_217[8]) + 1);
                 for (_for_it_294_0_0 = 1; (_for_it_294_0_0 <= 12); _for_it_294_0_0 = (_for_it_294_0_0 + 1)) {
 
-                    tmp_index_8998_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_9007_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_9021_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_9025_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_9009_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_9017_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_9013_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
-                    tmp_index_9009_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_9025_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     tmp_index_9004_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_9021_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_9007_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
+                    tmp_index_8998_0_0 = (jl_var_2029_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -32689,16 +32745,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         }
     }
     sym_kfdia_var_2075_0_0 = iendcol_var_456;
-    sym_klev_var_2076_0_0 = nlev_var_454;
     laytrop_min_var_2103_0_0 = 2147483647;
+    sym_klev_var_2076_0_0 = nlev_var_454;
 
     delete[] ixc_var_2021_0_0;
     delete[] ixlow_var_2022_0_0;
     delete[] ixhigh_var_2023_0_0;
     for (tmp_parfor_24_0_0 = istartcol_var_455; (tmp_parfor_24_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_24_0_0 = (tmp_parfor_24_0_0 + 1)) {
 
-        tmp_index_9318_0_0 = (tmp_parfor_24_0_0 - istartcol_var_455);
         tmp_index_9317_0_0 = (tmp_parfor_24_0_0 - istartcol_var_455);
+        tmp_index_9318_0_0 = (tmp_parfor_24_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_9317_0_0] < laytrop_min_var_2103_0_0)) {
 
             laytrop_min_var_2103_0_0 = ilaytrop[tmp_index_9318_0_0];
@@ -32850,18 +32906,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_311_0_0 = istartcol_var_455; (_for_it_311_0_0 <= iendcol_var_456); _for_it_311_0_0 = (_for_it_311_0_0 + 1)) {
 
             tmp_index_9334_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-            tmp_index_9339_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-            tmp_index_9337_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-            tmp_index_9342_0_0 = (_for_it_311_0_0 - istartcol_var_455);
             tmp_index_9332_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+            tmp_index_9342_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+            tmp_index_9337_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+            tmp_index_9339_0_0 = (_for_it_311_0_0 - istartcol_var_455);
             tmp_index_9344_0_0 = (_for_it_311_0_0 - istartcol_var_455);
             {
 
 
             }
+            indf_var_2098_0_0 = indfor_var_469[(tmp_index_9344_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_2095_0_0 = (((((jp_var_471[(tmp_index_9332_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9334_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspa_var_216[9]) + 1);
             inds_var_2097_0_0 = indself_var_474[(tmp_index_9342_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            indf_var_2098_0_0 = indfor_var_469[(tmp_index_9344_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
 
 
@@ -32869,17 +32925,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_2096_0_0 = ((((jp_var_471[(tmp_index_9337_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_9339_0_0 + ((_for_it_310_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspa_var_216[9]) + 1);
             for (_for_it_312_0_0 = 1; (_for_it_312_0_0 <= 6); _for_it_312_0_0 = (_for_it_312_0_0 + 1)) {
 
-                tmp_index_9379_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+                tmp_index_9356_0_0 = (_for_it_311_0_0 - istartcol_var_455);
                 tmp_index_9387_0_0 = (_for_it_311_0_0 - istartcol_var_455);
                 tmp_index_9366_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-                tmp_index_9360_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-                tmp_index_9346_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-                tmp_index_9350_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-                tmp_index_9375_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+                tmp_index_9379_0_0 = (_for_it_311_0_0 - istartcol_var_455);
                 tmp_index_9371_0_0 = (_for_it_311_0_0 - istartcol_var_455);
                 tmp_index_9383_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+                tmp_index_9346_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+                tmp_index_9360_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+                tmp_index_9350_0_0 = (_for_it_311_0_0 - istartcol_var_455);
                 tmp_index_9369_0_0 = (_for_it_311_0_0 - istartcol_var_455);
-                tmp_index_9356_0_0 = (_for_it_311_0_0 - istartcol_var_455);
+                tmp_index_9375_0_0 = (_for_it_311_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -32956,17 +33012,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_313_0_0 = (laytrop_max_var_2104_0_0 + 1); (_for_it_313_0_0 <= nlev_var_454); _for_it_313_0_0 = (_for_it_313_0_0 + 1)) {
         for (_for_it_314_0_0 = istartcol_var_455; (_for_it_314_0_0 <= iendcol_var_456); _for_it_314_0_0 = (_for_it_314_0_0 + 1)) {
 
-            tmp_index_9391_0_0 = (_for_it_314_0_0 - istartcol_var_455);
             tmp_index_9401_0_0 = (_for_it_314_0_0 - istartcol_var_455);
-            tmp_index_9393_0_0 = (_for_it_314_0_0 - istartcol_var_455);
-            tmp_index_9396_0_0 = (_for_it_314_0_0 - istartcol_var_455);
             tmp_index_9398_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+            tmp_index_9396_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+            tmp_index_9393_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+            tmp_index_9391_0_0 = (_for_it_314_0_0 - istartcol_var_455);
             {
 
 
             }
-            ind0_var_2095_0_0 = (((((jp_var_471[(tmp_index_9391_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9393_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspb_var_217[9]) + 1);
             indf_var_2098_0_0 = indfor_var_469[(tmp_index_9401_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_2095_0_0 = (((((jp_var_471[(tmp_index_9391_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9393_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspb_var_217[9]) + 1);
             {
 
 
@@ -32974,14 +33030,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_2096_0_0 = (((((jp_var_471[(tmp_index_9396_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_9398_0_0 + ((_for_it_313_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspb_var_217[9]) + 1);
             for (_for_it_315_0_0 = 1; (_for_it_315_0_0 <= 6); _for_it_315_0_0 = (_for_it_315_0_0 + 1)) {
 
-                tmp_index_9434_0_0 = (_for_it_314_0_0 - istartcol_var_455);
-                tmp_index_9426_0_0 = (_for_it_314_0_0 - istartcol_var_455);
                 tmp_index_9422_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+                tmp_index_9426_0_0 = (_for_it_314_0_0 - istartcol_var_455);
                 tmp_index_9407_0_0 = (_for_it_314_0_0 - istartcol_var_455);
-                tmp_index_9418_0_0 = (_for_it_314_0_0 - istartcol_var_455);
-                tmp_index_9413_0_0 = (_for_it_314_0_0 - istartcol_var_455);
-                tmp_index_9416_0_0 = (_for_it_314_0_0 - istartcol_var_455);
                 tmp_index_9430_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+                tmp_index_9416_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+                tmp_index_9413_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+                tmp_index_9434_0_0 = (_for_it_314_0_0 - istartcol_var_455);
+                tmp_index_9418_0_0 = (_for_it_314_0_0 - istartcol_var_455);
                 tmp_index_9403_0_0 = (_for_it_314_0_0 - istartcol_var_455);
                 {
 
@@ -33048,19 +33104,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2113_0_0 = ixlow_var_2106_0_0[((_for_it_317_0_0 + (sym_kfdia_var_2075_0_0 * (_for_it_316_0_0 - 1))) - 1)];
 
-                tmp_index_9446_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 tmp_index_9448_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                tmp_index_9441_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 tmp_index_9451_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                tmp_index_9443_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 tmp_index_9453_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                tmp_index_9443_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                tmp_index_9446_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                tmp_index_9441_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 {
 
 
                 }
+                indf_var_2098_0_0 = indfor_var_469[(tmp_index_9453_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_2095_0_0 = (((((jp_var_471[(tmp_index_9441_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9443_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspa_var_216[9]) + 1);
                 inds_var_2097_0_0 = indself_var_474[(tmp_index_9451_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                indf_var_2098_0_0 = indfor_var_469[(tmp_index_9453_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
 
 
@@ -33068,17 +33124,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_2096_0_0 = ((((jp_var_471[(tmp_index_9446_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_9448_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspa_var_216[9]) + 1);
                 for (_for_it_318_0_0 = 1; (_for_it_318_0_0 <= 6); _for_it_318_0_0 = (_for_it_318_0_0 + 1)) {
 
-                    tmp_index_9465_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9475_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9480_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9492_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9469_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9478_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9455_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9488_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9484_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9496_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                     tmp_index_9459_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9465_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9488_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9478_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9469_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9455_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9496_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9484_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9475_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9492_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9480_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -33154,17 +33210,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2113_0_0 = ixhigh_var_2107_0_0[((_for_it_319_0_0 + (sym_kfdia_var_2075_0_0 * (_for_it_316_0_0 - 1))) - 1)];
 
+                tmp_index_9509_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                tmp_index_9507_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 tmp_index_9502_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 tmp_index_9512_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 tmp_index_9504_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                tmp_index_9507_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                tmp_index_9509_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_2095_0_0 = (((((jp_var_471[(tmp_index_9502_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9504_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspb_var_217[9]) + 1);
                 indf_var_2098_0_0 = indfor_var_469[(tmp_index_9512_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_2095_0_0 = (((((jp_var_471[(tmp_index_9502_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9504_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspb_var_217[9]) + 1);
                 {
 
 
@@ -33172,15 +33228,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_2096_0_0 = (((((jp_var_471[(tmp_index_9507_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_9509_0_0 + ((_for_it_316_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_29_nspb_var_217[9]) + 1);
                 for (_for_it_320_0_0 = 1; (_for_it_320_0_0 <= 6); _for_it_320_0_0 = (_for_it_320_0_0 + 1)) {
 
-                    tmp_index_9527_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9518_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9514_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9537_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9529_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
-                    tmp_index_9545_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                     tmp_index_9541_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9529_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                     tmp_index_9524_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9537_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9518_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                     tmp_index_9533_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9545_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9527_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
+                    tmp_index_9514_0_0 = (jl_var_2113_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -33238,8 +33294,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kfdia_var_2031_0_0 = iendcol_var_456;
     laytrop_min_var_2063_0_0 = 2147483647;
+    sym_kfdia_var_2031_0_0 = iendcol_var_456;
     sym_klev_var_2032_0_0 = nlev_var_454;
 
     delete[] ixc_var_2105_0_0;
@@ -33399,21 +33455,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_297_0_0 = 1; (_for_it_297_0_0 <= laytrop_min_var_2063_0_0); _for_it_297_0_0 = (_for_it_297_0_0 + 1)) {
         for (_for_it_298_0_0 = istartcol_var_455; (_for_it_298_0_0 <= iendcol_var_456); _for_it_298_0_0 = (_for_it_298_0_0 + 1)) {
 
-            tmp_index_9051_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-            tmp_index_9058_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-            tmp_index_9056_0_0 = (_for_it_298_0_0 - istartcol_var_455);
             tmp_index_9060_0_0 = (_for_it_298_0_0 - istartcol_var_455);
             tmp_index_9049_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-            tmp_index_9044_0_0 = (_for_it_298_0_0 - istartcol_var_455);
             tmp_index_9054_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-            tmp_index_9062_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+            tmp_index_9051_0_0 = (_for_it_298_0_0 - istartcol_var_455);
             tmp_index_9046_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+            tmp_index_9044_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+            tmp_index_9062_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+            tmp_index_9058_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+            tmp_index_9056_0_0 = (_for_it_298_0_0 - istartcol_var_455);
             {
 
 
             }
-            ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9044_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9046_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspa_var_216[10]) + 1);
             indf_var_2057_0_0 = indfor_var_469[(tmp_index_9056_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9044_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9046_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspa_var_216[10]) + 1);
             inds_var_2056_0_0 = indself_var_474[(tmp_index_9054_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             indm_var_2058_0_0 = indminor_var_470[(tmp_index_9058_0_0 + ((_for_it_297_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
@@ -33439,18 +33495,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_299_0_0 = 1; (_for_it_299_0_0 <= 8); _for_it_299_0_0 = (_for_it_299_0_0 + 1)) {
 
-                tmp_index_9068_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9109_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9086_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9113_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9064_0_0 = (_for_it_298_0_0 - istartcol_var_455);
                 tmp_index_9074_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9109_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9068_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9064_0_0 = (_for_it_298_0_0 - istartcol_var_455);
                 tmp_index_9078_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9092_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9105_0_0 = (_for_it_298_0_0 - istartcol_var_455);
-                tmp_index_9101_0_0 = (_for_it_298_0_0 - istartcol_var_455);
                 tmp_index_9097_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9092_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9113_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9101_0_0 = (_for_it_298_0_0 - istartcol_var_455);
                 tmp_index_9095_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9105_0_0 = (_for_it_298_0_0 - istartcol_var_455);
+                tmp_index_9086_0_0 = (_for_it_298_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -33543,20 +33599,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_300_0_0 = (laytrop_max_var_2064_0_0 + 1); (_for_it_300_0_0 <= nlev_var_454); _for_it_300_0_0 = (_for_it_300_0_0 + 1)) {
         for (_for_it_301_0_0 = istartcol_var_455; (_for_it_301_0_0 <= iendcol_var_456); _for_it_301_0_0 = (_for_it_301_0_0 + 1)) {
 
-            tmp_index_9124_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-            tmp_index_9119_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-            tmp_index_9117_0_0 = (_for_it_301_0_0 - istartcol_var_455);
             tmp_index_9133_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-            tmp_index_9129_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-            tmp_index_9127_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-            tmp_index_9122_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+            tmp_index_9119_0_0 = (_for_it_301_0_0 - istartcol_var_455);
             tmp_index_9131_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+            tmp_index_9124_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+            tmp_index_9117_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+            tmp_index_9127_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+            tmp_index_9129_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+            tmp_index_9122_0_0 = (_for_it_301_0_0 - istartcol_var_455);
             {
 
 
             }
-            ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9117_0_0 + ((_for_it_300_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9119_0_0 + ((_for_it_300_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspb_var_217[10]) + 1);
             indf_var_2057_0_0 = indfor_var_469[(tmp_index_9127_0_0 + ((_for_it_300_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9117_0_0 + ((_for_it_300_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9119_0_0 + ((_for_it_300_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspb_var_217[10]) + 1);
             indm_var_2058_0_0 = indminor_var_470[(tmp_index_9129_0_0 + ((_for_it_300_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
 
@@ -33581,16 +33637,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_302_0_0 = 1; (_for_it_302_0_0 <= 8); _for_it_302_0_0 = (_for_it_302_0_0 + 1)) {
 
-                tmp_index_9162_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9156_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9158_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9139_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9135_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9174_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9166_0_0 = (_for_it_301_0_0 - istartcol_var_455);
-                tmp_index_9153_0_0 = (_for_it_301_0_0 - istartcol_var_455);
                 tmp_index_9147_0_0 = (_for_it_301_0_0 - istartcol_var_455);
                 tmp_index_9170_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9158_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9162_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9174_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9139_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9135_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9166_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9156_0_0 = (_for_it_301_0_0 - istartcol_var_455);
+                tmp_index_9153_0_0 = (_for_it_301_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -33672,21 +33728,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2073_0_0 = ixlow_var_2066_0_0[((_for_it_304_0_0 + (sym_kfdia_var_2031_0_0 * (_for_it_303_0_0 - 1))) - 1)];
 
-                tmp_index_9197_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9193_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9195_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9188_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9199_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9181_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9191_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9186_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9183_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9195_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9199_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9197_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9181_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9181_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9183_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspa_var_216[10]) + 1);
                 indf_var_2057_0_0 = indfor_var_469[(tmp_index_9193_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9181_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_9183_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspa_var_216[10]) + 1);
                 inds_var_2056_0_0 = indself_var_474[(tmp_index_9191_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 indm_var_2058_0_0 = indminor_var_470[(tmp_index_9195_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
@@ -33712,17 +33768,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_305_0_0 = 1; (_for_it_305_0_0 <= 8); _for_it_305_0_0 = (_for_it_305_0_0 + 1)) {
 
-                    tmp_index_9234_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9223_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9215_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9232_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9250_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9238_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9229_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9211_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9246_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9242_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9201_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9232_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9234_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9246_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9229_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9211_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9238_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9223_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9250_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9215_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9205_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     {
 
@@ -33815,20 +33871,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_2073_0_0 = ixhigh_var_2067_0_0[((_for_it_306_0_0 + (sym_kfdia_var_2031_0_0 * (_for_it_303_0_0 - 1))) - 1)];
 
-                tmp_index_9270_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9268_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9266_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9272_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9256_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9258_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                tmp_index_9261_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9270_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 tmp_index_9263_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9266_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9258_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9272_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9268_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                tmp_index_9261_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9256_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9258_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspb_var_217[10]) + 1);
                 indf_var_2057_0_0 = indfor_var_469[(tmp_index_9266_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_2054_0_0 = (((((jp_var_471[(tmp_index_9256_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_9258_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_28_nspb_var_217[10]) + 1);
                 indm_var_2058_0_0 = indminor_var_470[(tmp_index_9268_0_0 + ((_for_it_303_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
 
@@ -33853,16 +33909,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_307_0_0 = 1; (_for_it_307_0_0 <= 8); _for_it_307_0_0 = (_for_it_307_0_0 + 1)) {
 
-                    tmp_index_9309_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9301_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9295_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9274_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9305_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9286_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9274_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9297_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9292_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9309_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9313_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     tmp_index_9278_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9305_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
-                    tmp_index_9297_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9301_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
+                    tmp_index_9295_0_0 = (jl_var_2073_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -33958,8 +34014,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_20_0_0 = istartcol_var_455; (tmp_parfor_20_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_20_0_0 = (tmp_parfor_20_0_0 + 1)) {
 
-        tmp_index_7324_0_0 = (tmp_parfor_20_0_0 - istartcol_var_455);
         tmp_index_7325_0_0 = (tmp_parfor_20_0_0 - istartcol_var_455);
+        tmp_index_7324_0_0 = (tmp_parfor_20_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_7324_0_0] > laytrop_max_var_1781_0_0)) {
 
             laytrop_max_var_1781_0_0 = ilaytrop[tmp_index_7325_0_0];
@@ -34033,8 +34089,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_251_0_0 = (laytrop_min_var_1780_0_0 + 1); (_for_it_251_0_0 <= laytrop_max_var_1781_0_0); _for_it_251_0_0 = (_for_it_251_0_0 + 1)) {
 
-        ich_var_1785_0_0 = 0;
         icl_var_1786_0_0 = 0;
+        ich_var_1785_0_0 = 0;
         for (_for_it_252_0_0 = istartcol_var_455; (_for_it_252_0_0 <= iendcol_var_456); _for_it_252_0_0 = (_for_it_252_0_0 + 1)) {
 
             tmp_index_7331_0_0 = (_for_it_252_0_0 - istartcol_var_455);
@@ -34116,10 +34172,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_253_0_0 = 1; (_for_it_253_0_0 <= laytrop_min_var_1780_0_0); _for_it_253_0_0 = (_for_it_253_0_0 + 1)) {
         for (_for_it_254_0_0 = istartcol_var_455; (_for_it_254_0_0 <= iendcol_var_456); _for_it_254_0_0 = (_for_it_254_0_0 + 1)) {
 
-            tmp_index_7347_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-            tmp_index_7345_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-            tmp_index_7341_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_index_7343_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7341_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7345_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7347_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             {
                 double tmp_arg_161_0_0;
 
@@ -34172,11 +34228,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7355_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_call_191_0_0 = int(specmult_var_1750_0_0);
             tmp_index_7349_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-            tmp_index_7351_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7355_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_index_7353_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7351_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             {
                 double tmp_call_192_0_0;
                 double tmp_arg_162_0_0;
@@ -34265,10 +34321,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7357_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_call_193_0_0 = int(specmult1_var_1753_0_0);
-            tmp_index_7359_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7357_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_index_7361_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7359_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             {
                 double tmp_call_194_0_0;
                 double tmp_arg_164_0_0;
@@ -34357,20 +34413,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7365_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-            tmp_call_195_0_0 = int(specmult_planck_var_1756_0_0);
             tmp_index_7373_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7365_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_index_7368_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_call_195_0_0 = int(specmult_planck_var_1756_0_0);
             tmp_index_7375_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-            tmp_index_7370_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             tmp_index_7363_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+            tmp_index_7370_0_0 = (_for_it_254_0_0 - istartcol_var_455);
             {
 
 
             }
+            ind0_var_1740_0_0 = (((((jp_var_471[(tmp_index_7363_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7365_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_24_nspa_var_216[11]) + (1 + tmp_call_191_0_0));
             indf_var_1743_0_0 = indfor_var_469[(tmp_index_7375_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_1742_0_0 = indself_var_474[(tmp_index_7373_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            ind0_var_1740_0_0 = (((((jp_var_471[(tmp_index_7363_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7365_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_24_nspa_var_216[11]) + (1 + tmp_call_191_0_0));
             {
                 double tmp_call_196_0_0;
                 double tmp_arg_166_0_0;
@@ -34411,8 +34467,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            _if_cond_223_0_0 = (specparm_var_1751_0_0 < 0.125);
             ind1_var_1741_0_0 = ((((jp_var_471[(tmp_index_7368_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_7370_0_0 + ((_for_it_253_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_24_nspa_var_216[11]) + (1 + tmp_call_193_0_0));
+            _if_cond_223_0_0 = (specparm_var_1751_0_0 < 0.125);
             if ((_if_cond_223_0_0 == 1)) {
                 {
 
@@ -34463,12 +34519,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7383_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7377_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7379_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 tmp_index_7381_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7385_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7377_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7383_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 tmp_index_7387_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7385_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7379_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -34610,12 +34666,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7399_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7397_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7395_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7391_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7393_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7389_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                    tmp_index_7395_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                    tmp_index_7397_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7399_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -34706,10 +34762,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
+                    tmp_index_7407_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7401_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7403_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7405_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                    tmp_index_7407_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -34835,12 +34891,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7415_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 tmp_index_7409_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7411_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7417_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7413_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 tmp_index_7419_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7413_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7411_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7415_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7417_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -34982,12 +35038,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7429_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                    tmp_index_7423_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                    tmp_index_7427_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                    tmp_index_7425_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7431_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7427_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7423_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7425_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7421_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7429_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -35078,10 +35134,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_7439_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7437_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7433_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     tmp_index_7435_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                    tmp_index_7439_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -35348,12 +35404,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_255_0_0 = 1; (_for_it_255_0_0 <= 8); _for_it_255_0_0 = (_for_it_255_0_0 + 1)) {
 
-                tmp_index_7521_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 tmp_index_7525_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7536_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7515_0_0 = (_for_it_254_0_0 - istartcol_var_455);
-                tmp_index_7531_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 tmp_index_7511_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7515_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7536_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7521_0_0 = (_for_it_254_0_0 - istartcol_var_455);
+                tmp_index_7531_0_0 = (_for_it_254_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -35427,8 +35483,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_257_0_0 = (laytrop_max_var_1781_0_0 + 1); (_for_it_257_0_0 <= nlev_var_454); _for_it_257_0_0 = (_for_it_257_0_0 + 1)) {
             for (_for_it_258_0_0 = istartcol_var_455; (_for_it_258_0_0 <= iendcol_var_456); _for_it_258_0_0 = (_for_it_258_0_0 + 1)) {
 
-                tmp_index_7548_0_0 = (_for_it_258_0_0 - istartcol_var_455);
                 tmp_index_7545_0_0 = (_for_it_258_0_0 - istartcol_var_455);
+                tmp_index_7548_0_0 = (_for_it_258_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -35469,10 +35525,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1790_0_0 = ixlow_var_1783_0_0[((_for_it_260_0_0 + (sym_kfdia_var_1713_0_0 * (_for_it_259_0_0 - 1))) - 1)];
 
-                tmp_index_7556_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_index_7554_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 tmp_index_7558_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 tmp_index_7560_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7554_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7556_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_167_0_0;
 
@@ -35525,11 +35581,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7566_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_index_7564_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_call_197_0_0 = int(specmult_var_1750_0_0);
                 tmp_index_7568_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 tmp_index_7562_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_call_197_0_0 = int(specmult_var_1750_0_0);
+                tmp_index_7566_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7564_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 {
                     double tmp_call_198_0_0;
                     double tmp_arg_168_0_0;
@@ -35618,10 +35674,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7570_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 tmp_index_7572_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_index_7574_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 tmp_call_199_0_0 = int(specmult1_var_1753_0_0);
+                tmp_index_7574_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7570_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 {
                     double tmp_call_200_0_0;
                     double tmp_arg_170_0_0;
@@ -35710,20 +35766,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7578_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_index_7581_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_index_7586_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_call_201_0_0 = int(specmult_planck_var_1756_0_0);
-                tmp_index_7583_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                tmp_index_7588_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 tmp_index_7576_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7583_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_call_201_0_0 = int(specmult_planck_var_1756_0_0);
+                tmp_index_7581_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7588_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7586_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                tmp_index_7578_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                 {
 
 
                 }
+                ind0_var_1740_0_0 = (((((jp_var_471[(tmp_index_7576_0_0 + ((_for_it_259_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7578_0_0 + ((_for_it_259_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_24_nspa_var_216[11]) + (1 + tmp_call_197_0_0));
                 indf_var_1743_0_0 = indfor_var_469[(tmp_index_7588_0_0 + ((_for_it_259_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_1742_0_0 = indself_var_474[(tmp_index_7586_0_0 + ((_for_it_259_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                ind0_var_1740_0_0 = (((((jp_var_471[(tmp_index_7576_0_0 + ((_for_it_259_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7578_0_0 + ((_for_it_259_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_24_nspa_var_216[11]) + (1 + tmp_call_197_0_0));
                 {
                     double tmp_call_202_0_0;
                     double tmp_arg_172_0_0;
@@ -35816,12 +35872,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7590_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7600_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7596_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7592_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7594_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7598_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7600_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7592_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7596_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7590_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -35964,11 +36020,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                         }
                         tmp_index_7606_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7604_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7608_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7602_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7610_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7612_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                        tmp_index_7602_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                        tmp_index_7604_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -36059,10 +36115,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_7614_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                        tmp_index_7620_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7616_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7614_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7618_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7620_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -36188,12 +36244,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7630_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7626_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7624_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7628_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7632_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7630_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7622_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7626_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7632_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7624_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -36335,12 +36391,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_7638_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                        tmp_index_7636_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                        tmp_index_7642_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7644_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7640_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7642_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7636_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         tmp_index_7634_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                        tmp_index_7638_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -36701,12 +36757,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_261_0_0 = 1; (_for_it_261_0_0 <= 8); _for_it_261_0_0 = (_for_it_261_0_0 + 1)) {
 
-                    tmp_index_7749_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7744_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7734_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7728_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7749_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7724_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7738_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
-                    tmp_index_7728_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7734_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -36779,8 +36835,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     jl_var_1790_0_0 = ixhigh_var_1784_0_0[((_for_it_263_0_0 + (sym_kfdia_var_1713_0_0 * (_for_it_259_0_0 - 1))) - 1)];
 
-                    tmp_index_7763_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     tmp_index_7760_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
+                    tmp_index_7763_0_0 = (jl_var_1790_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -36812,8 +36868,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kidia_var_1791_0_0 = istartcol_var_455;
     sym_klev_var_1793_0_0 = nlev_var_454;
+    sym_kidia_var_1791_0_0 = istartcol_var_455;
     sym_kfdia_var_1792_0_0 = iendcol_var_456;
     colco_0_0 = new double DACE_ALIGN(64)[(((sym_kfdia_var_1792_0_0 - sym_kidia_var_1791_0_0) + ((sym_klev_var_1793_0_0 - 1) * ((sym_kfdia_var_1792_0_0 - sym_kidia_var_1791_0_0) + 1))) + 1)];
 
@@ -36846,8 +36902,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_21_0_0 = istartcol_var_455; (tmp_parfor_21_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_21_0_0 = (tmp_parfor_21_0_0 + 1)) {
 
-        tmp_index_7768_0_0 = (tmp_parfor_21_0_0 - istartcol_var_455);
         tmp_index_7769_0_0 = (tmp_parfor_21_0_0 - istartcol_var_455);
+        tmp_index_7768_0_0 = (tmp_parfor_21_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_7768_0_0] < laytrop_min_var_1877_0_0)) {
 
             laytrop_min_var_1877_0_0 = ilaytrop[tmp_index_7769_0_0];
@@ -36859,8 +36915,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_21_0_0 = istartcol_var_455; (tmp_parfor_21_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_21_0_0 = (tmp_parfor_21_0_0 + 1)) {
 
-        tmp_index_7771_0_0 = (tmp_parfor_21_0_0 - istartcol_var_455);
         tmp_index_7770_0_0 = (tmp_parfor_21_0_0 - istartcol_var_455);
+        tmp_index_7771_0_0 = (tmp_parfor_21_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_7770_0_0] > laytrop_max_var_1878_0_0)) {
 
             laytrop_max_var_1878_0_0 = ilaytrop[tmp_index_7771_0_0];
@@ -37049,9 +37105,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_268_0_0 = 1; (_for_it_268_0_0 <= laytrop_min_var_1877_0_0); _for_it_268_0_0 = (_for_it_268_0_0 + 1)) {
         for (_for_it_269_0_0 = istartcol_var_455; (_for_it_269_0_0 <= iendcol_var_456); _for_it_269_0_0 = (_for_it_269_0_0 + 1)) {
 
-            tmp_index_7799_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7801_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7795_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7801_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7799_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7797_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             {
                 double tmp_arg_173_0_0;
@@ -37106,9 +37162,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
             }
             tmp_index_7809_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7803_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7807_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_call_203_0_0 = int(specmult_var_1866_0_0);
+            tmp_index_7807_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7803_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7805_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             {
                 double tmp_call_204_0_0;
@@ -37198,10 +37254,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7811_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7815_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7813_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_call_205_0_0 = int(specmult1_var_1869_0_0);
+            tmp_index_7811_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7813_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             {
                 double tmp_call_206_0_0;
                 double tmp_arg_176_0_0;
@@ -37290,8 +37346,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7819_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_call_207_0_0 = int(specmult_mco2_var_1872_0_0);
+            tmp_index_7819_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7817_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             {
                 double tmp_call_208_0_0;
@@ -37434,8 +37490,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             }
             tmp_index_7825_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7827_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7829_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7827_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             {
                 double tmp_arg_180_0_0;
 
@@ -37488,10 +37544,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7835_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7833_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_call_210_0_0 = int(specmult_mco_0_0);
             tmp_index_7831_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7833_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7835_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_call_210_0_0 = int(specmult_mco_0_0);
             {
                 double tmp_call_211_0_0;
                 double tmp_arg_181_0_0;
@@ -37580,22 +37636,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_7849_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7851_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7847_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7842_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_index_7844_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-            tmp_call_212_0_0 = int(specmult_planck_var_1875_0_0);
-            tmp_index_7837_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             tmp_index_7839_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7851_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7837_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7842_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_call_212_0_0 = int(specmult_planck_var_1875_0_0);
+            tmp_index_7847_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7844_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+            tmp_index_7849_0_0 = (_for_it_269_0_0 - istartcol_var_455);
             {
 
 
             }
             ind0_var_1823_0_0 = (((((jp_var_471[(tmp_index_7837_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7839_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_25_nspa_var_216[12]) + (1 + tmp_call_203_0_0));
-            indm_var_1827_0_0 = indminor_var_470[(tmp_index_7851_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            inds_var_1825_0_0 = indself_var_474[(tmp_index_7847_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             indf_var_1826_0_0 = indfor_var_469[(tmp_index_7849_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            inds_var_1825_0_0 = indself_var_474[(tmp_index_7847_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indm_var_1827_0_0 = indminor_var_470[(tmp_index_7851_0_0 + ((_for_it_268_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_213_0_0;
                 double tmp_arg_183_0_0;
@@ -37689,11 +37745,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_7859_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7861_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7863_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 tmp_index_7855_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7853_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7863_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 tmp_index_7857_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7861_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7853_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -37835,12 +37891,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7875_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7867_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7871_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7869_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7865_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7867_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7869_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7873_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7871_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7875_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -37931,10 +37987,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_7881_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7883_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7877_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7879_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7877_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7883_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7881_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -38061,11 +38117,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_7885_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7891_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7887_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 tmp_index_7895_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7889_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7887_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7891_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 tmp_index_7893_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7889_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -38207,12 +38263,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7897_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7899_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7901_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7905_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7907_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7903_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                    tmp_index_7905_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7897_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7899_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -38303,9 +38359,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_7915_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7909_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7911_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                    tmp_index_7915_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     tmp_index_7913_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                     {
 
@@ -38573,10 +38629,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_270_0_0 = 1; (_for_it_270_0_0 <= 4); _for_it_270_0_0 = (_for_it_270_0_0 + 1)) {
 
-                tmp_index_7987_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_7991_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_8001_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 tmp_index_7997_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7987_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_8001_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_7991_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -38672,10 +38728,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8054_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_8047_0_0 = (_for_it_269_0_0 - istartcol_var_455);
-                tmp_index_8052_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 tmp_index_8045_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_8047_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_8054_0_0 = (_for_it_269_0_0 - istartcol_var_455);
+                tmp_index_8052_0_0 = (_for_it_269_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -38755,10 +38811,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             indm_var_1827_0_0 = indminor_var_470[(tmp_index_8063_0_0 + ((_for_it_271_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             for (_for_it_273_0_0 = 1; (_for_it_273_0_0 <= 4); _for_it_273_0_0 = (_for_it_273_0_0 + 1)) {
 
-                tmp_index_8067_0_0 = (_for_it_272_0_0 - istartcol_var_455);
+                tmp_index_8076_0_0 = (_for_it_272_0_0 - istartcol_var_455);
                 tmp_index_8078_0_0 = (_for_it_272_0_0 - istartcol_var_455);
                 tmp_index_8073_0_0 = (_for_it_272_0_0 - istartcol_var_455);
-                tmp_index_8076_0_0 = (_for_it_272_0_0 - istartcol_var_455);
+                tmp_index_8067_0_0 = (_for_it_272_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -38816,10 +38872,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1887_0_0 = ixlow_var_1880_0_0[((_for_it_275_0_0 + (sym_kfdia_var_1792_0_0 * (_for_it_274_0_0 - 1))) - 1)];
 
-                tmp_index_8091_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8085_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_index_8087_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8089_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8087_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8091_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_184_0_0;
 
@@ -38873,10 +38929,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_8095_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_index_8093_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_call_214_0_0 = int(specmult_var_1866_0_0);
                 tmp_index_8097_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8099_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_call_214_0_0 = int(specmult_var_1866_0_0);
+                tmp_index_8093_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 {
                     double tmp_call_215_0_0;
                     double tmp_arg_185_0_0;
@@ -38967,8 +39023,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_index_8105_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8103_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_index_8101_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_call_216_0_0 = int(specmult1_var_1869_0_0);
+                tmp_index_8101_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 {
                     double tmp_call_217_0_0;
                     double tmp_arg_187_0_0;
@@ -39057,9 +39113,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8107_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_call_218_0_0 = int(specmult_mco2_var_1872_0_0);
                 tmp_index_8109_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8107_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 {
                     double tmp_call_219_0_0;
                     double tmp_arg_189_0_0;
@@ -39255,10 +39311,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8123_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_call_221_0_0 = int(specmult_mco_0_0);
                 tmp_index_8125_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8123_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8121_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_call_221_0_0 = int(specmult_mco_0_0);
                 {
                     double tmp_call_222_0_0;
                     double tmp_arg_192_0_0;
@@ -39347,22 +39403,22 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_8141_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8132_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_index_8134_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_call_223_0_0 = int(specmult_planck_var_1875_0_0);
                 tmp_index_8137_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                tmp_index_8139_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_call_223_0_0 = int(specmult_planck_var_1875_0_0);
                 tmp_index_8127_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8139_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 tmp_index_8129_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8141_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                tmp_index_8134_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                 {
 
 
                 }
                 ind0_var_1823_0_0 = (((((jp_var_471[(tmp_index_8127_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_8129_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_25_nspa_var_216[12]) + (1 + tmp_call_214_0_0));
-                indm_var_1827_0_0 = indminor_var_470[(tmp_index_8141_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                inds_var_1825_0_0 = indself_var_474[(tmp_index_8137_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 indf_var_1826_0_0 = indfor_var_469[(tmp_index_8139_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                inds_var_1825_0_0 = indself_var_474[(tmp_index_8137_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indm_var_1827_0_0 = indminor_var_470[(tmp_index_8141_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_224_0_0;
                     double tmp_arg_194_0_0;
@@ -39403,8 +39459,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                ind1_var_1824_0_0 = ((((jp_var_471[(tmp_index_8132_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_8134_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_25_nspa_var_216[12]) + (1 + tmp_call_216_0_0));
                 _if_cond_251_0_0 = (specparm_var_1867_0_0 < 0.125);
+                ind1_var_1824_0_0 = ((((jp_var_471[(tmp_index_8132_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_8134_0_0 + ((_for_it_274_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_25_nspa_var_216[12]) + (1 + tmp_call_216_0_0));
                 if ((_if_cond_251_0_0 == 1)) {
                     {
 
@@ -39456,11 +39512,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                     tmp_index_8145_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8153_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8149_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8153_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8143_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8151_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8147_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8151_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -39602,12 +39658,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_8159_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8157_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8165_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8163_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8161_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8159_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8155_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8161_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8163_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8157_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -39698,10 +39754,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_8171_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8169_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8167_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8169_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8173_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8171_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -39827,11 +39883,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_8181_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8177_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8183_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8175_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8179_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8177_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8175_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8183_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8181_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8185_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     {
 
@@ -39974,11 +40030,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_8193_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8197_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8195_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8191_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8187_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8195_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8197_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8191_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8193_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8189_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         {
 
@@ -40071,9 +40127,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     } else {
 
                         tmp_index_8201_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8205_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                        tmp_index_8203_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         tmp_index_8199_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8203_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                        tmp_index_8205_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -40340,10 +40396,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_276_0_0 = 1; (_for_it_276_0_0 <= 4); _for_it_276_0_0 = (_for_it_276_0_0 + 1)) {
 
-                    tmp_index_8281_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8287_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8291_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8277_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8281_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8291_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8287_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -40439,9 +40495,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_8337_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8342_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8344_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8337_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8335_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     {
 
@@ -40522,9 +40578,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_278_0_0 = 1; (_for_it_278_0_0 <= 4); _for_it_278_0_0 = (_for_it_278_0_0 + 1)) {
 
                     tmp_index_8365_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
-                    tmp_index_8359_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8368_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     tmp_index_8370_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
+                    tmp_index_8359_0_0 = (jl_var_1887_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -40573,9 +40629,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
+    laytrop_min_var_1536_0_0 = 2147483647;
     sym_klev_var_1509_0_0 = nlev_var_454;
     sym_kfdia_var_1508_0_0 = iendcol_var_456;
-    laytrop_min_var_1536_0_0 = 2147483647;
 
     delete[] colco_0_0;
     delete[] ixc_var_1879_0_0;
@@ -40596,8 +40652,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_17_0_0 = istartcol_var_455; (tmp_parfor_17_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_17_0_0 = (tmp_parfor_17_0_0 + 1)) {
 
-        tmp_index_6102_0_0 = (tmp_parfor_17_0_0 - istartcol_var_455);
         tmp_index_6103_0_0 = (tmp_parfor_17_0_0 - istartcol_var_455);
+        tmp_index_6102_0_0 = (tmp_parfor_17_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_6102_0_0] > laytrop_max_var_1537_0_0)) {
 
             laytrop_max_var_1537_0_0 = ilaytrop[tmp_index_6103_0_0];
@@ -40735,19 +40791,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_214_0_0 = 1; (_for_it_214_0_0 <= laytrop_min_var_1536_0_0); _for_it_214_0_0 = (_for_it_214_0_0 + 1)) {
         for (_for_it_215_0_0 = istartcol_var_455; (_for_it_215_0_0 <= iendcol_var_456); _for_it_215_0_0 = (_for_it_215_0_0 + 1)) {
 
-            tmp_index_6127_0_0 = (_for_it_215_0_0 - istartcol_var_455);
             tmp_index_6120_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-            tmp_index_6115_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-            tmp_index_6117_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-            tmp_index_6125_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+            tmp_index_6127_0_0 = (_for_it_215_0_0 - istartcol_var_455);
             tmp_index_6122_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+            tmp_index_6117_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+            tmp_index_6115_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+            tmp_index_6125_0_0 = (_for_it_215_0_0 - istartcol_var_455);
             {
 
 
             }
-            ind0_var_1529_0_0 = (((((jp_var_471[(tmp_index_6115_0_0 + ((_for_it_214_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6117_0_0 + ((_for_it_214_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspa_var_216[13]) + 1);
             indf_var_1532_0_0 = indfor_var_469[(tmp_index_6127_0_0 + ((_for_it_214_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_1531_0_0 = indself_var_474[(tmp_index_6125_0_0 + ((_for_it_214_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_1529_0_0 = (((((jp_var_471[(tmp_index_6115_0_0 + ((_for_it_214_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6117_0_0 + ((_for_it_214_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspa_var_216[13]) + 1);
             {
 
 
@@ -40757,15 +40813,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 tmp_index_6143_0_0 = (_for_it_215_0_0 - istartcol_var_455);
                 tmp_index_6154_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-                tmp_index_6158_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-                tmp_index_6129_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-                tmp_index_6152_0_0 = (_for_it_215_0_0 - istartcol_var_455);
                 tmp_index_6166_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-                tmp_index_6139_0_0 = (_for_it_215_0_0 - istartcol_var_455);
                 tmp_index_6162_0_0 = (_for_it_215_0_0 - istartcol_var_455);
-                tmp_index_6149_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+                tmp_index_6139_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+                tmp_index_6152_0_0 = (_for_it_215_0_0 - istartcol_var_455);
                 tmp_index_6170_0_0 = (_for_it_215_0_0 - istartcol_var_455);
                 tmp_index_6133_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+                tmp_index_6158_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+                tmp_index_6149_0_0 = (_for_it_215_0_0 - istartcol_var_455);
+                tmp_index_6129_0_0 = (_for_it_215_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -40842,9 +40898,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_217_0_0 = (laytrop_max_var_1537_0_0 + 1); (_for_it_217_0_0 <= nlev_var_454); _for_it_217_0_0 = (_for_it_217_0_0 + 1)) {
         for (_for_it_218_0_0 = istartcol_var_455; (_for_it_218_0_0 <= iendcol_var_456); _for_it_218_0_0 = (_for_it_218_0_0 + 1)) {
 
-            tmp_index_6174_0_0 = (_for_it_218_0_0 - istartcol_var_455);
-            tmp_index_6179_0_0 = (_for_it_218_0_0 - istartcol_var_455);
             tmp_index_6176_0_0 = (_for_it_218_0_0 - istartcol_var_455);
+            tmp_index_6179_0_0 = (_for_it_218_0_0 - istartcol_var_455);
+            tmp_index_6174_0_0 = (_for_it_218_0_0 - istartcol_var_455);
             {
 
 
@@ -40858,11 +40914,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             ind1_var_1530_0_0 = (((((jp_var_471[(tmp_index_6179_0_0 + ((_for_it_217_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_6181_0_0 + ((_for_it_217_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspb_var_217[13]) + 1);
             for (_for_it_219_0_0 = 1; (_for_it_219_0_0 <= 2); _for_it_219_0_0 = (_for_it_219_0_0 + 1)) {
 
-                tmp_index_6205_0_0 = (_for_it_218_0_0 - istartcol_var_455);
-                tmp_index_6184_0_0 = (_for_it_218_0_0 - istartcol_var_455);
-                tmp_index_6187_0_0 = (_for_it_218_0_0 - istartcol_var_455);
                 tmp_index_6197_0_0 = (_for_it_218_0_0 - istartcol_var_455);
                 tmp_index_6201_0_0 = (_for_it_218_0_0 - istartcol_var_455);
+                tmp_index_6205_0_0 = (_for_it_218_0_0 - istartcol_var_455);
+                tmp_index_6187_0_0 = (_for_it_218_0_0 - istartcol_var_455);
+                tmp_index_6184_0_0 = (_for_it_218_0_0 - istartcol_var_455);
                 tmp_index_6193_0_0 = (_for_it_218_0_0 - istartcol_var_455);
                 tmp_index_6189_0_0 = (_for_it_218_0_0 - istartcol_var_455);
                 {
@@ -40915,18 +40971,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 jl_var_1546_0_0 = ixlow_var_1539_0_0[((_for_it_221_0_0 + (sym_kfdia_var_1508_0_0 * (_for_it_220_0_0 - 1))) - 1)];
 
                 tmp_index_6224_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                tmp_index_6222_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                tmp_index_6214_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                tmp_index_6212_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                 tmp_index_6219_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                tmp_index_6212_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                tmp_index_6214_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                tmp_index_6222_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                 tmp_index_6217_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                ind0_var_1529_0_0 = (((((jp_var_471[(tmp_index_6212_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6214_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspa_var_216[13]) + 1);
                 indf_var_1532_0_0 = indfor_var_469[(tmp_index_6224_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_1531_0_0 = indself_var_474[(tmp_index_6222_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_1529_0_0 = (((((jp_var_471[(tmp_index_6212_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6214_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspa_var_216[13]) + 1);
                 {
 
 
@@ -40934,17 +40990,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1530_0_0 = ((((jp_var_471[(tmp_index_6217_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_6219_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspa_var_216[13]) + 1);
                 for (_for_it_222_0_0 = 1; (_for_it_222_0_0 <= 2); _for_it_222_0_0 = (_for_it_222_0_0 + 1)) {
 
-                    tmp_index_6255_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6226_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6246_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6263_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6251_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6230_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6249_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6267_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6246_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6259_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6236_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6267_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6263_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6240_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6255_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6226_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6230_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6251_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -41020,9 +41076,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1546_0_0 = ixhigh_var_1540_0_0[((_for_it_223_0_0 + (sym_kfdia_var_1508_0_0 * (_for_it_220_0_0 - 1))) - 1)];
 
+                tmp_index_6275_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                 tmp_index_6273_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                 tmp_index_6278_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                tmp_index_6275_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                 {
 
 
@@ -41036,13 +41092,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1530_0_0 = (((((jp_var_471[(tmp_index_6278_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_6280_0_0 + ((_for_it_220_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_21_nspb_var_217[13]) + 1);
                 for (_for_it_224_0_0 = 1; (_for_it_224_0_0 <= 2); _for_it_224_0_0 = (_for_it_224_0_0 + 1)) {
 
+                    tmp_index_6283_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6292_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6304_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
+                    tmp_index_6296_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6300_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6286_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6283_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     tmp_index_6288_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6304_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6292_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
-                    tmp_index_6296_0_0 = (jl_var_1546_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -41084,9 +41140,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_klev_var_1549_0_0 = nlev_var_454;
     laytrop_min_var_1622_0_0 = 2147483647;
     sym_kfdia_var_1548_0_0 = iendcol_var_456;
+    sym_klev_var_1549_0_0 = nlev_var_454;
 
     delete[] ixc_var_1538_0_0;
     delete[] ixlow_var_1539_0_0;
@@ -41181,8 +41237,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (_for_it_225_0_0 = (laytrop_min_var_1622_0_0 + 1); (_for_it_225_0_0 <= laytrop_max_var_1623_0_0); _for_it_225_0_0 = (_for_it_225_0_0 + 1)) {
 
-        ich_var_1627_0_0 = 0;
         icl_var_1628_0_0 = 0;
+        ich_var_1627_0_0 = 0;
         for (_for_it_226_0_0 = istartcol_var_455; (_for_it_226_0_0 <= iendcol_var_456); _for_it_226_0_0 = (_for_it_226_0_0 + 1)) {
 
             tmp_index_6317_0_0 = (_for_it_226_0_0 - istartcol_var_455);
@@ -41335,11 +41391,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_6343_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6345_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6339_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_index_6341_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6339_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6345_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_call_163_0_0 = int(specmult_var_1611_0_0);
+            tmp_index_6343_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             {
                 double tmp_call_164_0_0;
                 double tmp_arg_134_0_0;
@@ -41428,10 +41484,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_call_165_0_0 = int(specmult1_var_1615_0_0);
             tmp_index_6349_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6351_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_index_6347_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_call_165_0_0 = int(specmult1_var_1615_0_0);
+            tmp_index_6351_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             {
                 double tmp_call_166_0_0;
                 double tmp_arg_136_0_0;
@@ -41520,10 +41576,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_6357_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6355_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_index_6353_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6355_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_call_167_0_0 = int(specmult_mn2_0_0);
+            tmp_index_6357_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             {
                 double tmp_call_168_0_0;
                 double tmp_arg_138_0_0;
@@ -41612,24 +41668,24 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_6361_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6373_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6369_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6366_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_call_169_0_0 = int(specmult_planck_var_1619_0_0);
             tmp_index_6364_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6359_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6361_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6373_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6371_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6366_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_index_6377_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             tmp_index_6375_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6359_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-            tmp_index_6371_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+            tmp_index_6369_0_0 = (_for_it_228_0_0 - istartcol_var_455);
             {
 
 
             }
-            indf_var_1579_0_0 = indfor_var_469[(tmp_index_6371_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-            ind0_var_1576_0_0 = (((((jp_var_471[(tmp_index_6359_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6361_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_22_nspa_var_216[14]) + (1 + tmp_call_163_0_0));
             indm_var_1580_0_0 = indminor_var_470[(tmp_index_6373_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            indf_var_1579_0_0 = indfor_var_469[(tmp_index_6371_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             inds_var_1578_0_0 = indself_var_474[(tmp_index_6369_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+            ind0_var_1576_0_0 = (((((jp_var_471[(tmp_index_6359_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6361_0_0 + ((_for_it_227_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_22_nspa_var_216[14]) + (1 + tmp_call_163_0_0));
             {
                 double tmp_call_170_0_0;
                 double tmp_arg_140_0_0;
@@ -41738,8 +41794,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6389_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6379_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6389_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6385_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6381_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6383_0_0 = (_for_it_228_0_0 - istartcol_var_455);
@@ -41885,12 +41941,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_6397_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6391_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                    tmp_index_6393_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6395_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6397_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6401_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6399_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6393_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -41981,10 +42037,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
-                    tmp_index_6407_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6403_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6405_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6409_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6407_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -42111,9 +42167,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 }
                 tmp_index_6419_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                tmp_index_6417_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                tmp_index_6411_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6413_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6411_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6417_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6421_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6415_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 {
@@ -42257,12 +42313,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_6433_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                    tmp_index_6423_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                    tmp_index_6431_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                    tmp_index_6427_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                    tmp_index_6425_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6429_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6427_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6433_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6425_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6431_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                    tmp_index_6423_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -42353,10 +42409,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 } else {
 
+                    tmp_index_6435_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6441_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6437_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     tmp_index_6439_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                    tmp_index_6435_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -42623,10 +42679,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_229_0_0 = 1; (_for_it_229_0_0 <= 2); _for_it_229_0_0 = (_for_it_229_0_0 + 1)) {
 
-                tmp_index_6527_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                tmp_index_6517_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                tmp_index_6523_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6513_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6527_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6523_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6517_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -42675,9 +42731,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6551_0_0 = (_for_it_228_0_0 - istartcol_var_455);
-                tmp_index_6553_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 tmp_index_6558_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6553_0_0 = (_for_it_228_0_0 - istartcol_var_455);
+                tmp_index_6551_0_0 = (_for_it_228_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -42751,8 +42807,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_231_0_0 = (laytrop_max_var_1623_0_0 + 1); (_for_it_231_0_0 <= nlev_var_454); _for_it_231_0_0 = (_for_it_231_0_0 + 1)) {
             for (_for_it_232_0_0 = istartcol_var_455; (_for_it_232_0_0 <= iendcol_var_456); _for_it_232_0_0 = (_for_it_232_0_0 + 1)) {
 
-                tmp_index_6567_0_0 = (_for_it_232_0_0 - istartcol_var_455);
                 tmp_index_6570_0_0 = (_for_it_232_0_0 - istartcol_var_455);
+                tmp_index_6567_0_0 = (_for_it_232_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -42794,8 +42850,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 jl_var_1632_0_0 = ixlow_var_1625_0_0[((_for_it_234_0_0 + (sym_kfdia_var_1548_0_0 * (_for_it_233_0_0 - 1))) - 1)];
 
                 tmp_index_6580_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6578_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6576_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6578_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6582_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_141_0_0;
@@ -42849,11 +42905,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6588_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6590_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6584_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6586_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_call_171_0_0 = int(specmult_var_1611_0_0);
+                tmp_index_6590_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6586_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6588_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 {
                     double tmp_call_172_0_0;
                     double tmp_arg_142_0_0;
@@ -42942,10 +42998,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6594_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6596_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6592_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_call_173_0_0 = int(specmult1_var_1615_0_0);
+                tmp_index_6594_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 {
                     double tmp_call_174_0_0;
                     double tmp_arg_144_0_0;
@@ -43034,10 +43090,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                tmp_call_175_0_0 = int(specmult_mn2_0_0);
+                tmp_index_6598_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6600_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6602_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6598_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_call_175_0_0 = int(specmult_mn2_0_0);
                 {
                     double tmp_call_176_0_0;
                     double tmp_arg_146_0_0;
@@ -43126,24 +43182,24 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6609_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6611_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6606_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6604_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6614_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6618_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_index_6620_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6616_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                tmp_index_6622_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 tmp_call_177_0_0 = int(specmult_planck_var_1619_0_0);
+                tmp_index_6611_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6616_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6618_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6614_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6622_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6604_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6609_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                tmp_index_6606_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                indf_var_1579_0_0 = indfor_var_469[(tmp_index_6616_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                ind0_var_1576_0_0 = (((((jp_var_471[(tmp_index_6604_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6606_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_22_nspa_var_216[14]) + (1 + tmp_call_171_0_0));
                 indm_var_1580_0_0 = indminor_var_470[(tmp_index_6618_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                indf_var_1579_0_0 = indfor_var_469[(tmp_index_6616_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 inds_var_1578_0_0 = indself_var_474[(tmp_index_6614_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                ind0_var_1576_0_0 = (((((jp_var_471[(tmp_index_6604_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6606_0_0 + ((_for_it_233_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_22_nspa_var_216[14]) + (1 + tmp_call_171_0_0));
                 {
                     double tmp_call_178_0_0;
                     double tmp_arg_148_0_0;
@@ -43252,12 +43308,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_6628_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6630_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                    tmp_index_6624_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6632_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                    tmp_index_6626_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6628_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6634_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6626_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6624_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -43399,11 +43455,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_6640_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6638_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6646_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6640_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6644_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6636_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6646_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6642_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         {
 
@@ -43496,9 +43552,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     } else {
 
                         tmp_index_6652_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6650_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6648_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6654_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6648_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6650_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -43624,12 +43680,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_6662_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                    tmp_index_6658_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6656_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                    tmp_index_6664_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                    tmp_index_6666_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6658_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6660_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6666_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6664_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6662_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -43771,12 +43827,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_6676_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6678_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6670_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6668_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6672_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6674_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6670_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6678_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6672_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6676_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -43867,10 +43923,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_6682_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                        tmp_index_6680_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6684_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         tmp_index_6686_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6682_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                        tmp_index_6680_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -44137,10 +44193,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_235_0_0 = 1; (_for_it_235_0_0 <= 2); _for_it_235_0_0 = (_for_it_235_0_0 + 1)) {
 
-                    tmp_index_6772_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6762_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
-                    tmp_index_6758_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6768_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6772_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6758_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -44264,8 +44320,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     jl_var_1632_0_0 = ixhigh_var_1626_0_0[((_for_it_237_0_0 + (sym_kfdia_var_1548_0_0 * (_for_it_233_0_0 - 1))) - 1)];
 
-                    tmp_index_6817_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     tmp_index_6814_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
+                    tmp_index_6817_0_0 = (jl_var_1632_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -44297,17 +44353,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
         }
     }
-    sym_kfdia_var_1634_0_0 = iendcol_var_456;
     laytrop_min_var_1701_0_0 = 2147483647;
     sym_klev_var_1635_0_0 = nlev_var_454;
+    sym_kfdia_var_1634_0_0 = iendcol_var_456;
 
     delete[] ixc_var_1624_0_0;
     delete[] ixlow_var_1625_0_0;
     delete[] ixhigh_var_1626_0_0;
     for (tmp_parfor_19_0_0 = istartcol_var_455; (tmp_parfor_19_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_19_0_0 = (tmp_parfor_19_0_0 + 1)) {
 
-        tmp_index_6821_0_0 = (tmp_parfor_19_0_0 - istartcol_var_455);
         tmp_index_6820_0_0 = (tmp_parfor_19_0_0 - istartcol_var_455);
+        tmp_index_6821_0_0 = (tmp_parfor_19_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_6820_0_0] < laytrop_min_var_1701_0_0)) {
 
             laytrop_min_var_1701_0_0 = ilaytrop[tmp_index_6821_0_0];
@@ -44319,8 +44375,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
     for (tmp_parfor_19_0_0 = istartcol_var_455; (tmp_parfor_19_0_0 <= ((((sym_iendcol_var_456 - sym_istartcol_var_455) + 1) + istartcol_var_455) - 1)); tmp_parfor_19_0_0 = (tmp_parfor_19_0_0 + 1)) {
 
-        tmp_index_6822_0_0 = (tmp_parfor_19_0_0 - istartcol_var_455);
         tmp_index_6823_0_0 = (tmp_parfor_19_0_0 - istartcol_var_455);
+        tmp_index_6822_0_0 = (tmp_parfor_19_0_0 - istartcol_var_455);
         if ((ilaytrop[tmp_index_6822_0_0] > laytrop_max_var_1702_0_0)) {
 
             laytrop_max_var_1702_0_0 = ilaytrop[tmp_index_6823_0_0];
@@ -44477,9 +44533,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
     for (_for_it_240_0_0 = 1; (_for_it_240_0_0 <= laytrop_min_var_1701_0_0); _for_it_240_0_0 = (_for_it_240_0_0 + 1)) {
         for (_for_it_241_0_0 = istartcol_var_455; (_for_it_241_0_0 <= iendcol_var_456); _for_it_241_0_0 = (_for_it_241_0_0 + 1)) {
 
-            tmp_index_6845_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-            tmp_index_6841_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6843_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6841_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6845_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6839_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             {
                 double tmp_arg_149_0_0;
@@ -44533,11 +44589,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_6853_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-            tmp_index_6847_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_call_179_0_0 = int(specmult_var_1690_0_0);
-            tmp_index_6849_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6853_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6851_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6849_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6847_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             {
                 double tmp_call_180_0_0;
                 double tmp_arg_150_0_0;
@@ -44626,9 +44682,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
+            tmp_index_6859_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6857_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6855_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-            tmp_index_6859_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_call_181_0_0 = int(specmult1_var_1694_0_0);
             {
                 double tmp_call_182_0_0;
@@ -44718,19 +44774,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
 
             }
-            tmp_index_6871_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6863_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-            tmp_index_6866_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-            tmp_index_6873_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-            tmp_call_183_0_0 = int(specmult_planck_var_1698_0_0);
-            tmp_index_6861_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             tmp_index_6868_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6861_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_call_183_0_0 = int(specmult_planck_var_1698_0_0);
+            tmp_index_6871_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6873_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+            tmp_index_6866_0_0 = (_for_it_241_0_0 - istartcol_var_455);
             {
 
 
             }
-            inds_var_1661_0_0 = indself_var_474[(tmp_index_6871_0_0 + ((_for_it_240_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             ind0_var_1659_0_0 = (((((jp_var_471[(tmp_index_6861_0_0 + ((_for_it_240_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_6863_0_0 + ((_for_it_240_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_23_nspa_var_216[15]) + (1 + tmp_call_179_0_0));
+            inds_var_1661_0_0 = indself_var_474[(tmp_index_6871_0_0 + ((_for_it_240_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             indf_var_1662_0_0 = indfor_var_469[(tmp_index_6873_0_0 + ((_for_it_240_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
             {
                 double tmp_call_184_0_0;
@@ -44824,12 +44880,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6881_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_6885_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_6877_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_6879_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_6883_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_6879_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_6875_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_6877_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_6885_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_6881_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -44971,11 +45027,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_6889_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                    tmp_index_6893_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6897_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6895_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6887_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                    tmp_index_6893_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                    tmp_index_6889_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6891_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     {
 
@@ -45068,9 +45124,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 } else {
 
                     tmp_index_6905_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                    tmp_index_6901_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6899_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6903_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                    tmp_index_6901_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -45196,9 +45252,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_6913_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_6915_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_6909_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_6915_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_6913_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_6917_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_6907_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_6911_0_0 = (_for_it_241_0_0 - istartcol_var_455);
@@ -45343,12 +45399,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_6929_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6921_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                    tmp_index_6919_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6925_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                    tmp_index_6927_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                    tmp_index_6929_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                    tmp_index_6919_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     tmp_index_6923_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                    tmp_index_6927_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -45709,12 +45765,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_242_0_0 = 1; (_for_it_242_0_0 <= 2); _for_it_242_0_0 = (_for_it_242_0_0 + 1)) {
 
-                tmp_index_7009_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_7013_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_7019_0_0 = (_for_it_241_0_0 - istartcol_var_455);
-                tmp_index_7023_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_7034_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_7019_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 tmp_index_7029_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_7013_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_7009_0_0 = (_for_it_241_0_0 - istartcol_var_455);
+                tmp_index_7023_0_0 = (_for_it_241_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -45804,12 +45860,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             for (_for_it_245_0_0 = 1; (_for_it_245_0_0 <= 2); _for_it_245_0_0 = (_for_it_245_0_0 + 1)) {
 
                 tmp_index_7070_0_0 = (_for_it_244_0_0 - istartcol_var_455);
-                tmp_index_7056_0_0 = (_for_it_244_0_0 - istartcol_var_455);
-                tmp_index_7053_0_0 = (_for_it_244_0_0 - istartcol_var_455);
                 tmp_index_7066_0_0 = (_for_it_244_0_0 - istartcol_var_455);
                 tmp_index_7058_0_0 = (_for_it_244_0_0 - istartcol_var_455);
-                tmp_index_7074_0_0 = (_for_it_244_0_0 - istartcol_var_455);
+                tmp_index_7056_0_0 = (_for_it_244_0_0 - istartcol_var_455);
+                tmp_index_7053_0_0 = (_for_it_244_0_0 - istartcol_var_455);
                 tmp_index_7062_0_0 = (_for_it_244_0_0 - istartcol_var_455);
+                tmp_index_7074_0_0 = (_for_it_244_0_0 - istartcol_var_455);
                 {
 
                     {
@@ -45860,10 +45916,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1711_0_0 = ixlow_var_1704_0_0[((_for_it_247_0_0 + (sym_kfdia_var_1634_0_0 * (_for_it_246_0_0 - 1))) - 1)];
 
-                tmp_index_7087_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_index_7085_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_index_7081_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7083_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_index_7087_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_index_7081_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_index_7085_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 {
                     double tmp_arg_155_0_0;
 
@@ -45916,11 +45972,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7095_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_call_185_0_0 = int(specmult_var_1690_0_0);
                 tmp_index_7093_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_index_7089_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7091_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_index_7089_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_call_185_0_0 = int(specmult_var_1690_0_0);
+                tmp_index_7095_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 {
                     double tmp_call_186_0_0;
                     double tmp_arg_156_0_0;
@@ -46009,8 +46065,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7097_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7101_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_index_7097_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_call_187_0_0 = int(specmult1_var_1694_0_0);
                 tmp_index_7099_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 {
@@ -46101,19 +46157,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
-                tmp_index_7105_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7110_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_index_7108_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_index_7103_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7113_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_call_189_0_0 = int(specmult_planck_var_1698_0_0);
+                tmp_index_7103_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7115_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_index_7108_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                tmp_call_189_0_0 = int(specmult_planck_var_1698_0_0);
+                tmp_index_7105_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                inds_var_1661_0_0 = indself_var_474[(tmp_index_7113_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 ind0_var_1659_0_0 = (((((jp_var_471[(tmp_index_7103_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7105_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_23_nspa_var_216[15]) + (1 + tmp_call_185_0_0));
+                inds_var_1661_0_0 = indself_var_474[(tmp_index_7113_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 indf_var_1662_0_0 = indfor_var_469[(tmp_index_7115_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                 {
                     double tmp_call_190_0_0;
@@ -46207,12 +46263,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
+                    tmp_index_7125_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7121_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7127_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7117_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7119_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7123_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7125_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7119_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7117_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -46354,12 +46410,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_7139_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                        tmp_index_7133_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                        tmp_index_7137_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                        tmp_index_7131_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7129_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7135_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7139_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7131_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7137_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7133_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -46450,10 +46506,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_7145_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7147_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                        tmp_index_7141_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7143_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7145_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7141_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -46579,12 +46635,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
 
                     }
-                    tmp_index_7149_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7155_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7157_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7153_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7151_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7159_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7153_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7155_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7149_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7151_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7157_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -46727,11 +46783,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                         }
                         tmp_index_7167_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7163_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7161_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7165_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7169_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7171_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                        tmp_index_7163_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                        tmp_index_7161_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -46822,8 +46878,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     } else {
 
-                        tmp_index_7175_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7177_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                        tmp_index_7175_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7173_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         tmp_index_7179_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                         {
@@ -47092,12 +47148,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_248_0_0 = 1; (_for_it_248_0_0 <= 2); _for_it_248_0_0 = (_for_it_248_0_0 + 1)) {
 
-                    tmp_index_7276_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7255_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7271_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7251_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7261_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7265_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7251_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7271_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7276_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -47169,15 +47225,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                 jl_var_1711_0_0 = ixhigh_var_1705_0_0[((_for_it_249_0_0 + (sym_kfdia_var_1634_0_0 * (_for_it_246_0_0 - 1))) - 1)];
 
+                tmp_index_7292_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7287_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 tmp_index_7289_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                tmp_index_7292_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 {
 
 
                 }
-                tmp_index_7294_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 ind0_var_1659_0_0 = (((((jp_var_471[(tmp_index_7287_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_7289_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_23_nspb_var_217[15]) + 1);
+                tmp_index_7294_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                 {
 
 
@@ -47185,13 +47241,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 ind1_var_1660_0_0 = (((((jp_var_471[(tmp_index_7292_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_7294_0_0 + ((_for_it_246_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_23_nspb_var_217[15]) + 1);
                 for (_for_it_250_0_0 = 1; (_for_it_250_0_0 <= 2); _for_it_250_0_0 = (_for_it_250_0_0 + 1)) {
 
-                    tmp_index_7302_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7314_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7300_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7310_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7302_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7297_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7306_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
+                    tmp_index_7314_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     tmp_index_7318_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
-                    tmp_index_7300_0_0 = (jl_var_1711_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -47241,8 +47297,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         for (_for_it_280_0 = 1; (_for_it_280_0 <= 140); _for_it_280_0 = (_for_it_280_0 + 1)) {
             for (_for_it_281_0 = istartcol_var_455; (_for_it_281_0 <= iendcol_var_456); _for_it_281_0 = (_for_it_281_0 + 1)) {
 
-                tmp_index_8380_0 = (_for_it_281_0 - istartcol_var_455);
                 tmp_index_8379_0 = (_for_it_281_0 - istartcol_var_455);
+                tmp_index_8380_0 = (_for_it_281_0 - istartcol_var_455);
                 {
 
                     {
@@ -47297,8 +47353,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             temperature_var_492_0 = v_thermodynamics_var_486_temperature_hl[((((32 * _for_it_423_0) + _for_it_424_0) + (32 * ilevoffset_0)) - 33)];
             if ((((temperature_var_492_0 < 339.0) && (temperature_var_492_0 >= 160.0)) == 1)) {
 
-                tmp_index_11739_0 = (_for_it_424_0 - istartcol_var_455);
                 tmp_index_11740_0 = (_for_it_424_0 - istartcol_var_455);
+                tmp_index_11739_0 = (_for_it_424_0 - istartcol_var_455);
                 {
 
                     {
@@ -47405,11 +47461,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             }
             for (_for_it_426_0 = istartcol_var_455; (_for_it_426_0 <= iendcol_var_456); _for_it_426_0 = (_for_it_426_0 + 1)) {
 
-                tmp_index_11748_0 = (_for_it_426_0 - istartcol_var_455);
-                tmp_index_11751_0 = (_for_it_426_0 - istartcol_var_455);
-                tmp_index_11755_0 = (_for_it_426_0 - istartcol_var_455);
-                tmp_index_11746_0 = (_for_it_426_0 - istartcol_var_455);
                 tmp_index_11752_0 = (_for_it_426_0 - istartcol_var_455);
+                tmp_index_11746_0 = (_for_it_426_0 - istartcol_var_455);
+                tmp_index_11755_0 = (_for_it_426_0 - istartcol_var_455);
+                tmp_index_11751_0 = (_for_it_426_0 - istartcol_var_455);
+                tmp_index_11748_0 = (_for_it_426_0 - istartcol_var_455);
 
                 tmp_index_11753_0 = ((ind_var_491_0[tmp_index_11752_0] + 1) - 1);
                 tmp_index_11756_0 = (ind_var_491_0[tmp_index_11755_0] - 1);
@@ -47448,10 +47504,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 iband_var_497_0 = v_config_var_485_i_band_from_g_lw[(_for_it_427_0 - 1)];
                 for (_for_it_428_0 = istartcol_var_455; (_for_it_428_0 <= iendcol_var_456); _for_it_428_0 = (_for_it_428_0 + 1)) {
 
-                    tmp_index_11766_0 = (nlev_var_454 - 1);
-                    tmp_index_11764_0 = (_for_it_428_0 - istartcol_var_455);
-                    tmp_index_11762_0 = (_for_it_428_0 - istartcol_var_455);
                     tmp_index_11761_0 = (_for_it_428_0 - istartcol_var_455);
+                    tmp_index_11764_0 = (_for_it_428_0 - istartcol_var_455);
+                    tmp_index_11766_0 = (nlev_var_454 - 1);
+                    tmp_index_11762_0 = (_for_it_428_0 - istartcol_var_455);
                     {
 
                         {
@@ -47481,10 +47537,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 iband_var_497_0 = v_config_var_485_i_band_from_g_lw[(_for_it_429_0 - 1)];
                 for (_for_it_430_0 = istartcol_var_455; (_for_it_430_0 <= iendcol_var_456); _for_it_430_0 = (_for_it_430_0 + 1)) {
 
-                    tmp_index_11768_0 = (_for_it_430_0 - istartcol_var_455);
                     tmp_index_11772_0 = (_for_it_430_0 - istartcol_var_455);
-                    tmp_index_11774_0 = (((nlev_var_454 + 2) - _for_it_423_0) - 1);
+                    tmp_index_11768_0 = (_for_it_430_0 - istartcol_var_455);
                     tmp_index_11770_0 = (_for_it_430_0 - istartcol_var_455);
+                    tmp_index_11774_0 = (((nlev_var_454 + 2) - _for_it_423_0) - 1);
                     {
 
                         {
@@ -47621,8 +47677,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else {
 
-                tmp_index_11786_0 = (_for_it_433_0 - istartcol_var_455);
                 tmp_index_11785_0 = (_for_it_433_0 - istartcol_var_455);
+                tmp_index_11786_0 = (_for_it_433_0 - istartcol_var_455);
                 {
 
                     {
@@ -47674,11 +47730,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         }
         for (_for_it_435_0 = istartcol_var_455; (_for_it_435_0 <= iendcol_var_456); _for_it_435_0 = (_for_it_435_0 + 1)) {
 
-            tmp_index_11797_0 = (_for_it_435_0 - istartcol_var_455);
-            tmp_index_11793_0 = (_for_it_435_0 - istartcol_var_455);
-            tmp_index_11788_0 = (_for_it_435_0 - istartcol_var_455);
             tmp_index_11790_0 = (_for_it_435_0 - istartcol_var_455);
+            tmp_index_11788_0 = (_for_it_435_0 - istartcol_var_455);
+            tmp_index_11797_0 = (_for_it_435_0 - istartcol_var_455);
             tmp_index_11794_0 = (_for_it_435_0 - istartcol_var_455);
+            tmp_index_11793_0 = (_for_it_435_0 - istartcol_var_455);
 
             tmp_index_11795_0 = ((ind_var_507_0[tmp_index_11794_0] + 1) - 1);
             tmp_index_11798_0 = (ind_var_507_0[tmp_index_11797_0] - 1);
@@ -47719,8 +47775,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         iband_var_511_0 = v_config_var_502_i_band_from_g_lw[(_for_it_436_0 - 1)];
         for (_for_it_437_0 = istartcol_var_455; (_for_it_437_0 <= iendcol_var_456); _for_it_437_0 = (_for_it_437_0 + 1)) {
 
-            tmp_index_11802_0 = (_for_it_437_0 - istartcol_var_455);
             tmp_index_11803_0 = (_for_it_437_0 - istartcol_var_455);
+            tmp_index_11802_0 = (_for_it_437_0 - istartcol_var_455);
             tmp_index_11805_0 = (_for_it_437_0 - istartcol_var_455);
             {
                 double* pfrac_var_504_0;
@@ -47813,8 +47869,24 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         }
 
     }
-    i_nlayers_var_1073_0 = nlev_var_454;
+    goto_1_0 = 0;
     goto_0_0 = 0;
+
+    {
+
+        {
+            double z_stpfac_var_1077_out;
+
+            ///////////////////
+            // Tasklet code (T_l3165_c3165)
+            z_stpfac_var_1077_out = 0.29220138203356366;
+            ///////////////////
+
+            z_stpfac_var_1077_0 = z_stpfac_var_1077_out;
+        }
+
+    }
+    i_nlayers_var_1073_0 = nlev_var_454;
 
     for (_for_it_123_0 = 1; (_for_it_123_0 <= nlev_var_454); _for_it_123_0 = (_for_it_123_0 + 1)) {
         for (_for_it_124_0 = istartcol_var_455; (_for_it_124_0 <= iendcol_var_456); _for_it_124_0 = (_for_it_124_0 + 1)) {
@@ -47975,21 +48047,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     }
                 }
-                tmp_index_2940_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2947_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2942_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2945_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2940_0 = (_for_it_127_0 - istartcol_var_455);
 
                 jp1_var_1076_0 = (jp_var_471[(tmp_index_2940_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 1);
-                tmp_index_2949_0 = (jp_var_471[(tmp_index_2947_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 tmp_index_2944_0 = (jp_var_471[(tmp_index_2942_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
+                tmp_index_2949_0 = (jp_var_471[(tmp_index_2947_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1);
                 {
 
 
                 }
                 tmp_arg_45_0 = (3.0 + ((ztavel[(tmp_index_2945_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - v_global_data_var_14_tref_var_316[tmp_index_2949_0]) / 15.0));
-                tmp_index_2952_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2950_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2952_0 = (_for_it_127_0 - istartcol_var_455);
                 {
                     double* v_global_data_var_14_preflog_var_315;
                     v_global_data_var_14_preflog_var_315 = (double*)(&((*global_data_var_14_0)->preflog_var_315)[0]);
@@ -48082,8 +48154,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                     }
                 }
-                tmp_index_2962_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2960_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2962_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2967_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2964_0 = (_for_it_127_0 - istartcol_var_455);
 
@@ -48204,12 +48276,29 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
                 }
                 tmp_index_2980_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2992_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_2982_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2990_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2985_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_2988_0 = (_for_it_127_0 - istartcol_var_455);
 
                 tmp_arg_48_0 = (jt1_var_473[(tmp_index_2980_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 3);
                 {
                     float tmp_call_72_0;
 
+                    {
+                        double pavel_var_1048_0_in_0 = zpavel[(tmp_index_2990_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                        double ptavel_var_1049_0_in_0 = ztavel[(tmp_index_2992_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                        double z_stpfac_var_1077_0_in = z_stpfac_var_1077_0;
+                        double z_scalefac_var_1083_out;
+
+                        ///////////////////
+                        // Tasklet code (T_l3204_c3204)
+                        z_scalefac_var_1083_out = ((pavel_var_1048_0_in_0 * z_stpfac_var_1077_0_in) / ptavel_var_1049_0_in_0);
+                        ///////////////////
+
+                        z_scalefac_var_1083_0 = z_scalefac_var_1083_out;
+                    }
                     {
                         float tmp_call_72_out;
 
@@ -48233,6 +48322,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                         z_ft1_var_1081_0 = z_ft1_var_1081_out;
                     }
+                    {
+                        double pcoldry_var_1050_0_in_0 = zcoldry[(tmp_index_2988_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                        double pwkl_var_1051_0_in_0 = zwkl[(tmp_index_2985_0 + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35)))];
+                        double z_water_var_1082_out;
+
+                        ///////////////////
+                        // Tasklet code (T_l3203_c3203)
+                        z_water_var_1082_out = (pwkl_var_1051_0_in_0 / pcoldry_var_1050_0_in_0);
+                        ///////////////////
+
+                        z_water_var_1082_0 = z_water_var_1082_out;
+                    }
 
                 }
                 if (((z_plog_var_1078_0 <= 4.56) == 1)) {
@@ -48240,13 +48341,311 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     goto_0_0 = 1;
 
                 }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_2994_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_2995_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            int klaytrop_var_1052_0_in_0 = ilaytrop[tmp_index_2995_0];
+                            int klaytrop_var_1052_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3206_c3206)
+                            klaytrop_var_1052_out_0 = (klaytrop_var_1052_0_in_0 + 1);
+                            ///////////////////
+
+                            ilaytrop[tmp_index_2994_0] = klaytrop_var_1052_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_2996_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double z_scalefac_var_1083_0_in = z_scalefac_var_1083_0;
+                            double z_water_var_1082_0_in = z_water_var_1082_0;
+                            double pforfac_var_1059_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3207_c3207)
+                            pforfac_var_1059_out_0 = (z_scalefac_var_1083_0_in / (1.0 + z_water_var_1082_0_in));
+                            ///////////////////
+
+                            zforfac[(tmp_index_2996_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pforfac_var_1059_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_2998_0 = (_for_it_127_0 - istartcol_var_455);
+
+                    z_factor_var_1084_0 = ((332.0 - ztavel[(tmp_index_2998_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))]) / 36.0);
+
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_3000_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            int kindfor_var_1061_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3209_c3209)
+                            kindfor_var_1061_out_0 = min(2, max(1, int(z_factor_var_1084_0)));
+                            ///////////////////
+
+                            indfor_var_469[(tmp_index_3000_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = kindfor_var_1061_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_3004_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3002_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+                        float tmp_call_76_0;
+
+                        {
+                            int kindfor_var_1061_0_in_0 = indfor_var_469[(tmp_index_3002_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            float tmp_call_76_out;
+
+                            ///////////////////
+                            // Tasklet code (T_l3210_c3210)
+                            tmp_call_76_out = float(kindfor_var_1061_0_in_0);
+                            ///////////////////
+
+                            tmp_call_76_0 = tmp_call_76_out;
+                        }
+                        {
+                            float tmp_call_76_0_in = tmp_call_76_0;
+                            double pforfrac_var_1060_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3210_c3210)
+                            pforfrac_var_1060_out_0 = (z_factor_var_1084_0 - tmp_call_76_0_in);
+                            ///////////////////
+
+                            zforfrac[(tmp_index_3004_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pforfrac_var_1060_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_3006_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3008_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pforfac_var_1059_0_in_0 = zforfac[(tmp_index_3008_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            double z_water_var_1082_0_in = z_water_var_1082_0;
+                            double pselffac_var_1062_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3211_c3211)
+                            pselffac_var_1062_out_0 = (z_water_var_1082_0_in * pforfac_var_1059_0_in_0);
+                            ///////////////////
+
+                            zselffac[(tmp_index_3006_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pselffac_var_1062_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_3010_0 = (_for_it_127_0 - istartcol_var_455);
+
+                    z_factor_var_1084_0 = ((ztavel[(tmp_index_3010_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 188.0) / 7.2);
+
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_3012_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            int kindself_var_1064_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3213_c3213)
+                            kindself_var_1064_out_0 = min(9, max(1, (int(z_factor_var_1084_0) - 7)));
+                            ///////////////////
+
+                            indself_var_474[(tmp_index_3012_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = kindself_var_1064_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_0_0) == 1)) {
+
+                    tmp_index_3014_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3016_0 = (_for_it_127_0 - istartcol_var_455);
+
+                    tmp_arg_50_0 = (indself_var_474[(tmp_index_3014_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] + 7);
+                    {
+                        float tmp_call_80_0;
+
+                        {
+                            float tmp_call_80_out;
+
+                            ///////////////////
+                            // Tasklet code (T_l3214_c3214)
+                            tmp_call_80_out = float(tmp_arg_50_0);
+                            ///////////////////
+
+                            tmp_call_80_0 = tmp_call_80_out;
+                        }
+                        {
+                            float tmp_call_80_0_in = tmp_call_80_0;
+                            double pselffrac_var_1063_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3214_c3214)
+                            pselffrac_var_1063_out_0 = (z_factor_var_1084_0 - tmp_call_80_0_in);
+                            ///////////////////
+
+                            zselffrac[(tmp_index_3016_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pselffrac_var_1063_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3018_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3020_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(tmp_index_3020_0 + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35)))];
+                            double pcolh2o_var_1055_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3215_c3215)
+                            pcolh2o_var_1055_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolh2o[(tmp_index_3018_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolh2o_var_1055_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3023_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3025_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[((((sym_iendcol_var_456 - sym_istartcol_var_455) + tmp_index_3025_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 1)];
+                            double pcolco2_var_1054_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3216_c3216)
+                            pcolco2_var_1054_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolco2[(tmp_index_3023_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolco2_var_1054_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3028_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3030_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(((((2 * sym_iendcol_var_456) - (2 * sym_istartcol_var_455)) + tmp_index_3030_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 2)];
+                            double pcolo3_var_1058_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3217_c3217)
+                            pcolo3_var_1058_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolo3[(tmp_index_3028_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolo3_var_1058_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3033_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3035_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(((((5 * sym_iendcol_var_456) - (5 * sym_istartcol_var_455)) + tmp_index_3035_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 5)];
+                            double pcolch4_var_1053_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3218_c3218)
+                            pcolch4_var_1053_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolch4[(tmp_index_3033_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolch4_var_1053_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3038_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3040_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(((((6 * sym_iendcol_var_456) - (6 * sym_istartcol_var_455)) + tmp_index_3040_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 6)];
+                            double pcolo2_var_1057_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3219_c3219)
+                            pcolo2_var_1057_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolo2[(tmp_index_3038_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolo2_var_1057_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3045_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3043_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3047_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pcoldry_var_1050_0_in_0 = zcoldry[(tmp_index_3045_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            double pcolh2o_var_1055_0_in_0 = zcolh2o[(tmp_index_3047_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            double pcolmol_var_1056_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3220_c3220)
+                            pcolmol_var_1056_out_0 = ((1e-20 * pcoldry_var_1050_0_in_0) + pcolh2o_var_1055_0_in_0);
+                            ///////////////////
+
+                            zcolmol[(tmp_index_3043_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolmol_var_1056_out_0;
+                        }
+
+                    }
+                }
                 tmp_index_3049_0 = (_for_it_127_0 - istartcol_var_455);
 
-                _if_cond_89_0 = ((! goto_0_0) && (zcolco2[(tmp_index_3049_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
+                _if_cond_89_0 = ((1 - goto_0_0) && (zcolco2[(tmp_index_3049_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
                 if ((_if_cond_89_0 == 1)) {
 
-                    tmp_index_3051_0 = (_for_it_127_0 - istartcol_var_455);
                     tmp_index_3053_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3051_0 = (_for_it_127_0 - istartcol_var_455);
                     {
 
                         {
@@ -48265,7 +48664,7 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_index_3055_0 = (_for_it_127_0 - istartcol_var_455);
 
-                _if_cond_90_0 = ((! goto_0_0) && (zcolch4[(tmp_index_3055_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
+                _if_cond_90_0 = ((1 - goto_0_0) && (zcolch4[(tmp_index_3055_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
                 if ((_if_cond_90_0 == 1)) {
 
                     tmp_index_3059_0 = (_for_it_127_0 - istartcol_var_455);
@@ -48288,11 +48687,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_index_3061_0 = (_for_it_127_0 - istartcol_var_455);
 
-                _if_cond_91_0 = ((! goto_0_0) && (zcolo2[(tmp_index_3061_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
+                _if_cond_91_0 = ((1 - goto_0_0) && (zcolo2[(tmp_index_3061_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
                 if ((_if_cond_91_0 == 1)) {
 
-                    tmp_index_3063_0 = (_for_it_127_0 - istartcol_var_455);
                     tmp_index_3065_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3063_0 = (_for_it_127_0 - istartcol_var_455);
                     {
 
                         {
@@ -48309,9 +48708,199 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
+                if (((1 - goto_0_0) == 1)) {
+
+                    goto_1_0 = 1;
+
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3069_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double z_scalefac_var_1083_0_in = z_scalefac_var_1083_0;
+                            double z_water_var_1082_0_in = z_water_var_1082_0;
+                            double pforfac_var_1059_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3227_c3227)
+                            pforfac_var_1059_out_0 = (z_scalefac_var_1083_0_in / (1.0 + z_water_var_1082_0_in));
+                            ///////////////////
+
+                            zforfac[(tmp_index_3069_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pforfac_var_1059_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_1_0) == 1)) {
+
+                    tmp_index_3071_0 = (_for_it_127_0 - istartcol_var_455);
+
+                    z_factor_var_1084_0 = ((ztavel[(tmp_index_3071_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 188.0) / 36.0);
+
+                }
+                if (((1 - goto_1_0) == 1)) {
+
+                    tmp_index_3073_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            int kindfor_var_1061_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3229_c3229)
+                            kindfor_var_1061_out_0 = 3;
+                            ///////////////////
+
+                            indfor_var_469[(tmp_index_3073_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = kindfor_var_1061_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_1_0) == 1)) {
+
+                    tmp_index_3075_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pforfrac_var_1060_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3230_c3230)
+                            pforfrac_var_1060_out_0 = (z_factor_var_1084_0 - 1.0);
+                            ///////////////////
+
+                            zforfrac[(tmp_index_3075_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pforfrac_var_1060_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3079_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3077_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(tmp_index_3079_0 + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35)))];
+                            double pcolh2o_var_1055_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3231_c3231)
+                            pcolh2o_var_1055_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolh2o[(tmp_index_3077_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolh2o_var_1055_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3082_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3084_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[((((sym_iendcol_var_456 - sym_istartcol_var_455) + tmp_index_3084_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 1)];
+                            double pcolco2_var_1054_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3232_c3232)
+                            pcolco2_var_1054_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolco2[(tmp_index_3082_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolco2_var_1054_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3087_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3089_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(((((2 * sym_iendcol_var_456) - (2 * sym_istartcol_var_455)) + tmp_index_3089_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 2)];
+                            double pcolo3_var_1058_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3233_c3233)
+                            pcolo3_var_1058_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolo3[(tmp_index_3087_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolo3_var_1058_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3094_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3092_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(((((5 * sym_iendcol_var_456) - (5 * sym_istartcol_var_455)) + tmp_index_3094_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 5)];
+                            double pcolch4_var_1053_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3234_c3234)
+                            pcolch4_var_1053_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolch4[(tmp_index_3092_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolch4_var_1053_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3099_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3097_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pwkl_var_1051_0_in_0 = zwkl[(((((6 * sym_iendcol_var_456) - (6 * sym_istartcol_var_455)) + tmp_index_3099_0) + ((_for_it_126_0 - 1) * (((35 * sym_iendcol_var_456) - (35 * sym_istartcol_var_455)) + 35))) + 6)];
+                            double pcolo2_var_1057_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3235_c3235)
+                            pcolo2_var_1057_out_0 = (1e-20 * pwkl_var_1051_0_in_0);
+                            ///////////////////
+
+                            zcolo2[(tmp_index_3097_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolo2_var_1057_out_0;
+                        }
+
+                    }
+                }
+                if ((((1 - goto_1_0) && (1 - goto_0_0)) == 1)) {
+
+                    tmp_index_3104_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3106_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3102_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pcoldry_var_1050_0_in_0 = zcoldry[(tmp_index_3104_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            double pcolh2o_var_1055_0_in_0 = zcolh2o[(tmp_index_3106_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            double pcolmol_var_1056_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3236_c3236)
+                            pcolmol_var_1056_out_0 = ((1e-20 * pcoldry_var_1050_0_in_0) + pcolh2o_var_1055_0_in_0);
+                            ///////////////////
+
+                            zcolmol[(tmp_index_3102_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pcolmol_var_1056_out_0;
+                        }
+
+                    }
+                }
                 tmp_index_3108_0 = (_for_it_127_0 - istartcol_var_455);
 
-                _if_cond_104_0 = (true && (zcolco2[(tmp_index_3108_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
+                _if_cond_104_0 = ((1 - goto_1_0) && (zcolco2[(tmp_index_3108_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
                 if ((_if_cond_104_0 == 1)) {
 
                     tmp_index_3112_0 = (_for_it_127_0 - istartcol_var_455);
@@ -48334,11 +48923,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_index_3114_0 = (_for_it_127_0 - istartcol_var_455);
 
-                _if_cond_105_0 = (true && (zcolch4[(tmp_index_3114_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
+                _if_cond_105_0 = ((1 - goto_1_0) && (zcolch4[(tmp_index_3114_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
                 if ((_if_cond_105_0 == 1)) {
 
-                    tmp_index_3118_0 = (_for_it_127_0 - istartcol_var_455);
                     tmp_index_3116_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3118_0 = (_for_it_127_0 - istartcol_var_455);
                     {
 
                         {
@@ -48357,11 +48946,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 tmp_index_3120_0 = (_for_it_127_0 - istartcol_var_455);
 
-                _if_cond_106_0 = (true && (zcolo2[(tmp_index_3120_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
+                _if_cond_106_0 = ((1 - goto_1_0) && (zcolo2[(tmp_index_3120_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] == 0.0));
                 if ((_if_cond_106_0 == 1)) {
 
-                    tmp_index_3124_0 = (_for_it_127_0 - istartcol_var_455);
                     tmp_index_3122_0 = (_for_it_127_0 - istartcol_var_455);
+                    tmp_index_3124_0 = (_for_it_127_0 - istartcol_var_455);
                     {
 
                         {
@@ -48378,9 +48967,63 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
+                if (((1 - goto_1_0) == 1)) {
+
+                    tmp_index_3128_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pselffac_var_1062_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3241_c3241)
+                            pselffac_var_1062_out_0 = 0.0;
+                            ///////////////////
+
+                            zselffac[(tmp_index_3128_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pselffac_var_1062_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_1_0) == 1)) {
+
+                    tmp_index_3130_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            double pselffrac_var_1063_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3242_c3242)
+                            pselffrac_var_1063_out_0 = 0.0;
+                            ///////////////////
+
+                            zselffrac[(tmp_index_3130_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = pselffrac_var_1063_out_0;
+                        }
+
+                    }
+                }
+                if (((1 - goto_1_0) == 1)) {
+
+                    tmp_index_3132_0 = (_for_it_127_0 - istartcol_var_455);
+                    {
+
+                        {
+                            int kindself_var_1064_out_0;
+
+                            ///////////////////
+                            // Tasklet code (T_l3243_c3243)
+                            kindself_var_1064_out_0 = 0;
+                            ///////////////////
+
+                            indself_var_474[(tmp_index_3132_0 + ((_for_it_126_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] = kindself_var_1064_out_0;
+                        }
+
+                    }
+                }
                 tmp_index_3140_0 = (_for_it_127_0 - istartcol_var_455);
-                tmp_index_3136_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_3134_0 = (_for_it_127_0 - istartcol_var_455);
+                tmp_index_3136_0 = (_for_it_127_0 - istartcol_var_455);
                 tmp_index_3138_0 = (_for_it_127_0 - istartcol_var_455);
                 {
                     double z_compfp_var_1086_0;
@@ -48527,8 +49170,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         _if_cond_292_0 = (v_single_level_var_458_cos_sza[tmp_index_10094_0] > 0.0);
         if ((_if_cond_292_0 == 1)) {
 
-            tmp_index_10095_0 = (_for_it_348_0 - istartcol_var_455);
             icount_0 = (icount_0 + 1);
+            tmp_index_10095_0 = (_for_it_348_0 - istartcol_var_455);
             {
 
                 {
@@ -48546,7 +49189,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
         }
 
     }
-    _if_cond_293_0 = (icount_0 != 0);
+    sym_kfdia_var_2244_0_0 = iendcol_var_456;
+    sym_kidia_var_2243_0_0 = istartcol_var_455;
+_if_cond_293_0 = (icount_0 != 0);
     ztaug_0 = new double DACE_ALIGN(64)[((((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + ((15 * sym_klev_var_2181_0) * ((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + 1))) + ((sym_klev_var_2181_0 - 1) * ((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + 1))) + 1)];
     ztaur_0 = new double DACE_ALIGN(64)[((((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + ((15 * sym_klev_var_2181_0) * ((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + 1))) + ((sym_klev_var_2181_0 - 1) * ((sym_kfdia_var_2180_0 - sym_kidia_var_2179_0) + 1))) + 1)];
     zsflxzen_0 = new double DACE_ALIGN(64)[(((16 * sym_kfdia_var_2180_0) - (16 * sym_kidia_var_2179_0)) + 16)];
@@ -48574,13 +49219,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             igt_0 = v_global_data_var_32_ngc[(_for_it_349_0 - 16)];
             if ((_for_it_349_0 == 16)) {
 
-                sym_kfdia_var_2372_0_0 = iendcol_var_456;
-                sym_kidia_var_2371_0_0 = istartcol_var_455;
                 laytrop_min_var_2406_0_0 = 2147483647;
+                sym_kidia_var_2371_0_0 = istartcol_var_455;
+                sym_kfdia_var_2372_0_0 = iendcol_var_456;
                 for (tmp_parfor_29_0_0 = istartcol_var_455; (tmp_parfor_29_0_0 <= iendcol_var_456); tmp_parfor_29_0_0 = (tmp_parfor_29_0_0 + 1)) {
 
-                    tmp_index_11404_0_0 = (tmp_parfor_29_0_0 - istartcol_var_455);
                     tmp_index_11405_0_0 = (tmp_parfor_29_0_0 - istartcol_var_455);
+                    tmp_index_11404_0_0 = (tmp_parfor_29_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_11404_0_0] < laytrop_min_var_2406_0_0)) {
 
                         laytrop_min_var_2406_0_0 = ilaytrop[tmp_index_11405_0_0];
@@ -48591,8 +49236,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 laytrop_max_var_2407_0_0 = -2147483648LL;
                 for (tmp_parfor_29_0_0 = istartcol_var_455; (tmp_parfor_29_0_0 <= iendcol_var_456); tmp_parfor_29_0_0 = (tmp_parfor_29_0_0 + 1)) {
 
-                    tmp_index_11406_0_0 = (tmp_parfor_29_0_0 - istartcol_var_455);
                     tmp_index_11407_0_0 = (tmp_parfor_29_0_0 - istartcol_var_455);
+                    tmp_index_11406_0_0 = (tmp_parfor_29_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_11406_0_0] > laytrop_max_var_2407_0_0)) {
 
                         laytrop_max_var_2407_0_0 = ilaytrop[tmp_index_11407_0_0];
@@ -48624,8 +49269,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     for (_for_it_391_0_0 = istartcol_var_455; (_for_it_391_0_0 <= iendcol_var_456); _for_it_391_0_0 = (_for_it_391_0_0 + 1)) {
 
                         tmp_index_11415_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                        tmp_index_11409_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         tmp_index_11411_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                        tmp_index_11409_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         tmp_index_11413_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         {
 
@@ -48679,20 +49324,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_11416_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                        tmp_index_11423_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                        tmp_index_11418_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         tmp_index_11430_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         tmp_index_11426_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                        tmp_index_11428_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                        tmp_index_11418_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                        tmp_call_290_0_0 = int(z_specmult_var_2410_0_0);
-                        tmp_index_11423_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         tmp_index_11421_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                        tmp_call_290_0_0 = int(z_specmult_var_2410_0_0);
+                        tmp_index_11416_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                        tmp_index_11428_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                         {
 
 
                         }
-                        indf_var_2400_0_0 = indfor_var_469[(tmp_index_11428_0_0 + ((_for_it_390_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         ind0_var_2397_0_0 = (((((jp_var_471[(tmp_index_11416_0_0 + ((_for_it_390_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_11418_0_0 + ((_for_it_390_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_37_nspa_var_313[0]) + (1 + tmp_call_290_0_0));
+                        indf_var_2400_0_0 = indfor_var_469[(tmp_index_11428_0_0 + ((_for_it_390_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         inds_var_2399_0_0 = indself_var_474[(tmp_index_11426_0_0 + ((_for_it_390_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         {
                             double tmp_call_291_0_0;
@@ -48741,21 +49386,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_392_0_0 = 1; (_for_it_392_0_0 <= 6); _for_it_392_0_0 = (_for_it_392_0_0 + 1)) {
 
-                            tmp_index_11469_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11483_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11453_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             tmp_index_11465_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11461_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             tmp_index_11441_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11457_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11473_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             tmp_index_11445_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             tmp_index_11449_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11489_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11432_0_0 = (_for_it_391_0_0 - istartcol_var_455);
-                            tmp_index_11467_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11469_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             tmp_index_11479_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11457_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11483_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11473_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             tmp_index_11437_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11432_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11461_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11453_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11489_0_0 = (_for_it_391_0_0 - istartcol_var_455);
+                            tmp_index_11467_0_0 = (_for_it_391_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -48825,9 +49470,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_325_0_0 = (_for_it_393_0_0 <= ilaytrop[tmp_index_11492_0_0]);
                         if ((_if_cond_325_0_0 == 1)) {
 
-                            tmp_index_11493_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                            tmp_index_11495_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11499_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11495_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11493_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11497_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             {
 
@@ -48882,19 +49527,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                             tmp_index_11512_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                            tmp_index_11507_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                            tmp_index_11500_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_call_292_0_0 = int(z_specmult_var_2410_0_0);
                             tmp_index_11505_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11502_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                            tmp_index_11510_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11507_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11500_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11514_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11510_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            indf_var_2400_0_0 = indfor_var_469[(tmp_index_11512_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             ind0_var_2397_0_0 = (((((jp_var_471[(tmp_index_11500_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_11502_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_37_nspa_var_313[0]) + (1 + tmp_call_292_0_0));
+                            indf_var_2400_0_0 = indfor_var_469[(tmp_index_11512_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             inds_var_2399_0_0 = indself_var_474[(tmp_index_11510_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             {
                                 double tmp_call_293_0_0;
@@ -48943,21 +49588,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_395_0_0 = 1; (_for_it_395_0_0 <= 6); _for_it_395_0_0 = (_for_it_395_0_0 + 1)) {
 
-                                tmp_index_11553_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11521_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11573_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11529_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11533_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11557_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11516_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11525_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11567_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11563_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11551_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11525_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11516_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11563_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11553_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11529_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11537_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11567_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11521_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11541_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11545_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11549_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11557_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11545_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -49017,8 +49662,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                         } else {
 
-                            tmp_index_11576_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11578_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11576_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             {
 
 
@@ -49042,16 +49687,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_11586_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11588_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11583_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             tmp_index_11581_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                            tmp_index_11588_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            tmp_index_11586_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            ind0_var_2397_0_0 = (((((jp_var_471[(tmp_index_11581_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_11583_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_37_nspb_var_314[0]) + 1);
                             tmp_index_11591_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                            ind0_var_2397_0_0 = (((((jp_var_471[(tmp_index_11581_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_11583_0_0 + ((_for_it_393_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_37_nspb_var_314[0]) + 1);
                             {
 
 
@@ -49075,13 +49720,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_396_0_0 = 1; (_for_it_396_0_0 <= 6); _for_it_396_0_0 = (_for_it_396_0_0 + 1)) {
 
-                                tmp_index_11610_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11602_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11598_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11596_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11606_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11614_0_0 = (_for_it_394_0_0 - istartcol_var_455);
                                 tmp_index_11593_0_0 = (_for_it_394_0_0 - istartcol_var_455);
-                                tmp_index_11606_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11598_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11610_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11596_0_0 = (_for_it_394_0_0 - istartcol_var_455);
+                                tmp_index_11602_0_0 = (_for_it_394_0_0 - istartcol_var_455);
 
                                 _if_cond_326_0_0 = (_for_it_393_0_0 == i_laysolfr_var_2403_0_0[tmp_index_11614_0_0]);
                                 {
@@ -49185,8 +49830,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
 
                         }
-                        ind0_var_2397_0_0 = (((((jp_var_471[(tmp_index_11626_0_0 + ((_for_it_397_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_11628_0_0 + ((_for_it_397_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_37_nspb_var_314[0]) + 1);
                         tmp_index_11636_0_0 = (_for_it_398_0_0 - istartcol_var_455);
+                        ind0_var_2397_0_0 = (((((jp_var_471[(tmp_index_11626_0_0 + ((_for_it_397_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_11628_0_0 + ((_for_it_397_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_37_nspb_var_314[0]) + 1);
                         {
 
 
@@ -49211,12 +49856,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         for (_for_it_399_0_0 = 1; (_for_it_399_0_0 <= 6); _for_it_399_0_0 = (_for_it_399_0_0 + 1)) {
 
                             tmp_index_11659_0_0 = (_for_it_398_0_0 - istartcol_var_455);
-                            tmp_index_11647_0_0 = (_for_it_398_0_0 - istartcol_var_455);
-                            tmp_index_11643_0_0 = (_for_it_398_0_0 - istartcol_var_455);
                             tmp_index_11641_0_0 = (_for_it_398_0_0 - istartcol_var_455);
-                            tmp_index_11651_0_0 = (_for_it_398_0_0 - istartcol_var_455);
                             tmp_index_11638_0_0 = (_for_it_398_0_0 - istartcol_var_455);
+                            tmp_index_11651_0_0 = (_for_it_398_0_0 - istartcol_var_455);
+                            tmp_index_11643_0_0 = (_for_it_398_0_0 - istartcol_var_455);
                             tmp_index_11655_0_0 = (_for_it_398_0_0 - istartcol_var_455);
+                            tmp_index_11647_0_0 = (_for_it_398_0_0 - istartcol_var_455);
 
                             _if_cond_329_0_0 = (_for_it_397_0_0 == i_laysolfr_var_2403_0_0[tmp_index_11659_0_0]);
                             {
@@ -49286,8 +49931,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             } else if ((_for_it_349_0 == 17)) {
 
                 laytrop_min_var_2314_0_0 = 2147483647;
-                sym_kidia_var_2279_0_0 = istartcol_var_455;
                 sym_kfdia_var_2280_0_0 = iendcol_var_456;
+                sym_kidia_var_2279_0_0 = istartcol_var_455;
                 for (tmp_parfor_28_0_0 = istartcol_var_455; (tmp_parfor_28_0_0 <= iendcol_var_456); tmp_parfor_28_0_0 = (tmp_parfor_28_0_0 + 1)) {
 
                     tmp_index_10617_0_0 = (tmp_parfor_28_0_0 - istartcol_var_455);
@@ -49302,8 +49947,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 laytrop_max_var_2315_0_0 = -2147483648LL;
                 for (tmp_parfor_28_0_0 = istartcol_var_455; (tmp_parfor_28_0_0 <= iendcol_var_456); tmp_parfor_28_0_0 = (tmp_parfor_28_0_0 + 1)) {
 
-                    tmp_index_10620_0_0 = (tmp_parfor_28_0_0 - istartcol_var_455);
                     tmp_index_10619_0_0 = (tmp_parfor_28_0_0 - istartcol_var_455);
+                    tmp_index_10620_0_0 = (tmp_parfor_28_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_10619_0_0] > laytrop_max_var_2315_0_0)) {
 
                         laytrop_max_var_2315_0_0 = ilaytrop[tmp_index_10620_0_0];
@@ -49334,10 +49979,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_377_0_0 = 1; (_for_it_377_0_0 <= laytrop_min_var_2314_0_0); _for_it_377_0_0 = (_for_it_377_0_0 + 1)) {
                     for (_for_it_378_0_0 = istartcol_var_455; (_for_it_378_0_0 <= iendcol_var_456); _for_it_378_0_0 = (_for_it_378_0_0 + 1)) {
 
+                        tmp_index_10622_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                        tmp_index_10628_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         tmp_index_10626_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         tmp_index_10624_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                        tmp_index_10628_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                        tmp_index_10622_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -49390,21 +50035,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_10643_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                        tmp_call_258_0_0 = int(z_specmult_var_2318_0_0);
+                        tmp_index_10634_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         tmp_index_10639_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         tmp_index_10636_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                        tmp_index_10643_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         tmp_index_10631_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                        tmp_call_258_0_0 = int(z_specmult_var_2318_0_0);
-                        tmp_index_10641_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                        tmp_index_10634_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         tmp_index_10629_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                        tmp_index_10641_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                         {
 
 
                         }
                         indf_var_2308_0_0 = indfor_var_469[(tmp_index_10641_0_0 + ((_for_it_377_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                        ind0_var_2305_0_0 = (((((jp_var_471[(tmp_index_10629_0_0 + ((_for_it_377_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_10631_0_0 + ((_for_it_377_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_35_nspa_var_313[1]) + (1 + tmp_call_258_0_0));
                         inds_var_2307_0_0 = indself_var_474[(tmp_index_10639_0_0 + ((_for_it_377_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                        ind0_var_2305_0_0 = (((((jp_var_471[(tmp_index_10629_0_0 + ((_for_it_377_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_10631_0_0 + ((_for_it_377_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_35_nspa_var_313[1]) + (1 + tmp_call_258_0_0));
                         {
                             double tmp_call_259_0_0;
 
@@ -49452,21 +50097,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_379_0_0 = 1; (_for_it_379_0_0 <= 12); _for_it_379_0_0 = (_for_it_379_0_0 + 1)) {
 
-                            tmp_index_10662_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                             tmp_index_10702_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10682_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10696_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10658_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10666_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                             tmp_index_10670_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10645_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10654_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10686_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                             tmp_index_10692_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                             tmp_index_10674_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10650_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10680_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10658_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10696_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10682_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                             tmp_index_10678_0_0 = (_for_it_378_0_0 - istartcol_var_455);
-                            tmp_index_10666_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10654_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10645_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10662_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10686_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10680_0_0 = (_for_it_378_0_0 - istartcol_var_455);
+                            tmp_index_10650_0_0 = (_for_it_378_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -49537,9 +50182,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         if ((_if_cond_306_0_0 == 1)) {
 
                             tmp_index_10712_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                            tmp_index_10710_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10708_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10706_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10710_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -49592,21 +50237,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_10720_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10727_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                            tmp_index_10723_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10715_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10720_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10718_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10725_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10713_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                            tmp_index_10718_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10723_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_call_260_0_0 = int(z_specmult_var_2318_0_0);
                             {
 
 
                             }
                             indf_var_2308_0_0 = indfor_var_469[(tmp_index_10725_0_0 + ((_for_it_380_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                            ind0_var_2305_0_0 = (((((jp_var_471[(tmp_index_10713_0_0 + ((_for_it_380_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_10715_0_0 + ((_for_it_380_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_35_nspa_var_313[1]) + (1 + tmp_call_260_0_0));
                             inds_var_2307_0_0 = indself_var_474[(tmp_index_10723_0_0 + ((_for_it_380_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            ind0_var_2305_0_0 = (((((jp_var_471[(tmp_index_10713_0_0 + ((_for_it_380_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_10715_0_0 + ((_for_it_380_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_35_nspa_var_313[1]) + (1 + tmp_call_260_0_0));
                             {
                                 double tmp_call_261_0_0;
 
@@ -49654,21 +50299,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_382_0_0 = 1; (_for_it_382_0_0 <= 12); _for_it_382_0_0 = (_for_it_382_0_0 + 1)) {
 
-                                tmp_index_10780_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10786_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10746_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10729_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10738_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10786_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10766_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10734_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10750_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10758_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10754_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10776_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10750_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10766_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10770_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10738_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10742_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10734_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10764_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10762_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10746_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10780_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10776_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10770_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10742_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -49753,10 +50398,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_10800_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                            tmp_index_10796_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10794_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10796_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10798_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10800_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -49809,13 +50454,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_10813_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_call_262_0_0 = int(z_specmult_var_2318_0_0);
                             tmp_index_10811_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10803_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                            tmp_index_10808_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                            tmp_call_262_0_0 = int(z_specmult_var_2318_0_0);
-                            tmp_index_10806_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             tmp_index_10801_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10808_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10813_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                            tmp_index_10806_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                             {
 
 
@@ -49869,18 +50514,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_383_0_0 = 1; (_for_it_383_0_0 <= 12); _for_it_383_0_0 = (_for_it_383_0_0 + 1)) {
 
-                                tmp_index_10848_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10850_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10862_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10836_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10844_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10852_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10840_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10815_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10856_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10862_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10850_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10848_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10836_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10852_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10832_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10840_0_0 = (_for_it_381_0_0 - istartcol_var_455);
+                                tmp_index_10844_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10824_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10828_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10832_0_0 = (_for_it_381_0_0 - istartcol_var_455);
-                                tmp_index_10815_0_0 = (_for_it_381_0_0 - istartcol_var_455);
                                 tmp_index_10820_0_0 = (_for_it_381_0_0 - istartcol_var_455);
 
                                 _if_cond_307_0_0 = (_for_it_380_0_0 == i_laysolfr_var_2311_0_0[tmp_index_10862_0_0]);
@@ -49971,8 +50616,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_384_0_0 = (laytrop_max_var_2315_0_0 + 1); (_for_it_384_0_0 <= i_nlayers_var_2312_0_0); _for_it_384_0_0 = (_for_it_384_0_0 + 1)) {
                     for (_for_it_385_0_0 = istartcol_var_455; (_for_it_385_0_0 <= iendcol_var_456); _for_it_385_0_0 = (_for_it_385_0_0 + 1)) {
 
-                        tmp_index_10876_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         tmp_index_10874_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_index_10876_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         {
 
 
@@ -49996,10 +50641,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_10879_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                        tmp_index_10881_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         tmp_index_10883_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_index_10879_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         tmp_index_10885_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_index_10881_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -50052,13 +50697,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_10891_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                        tmp_call_264_0_0 = int(z_specmult_var_2318_0_0);
-                        tmp_index_10898_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         tmp_index_10893_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_index_10898_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         tmp_index_10886_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                        tmp_index_10888_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_index_10891_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                         tmp_index_10896_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_index_10888_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                        tmp_call_264_0_0 = int(z_specmult_var_2318_0_0);
                         {
 
 
@@ -50112,18 +50757,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_386_0_0 = 1; (_for_it_386_0_0 <= 12); _for_it_386_0_0 = (_for_it_386_0_0 + 1)) {
 
-                            tmp_index_10905_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10917_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10900_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10941_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10921_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                             tmp_index_10947_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10913_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10933_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10937_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10909_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                             tmp_index_10929_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                             tmp_index_10925_0_0 = (_for_it_385_0_0 - istartcol_var_455);
-                            tmp_index_10909_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10921_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10913_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10917_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10937_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10933_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10900_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10905_0_0 = (_for_it_385_0_0 - istartcol_var_455);
+                            tmp_index_10941_0_0 = (_for_it_385_0_0 - istartcol_var_455);
                             tmp_index_10935_0_0 = (_for_it_385_0_0 - istartcol_var_455);
 
                             _if_cond_310_0_0 = (_for_it_384_0_0 == i_laysolfr_var_2311_0_0[tmp_index_10947_0_0]);
@@ -50212,13 +50857,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 18)) {
 
+                sym_kidia_var_646_0_0 = istartcol_var_455;
                 sym_kfdia_var_647_0_0 = iendcol_var_456;
                 laytrop_min_var_681_0_0 = 2147483647;
-                sym_kidia_var_646_0_0 = istartcol_var_455;
                 for (tmp_parfor_2_0_0 = istartcol_var_455; (tmp_parfor_2_0_0 <= iendcol_var_456); tmp_parfor_2_0_0 = (tmp_parfor_2_0_0 + 1)) {
 
-                    tmp_index_224_0_0 = (tmp_parfor_2_0_0 - istartcol_var_455);
                     tmp_index_223_0_0 = (tmp_parfor_2_0_0 - istartcol_var_455);
+                    tmp_index_224_0_0 = (tmp_parfor_2_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_223_0_0] < laytrop_min_var_681_0_0)) {
 
                         laytrop_min_var_681_0_0 = ilaytrop[tmp_index_224_0_0];
@@ -50263,8 +50908,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_23_0_0 = 1; (_for_it_23_0_0 <= laytrop_min_var_681_0_0); _for_it_23_0_0 = (_for_it_23_0_0 + 1)) {
                     for (_for_it_24_0_0 = istartcol_var_455; (_for_it_24_0_0 <= iendcol_var_456); _for_it_24_0_0 = (_for_it_24_0_0 + 1)) {
 
-                        tmp_index_231_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         tmp_index_229_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_index_231_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         {
 
 
@@ -50291,10 +50936,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_241_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                        tmp_index_237_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                        tmp_index_235_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         tmp_index_239_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_index_237_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_index_241_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_index_235_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -50349,19 +50994,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         tmp_index_244_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         tmp_index_242_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                        tmp_call_1_0_0 = int(z_specmult_var_685_0_0);
-                        tmp_index_254_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         tmp_index_252_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                        tmp_index_249_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_index_254_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         tmp_index_256_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                         tmp_index_247_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_index_249_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                        tmp_call_1_0_0 = int(z_specmult_var_685_0_0);
                         {
 
 
                         }
+                        inds_var_674_0_0 = indself_var_474[(tmp_index_252_0_0 + ((_for_it_23_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         ind0_var_672_0_0 = (((((jp_var_471[(tmp_index_242_0_0 + ((_for_it_23_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_244_0_0 + ((_for_it_23_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_5_nspa_var_313[2]) + (1 + tmp_call_1_0_0));
                         indf_var_675_0_0 = indfor_var_469[(tmp_index_254_0_0 + ((_for_it_23_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                        inds_var_674_0_0 = indself_var_474[(tmp_index_252_0_0 + ((_for_it_23_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         {
                             double tmp_call_2_0_0;
 
@@ -50409,21 +51054,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_25_0_0 = 1; (_for_it_25_0_0 <= 8); _for_it_25_0_0 = (_for_it_25_0_0 + 1)) {
 
-                            tmp_index_291_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_267_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_279_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_305_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_293_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                             tmp_index_287_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_271_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_299_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                             tmp_index_275_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_263_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_283_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                             tmp_index_309_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                             tmp_index_295_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_283_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_291_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_267_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_299_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                             tmp_index_258_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_293_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_263_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_305_0_0 = (_for_it_24_0_0 - istartcol_var_455);
+                            tmp_index_271_0_0 = (_for_it_24_0_0 - istartcol_var_455);
                             tmp_index_315_0_0 = (_for_it_24_0_0 - istartcol_var_455);
-                            tmp_index_279_0_0 = (_for_it_24_0_0 - istartcol_var_455);
 
                             _if_cond_9_0_0 = (_for_it_23_0_0 == i_laysolfr_var_678_0_0[tmp_index_315_0_0]);
                             {
@@ -50550,10 +51195,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_340_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                            tmp_index_336_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                            tmp_index_334_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_index_338_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_340_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_334_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_336_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -50606,21 +51251,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_346_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                            tmp_index_355_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                            tmp_index_348_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                            tmp_index_341_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_call_4_0_0 = int(z_specmult_var_685_0_0);
+                            tmp_index_346_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_index_343_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_348_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_index_353_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_355_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_341_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_index_351_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             {
 
 
                             }
+                            inds_var_674_0_0 = indself_var_474[(tmp_index_351_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             ind0_var_672_0_0 = (((((jp_var_471[(tmp_index_341_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_343_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_5_nspa_var_313[2]) + (1 + tmp_call_4_0_0));
                             indf_var_675_0_0 = indfor_var_469[(tmp_index_353_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                            inds_var_674_0_0 = indself_var_474[(tmp_index_351_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             {
                                 double tmp_call_5_0_0;
 
@@ -50668,21 +51313,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_28_0_0 = 1; (_for_it_28_0_0 <= 8); _for_it_28_0_0 = (_for_it_28_0_0 + 1)) {
 
-                                tmp_index_378_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_392_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_366_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_394_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_398_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_408_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_378_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_404_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_390_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_374_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_370_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_398_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_414_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_357_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_386_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_362_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_366_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_382_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_362_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_392_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_357_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_414_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_370_0_0 = (_for_it_27_0_0 - istartcol_var_455);
 
                                 _if_cond_11_0_0 = (_for_it_26_0_0 == i_laysolfr_var_678_0_0[tmp_index_414_0_0]);
                                 {
@@ -50771,16 +51416,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                         } else {
 
-                            tmp_index_426_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_index_428_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                            tmp_index_431_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             tmp_index_433_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_431_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            tmp_index_426_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            ind0_var_672_0_0 = (((((jp_var_471[(tmp_index_426_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_428_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_5_nspb_var_314[2]) + 1);
                             tmp_index_436_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                            ind0_var_672_0_0 = (((((jp_var_471[(tmp_index_426_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_428_0_0 + ((_for_it_26_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_5_nspb_var_314[2]) + 1);
                             {
 
 
@@ -50805,12 +51450,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             for (_for_it_29_0_0 = 1; (_for_it_29_0_0 <= 8); _for_it_29_0_0 = (_for_it_29_0_0 + 1)) {
 
                                 tmp_index_438_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_455_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_451_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_447_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_441_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_443_0_0 = (_for_it_27_0_0 - istartcol_var_455);
-                                tmp_index_455_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 tmp_index_459_0_0 = (_for_it_27_0_0 - istartcol_var_455);
+                                tmp_index_443_0_0 = (_for_it_27_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -50855,16 +51500,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_30_0_0 = (laytrop_max_var_682_0_0 + 1); (_for_it_30_0_0 <= i_nlayers_var_679_0_0); _for_it_30_0_0 = (_for_it_30_0_0 + 1)) {
                     for (_for_it_31_0_0 = istartcol_var_455; (_for_it_31_0_0 <= iendcol_var_456); _for_it_31_0_0 = (_for_it_31_0_0 + 1)) {
 
-                        tmp_index_464_0_0 = (_for_it_31_0_0 - istartcol_var_455);
-                        tmp_index_469_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                         tmp_index_467_0_0 = (_for_it_31_0_0 - istartcol_var_455);
+                        tmp_index_469_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                         tmp_index_462_0_0 = (_for_it_31_0_0 - istartcol_var_455);
+                        tmp_index_464_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                         {
 
 
                         }
-                        ind0_var_672_0_0 = (((((jp_var_471[(tmp_index_462_0_0 + ((_for_it_30_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_464_0_0 + ((_for_it_30_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_5_nspb_var_314[2]) + 1);
                         tmp_index_472_0_0 = (_for_it_31_0_0 - istartcol_var_455);
+                        ind0_var_672_0_0 = (((((jp_var_471[(tmp_index_462_0_0 + ((_for_it_30_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_464_0_0 + ((_for_it_30_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_5_nspb_var_314[2]) + 1);
                         {
 
 
@@ -50889,12 +51534,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         for (_for_it_32_0_0 = 1; (_for_it_32_0_0 <= 8); _for_it_32_0_0 = (_for_it_32_0_0 + 1)) {
 
                             tmp_index_474_0_0 = (_for_it_31_0_0 - istartcol_var_455);
-                            tmp_index_479_0_0 = (_for_it_31_0_0 - istartcol_var_455);
-                            tmp_index_491_0_0 = (_for_it_31_0_0 - istartcol_var_455);
-                            tmp_index_487_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                             tmp_index_495_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                             tmp_index_483_0_0 = (_for_it_31_0_0 - istartcol_var_455);
+                            tmp_index_479_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                             tmp_index_477_0_0 = (_for_it_31_0_0 - istartcol_var_455);
+                            tmp_index_487_0_0 = (_for_it_31_0_0 - istartcol_var_455);
+                            tmp_index_491_0_0 = (_for_it_31_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -50937,8 +51582,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 19)) {
 
-                sym_kidia_var_759_0_0 = istartcol_var_455;
                 sym_kfdia_var_760_0_0 = iendcol_var_456;
+                sym_kidia_var_759_0_0 = istartcol_var_455;
                 laytrop_min_var_794_0_0 = 2147483647;
                 for (tmp_parfor_5_0_0 = istartcol_var_455; (tmp_parfor_5_0_0 <= iendcol_var_456); tmp_parfor_5_0_0 = (tmp_parfor_5_0_0 + 1)) {
 
@@ -50966,8 +51611,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 i_nlayers_var_792_0_0 = nlev_var_454;
                 for (_for_it_55_0_0 = istartcol_var_455; (_for_it_55_0_0 <= iendcol_var_456); _for_it_55_0_0 = (_for_it_55_0_0 + 1)) {
 
-                    tmp_index_935_0_0 = (_for_it_55_0_0 - istartcol_var_455);
                     tmp_index_934_0_0 = (_for_it_55_0_0 - istartcol_var_455);
+                    tmp_index_935_0_0 = (_for_it_55_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -50988,8 +51633,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_56_0_0 = 1; (_for_it_56_0_0 <= laytrop_min_var_794_0_0); _for_it_56_0_0 = (_for_it_56_0_0 + 1)) {
                     for (_for_it_57_0_0 = istartcol_var_455; (_for_it_57_0_0 <= iendcol_var_456); _for_it_57_0_0 = (_for_it_57_0_0 + 1)) {
 
-                        tmp_index_936_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         tmp_index_938_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                        tmp_index_936_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         {
 
 
@@ -51016,9 +51661,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_948_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         tmp_index_944_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         tmp_index_942_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                        tmp_index_948_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         tmp_index_946_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         {
 
@@ -51072,20 +51717,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_949_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                        tmp_index_963_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                        tmp_index_951_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                        tmp_index_961_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         tmp_index_954_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                        tmp_index_956_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                        tmp_call_15_0_0 = int(z_specmult_var_798_0_0);
+                        tmp_index_963_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                        tmp_index_961_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                        tmp_index_949_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         tmp_index_959_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                        tmp_call_15_0_0 = int(z_specmult_var_798_0_0);
+                        tmp_index_956_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                        tmp_index_951_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                         {
 
 
                         }
-                        inds_var_787_0_0 = indself_var_474[(tmp_index_959_0_0 + ((_for_it_56_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         ind0_var_785_0_0 = (((((jp_var_471[(tmp_index_949_0_0 + ((_for_it_56_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_951_0_0 + ((_for_it_56_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_8_nspa_var_313[3]) + (1 + tmp_call_15_0_0));
+                        inds_var_787_0_0 = indself_var_474[(tmp_index_959_0_0 + ((_for_it_56_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         indf_var_788_0_0 = indfor_var_469[(tmp_index_961_0_0 + ((_for_it_56_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         {
                             double tmp_call_16_0_0;
@@ -51134,19 +51779,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_58_0_0 = 1; (_for_it_58_0_0 <= 8); _for_it_58_0_0 = (_for_it_58_0_0 + 1)) {
 
-                            tmp_index_1006_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_974_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_1002_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_1012_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_1016_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_970_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_982_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_1022_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_978_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_990_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_982_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_974_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_1000_0_0 = (_for_it_57_0_0 - istartcol_var_455);
-                            tmp_index_994_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_1006_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_1016_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_998_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_1012_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_1000_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_990_0_0 = (_for_it_57_0_0 - istartcol_var_455);
+                            tmp_index_994_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_965_0_0 = (_for_it_57_0_0 - istartcol_var_455);
                             tmp_index_986_0_0 = (_for_it_57_0_0 - istartcol_var_455);
 
@@ -51247,8 +51892,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_25_0_0 = (_for_it_59_0_0 <= ilaytrop[tmp_index_1034_0_0]);
                         if ((_if_cond_25_0_0 == 1)) {
 
-                            tmp_index_1035_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1037_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                            tmp_index_1035_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             {
 
 
@@ -51331,20 +51976,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_1058_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                            tmp_call_18_0_0 = int(z_specmult_var_798_0_0);
-                            tmp_index_1050_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1062_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1048_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                            tmp_index_1055_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1060_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                            tmp_index_1050_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                            tmp_index_1055_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1053_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                            tmp_call_18_0_0 = int(z_specmult_var_798_0_0);
+                            tmp_index_1058_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            inds_var_787_0_0 = indself_var_474[(tmp_index_1058_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             ind0_var_785_0_0 = (((((jp_var_471[(tmp_index_1048_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1050_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_8_nspa_var_313[3]) + (1 + tmp_call_18_0_0));
+                            inds_var_787_0_0 = indself_var_474[(tmp_index_1058_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             indf_var_788_0_0 = indfor_var_469[(tmp_index_1060_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             {
                                 double tmp_call_19_0_0;
@@ -51393,21 +52038,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_61_0_0 = 1; (_for_it_61_0_0 <= 8); _for_it_61_0_0 = (_for_it_61_0_0 + 1)) {
 
-                                tmp_index_1115_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1093_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1111_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1085_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1121_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1064_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1105_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1081_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1101_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1099_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1077_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1097_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 tmp_index_1089_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1073_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 tmp_index_1069_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1093_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1121_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1105_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1099_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1115_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1101_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1081_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1097_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1064_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1111_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1073_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1077_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1085_0_0 = (_for_it_60_0_0 - istartcol_var_455);
 
                                 _if_cond_26_0_0 = (_for_it_59_0_0 == i_laysolfr_var_791_0_0[tmp_index_1121_0_0]);
                                 {
@@ -51498,14 +52143,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             tmp_index_1140_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1138_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                            tmp_index_1135_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             tmp_index_1133_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                            tmp_index_1135_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            tmp_index_1143_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             ind0_var_785_0_0 = (((((jp_var_471[(tmp_index_1133_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_1135_0_0 + ((_for_it_59_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_8_nspb_var_314[3]) + 1);
+                            tmp_index_1143_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                             {
 
 
@@ -51529,13 +52174,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_62_0_0 = 1; (_for_it_62_0_0 <= 8); _for_it_62_0_0 = (_for_it_62_0_0 + 1)) {
 
-                                tmp_index_1145_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 tmp_index_1150_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1166_0_0 = (_for_it_60_0_0 - istartcol_var_455);
-                                tmp_index_1158_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 tmp_index_1148_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 tmp_index_1154_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 tmp_index_1162_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1158_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1145_0_0 = (_for_it_60_0_0 - istartcol_var_455);
+                                tmp_index_1166_0_0 = (_for_it_60_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -51580,10 +52225,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_63_0_0 = (laytrop_max_var_795_0_0 + 1); (_for_it_63_0_0 <= i_nlayers_var_792_0_0); _for_it_63_0_0 = (_for_it_63_0_0 + 1)) {
                     for (_for_it_64_0_0 = istartcol_var_455; (_for_it_64_0_0 <= iendcol_var_456); _for_it_64_0_0 = (_for_it_64_0_0 + 1)) {
 
-                        tmp_index_1169_0_0 = (_for_it_64_0_0 - istartcol_var_455);
-                        tmp_index_1176_0_0 = (_for_it_64_0_0 - istartcol_var_455);
-                        tmp_index_1171_0_0 = (_for_it_64_0_0 - istartcol_var_455);
                         tmp_index_1174_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                        tmp_index_1176_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                        tmp_index_1169_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                        tmp_index_1171_0_0 = (_for_it_64_0_0 - istartcol_var_455);
                         {
 
 
@@ -51613,13 +52258,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_65_0_0 = 1; (_for_it_65_0_0 <= 8); _for_it_65_0_0 = (_for_it_65_0_0 + 1)) {
 
-                            tmp_index_1181_0_0 = (_for_it_64_0_0 - istartcol_var_455);
-                            tmp_index_1198_0_0 = (_for_it_64_0_0 - istartcol_var_455);
-                            tmp_index_1184_0_0 = (_for_it_64_0_0 - istartcol_var_455);
                             tmp_index_1202_0_0 = (_for_it_64_0_0 - istartcol_var_455);
-                            tmp_index_1194_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                            tmp_index_1181_0_0 = (_for_it_64_0_0 - istartcol_var_455);
                             tmp_index_1190_0_0 = (_for_it_64_0_0 - istartcol_var_455);
                             tmp_index_1186_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                            tmp_index_1184_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                            tmp_index_1198_0_0 = (_for_it_64_0_0 - istartcol_var_455);
+                            tmp_index_1194_0_0 = (_for_it_64_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -51662,13 +52307,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 20)) {
 
-                sym_kfdia_var_844_0_0 = iendcol_var_456;
                 sym_kidia_var_843_0_0 = istartcol_var_455;
+                sym_kfdia_var_844_0_0 = iendcol_var_456;
                 laytrop_min_var_876_0_0 = 2147483647;
                 for (tmp_parfor_7_0_0 = istartcol_var_455; (tmp_parfor_7_0_0 <= iendcol_var_456); tmp_parfor_7_0_0 = (tmp_parfor_7_0_0 + 1)) {
 
-                    tmp_index_1551_0_0 = (tmp_parfor_7_0_0 - istartcol_var_455);
                     tmp_index_1550_0_0 = (tmp_parfor_7_0_0 - istartcol_var_455);
+                    tmp_index_1551_0_0 = (tmp_parfor_7_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_1550_0_0] < laytrop_min_var_876_0_0)) {
 
                         laytrop_min_var_876_0_0 = ilaytrop[tmp_index_1551_0_0];
@@ -51713,8 +52358,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_78_0_0 = 1; (_for_it_78_0_0 <= laytrop_min_var_876_0_0); _for_it_78_0_0 = (_for_it_78_0_0 + 1)) {
                     for (_for_it_79_0_0 = istartcol_var_455; (_for_it_79_0_0 <= iendcol_var_456); _for_it_79_0_0 = (_for_it_79_0_0 + 1)) {
 
-                        tmp_index_1556_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                         tmp_index_1558_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                        tmp_index_1556_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                         {
 
 
@@ -51722,8 +52367,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_33_0_0 = ((jp_var_471[(tmp_index_1556_0_0 + ((_for_it_78_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_10_layreffr_var_250[0]) && (jp_var_471[((_for_it_78_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_1558_0_0)] >= v_global_data_var_10_layreffr_var_250[0]));
                         if ((_if_cond_33_0_0 == 1)) {
 
-                            tmp_index_1561_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1560_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1561_0_0 = (_for_it_79_0_0 - istartcol_var_455);
 
                             tmp_call_30_0_0 = min((_for_it_78_0_0 + 1), ilaytrop[tmp_index_1560_0_0]);
                             {
@@ -51741,13 +52386,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_1569_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                        tmp_index_1562_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                        tmp_index_1572_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                        tmp_index_1576_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                         tmp_index_1564_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                        tmp_index_1569_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                         tmp_index_1574_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                         tmp_index_1567_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                        tmp_index_1576_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                        tmp_index_1572_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                        tmp_index_1562_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                         {
 
 
@@ -51778,19 +52423,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_80_0_0 = 1; (_for_it_80_0_0 <= 10); _for_it_80_0_0 = (_for_it_80_0_0 + 1)) {
 
-                            tmp_index_1581_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                            tmp_index_1599_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1587_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                            tmp_index_1603_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                            tmp_index_1622_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                            tmp_index_1583_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1625_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1599_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1603_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1581_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1619_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1613_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1622_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1595_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1609_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1591_0_0 = (_for_it_79_0_0 - istartcol_var_455);
-                            tmp_index_1595_0_0 = (_for_it_79_0_0 - istartcol_var_455);
                             tmp_index_1578_0_0 = (_for_it_79_0_0 - istartcol_var_455);
+                            tmp_index_1583_0_0 = (_for_it_79_0_0 - istartcol_var_455);
 
                             _if_cond_34_0_0 = (_for_it_78_0_0 == i_laysolfr_var_873_0_0[tmp_index_1625_0_0]);
                             {
@@ -51872,8 +52517,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_35_0_0 = (_for_it_81_0_0 <= ilaytrop[tmp_index_1629_0_0]);
                         if ((_if_cond_35_0_0 == 1)) {
 
-                            tmp_index_1630_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1632_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1630_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             {
 
 
@@ -51881,8 +52526,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             _if_cond_35_0_0 = ((jp_var_471[(tmp_index_1630_0_0 + ((_for_it_81_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_10_layreffr_var_250[0]) && (jp_var_471[((_for_it_81_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_1632_0_0)] >= v_global_data_var_10_layreffr_var_250[0]));
                             if ((_if_cond_35_0_0 == 1)) {
 
-                                tmp_index_1635_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1634_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1635_0_0 = (_for_it_82_0_0 - istartcol_var_455);
 
                                 tmp_call_31_0_0 = min((_for_it_81_0_0 + 1), ilaytrop[tmp_index_1634_0_0]);
                                 {
@@ -51900,13 +52545,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_1641_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                            tmp_index_1648_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                            tmp_index_1643_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                            tmp_index_1636_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                            tmp_index_1650_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1638_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1646_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1648_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1650_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1641_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1636_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1643_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             {
 
 
@@ -51937,19 +52582,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_83_0_0 = 1; (_for_it_83_0_0 <= 10); _for_it_83_0_0 = (_for_it_83_0_0 + 1)) {
 
-                                tmp_index_1693_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1683_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1696_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1655_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1657_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1661_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1673_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1699_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1696_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1687_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1677_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1683_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1665_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1673_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1693_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1669_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1655_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1652_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1677_0_0 = (_for_it_82_0_0 - istartcol_var_455);
 
                                 _if_cond_36_0_0 = (_for_it_81_0_0 == i_laysolfr_var_873_0_0[tmp_index_1699_0_0]);
                                 {
@@ -52022,10 +52667,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         } else {
 
                             tmp_index_1708_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                            tmp_index_1703_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1705_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1713_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1715_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                            tmp_index_1703_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             tmp_index_1710_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                             {
 
@@ -52056,16 +52701,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_84_0_0 = 1; (_for_it_84_0_0 <= 10); _for_it_84_0_0 = (_for_it_84_0_0 + 1)) {
 
-                                tmp_index_1742_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1722_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1726_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1748_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1734_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1738_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1717_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1751_0_0 = (_for_it_82_0_0 - istartcol_var_455);
-                                tmp_index_1720_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 tmp_index_1730_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1751_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1726_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1738_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1720_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1717_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1742_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1734_0_0 = (_for_it_82_0_0 - istartcol_var_455);
+                                tmp_index_1748_0_0 = (_for_it_82_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -52117,11 +52762,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_85_0_0 = (laytrop_max_var_877_0_0 + 1); (_for_it_85_0_0 <= i_nlayers_var_874_0_0); _for_it_85_0_0 = (_for_it_85_0_0 + 1)) {
                     for (_for_it_86_0_0 = istartcol_var_455; (_for_it_86_0_0 <= iendcol_var_456); _for_it_86_0_0 = (_for_it_86_0_0 + 1)) {
 
-                        tmp_index_1761_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                        tmp_index_1766_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                        tmp_index_1764_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                         tmp_index_1756_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                         tmp_index_1754_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                        tmp_index_1764_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                        tmp_index_1766_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                        tmp_index_1761_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                         tmp_index_1759_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                         {
 
@@ -52152,16 +52797,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_87_0_0 = 1; (_for_it_87_0_0 <= 10); _for_it_87_0_0 = (_for_it_87_0_0 + 1)) {
 
-                            tmp_index_1793_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                            tmp_index_1768_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                            tmp_index_1771_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                            tmp_index_1785_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                            tmp_index_1789_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                             tmp_index_1777_0_0 = (_for_it_86_0_0 - istartcol_var_455);
-                            tmp_index_1781_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                             tmp_index_1799_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                             tmp_index_1802_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                            tmp_index_1771_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                            tmp_index_1785_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                             tmp_index_1773_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                            tmp_index_1781_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                            tmp_index_1768_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                            tmp_index_1793_0_0 = (_for_it_86_0_0 - istartcol_var_455);
+                            tmp_index_1789_0_0 = (_for_it_86_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -52211,8 +52856,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 21)) {
 
-                laytrop_min_var_836_0_0 = 2147483647;
                 sym_kfdia_var_802_0_0 = iendcol_var_456;
+                laytrop_min_var_836_0_0 = 2147483647;
                 sym_kidia_var_801_0_0 = istartcol_var_455;
                 for (tmp_parfor_6_0_0 = istartcol_var_455; (tmp_parfor_6_0_0 <= iendcol_var_456); tmp_parfor_6_0_0 = (tmp_parfor_6_0_0 + 1)) {
 
@@ -52240,8 +52885,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 i_nlayers_var_834_0_0 = nlev_var_454;
                 for (_for_it_66_0_0 = istartcol_var_455; (_for_it_66_0_0 <= iendcol_var_456); _for_it_66_0_0 = (_for_it_66_0_0 + 1)) {
 
-                    tmp_index_1209_0_0 = (_for_it_66_0_0 - istartcol_var_455);
                     tmp_index_1210_0_0 = (_for_it_66_0_0 - istartcol_var_455);
+                    tmp_index_1209_0_0 = (_for_it_66_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -52262,8 +52907,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_67_0_0 = 1; (_for_it_67_0_0 <= laytrop_min_var_836_0_0); _for_it_67_0_0 = (_for_it_67_0_0 + 1)) {
                     for (_for_it_68_0_0 = istartcol_var_455; (_for_it_68_0_0 <= iendcol_var_456); _for_it_68_0_0 = (_for_it_68_0_0 + 1)) {
 
-                        tmp_index_1211_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         tmp_index_1213_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1211_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         {
 
 
@@ -52271,8 +52916,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_28_0_0 = ((jp_var_471[(tmp_index_1211_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_9_layreffr_var_258[0]) && (jp_var_471[((_for_it_67_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_1213_0_0)] >= v_global_data_var_9_layreffr_var_258[0]));
                         if ((_if_cond_28_0_0 == 1)) {
 
-                            tmp_index_1215_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                             tmp_index_1216_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1215_0_0 = (_for_it_68_0_0 - istartcol_var_455);
 
                             tmp_call_20_0_0 = min((_for_it_67_0_0 + 1), ilaytrop[tmp_index_1215_0_0]);
                             {
@@ -52290,10 +52935,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_1217_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                        tmp_index_1223_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                        tmp_index_1221_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         tmp_index_1219_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1217_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1221_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1223_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -52346,21 +52991,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_1236_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                        tmp_index_1229_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                        tmp_index_1231_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                        tmp_index_1234_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         tmp_index_1224_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1229_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1226_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1236_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         tmp_index_1238_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         tmp_call_21_0_0 = int(z_specmult_var_840_0_0);
-                        tmp_index_1226_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1234_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                        tmp_index_1231_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                         {
 
 
                         }
                         indf_var_830_0_0 = indfor_var_469[(tmp_index_1236_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                        ind0_var_827_0_0 = (((((jp_var_471[(tmp_index_1224_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1226_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_9_nspa_var_313[5]) + (1 + tmp_call_21_0_0));
                         inds_var_829_0_0 = indself_var_474[(tmp_index_1234_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                        ind0_var_827_0_0 = (((((jp_var_471[(tmp_index_1224_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1226_0_0 + ((_for_it_67_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_9_nspa_var_313[5]) + (1 + tmp_call_21_0_0));
                         {
                             double tmp_call_22_0_0;
 
@@ -52408,21 +53053,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_69_0_0 = 1; (_for_it_69_0_0 <= 10); _for_it_69_0_0 = (_for_it_69_0_0 + 1)) {
 
-                            tmp_index_1253_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1265_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                             tmp_index_1261_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1269_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1277_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1240_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1281_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1249_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1287_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1291_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1297_0_0 = (_for_it_68_0_0 - istartcol_var_455);
-                            tmp_index_1257_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                             tmp_index_1245_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1277_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1253_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1269_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1257_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1287_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1265_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1281_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1291_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1249_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                             tmp_index_1275_0_0 = (_for_it_68_0_0 - istartcol_var_455);
                             tmp_index_1273_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1240_0_0 = (_for_it_68_0_0 - istartcol_var_455);
+                            tmp_index_1297_0_0 = (_for_it_68_0_0 - istartcol_var_455);
 
                             _if_cond_29_0_0 = (_for_it_67_0_0 == i_laysolfr_var_833_0_0[tmp_index_1297_0_0]);
                             {
@@ -52521,8 +53166,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_30_0_0 = (_for_it_70_0_0 <= ilaytrop[tmp_index_1309_0_0]);
                         if ((_if_cond_30_0_0 == 1)) {
 
-                            tmp_index_1310_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1312_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1310_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             {
 
 
@@ -52549,10 +53194,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_1320_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1316_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1322_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1318_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1320_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -52605,21 +53250,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_1323_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_index_1328_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_call_24_0_0 = int(z_specmult_var_840_0_0);
                             tmp_index_1325_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1333_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1330_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1337_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1323_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1335_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_call_24_0_0 = int(z_specmult_var_840_0_0);
-                            tmp_index_1333_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1328_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             {
 
 
                             }
                             indf_var_830_0_0 = indfor_var_469[(tmp_index_1335_0_0 + ((_for_it_70_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                            ind0_var_827_0_0 = (((((jp_var_471[(tmp_index_1323_0_0 + ((_for_it_70_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1325_0_0 + ((_for_it_70_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_9_nspa_var_313[5]) + (1 + tmp_call_24_0_0));
                             inds_var_829_0_0 = indself_var_474[(tmp_index_1333_0_0 + ((_for_it_70_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            ind0_var_827_0_0 = (((((jp_var_471[(tmp_index_1323_0_0 + ((_for_it_70_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1325_0_0 + ((_for_it_70_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_9_nspa_var_313[5]) + (1 + tmp_call_24_0_0));
                             {
                                 double tmp_call_25_0_0;
 
@@ -52669,19 +53314,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 tmp_index_1380_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1396_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1372_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1364_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1360_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1348_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1376_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1386_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1352_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1344_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1374_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1352_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1376_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1344_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1390_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1339_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1356_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1386_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1348_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1364_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1372_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1368_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1356_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1360_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1339_0_0 = (_for_it_71_0_0 - istartcol_var_455);
 
                                 _if_cond_31_0_0 = (_for_it_70_0_0 == i_laysolfr_var_833_0_0[tmp_index_1396_0_0]);
                                 {
@@ -52772,8 +53417,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             tmp_index_1410_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1414_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_index_1412_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1408_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1412_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -52826,13 +53471,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
+                            tmp_index_1425_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1417_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_index_1422_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1415_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                            tmp_index_1427_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             tmp_call_26_0_0 = int(z_specmult_var_840_0_0);
                             tmp_index_1420_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_index_1417_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_index_1415_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_index_1425_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                            tmp_index_1427_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                             {
 
 
@@ -52886,19 +53531,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_73_0_0 = 1; (_for_it_73_0_0 <= 10); _for_it_73_0_0 = (_for_it_73_0_0 + 1)) {
 
-                                tmp_index_1476_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1442_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1434_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1466_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1446_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1462_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1464_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1438_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1429_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1466_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1476_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1454_0_0 = (_for_it_71_0_0 - istartcol_var_455);
+                                tmp_index_1434_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1450_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1462_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1470_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 tmp_index_1458_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1454_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1464_0_0 = (_for_it_71_0_0 - istartcol_var_455);
-                                tmp_index_1446_0_0 = (_for_it_71_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -52959,10 +53604,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_74_0_0 = (laytrop_max_var_837_0_0 + 1); (_for_it_74_0_0 <= i_nlayers_var_834_0_0); _for_it_74_0_0 = (_for_it_74_0_0 + 1)) {
                     for (_for_it_75_0_0 = istartcol_var_455; (_for_it_75_0_0 <= iendcol_var_456); _for_it_75_0_0 = (_for_it_75_0_0 + 1)) {
 
-                        tmp_index_1485_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         tmp_index_1481_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                        tmp_index_1483_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                        tmp_index_1485_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         tmp_index_1479_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                        tmp_index_1483_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -53015,13 +53660,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_1488_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         tmp_index_1498_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         tmp_index_1493_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         tmp_index_1486_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                        tmp_index_1496_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                        tmp_call_28_0_0 = int(z_specmult_var_840_0_0);
                         tmp_index_1491_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                        tmp_call_28_0_0 = int(z_specmult_var_840_0_0);
+                        tmp_index_1496_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                        tmp_index_1488_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                         {
 
 
@@ -53075,19 +53720,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_76_0_0 = 1; (_for_it_76_0_0 <= 10); _for_it_76_0_0 = (_for_it_76_0_0 + 1)) {
 
-                            tmp_index_1505_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1500_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1533_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1535_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1529_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1541_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1521_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1513_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1509_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1517_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                             tmp_index_1547_0_0 = (_for_it_75_0_0 - istartcol_var_455);
-                            tmp_index_1537_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                             tmp_index_1525_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1521_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1533_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1513_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1537_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1505_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1529_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1500_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1517_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1509_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1541_0_0 = (_for_it_75_0_0 - istartcol_var_455);
+                            tmp_index_1535_0_0 = (_for_it_75_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -53146,13 +53791,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 22)) {
 
+                sym_kfdia_var_880_0_0 = iendcol_var_456;
                 laytrop_min_var_914_0_0 = 2147483647;
                 sym_kidia_var_879_0_0 = istartcol_var_455;
-                sym_kfdia_var_880_0_0 = iendcol_var_456;
                 for (tmp_parfor_8_0_0 = istartcol_var_455; (tmp_parfor_8_0_0 <= iendcol_var_456); tmp_parfor_8_0_0 = (tmp_parfor_8_0_0 + 1)) {
 
-                    tmp_index_1805_0_0 = (tmp_parfor_8_0_0 - istartcol_var_455);
                     tmp_index_1806_0_0 = (tmp_parfor_8_0_0 - istartcol_var_455);
+                    tmp_index_1805_0_0 = (tmp_parfor_8_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_1805_0_0] < laytrop_min_var_914_0_0)) {
 
                         laytrop_min_var_914_0_0 = ilaytrop[tmp_index_1806_0_0];
@@ -53189,8 +53834,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
                 for (_for_it_88_0_0 = istartcol_var_455; (_for_it_88_0_0 <= iendcol_var_456); _for_it_88_0_0 = (_for_it_88_0_0 + 1)) {
 
-                    tmp_index_1809_0_0 = (_for_it_88_0_0 - istartcol_var_455);
                     tmp_index_1810_0_0 = (_for_it_88_0_0 - istartcol_var_455);
+                    tmp_index_1809_0_0 = (_for_it_88_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -53211,8 +53856,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_89_0_0 = 1; (_for_it_89_0_0 <= laytrop_min_var_914_0_0); _for_it_89_0_0 = (_for_it_89_0_0 + 1)) {
                     for (_for_it_90_0_0 = istartcol_var_455; (_for_it_90_0_0 <= iendcol_var_456); _for_it_90_0_0 = (_for_it_90_0_0 + 1)) {
 
-                        tmp_index_1811_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1813_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                        tmp_index_1811_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         {
 
 
@@ -53240,10 +53885,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                         }
                         tmp_index_1823_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                        tmp_index_1821_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1825_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1819_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1817_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                        tmp_index_1821_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -53308,21 +53953,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_1828_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1833_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1831_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                        tmp_index_1828_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1840_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                        tmp_call_33_0_0 = int(z_specmult_var_918_0_0);
-                        tmp_index_1838_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1826_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                        tmp_index_1838_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                         tmp_index_1836_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                        tmp_call_33_0_0 = int(z_specmult_var_918_0_0);
                         {
 
 
                         }
-                        inds_var_907_0_0 = indself_var_474[(tmp_index_1836_0_0 + ((_for_it_89_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         indf_var_908_0_0 = indfor_var_469[(tmp_index_1838_0_0 + ((_for_it_89_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         ind0_var_905_0_0 = (((((jp_var_471[(tmp_index_1826_0_0 + ((_for_it_89_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1828_0_0 + ((_for_it_89_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_11_nspa_var_313[6]) + (1 + tmp_call_33_0_0));
+                        inds_var_907_0_0 = indself_var_474[(tmp_index_1836_0_0 + ((_for_it_89_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         {
                             double tmp_call_34_0_0;
 
@@ -53370,20 +54015,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_91_0_0 = 1; (_for_it_91_0_0 <= 2); _for_it_91_0_0 = (_for_it_91_0_0 + 1)) {
 
-                            tmp_index_1883_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1847_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1893_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1842_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                             tmp_index_1889_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1883_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                             tmp_index_1875_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1867_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1859_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1871_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                             tmp_index_1863_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                             tmp_index_1855_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1859_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1851_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1893_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1847_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1842_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1871_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1867_0_0 = (_for_it_90_0_0 - istartcol_var_455);
-                            tmp_index_1899_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                             tmp_index_1879_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1851_0_0 = (_for_it_90_0_0 - istartcol_var_455);
+                            tmp_index_1899_0_0 = (_for_it_90_0_0 - istartcol_var_455);
                             tmp_index_1877_0_0 = (_for_it_90_0_0 - istartcol_var_455);
 
                             _if_cond_39_0_0 = (_for_it_89_0_0 == i_laysolfr_var_911_0_0[tmp_index_1899_0_0]);
@@ -53484,8 +54129,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_40_0_0 = (_for_it_92_0_0 <= ilaytrop[tmp_index_1911_0_0]);
                         if ((_if_cond_40_0_0 == 1)) {
 
-                            tmp_index_1914_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_1912_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1914_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             {
 
 
@@ -53493,8 +54138,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             _if_cond_40_0_0 = ((jp_var_471[(tmp_index_1912_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_11_layreffr_var_266[0]) && (jp_var_471[((_for_it_92_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_1914_0_0)] >= v_global_data_var_11_layreffr_var_266[0]));
                             if ((_if_cond_40_0_0 == 1)) {
 
-                                tmp_index_1916_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_1917_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1916_0_0 = (_for_it_93_0_0 - istartcol_var_455);
 
                                 tmp_call_35_0_0 = min((_for_it_92_0_0 + 1), ilaytrop[tmp_index_1916_0_0]);
                                 {
@@ -53512,11 +54157,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_1922_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_1920_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_1924_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_1926_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_1918_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1924_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1922_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -53581,21 +54226,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_1932_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_1927_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_1939_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_call_36_0_0 = int(z_specmult_var_918_0_0);
                             tmp_index_1929_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_1937_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_1934_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_1941_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1932_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1939_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1927_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_1937_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            inds_var_907_0_0 = indself_var_474[(tmp_index_1937_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             indf_var_908_0_0 = indfor_var_469[(tmp_index_1939_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             ind0_var_905_0_0 = (((((jp_var_471[(tmp_index_1927_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_1929_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_11_nspa_var_313[6]) + (1 + tmp_call_36_0_0));
+                            inds_var_907_0_0 = indself_var_474[(tmp_index_1937_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             {
                                 double tmp_call_37_0_0;
 
@@ -53643,21 +54288,21 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_94_0_0 = 1; (_for_it_94_0_0 <= 2); _for_it_94_0_0 = (_for_it_94_0_0 + 1)) {
 
-                                tmp_index_1972_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1960_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1964_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1956_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1994_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_1990_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1968_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1956_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1960_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_1980_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1943_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1952_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1976_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1948_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_2000_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_1984_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_1978_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1972_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1968_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1952_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_2000_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1948_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1943_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1994_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1976_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1984_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_1964_0_0 = (_for_it_93_0_0 - istartcol_var_455);
 
                                 _if_cond_41_0_0 = (_for_it_92_0_0 == i_laysolfr_var_911_0_0[tmp_index_2000_0_0]);
                                 {
@@ -53747,17 +54392,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                         } else {
 
-                            tmp_index_2016_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_2014_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_2012_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                            tmp_index_2021_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             tmp_index_2019_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_2014_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_2021_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_2012_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                            tmp_index_2016_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            tmp_index_2024_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             ind0_var_905_0_0 = (((((jp_var_471[(tmp_index_2014_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_2016_0_0 + ((_for_it_92_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_11_nspb_var_314[6]) + 1);
+                            tmp_index_2024_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -53792,13 +54437,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_95_0_0 = 1; (_for_it_95_0_0 <= 2); _for_it_95_0_0 = (_for_it_95_0_0 + 1)) {
 
-                                tmp_index_2047_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_2029_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_2026_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_2031_0_0 = (_for_it_93_0_0 - istartcol_var_455);
-                                tmp_index_2043_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_2047_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_2039_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 tmp_index_2035_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_2043_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_2031_0_0 = (_for_it_93_0_0 - istartcol_var_455);
+                                tmp_index_2029_0_0 = (_for_it_93_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -53845,17 +54490,17 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_96_0_0 = (laytrop_max_var_915_0_0 + 1); (_for_it_96_0_0 <= i_nlayers_var_912_0_0); _for_it_96_0_0 = (_for_it_96_0_0 + 1)) {
                     for (_for_it_97_0_0 = istartcol_var_455; (_for_it_97_0_0 <= iendcol_var_456); _for_it_97_0_0 = (_for_it_97_0_0 + 1)) {
 
-                        tmp_index_2054_0_0 = (_for_it_97_0_0 - istartcol_var_455);
-                        tmp_index_2059_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                         tmp_index_2052_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                         tmp_index_2057_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                         tmp_index_2050_0_0 = (_for_it_97_0_0 - istartcol_var_455);
+                        tmp_index_2054_0_0 = (_for_it_97_0_0 - istartcol_var_455);
+                        tmp_index_2059_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                         {
 
 
                         }
-                        tmp_index_2062_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                         ind0_var_905_0_0 = (((((jp_var_471[(tmp_index_2052_0_0 + ((_for_it_96_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_2054_0_0 + ((_for_it_96_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_11_nspb_var_314[6]) + 1);
+                        tmp_index_2062_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -53890,13 +54535,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_98_0_0 = 1; (_for_it_98_0_0 <= 2); _for_it_98_0_0 = (_for_it_98_0_0 + 1)) {
 
-                            tmp_index_2067_0_0 = (_for_it_97_0_0 - istartcol_var_455);
-                            tmp_index_2064_0_0 = (_for_it_97_0_0 - istartcol_var_455);
-                            tmp_index_2085_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                             tmp_index_2077_0_0 = (_for_it_97_0_0 - istartcol_var_455);
+                            tmp_index_2085_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                             tmp_index_2069_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                             tmp_index_2073_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                             tmp_index_2081_0_0 = (_for_it_97_0_0 - istartcol_var_455);
+                            tmp_index_2064_0_0 = (_for_it_97_0_0 - istartcol_var_455);
+                            tmp_index_2067_0_0 = (_for_it_97_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -53941,9 +54586,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 23)) {
 
+                sym_kidia_var_921_0_0 = istartcol_var_455;
                 laytrop_min_var_953_0_0 = 2147483647;
                 sym_kfdia_var_922_0_0 = iendcol_var_456;
-                sym_kidia_var_921_0_0 = istartcol_var_455;
                 for (tmp_parfor_9_0_0 = istartcol_var_455; (tmp_parfor_9_0_0 <= iendcol_var_456); tmp_parfor_9_0_0 = (tmp_parfor_9_0_0 + 1)) {
 
                     tmp_index_2089_0_0 = (tmp_parfor_9_0_0 - istartcol_var_455);
@@ -53970,8 +54615,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 i_nlayers_var_951_0_0 = nlev_var_454;
                 for (_for_it_99_0_0 = istartcol_var_455; (_for_it_99_0_0 <= iendcol_var_456); _for_it_99_0_0 = (_for_it_99_0_0 + 1)) {
 
-                    tmp_index_2093_0_0 = (_for_it_99_0_0 - istartcol_var_455);
                     tmp_index_2092_0_0 = (_for_it_99_0_0 - istartcol_var_455);
+                    tmp_index_2093_0_0 = (_for_it_99_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -53992,8 +54637,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_100_0_0 = 1; (_for_it_100_0_0 <= laytrop_min_var_953_0_0); _for_it_100_0_0 = (_for_it_100_0_0 + 1)) {
                     for (_for_it_101_0_0 = istartcol_var_455; (_for_it_101_0_0 <= iendcol_var_456); _for_it_101_0_0 = (_for_it_101_0_0 + 1)) {
 
-                        tmp_index_2094_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                         tmp_index_2096_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                        tmp_index_2094_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                         {
 
 
@@ -54001,8 +54646,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_43_0_0 = ((jp_var_471[(tmp_index_2094_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_12_layreffr_var_272[0]) && (jp_var_471[((_for_it_100_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_2096_0_0)] >= v_global_data_var_12_layreffr_var_272[0]));
                         if ((_if_cond_43_0_0 == 1)) {
 
-                            tmp_index_2099_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                             tmp_index_2098_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2099_0_0 = (_for_it_101_0_0 - istartcol_var_455);
 
                             tmp_call_38_0_0 = min((_for_it_100_0_0 + 1), ilaytrop[tmp_index_2098_0_0]);
                             {
@@ -54020,19 +54665,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_2110_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                         tmp_index_2105_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                        tmp_index_2102_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                        tmp_index_2112_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                         tmp_index_2107_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                        tmp_index_2110_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                         tmp_index_2100_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                        tmp_index_2112_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                        tmp_index_2102_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                         {
 
 
                         }
+                        ind0_var_945_0_0 = (((((jp_var_471[(tmp_index_2100_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_2102_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_12_nspa_var_313[7]) + 1);
                         indf_var_948_0_0 = indfor_var_469[(tmp_index_2112_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         inds_var_947_0_0 = indself_var_474[(tmp_index_2110_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                        ind0_var_945_0_0 = (((((jp_var_471[(tmp_index_2100_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_2102_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_12_nspa_var_313[7]) + 1);
                         {
 
 
@@ -54040,18 +54685,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         ind1_var_946_0_0 = ((((jp_var_471[(tmp_index_2105_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_2107_0_0 + ((_for_it_100_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_12_nspa_var_313[7]) + 1);
                         for (_for_it_102_0_0 = 1; (_for_it_102_0_0 <= 10); _for_it_102_0_0 = (_for_it_102_0_0 + 1)) {
 
-                            tmp_index_2158_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2130_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2114_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2138_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2152_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2126_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                             tmp_index_2120_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                             tmp_index_2142_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                             tmp_index_2117_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2122_0_0 = (_for_it_101_0_0 - istartcol_var_455);
-                            tmp_index_2148_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                             tmp_index_2134_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2114_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2138_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2130_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2122_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2126_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2152_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2148_0_0 = (_for_it_101_0_0 - istartcol_var_455);
+                            tmp_index_2158_0_0 = (_for_it_101_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -54152,8 +54797,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_45_0_0 = (_for_it_103_0_0 <= ilaytrop[tmp_index_2165_0_0]);
                         if ((_if_cond_45_0_0 == 1)) {
 
-                            tmp_index_2168_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                             tmp_index_2166_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                            tmp_index_2168_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                             {
 
 
@@ -54180,19 +54825,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_2179_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                             tmp_index_2172_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                            tmp_index_2182_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                            tmp_index_2184_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                            tmp_index_2177_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                            tmp_index_2179_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                             tmp_index_2174_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                            tmp_index_2184_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                            tmp_index_2182_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                            tmp_index_2177_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                             {
 
 
                             }
+                            ind0_var_945_0_0 = (((((jp_var_471[(tmp_index_2172_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_2174_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_12_nspa_var_313[7]) + 1);
                             indf_var_948_0_0 = indfor_var_469[(tmp_index_2184_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             inds_var_947_0_0 = indself_var_474[(tmp_index_2182_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                            ind0_var_945_0_0 = (((((jp_var_471[(tmp_index_2172_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_2174_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_12_nspa_var_313[7]) + 1);
                             {
 
 
@@ -54200,18 +54845,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             ind1_var_946_0_0 = ((((jp_var_471[(tmp_index_2177_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_2179_0_0 + ((_for_it_103_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_12_nspa_var_313[7]) + 1);
                             for (_for_it_105_0_0 = 1; (_for_it_105_0_0 <= 10); _for_it_105_0_0 = (_for_it_105_0_0 + 1)) {
 
-                                tmp_index_2224_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2220_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2186_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2194_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2202_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2206_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2189_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2192_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2198_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2210_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                                 tmp_index_2230_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                                 tmp_index_2214_0_0 = (_for_it_104_0_0 - istartcol_var_455);
-                                tmp_index_2210_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2198_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2206_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2220_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2192_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2189_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2202_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2224_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2186_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2194_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -54303,9 +54948,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         } else {
                             for (_for_it_106_0_0 = 1; (_for_it_106_0_0 <= 10); _for_it_106_0_0 = (_for_it_106_0_0 + 1)) {
 
-                                tmp_index_2240_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                                 tmp_index_2243_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                                 tmp_index_2237_0_0 = (_for_it_104_0_0 - istartcol_var_455);
+                                tmp_index_2240_0_0 = (_for_it_104_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -54343,9 +54988,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     for (_for_it_108_0_0 = (laytrop_max_var_954_0_0 + 1); (_for_it_108_0_0 <= i_nlayers_var_951_0_0); _for_it_108_0_0 = (_for_it_108_0_0 + 1)) {
                         for (_for_it_109_0_0 = istartcol_var_455; (_for_it_109_0_0 <= iendcol_var_456); _for_it_109_0_0 = (_for_it_109_0_0 + 1)) {
 
+                            tmp_index_2246_0_0 = (_for_it_109_0_0 - istartcol_var_455);
                             tmp_index_2252_0_0 = (_for_it_109_0_0 - istartcol_var_455);
                             tmp_index_2249_0_0 = (_for_it_109_0_0 - istartcol_var_455);
-                            tmp_index_2246_0_0 = (_for_it_109_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -54380,13 +55025,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 24)) {
 
-                sym_kidia_var_688_0_0 = istartcol_var_455;
                 laytrop_min_var_724_0_0 = 2147483647;
+                sym_kidia_var_688_0_0 = istartcol_var_455;
                 sym_kfdia_var_689_0_0 = iendcol_var_456;
                 for (tmp_parfor_3_0_0 = istartcol_var_455; (tmp_parfor_3_0_0 <= iendcol_var_456); tmp_parfor_3_0_0 = (tmp_parfor_3_0_0 + 1)) {
 
-                    tmp_index_498_0_0 = (tmp_parfor_3_0_0 - istartcol_var_455);
                     tmp_index_499_0_0 = (tmp_parfor_3_0_0 - istartcol_var_455);
+                    tmp_index_498_0_0 = (tmp_parfor_3_0_0 - istartcol_var_455);
                     if ((ilaytrop[tmp_index_498_0_0] < laytrop_min_var_724_0_0)) {
 
                         laytrop_min_var_724_0_0 = ilaytrop[tmp_index_499_0_0];
@@ -54409,8 +55054,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 i_nlayers_var_722_0_0 = nlev_var_454;
                 for (_for_it_33_0_0 = istartcol_var_455; (_for_it_33_0_0 <= iendcol_var_456); _for_it_33_0_0 = (_for_it_33_0_0 + 1)) {
 
-                    tmp_index_503_0_0 = (_for_it_33_0_0 - istartcol_var_455);
                     tmp_index_502_0_0 = (_for_it_33_0_0 - istartcol_var_455);
+                    tmp_index_503_0_0 = (_for_it_33_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -54431,8 +55076,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_34_0_0 = 1; (_for_it_34_0_0 <= laytrop_min_var_724_0_0); _for_it_34_0_0 = (_for_it_34_0_0 + 1)) {
                     for (_for_it_35_0_0 = istartcol_var_455; (_for_it_35_0_0 <= iendcol_var_456); _for_it_35_0_0 = (_for_it_35_0_0 + 1)) {
 
-                        tmp_index_506_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                         tmp_index_504_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_506_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                         {
 
 
@@ -54440,8 +55085,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_13_0_0 = ((jp_var_471[(tmp_index_504_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_6_layreffr_var_279[0]) && (jp_var_471[((_for_it_34_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_506_0_0)] >= v_global_data_var_6_layreffr_var_279[0]));
                         if ((_if_cond_13_0_0 == 1)) {
 
-                            tmp_index_508_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                             tmp_index_509_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_508_0_0 = (_for_it_35_0_0 - istartcol_var_455);
 
                             tmp_call_6_0_0 = min((_for_it_34_0_0 + 1), ilaytrop[tmp_index_508_0_0]);
                             {
@@ -54459,10 +55104,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_514_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                        tmp_index_516_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                        tmp_index_512_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                         tmp_index_510_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_512_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_516_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_514_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -54515,20 +55160,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_524_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                        tmp_index_529_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                        tmp_index_519_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                        tmp_index_517_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                         tmp_index_522_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                        tmp_call_7_0_0 = int(z_specmult_var_728_0_0);
                         tmp_index_527_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_529_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_524_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_index_517_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                        tmp_call_7_0_0 = int(z_specmult_var_728_0_0);
+                        tmp_index_519_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                         {
 
 
                         }
-                        inds_var_717_0_0 = indself_var_474[(tmp_index_527_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                        indf_var_718_0_0 = indfor_var_469[(tmp_index_529_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         ind0_var_715_0_0 = (((((jp_var_471[(tmp_index_517_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_519_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspa_var_313[8]) + (1 + tmp_call_7_0_0));
+                        indf_var_718_0_0 = indfor_var_469[(tmp_index_529_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                        inds_var_717_0_0 = indself_var_474[(tmp_index_527_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                         {
                             double tmp_call_8_0_0;
 
@@ -54560,23 +55205,23 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         ind1_var_716_0_0 = ((((jp_var_471[(tmp_index_522_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_524_0_0 + ((_for_it_34_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspa_var_313[8]) + (1 + tmp_call_7_0_0));
                         for (_for_it_36_0_0 = 1; (_for_it_36_0_0 <= 8); _for_it_36_0_0 = (_for_it_36_0_0 + 1)) {
 
-                            tmp_index_593_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_556_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_599_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_577_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_560_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_572_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_579_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_544_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_574_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_564_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_539_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_531_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_548_0_0 = (_for_it_35_0_0 - istartcol_var_455);
-                            tmp_index_583_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                             tmp_index_552_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_564_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_560_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                             tmp_index_589_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_556_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_548_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_577_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_593_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_531_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_544_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_579_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_539_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_599_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_574_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                             tmp_index_568_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_583_0_0 = (_for_it_35_0_0 - istartcol_var_455);
+                            tmp_index_572_0_0 = (_for_it_35_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -54695,8 +55340,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_15_0_0 = (_for_it_37_0_0 <= ilaytrop[tmp_index_611_0_0]);
                         if ((_if_cond_15_0_0 == 1)) {
 
-                            tmp_index_614_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             tmp_index_612_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_614_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             {
 
 
@@ -54704,8 +55349,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             _if_cond_15_0_0 = ((jp_var_471[(tmp_index_612_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_6_layreffr_var_279[0]) && (jp_var_471[((_for_it_37_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_614_0_0)] >= v_global_data_var_6_layreffr_var_279[0]));
                             if ((_if_cond_15_0_0 == 1)) {
 
-                                tmp_index_616_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_617_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_616_0_0 = (_for_it_38_0_0 - istartcol_var_455);
 
                                 tmp_call_9_0_0 = min((_for_it_37_0_0 + 1), ilaytrop[tmp_index_616_0_0]);
                                 {
@@ -54723,9 +55368,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_622_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                            tmp_index_624_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             tmp_index_618_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_624_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_622_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             tmp_index_620_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             {
 
@@ -54779,20 +55424,20 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_632_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                            tmp_index_635_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                            tmp_index_637_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                            tmp_call_10_0_0 = int(z_specmult_var_728_0_0);
                             tmp_index_627_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                            tmp_index_630_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_632_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_call_10_0_0 = int(z_specmult_var_728_0_0);
+                            tmp_index_637_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_635_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             tmp_index_625_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_630_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            inds_var_717_0_0 = indself_var_474[(tmp_index_635_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
-                            indf_var_718_0_0 = indfor_var_469[(tmp_index_637_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             ind0_var_715_0_0 = (((((jp_var_471[(tmp_index_625_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_627_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspa_var_313[8]) + (1 + tmp_call_10_0_0));
+                            indf_var_718_0_0 = indfor_var_469[(tmp_index_637_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
+                            inds_var_717_0_0 = indself_var_474[(tmp_index_635_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))];
                             {
                                 double tmp_call_11_0_0;
 
@@ -54824,23 +55469,23 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             ind1_var_716_0_0 = ((((jp_var_471[(tmp_index_630_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_632_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspa_var_313[8]) + (1 + tmp_call_10_0_0));
                             for (_for_it_39_0_0 = 1; (_for_it_39_0_0 <= 8); _for_it_39_0_0 = (_for_it_39_0_0 + 1)) {
 
+                                tmp_index_701_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_647_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_664_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_685_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_707_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_672_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_691_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_697_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_707_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_682_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_676_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_660_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_685_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_664_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_680_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_639_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_668_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_652_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_656_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_647_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_682_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_639_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_660_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_687_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_701_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_697_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_676_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_656_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_652_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -54950,14 +55595,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         } else {
 
                             tmp_index_724_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                            tmp_index_719_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             tmp_index_721_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                            tmp_index_719_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            tmp_index_726_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             ind0_var_715_0_0 = (((((jp_var_471[(tmp_index_719_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_721_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspb_var_314[8]) + 1);
+                            tmp_index_726_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                             {
 
 
@@ -54965,15 +55610,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             ind1_var_716_0_0 = (((((jp_var_471[(tmp_index_724_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_726_0_0 + ((_for_it_37_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspb_var_314[8]) + 1);
                             for (_for_it_40_0_0 = 1; (_for_it_40_0_0 <= 8); _for_it_40_0_0 = (_for_it_40_0_0 + 1)) {
 
-                                tmp_index_749_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_745_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_756_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_735_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_737_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_729_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_732_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_741_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 tmp_index_753_0_0 = (_for_it_38_0_0 - istartcol_var_455);
-                                tmp_index_729_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_745_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_756_0_0 = (_for_it_38_0_0 - istartcol_var_455);
+                                tmp_index_749_0_0 = (_for_it_38_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -55048,15 +55693,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         ind1_var_716_0_0 = (((((jp_var_471[(tmp_index_764_0_0 + ((_for_it_41_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 12) * 5) + (jt1_var_473[(tmp_index_766_0_0 + ((_for_it_41_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_6_nspb_var_314[8]) + 1);
                         for (_for_it_43_0_0 = 1; (_for_it_43_0_0 <= 8); _for_it_43_0_0 = (_for_it_43_0_0 + 1)) {
 
-                            tmp_index_772_0_0 = (_for_it_42_0_0 - istartcol_var_455);
-                            tmp_index_769_0_0 = (_for_it_42_0_0 - istartcol_var_455);
-                            tmp_index_775_0_0 = (_for_it_42_0_0 - istartcol_var_455);
                             tmp_index_796_0_0 = (_for_it_42_0_0 - istartcol_var_455);
-                            tmp_index_789_0_0 = (_for_it_42_0_0 - istartcol_var_455);
+                            tmp_index_772_0_0 = (_for_it_42_0_0 - istartcol_var_455);
                             tmp_index_785_0_0 = (_for_it_42_0_0 - istartcol_var_455);
-                            tmp_index_781_0_0 = (_for_it_42_0_0 - istartcol_var_455);
+                            tmp_index_789_0_0 = (_for_it_42_0_0 - istartcol_var_455);
                             tmp_index_777_0_0 = (_for_it_42_0_0 - istartcol_var_455);
+                            tmp_index_775_0_0 = (_for_it_42_0_0 - istartcol_var_455);
+                            tmp_index_769_0_0 = (_for_it_42_0_0 - istartcol_var_455);
                             tmp_index_793_0_0 = (_for_it_42_0_0 - istartcol_var_455);
+                            tmp_index_781_0_0 = (_for_it_42_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -55113,8 +55758,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 25)) {
 
-                sym_kfdia_var_732_0_0 = iendcol_var_456;
                 sym_kidia_var_731_0_0 = istartcol_var_455;
+                sym_kfdia_var_732_0_0 = iendcol_var_456;
                 laytrop_min_var_756_0_0 = 2147483647;
                 for (tmp_parfor_4_0_0 = istartcol_var_455; (tmp_parfor_4_0_0 <= iendcol_var_456); tmp_parfor_4_0_0 = (tmp_parfor_4_0_0 + 1)) {
 
@@ -55173,8 +55818,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_18_0_0 = ((jp_var_471[(tmp_index_805_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] < v_global_data_var_7_layreffr_var_287[0]) && (jp_var_471[((_for_it_45_0_0 * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)) + tmp_index_807_0_0)] >= v_global_data_var_7_layreffr_var_287[0]));
                         if ((_if_cond_18_0_0 == 1)) {
 
-                            tmp_index_810_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_809_0_0 = (_for_it_46_0_0 - istartcol_var_455);
+                            tmp_index_810_0_0 = (_for_it_46_0_0 - istartcol_var_455);
 
                             tmp_call_12_0_0 = min((_for_it_45_0_0 + 1), ilaytrop[tmp_index_809_0_0]);
                             {
@@ -55192,15 +55837,15 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_811_0_0 = (_for_it_46_0_0 - istartcol_var_455);
-                        tmp_index_816_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                         tmp_index_813_0_0 = (_for_it_46_0_0 - istartcol_var_455);
+                        tmp_index_816_0_0 = (_for_it_46_0_0 - istartcol_var_455);
+                        tmp_index_811_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                         {
 
 
                         }
-                        ind0_var_750_0_0 = (((((jp_var_471[(tmp_index_811_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_813_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_7_nspa_var_313[9]) + 1);
                         tmp_index_818_0_0 = (_for_it_46_0_0 - istartcol_var_455);
+                        ind0_var_750_0_0 = (((((jp_var_471[(tmp_index_811_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_813_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_7_nspa_var_313[9]) + 1);
                         {
 
 
@@ -55208,14 +55853,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         ind1_var_751_0_0 = ((((jp_var_471[(tmp_index_816_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_818_0_0 + ((_for_it_45_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_7_nspa_var_313[9]) + 1);
                         for (_for_it_47_0_0 = 1; (_for_it_47_0_0 <= 6); _for_it_47_0_0 = (_for_it_47_0_0 + 1)) {
 
+                            tmp_index_837_0_0 = (_for_it_46_0_0 - istartcol_var_455);
+                            tmp_index_841_0_0 = (_for_it_46_0_0 - istartcol_var_455);
+                            tmp_index_827_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_824_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_833_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_821_0_0 = (_for_it_46_0_0 - istartcol_var_455);
-                            tmp_index_837_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_848_0_0 = (_for_it_46_0_0 - istartcol_var_455);
-                            tmp_index_827_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_829_0_0 = (_for_it_46_0_0 - istartcol_var_455);
-                            tmp_index_841_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             tmp_index_845_0_0 = (_for_it_46_0_0 - istartcol_var_455);
                             {
 
@@ -55308,8 +55953,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_20_0_0 = (_for_it_48_0_0 <= ilaytrop[tmp_index_855_0_0]);
                         if ((_if_cond_20_0_0 == 1)) {
 
-                            tmp_index_856_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                             tmp_index_858_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                            tmp_index_856_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                             {
 
 
@@ -55337,14 +55982,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
                             }
                             tmp_index_867_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                            tmp_index_862_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                             tmp_index_864_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                            tmp_index_862_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            ind0_var_750_0_0 = (((((jp_var_471[(tmp_index_862_0_0 + ((_for_it_48_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_864_0_0 + ((_for_it_48_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_7_nspa_var_313[9]) + 1);
                             tmp_index_869_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                            ind0_var_750_0_0 = (((((jp_var_471[(tmp_index_862_0_0 + ((_for_it_48_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_864_0_0 + ((_for_it_48_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_7_nspa_var_313[9]) + 1);
                             {
 
 
@@ -55353,14 +55998,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             for (_for_it_50_0_0 = 1; (_for_it_50_0_0 <= 6); _for_it_50_0_0 = (_for_it_50_0_0 + 1)) {
 
                                 tmp_index_878_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                                tmp_index_880_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 tmp_index_875_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 tmp_index_892_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 tmp_index_884_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                                tmp_index_872_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                                tmp_index_888_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                                tmp_index_880_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                                tmp_index_896_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 tmp_index_899_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                                tmp_index_888_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                                tmp_index_896_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                                tmp_index_872_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -55443,10 +56088,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         } else {
                             for (_for_it_51_0_0 = 1; (_for_it_51_0_0 <= 6); _for_it_51_0_0 = (_for_it_51_0_0 + 1)) {
 
+                                tmp_index_906_0_0 = (_for_it_49_0_0 - istartcol_var_455);
+                                tmp_index_909_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 tmp_index_915_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 tmp_index_912_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                                tmp_index_909_0_0 = (_for_it_49_0_0 - istartcol_var_455);
-                                tmp_index_906_0_0 = (_for_it_49_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -55497,10 +56142,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     for (_for_it_53_0_0 = (laytrop_max_var_757_0_0 + 1); (_for_it_53_0_0 <= i_nlayers_var_754_0_0); _for_it_53_0_0 = (_for_it_53_0_0 + 1)) {
                         for (_for_it_54_0_0 = istartcol_var_455; (_for_it_54_0_0 <= iendcol_var_456); _for_it_54_0_0 = (_for_it_54_0_0 + 1)) {
 
-                            tmp_index_927_0_0 = (_for_it_54_0_0 - istartcol_var_455);
                             tmp_index_918_0_0 = (_for_it_54_0_0 - istartcol_var_455);
-                            tmp_index_924_0_0 = (_for_it_54_0_0 - istartcol_var_455);
                             tmp_index_921_0_0 = (_for_it_54_0_0 - istartcol_var_455);
+                            tmp_index_924_0_0 = (_for_it_54_0_0 - istartcol_var_455);
+                            tmp_index_927_0_0 = (_for_it_54_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -55548,9 +56193,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 26)) {
 
+                laytrop_min_var_644_0_0 = 2147483647;
                 sym_kidia_var_630_0_0 = istartcol_var_455;
                 sym_kfdia_var_631_0_0 = iendcol_var_456;
-                laytrop_min_var_644_0_0 = 2147483647;
                 for (tmp_parfor_1_0_0 = istartcol_var_455; (tmp_parfor_1_0_0 <= iendcol_var_456); tmp_parfor_1_0_0 = (tmp_parfor_1_0_0 + 1)) {
 
                     tmp_index_173_0_0 = (tmp_parfor_1_0_0 - istartcol_var_455);
@@ -55577,8 +56222,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 i_nlayers_var_642_0_0 = nlev_var_454;
                 for (_for_it_11_0_0 = istartcol_var_455; (_for_it_11_0_0 <= iendcol_var_456); _for_it_11_0_0 = (_for_it_11_0_0 + 1)) {
 
-                    tmp_index_176_0_0 = (_for_it_11_0_0 - istartcol_var_455);
                     tmp_index_177_0_0 = (_for_it_11_0_0 - istartcol_var_455);
+                    tmp_index_176_0_0 = (_for_it_11_0_0 - istartcol_var_455);
                     {
 
                         {
@@ -55622,9 +56267,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_182_0_0 = (_for_it_13_0_0 - istartcol_var_455);
-                            tmp_index_185_0_0 = (_for_it_13_0_0 - istartcol_var_455);
                             tmp_index_188_0_0 = (_for_it_13_0_0 - istartcol_var_455);
+                            tmp_index_185_0_0 = (_for_it_13_0_0 - istartcol_var_455);
+                            tmp_index_182_0_0 = (_for_it_13_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -55688,9 +56333,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                     }
                                 }
-                                tmp_index_196_0_0 = (_for_it_16_0_0 - istartcol_var_455);
-                                tmp_index_199_0_0 = (_for_it_16_0_0 - istartcol_var_455);
                                 tmp_index_202_0_0 = (_for_it_16_0_0 - istartcol_var_455);
+                                tmp_index_199_0_0 = (_for_it_16_0_0 - istartcol_var_455);
+                                tmp_index_196_0_0 = (_for_it_16_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -55722,8 +56367,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         } else {
                             for (_for_it_18_0_0 = 1; (_for_it_18_0_0 <= 6); _for_it_18_0_0 = (_for_it_18_0_0 + 1)) {
 
-                                tmp_index_208_0_0 = (_for_it_16_0_0 - istartcol_var_455);
                                 tmp_index_211_0_0 = (_for_it_16_0_0 - istartcol_var_455);
+                                tmp_index_208_0_0 = (_for_it_16_0_0 - istartcol_var_455);
                                 tmp_index_205_0_0 = (_for_it_16_0_0 - istartcol_var_455);
                                 {
 
@@ -55762,9 +56407,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     for (_for_it_20_0_0 = (laytrop_max_var_645_0_0 + 1); (_for_it_20_0_0 <= i_nlayers_var_642_0_0); _for_it_20_0_0 = (_for_it_20_0_0 + 1)) {
                         for (_for_it_21_0_0 = istartcol_var_455; (_for_it_21_0_0 <= iendcol_var_456); _for_it_21_0_0 = (_for_it_21_0_0 + 1)) {
 
+                            tmp_index_217_0_0 = (_for_it_21_0_0 - istartcol_var_455);
                             tmp_index_214_0_0 = (_for_it_21_0_0 - istartcol_var_455);
                             tmp_index_220_0_0 = (_for_it_21_0_0 - istartcol_var_455);
-                            tmp_index_217_0_0 = (_for_it_21_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -55799,8 +56444,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 }
             } else if ((_for_it_349_0 == 27)) {
 
-                sym_kidia_var_603_0_0 = istartcol_var_455;
                 sym_kfdia_var_604_0_0 = iendcol_var_456;
+                sym_kidia_var_603_0_0 = istartcol_var_455;
                 laytrop_min_var_627_0_0 = 2147483647;
                 for (tmp_parfor_0_0_0 = istartcol_var_455; (tmp_parfor_0_0_0 <= iendcol_var_456); tmp_parfor_0_0_0 = (tmp_parfor_0_0_0 + 1)) {
 
@@ -55855,8 +56500,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
 
                         }
-                        ind0_var_621_0_0 = (((((jp_var_471[(tmp_index_5_0_0 + ((_for_it_1_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7_0_0 + ((_for_it_1_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_3_nspa_var_313[11]) + 1);
                         tmp_index_12_0_0 = (_for_it_2_0_0 - istartcol_var_455);
+                        ind0_var_621_0_0 = (((((jp_var_471[(tmp_index_5_0_0 + ((_for_it_1_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1) * 5) + (jt_var_472[(tmp_index_7_0_0 + ((_for_it_1_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_3_nspa_var_313[11]) + 1);
                         {
 
 
@@ -55864,14 +56509,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         ind1_var_622_0_0 = ((((jp_var_471[(tmp_index_10_0_0 + ((_for_it_1_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_12_0_0 + ((_for_it_1_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_3_nspa_var_313[11]) + 1);
                         for (_for_it_3_0_0 = 1; (_for_it_3_0_0 <= 8); _for_it_3_0_0 = (_for_it_3_0_0 + 1)) {
 
-                            tmp_index_21_0_0 = (_for_it_2_0_0 - istartcol_var_455);
-                            tmp_index_39_0_0 = (_for_it_2_0_0 - istartcol_var_455);
+                            tmp_index_15_0_0 = (_for_it_2_0_0 - istartcol_var_455);
                             tmp_index_31_0_0 = (_for_it_2_0_0 - istartcol_var_455);
                             tmp_index_35_0_0 = (_for_it_2_0_0 - istartcol_var_455);
-                            tmp_index_18_0_0 = (_for_it_2_0_0 - istartcol_var_455);
                             tmp_index_23_0_0 = (_for_it_2_0_0 - istartcol_var_455);
-                            tmp_index_15_0_0 = (_for_it_2_0_0 - istartcol_var_455);
                             tmp_index_27_0_0 = (_for_it_2_0_0 - istartcol_var_455);
+                            tmp_index_21_0_0 = (_for_it_2_0_0 - istartcol_var_455);
+                            tmp_index_39_0_0 = (_for_it_2_0_0 - istartcol_var_455);
+                            tmp_index_18_0_0 = (_for_it_2_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -55932,9 +56577,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_0_0_0 = (_for_it_4_0_0 <= ilaytrop[tmp_index_42_0_0]);
                         if ((_if_cond_0_0_0 == 1)) {
 
+                            tmp_index_43_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                             tmp_index_45_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                             tmp_index_48_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                            tmp_index_43_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                             {
 
 
@@ -55948,14 +56593,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             ind1_var_622_0_0 = ((((jp_var_471[(tmp_index_48_0_0 + ((_for_it_4_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] * 5) + (jt1_var_473[(tmp_index_50_0_0 + ((_for_it_4_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_3_nspa_var_313[11]) + 1);
                             for (_for_it_6_0_0 = 1; (_for_it_6_0_0 <= 8); _for_it_6_0_0 = (_for_it_6_0_0 + 1)) {
 
-                                tmp_index_56_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_61_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_65_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_69_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 tmp_index_73_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_59_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_77_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 tmp_index_53_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_69_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_65_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_77_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_61_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_59_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_56_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -56006,8 +56651,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                         } else {
 
-                            tmp_index_80_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                             tmp_index_82_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                            tmp_index_80_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                             {
 
 
@@ -56048,13 +56693,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             for (_for_it_7_0_0 = 1; (_for_it_7_0_0 <= 8); _for_it_7_0_0 = (_for_it_7_0_0 + 1)) {
 
                                 tmp_index_111_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_107_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_101_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_115_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 tmp_index_98_0_0 = (_for_it_5_0_0 - istartcol_var_455);
-                                tmp_index_95_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_101_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 tmp_index_119_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_115_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_107_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 tmp_index_103_0_0 = (_for_it_5_0_0 - istartcol_var_455);
+                                tmp_index_95_0_0 = (_for_it_5_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -56141,8 +56786,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_8_0_0 = (laytrop_max_var_628_0_0 + 1); (_for_it_8_0_0 <= i_nlayers_var_625_0_0); _for_it_8_0_0 = (_for_it_8_0_0 + 1)) {
                     for (_for_it_9_0_0 = istartcol_var_455; (_for_it_9_0_0 <= iendcol_var_456); _for_it_9_0_0 = (_for_it_9_0_0 + 1)) {
 
-                        tmp_index_128_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                         tmp_index_126_0_0 = (_for_it_9_0_0 - istartcol_var_455);
+                        tmp_index_128_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                         {
 
 
@@ -56166,8 +56811,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_133_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                         tmp_index_131_0_0 = (_for_it_9_0_0 - istartcol_var_455);
+                        tmp_index_133_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                         tmp_index_136_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                         {
 
@@ -56184,12 +56829,12 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             tmp_index_165_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                             tmp_index_153_0_0 = (_for_it_9_0_0 - istartcol_var_455);
-                            tmp_index_161_0_0 = (_for_it_9_0_0 - istartcol_var_455);
-                            tmp_index_157_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                             tmp_index_147_0_0 = (_for_it_9_0_0 - istartcol_var_455);
-                            tmp_index_144_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                             tmp_index_141_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                             tmp_index_149_0_0 = (_for_it_9_0_0 - istartcol_var_455);
+                            tmp_index_161_0_0 = (_for_it_9_0_0 - istartcol_var_455);
+                            tmp_index_157_0_0 = (_for_it_9_0_0 - istartcol_var_455);
+                            tmp_index_144_0_0 = (_for_it_9_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -56323,10 +56968,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_355_0_0 = 1; (_for_it_355_0_0 <= laytrop_min_var_2236_0_0); _for_it_355_0_0 = (_for_it_355_0_0 + 1)) {
                     for (_for_it_356_0_0 = istartcol_var_455; (_for_it_356_0_0 <= iendcol_var_456); _for_it_356_0_0 = (_for_it_356_0_0 + 1)) {
 
-                        tmp_index_10138_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                         tmp_index_10132_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                         tmp_index_10136_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                         tmp_index_10134_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                        tmp_index_10138_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -56379,11 +57024,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_10144_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                        tmp_index_10141_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                        tmp_index_10139_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                        tmp_call_250_0_0 = int(z_specmult_var_2240_0_0);
                         tmp_index_10146_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                        tmp_index_10144_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                        tmp_call_250_0_0 = int(z_specmult_var_2240_0_0);
+                        tmp_index_10139_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                        tmp_index_10141_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                         {
 
 
@@ -56437,16 +57082,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_357_0_0 = 1; (_for_it_357_0_0 <= 6); _for_it_357_0_0 = (_for_it_357_0_0 + 1)) {
 
+                            tmp_index_10184_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                             tmp_index_10176_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                            tmp_index_10172_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                            tmp_index_10156_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                            tmp_index_10186_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                            tmp_index_10151_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                            tmp_index_10180_0_0 = (_for_it_356_0_0 - istartcol_var_455);
+                            tmp_index_10160_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                             tmp_index_10168_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                             tmp_index_10164_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10186_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10172_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10180_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10156_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10151_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10184_0_0 = (_for_it_356_0_0 - istartcol_var_455);
-                            tmp_index_10160_0_0 = (_for_it_356_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -56506,9 +57151,9 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         if ((_if_cond_296_0_0 == 1)) {
 
                             tmp_index_10196_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                            tmp_index_10190_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                            tmp_index_10192_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             tmp_index_10194_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                            tmp_index_10192_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                            tmp_index_10190_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -56619,16 +57264,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_360_0_0 = 1; (_for_it_360_0_0 <= 6); _for_it_360_0_0 = (_for_it_360_0_0 + 1)) {
 
-                                tmp_index_10209_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                                 tmp_index_10214_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10222_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10230_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10244_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10218_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                                 tmp_index_10238_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                                 tmp_index_10226_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10234_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10218_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                                 tmp_index_10242_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10222_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10230_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10209_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10244_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10234_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -56702,10 +57347,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
-                            tmp_index_10252_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             tmp_index_10258_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             tmp_index_10254_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             tmp_index_10256_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                            tmp_index_10252_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -56758,11 +57403,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                                 }
 
                             }
-                            tmp_index_10266_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                            tmp_index_10261_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                            tmp_call_254_0_0 = int(z_specmult_var_2240_0_0);
                             tmp_index_10259_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                             tmp_index_10264_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                            tmp_index_10261_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                            tmp_index_10266_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                            tmp_call_254_0_0 = int(z_specmult_var_2240_0_0);
                             {
 
 
@@ -56816,16 +57461,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_361_0_0 = 1; (_for_it_361_0_0 <= 6); _for_it_361_0_0 = (_for_it_361_0_0 + 1)) {
 
-                                tmp_index_10306_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10280_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10276_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10292_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10288_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10284_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10304_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10296_0_0 = (_for_it_359_0_0 - istartcol_var_455);
-                                tmp_index_10271_0_0 = (_for_it_359_0_0 - istartcol_var_455);
                                 tmp_index_10300_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10276_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10284_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10296_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10280_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10288_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10304_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10271_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10306_0_0 = (_for_it_359_0_0 - istartcol_var_455);
+                                tmp_index_10292_0_0 = (_for_it_359_0_0 - istartcol_var_455);
 
                                 _if_cond_297_0_0 = (_for_it_358_0_0 == i_laysolfr_var_2233_0_0[tmp_index_10306_0_0]);
                                 {
@@ -56909,8 +57554,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_362_0_0 = (laytrop_max_var_2237_0_0 + 1); (_for_it_362_0_0 <= i_nlayers_var_2234_0_0); _for_it_362_0_0 = (_for_it_362_0_0 + 1)) {
                     for (_for_it_363_0_0 = istartcol_var_455; (_for_it_363_0_0 <= iendcol_var_456); _for_it_363_0_0 = (_for_it_363_0_0 + 1)) {
 
-                        tmp_index_10320_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         tmp_index_10318_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                        tmp_index_10320_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         {
 
 
@@ -56934,10 +57579,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_10329_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         tmp_index_10325_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         tmp_index_10323_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         tmp_index_10327_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                        tmp_index_10329_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         {
 
                             {
@@ -56990,11 +57635,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
 
                         }
-                        tmp_index_10335_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                        tmp_index_10330_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         tmp_index_10337_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                        tmp_index_10332_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                        tmp_index_10330_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                        tmp_index_10335_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         tmp_call_256_0_0 = int(z_specmult_var_2240_0_0);
+                        tmp_index_10332_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                         {
 
 
@@ -57048,16 +57693,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_364_0_0 = 1; (_for_it_364_0_0 <= 6); _for_it_364_0_0 = (_for_it_364_0_0 + 1)) {
 
+                            tmp_index_10347_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                            tmp_index_10363_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                            tmp_index_10375_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                            tmp_index_10355_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                             tmp_index_10371_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                            tmp_index_10342_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                             tmp_index_10359_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                             tmp_index_10351_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                            tmp_index_10363_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                             tmp_index_10367_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                            tmp_index_10347_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                            tmp_index_10355_0_0 = (_for_it_363_0_0 - istartcol_var_455);
                             tmp_index_10377_0_0 = (_for_it_363_0_0 - istartcol_var_455);
-                            tmp_index_10375_0_0 = (_for_it_363_0_0 - istartcol_var_455);
+                            tmp_index_10342_0_0 = (_for_it_363_0_0 - istartcol_var_455);
 
                             _if_cond_300_0_0 = (_for_it_362_0_0 == i_laysolfr_var_2233_0_0[tmp_index_10377_0_0]);
                             {
@@ -57140,8 +57785,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
             } else if ((_for_it_349_0 == 29)) {
 
                 laytrop_min_var_2263_0_0 = 2147483647;
-                sym_kidia_var_2243_0_0 = istartcol_var_455;
                 sym_kfdia_var_2244_0_0 = iendcol_var_456;
+                sym_kidia_var_2243_0_0 = istartcol_var_455;
                 for (tmp_parfor_27_0_0 = istartcol_var_455; (tmp_parfor_27_0_0 <= iendcol_var_456); tmp_parfor_27_0_0 = (tmp_parfor_27_0_0 + 1)) {
 
                     tmp_index_10390_0_0 = (tmp_parfor_27_0_0 - istartcol_var_455);
@@ -57188,13 +57833,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                 for (_for_it_366_0_0 = 1; (_for_it_366_0_0 <= laytrop_min_var_2263_0_0); _for_it_366_0_0 = (_for_it_366_0_0 + 1)) {
                     for (_for_it_367_0_0 = istartcol_var_455; (_for_it_367_0_0 <= iendcol_var_456); _for_it_367_0_0 = (_for_it_367_0_0 + 1)) {
 
-                        tmp_index_10401_0_0 = (_for_it_367_0_0 - istartcol_var_455);
-                        tmp_index_10396_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                         tmp_index_10408_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                        tmp_index_10399_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                         tmp_index_10406_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                         tmp_index_10394_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                         tmp_index_10404_0_0 = (_for_it_367_0_0 - istartcol_var_455);
-                        tmp_index_10399_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                        tmp_index_10396_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                        tmp_index_10401_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                         {
 
 
@@ -57225,18 +57870,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_368_0_0 = 1; (_for_it_368_0_0 <= 12); _for_it_368_0_0 = (_for_it_368_0_0 + 1)) {
 
-                            tmp_index_10451_0_0 = (_for_it_367_0_0 - istartcol_var_455);
-                            tmp_index_10431_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10415_0_0 = (_for_it_367_0_0 - istartcol_var_455);
-                            tmp_index_10427_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                            tmp_index_10423_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                            tmp_index_10431_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10445_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                            tmp_index_10451_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                            tmp_index_10419_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10435_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10410_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10413_0_0 = (_for_it_367_0_0 - istartcol_var_455);
-                            tmp_index_10419_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10441_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             tmp_index_10454_0_0 = (_for_it_367_0_0 - istartcol_var_455);
-                            tmp_index_10423_0_0 = (_for_it_367_0_0 - istartcol_var_455);
+                            tmp_index_10427_0_0 = (_for_it_367_0_0 - istartcol_var_455);
                             {
 
                                 {
@@ -57297,13 +57942,13 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_301_0_0 = (_for_it_369_0_0 <= ilaytrop[tmp_index_10457_0_0]);
                         if ((_if_cond_301_0_0 == 1)) {
 
-                            tmp_index_10463_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                            tmp_index_10460_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                            tmp_index_10465_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                            tmp_index_10458_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                            tmp_index_10468_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             tmp_index_10472_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            tmp_index_10458_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            tmp_index_10463_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            tmp_index_10465_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             tmp_index_10470_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            tmp_index_10468_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            tmp_index_10460_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             {
 
 
@@ -57334,18 +57979,18 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_371_0_0 = 1; (_for_it_371_0_0 <= 12); _for_it_371_0_0 = (_for_it_371_0_0 + 1)) {
 
-                                tmp_index_10483_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10487_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10499_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10495_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10509_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10479_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10515_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10474_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10477_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10479_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10499_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10515_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10509_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10505_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10518_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10483_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10491_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10495_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10487_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10518_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10505_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 {
 
                                     {
@@ -57396,8 +58041,8 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                         } else {
 
-                            tmp_index_10523_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             tmp_index_10521_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            tmp_index_10523_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             {
 
 
@@ -57421,16 +58066,16 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                                 }
                             }
+                            tmp_index_10533_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             tmp_index_10531_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             tmp_index_10528_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             tmp_index_10526_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                            tmp_index_10533_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                             {
 
 
                             }
-                            ind0_var_2270_0_0 = (((((jp_var_471[(tmp_index_10526_0_0 + ((_for_it_369_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_10528_0_0 + ((_for_it_369_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_34_nspb_var_314[13]) + 1);
                             tmp_index_10536_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                            ind0_var_2270_0_0 = (((((jp_var_471[(tmp_index_10526_0_0 + ((_for_it_369_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 13) * 5) + (jt_var_472[(tmp_index_10528_0_0 + ((_for_it_369_0_0 - 1) * ((sym_iendcol_var_456 - sym_istartcol_var_455) + 1)))] - 1)) * v_global_data_var_34_nspb_var_314[13]) + 1);
                             {
 
 
@@ -57454,14 +58099,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                             }
                             for (_for_it_372_0_0 = 1; (_for_it_372_0_0 <= 12); _for_it_372_0_0 = (_for_it_372_0_0 + 1)) {
 
-                                tmp_index_10562_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10551_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10555_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10559_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10547_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10551_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10562_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10543_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10538_0_0 = (_for_it_370_0_0 - istartcol_var_455);
-                                tmp_index_10547_0_0 = (_for_it_370_0_0 - istartcol_var_455);
                                 tmp_index_10541_0_0 = (_for_it_370_0_0 - istartcol_var_455);
+                                tmp_index_10559_0_0 = (_for_it_370_0_0 - istartcol_var_455);
 
                                 _if_cond_302_0_0 = (_for_it_369_0_0 == i_laysolfr_var_2275_0_0[tmp_index_10562_0_0]);
                                 {
@@ -57559,10 +58204,10 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                             }
                         }
-                        tmp_index_10576_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                        tmp_index_10574_0_0 = (_for_it_374_0_0 - istartcol_var_455);
                         tmp_index_10581_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                        tmp_index_10574_0_0 = (_for_it_374_0_0 - istartcol_var_455);
                         tmp_index_10579_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                        tmp_index_10576_0_0 = (_for_it_374_0_0 - istartcol_var_455);
                         {
 
 
@@ -57592,14 +58237,14 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         }
                         for (_for_it_375_0_0 = 1; (_for_it_375_0_0 <= 12); _for_it_375_0_0 = (_for_it_375_0_0 + 1)) {
 
-                            tmp_index_10591_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                            tmp_index_10595_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                            tmp_index_10603_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                            tmp_index_10599_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                            tmp_index_10610_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                            tmp_index_10589_0_0 = (_for_it_374_0_0 - istartcol_var_455);
-                            tmp_index_10607_0_0 = (_for_it_374_0_0 - istartcol_var_455);
                             tmp_index_10586_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10599_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10589_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10595_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10607_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10591_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10603_0_0 = (_for_it_374_0_0 - istartcol_var_455);
+                            tmp_index_10610_0_0 = (_for_it_374_0_0 - istartcol_var_455);
 
                             _if_cond_305_0_0 = (_for_it_373_0_0 == i_laysolfr_var_2275_0_0[tmp_index_10610_0_0]);
                             {
@@ -57680,11 +58325,11 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     _if_cond_293_0 = (v_single_level_var_458_cos_sza[tmp_index_10097_0] > 0.0);
                     if ((_if_cond_293_0 == 1)) {
 
+                        tmp_index_10100_0 = (_for_it_351_0 - istartcol_var_455);
+                        tmp_index_10101_0 = (_for_it_351_0 - istartcol_var_455);
+                        tmp_index_10103_0 = (_for_it_351_0 - istartcol_var_455);
                         tmp_index_10098_0 = (_for_it_351_0 - istartcol_var_455);
                         tmp_index_10099_0 = (_for_it_351_0 - istartcol_var_455);
-                        tmp_index_10103_0 = (_for_it_351_0 - istartcol_var_455);
-                        tmp_index_10101_0 = (_for_it_351_0 - istartcol_var_455);
-                        tmp_index_10100_0 = (_for_it_351_0 - istartcol_var_455);
                         {
                             int tmp_index_10102_0;
 
@@ -57737,19 +58382,19 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                         _if_cond_294_0 = (v_single_level_var_458_cos_sza[tmp_index_10105_0] > 0.0);
                         if ((_if_cond_294_0 == 1)) {
 
-                            tmp_index_10113_0 = (_for_it_353_0 - istartcol_var_455);
-                            tmp_index_10117_0 = (_for_it_353_0 - istartcol_var_455);
-                            tmp_index_10120_0 = (_for_it_353_0 - istartcol_var_455);
-                            tmp_index_10106_0 = (_for_it_353_0 - istartcol_var_455);
-                            tmp_index_10123_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10116_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10124_0 = (_for_it_353_0 - istartcol_var_455);
                             tmp_index_10110_0 = (_for_it_353_0 - istartcol_var_455);
                             tmp_index_10107_0 = (_for_it_353_0 - istartcol_var_455);
-                            tmp_index_10124_0 = (_for_it_353_0 - istartcol_var_455);
-                            tmp_index_10116_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10113_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10123_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10120_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10106_0 = (_for_it_353_0 - istartcol_var_455);
+                            tmp_index_10117_0 = (_for_it_353_0 - istartcol_var_455);
 
+                            tmp_index_10109_0 = (iw_0[tmp_index_10106_0] - 1);
                             tmp_index_10119_0 = (iw_0[tmp_index_10116_0] - 1);
                             tmp_index_10126_0 = (iw_0[tmp_index_10123_0] - 1);
-                            tmp_index_10109_0 = (iw_0[tmp_index_10106_0] - 1);
                             {
 
                                 {
