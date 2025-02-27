@@ -48336,6 +48336,7 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
                     }
 
                 }
+                goto_0_0 = 0;
                 if (((z_plog_var_1078_0 <= 4.56) == 1)) {
 
                     goto_0_0 = 1;
@@ -48708,6 +48709,7 @@ void __program_gas_optics_internal(gas_optics_state_t*__state, config_type* conf
 
                     }
                 }
+                goto_1_0 = 0;
                 if (((1 - goto_0_0) == 1)) {
 
                     goto_1_0 = 1;
