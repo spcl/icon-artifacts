@@ -113,9 +113,13 @@ std::pair<array_meta, T*> read_array(std::istream& s) {
 
 template <typename T>
 T* read_pointer(std::istream& s) {
+  read_line(s, {"# missing"});  // Should contain '# missing'
+  int missing;
+  read_scalar(missing, s);
   auto [m, arr] = read_array<T>(s);
   return arr;
 }
+
 
 void deserialize(float* x, std::istream& s) { read_scalar(*x, s); }
 void deserialize(double* x, std::istream& s) { read_scalar(*x, s); }
@@ -131,43 +135,6 @@ void deserialize(int& x, std::istream& s) { read_scalar(x, s); }
 void deserialize(long& x, std::istream& s) { read_scalar(x, s); }
 void deserialize(long long& x, std::istream& s) { read_scalar(x, s); }
 void deserialize(bool& x, std::istream& s) { read_scalar(x, s); }
-
-void deserialize(global_data_type* x, std::istream& s) {
-  bool yep;
-  array_meta m;
-  read_line(s, {"# nflatlev"});  // Should contain '# nflatlev'
-
-  m = read_array_meta(s);
-
-  // We only need to allocate a volume of contiguous memory, and let DaCe
-  // interpret (assuming it follows the same protocol as us).
-  x->nflatlev = m.read<std::remove_pointer<decltype(x->nflatlev)>::type>(s);
-
-  read_line(s, {"# lextra_diffu"});  // Should contain '# lextra_diffu'
-
-  deserialize(&(x->lextra_diffu), s);
-
-  read_line(s, {"# timers_level"});  // Should contain '# timers_level'
-
-  deserialize(&(x->timers_level), s);
-
-  read_line(s, {"# timer_solve_nh_veltend"});  // Should contain '#
-                                               // timer_solve_nh_veltend'
-
-  deserialize(&(x->timer_solve_nh_veltend), s);
-
-  read_line(s, {"# timer_intp"});  // Should contain '# timer_intp'
-
-  deserialize(&(x->timer_intp), s);
-
-  read_line(s, {"# nrdmax"});  // Should contain '# nrdmax'
-
-  m = read_array_meta(s);
-
-  // We only need to allocate a volume of contiguous memory, and let DaCe
-  // interpret (assuming it follows the same protocol as us).
-  x->nrdmax = m.read<std::remove_pointer<decltype(x->nrdmax)>::type>(s);
-}
 
 void deserialize(t_grid_domain_decomp_info* x, std::istream& s) {
   bool yep;
@@ -286,8 +253,6 @@ void deserialize(t_grid_cells* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->area = nullptr;
   x->area = read_pointer<std::remove_pointer<decltype(x->area)>::type>(s);
 
   read_line(s, {"# start_index"});  // Should contain '# start_index'
@@ -592,8 +557,6 @@ void deserialize(t_nh_prog* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->w = nullptr;
   x->w = read_pointer<std::remove_pointer<decltype(x->w)>::type>(s);
 
   read_line(s, {"# vn"});  // Should contain '# vn'
@@ -601,8 +564,6 @@ void deserialize(t_nh_prog* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->vn = nullptr;
   x->vn = read_pointer<std::remove_pointer<decltype(x->vn)>::type>(s);
 }
 
@@ -614,8 +575,6 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->vn_ie_ubc = nullptr;
   x->vn_ie_ubc =
       read_pointer<std::remove_pointer<decltype(x->vn_ie_ubc)>::type>(s);
 
@@ -624,8 +583,6 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->vt = nullptr;
   x->vt = read_pointer<std::remove_pointer<decltype(x->vt)>::type>(s);
 
   read_line(s, {"# vn_ie"});  // Should contain '# vn_ie'
@@ -633,8 +590,6 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->vn_ie = nullptr;
   x->vn_ie = read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
 
   read_line(s, {"# w_concorr_c"});  // Should contain '# w_concorr_c'
@@ -642,8 +597,6 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->w_concorr_c = nullptr;
   x->w_concorr_c =
       read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
 
@@ -652,8 +605,6 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->ddt_vn_apc_pc = nullptr;
   x->ddt_vn_apc_pc =
       read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
 
@@ -662,8 +613,6 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->ddt_w_adv_pc = nullptr;
   x->ddt_w_adv_pc =
       read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
 
@@ -680,8 +629,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->ddxn_z_full = nullptr;
   x->ddxn_z_full =
       read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
 
@@ -690,8 +637,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->ddxt_z_full = nullptr;
   x->ddxt_z_full =
       read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
 
@@ -700,8 +645,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->ddqz_z_full_e = nullptr;
   x->ddqz_z_full_e =
       read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
 
@@ -710,8 +653,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->ddqz_z_half = nullptr;
   x->ddqz_z_half =
       read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
 
@@ -720,8 +661,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->wgtfac_c = nullptr;
   x->wgtfac_c =
       read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
 
@@ -730,8 +669,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->wgtfac_e = nullptr;
   x->wgtfac_e =
       read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
 
@@ -740,8 +677,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->wgtfacq_e = nullptr;
   x->wgtfacq_e =
       read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
 
@@ -750,8 +685,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->coeff_gradekin = nullptr;
   x->coeff_gradekin =
       read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
 
@@ -760,8 +693,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->coeff1_dwdz = nullptr;
   x->coeff1_dwdz =
       read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
 
@@ -770,8 +701,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->coeff2_dwdz = nullptr;
   x->coeff2_dwdz =
       read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
 
@@ -781,8 +710,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->deepatmo_gradh_mc = nullptr;
   x->deepatmo_gradh_mc =
       read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(
           s);
@@ -792,8 +719,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->deepatmo_invr_mc = nullptr;
   x->deepatmo_invr_mc =
       read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(s);
 
@@ -803,8 +728,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->deepatmo_gradh_ifc = nullptr;
   x->deepatmo_gradh_ifc =
       read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(
           s);
@@ -815,8 +738,6 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  // read_line(s, {"=>"});  // Should contain '=> ...'
-  // x->deepatmo_invr_ifc = nullptr;
   x->deepatmo_invr_ifc =
       read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(
           s);
@@ -851,53 +772,6 @@ std::string serialize(float x) { return std::to_string(x); }
 std::string serialize(double x) { return std::to_string(x); }
 std::string serialize(long double x) { return std::to_string(x); }
 std::string serialize(bool x) { return serialize(int(x)); }
-
-std::string serialize(const global_data_type* x) {
-  std::stringstream s;
-  add_line("# nflatlev", s);
-
-  {
-    const array_meta& m = (*ARRAY_META_DICT())[x->nflatlev];
-    add_line("# rank", s);
-    add_line(m.rank, s);
-    add_line("# size", s);
-    for (auto i : m.size) add_line(i, s);
-    add_line("# lbound", s);
-    for (auto i : m.lbound) add_line(i, s);
-    add_line("# entries", s);
-    for (int i = 0; i < m.volume(); ++i) {
-      add_line(serialize(x->nflatlev[i]), s);
-    }
-  }
-
-  add_line("# lextra_diffu", s);
-  add_line(serialize(x->lextra_diffu), s);
-  add_line("# timers_level", s);
-  add_line(serialize(x->timers_level), s);
-  add_line("# timer_solve_nh_veltend", s);
-  add_line(serialize(x->timer_solve_nh_veltend), s);
-  add_line("# timer_intp", s);
-  add_line(serialize(x->timer_intp), s);
-  add_line("# nrdmax", s);
-
-  {
-    const array_meta& m = (*ARRAY_META_DICT())[x->nrdmax];
-    add_line("# rank", s);
-    add_line(m.rank, s);
-    add_line("# size", s);
-    for (auto i : m.size) add_line(i, s);
-    add_line("# lbound", s);
-    for (auto i : m.lbound) add_line(i, s);
-    add_line("# entries", s);
-    for (int i = 0; i < m.volume(); ++i) {
-      add_line(serialize(x->nrdmax[i]), s);
-    }
-  }
-
-  std::string out = s.str();
-  if (out.length() > 0) out.pop_back();
-  return out;
-}
 
 std::string serialize(const t_grid_domain_decomp_info* x) {
   std::stringstream s;
@@ -1809,7 +1683,31 @@ T* array_meta::read(std::istream& s) const {
   return buf;
 }
 
-void deserialize_global_data(global_data_type* g, std::istream& s) {}
+void deserialize_global_data(global_data_type* g, std::istream& s) {
+  {
+    read_line(s, "# nflatlev");
+    auto [m, arr] = read_array<int>(s);
+    g->nflatlev = arr;
+  }
+
+  read_line(s, "# lextra_diffu");
+  deserialize(g->lextra_diffu, s);
+
+  read_line(s, "# timers_level");
+  deserialize(g->timers_level, s);
+
+  read_line(s, "# timer_solve_nh_veltend");
+  deserialize(g->timer_solve_nh_veltend, s);
+
+  read_line(s, "# timer_intp");
+  deserialize(g->timer_intp, s);
+
+  {
+    read_line(s, "# nrdmax");
+    auto [m, arr] = read_array<int>(s);
+    g->nrdmax = arr;
+  }
+}
 
 template <typename T>
 std::string serialize_array(T* arr) {
