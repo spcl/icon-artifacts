@@ -2,6 +2,92 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
+struct t_grid_vertices {
+    int* cell_blk = {};
+    int* cell_idx = {};
+    int* edge_blk = {};
+    int* edge_idx = {};
+    int* end_blk = {};
+    int* end_block = {};
+    int* end_index = {};
+    int* start_blk = {};
+    int* start_block = {};
+    int* start_index = {};
+};
+
+struct global_data_type {
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
+};
+
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s_76 = {};
+    int __f2dace_SA_vn_d_1_s_77 = {};
+    int __f2dace_SA_vn_d_2_s_78 = {};
+    int __f2dace_SA_w_d_0_s_73 = {};
+    int __f2dace_SA_w_d_1_s_74 = {};
+    int __f2dace_SA_w_d_2_s_75 = {};
+    int __f2dace_SOA_vn_d_0_s_76 = {};
+    int __f2dace_SOA_vn_d_1_s_77 = {};
+    int __f2dace_SOA_vn_d_2_s_78 = {};
+    int __f2dace_SOA_w_d_0_s_73 = {};
+    int __f2dace_SOA_w_d_1_s_74 = {};
+    int __f2dace_SOA_w_d_2_s_75 = {};
+    double* vn = {};
+    double* w = {};
+};
+
+struct t_grid_domain_decomp_info {
+    int* owner_mask = {};
+};
+
+struct t_grid_cells {
+    int __f2dace_SA_area_d_0_s_2 = {};
+    int __f2dace_SA_area_d_1_s_3 = {};
+    int __f2dace_SOA_area_d_0_s_2 = {};
+    int __f2dace_SOA_area_d_1_s_3 = {};
+    double* area = {};
+    t_grid_domain_decomp_info* decomp_info = {};
+    int* edge_blk = {};
+    int* edge_idx = {};
+    int* end_block = {};
+    int* end_index = {};
+    int* neighbor_blk = {};
+    int* neighbor_idx = {};
+    int* start_block = {};
+    int* start_index = {};
+};
+
+struct t_grid_edges {
+    double* area_edge = {};
+    int* cell_blk = {};
+    int* cell_idx = {};
+    int* end_block = {};
+    int* end_index = {};
+    double* f_e = {};
+    double* fn_e = {};
+    double* ft_e = {};
+    double* inv_dual_edge_length = {};
+    double* inv_primal_edge_length = {};
+    int* quad_blk = {};
+    int* quad_idx = {};
+    int* start_block = {};
+    int* start_index = {};
+    double* tangent_orientation = {};
+    int* vertex_blk = {};
+    int* vertex_idx = {};
+};
+
+struct t_patch {
+    t_grid_cells* cells = {};
+    t_grid_edges* edges = {};
+    t_grid_vertices* verts = {};
+};
+
 struct t_nh_diag {
     int __f2dace_SA_ddt_vn_apc_pc_d_0_s_88 = {};
     int __f2dace_SA_ddt_vn_apc_pc_d_1_s_89 = {};
@@ -43,34 +129,6 @@ struct t_nh_diag {
     double* vn_ie = {};
     double* vt = {};
     double* w_concorr_c = {};
-    double* vn_ie_ubc = {};
-};
-
-struct t_int_state {
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* geofac_grdiv = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* rbf_vec_coeff_e = {};
-};
-
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s_76 = {};
-    int __f2dace_SA_vn_d_1_s_77 = {};
-    int __f2dace_SA_vn_d_2_s_78 = {};
-    int __f2dace_SA_w_d_0_s_73 = {};
-    int __f2dace_SA_w_d_1_s_74 = {};
-    int __f2dace_SA_w_d_2_s_75 = {};
-    int __f2dace_SOA_vn_d_0_s_76 = {};
-    int __f2dace_SOA_vn_d_1_s_77 = {};
-    int __f2dace_SOA_vn_d_2_s_78 = {};
-    int __f2dace_SOA_w_d_0_s_73 = {};
-    int __f2dace_SOA_w_d_1_s_74 = {};
-    int __f2dace_SOA_w_d_2_s_75 = {};
-    double* vn = {};
-    double* w = {};
 };
 
 struct t_nh_metrics {
@@ -158,73 +216,14 @@ struct t_nh_metrics {
     double* wgtfacq_e = {};
 };
 
-struct t_grid_domain_decomp_info {
-    int* owner_mask = {};
-};
-
-struct t_grid_cells {
-    int __f2dace_SA_area_d_0_s_2 = {};
-    int __f2dace_SA_area_d_1_s_3 = {};
-    int __f2dace_SOA_area_d_0_s_2 = {};
-    int __f2dace_SOA_area_d_1_s_3 = {};
-    double* area = {};
-    t_grid_domain_decomp_info* decomp_info = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* neighbor_blk = {};
-    int* neighbor_idx = {};
-    int* start_block = {};
-    int* start_index = {};
-};
-
-struct t_grid_vertices {
-    int* cell_blk = {};
-    int* cell_idx = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_blk = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* start_blk = {};
-    int* start_block = {};
-    int* start_index = {};
-};
-
-struct t_grid_edges {
-    double* area_edge = {};
-    int* cell_blk = {};
-    int* cell_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    double* f_e = {};
-    double* fn_e = {};
-    double* ft_e = {};
-    double* inv_dual_edge_length = {};
-    double* inv_primal_edge_length = {};
-    int* quad_blk = {};
-    int* quad_idx = {};
-    int* start_block = {};
-    int* start_index = {};
-    double* tangent_orientation = {};
-    int* vertex_blk = {};
-    int* vertex_idx = {};
-};
-
-struct t_patch {
-    t_grid_cells* cells = {};
-    t_grid_edges* edges = {};
-    t_grid_vertices* verts = {};
-};
-
-struct global_data_type {
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
+struct t_int_state {
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* geofac_grdiv = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* rbf_vec_coeff_e = {};
 };
 
 struct velocity_tendencies_state_t {
@@ -523,7 +522,7 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
     int _if_cond_14;
     int i_startblk_2;
     int i_endblk_2;
-    int tmp_arg_9;
+    int tmp_arg_16;
     double tmp_call_18;
     int i_startblk_var_80_0;
     int i_endblk_var_81_0;
@@ -582,8 +581,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
     int _for_it_20;
     int _for_it_21;
     int _if_cond_15;
-    int tmp_arg_4;
-    int tmp_arg_5;
+    int tmp_arg_10;
+    int tmp_arg_11;
     int _if_cond_21;
     int _for_it_22;
     int _for_it_23;
@@ -629,7 +628,7 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
     int tmp_index_607;
     int tmp_index_609;
     int _for_it_43;
-    int tmp_arg_6;
+    int tmp_arg_13;
     int _for_it_44;
     int _for_it_45;
     int tmp_index_624;
@@ -678,7 +677,7 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
     int tmp_index_854;
     int tmp_index_856;
     int _for_it_51;
-    int tmp_arg_10;
+    int tmp_arg_18;
     int _for_it_52;
     int tmp_index_883;
     int tmp_index_885;
@@ -714,8 +713,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
     int tmp_index_79_0;
     int tmp_index_81_0;
     int _for_it_2_0;
-    int i_endidx_var_65_0;
     int i_startidx_var_64_0;
+    int i_endidx_var_65_0;
 
 
     {
@@ -980,8 +979,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
 
 
             }
-            i_endidx_var_65_0 = 48;
             i_startidx_var_64_0 = v_v_p_patch_var_41_verts_start_index[9];
+            i_endidx_var_65_0 = 48;
             if (((_for_it_0_0 == i_endblk_var_63_0) == 1)) {
                 {
 
@@ -1002,8 +1001,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
 
             } else {
 
-                i_endidx_var_65_0 = 48;
                 i_startidx_var_64_0 = 1;
+                i_endidx_var_65_0 = 48;
 
             }
         }
@@ -1873,8 +1872,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
             }
 
         }
-        tmp_arg_4 = (nrdmax_jg - 2);
-        for (_for_it_34 = max(3, tmp_arg_4); (_for_it_34 <= (90 - 3)); _for_it_34 = (_for_it_34 + 1)) {
+        tmp_arg_10 = (nrdmax_jg - 2);
+        for (_for_it_34 = max(3, tmp_arg_10); (_for_it_34 <= (90 - 3)); _for_it_34 = (_for_it_34 + 1)) {
             {
 
                 {
@@ -1891,7 +1890,7 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
             }
 
         }
-        tmp_arg_5 = (nrdmax_jg - 2);
+        tmp_arg_11 = (nrdmax_jg - 2);
         {
 
             {
@@ -1906,7 +1905,7 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
             }
 
         }
-        for (_for_it_35 = max(3, tmp_arg_5); (_for_it_35 <= (90 - 3)); _for_it_35 = (_for_it_35 + 1)) {
+        for (_for_it_35 = max(3, tmp_arg_11); (_for_it_35 <= (90 - 3)); _for_it_35 = (_for_it_35 + 1)) {
 
             clip_count = 0;
             for (_for_it_36 = i_startidx_var_88; (_for_it_36 <= i_endidx_var_89); _for_it_36 = (_for_it_36 + 1)) {
@@ -2283,8 +2282,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
         }
         if ((_if_cond_23 == 1)) {
 
-            tmp_arg_6 = (nrdmax_jg - 2);
-            for (_for_it_44 = max(3, tmp_arg_6); (_for_it_44 <= (90 - 3)); _for_it_44 = (_for_it_44 + 1)) {
+            tmp_arg_13 = (nrdmax_jg - 2);
+            for (_for_it_44 = max(3, tmp_arg_13); (_for_it_44 <= (90 - 3)); _for_it_44 = (_for_it_44 + 1)) {
                 {
 
                     {
@@ -2344,8 +2343,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
                             tmp_index_643 = (v_v_p_patch_cells_neighbor_idx[(((32 * _for_it_22) + _for_it_45) - 33)] - __f2dace_SOA_w_d_0_s_73_p_prog_6);
                             {
                                 double tmp_call_10;
-                                double tmp_arg_7;
-                                double tmp_arg_8;
+                                double tmp_arg_14;
+                                double tmp_arg_15;
 
                                 {
                                     double tmp_call_11_0_in = tmp_call_11;
@@ -2353,35 +2352,35 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
                                     double cfl_w_limit_0_in = cfl_w_limit;
                                     double p_metrics_0_in_ddqz_z_half_0 = v_p_metrics_ddqz_z_half[(((((__f2dace_SA_ddqz_z_half_d_0_s_105_p_metrics_7 * __f2dace_SA_ddqz_z_half_d_1_s_106_p_metrics_7) * ((- __f2dace_SOA_ddqz_z_half_d_2_s_107_p_metrics_7) + _for_it_22)) + (__f2dace_SA_ddqz_z_half_d_0_s_105_p_metrics_7 * ((- __f2dace_SOA_ddqz_z_half_d_1_s_106_p_metrics_7) + _for_it_44))) - __f2dace_SOA_ddqz_z_half_d_0_s_105_p_metrics_7) + _for_it_45)];
                                     double dtime_1_in = dtime;
-                                    double tmp_arg_8_out;
+                                    double tmp_arg_15_out;
 
                                     ///////////////////
                                     // Tasklet code (T_l511_c511)
-                                    tmp_arg_8_out = (((tmp_call_11_0_in * dtime_0_in) / p_metrics_0_in_ddqz_z_half_0) - (cfl_w_limit_0_in * dtime_1_in));
+                                    tmp_arg_15_out = (((tmp_call_11_0_in * dtime_0_in) / p_metrics_0_in_ddqz_z_half_0) - (cfl_w_limit_0_in * dtime_1_in));
                                     ///////////////////
 
-                                    tmp_arg_8 = tmp_arg_8_out;
+                                    tmp_arg_15 = tmp_arg_15_out;
                                 }
                                 {
                                     double cfl_w_limit_0_in = cfl_w_limit;
                                     double dtime_0_in = dtime;
-                                    double tmp_arg_7_out;
+                                    double tmp_arg_14_out;
 
                                     ///////////////////
                                     // Tasklet code (T_l511_c511)
-                                    tmp_arg_7_out = (0.85 - (cfl_w_limit_0_in * dtime_0_in));
+                                    tmp_arg_14_out = (0.85 - (cfl_w_limit_0_in * dtime_0_in));
                                     ///////////////////
 
-                                    tmp_arg_7 = tmp_arg_7_out;
+                                    tmp_arg_14 = tmp_arg_14_out;
                                 }
                                 {
-                                    double tmp_arg_7_0_in = tmp_arg_7;
-                                    double tmp_arg_8_0_in = tmp_arg_8;
+                                    double tmp_arg_14_0_in = tmp_arg_14;
+                                    double tmp_arg_15_0_in = tmp_arg_15;
                                     double tmp_call_10_out;
 
                                     ///////////////////
                                     // Tasklet code (T_l511_c511)
-                                    tmp_call_10_out = min(tmp_arg_7_0_in, tmp_arg_8_0_in);
+                                    tmp_call_10_out = min(tmp_arg_14_0_in, tmp_arg_15_0_in);
                                     ///////////////////
 
                                     tmp_call_10 = tmp_call_10_out;
@@ -2459,9 +2458,9 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
         }
 
     }
-    tmp_arg_9 = (nrdmax_jg - 2);
+    tmp_arg_16 = (nrdmax_jg - 2);
 
-    for (_for_it_46 = max(3, tmp_arg_9); (_for_it_46 <= (90 - 3)); _for_it_46 = (_for_it_46 + 1)) {
+    for (_for_it_46 = max(3, tmp_arg_16); (_for_it_46 <= (90 - 3)); _for_it_46 = (_for_it_46 + 1)) {
 
         tmp_call_13 = 0;
         for (tmp_parfor_0 = i_startblk_var_86; (tmp_parfor_0 <= i_endblk_var_87); tmp_parfor_0 = (tmp_parfor_0 + 1)) {
@@ -2758,8 +2757,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
         }
         if ((_if_cond_27 == 1)) {
 
-            tmp_arg_10 = (nrdmax_jg - 2);
-            for (_for_it_52 = max(3, tmp_arg_10); (_for_it_52 <= (90 - 4)); _for_it_52 = (_for_it_52 + 1)) {
+            tmp_arg_18 = (nrdmax_jg - 2);
+            for (_for_it_52 = max(3, tmp_arg_18); (_for_it_52 <= (90 - 4)); _for_it_52 = (_for_it_52 + 1)) {
                 {
 
                     {
@@ -2866,8 +2865,8 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
                             tmp_index_929 = (v_v_p_patch_edges_quad_idx[(((32 * _for_it_47) + _for_it_53) - 33)] - __f2dace_SOA_vn_d_0_s_76_p_prog_6);
                             {
                                 double tmp_call_16;
-                                double tmp_arg_11;
-                                double tmp_arg_12;
+                                double tmp_arg_19;
+                                double tmp_arg_20;
 
                                 {
                                     double tmp_call_17_0_in = tmp_call_17;
@@ -2875,35 +2874,35 @@ void __program_velocity_tendencies_internal(velocity_tendencies_state_t*__state,
                                     double cfl_w_limit_0_in = cfl_w_limit;
                                     double p_metrics_0_in_ddqz_z_full_e_0 = v_p_metrics_ddqz_z_full_e[(((((__f2dace_SA_ddqz_z_full_e_d_0_s_102_p_metrics_7 * __f2dace_SA_ddqz_z_full_e_d_1_s_103_p_metrics_7) * ((- __f2dace_SOA_ddqz_z_full_e_d_2_s_104_p_metrics_7) + _for_it_47)) + (__f2dace_SA_ddqz_z_full_e_d_0_s_102_p_metrics_7 * ((- __f2dace_SOA_ddqz_z_full_e_d_1_s_103_p_metrics_7) + _for_it_52))) - __f2dace_SOA_ddqz_z_full_e_d_0_s_102_p_metrics_7) + _for_it_53)];
                                     double dtime_1_in = dtime;
-                                    double tmp_arg_12_out;
+                                    double tmp_arg_20_out;
 
                                     ///////////////////
                                     // Tasklet code (T_l562_c562)
-                                    tmp_arg_12_out = (((tmp_call_17_0_in * dtime_0_in) / p_metrics_0_in_ddqz_z_full_e_0) - (cfl_w_limit_0_in * dtime_1_in));
+                                    tmp_arg_20_out = (((tmp_call_17_0_in * dtime_0_in) / p_metrics_0_in_ddqz_z_full_e_0) - (cfl_w_limit_0_in * dtime_1_in));
                                     ///////////////////
 
-                                    tmp_arg_12 = tmp_arg_12_out;
+                                    tmp_arg_20 = tmp_arg_20_out;
                                 }
                                 {
                                     double cfl_w_limit_0_in = cfl_w_limit;
                                     double dtime_0_in = dtime;
-                                    double tmp_arg_11_out;
+                                    double tmp_arg_19_out;
 
                                     ///////////////////
                                     // Tasklet code (T_l562_c562)
-                                    tmp_arg_11_out = (0.85 - (cfl_w_limit_0_in * dtime_0_in));
+                                    tmp_arg_19_out = (0.85 - (cfl_w_limit_0_in * dtime_0_in));
                                     ///////////////////
 
-                                    tmp_arg_11 = tmp_arg_11_out;
+                                    tmp_arg_19 = tmp_arg_19_out;
                                 }
                                 {
-                                    double tmp_arg_11_0_in = tmp_arg_11;
-                                    double tmp_arg_12_0_in = tmp_arg_12;
+                                    double tmp_arg_19_0_in = tmp_arg_19;
+                                    double tmp_arg_20_0_in = tmp_arg_20;
                                     double tmp_call_16_out;
 
                                     ///////////////////
                                     // Tasklet code (T_l562_c562)
-                                    tmp_call_16_out = min(tmp_arg_11_0_in, tmp_arg_12_0_in);
+                                    tmp_call_16_out = min(tmp_arg_19_0_in, tmp_arg_20_0_in);
                                     ///////////////////
 
                                     tmp_call_16 = tmp_call_16_out;

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <format>
 #include <iostream>
 #include <istream>
 #include <optional>
@@ -112,14 +113,13 @@ std::pair<array_meta, T*> read_array(std::istream& s) {
 }
 
 template <typename T>
-T* read_pointer(std::istream& s) {
+std::pair<array_meta, T*> read_pointer(std::istream& s) {
   read_line(s, {"# missing"});  // Should contain '# missing'
   int missing;
   read_scalar(missing, s);
-  auto [m, arr] = read_array<T>(s);
-  return arr;
+  assert(missing == 1);
+  return read_array<T>(s);
 }
-
 
 void deserialize(float* x, std::istream& s) { read_scalar(*x, s); }
 void deserialize(double* x, std::istream& s) { read_scalar(*x, s); }
@@ -253,7 +253,15 @@ void deserialize(t_grid_cells* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->area = read_pointer<std::remove_pointer<decltype(x->area)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->area)>::type>(s);
+    x->__f2dace_SA_area_d_0_s_2 = m.size.at(0);
+    x->__f2dace_SA_area_d_1_s_3 = m.size.at(1);
+    x->__f2dace_SOA_area_d_0_s_2 = m.lbound.at(0);
+    x->__f2dace_SOA_area_d_1_s_3 = m.lbound.at(1);
+    x->area = arr;
+  }
 
   read_line(s, {"# start_index"});  // Should contain '# start_index'
 
@@ -557,64 +565,124 @@ void deserialize(t_nh_prog* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->w = read_pointer<std::remove_pointer<decltype(x->w)>::type>(s);
+  {
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w)>::type>(s);
+    x->__f2dace_SA_w_d_0_s_73 = m.size.at(0);
+    x->__f2dace_SA_w_d_1_s_74 = m.size.at(1);
+    x->__f2dace_SA_w_d_2_s_75 = m.size.at(2);
+    x->__f2dace_SOA_w_d_0_s_73 = m.lbound.at(0);
+    x->__f2dace_SOA_w_d_1_s_74 = m.lbound.at(1);
+    x->__f2dace_SOA_w_d_2_s_75 = m.lbound.at(2);
+    x->w = arr;
+  }
 
   read_line(s, {"# vn"});  // Should contain '# vn'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->vn = read_pointer<std::remove_pointer<decltype(x->vn)>::type>(s);
+  {
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn)>::type>(s);
+    x->__f2dace_SA_vn_d_0_s_76 = m.size.at(0);
+    x->__f2dace_SA_vn_d_1_s_77 = m.size.at(1);
+    x->__f2dace_SA_vn_d_2_s_78 = m.size.at(2);
+    x->__f2dace_SOA_vn_d_0_s_76 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_d_1_s_77 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_d_2_s_78 = m.lbound.at(2);
+    x->vn = arr;
+  }
 }
 
 void deserialize(t_nh_diag* x, std::istream& s) {
   bool yep;
   array_meta m;
-  read_line(s, {"# vn_ie_ubc"});  // Should contain '# vn_ie_ubc'
-
-  read_line(s, {"# assoc"});  // Should contain '# assoc'
-  deserialize(&yep, s);
-
-  x->vn_ie_ubc =
-      read_pointer<std::remove_pointer<decltype(x->vn_ie_ubc)>::type>(s);
-
   read_line(s, {"# vt"});  // Should contain '# vt'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->vt = read_pointer<std::remove_pointer<decltype(x->vt)>::type>(s);
+  {
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vt)>::type>(s);
+    x->__f2dace_SA_vt_d_0_s_79 = m.size.at(0);
+    x->__f2dace_SA_vt_d_1_s_80 = m.size.at(1);
+    x->__f2dace_SA_vt_d_2_s_81 = m.size.at(2);
+    x->__f2dace_SOA_vt_d_0_s_79 = m.lbound.at(0);
+    x->__f2dace_SOA_vt_d_1_s_80 = m.lbound.at(1);
+    x->__f2dace_SOA_vt_d_2_s_81 = m.lbound.at(2);
+    x->vt = arr;
+  }
 
   read_line(s, {"# vn_ie"});  // Should contain '# vn_ie'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->vn_ie = read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
+    x->__f2dace_SA_vn_ie_d_0_s_82 = m.size.at(0);
+    x->__f2dace_SA_vn_ie_d_1_s_83 = m.size.at(1);
+    x->__f2dace_SA_vn_ie_d_2_s_84 = m.size.at(2);
+    x->__f2dace_SOA_vn_ie_d_0_s_82 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_ie_d_1_s_83 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_ie_d_2_s_84 = m.lbound.at(2);
+    x->vn_ie = arr;
+  }
 
   read_line(s, {"# w_concorr_c"});  // Should contain '# w_concorr_c'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->w_concorr_c =
-      read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
+    x->__f2dace_SA_w_concorr_c_d_0_s_85 = m.size.at(0);
+    x->__f2dace_SA_w_concorr_c_d_1_s_86 = m.size.at(1);
+    x->__f2dace_SA_w_concorr_c_d_2_s_87 = m.size.at(2);
+    x->__f2dace_SOA_w_concorr_c_d_0_s_85 = m.lbound.at(0);
+    x->__f2dace_SOA_w_concorr_c_d_1_s_86 = m.lbound.at(1);
+    x->__f2dace_SOA_w_concorr_c_d_2_s_87 = m.lbound.at(2);
+    x->w_concorr_c = arr;
+  }
 
   read_line(s, {"# ddt_vn_apc_pc"});  // Should contain '# ddt_vn_apc_pc'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->ddt_vn_apc_pc =
-      read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_0_s_88 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_1_s_89 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_2_s_90 = m.size.at(2);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_3_s_91 = m.size.at(3);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_0_s_88 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_1_s_89 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_2_s_90 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_3_s_91 = m.lbound.at(3);
+    x->ddt_vn_apc_pc = arr;
+  }
 
   read_line(s, {"# ddt_w_adv_pc"});  // Should contain '# ddt_w_adv_pc'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->ddt_w_adv_pc =
-      read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
+    x->__f2dace_SA_ddt_w_adv_pc_d_0_s_92 = m.size.at(0);
+    x->__f2dace_SA_ddt_w_adv_pc_d_1_s_93 = m.size.at(1);
+    x->__f2dace_SA_ddt_w_adv_pc_d_2_s_94 = m.size.at(2);
+    x->__f2dace_SA_ddt_w_adv_pc_d_3_s_95 = m.size.at(3);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_0_s_92 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_1_s_93 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_2_s_94 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_3_s_95 = m.lbound.at(3);
+    x->ddt_w_adv_pc = arr;
+  }
 
   read_line(s, {"# max_vcfl_dyn"});  // Should contain '# max_vcfl_dyn'
 
@@ -629,80 +697,170 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->ddxn_z_full =
-      read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
+    x->__f2dace_SA_ddxn_z_full_d_0_s_96 = m.size.at(0);
+    x->__f2dace_SA_ddxn_z_full_d_1_s_97 = m.size.at(1);
+    x->__f2dace_SA_ddxn_z_full_d_2_s_98 = m.size.at(2);
+    x->__f2dace_SOA_ddxn_z_full_d_0_s_96 = m.lbound.at(0);
+    x->__f2dace_SOA_ddxn_z_full_d_1_s_97 = m.lbound.at(1);
+    x->__f2dace_SOA_ddxn_z_full_d_2_s_98 = m.lbound.at(2);
+    x->ddxn_z_full = arr;
+  }
 
   read_line(s, {"# ddxt_z_full"});  // Should contain '# ddxt_z_full'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->ddxt_z_full =
-      read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
+    x->__f2dace_SA_ddxt_z_full_d_0_s_99 = m.size.at(0);
+    x->__f2dace_SA_ddxt_z_full_d_1_s_100 = m.size.at(1);
+    x->__f2dace_SA_ddxt_z_full_d_2_s_101 = m.size.at(2);
+    x->__f2dace_SOA_ddxt_z_full_d_0_s_99 = m.lbound.at(0);
+    x->__f2dace_SOA_ddxt_z_full_d_1_s_100 = m.lbound.at(1);
+    x->__f2dace_SOA_ddxt_z_full_d_2_s_101 = m.lbound.at(2);
+    x->ddxt_z_full = arr;
+  }
 
   read_line(s, {"# ddqz_z_full_e"});  // Should contain '# ddqz_z_full_e'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->ddqz_z_full_e =
-      read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
+    x->__f2dace_SA_ddqz_z_full_e_d_0_s_102 = m.size.at(0);
+    x->__f2dace_SA_ddqz_z_full_e_d_1_s_103 = m.size.at(1);
+    x->__f2dace_SA_ddqz_z_full_e_d_2_s_104 = m.size.at(2);
+    x->__f2dace_SOA_ddqz_z_full_e_d_0_s_102 = m.lbound.at(0);
+    x->__f2dace_SOA_ddqz_z_full_e_d_1_s_103 = m.lbound.at(1);
+    x->__f2dace_SOA_ddqz_z_full_e_d_2_s_104 = m.lbound.at(2);
+    x->ddqz_z_full_e = arr;
+  }
 
   read_line(s, {"# ddqz_z_half"});  // Should contain '# ddqz_z_half'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->ddqz_z_half =
-      read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
+    x->__f2dace_SA_ddqz_z_half_d_0_s_105 = m.size.at(0);
+    x->__f2dace_SA_ddqz_z_half_d_1_s_106 = m.size.at(1);
+    x->__f2dace_SA_ddqz_z_half_d_2_s_107 = m.size.at(2);
+    x->__f2dace_SOA_ddqz_z_half_d_0_s_105 = m.lbound.at(0);
+    x->__f2dace_SOA_ddqz_z_half_d_1_s_106 = m.lbound.at(1);
+    x->__f2dace_SOA_ddqz_z_half_d_2_s_107 = m.lbound.at(2);
+    x->ddqz_z_half = arr;
+  }
 
   read_line(s, {"# wgtfac_c"});  // Should contain '# wgtfac_c'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->wgtfac_c =
-      read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
+    x->__f2dace_SA_wgtfac_c_d_0_s_108 = m.size.at(0);
+    x->__f2dace_SA_wgtfac_c_d_1_s_109 = m.size.at(1);
+    x->__f2dace_SA_wgtfac_c_d_2_s_110 = m.size.at(2);
+    x->__f2dace_SOA_wgtfac_c_d_0_s_108 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfac_c_d_1_s_109 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfac_c_d_2_s_110 = m.lbound.at(2);
+    x->wgtfac_c = arr;
+  }
 
   read_line(s, {"# wgtfac_e"});  // Should contain '# wgtfac_e'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->wgtfac_e =
-      read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
+    x->__f2dace_SA_wgtfac_e_d_0_s_111 = m.size.at(0);
+    x->__f2dace_SA_wgtfac_e_d_1_s_112 = m.size.at(1);
+    x->__f2dace_SA_wgtfac_e_d_2_s_113 = m.size.at(2);
+    x->__f2dace_SOA_wgtfac_e_d_0_s_111 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfac_e_d_1_s_112 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfac_e_d_2_s_113 = m.lbound.at(2);
+    x->wgtfac_e = arr;
+  }
 
   read_line(s, {"# wgtfacq_e"});  // Should contain '# wgtfacq_e'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->wgtfacq_e =
-      read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
+    x->__f2dace_SA_wgtfacq_e_d_0_s_114 = m.size.at(0);
+    x->__f2dace_SA_wgtfacq_e_d_1_s_115 = m.size.at(1);
+    x->__f2dace_SA_wgtfacq_e_d_2_s_116 = m.size.at(2);
+    x->__f2dace_SOA_wgtfacq_e_d_0_s_114 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfacq_e_d_1_s_115 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfacq_e_d_2_s_116 = m.lbound.at(2);
+    x->wgtfacq_e = arr;
+  }
 
   read_line(s, {"# coeff_gradekin"});  // Should contain '# coeff_gradekin'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->coeff_gradekin =
-      read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
+    x->__f2dace_SA_coeff_gradekin_d_0_s_117 = m.size.at(0);
+    x->__f2dace_SA_coeff_gradekin_d_1_s_118 = m.size.at(1);
+    x->__f2dace_SA_coeff_gradekin_d_2_s_119 = m.size.at(2);
+    x->__f2dace_SOA_coeff_gradekin_d_0_s_117 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff_gradekin_d_1_s_118 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff_gradekin_d_2_s_119 = m.lbound.at(2);
+    x->coeff_gradekin = arr;
+  }
 
   read_line(s, {"# coeff1_dwdz"});  // Should contain '# coeff1_dwdz'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->coeff1_dwdz =
-      read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
+    x->__f2dace_SA_coeff1_dwdz_d_0_s_120 = m.size.at(0);
+    x->__f2dace_SA_coeff1_dwdz_d_1_s_121 = m.size.at(1);
+    x->__f2dace_SA_coeff1_dwdz_d_2_s_122 = m.size.at(2);
+    x->__f2dace_SOA_coeff1_dwdz_d_0_s_120 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff1_dwdz_d_1_s_121 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff1_dwdz_d_2_s_122 = m.lbound.at(2);
+    x->coeff1_dwdz = arr;
+  }
 
   read_line(s, {"# coeff2_dwdz"});  // Should contain '# coeff2_dwdz'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->coeff2_dwdz =
-      read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
+    x->__f2dace_SA_coeff2_dwdz_d_0_s_123 = m.size.at(0);
+    x->__f2dace_SA_coeff2_dwdz_d_1_s_124 = m.size.at(1);
+    x->__f2dace_SA_coeff2_dwdz_d_2_s_125 = m.size.at(2);
+    x->__f2dace_SOA_coeff2_dwdz_d_0_s_123 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff2_dwdz_d_1_s_124 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff2_dwdz_d_2_s_125 = m.lbound.at(2);
+    x->coeff2_dwdz = arr;
+  }
 
   read_line(s,
             {"# deepatmo_gradh_mc"});  // Should contain '# deepatmo_gradh_mc'
@@ -710,17 +868,28 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->deepatmo_gradh_mc =
-      read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(
-          s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(
+            s);
+    x->__f2dace_SA_deepatmo_gradh_mc_d_0_s_126 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_gradh_mc_d_0_s_126 = m.lbound.at(0);
+    x->deepatmo_gradh_mc = arr;
+  }
 
   read_line(s, {"# deepatmo_invr_mc"});  // Should contain '# deepatmo_invr_mc'
 
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->deepatmo_invr_mc =
-      read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(
+            s);
+    x->__f2dace_SA_deepatmo_invr_mc_d_0_s_127 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_invr_mc_d_0_s_127 = m.lbound.at(0);
+    x->deepatmo_invr_mc = arr;
+  }
 
   read_line(s,
             {"# deepatmo_gradh_ifc"});  // Should contain '# deepatmo_gradh_ifc'
@@ -728,9 +897,13 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->deepatmo_gradh_ifc =
-      read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(
-          s);
+  {
+    auto [m, arr] = read_pointer<
+        std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(s);
+    x->__f2dace_SA_deepatmo_gradh_ifc_d_0_s_128 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_gradh_ifc_d_0_s_128 = m.lbound.at(0);
+    x->deepatmo_gradh_ifc = arr;
+  }
 
   read_line(s,
             {"# deepatmo_invr_ifc"});  // Should contain '# deepatmo_invr_ifc'
@@ -738,22 +911,27 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   read_line(s, {"# assoc"});  // Should contain '# assoc'
   deserialize(&yep, s);
 
-  x->deepatmo_invr_ifc =
-      read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(
-          s);
+  {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(
+            s);
+    x->__f2dace_SA_deepatmo_invr_ifc_d_0_s_129 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_invr_ifc_d_0_s_129 = m.lbound.at(0);
+    x->deepatmo_invr_ifc = arr;
+  }
 }
 
 template <typename T>
 void add_line(const T& x, std::ostream& s, bool trailing_newline = true) {
-  s << x;
+  s << std::format("{}", x);
   if (trailing_newline) s << std::endl;
 }
 void add_line(long long x, std::ostream& s, bool trailing_newline = true) {
-  s << x;
+  s << std::format("{}", x);
   if (trailing_newline) s << std::endl;
 }
 void add_line(long double x, std::ostream& s, bool trailing_newline = true) {
-  s << x;
+  s << std::format("{:.16f}", x);
   if (trailing_newline) s << std::endl;
 }
 void add_line(bool x, std::ostream& s, bool trailing_newline = true) {
@@ -765,12 +943,12 @@ std::string serialize(const T* x) {
   add_line(*x, s, false);
   return s.str();
 }
-std::string serialize(int x) { return std::to_string(x); }
-std::string serialize(long x) { return std::to_string(x); }
-std::string serialize(long long x) { return std::to_string(x); }
-std::string serialize(float x) { return std::to_string(x); }
-std::string serialize(double x) { return std::to_string(x); }
-std::string serialize(long double x) { return std::to_string(x); }
+std::string serialize(int x) { return std::format("{}", x); }
+std::string serialize(long x) { return std::format("{}", x); }
+std::string serialize(long long x) { return std::format("{}", x); }
+std::string serialize(float x) { return std::format("{:.16f}", x); }
+std::string serialize(double x) { return std::format("{:.16f}", x); }
+std::string serialize(long double x) { return std::format("{:.16f}", x); }
 std::string serialize(bool x) { return serialize(int(x)); }
 
 std::string serialize(const t_grid_domain_decomp_info* x) {
@@ -778,7 +956,7 @@ std::string serialize(const t_grid_domain_decomp_info* x) {
   add_line("# owner_mask", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->owner_mask];
+    const array_meta& m = ARRAY_META_DICT()->at(x->owner_mask);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -801,7 +979,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# c_lin_e", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->c_lin_e];
+    const array_meta& m = ARRAY_META_DICT()->at(x->c_lin_e);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -817,7 +995,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# e_bln_c_s", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->e_bln_c_s];
+    const array_meta& m = ARRAY_META_DICT()->at(x->e_bln_c_s);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -833,7 +1011,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# cells_aw_verts", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->cells_aw_verts];
+    const array_meta& m = ARRAY_META_DICT()->at(x->cells_aw_verts);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -849,7 +1027,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# rbf_vec_coeff_e", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->rbf_vec_coeff_e];
+    const array_meta& m = ARRAY_META_DICT()->at(x->rbf_vec_coeff_e);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -865,7 +1043,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# geofac_grdiv", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->geofac_grdiv];
+    const array_meta& m = ARRAY_META_DICT()->at(x->geofac_grdiv);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -881,7 +1059,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# geofac_rot", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->geofac_rot];
+    const array_meta& m = ARRAY_META_DICT()->at(x->geofac_rot);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -897,7 +1075,7 @@ std::string serialize(const t_int_state* x) {
   add_line("# geofac_n2s", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->geofac_n2s];
+    const array_meta& m = ARRAY_META_DICT()->at(x->geofac_n2s);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -920,7 +1098,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# neighbor_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->neighbor_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->neighbor_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -936,7 +1114,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# neighbor_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->neighbor_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->neighbor_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -952,7 +1130,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# edge_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->edge_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->edge_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -968,7 +1146,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# edge_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->edge_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->edge_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -990,7 +1168,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# start_index", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_index];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_index);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1006,7 +1184,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# end_index", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_index];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_index);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1022,7 +1200,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# start_block", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_block];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_block);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1038,7 +1216,7 @@ std::string serialize(const t_grid_cells* x) {
   add_line("# end_block", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_block];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_block);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1063,7 +1241,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# cell_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->cell_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->cell_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1079,7 +1257,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# cell_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->cell_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->cell_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1095,7 +1273,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# vertex_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->vertex_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->vertex_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1111,7 +1289,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# vertex_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->vertex_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->vertex_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1127,7 +1305,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# tangent_orientation", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->tangent_orientation];
+    const array_meta& m = ARRAY_META_DICT()->at(x->tangent_orientation);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1143,7 +1321,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# quad_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->quad_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->quad_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1159,7 +1337,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# quad_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->quad_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->quad_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1175,7 +1353,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# inv_primal_edge_length", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->inv_primal_edge_length];
+    const array_meta& m = ARRAY_META_DICT()->at(x->inv_primal_edge_length);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1191,7 +1369,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# inv_dual_edge_length", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->inv_dual_edge_length];
+    const array_meta& m = ARRAY_META_DICT()->at(x->inv_dual_edge_length);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1207,7 +1385,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# area_edge", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->area_edge];
+    const array_meta& m = ARRAY_META_DICT()->at(x->area_edge);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1223,7 +1401,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# f_e", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->f_e];
+    const array_meta& m = ARRAY_META_DICT()->at(x->f_e);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1239,7 +1417,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# fn_e", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->fn_e];
+    const array_meta& m = ARRAY_META_DICT()->at(x->fn_e);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1255,7 +1433,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# ft_e", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->ft_e];
+    const array_meta& m = ARRAY_META_DICT()->at(x->ft_e);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1271,7 +1449,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# start_index", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_index];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_index);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1287,7 +1465,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# end_index", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_index];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_index);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1303,7 +1481,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# start_block", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_block];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_block);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1319,7 +1497,7 @@ std::string serialize(const t_grid_edges* x) {
   add_line("# end_block", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_block];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_block);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1342,7 +1520,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# cell_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->cell_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->cell_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1358,7 +1536,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# cell_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->cell_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->cell_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1374,7 +1552,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# edge_idx", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->edge_idx];
+    const array_meta& m = ARRAY_META_DICT()->at(x->edge_idx);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1390,7 +1568,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# edge_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->edge_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->edge_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1406,7 +1584,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# start_index", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_index];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_index);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1422,7 +1600,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# end_index", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_index];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_index);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1438,7 +1616,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# start_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1454,7 +1632,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# start_block", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->start_block];
+    const array_meta& m = ARRAY_META_DICT()->at(x->start_block);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1470,7 +1648,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# end_blk", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_blk];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_blk);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1486,7 +1664,7 @@ std::string serialize(const t_grid_vertices* x) {
   add_line("# end_block", s);
 
   {
-    const array_meta& m = (*ARRAY_META_DICT())[x->end_block];
+    const array_meta& m = ARRAY_META_DICT()->at(x->end_block);
     add_line("# rank", s);
     add_line(m.rank, s);
     add_line("# size", s);
@@ -1538,12 +1716,6 @@ std::string serialize(const t_nh_prog* x) {
 
 std::string serialize(const t_nh_diag* x) {
   std::stringstream s;
-  add_line("# vn_ie_ubc", s);
-
-  add_line("# assoc", s);
-  add_line(serialize(x->vn_ie_ubc != nullptr), s);
-
-  add_line("=> missing", s);
   add_line("# vt", s);
 
   add_line("# assoc", s);
@@ -1711,7 +1883,7 @@ void deserialize_global_data(global_data_type* g, std::istream& s) {
 
 template <typename T>
 std::string serialize_array(T* arr) {
-  const auto m = (*ARRAY_META_DICT())[static_cast<void*>(arr)];
+  const auto m = ARRAY_META_DICT()->at(static_cast<void*>(arr));
   std::stringstream s;
   add_line("# rank", s);
   add_line(m.rank, s);
