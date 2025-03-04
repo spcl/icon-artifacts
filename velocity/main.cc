@@ -204,14 +204,14 @@ int main() {
 
   __dace_exit_velocity_tendencies(h);
 
-  // {
-  //   std::ofstream data("global_data.got");
-  //   data << serde::serialize(&global_data) << std::endl;
-  // }
-  // {
-  //   std::ofstream data("global_data.want");
-  //   data << serde::serialize(&global_data_want) << std::endl;
-  // }
+  {
+    std::ofstream data("global_data.got");
+    data << serde::serialize_global_data(&global_data) << std::endl;
+  }
+  {
+    std::ofstream data("global_data.want");
+    data << serde::serialize_global_data(&global_data_want) << std::endl;
+  }
   {
     std::ofstream data("p_diag.got");
     data << serde::serialize(&p_diag) << std::endl;
