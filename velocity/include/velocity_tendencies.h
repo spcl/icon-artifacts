@@ -5,20 +5,6 @@
 #include <dace/dace.h>
 
 
-struct t_grid_vertices {
-    int* cell_blk = {};
-int* cell_idx = {};
-int* edge_blk = {};
-int* edge_idx = {};
-int* end_blk = {};
-int* end_block = {};
-int* end_index = {};
-int* start_blk = {};
-int* start_block = {};
-int* start_index = {};
-};
-
-
 struct global_data_type {
     int lextra_diffu = {};
 int* nflatlev = {};
@@ -26,6 +12,108 @@ int* nrdmax = {};
 int timer_intp = {};
 int timer_solve_nh_veltend = {};
 int timers_level = {};
+};
+
+
+struct t_grid_domain_decomp_info {
+    int* owner_mask = {};
+};
+
+
+struct t_int_state {
+    double* c_lin_e = {};
+double* cells_aw_verts = {};
+double* e_bln_c_s = {};
+double* geofac_grdiv = {};
+double* geofac_n2s = {};
+double* geofac_rot = {};
+double* rbf_vec_coeff_e = {};
+};
+
+
+struct t_nh_metrics {
+    int __f2dace_SA_coeff1_dwdz_d_0_s_120 = {};
+int __f2dace_SA_coeff1_dwdz_d_1_s_121 = {};
+int __f2dace_SA_coeff1_dwdz_d_2_s_122 = {};
+int __f2dace_SA_coeff2_dwdz_d_0_s_123 = {};
+int __f2dace_SA_coeff2_dwdz_d_1_s_124 = {};
+int __f2dace_SA_coeff2_dwdz_d_2_s_125 = {};
+int __f2dace_SA_coeff_gradekin_d_0_s_117 = {};
+int __f2dace_SA_coeff_gradekin_d_1_s_118 = {};
+int __f2dace_SA_coeff_gradekin_d_2_s_119 = {};
+int __f2dace_SA_ddqz_z_full_e_d_0_s_102 = {};
+int __f2dace_SA_ddqz_z_full_e_d_1_s_103 = {};
+int __f2dace_SA_ddqz_z_full_e_d_2_s_104 = {};
+int __f2dace_SA_ddqz_z_half_d_0_s_105 = {};
+int __f2dace_SA_ddqz_z_half_d_1_s_106 = {};
+int __f2dace_SA_ddqz_z_half_d_2_s_107 = {};
+int __f2dace_SA_ddxn_z_full_d_0_s_96 = {};
+int __f2dace_SA_ddxn_z_full_d_1_s_97 = {};
+int __f2dace_SA_ddxn_z_full_d_2_s_98 = {};
+int __f2dace_SA_ddxt_z_full_d_0_s_99 = {};
+int __f2dace_SA_ddxt_z_full_d_1_s_100 = {};
+int __f2dace_SA_ddxt_z_full_d_2_s_101 = {};
+int __f2dace_SA_deepatmo_gradh_ifc_d_0_s_128 = {};
+int __f2dace_SA_deepatmo_gradh_mc_d_0_s_126 = {};
+int __f2dace_SA_deepatmo_invr_ifc_d_0_s_129 = {};
+int __f2dace_SA_deepatmo_invr_mc_d_0_s_127 = {};
+int __f2dace_SA_wgtfac_c_d_0_s_108 = {};
+int __f2dace_SA_wgtfac_c_d_1_s_109 = {};
+int __f2dace_SA_wgtfac_c_d_2_s_110 = {};
+int __f2dace_SA_wgtfac_e_d_0_s_111 = {};
+int __f2dace_SA_wgtfac_e_d_1_s_112 = {};
+int __f2dace_SA_wgtfac_e_d_2_s_113 = {};
+int __f2dace_SA_wgtfacq_e_d_0_s_114 = {};
+int __f2dace_SA_wgtfacq_e_d_1_s_115 = {};
+int __f2dace_SA_wgtfacq_e_d_2_s_116 = {};
+int __f2dace_SOA_coeff1_dwdz_d_0_s_120 = {};
+int __f2dace_SOA_coeff1_dwdz_d_1_s_121 = {};
+int __f2dace_SOA_coeff1_dwdz_d_2_s_122 = {};
+int __f2dace_SOA_coeff2_dwdz_d_0_s_123 = {};
+int __f2dace_SOA_coeff2_dwdz_d_1_s_124 = {};
+int __f2dace_SOA_coeff2_dwdz_d_2_s_125 = {};
+int __f2dace_SOA_coeff_gradekin_d_0_s_117 = {};
+int __f2dace_SOA_coeff_gradekin_d_1_s_118 = {};
+int __f2dace_SOA_coeff_gradekin_d_2_s_119 = {};
+int __f2dace_SOA_ddqz_z_full_e_d_0_s_102 = {};
+int __f2dace_SOA_ddqz_z_full_e_d_1_s_103 = {};
+int __f2dace_SOA_ddqz_z_full_e_d_2_s_104 = {};
+int __f2dace_SOA_ddqz_z_half_d_0_s_105 = {};
+int __f2dace_SOA_ddqz_z_half_d_1_s_106 = {};
+int __f2dace_SOA_ddqz_z_half_d_2_s_107 = {};
+int __f2dace_SOA_ddxn_z_full_d_0_s_96 = {};
+int __f2dace_SOA_ddxn_z_full_d_1_s_97 = {};
+int __f2dace_SOA_ddxn_z_full_d_2_s_98 = {};
+int __f2dace_SOA_ddxt_z_full_d_0_s_99 = {};
+int __f2dace_SOA_ddxt_z_full_d_1_s_100 = {};
+int __f2dace_SOA_ddxt_z_full_d_2_s_101 = {};
+int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s_128 = {};
+int __f2dace_SOA_deepatmo_gradh_mc_d_0_s_126 = {};
+int __f2dace_SOA_deepatmo_invr_ifc_d_0_s_129 = {};
+int __f2dace_SOA_deepatmo_invr_mc_d_0_s_127 = {};
+int __f2dace_SOA_wgtfac_c_d_0_s_108 = {};
+int __f2dace_SOA_wgtfac_c_d_1_s_109 = {};
+int __f2dace_SOA_wgtfac_c_d_2_s_110 = {};
+int __f2dace_SOA_wgtfac_e_d_0_s_111 = {};
+int __f2dace_SOA_wgtfac_e_d_1_s_112 = {};
+int __f2dace_SOA_wgtfac_e_d_2_s_113 = {};
+int __f2dace_SOA_wgtfacq_e_d_0_s_114 = {};
+int __f2dace_SOA_wgtfacq_e_d_1_s_115 = {};
+int __f2dace_SOA_wgtfacq_e_d_2_s_116 = {};
+double* coeff1_dwdz = {};
+double* coeff2_dwdz = {};
+double* coeff_gradekin = {};
+double* ddqz_z_full_e = {};
+double* ddqz_z_half = {};
+double* ddxn_z_full = {};
+double* ddxt_z_full = {};
+double* deepatmo_gradh_ifc = {};
+double* deepatmo_gradh_mc = {};
+double* deepatmo_invr_ifc = {};
+double* deepatmo_invr_mc = {};
+double* wgtfac_c = {};
+double* wgtfac_e = {};
+double* wgtfacq_e = {};
 };
 
 
@@ -47,8 +135,17 @@ double* w = {};
 };
 
 
-struct t_grid_domain_decomp_info {
-    int* owner_mask = {};
+struct t_grid_vertices {
+    int* cell_blk = {};
+int* cell_idx = {};
+int* edge_blk = {};
+int* edge_idx = {};
+int* end_blk = {};
+int* end_block = {};
+int* end_index = {};
+int* start_blk = {};
+int* start_block = {};
+int* start_index = {};
 };
 
 
@@ -139,103 +236,6 @@ double max_vcfl_dyn = {};
 double* vn_ie = {};
 double* vt = {};
 double* w_concorr_c = {};
-};
-
-
-struct t_nh_metrics {
-    int __f2dace_SA_coeff1_dwdz_d_0_s_120 = {};
-int __f2dace_SA_coeff1_dwdz_d_1_s_121 = {};
-int __f2dace_SA_coeff1_dwdz_d_2_s_122 = {};
-int __f2dace_SA_coeff2_dwdz_d_0_s_123 = {};
-int __f2dace_SA_coeff2_dwdz_d_1_s_124 = {};
-int __f2dace_SA_coeff2_dwdz_d_2_s_125 = {};
-int __f2dace_SA_coeff_gradekin_d_0_s_117 = {};
-int __f2dace_SA_coeff_gradekin_d_1_s_118 = {};
-int __f2dace_SA_coeff_gradekin_d_2_s_119 = {};
-int __f2dace_SA_ddqz_z_full_e_d_0_s_102 = {};
-int __f2dace_SA_ddqz_z_full_e_d_1_s_103 = {};
-int __f2dace_SA_ddqz_z_full_e_d_2_s_104 = {};
-int __f2dace_SA_ddqz_z_half_d_0_s_105 = {};
-int __f2dace_SA_ddqz_z_half_d_1_s_106 = {};
-int __f2dace_SA_ddqz_z_half_d_2_s_107 = {};
-int __f2dace_SA_ddxn_z_full_d_0_s_96 = {};
-int __f2dace_SA_ddxn_z_full_d_1_s_97 = {};
-int __f2dace_SA_ddxn_z_full_d_2_s_98 = {};
-int __f2dace_SA_ddxt_z_full_d_0_s_99 = {};
-int __f2dace_SA_ddxt_z_full_d_1_s_100 = {};
-int __f2dace_SA_ddxt_z_full_d_2_s_101 = {};
-int __f2dace_SA_deepatmo_gradh_ifc_d_0_s_128 = {};
-int __f2dace_SA_deepatmo_gradh_mc_d_0_s_126 = {};
-int __f2dace_SA_deepatmo_invr_ifc_d_0_s_129 = {};
-int __f2dace_SA_deepatmo_invr_mc_d_0_s_127 = {};
-int __f2dace_SA_wgtfac_c_d_0_s_108 = {};
-int __f2dace_SA_wgtfac_c_d_1_s_109 = {};
-int __f2dace_SA_wgtfac_c_d_2_s_110 = {};
-int __f2dace_SA_wgtfac_e_d_0_s_111 = {};
-int __f2dace_SA_wgtfac_e_d_1_s_112 = {};
-int __f2dace_SA_wgtfac_e_d_2_s_113 = {};
-int __f2dace_SA_wgtfacq_e_d_0_s_114 = {};
-int __f2dace_SA_wgtfacq_e_d_1_s_115 = {};
-int __f2dace_SA_wgtfacq_e_d_2_s_116 = {};
-int __f2dace_SOA_coeff1_dwdz_d_0_s_120 = {};
-int __f2dace_SOA_coeff1_dwdz_d_1_s_121 = {};
-int __f2dace_SOA_coeff1_dwdz_d_2_s_122 = {};
-int __f2dace_SOA_coeff2_dwdz_d_0_s_123 = {};
-int __f2dace_SOA_coeff2_dwdz_d_1_s_124 = {};
-int __f2dace_SOA_coeff2_dwdz_d_2_s_125 = {};
-int __f2dace_SOA_coeff_gradekin_d_0_s_117 = {};
-int __f2dace_SOA_coeff_gradekin_d_1_s_118 = {};
-int __f2dace_SOA_coeff_gradekin_d_2_s_119 = {};
-int __f2dace_SOA_ddqz_z_full_e_d_0_s_102 = {};
-int __f2dace_SOA_ddqz_z_full_e_d_1_s_103 = {};
-int __f2dace_SOA_ddqz_z_full_e_d_2_s_104 = {};
-int __f2dace_SOA_ddqz_z_half_d_0_s_105 = {};
-int __f2dace_SOA_ddqz_z_half_d_1_s_106 = {};
-int __f2dace_SOA_ddqz_z_half_d_2_s_107 = {};
-int __f2dace_SOA_ddxn_z_full_d_0_s_96 = {};
-int __f2dace_SOA_ddxn_z_full_d_1_s_97 = {};
-int __f2dace_SOA_ddxn_z_full_d_2_s_98 = {};
-int __f2dace_SOA_ddxt_z_full_d_0_s_99 = {};
-int __f2dace_SOA_ddxt_z_full_d_1_s_100 = {};
-int __f2dace_SOA_ddxt_z_full_d_2_s_101 = {};
-int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s_128 = {};
-int __f2dace_SOA_deepatmo_gradh_mc_d_0_s_126 = {};
-int __f2dace_SOA_deepatmo_invr_ifc_d_0_s_129 = {};
-int __f2dace_SOA_deepatmo_invr_mc_d_0_s_127 = {};
-int __f2dace_SOA_wgtfac_c_d_0_s_108 = {};
-int __f2dace_SOA_wgtfac_c_d_1_s_109 = {};
-int __f2dace_SOA_wgtfac_c_d_2_s_110 = {};
-int __f2dace_SOA_wgtfac_e_d_0_s_111 = {};
-int __f2dace_SOA_wgtfac_e_d_1_s_112 = {};
-int __f2dace_SOA_wgtfac_e_d_2_s_113 = {};
-int __f2dace_SOA_wgtfacq_e_d_0_s_114 = {};
-int __f2dace_SOA_wgtfacq_e_d_1_s_115 = {};
-int __f2dace_SOA_wgtfacq_e_d_2_s_116 = {};
-double* coeff1_dwdz = {};
-double* coeff2_dwdz = {};
-double* coeff_gradekin = {};
-double* ddqz_z_full_e = {};
-double* ddqz_z_half = {};
-double* ddxn_z_full = {};
-double* ddxt_z_full = {};
-double* deepatmo_gradh_ifc = {};
-double* deepatmo_gradh_mc = {};
-double* deepatmo_invr_ifc = {};
-double* deepatmo_invr_mc = {};
-double* wgtfac_c = {};
-double* wgtfac_e = {};
-double* wgtfacq_e = {};
-};
-
-
-struct t_int_state {
-    double* c_lin_e = {};
-double* cells_aw_verts = {};
-double* e_bln_c_s = {};
-double* geofac_grdiv = {};
-double* geofac_n2s = {};
-double* geofac_rot = {};
-double* rbf_vec_coeff_e = {};
 };
 
 
