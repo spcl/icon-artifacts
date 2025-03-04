@@ -1855,6 +1855,21 @@ T* array_meta::read(std::istream& s) const {
   return buf;
 }
 
+template <typename T>
+std::string serialize_array(T* arr) {
+  const auto m = ARRAY_META_DICT()->at(static_cast<void*>(arr));
+  std::stringstream s;
+  add_line("# rank", s);
+  add_line(m.rank, s);
+  add_line("# size", s);
+  for (auto i : m.size) add_line(i, s);
+  add_line("# lbound", s);
+  for (auto i : m.lbound) add_line(i, s);
+  add_line("# entries", s);
+  for (int i = 0; i < m.volume(); ++i) add_line(serialize(arr[i]), s);
+  return s.str();
+}
+
 void deserialize_global_data(global_data_type* g, std::istream& s) {
   {
     read_line(s, "# nflatlev");
@@ -1864,6 +1879,9 @@ void deserialize_global_data(global_data_type* g, std::istream& s) {
 
   read_line(s, "# lextra_diffu");
   deserialize(g->lextra_diffu, s);
+
+  read_line(s, "# nproma");
+  deserialize(g->nproma, s);
 
   read_line(s, "# timers_level");
   deserialize(g->timers_level, s);
@@ -1881,20 +1899,26 @@ void deserialize_global_data(global_data_type* g, std::istream& s) {
   }
 }
 
-template <typename T>
-std::string serialize_array(T* arr) {
-  const auto m = ARRAY_META_DICT()->at(static_cast<void*>(arr));
+std::string serialize_global_data(const global_data_type* g) {
   std::stringstream s;
-  add_line("# rank", s);
-  add_line(m.rank, s);
-  add_line("# size", s);
-  for (auto i : m.size) add_line(i, s);
-  add_line("# lbound", s);
-  for (auto i : m.lbound) add_line(i, s);
-  add_line("# entries", s);
-  for (int i = 0; i < m.volume(); ++i) add_line(serialize(arr[i]), s);
+
+  add_line(serialize_array(g->nflatlev), s);
+
+  add_line(serialize(g->lextra_diffu), s);
+
+  add_line(serialize(g->nproma), s);
+
+  add_line(serialize(g->timers_level), s);
+
+  add_line(serialize(g->timer_solve_nh_veltend), s);
+
+  add_line(serialize(g->timer_intp), s);
+
+  add_line(serialize_array(g->nrdmax), s);
+
   return s.str();
 }
+
 }  // namespace serde
 
 #endif  // __DACE_SERDE__

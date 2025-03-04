@@ -2,6 +2,7 @@ MODULE global_mod
   TYPE :: global_data_type
     INTEGER :: nflatlev(10)
     LOGICAL :: lextra_diffu
+    INTEGER :: nproma = 1
     INTEGER :: timers_level
     INTEGER :: timer_solve_nh_veltend
     INTEGER :: timer_intp
@@ -26,7 +27,6 @@ MODULE mo_intp_data_strc
     REAL(KIND = 8) :: geofac_rot(1 : 32, 1 : 6, 1 : 321)
     REAL(KIND = 8) :: geofac_n2s(1 : 32, 1 : 4, 1 : 640)
   END TYPE t_int_state
-  CONTAINS
 END MODULE mo_intp_data_strc
 MODULE mo_model_domain
   USE mo_decomposition_tools, ONLY: t_grid_domain_decomp_info
@@ -79,14 +79,14 @@ MODULE mo_model_domain
     TYPE(t_grid_edges) :: edges
     TYPE(t_grid_vertices) :: verts
   END TYPE t_patch
-  CONTAINS
 END MODULE mo_model_domain
 MODULE mo_loopindices
   IMPLICIT NONE
   CONTAINS
   SUBROUTINE get_indices_c(global_data_var_20, p_patch_var_23, i_blk_var_24, i_startblk_var_25, i_endblk_var_26, i_startidx_var_29, i_endidx_var_30, irl_start_var_27, opt_rl_end_var_28)
-    USE mo_model_domain, ONLY: t_patch
     USE global_mod, ONLY: global_data_type
+    USE mo_model_domain, ONLY: t_patch
+    TYPE(global_data_type) :: global_data_var_20
     TYPE(t_patch), INTENT(IN) :: p_patch_var_23
     INTEGER, INTENT(IN) :: i_blk_var_24
     INTEGER, INTENT(IN) :: i_startblk_var_25
@@ -95,23 +95,23 @@ MODULE mo_loopindices
     INTEGER, OPTIONAL, INTENT(IN) :: opt_rl_end_var_28
     INTEGER, INTENT(OUT) :: i_startidx_var_29, i_endidx_var_30
     INTEGER :: irl_end_var_31
-    TYPE(global_data_type) :: global_data_var_20
     irl_end_var_31 = opt_rl_end_var_28
     IF (i_blk_var_24 == i_startblk_var_25) THEN
       i_startidx_var_29 = MAX(1, p_patch_var_23 % cells % start_index(irl_start_var_27))
-      i_endidx_var_30 = 48
+      i_endidx_var_30 = global_data_var_20 % nproma
       IF (i_blk_var_24 == i_endblk_var_26) i_endidx_var_30 = p_patch_var_23 % cells % end_index(irl_end_var_31)
     ELSE IF (i_blk_var_24 == i_endblk_var_26) THEN
       i_startidx_var_29 = 1
       i_endidx_var_30 = p_patch_var_23 % cells % end_index(irl_end_var_31)
     ELSE
       i_startidx_var_29 = 1
-      i_endidx_var_30 = 48
+      i_endidx_var_30 = global_data_var_20 % nproma
     END IF
   END SUBROUTINE get_indices_c
   SUBROUTINE get_indices_e(global_data_var_21, p_patch_var_32, i_blk_var_33, i_startblk_var_34, i_endblk_var_35, i_startidx_var_38, i_endidx_var_39, irl_start_var_36, opt_rl_end_var_37)
-    USE mo_model_domain, ONLY: t_patch
     USE global_mod, ONLY: global_data_type
+    USE mo_model_domain, ONLY: t_patch
+    TYPE(global_data_type) :: global_data_var_21
     TYPE(t_patch), INTENT(IN) :: p_patch_var_32
     INTEGER, INTENT(IN) :: i_blk_var_33
     INTEGER, INTENT(IN) :: i_startblk_var_34
@@ -120,14 +120,14 @@ MODULE mo_loopindices
     INTEGER, OPTIONAL, INTENT(IN) :: opt_rl_end_var_37
     INTEGER, INTENT(OUT) :: i_startidx_var_38, i_endidx_var_39
     INTEGER :: irl_end_var_40
-    TYPE(global_data_type) :: global_data_var_21
     irl_end_var_40 = opt_rl_end_var_37
     i_startidx_var_38 = MERGE(1, MAX(1, p_patch_var_32 % edges % start_index(irl_start_var_36)), i_blk_var_33 /= i_startblk_var_34)
-    i_endidx_var_39 = MERGE(48, p_patch_var_32 % edges % end_index(irl_end_var_40), i_blk_var_33 /= i_endblk_var_35)
+    i_endidx_var_39 = MERGE(global_data_var_21 % nproma, p_patch_var_32 % edges % end_index(irl_end_var_40), i_blk_var_33 /= i_endblk_var_35)
   END SUBROUTINE get_indices_e
   SUBROUTINE get_indices_v(global_data_var_22, p_patch_var_41, i_blk_var_42, i_startblk_var_43, i_endblk_var_44, i_startidx_var_47, i_endidx_var_48, irl_start_var_45, opt_rl_end_var_46)
-    USE mo_model_domain, ONLY: t_patch
     USE global_mod, ONLY: global_data_type
+    USE mo_model_domain, ONLY: t_patch
+    TYPE(global_data_type) :: global_data_var_22
     TYPE(t_patch), INTENT(IN) :: p_patch_var_41
     INTEGER, INTENT(IN) :: i_blk_var_42
     INTEGER, INTENT(IN) :: i_startblk_var_43
@@ -136,18 +136,17 @@ MODULE mo_loopindices
     INTEGER, OPTIONAL, INTENT(IN) :: opt_rl_end_var_46
     INTEGER, INTENT(OUT) :: i_startidx_var_47, i_endidx_var_48
     INTEGER :: irl_end_var_49
-    TYPE(global_data_type) :: global_data_var_22
     irl_end_var_49 = -5
     IF (i_blk_var_42 == i_startblk_var_43) THEN
       i_startidx_var_47 = p_patch_var_41 % verts % start_index(2)
-      i_endidx_var_48 = 48
+      i_endidx_var_48 = global_data_var_22 % nproma
       IF (i_blk_var_42 == i_endblk_var_44) i_endidx_var_48 = p_patch_var_41 % verts % end_index(- 5)
     ELSE IF (i_blk_var_42 == i_endblk_var_44) THEN
       i_startidx_var_47 = 1
       i_endidx_var_48 = p_patch_var_41 % verts % end_index(- 5)
     ELSE
       i_startidx_var_47 = 1
-      i_endidx_var_48 = 48
+      i_endidx_var_48 = global_data_var_22 % nproma
     END IF
   END SUBROUTINE get_indices_v
 END MODULE mo_loopindices
@@ -155,10 +154,11 @@ MODULE mo_math_divrot
   IMPLICIT NONE
   CONTAINS
   SUBROUTINE rot_vertex_ri(global_data_var_23, vec_e, ptr_patch_var_50, ptr_int, rot_vec, opt_slev_var_51, opt_elev_var_52, opt_rlend_var_53, opt_acc_async_var_54)
+    USE global_mod, ONLY: global_data_type
     USE mo_model_domain, ONLY: t_patch
     USE mo_intp_data_strc, ONLY: t_int_state
-    USE global_mod, ONLY: global_data_type
     USE mo_loopindices, ONLY: get_indices_v
+    TYPE(global_data_type) :: global_data_var_23
     TYPE(t_patch), TARGET, INTENT(IN) :: ptr_patch_var_50
     TYPE(t_int_state), INTENT(IN) :: ptr_int
     REAL(KIND = 8), INTENT(IN) :: vec_e(:, :, :)
@@ -171,7 +171,6 @@ MODULE mo_math_divrot
     INTEGER :: jv_var_57, jk_var_58, jb_var_59
     INTEGER :: rl_start_var_60, rl_end_var_61
     INTEGER :: i_startblk_var_62, i_endblk_var_63, i_startidx_var_64, i_endidx_var_65
-    TYPE(global_data_type) :: global_data_var_23
     slev_var_55 = 1
     elev_var_56 = UBOUND(vec_e, 2)
     rl_start_var_60 = 2
@@ -201,30 +200,30 @@ MODULE mo_nonhydro_types
     REAL(KIND = 8), POINTER, CONTIGUOUS :: ddxn_z_full(:, :, :), ddxt_z_full(:, :, :), ddqz_z_full_e(:, :, :), ddqz_z_half(:, :, :), wgtfac_c(:, :, :), wgtfac_e(:, :, :), wgtfacq_e(:, :, :), coeff_gradekin(:, :, :), coeff1_dwdz(:, :, :), coeff2_dwdz(:, :, :)
     REAL(KIND = 8), POINTER, CONTIGUOUS :: deepatmo_gradh_mc(:), deepatmo_invr_mc(:), deepatmo_gradh_ifc(:), deepatmo_invr_ifc(:)
   END TYPE t_nh_metrics
-  CONTAINS
 END MODULE mo_nonhydro_types
 MODULE mo_real_timer
   IMPLICIT NONE
   CONTAINS
   SUBROUTINE timer_start(global_data_var_24, it_var_66)
     USE global_mod, ONLY: global_data_type
-    INTEGER, INTENT(IN) :: it_var_66
     TYPE(global_data_type) :: global_data_var_24
+    INTEGER, INTENT(IN) :: it_var_66
   END SUBROUTINE timer_start
   SUBROUTINE timer_stop(global_data_var_25, it_var_67)
     USE global_mod, ONLY: global_data_type
-    INTEGER, INTENT(IN) :: it_var_67
     TYPE(global_data_type) :: global_data_var_25
+    INTEGER, INTENT(IN) :: it_var_67
   END SUBROUTINE timer_stop
 END MODULE mo_real_timer
 MODULE mo_icon_interpolation_scalar
   IMPLICIT NONE
   CONTAINS
   SUBROUTINE cells2verts_scalar_ri(global_data_var_26, p_cell_in, ptr_patch_var_68, c_int, p_vert_out, opt_slev_var_69, opt_elev_var_70, opt_rlstart, opt_rlend_var_71, opt_acc_async_var_72)
-    USE mo_model_domain, ONLY: t_patch
     USE global_mod, ONLY: global_data_type
+    USE mo_model_domain, ONLY: t_patch
     USE mo_real_timer, ONLY: timer_start, timer_stop
     USE mo_loopindices, ONLY: get_indices_v
+    TYPE(global_data_type) :: global_data_var_26
     TYPE(t_patch), TARGET, INTENT(IN) :: ptr_patch_var_68
     REAL(KIND = 8), INTENT(IN) :: p_cell_in(:, :, :)
     REAL(KIND = 8), INTENT(IN) :: c_int(:, :, :)
@@ -237,7 +236,6 @@ MODULE mo_icon_interpolation_scalar
     INTEGER :: jv_var_75, jk_var_76, jb_var_77
     INTEGER :: rl_start_var_78, rl_end_var_79
     INTEGER :: i_startblk_var_80, i_endblk_var_81, i_startidx_var_82, i_endidx_var_83, i_nchdom
-    TYPE(global_data_type) :: global_data_var_26
     slev_var_73 = 1
     elev_var_74 = UBOUND(p_cell_in, 2)
     rl_start_var_78 = 2
@@ -261,14 +259,15 @@ MODULE mo_velocity_advection
   IMPLICIT NONE
   CONTAINS
   SUBROUTINE velocity_tendencies(global_data, p_prog, p_patch, p_int, p_metrics, p_diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntnd, istep, lvn_only, dtime, dt_linintp_ubc, ldeepatmo)
+    USE global_mod, ONLY: global_data_type
     USE mo_model_domain, ONLY: t_patch
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_nonhydro_types, ONLY: t_nh_diag, t_nh_metrics, t_nh_prog
-    USE global_mod, ONLY: global_data_type
     USE mo_real_timer, ONLY: timer_start, timer_stop
     USE mo_icon_interpolation_scalar, ONLY: cells2verts_scalar_ri
     USE mo_math_divrot, ONLY: rot_vertex_ri
     USE mo_loopindices, ONLY: get_indices_c, get_indices_e
+    TYPE(global_data_type) :: global_data
     TYPE(t_patch), TARGET, INTENT(IN) :: p_patch
     TYPE(t_int_state), TARGET, INTENT(IN) :: p_int
     TYPE(t_nh_prog), INTENT(INOUT) :: p_prog
@@ -285,13 +284,13 @@ MODULE mo_velocity_advection
     INTEGER :: i_startblk_var_86, i_endblk_var_87, i_startidx_var_88, i_endidx_var_89
     INTEGER :: i_startblk_2, i_endblk_2, i_startidx_2, i_endidx_2
     INTEGER :: rl_start_var_90, rl_end_var_91, rl_start_2, rl_end_2
-    REAL(KIND = 8) :: z_w_concorr_mc(48, 90)
-    REAL(KIND = 8) :: z_w_con_c(48, 91)
-    REAL(KIND = 8) :: z_w_con_c_full(48, 90, 640)
-    REAL(KIND = 8) :: z_v_grad_w(48, 90, 960)
-    REAL(KIND = 8) :: z_w_v(48, 91, 321)
-    REAL(KIND = 8) :: zeta(48, 90, 321)
-    REAL(KIND = 8) :: z_ekinh(48, 90, 640)
+    REAL(KIND = 8) :: z_w_concorr_mc(global_data % nproma, 90)
+    REAL(KIND = 8) :: z_w_con_c(global_data % nproma, 91)
+    REAL(KIND = 8) :: z_w_con_c_full(global_data % nproma, 90, 640)
+    REAL(KIND = 8) :: z_v_grad_w(global_data % nproma, 90, 960)
+    REAL(KIND = 8) :: z_w_v(global_data % nproma, 91, 321)
+    REAL(KIND = 8) :: zeta(global_data % nproma, 90, 321)
+    REAL(KIND = 8) :: z_ekinh(global_data % nproma, 90, 640)
     INTEGER :: nlev_var_92, nlevp1_var_93
     LOGICAL :: l_vert_nested
     INTEGER :: jg
@@ -299,9 +298,7 @@ MODULE mo_velocity_advection
     REAL(KIND = 8) :: w_con_e, scalfac_exdiff, difcoef, max_vcfl_dyn_var_94
     INTEGER :: ie, nrdmax_jg, nflatlev_jg, clip_count
     LOGICAL :: levmask(640, 90), levelmask(90)
-    LOGICAL :: cfl_clipping(48, 91)
-    TYPE(global_data_type) :: global_data
-    CALL global_init_fn(global_data)
+    LOGICAL :: cfl_clipping(global_data % nproma, 91)
     IF (global_data % timers_level > 5) CALL timer_start(global_data, global_data % timer_solve_nh_veltend)
     l_vert_nested = .FALSE.
     jg = 1
@@ -520,8 +517,3 @@ MODULE mo_velocity_advection
     IF (global_data % timers_level > 5) CALL timer_stop(global_data, global_data % timer_solve_nh_veltend)
   END SUBROUTINE velocity_tendencies
 END MODULE mo_velocity_advection
-SUBROUTINE global_init_fn(global_data_var_27)
-  USE global_mod, ONLY: global_data_type
-  IMPLICIT NONE
-  TYPE(global_data_type) :: global_data_var_27
-END SUBROUTINE global_init_fn
