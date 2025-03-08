@@ -63,6 +63,7 @@ for path in paths:
         sdfg.apply_transformations_repeated(LoopToMap, validate=False)
         sdfg.save(f"map_{sdfg.name}.sdfgz", compress=True)
         sdfg.validate()
+        """
         sdfg.apply_gpu_transformations(validate=False, simplify=False)
         sdfg.save("to_gpu.sdfgz", compress=True)
 
@@ -99,6 +100,7 @@ for path in paths:
         sdfg.save("fixed.sdfgz", compress=True)
         #sdfg.validate()
         #sdfg.save("fixed2.sdfgz", compress=True)
+        """
 
         ################################################################################
         ### Compile the (optimized) SDFG with alterations
@@ -107,10 +109,14 @@ for path in paths:
         # compile the SDFG
         sdfg.generate_code()
 
+
     #if path != "sdfgs/add_aerosol_optics_simplified_dbg22.sdfgz":
     #    gen_sdfg()
     gen_sdfg()
-
+    try:
+        sdfg.compile()
+    except Exception as e:
+        pass
     # Source file changes
     # get build location and dace location
     build_loc = sdfg.build_folder
@@ -118,6 +124,7 @@ for path in paths:
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
 
     if path == "sdfgs/add_aerosol_optics_simplified_dbg22.sdfgz":
+        """
         file_path = f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu"
 
         # Read the file
@@ -131,7 +138,8 @@ for path in paths:
         # Write back the modified content
         with open(file_path, "w") as file:
             file.writelines(filtered_lines)
-
+        """
+        pass
 
     # copy main_cpp_file to .dacecache/<name>/src/cpu/
     main_name = main_dict[sdfg_name]
@@ -150,6 +158,7 @@ for path in paths:
             else:
                 file.write(line)
     root_dir = f"{build_loc}/src"
+    """
     for dirpath, _, filenames in os.walk(root_dir):
         for filename in filenames:
             if filename.endswith(".cpp"):
@@ -157,7 +166,7 @@ for path in paths:
                 new_path = os.path.join(dirpath, filename[:-4] + ".cu")  # Replace ".cpp" with ".cu"
                 os.rename(old_path, new_path)
                 print(f"Renamed: {old_path} -> {new_path}")
-
+    """
 
     # copy header to .dacecache/<name>/include/
     header_name = header_dict[sdfg_name]
@@ -170,13 +179,19 @@ for path in paths:
         "-Xcompiler=-fsanitize=address", "-Xcompiler=-faligned-new", "-std=c++17", "-O0", "-Xcompiler=-ggdb", "-Xcompiler=-O0",
         "-o", sdfg_name
     ]
+    compile_cmd = [
+        "g++", f"{build_loc}/src/cpu/{sdfg_name}.cpp", f"{build_loc}/src/cpu/{main_name}",
+        "-I", f"{build_loc}/include", "-I", f"{dace_include}",
+        "-fsanitize=address", "-faligned-new", "-std=c++17", "-O0", "-ggdb",
+        "-o", sdfg_name
+    ]
     print(compile_cmd)
 
     print(f"Running compile command: {' '.join(compile_cmd)}")
     subprocess.run(compile_cmd, check=False)  # This waits for compilation to finish
 
     print(f"RUNNING {sdfg_name}")
-    subprocess.run(f"./{sdfg_name}", shell=True, check=False)  # This waits for execution to finish
+    subprocess.run(f"export ASAN_OPTIONS=new_delete_type_mismatch=0; ./{sdfg_name}", shell=True, check=False)  # This waits for execution to finish
 
     print(f"COMPARING {sdfg_name}")
 
