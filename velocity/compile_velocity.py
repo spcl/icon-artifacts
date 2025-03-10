@@ -30,7 +30,7 @@ sdfg = dace.SDFG.from_file(path)
 ################################################################################
 
 
-if Path("velocity_to_gpu.sdfgz").exists():
+if Path("to_gpu_velocity.sdfgz").exists():
     sdfg = sdfg.from_file("to_gpu_velocity.sdfgz")
 else:
     StructToContainerGroups(save_steps=False, verbose=False, simplify=False, interface_with_struct_copy=True, interface_to_gpu=True).apply_pass(sdfg, {})
@@ -139,36 +139,59 @@ def set_default_map_to_gpu(sdfg):
                     n.map.schedule = dace.ScheduleType.GPU_Device
 
 # Pass levmask as an argument if it is a symbol in the SDFG but not passed as an array
-def pass_levmask_as_array_not_as_symbol(rootsdfg, sdfg: dace.SDFG, _n: dace.nodes.Node, levmask):
-    has_levmask = False
+def pass_name_as_array_not_as_symbol(rootsdfg, sdfg: dace.SDFG, nested_sdfg_node: dace.nodes.Node, name: str):
+    has_name = False
     for s in sdfg.states():
         for n in s.nodes():
             if isinstance(n, dace.nodes.NestedSDFG):
-                pass_levmask_as_array_not_as_symbol(rootsdfg, n.sdfg, n, levmask)
+                pass_name_as_array_not_as_symbol(rootsdfg, n.sdfg, n, name)
         for n in s.nodes():
             if isinstance(n, dace.nodes.AccessNode):
-                if n.data == "levmask":
-                    has_levmask = True
+                if n.data == name:
+                    has_name = True
         for e in s.edges():
             if isinstance(e.data, dace.memlet.Memlet):
-                if e.data.data == "levmask":
-                    has_levmask = True
+                if e.data.data == name:
+                    has_name = True
 
-    if has_levmask:
-        assert "levmask" in sdfg.arrays
-    if not has_levmask:
-        if ("levmask" in sdfg.arrays):
-            sdfg.remove_data("levmask")
-        if ("levmask" in sdfg.symbols):
+    if has_name:
+        assert name in sdfg.arrays
+    if not has_name:
+        # If does not have the name but is defined as a symbol
+        # Then it is sued on interstate edge prob and need to pass it
+        if (name in sdfg.arrays):
+            sdfg.remove_data(name)
+        if (name in sdfg.symbols):
             assert sdfg != rootsdfg
-            arr =  copy.deepcopy(rootsdfg.arrays["levmask"])
+            arr =  copy.deepcopy(rootsdfg.arrays[name])
             arr.transient = False
-            sdfg.remove_symbol("levmask")
-            sdfg.add_datadesc("levmask", arr)
-            an = sdfg.parent.add_access("levmask")
-            sdfg.parent.add_edge(an, None, _n, "levmask", dace.memlet.Memlet(expr="levmask"))
-            _n.add_in_connector("levmask")
-            sdfg.save("levmask_passed.sdfgz", compress=True)
+            sdfg.remove_symbol(name)
+            sdfg.add_datadesc(name, arr)
+            an = sdfg.parent.add_access(name)
+            #sdfg.parent.add_edge(an, None, _n, name, dace.memlet.Memlet(expr=name))
+            entry_nodes = []
+            enode = nested_sdfg_node
+            while enode is not None:
+                entry_nodes.append(enode)
+                enode = sdfg.parent.entry_node(enode)
+
+            entry_chain = list(reversed(entry_nodes))
+
+            sdfg.parent.add_edge(an, None, entry_chain[0], f"IN_{name}", dace.memlet.Memlet(expr=name))
+            entry_chain[0].add_in_connector(f"IN_{name}")
+
+            for i in range(len(entry_chain) - 2):
+                sdfg.parent.add_edge(entry_chain[i], f"OUT_{name}", entry_chain[i + 1], f"IN_{name}", dace.memlet.Memlet(expr=name))
+                entry_chain[i].add_out_connector(f"OUT_{name}")
+                entry_chain[i+1].add_in_connector(f"IN_{name}")
+
+            # Last node is the nested SDFG
+            sdfg.parent.add_edge(entry_chain[-2], f"OUT_{name}", entry_chain[-1], f"{name}", dace.memlet.Memlet(expr=name))
+            entry_chain[-2].add_out_connector(f"OUT_{name}")
+            entry_chain[-1].add_in_connector(f"{name}")
+
+            if save_steps:
+                sdfg.save(f"{name}_passed.sdfgz", compress=True)
 
 def set_scalar_storage_from_gpu_global_to_register(sdfg: dace.SDFG):
     for arr_name, arr in sdfg.arrays.items():
@@ -208,7 +231,7 @@ if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("
                 ("single_state_body_1", "single_state_body_map"),
                 ("single_state_body_0","single_state_body_map")])
 set_default_map_to_gpu(sdfg)
-pass_levmask_as_array_not_as_symbol(sdfg, sdfg, None, sdfg.arrays["levmask"])
+pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
 set_scalar_storage_from_gpu_global_to_register(sdfg)
 
 # Prob not needed anymore
