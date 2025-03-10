@@ -226,6 +226,51 @@ def pad_access_node_between_map_and_view(sdfg):
                         state.add_edge(ie.src, ie.src_conn, an, None, dace.memlet.Memlet(expr=d))
                         state.remove_edge(ie)
 
+def rename_symbol_connector(sdfg: dace.SDFG, name: str):
+    for state in sdfg.states():
+        for n in state.nodes():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                rename_symbol_connector(n.sdfg, name)
+            # If AccessNode -> MapEntry, where the data is scalar and is used to create a symbol
+            # Then change the in connector name and change all occurences within the area
+            if isinstance(n, dace.nodes.AccessNode):
+                for oe in state.out_edges(n):
+                    if (isinstance(oe.dst, dace.nodes.MapEntry) and
+                        name in oe.dst.in_connectors and n.data == name and
+                        isinstance(sdfg.arrays[oe.data.data], dace.data.Scalar)):
+                        oe.dst.remove_in_connector(name)
+                        oe.dst.add_in_connector("__" + name)
+                        oe.dst_conn = "__" + name
+
+                        # If state.replace does not work, change this
+                        for _n in list(state.all_nodes_between(oe.dst, state.exit_node(oe.dst))) + [oe.dst, state.exit_node(oe.dst)]:
+                            if isinstance(_n, dace.nodes.MapEntry):
+                                new_params = ["__" + name if p == name else p for p in _n.map.params]
+                                new_subsets = [(b.subs(name, "__" + name) if isinstance(b, dace.symbolic.SymExpr) else b,
+                                                e.subs(name, "__" + name) if isinstance(e, dace.symbolic.SymExpr) else e,
+                                                s.subs(name, "__" + name) if isinstance(s, dace.symbolic.SymExpr) else s)
+                                               for (b,e,s) in _n.map.range]
+                                _n.map.params = new_params
+                                _n.map.range = dace.subsets.Range(new_subsets)
+                            if isinstance(_n, dace.nodes.AccessNode) and _n.data == name:
+                                _n.data = "__" + name
+
+                        #for _e in list(*state.all_nodes_between(oe.dst, state.exit_node(oe.dst))):
+                        # If it used in interstate edges it will crash, implement it here.
+
+                        if save_steps:
+                            sdfg.save("reconnectored_velocity.sdfgz", compress=True)
+
+
+def set_view_lifetime_to_scope(sdfg: dace.SDFG):
+    for state in sdfg.states():
+        for n in state.nodes():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                set_view_lifetime_to_scope(n.sdfg)
+    for arr in sdfg.arrays.values():
+        if isinstance(arr, dace.data.View):
+            arr.lifetime = dace.dtypes.AllocationLifetime.Scope
+
 # Apply velocity tendencies specific "fix" transformations
 if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("single_state_body", "single_state_body_map"),
                 ("single_state_body_1", "single_state_body_map"),
@@ -233,6 +278,8 @@ if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("
 set_default_map_to_gpu(sdfg)
 pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
 set_scalar_storage_from_gpu_global_to_register(sdfg)
+rename_symbol_connector(sdfg, "nflatlev_jg")
+set_view_lifetime_to_scope(sdfg)
 
 # Prob not needed anymore
 # set_top_level_default_storage_to_gpu_global(sdfg)
@@ -248,9 +295,10 @@ except Exception as e:
     print("Code is still not compiling!")
     raise e
 
-sdfg.simplify(validate=True)
-if save_steps:
-    sdfg.save("velocity_final.sdfgz", compress=True)
+# Simplifying makes it invalid again...
+#sdfg.simplify(validate=True)
+#if save_steps:
+#    sdfg.save("velocity_final.sdfgz", compress=True)
 
 ################################################################################
 ### Compile the (optimized) SDFG with alterations
