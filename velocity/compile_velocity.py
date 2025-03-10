@@ -4,7 +4,6 @@ import subprocess
 import dace
 import shutil
 import os
-
 from dace.transformation.passes.duplicate_const_arrays import DuplicateConstArrays
 from dace.transformation.passes.struct_to_container_group import StructToContainerGroups
 from dace.transformation.interstate import LoopToMap
@@ -290,7 +289,7 @@ if save_steps:
 sdfg.validate()
 
 try:
-    sdfg.compile(validate=False)
+    sdfg.compile(validate=True)
 except Exception as e:
     print("Code is still not compiling!")
     raise e
@@ -303,9 +302,6 @@ except Exception as e:
 ################################################################################
 ### Compile the (optimized) SDFG with alterations
 ################################################################################
-
-# compile the SDFG
-sdfg.compile(validate=True)
 
 # get build location and dace location
 build_loc = sdfg.build_folder
@@ -333,8 +329,26 @@ header_name = header_dict[sdfg_name]
 shutil.copy(f"{header_name}", f"{build_loc}/include/{header_name}")
 
 # compile c++ <SDFG cpp file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -std=c++17 -O0 -ggdb
+# But CUDA version this time
+
+# Replace cpp with cu
+def replace_cpp_with_cu(directory):
+    directory = Path(directory)  # Convert to Path object
+    for file in directory.rglob("*.cpp"):  # Find all .cpp files
+        new_name = file.with_suffix(".cu")  # Change the suffix to .cu
+        file.rename(new_name)  # Rename the file
+        print(f"Renamed: {file} -> {new_name}")
+    for file in directory.rglob("*.cc"):
+        new_name = file.with_suffix(".cu")  # Change the suffix to .cu
+        file.rename(new_name)  # Rename the file
+        print(f"Renamed: {file} -> {new_name}")
+
+# To avoid link issues fastly for CUDA libs and have cuda compiler definition
+replace_cpp_with_cu(build_loc)
+
 os.system(
-    f"c++ {build_loc}/src/cpu/{sdfg_name}.cpp {build_loc}/src/cpu/{main_name} -I {build_loc}/include -I {dace_include} -faligned-new -std=c++20 -O0 -ggdb -o {sdfg_name}"
+    f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu \
+{build_loc}/src/cpu/{main_name.replace(".cc", ".cu")} -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new -std=c++20 -o {sdfg_name}"
 )
 os.system(
     f"./{sdfg_name}"
@@ -347,13 +361,16 @@ for got_file in got_files:
 
     if os.path.isfile(want_file):
         print(f"Comparing {got_file} with {want_file}...")
-        result = subprocess.run(["diff", got_file, want_file])
-        if result.stdout:
+        result = subprocess.run(["diff", got_file, want_file], capture_output=True, text=True)
+
+        if result.stdout:  # If there's a difference
+            print("Verification failed")
             with open(got_file + ".out", "w") as f:
                 f.write(result.stdout)
-        if result.stderr:
-            print(f"Error: {result.stderr}")  # Print any errors
-            with open(got_file + ".err", "w") as f:
-                f.write(result.stderr)
+            if result.stderr:  # If there's an error
+                with open(got_file + ".err", "w") as f:
+                    f.write(result.stderr)
+        else:
+            print("All good")
     else:
         print(f"Warning: No matching .want file for {got_file}")
