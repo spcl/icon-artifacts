@@ -35,9 +35,14 @@ else:
     StructToContainerGroups(save_steps=False, verbose=False, simplify=False, interface_with_struct_copy=True, interface_to_gpu=True).apply_pass(sdfg, {})
     if save_steps:
         sdfg.save("flat_velocity.sdfgz", compress=True)
+    sdfg.validate()
+    sdfg.simplify()
+    sdfg.validate()
     sdfg.apply_transformations_repeated(LoopToMap, validate=False)
     if save_steps:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
+    sdfg.validate()
+    #sdfg.simplify() #This fails
     sdfg.validate()
     sdfg.apply_gpu_transformations(validate=False, simplify=False, host_data=[v for v, k in sdfg.arrays.items() if isinstance(k, dace.data.Array)],
                                    dont_copy_structs=True)
@@ -49,7 +54,6 @@ for arr_name, arr in sdfg.arrays.items():
         arr.storage = dace.dtypes.StorageType.CPU_Heap
 
 # The task lists are the tasklets that need to be wrapped in a single-state GPU map even after applying array duplication
-["T_l467_c467", "T_l472_c472"]
 DuplicateConstArrays().apply_pass(sdfg, {"wrap_list": ["T_l467_c467", "T_l472_c472"]})
 if save_steps:
     sdfg.save("arrays_duplicated_velocity.sdfgz", compress=True)
@@ -352,7 +356,7 @@ replace_cpp_with_cu(build_loc)
 
 os.system(
     f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu \
-{build_loc}/src/cpu/{main_name.replace(".cc", ".cu")} -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new -std=c++20 -o {sdfg_name}"
+{build_loc}/src/cpu/{main_name.replace('.cc', '.cu')} -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new -std=c++20 -o {sdfg_name}"
 )
 os.system(
     f"./{sdfg_name}"
