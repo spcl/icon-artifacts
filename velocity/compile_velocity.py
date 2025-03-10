@@ -44,6 +44,10 @@ else:
     if save_steps:
         sdfg.save("to_gpu_velocity.sdfgz", compress=True)
 
+for arr_name, arr in sdfg.arrays.items():
+    if "gpu_" + arr_name in sdfg.arrays:
+        arr.storage = dace.dtypes.StorageType.CPU_Heap
+
 # The task lists are the tasklets that need to be wrapped in a single-state GPU map even after applying array duplication
 ["T_l467_c467", "T_l472_c472"]
 DuplicateConstArrays().apply_pass(sdfg, {"wrap_list": ["T_l467_c467", "T_l472_c472"]})
