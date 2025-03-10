@@ -43,7 +43,7 @@ else:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
     sdfg.validate()
     #sdfg.simplify() #This fails
-    sdfg.validate()
+    #sdfg.validate()
     sdfg.apply_gpu_transformations(validate=False, simplify=False, host_data=[v for v, k in sdfg.arrays.items() if isinstance(k, dace.data.Array)],
                                    dont_copy_structs=True)
     if save_steps:
