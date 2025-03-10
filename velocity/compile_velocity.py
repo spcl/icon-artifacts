@@ -40,12 +40,13 @@ else:
     if save_steps:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
     sdfg.validate()
-    sdfg.apply_gpu_transformations(validate=False, simplify=False, host_data=[v for v, k in sdfg.arrays.items() if isinstance(k, dace.data.Array)])
+    sdfg.apply_gpu_transformations(validate=False, simplify=False, host_data=[v for v, k in sdfg.arrays.items() if isinstance(k, dace.data.Array)],
+                                   dont_copy_structs=True)
     if save_steps:
         sdfg.save("to_gpu_velocity.sdfgz", compress=True)
 
 # The task lists are the tasklets that need to be wrapped in a single-state GPU map even after applying array duplication
-["T_l467_c467", "T_l472_c472", "T_l268_c268"]
+["T_l467_c467", "T_l472_c472"]
 DuplicateConstArrays().apply_pass(sdfg, {"wrap_list": ["T_l467_c467", "T_l472_c472"]})
 if save_steps:
     sdfg.save("arrays_duplicated_velocity.sdfgz", compress=True)
