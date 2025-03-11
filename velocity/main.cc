@@ -140,14 +140,17 @@ int main() {
       serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
       /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
       serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+      serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(2),
       /*__f2dace_A_z_vt_ie_d_0_s_160=*/
       serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
       /*__f2dace_A_z_vt_ie_d_1_s_161=*/
       serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+      serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(2),
       /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
       serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
       /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
       serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
+      serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(2),
       /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
       serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
       /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
@@ -174,14 +177,17 @@ int main() {
       serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
       /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
       serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+      serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(2),
       /*__f2dace_A_z_vt_ie_d_0_s_160=*/
       serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
       /*__f2dace_A_z_vt_ie_d_1_s_161=*/
       serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+      serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(2),
       /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
       serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
       /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
       serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
+      serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(2),
       /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
       serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
       /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/

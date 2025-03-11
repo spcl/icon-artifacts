@@ -4,6 +4,7 @@ import subprocess
 import dace
 import shutil
 import os
+from dace.transformation.dataflow import MapCollapse
 from dace.transformation.passes.duplicate_const_arrays import DuplicateConstArrays
 from dace.transformation.passes.struct_to_container_group import StructToContainerGroups
 from dace.transformation.interstate import LoopToMap
@@ -27,7 +28,11 @@ sdfg = dace.SDFG.from_file(path)
 ################################################################################
 ### Apply Optimizations
 ################################################################################
-
+# Put host data back to CPU_Heap (library outputs are transient and are always put to GPU)
+def put_host_prefixed_data_back_to_cpu(sdfg):
+    for arr_name, arr in sdfg.arrays.items():
+        if arr_name.startswith("host_"):
+            arr.storage = dace.dtypes.StorageType.CPU_Heap
 
 if Path("to_gpu_velocity.sdfgz").exists():
     sdfg = sdfg.from_file("to_gpu_velocity.sdfgz")
@@ -35,17 +40,13 @@ else:
     StructToContainerGroups(save_steps=False, verbose=False, simplify=False, interface_with_struct_copy=True, interface_to_gpu=True).apply_pass(sdfg, {})
     if save_steps:
         sdfg.save("flat_velocity.sdfgz", compress=True)
-    sdfg.validate()
-    sdfg.simplify()
-    sdfg.validate()
     sdfg.apply_transformations_repeated(LoopToMap, validate=False)
+    sdfg.apply_transformations_repeated(MapCollapse, validate=False)
     if save_steps:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
-    sdfg.validate()
-    #sdfg.simplify() #This fails
-    #sdfg.validate()
-    sdfg.apply_gpu_transformations(validate=False, simplify=False, host_data=[v for v, k in sdfg.arrays.items() if isinstance(k, dace.data.Array)],
+    sdfg.apply_gpu_transformations(validate=False, simplify=False,
                                    dont_copy_structs=True)
+    put_host_prefixed_data_back_to_cpu(sdfg)
     if save_steps:
         sdfg.save("to_gpu_velocity.sdfgz", compress=True)
 
@@ -356,29 +357,34 @@ replace_cpp_with_cu(build_loc)
 
 os.system(
     f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu \
-{build_loc}/src/cpu/{main_name.replace('.cc', '.cu')} -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new -std=c++20 -o {sdfg_name}"
-)
-os.system(
-    f"./{sdfg_name}"
+{build_loc}/src/cpu/{main_name.replace('.cc', '.cu')} -I {build_loc}/include -I {dace_include} \
+-Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=native -O0 -o {sdfg_name}"
 )
 
-got_files = [f for f in os.listdir() if f.endswith(".got")]
+run = False
 
-for got_file in got_files:
-    want_file = got_file.replace(".got", ".want")
+if run:
+    os.system(
+        f"./{sdfg_name}"
+    )
 
-    if os.path.isfile(want_file):
-        print(f"Comparing {got_file} with {want_file}...")
-        result = subprocess.run(["diff", got_file, want_file], capture_output=True, text=True)
+    got_files = [f for f in os.listdir() if f.endswith(".got")]
 
-        if result.stdout:  # If there's a difference
-            print("Verification failed")
-            with open(got_file + ".out", "w") as f:
-                f.write(result.stdout)
-            if result.stderr:  # If there's an error
-                with open(got_file + ".err", "w") as f:
-                    f.write(result.stderr)
+    for got_file in got_files:
+        want_file = got_file.replace(".got", ".want")
+
+        if os.path.isfile(want_file):
+            print(f"Comparing {got_file} with {want_file}...")
+            result = subprocess.run(["diff", got_file, want_file], capture_output=True, text=True)
+
+            if result.stdout:  # If there's a difference
+                print("Verification failed")
+                with open(got_file + ".out", "w") as f:
+                    f.write(result.stdout)
+                if result.stderr:  # If there's an error
+                    with open(got_file + ".err", "w") as f:
+                        f.write(result.stderr)
+            else:
+                print("All good")
         else:
-            print("All good")
-    else:
-        print(f"Warning: No matching .want file for {got_file}")
+            print(f"Warning: No matching .want file for {got_file}")
