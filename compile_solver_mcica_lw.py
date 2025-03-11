@@ -183,6 +183,8 @@ for got, want in zip(got_files, want_files):
 
 if not found_diff_all:
     print("No numerical differences found")
+else:
+    exit(1)
 
 
 ################################################################################
