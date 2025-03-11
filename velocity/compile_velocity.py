@@ -201,11 +201,10 @@ def pass_name_as_array_not_as_symbol(rootsdfg, sdfg: dace.SDFG, nested_sdfg_node
             if save_steps:
                 sdfg.save(f"{name}_passed.sdfgz", compress=True)
 
-def set_scalar_storage_from_gpu_global_to_register(sdfg: dace.SDFG):
+def set_scalar_storage_to_register(sdfg: dace.SDFG):
     for arr_name, arr in sdfg.arrays.items():
         if isinstance(arr, dace.data.Scalar):
-            if arr.storage == dace.dtypes.StorageType.GPU_Global:
-                arr.storage = dace.dtypes.StorageType.Register
+            arr.storage = dace.dtypes.StorageType.Register
 
 # Also iterates to nested SDFGs if scope is None and storage default, put to GPU global
 def set_top_level_default_storage_to_gpu_global(sdfg):
@@ -285,7 +284,7 @@ if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("
                 ("single_state_body_0","single_state_body_map")])
 set_default_map_to_gpu(sdfg)
 pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
-set_scalar_storage_from_gpu_global_to_register(sdfg)
+set_scalar_storage_to_register(sdfg)
 rename_symbol_connector(sdfg, "nflatlev_jg")
 set_view_lifetime_to_scope(sdfg)
 
