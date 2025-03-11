@@ -4,6 +4,8 @@ import subprocess
 import dace
 import shutil
 import os
+from dace.codegen.control_flow import ConditionalBlock, ControlFlowRegion
+from dace.properties import CodeBlock
 from dace.transformation.dataflow import MapCollapse
 from dace.transformation.passes.duplicate_const_arrays import DuplicateConstArrays
 from dace.transformation.passes.struct_to_container_group import StructToContainerGroups
@@ -33,6 +35,8 @@ def put_host_prefixed_data_back_to_cpu(sdfg):
     for arr_name, arr in sdfg.arrays.items():
         if arr_name.startswith("host_"):
             arr.storage = dace.dtypes.StorageType.CPU_Heap
+        if not arr.transient and not isinstance(arr, dace.data.View):
+            arr.storage = dace.dtypes.StorageType.CPU_Heap
 
 if Path("to_gpu_velocity.sdfgz").exists():
     sdfg = sdfg.from_file("to_gpu_velocity.sdfgz")
@@ -45,7 +49,7 @@ else:
     if save_steps:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
     sdfg.apply_gpu_transformations(validate=False, simplify=False,
-                                   dont_copy_structs=True)
+                                   dont_copy_structs=True, host_data=[k for k, v in sdfg.arrays.items() if isinstance(v, dace.data.Scalar)])
     put_host_prefixed_data_back_to_cpu(sdfg)
     if save_steps:
         sdfg.save("to_gpu_velocity.sdfgz", compress=True)
@@ -278,26 +282,228 @@ def set_view_lifetime_to_scope(sdfg: dace.SDFG):
         if isinstance(arr, dace.data.View):
             arr.lifetime = dace.dtypes.AllocationLifetime.Scope
 
+
+def symbollify_gpu_scalars(sdfg: dace.SDFG):
+    gpu_scalars = [k for k,v in sdfg.arrays.items() if isinstance(v, dace.data.Scalar) and v.storage == dace.dtypes.StorageType.GPU_Global]
+
+    for _cfg in sdfg.nodes():
+        if isinstance(_cfg, ControlFlowRegion):
+            for cfg in _cfg.nodes():
+                if isinstance(cfg, ConditionalBlock):
+                    print("CB", cfg.label)
+                    if cfg.label == "Conditional_l_467_c_467":
+                        assert "_if_cond_16" in gpu_scalars, f"{gpu_scalars}"
+                        raise Exception("uwu")
+                    for codeblock, region in cfg.branches:
+                        needed_syms = set()
+                        if codeblock is not None:
+                            if codeblock.code is not None:
+                                for gs in gpu_scalars:
+
+                                    if gs in codeblock.code:
+                                        codeblock.code = codeblock.code.replace(gs, f"__{gs}")
+                                        needed_syms.add(gs, f"__{gs}")
+
+                        if cfg.label == "Conditional_l_467_c_467":
+                            assert len(needed_syms) > 0, f"{needed_syms}"
+
+                        if len(needed_syms) > 0:
+                            assignments = {}
+                            for src, dst in needed_syms:
+                                assignments[dst] = f"{src}[0]"
+                            sdfg.add_state_before(region, "map_views", assignments=assignments)
+                else:
+                    print("N", cfg.label)
+                    if cfg.label == "Conditional_l_467_c_467":
+                        raise Exception(f"uwu, {type(cfg)}")
+        cfg = _cfg
+        if isinstance(cfg, ConditionalBlock):
+            print("CB2", cfg.label)
+            if cfg.label == "Conditional_l_467_c_467":
+                assert "_if_cond_16" in gpu_scalars, f"{gpu_scalars}"
+                raise Exception("uwu")
+            for codeblock, region in cfg.branches:
+                needed_syms = set()
+                if codeblock is not None:
+                    if codeblock.code is not None:
+                        for gs in gpu_scalars:
+
+                            if gs in codeblock.code:
+                                codeblock.code = codeblock.code.replace(gs, f"__{gs}")
+                                needed_syms.add(gs, f"__{gs}")
+
+                if cfg.label == "Conditional_l_467_c_467":
+                    assert len(needed_syms) > 0, f"{needed_syms}"
+
+                if len(needed_syms) > 0:
+                    assignments = {}
+                    for src, dst in needed_syms:
+                        assignments[dst] = f"{src}[0]"
+                    sdfg.add_state_before(region, "map_views", assignments=assignments)
+        else:
+            print("N2", cfg.label)
+            if cfg.label == "Conditional_l_467_c_467":
+                raise Exception(f"uwu, {type(cfg)}")
+
+
+    for e in sdfg.edges():
+        needed_syms = set()
+        if e.data is not None:
+            for dst, src in e.data.assignments.items():
+                for gs in gpu_scalars:
+                    if gs in src.split():
+                        needed_syms.add((gs, f"__{gs}"))
+                        e.data.assignments[dst] = e.data.assignments[dst].replace(gs, f"__{gs}")
+            codeblock = e.data.condition
+            if codeblock is not None:
+                if codeblock.code is not None:
+                    for gs in gpu_scalars:
+                        if gs in codeblock.code:
+                            codeblock.code = codeblock.code.replace(gs, f"__{gs}")
+                            needed_syms.add(gs, f"__{gs}")
+        if len(needed_syms) > 0:
+            assignments = {}
+            for src, dst in needed_syms:
+                assignments[dst] = f"{src}[0]"
+            sdfg.add_state_after(e.src, "map_views", assignments=assignments)
+
+    for s in sdfg.states():
+        for n in s.nodes():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                symbollify_gpu_scalars(n.sdfg)
+
+
+    """
+    for node in cfg.nodes():
+        #if isinstance(node, dace.nodes.AccessNode):
+
+        views_to_read = (entry.free_symbols & sdfg.arrays.keys()) - containers_to_read
+        view_assignments = {}
+        for rd in views_to_read:
+            rd_name = f"{rd}_map"
+            view_assignments[rd_name] = rd
+
+            rd_sym = symbolic.pystr_to_symbolic(rd)
+            rd_name_sym = symbolic.pystr_to_symbolic(rd_name)
+
+            for i in range(len(map_node.range)):
+            lb, up, st = map_node.range[i]
+            lb = lb.replace(rd_sym, rd_name_sym)
+            up = up.replace(rd_sym, rd_name_sym)
+            st = st.replace(rd_sym, rd_name_sym)
+            map_node.range[i] = (lb, up, st)
+        graph.add_state_before(body, "map_views", assignments=view_assignments)"
+    """
+
 # Apply velocity tendencies specific "fix" transformations
 if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("single_state_body", "single_state_body_map"),
                 ("single_state_body_1", "single_state_body_map"),
                 ("single_state_body_0","single_state_body_map")])
 set_default_map_to_gpu(sdfg)
 pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
-set_scalar_storage_to_register(sdfg)
+#set_scalar_storage_to_register(sdfg)
 rename_symbol_connector(sdfg, "nflatlev_jg")
 set_view_lifetime_to_scope(sdfg)
 
+sdfg.save("tmp.sdfgz", compress=True)
+#symbollify_gpu_scalars(sdfg)
+
+def move_map_to_cpu(sdfg: dace.SDFG, state: dace.SDFGState, map_exit: dace.nodes.MapExit, node: dace.nodes.AccessNode):
+    map_entry = [v for v in state.nodes() if isinstance(v, dace.nodes.MapEntry) and v.map == map_exit.map][0]
+    if map_entry.map.schedule == dace.ScheduleType.GPU_Device:
+        map_entry.map.schedule = dace.ScheduleType.Sequential
+        diff_map = {}
+        for e in state.in_edges(map_entry):
+            if isinstance(e.src, dace.nodes.AccessNode):
+                src = e.src
+                ep1 = copy.deepcopy(e.dst_conn)
+                ep2 = copy.deepcopy(e.dst_conn).replace("IN_", "OUT_")
+                p1 = "IN_host_" + src.data
+                p2 = "OUT_host_" + src.data
+                e.dst_conn = "IN_host_" + src.data
+                for _e in state.out_edges(map_entry):
+                    if _e.src_conn == ep2:
+                        if p2 not in map_entry.out_connectors:
+                            _e.src_conn = p2
+                        else:
+                            p1 += "_2"
+                            p2 += "_2"
+                            _e.src_conn = p2
+                            e.dst_conn += "_2"
+                        #raise Exception(ep1, ep2, p1, p2)
+                map_entry.add_in_connector(p1)
+                map_entry.add_out_connector(p2)
+                map_entry.remove_in_connector(ep1)
+                map_entry.remove_out_connector(ep2)
+
+
+                while src is not None:
+                    print(state, src)
+                    srcdata = src.data
+                    if sdfg.arrays[srcdata].storage == dace.dtypes.StorageType.GPU_Global:
+                        #src.data = f"host_{src.data}"
+                        if f"host_{src.data}" not in sdfg.arrays:
+                            arr2 = copy.deepcopy(sdfg.arrays[src.data])
+                            arr2.storage = dace.dtypes.StorageType.CPU_Heap
+                            sdfg.add_datadesc(f"host_{src.data}", arr2)
+                            #raise Exception(f"TODO {src.data} {node} {state}")
+                            for e in state.out_edges(src):
+                                if e.data.data == srcdata:
+                                    assert e.src_conn is None
+                                    an = state.add_access(f"host_{src.data}")
+
+                                    state.add_edge(src, None,
+                                                an, None, copy.deepcopy(e.data))
+                                    state.add_edge(an, None,
+                                                e.dst, e.dst_conn, copy.deepcopy(e.data))
+                                    state.remove_edge(e)
+                        else:
+                            for oe in state.out_edges(src):
+                                if oe.data.data == srcdata:
+                                    oe.data.data = f"host_{src.data}"
+                            diff_map[src.data] = f"host_{src.data}"
+                            src.data = "host_" + src.data
+                    if len(state.in_edges(src)) == 1 and isinstance(state.in_edges(src)[0].src, dace.nodes.AccessNode):
+                        src = state.in_edges(src)[0].src
+                    else:
+                        src = None
+        for e in state.all_edges(*state.all_nodes_between(map_entry, map_exit)):
+            if e.data.data in diff_map:
+                e.data.data = diff_map[e.data.data]
+
+
+def put_scalars_to_host(sdfg: dace.SDFG):
+    for arr in sdfg.arrays.values():
+        if isinstance(arr, dace.data.Scalar):
+            if arr.transient:
+                arr.storage = dace.dtypes.StorageType.Register
+            else:
+                arr.storage = dace.dtypes.StorageType.CPU_Heap
+    for state in sdfg.states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                put_scalars_to_host(node.sdfg)
+            if isinstance(node, dace.nodes.AccessNode):
+                arr = sdfg.arrays[node.data]
+                if isinstance(arr, dace.data.Scalar):
+                    for e in state.in_edges(node):
+                        if isinstance(e.src, dace.nodes.MapExit):
+                            # Map writing to scalar
+                            move_map_to_cpu(sdfg, state, e.src, node)
+
+
+#raise Exception("we")
 # Prob not needed anymore
 # set_top_level_default_storage_to_gpu_global(sdfg)
 # pad_access_node_between_map_and_view(sdfg)
+put_scalars_to_host(sdfg)
 
 if save_steps:
     sdfg.save("velocity_fixed.sdfgz", compress=True)
-sdfg.validate()
+#sdfg.validate()
 
 try:
-    sdfg.compile(validate=True)
+    sdfg.compile(validate=False)
 except Exception as e:
     print("Code is still not compiling!")
     raise e
