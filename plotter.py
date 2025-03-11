@@ -25,6 +25,10 @@ def plot_csv(file_path):
   medians = data.groupby('name').median()['time(ms)']
   std_devs = data.groupby('name').std()['time(ms)']
   names = data['name'].unique()
+
+  # Ensure ordering of names, medians, and std_devs, match
+  medians = [medians[name] for name in names]
+  std_devs = [std_devs[name] for name in names]
   
   # Plot the data
   plt.figure(figsize=(8, 4))
