@@ -164,14 +164,17 @@ if not found_diff_all:
 #     os.system(f"./{sdfg_name}")
 
 # Measure
+# times = []
 # for i in range(10):
 #     sdfg.clear_instrumentation_reports()
 #     os.system(f"./{sdfg_name}")
 #     report = sdfg.get_latest_report()
 #     assert report.events[-1].name == f"SDFG {sdfg.name}"
 #     time = report.events[-1].duration # in us
-#     print(f"GPU,{time}")
+#     times.append(time)
 
+# for time in times:
+#     print(f"GPU,{time}")
 
 ################################################################################
 ### Cleanup
