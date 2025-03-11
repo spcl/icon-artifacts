@@ -14,7 +14,7 @@ header_dict = {
 }
 
 main_dict = {
-    "velocity_tendencies": "main.cc",
+    "velocity_tendencies": "main_gpu.cc",
 }
 
 path = "velocity.sdfgz"
