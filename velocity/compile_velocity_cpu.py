@@ -4,88 +4,232 @@ import subprocess
 import dace
 import shutil
 import os
+import math
 from dace.transformation.passes.duplicate_const_arrays import DuplicateConstArrays
 from dace.transformation.passes.struct_to_container_group import StructToContainerGroups
 from dace.transformation.interstate import LoopToMap
-
-header_dict = {
-    "velocity_tendencies": "serde_velocity.h",
-}
-
-main_dict = {
-    "velocity_tendencies": "main.cc",
-}
-
-path = "velocity.sdfgz"
-
-save_steps = True
+from dace.transformation.interstate import LoopNormalize
+from dace.transformation.interstate import ContinueToCondition
+from dace.transformation.passes import SymbolPropagation
+from dace.sdfg.state import LoopRegion, ContinueBlock, ConditionalBlock
+from dace.sdfg.utils import inline_control_flow_regions
 
 # Load SDFG
-sdfg = dace.SDFG.from_file(path)
-
-StructToContainerGroups(save_steps=False, verbose=False, simplify=False, interface_with_struct_copy=True,
-                        interface_to_gpu=False).apply_pass(sdfg, {})
-if save_steps:
-    sdfg.save("flat_velocity.sdfgz", compress=True)
+sdfg = dace.SDFG.from_file("velocity.sdfg")
 sdfg.validate()
-sdfg.compile()
 
+################################################################################
+### Apply Optimizations
+################################################################################
+
+
+def make_array_loop_local(sdfg: dace.SDFG, array_name, loop_name):
+    """
+    Renames an array in the loop, so it's only accessed in the loop. You need to make sure that the array is not accessed outside of the loop (or written before read outside of the loop).
+    """
+    # Find the loop
+    loop = None
+    for node, _ in sdfg.all_nodes_recursive():
+        if isinstance(node, LoopRegion) and node.label == loop_name:
+            loop = node
+            break
+    assert loop is not None
+    # Creat a new array
+    assert array_name in sdfg.arrays
+    array = sdfg.arrays[array_name]
+    new_name, _ = sdfg.add_array(
+        f"{array_name}_local",
+        shape=array.shape,
+        dtype=array.dtype,
+        storage=array.storage,
+        location=array.location,
+        transient=array.transient,
+        strides=array.strides,
+        offset=array.offset,
+        lifetime=array.lifetime,
+        debuginfo=array.debuginfo,
+        allow_conflicts=array.allow_conflicts,
+        total_size=array.total_size,
+        find_new_name=True,
+        alignment=array.alignment,
+        may_alias=array.may_alias,
+    )
+    # Replace each occurrence of the array in the loop
+    loop.replace(array_name, new_name)
+
+
+# How many for loops exist?
+loops_prev = 0
+for node, state in sdfg.all_nodes_recursive():
+    if isinstance(node, LoopRegion):
+        loops_prev += 1
+
+# Apply transformations
+StructToContainerGroups(
+    save_steps=False,
+    verbose=False,
+    simplify=False,
+    interface_with_struct_copy=True,
+    interface_to_gpu=False,
+).apply_pass(sdfg, {})
+
+
+sdfg.apply_transformations_repeated(ContinueToCondition)
+sdfg.apply_transformations_repeated(LoopNormalize)
+# SymbolPropagation().apply_pass(sdfg, {})
+# sdfg.simplify()
+
+# XXX: Order is important!
+make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
+make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
+make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
+
+
+# sdfg.apply_transformations_repeated(LoopToMap)
+# sdfg.apply_transformations_repeated(LoopToMap)
+# print("LoopToMap applied")
+
+# How many now?
+loops_post = 0
+for node, state in sdfg.all_nodes_recursive():
+    if isinstance(node, LoopRegion):
+        print(node)
+        loops_post += 1
+print(f"Loops before: {loops_prev}, Loops after: {loops_post}")
+
+sdfg.validate()
+
+################################################################################
+### Compile the (optimized) SDFG with alterations
+################################################################################
+
+# get build location and dace location
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
 
-# copy main_cpp_file to .dacecache/<name>/src/cpu/
-main_name = main_dict[sdfg_name]
-shutil.copy(f"{main_name}", f"{build_loc}/src/cpu/{main_name}")
+# Generate code
+sdfg.instrument = dace.InstrumentationType.Timer
+try:
+    sdfg.compile()
+except Exception as e:
+    pass
 
-# change the line "constexpr char ROOT[] ="
-# to contain "<path to this script>/inputs/<name>/"
-input_folder = os.path.dirname(os.path.realpath(__file__)) + "/inputs"
-with open(f"{build_loc}/src/cpu/{main_name}", "r") as file:
-    lines = file.readlines()
-with open(f"{build_loc}/src/cpu/{main_name}", "w") as file:
-    for line in lines:
-        if line.startswith("constexpr char ROOT[] ="):
-            file.write(f'constexpr char ROOT[] = "{input_folder}/{sdfg_name}/";\n')
-        else:
-            file.write(line)
+# compile the SDFG
+sdfg._regenerate_code = False
+sdfg.compile()
+
+# copy main_cpp_file to .dacecache/<name>/src/cpu/
+shutil.copy(f"main.cc", f"{build_loc}/src/cpu/main.cc")
 
 # copy header to .dacecache/<name>/include/
-header_name = header_dict[sdfg_name]
-shutil.copy(f"{header_name}", f"{build_loc}/include/{header_name}")
+shutil.copy(f"serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
 
 # compile c++ <SDFG cpp file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -std=c++17 -O0 -ggdb
-# But CUDA version this time
-
-
-os.system(
-    f"c++ {build_loc}/src/cpu/{sdfg_name}.cpp \
-{build_loc}/src/cpu/{main_name} -I {build_loc}/include -I {dace_include} \
--faligned-new -std=c++20 -O0 -o {sdfg_name}"
+exit_code = os.system(
+    f"c++ {build_loc}/src/cpu/{sdfg_name}.cpp {build_loc}/src/cpu/main.cc -I {build_loc}/include -I {dace_include} -std=c++20 -O0 -ggdb -o {sdfg_name}"
 )
-run = True
-if run:
-    os.system(
-        f"./{sdfg_name}"
-    )
 
-    got_files = [f for f in os.listdir() if f.endswith(".got")]
+# check if compilation was successful
+if exit_code != 0:
+    print("Compilation failed")
+    exit(1)
 
-    for got_file in got_files:
-        want_file = got_file.replace(".got", ".want")
 
-        if os.path.isfile(want_file):
-            print(f"Comparing {got_file} with {want_file}...")
-            result = subprocess.run(["diff", got_file, want_file], capture_output=True, text=True)
+################################################################################
+### Execute and compare .got and .want files
+################################################################################
 
-            if result.stdout:  # If there's a difference
-                print("Verification failed")
-                with open(got_file + ".out", "w") as f:
-                    f.write(result.stdout)
-                if result.stderr:  # If there's an error
-                    with open(got_file + ".err", "w") as f:
-                        f.write(result.stderr)
-            else:
-                print("All good")
-        else:
-            print(f"Warning: No matching .want file for {got_file}")
+# execute the compiled program
+exit_code = os.system(f"./{sdfg_name}")
+
+# check if execution was successful
+if exit_code != 0:
+    print("Execution failed")
+    exit(1)
+
+# Get list of .got and .want files
+got_files = [f for f in os.listdir() if f.endswith(".got")]
+want_files = [f.replace(".got", ".want") for f in got_files]
+
+# Compare each .got file with its corresponding .want file
+found_diff_all = False
+for got, want in zip(got_files, want_files):
+    found_diff = False
+    with open(got, "r") as got_file, open(want, "r") as want_file:
+        got_lines = got_file.readlines()
+        want_lines = want_file.readlines()
+
+        if len(got_lines) != len(want_lines):
+            print(f"{got} and {want} have different number of lines")
+            found_diff = True
+            continue
+
+        # lines containing text should be identical, lines containing numbers should be close
+        for got_line, want_line in zip(got_lines, want_lines):
+            # Are the lines floating point numbers?
+            try:
+                got_num = float(got_line)
+                want_num = float(want_line)
+                # TODO: Adjust rel_tol and abs_tol
+                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=0):
+                    print(f"{got} and {want} have numerical differences")
+                    found_diff = True
+                    break
+
+            except ValueError:
+                # If not, they should be identical
+                if got_line != want_line:
+                    print(f"{got} and {want} have different text")
+                    found_diff = True
+                    break
+    if not found_diff:
+        print(f"{got} and {want} are identical")
+    found_diff_all = found_diff_all or found_diff
+
+
+if not found_diff_all:
+    print("No numerical differences found")
+else:
+    exit(1)
+
+
+################################################################################
+### Measure performance
+################################################################################
+
+# # Warmup
+# for i in range(10):
+#     os.system(f"./{sdfg_name}")
+
+# # Measure
+# times = []
+# for i in range(10):
+#     sdfg.clear_instrumentation_reports()
+#     os.system(f"./{sdfg_name}")
+#     report = sdfg.get_latest_report()
+#     assert report.events[-1].name == f"SDFG {sdfg.name}"
+#     time = report.events[-1].duration # in us
+#     times.append(time)
+
+# for time in times:
+#     print(f"CPU,{time}")
+
+################################################################################
+### Cleanup
+################################################################################
+
+# remove the compiled program
+os.remove(sdfg_name)
+
+# remove the .got files
+for got in got_files:
+    os.remove(got)
+
+# remove the .want files
+for want in want_files:
+    os.remove(want)
+
+# remove the .dacecache folder
+# shutil.rmtree(build_loc)
