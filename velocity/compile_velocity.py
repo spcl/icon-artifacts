@@ -1,3 +1,4 @@
+import ast
 import copy
 from pathlib import Path
 import subprocess
@@ -491,6 +492,36 @@ def symbollify_gpu_scalars(sdfg: dace.SDFG):
         graph.add_state_before(body, "map_views", assignments=view_assignments)"
     """
 
+def rename_on_if_conds(sdfg: dace.SDFG, src: str, dst: str):
+    gpu_host_name_map = {src: dst}
+    assert "vcflmax" in gpu_host_name_map
+    assert "host_vcflmax" == gpu_host_name_map["vcflmax"]
+
+    for node, parent in sdfg.all_nodes_recursive():
+        if not isinstance(node, ConditionalBlock):
+            continue
+
+        for b in node.branches:
+            if b[0] is None:
+                continue
+            if isinstance(b[0].code, list):
+                for i, el in enumerate(b[0].code):
+                    if isinstance(el, str):
+                        for src,dst in gpu_host_name_map.items():
+                            b[0].code[i] = b[0].code[i].replace(src,dst)
+                    else:
+                        def replace_x_with_y(expr: ast.Expr, repl_dict) -> ast.Expr:
+                            expr_str = ast.unparse(expr).strip()
+                            for src,dst in repl_dict.items():
+                                modified_str = expr_str.replace(src, dst)
+                            return ast.parse(modified_str, mode="eval").body
+                        b[0].code[i] = replace_x_with_y(b[0].code[i], gpu_host_name_map)
+            else:
+                assert isinstance(b[0].code, str)
+                for src,dst in gpu_host_name_map.items():
+                    b[0].code = b[0].code.replace(src,dst)
+
+
 # Apply velocity tendencies specific "fix" transformations
 if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("single_state_body", "single_state_body_map"),
                 ("single_state_body_1", "single_state_body_map"),
@@ -500,8 +531,9 @@ pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
 set_scalar_storage_to_register(sdfg)
 rename_symbol_connector(sdfg, "nflatlev_jg")
 set_view_lifetime_to_scope(sdfg)
-
-sdfg.save("tmp.sdfgz", compress=True)
+rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
+if save_steps:
+    sdfg.save("complete.sdfgz", compress=True)
 #symbollify_gpu_scalars(sdfg)
 
 def move_map_to_cpu(sdfg: dace.SDFG, state: dace.SDFGState, map_exit: dace.nodes.MapExit, node: dace.nodes.AccessNode):
