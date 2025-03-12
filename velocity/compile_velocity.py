@@ -38,6 +38,96 @@ def put_host_prefixed_data_back_to_cpu(sdfg):
         if not arr.transient and not isinstance(arr, dace.data.View):
             arr.storage = dace.dtypes.StorageType.CPU_Heap
 
+def scalar_to_length_one_array(sdfg):
+    scalar_to_arr_map = {}
+    add_arrays =set()
+    for arr_name, arr in sdfg.arrays.items():
+        if isinstance(arr, dace.data.Scalar):
+            arr.storage = dace.dtypes.StorageType.Register
+            na = dace.data.Array(dtype=arr.dtype, shape=[1], storage=dace.dtypes.StorageType.GPU_Global, transient=True,
+                            allow_conflicts=arr.allow_conflicts, lifetime=arr.lifetime,
+                            strides=[1], offset=[0])
+            add_arrays.add(("gpu_" + arr_name, na))
+            scalar_to_arr_map[arr_name] = "gpu_" + arr_name
+            if arr.transient is False:
+                sstate = sdfg.start_state
+                an0 = sstate.add_access(arr_name)
+                an1 = sstate.add_access("gpu_" + arr_name)
+                sstate.add_edge(an0, None, an1, None, dace.memlet.Memlet(expr=arr_name))
+    for arr_name, arr in add_arrays:
+        if arr_name not in sdfg.arrays:
+            sdfg.add_datadesc(arr_name, arr)
+        else:
+            sdfg.remove_data(arr_name, validate=False)
+            sdfg.add_datadesc(arr_name, arr)
+    return scalar_to_arr_map
+
+from dace.sdfg import utils as sdutil
+
+def replace_connectors_and_data(state: dace.SDFGState, node: dace.nodes.MapExit, old_name:str, new_name:str):
+    map_entry = [n for n in state.nodes() if isinstance(n, dace.nodes.MapEntry) and n.map == node.map][0]
+    edges_to_rm = set()
+    edges_to_add = set()
+    for e in state.all_edges(*state.all_nodes_between(map_entry, node)):
+        if e.src == map_entry:
+            continue
+        edges_to_rm.add(e)
+
+        if e.src_conn == "IN_" + old_name:
+            src_conn = "IN_" + new_name
+        else:
+            src_conn = e.src_conn
+
+        if e.dst_conn == "OUT_" + old_name:
+            dst_conn = "OUT_" + new_name
+        else:
+            dst_conn = e.dst_conn
+
+        if e.data.data == old_name:
+            mem = dace.memlet.Memlet(expr=new_name)
+        else:
+            mem = copy.deepcopy(e.data)
+
+        dst = e.dst
+        edges_to_add.add((e.src, src_conn, dst, dst_conn, mem))
+
+    for e in edges_to_rm:
+        state.remove_edge(e)
+    for e in edges_to_add:
+        state.add_edge(*e)
+
+
+def replace_gpu_scalar_outputs(sdfg: dace.SDFG, scalar_to_arr_map: dace.Dict[str, str]):
+    for state in sdfg.states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                replace_gpu_scalar_outputs(node.sdfg, scalar_to_arr_map)
+            edges_to_rm = set()
+            edges_to_add = set()
+            d = dict()
+            if isinstance(node, dace.nodes.MapExit) and node.map.schedule == dace.ScheduleType.GPU_Device:
+                for e in state.out_edges(node):
+                    if isinstance(e.dst, dace.nodes.AccessNode):
+                        if (isinstance(sdfg.arrays[e.dst.data], dace.data.Scalar) and
+                            e.dst.data in scalar_to_arr_map):
+                            an = state.add_access(scalar_to_arr_map[e.dst.data])
+                            edges_to_add.add((e.src, e.src_conn, an, None,dace.memlet.Memlet(expr=scalar_to_arr_map[e.dst.data])))
+                            edges_to_add.add((an, None, e.dst, e.dst_conn, dace.memlet.Memlet(expr=e.dst.data)))
+                            edges_to_rm.add(e)
+                            d[node, e.dst.data] = scalar_to_arr_map[e.dst.data]
+
+            for e in edges_to_rm:
+                state.remove_edge(e)
+            for e in edges_to_add:
+                state.add_edge(*e)
+
+            for (node, src), dst in d.items():
+                replace_connectors_and_data(state, node, src, dst)
+
+
+scalar_to_length_one_array(sdfg)
+sdfg.validate()
+
 if Path("to_gpu_velocity.sdfgz").exists():
     sdfg = sdfg.from_file("to_gpu_velocity.sdfgz")
 else:
@@ -48,8 +138,14 @@ else:
     sdfg.apply_transformations_repeated(MapCollapse, validate=False)
     if save_steps:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
+
+    s_a_map = scalar_to_length_one_array(sdfg)
+
     sdfg.apply_gpu_transformations(validate=False, simplify=False,
                                    dont_copy_structs=True, host_data=[k for k, v in sdfg.arrays.items() if isinstance(v, dace.data.Scalar)])
+
+    replace_gpu_scalar_outputs(sdfg, s_a_map)
+
     put_host_prefixed_data_back_to_cpu(sdfg)
     if save_steps:
         sdfg.save("to_gpu_velocity.sdfgz", compress=True)
@@ -401,7 +497,7 @@ if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("
                 ("single_state_body_0","single_state_body_map")])
 set_default_map_to_gpu(sdfg)
 pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
-#set_scalar_storage_to_register(sdfg)
+set_scalar_storage_to_register(sdfg)
 rename_symbol_connector(sdfg, "nflatlev_jg")
 set_view_lifetime_to_scope(sdfg)
 
@@ -415,61 +511,90 @@ def move_map_to_cpu(sdfg: dace.SDFG, state: dace.SDFGState, map_exit: dace.nodes
         diff_map = {}
         for e in state.in_edges(map_entry):
             if isinstance(e.src, dace.nodes.AccessNode):
+                # 1. For all input of MapEntry update the in and out connectors to be
+                #    Host prefixed of the data
+                if sdfg.arrays[e.src.data].storage == dace.dtypes.StorageType.GPU_Global:
+                    diff_map[e.src.data] = "host_" + e.src.data
+
                 src = e.src
-                ep1 = copy.deepcopy(e.dst_conn)
-                ep2 = copy.deepcopy(e.dst_conn).replace("IN_", "OUT_")
-                p1 = "IN_host_" + src.data
-                p2 = "OUT_host_" + src.data
-                e.dst_conn = "IN_host_" + src.data
-                for _e in state.out_edges(map_entry):
-                    if _e.src_conn == ep2:
-                        if p2 not in map_entry.out_connectors:
-                            _e.src_conn = p2
-                        else:
-                            p1 += "_2"
-                            p2 += "_2"
-                            _e.src_conn = p2
-                            e.dst_conn += "_2"
-                        #raise Exception(ep1, ep2, p1, p2)
-                map_entry.add_in_connector(p1)
-                map_entry.add_out_connector(p2)
-                map_entry.remove_in_connector(ep1)
-                map_entry.remove_out_connector(ep2)
-
-
                 while src is not None:
-                    print(state, src)
                     srcdata = src.data
+                    # If storage is GPU storage, and host not in array add
                     if sdfg.arrays[srcdata].storage == dace.dtypes.StorageType.GPU_Global:
-                        #src.data = f"host_{src.data}"
                         if f"host_{src.data}" not in sdfg.arrays:
                             arr2 = copy.deepcopy(sdfg.arrays[src.data])
                             arr2.storage = dace.dtypes.StorageType.CPU_Heap
                             sdfg.add_datadesc(f"host_{src.data}", arr2)
-                            #raise Exception(f"TODO {src.data} {node} {state}")
-                            for e in state.out_edges(src):
-                                if e.data.data == srcdata:
-                                    assert e.src_conn is None
-                                    an = state.add_access(f"host_{src.data}")
 
-                                    state.add_edge(src, None,
-                                                an, None, copy.deepcopy(e.data))
-                                    state.add_edge(an, None,
-                                                e.dst, e.dst_conn, copy.deepcopy(e.data))
-                                    state.remove_edge(e)
+                    if sdfg.arrays[srcdata].storage == dace.dtypes.StorageType.GPU_Global:
+                        if (isinstance(src, dace.nodes.AccessNode) and
+                            not isinstance(sdfg.arrays[src.data], dace.data.View) and
+                            state.in_degree(src) != 0
+                            ):
+                            # Insert a copy
+                            for __e in state.out_edges(src):
+                                assert __e.src_conn is None
+                                an = state.add_access(f"host_{src.data}")
+
+                                state.add_edge(src, None,
+                                            an, None, copy.deepcopy(__e.data))
+                                state.add_edge(an, None,
+                                            __e.dst, __e.dst_conn, copy.deepcopy(__e.data))
+                                state.remove_edge(__e)
                         else:
-                            for oe in state.out_edges(src):
-                                if oe.data.data == srcdata:
-                                    oe.data.data = f"host_{src.data}"
-                            diff_map[src.data] = f"host_{src.data}"
-                            src.data = "host_" + src.data
+                            if isinstance(sdfg.arrays[src.data], dace.data.View):
+                                for __e in state.out_edges(src):
+                                    if __e.data.data == srcdata:
+                                        assert __e.src_conn is None
+                                        an = state.add_access(f"host_{src.data}")
+
+                                        d = copy.deepcopy(__e.data)
+                                        d.data = an.data
+                                        ke = state.add_edge(an, None, __e.dst, __e.dst_conn, d)
+                                        for ie in state.in_edges(src):
+                                            state.add_edge(ie.src, ie.src_conn, an, ie.dst_conn, copy.deepcopy(ie.data))
+                                            if ie.dst_conn not in an.in_connectors:
+                                                an.add_in_connector(ie.dst_conn)
+                                            state.remove_edge(ie)
+                                        ke.data.data = f"host_{src.data}"
+                                        state.remove_edge(__e)
+                                        state.remove_node(src)
+                                        src = an
+                            else:
+                                for __e in state.out_edges(src):
+                                    if __e.data.data == srcdata:
+                                        assert __e.src_conn is None
+                                        an = state.add_access(f"host_{src.data}")
+
+                                        d = copy.deepcopy(__e.data)
+                                        d.data = an.data
+                                        state.add_edge(src, None,
+                                                    an, None, d)
+                                        d = copy.deepcopy(__e.data)
+                                        d.data = an.data
+                                        state.add_edge(an, None,
+                                                    __e.dst, __e.dst_conn, d)
+                                        state.remove_edge(__e)
+
                     if len(state.in_edges(src)) == 1 and isinstance(state.in_edges(src)[0].src, dace.nodes.AccessNode):
                         src = state.in_edges(src)[0].src
                     else:
                         src = None
+
         for e in state.all_edges(*state.all_nodes_between(map_entry, map_exit)):
             if e.data.data in diff_map:
                 e.data.data = diff_map[e.data.data]
+
+        # Hack, fix the memlets that have been turned incorrect
+        if state.label == "_state_l328_c328":
+            for e in state.edges():
+                src, src_conn, dst, dst_conn, data = e
+                if state.out_degree(dst) == 0 and isinstance(sdfg.arrays[dst.data], dace.data.View) and dst_conn == "views":
+                    e.data = dace.memlet.Memlet(expr=e.data.data)
+                    state.remove_node(dst)
+                    if state.out_degree(src) == 0:
+                        state.remove_node(src)
+
 
 
 def put_scalars_to_host(sdfg: dace.SDFG):
@@ -496,11 +621,11 @@ def put_scalars_to_host(sdfg: dace.SDFG):
 # Prob not needed anymore
 # set_top_level_default_storage_to_gpu_global(sdfg)
 # pad_access_node_between_map_and_view(sdfg)
-put_scalars_to_host(sdfg)
+# put_scalars_to_host(sdfg)
 
 if save_steps:
     sdfg.save("velocity_fixed.sdfgz", compress=True)
-#sdfg.validate()
+sdfg.validate()
 
 try:
     sdfg.compile(validate=False)
