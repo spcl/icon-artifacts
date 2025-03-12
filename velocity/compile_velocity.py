@@ -136,7 +136,10 @@ else:
     if save_steps:
         sdfg.save("flat_velocity.sdfgz", compress=True)
     sdfg.apply_transformations_repeated(LoopToMap, validate=False)
-    sdfg.apply_transformations_repeated(MapCollapse, validate=False)
+    sdfg.simplify(validate=False)
+    n = sdfg.apply_transformations_repeated(MapCollapse, validate=False)
+    print("Applied MapCollapse:", n)
+    #raise Exception(n)
     if save_steps:
         sdfg.save(f"map_velocity.sdfgz", compress=True)
 
@@ -469,29 +472,6 @@ def symbollify_gpu_scalars(sdfg: dace.SDFG):
             if isinstance(n, dace.nodes.NestedSDFG):
                 symbollify_gpu_scalars(n.sdfg)
 
-
-    """
-    for node in cfg.nodes():
-        #if isinstance(node, dace.nodes.AccessNode):
-
-        views_to_read = (entry.free_symbols & sdfg.arrays.keys()) - containers_to_read
-        view_assignments = {}
-        for rd in views_to_read:
-            rd_name = f"{rd}_map"
-            view_assignments[rd_name] = rd
-
-            rd_sym = symbolic.pystr_to_symbolic(rd)
-            rd_name_sym = symbolic.pystr_to_symbolic(rd_name)
-
-            for i in range(len(map_node.range)):
-            lb, up, st = map_node.range[i]
-            lb = lb.replace(rd_sym, rd_name_sym)
-            up = up.replace(rd_sym, rd_name_sym)
-            st = st.replace(rd_sym, rd_name_sym)
-            map_node.range[i] = (lb, up, st)
-        graph.add_state_before(body, "map_views", assignments=view_assignments)"
-    """
-
 def rename_on_if_conds(sdfg: dace.SDFG, src: str, dst: str):
     gpu_host_name_map = {src: dst}
 
@@ -523,7 +503,11 @@ def rename_on_if_conds(sdfg: dace.SDFG, src: str, dst: str):
 # Apply velocity tendencies specific "fix" transformations
 if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("single_state_body", "single_state_body_map"),
                 ("single_state_body_1", "single_state_body_map"),
-                ("single_state_body_0","single_state_body_map")])
+                ("single_state_body_0","single_state_body_map"),
+                ("single_state_body_1", "single_state_body_1_map"),
+                ("single_state_body","single_state_body_0_map"),
+                ("single_state_body_0", "single_state_body_0_map"),
+                ("single_state_body_1", "single_state_body_2_map")])
 set_default_map_to_gpu(sdfg)
 pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
 set_scalar_storage_to_register(sdfg)
@@ -532,7 +516,6 @@ set_view_lifetime_to_scope(sdfg)
 rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
 if save_steps:
     sdfg.save("complete.sdfgz", compress=True)
-#symbollify_gpu_scalars(sdfg)
 
 def move_map_to_cpu(sdfg: dace.SDFG, state: dace.SDFGState, map_exit: dace.nodes.MapExit, node: dace.nodes.AccessNode):
     map_entry = [v for v in state.nodes() if isinstance(v, dace.nodes.MapEntry) and v.map == map_exit.map][0]
