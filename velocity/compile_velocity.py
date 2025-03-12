@@ -494,8 +494,6 @@ def symbollify_gpu_scalars(sdfg: dace.SDFG):
 
 def rename_on_if_conds(sdfg: dace.SDFG, src: str, dst: str):
     gpu_host_name_map = {src: dst}
-    assert "vcflmax" in gpu_host_name_map
-    assert "host_vcflmax" == gpu_host_name_map["vcflmax"]
 
     for node, parent in sdfg.all_nodes_recursive():
         if not isinstance(node, ConditionalBlock):
