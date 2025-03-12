@@ -11,8 +11,10 @@ from dace.transformation.interstate import LoopToMap
 from dace.transformation.interstate import LoopNormalize
 from dace.transformation.interstate import ContinueToCondition
 from dace.transformation.passes import SymbolPropagation
+from dace.transformation.dataflow import AugAssignToWCR
 from dace.sdfg.state import LoopRegion, ContinueBlock, ConditionalBlock
 from dace.sdfg.utils import inline_control_flow_regions
+
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfg")
@@ -65,9 +67,8 @@ for node, state in sdfg.all_nodes_recursive():
         loops_prev += 1
 
 # Apply transformations
-
-if Path("s2cg.sdfg").exists():
-    sdfg = dace.SDFG.from_file("s2cg.sdfg")
+if Path("pipe.sdfg").exists():
+    sdfg = dace.SDFG.from_file("pipe.sdfg")
 else:
   StructToContainerGroups(
       save_steps=False,
@@ -76,11 +77,7 @@ else:
       interface_with_struct_copy=True,
       interface_to_gpu=False,
   ).apply_pass(sdfg, {})
-  sdfg.save("s2cg.sdfg")
 
-if Path("dca.sdfg").exists():
-    sdfg = dace.SDFG.from_file("dca.sdfg")
-else:
   sdfg.simplify()
   sdfg.apply_transformations_repeated(ContinueToCondition)
   sdfg.simplify()
@@ -95,9 +92,9 @@ else:
   make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
   make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
 
-  sdfg.save("dca.sdfg")
+  sdfg.simplify()
+  sdfg.save("pipe.sdfg")
 
-sdfg.simplify()
 
 sdfg.apply_transformations_repeated(LoopToMap)
 # sdfg.apply_transformations_repeated(LoopToMap)
