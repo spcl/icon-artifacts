@@ -65,30 +65,42 @@ for node, state in sdfg.all_nodes_recursive():
         loops_prev += 1
 
 # Apply transformations
-StructToContainerGroups(
-    save_steps=False,
-    verbose=False,
-    simplify=False,
-    interface_with_struct_copy=True,
-    interface_to_gpu=False,
-).apply_pass(sdfg, {})
 
+if Path("s2cg.sdfg").exists():
+    sdfg = dace.SDFG.from_file("s2cg.sdfg")
+else:
+  StructToContainerGroups(
+      save_steps=False,
+      verbose=False,
+      simplify=False,
+      interface_with_struct_copy=True,
+      interface_to_gpu=False,
+  ).apply_pass(sdfg, {})
+  sdfg.save("s2cg.sdfg")
 
-sdfg.apply_transformations_repeated(ContinueToCondition)
-sdfg.apply_transformations_repeated(LoopNormalize)
-# SymbolPropagation().apply_pass(sdfg, {})
-# sdfg.simplify()
+if Path("dca.sdfg").exists():
+    sdfg = dace.SDFG.from_file("dca.sdfg")
+else:
+  sdfg.simplify()
+  sdfg.apply_transformations_repeated(ContinueToCondition)
+  sdfg.simplify()
+  sdfg.apply_transformations_repeated(LoopNormalize)
+  sdfg.simplify()
+  SymbolPropagation().apply_pass(sdfg, {})
+  sdfg.simplify()
 
-# XXX: Order is important!
-make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
-make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
-make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
+  # XXX: Order is important!
+  make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+  make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
+  make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
+  make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
 
+  sdfg.save("dca.sdfg")
 
+sdfg.simplify()
+
+sdfg.apply_transformations_repeated(LoopToMap)
 # sdfg.apply_transformations_repeated(LoopToMap)
-# sdfg.apply_transformations_repeated(LoopToMap)
-# print("LoopToMap applied")
 
 # How many now?
 loops_post = 0
@@ -232,4 +244,4 @@ for want in want_files:
     os.remove(want)
 
 # remove the .dacecache folder
-# shutil.rmtree(build_loc)
+shutil.rmtree(build_loc)
