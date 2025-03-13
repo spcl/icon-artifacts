@@ -798,6 +798,7 @@ class MaxReduce(CodeLibraryNode):
     def generate_code(self, inputs, outputs):
         return self.code
 
+
 def replace_loop_with_max_reduction(sdfg: dace.SDFG, loop_name: str):
     loop_node = None
     for node, state in sdfg.all_nodes_recursive():
@@ -814,15 +815,22 @@ def replace_loop_with_max_reduction(sdfg: dace.SDFG, loop_name: str):
         // Max reduce
         // TODO: Implement max reduce
         // End of max reduce
-        """
+        """,
     )
     red_lib_node.schedule = dace.ScheduleType.GPU_Device
     red_state.add_node(red_lib_node)
-    red_state.add_edge(red_state.add_read("vcflmax"), None, red_lib_node, "in_arr", dace.Memlet("vcflmax"))
-    
+    red_state.add_edge(
+        red_state.add_read("vcflmax"),
+        None,
+        red_lib_node,
+        "in_arr",
+        dace.Memlet("vcflmax"),
+    )
+
     post_state = sdfg.add_state_after(loop_node)
     sdfg.remove_node(loop_node)
     sdfg.add_edge(red_state, post_state, dace.InterstateEdge())
+
 
 # Replace cpp with cu
 def replace_cpp_with_cu(directory):
@@ -853,7 +861,7 @@ else:
     SymbolPropagation().apply_pass(sdfg, {})
     sdfg.simplify()  # w/o ArrayElimination
 
-    scalar_to_length_one_array(sdfg)
+    # scalar_to_length_one_array(sdfg)
     sdfg.validate()
 
     StructToContainerGroups(
@@ -879,8 +887,8 @@ if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
     sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
-    sdfg.apply_transformations_repeated(MapCollapse)
-    sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
+    # sdfg.apply_transformations_repeated(MapCollapse)
+    # sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
 
     s_a_map = scalar_to_length_one_array(sdfg)
     sdfg.apply_gpu_transformations(
@@ -908,23 +916,23 @@ else:
         sdfg, {"wrap_list": ["T_l467_c467", "T_l472_c472"]}
     )
 
-    if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(
-        sdfg,
-        labels=[
-            ("single_state_body", "single_state_body_map"),
-            ("single_state_body_1", "single_state_body_map"),
-            ("single_state_body_0", "single_state_body_map"),
-            ("single_state_body_1", "single_state_body_1_map"),
-            ("single_state_body", "single_state_body_0_map"),
-            ("single_state_body_0", "single_state_body_0_map"),
-            ("single_state_body_1", "single_state_body_2_map"),
-        ],
-    )
-    set_default_map_to_gpu(sdfg)
-    pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
-    set_scalar_storage_to_register(sdfg)
-    rename_symbol_connector(sdfg, "nflatlev_jg")
-    set_view_lifetime_to_scope(sdfg)
+    # if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(
+    #     sdfg,
+    #     labels=[
+    #         ("single_state_body", "single_state_body_map"),
+    #         ("single_state_body_1", "single_state_body_map"),
+    #         ("single_state_body_0", "single_state_body_map"),
+    #         ("single_state_body_1", "single_state_body_1_map"),
+    #         ("single_state_body", "single_state_body_0_map"),
+    #         ("single_state_body_0", "single_state_body_0_map"),
+    #         ("single_state_body_1", "single_state_body_2_map"),
+    #     ],
+    # )
+    # set_default_map_to_gpu(sdfg)
+    # pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
+    # set_scalar_storage_to_register(sdfg)
+    # rename_symbol_connector(sdfg, "nflatlev_jg")
+    # set_view_lifetime_to_scope(sdfg)
     # rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
     replace_loop_with_max_reduction(sdfg, "FOR_l_568_c_568")
 
