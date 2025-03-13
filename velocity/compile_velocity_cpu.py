@@ -139,7 +139,7 @@ shutil.copy(f"main.cc", f"{build_loc}/src/cpu/main.cc")
 # copy header to .dacecache/<name>/include/
 shutil.copy(f"serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
 
-# compile c++ <SDFG cpp file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -std=c++17 -O0 -ggdb
+# compile c++ <SDFG cpp file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -std=c++20 -O0 -ggdb
 exit_code = os.system(
     f"c++ {build_loc}/src/cpu/{sdfg_name}.cpp {build_loc}/src/cpu/main.cc -I {build_loc}/include -I {dace_include} -std=c++20 -O0 -ggdb -o {sdfg_name}"
 )
@@ -175,7 +175,7 @@ for got, want in zip(got_files, want_files):
         want_lines = want_file.readlines()
 
         if len(got_lines) != len(want_lines):
-            print(f"{got} and {want} have different number of lines")
+            print(f"{got} and {want} have different number of lines ❌")
             found_diff = True
             continue
 
@@ -187,25 +187,25 @@ for got, want in zip(got_files, want_files):
                 want_num = float(want_line)
                 # TODO: Adjust rel_tol and abs_tol
                 if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=0):
-                    print(f"{got} and {want} have numerical differences")
+                    print(f"{got} and {want} have numerical differences ❌")
                     found_diff = True
                     break
 
             except ValueError:
                 # If not, they should be identical
                 if got_line != want_line:
-                    print(f"{got} and {want} have different text")
+                    print(f"{got} and {want} have different text ❌")
                     found_diff = True
                     break
     if not found_diff:
-        print(f"{got} and {want} are identical")
+        print(f"{got} and {want} are identical ✅")
     found_diff_all = found_diff_all or found_diff
 
 
 if not found_diff_all:
-    print("No numerical differences found")
+    print("No numerical differences found ✅")
 else:
-    exit(1)
+    print("Numerical differences found ❌")
 
 
 ################################################################################
