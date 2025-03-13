@@ -1,29 +1,32 @@
-import ast
-import copy
 from pathlib import Path
-import subprocess
 import dace
 import shutil
 import os
-from dace.codegen.control_flow import ConditionalBlock, ControlFlowRegion
-from dace.properties import CodeBlock
+import math
+import ast
+import copy
+from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.dataflow import MapCollapse
-from dace.transformation.passes.duplicate_const_arrays import DuplicateConstArrays
-from dace.transformation.passes.struct_to_container_group import StructToContainerGroups
-from dace.transformation.interstate import LoopToMap
+from dace.transformation.passes import (
+    SymbolPropagation,
+    StructToContainerGroups,
+    DuplicateConstArrays,
+)
+from dace.sdfg.state import LoopRegion, ConditionalBlock, ControlFlowRegion
 
-header_dict = {"velocity_tendencies": "serde_velocity.h"}
-main_dict = {"velocity_tendencies": "main_gpu.cc"}
-path = "velocity.sdfgz"
-save_steps = True
+use_cache = True
+run_benchmark = False
+save_steps = False
 
 # Load SDFG
-sdfg = dace.SDFG.from_file(path)
-
+sdfg = dace.SDFG.from_file("velocity.sdfg")
+sdfg.validate()
 
 ################################################################################
-### Apply Optimizations
+### Fixing Functions
 ################################################################################
+
+
 # Put host data back to CPU_Heap (library outputs are transient and are always put to GPU)
 def put_host_prefixed_data_back_to_cpu(sdfg):
     for arr_name, arr in sdfg.arrays.items():
@@ -63,9 +66,6 @@ def scalar_to_length_one_array(sdfg):
             sdfg.remove_data(arr_name, validate=False)
             sdfg.add_datadesc(arr_name, arr)
     return scalar_to_arr_map
-
-
-from dace.sdfg import utils as sdutil
 
 
 def replace_connectors_and_data(
@@ -158,54 +158,39 @@ def replace_gpu_scalar_outputs(sdfg: dace.SDFG, scalar_to_arr_map: dace.Dict[str
                 replace_connectors_and_data(state, node, src, dst)
 
 
-scalar_to_length_one_array(sdfg)
-sdfg.validate()
-
-if Path("to_gpu_velocity.sdfgz").exists():
-    sdfg = sdfg.from_file("to_gpu_velocity.sdfgz")
-else:
-    StructToContainerGroups(
-        save_steps=False,
-        verbose=False,
-        simplify=False,
-        interface_with_struct_copy=True,
-        interface_to_gpu=True,
-    ).apply_pass(sdfg, {})
-    if save_steps:
-        sdfg.save("flat_velocity.sdfgz", compress=True)
-    sdfg.apply_transformations_repeated(LoopToMap, validate=False)
-    sdfg.simplify(validate=False)
-    n = sdfg.apply_transformations_repeated(MapCollapse, validate=False)
-    print("Applied MapCollapse:", n)
-    # raise Exception(n)
-    if save_steps:
-        sdfg.save(f"map_velocity.sdfgz", compress=True)
-
-    s_a_map = scalar_to_length_one_array(sdfg)
-
-    sdfg.apply_gpu_transformations(
-        validate=False,
-        simplify=False,
-        dont_copy_structs=True,
-        host_data=[
-            k for k, v in sdfg.arrays.items() if isinstance(v, dace.data.Scalar)
-        ],
+def make_array_loop_local(sdfg: dace.SDFG, array_name, loop_name):
+    """
+    Renames an array in the loop, so it's only accessed in the loop. You need to make sure that the array is not accessed outside of the loop (or written before read outside of the loop).
+    """
+    # Find the loop
+    loop = None
+    for node, _ in sdfg.all_nodes_recursive():
+        if isinstance(node, LoopRegion) and node.label == loop_name:
+            loop = node
+            break
+    assert loop is not None
+    # Creat a new array
+    assert array_name in sdfg.arrays
+    array = sdfg.arrays[array_name]
+    new_name, _ = sdfg.add_array(
+        f"{array_name}_local",
+        shape=array.shape,
+        dtype=array.dtype,
+        storage=array.storage,
+        location=array.location,
+        transient=array.transient,
+        strides=array.strides,
+        offset=array.offset,
+        lifetime=array.lifetime,
+        debuginfo=array.debuginfo,
+        allow_conflicts=array.allow_conflicts,
+        total_size=array.total_size,
+        find_new_name=True,
+        alignment=array.alignment,
+        may_alias=array.may_alias,
     )
-
-    replace_gpu_scalar_outputs(sdfg, s_a_map)
-
-    put_host_prefixed_data_back_to_cpu(sdfg)
-    if save_steps:
-        sdfg.save("to_gpu_velocity.sdfgz", compress=True)
-
-for arr_name, arr in sdfg.arrays.items():
-    if "gpu_" + arr_name in sdfg.arrays:
-        arr.storage = dace.dtypes.StorageType.CPU_Heap
-
-# The task lists are the tasklets that need to be wrapped in a single-state GPU map even after applying array duplication
-DuplicateConstArrays().apply_pass(sdfg, {"wrap_list": ["T_l467_c467", "T_l472_c472"]})
-if save_steps:
-    sdfg.save("arrays_duplicated_velocity.sdfgz", compress=True)
+    # Replace each occurrence of the array in the loop
+    loop.replace(array_name, new_name)
 
 
 # Does what the title says
@@ -649,29 +634,6 @@ def rename_on_if_conds(sdfg: dace.SDFG, src: str, dst: str):
                     b[0].code = b[0].code.replace(src, dst)
 
 
-# Apply velocity tendencies specific "fix" transformations
-if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(
-    sdfg,
-    labels=[
-        ("single_state_body", "single_state_body_map"),
-        ("single_state_body_1", "single_state_body_map"),
-        ("single_state_body_0", "single_state_body_map"),
-        ("single_state_body_1", "single_state_body_1_map"),
-        ("single_state_body", "single_state_body_0_map"),
-        ("single_state_body_0", "single_state_body_0_map"),
-        ("single_state_body_1", "single_state_body_2_map"),
-    ],
-)
-set_default_map_to_gpu(sdfg)
-pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
-set_scalar_storage_to_register(sdfg)
-rename_symbol_connector(sdfg, "nflatlev_jg")
-set_view_lifetime_to_scope(sdfg)
-rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
-if save_steps:
-    sdfg.save("complete.sdfgz", compress=True)
-
-
 def move_map_to_cpu(
     sdfg: dace.SDFG,
     state: dace.SDFGState,
@@ -823,60 +785,6 @@ def put_scalars_to_host(sdfg: dace.SDFG):
                             move_map_to_cpu(sdfg, state, e.src, node)
 
 
-# raise Exception("we")
-# Prob not needed anymore
-# set_top_level_default_storage_to_gpu_global(sdfg)
-# pad_access_node_between_map_and_view(sdfg)
-# put_scalars_to_host(sdfg)
-
-if save_steps:
-    sdfg.save("velocity_fixed.sdfgz", compress=True)
-sdfg.validate()
-
-try:
-    sdfg.compile(validate=False)
-except Exception as e:
-    print("Code is still not compiling!")
-    raise e
-
-# Simplifying makes it invalid again...
-# sdfg.simplify(validate=True)
-# if save_steps:
-#    sdfg.save("velocity_final.sdfgz", compress=True)
-
-################################################################################
-### Compile the (optimized) SDFG with alterations
-################################################################################
-
-# get build location and dace location
-build_loc = sdfg.build_folder
-sdfg_name = sdfg.name
-dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
-
-# copy main_cpp_file to .dacecache/<name>/src/cpu/
-main_name = main_dict[sdfg_name]
-shutil.copy(f"{main_name}", f"{build_loc}/src/cpu/{main_name}")
-
-# change the line "constexpr char ROOT[] ="
-# to contain "<path to this script>/inputs/<name>/"
-input_folder = os.path.dirname(os.path.realpath(__file__)) + "/inputs"
-with open(f"{build_loc}/src/cpu/{main_name}", "r") as file:
-    lines = file.readlines()
-with open(f"{build_loc}/src/cpu/{main_name}", "w") as file:
-    for line in lines:
-        if line.startswith("constexpr char ROOT[] ="):
-            file.write(f'constexpr char ROOT[] = "{input_folder}/{sdfg_name}/";\n')
-        else:
-            file.write(line)
-
-# copy header to .dacecache/<name>/include/
-header_name = header_dict[sdfg_name]
-shutil.copy(f"{header_name}", f"{build_loc}/include/{header_name}")
-
-# compile c++ <SDFG cpp file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -std=c++17 -O0 -ggdb
-# But CUDA version this time
-
-
 # Replace cpp with cu
 def replace_cpp_with_cu(directory):
     directory = Path(directory)  # Convert to Path object
@@ -890,39 +798,220 @@ def replace_cpp_with_cu(directory):
         print(f"Renamed: {file} -> {new_name}")
 
 
+################################################################################
+### Apply Optimizations
+################################################################################
+
+
+# Apply transformations
+if Path("gpu_pipe_stage1.sdfg").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfg")
+else:
+    scalar_to_length_one_array(sdfg)
+    sdfg.validate()
+
+    StructToContainerGroups(
+        save_steps=False,
+        verbose=False,
+        simplify=False,
+        interface_with_struct_copy=True,
+        interface_to_gpu=True,
+    ).apply_pass(sdfg, {})
+
+    sdfg.apply_transformations_repeated(LoopToMap, validate=False)
+    sdfg.simplify(validate=False)
+    sdfg.apply_transformations_repeated(MapCollapse, validate=False)
+
+    s_a_map = scalar_to_length_one_array(sdfg)
+    sdfg.apply_gpu_transformations(
+        validate=False,
+        simplify=False,
+        dont_copy_structs=True,
+        host_data=[
+            k for k, v in sdfg.arrays.items() if isinstance(v, dace.data.Scalar)
+        ],
+    )
+
+    replace_gpu_scalar_outputs(sdfg, s_a_map)
+    put_host_prefixed_data_back_to_cpu(sdfg)
+    if use_cache:
+        sdfg.save("gpu_pipe_stage1.sdfg")
+
+if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("gpu_pipe_stage2.sdfg")
+else:
+    for arr_name, arr in sdfg.arrays.items():
+        if "gpu_" + arr_name in sdfg.arrays:
+            arr.storage = dace.dtypes.StorageType.CPU_Heap
+    # The task lists are the tasklets that need to be wrapped in a single-state GPU map even after applying array duplication
+    DuplicateConstArrays().apply_pass(
+        sdfg, {"wrap_list": ["T_l467_c467", "T_l472_c472"]}
+    )
+
+    if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(
+        sdfg,
+        labels=[
+            ("single_state_body", "single_state_body_map"),
+            ("single_state_body_1", "single_state_body_map"),
+            ("single_state_body_0", "single_state_body_map"),
+            ("single_state_body_1", "single_state_body_1_map"),
+            ("single_state_body", "single_state_body_0_map"),
+            ("single_state_body_0", "single_state_body_0_map"),
+            ("single_state_body_1", "single_state_body_2_map"),
+        ],
+    )
+    set_default_map_to_gpu(sdfg)
+    pass_name_as_array_not_as_symbol(sdfg, sdfg, None, "levmask")
+    set_scalar_storage_to_register(sdfg)
+    rename_symbol_connector(sdfg, "nflatlev_jg")
+    set_view_lifetime_to_scope(sdfg)
+    rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
+
+    if use_cache:
+        sdfg.save("gpu_pipe_stage2.sdfg")
+
+
+sdfg.validate()
+sdfg.instrument = dace.InstrumentationType.Timer
+
+################################################################################
+### Compile the (optimized) SDFG with alterations
+################################################################################
+
+# get build location and dace location
+build_loc = sdfg.build_folder
+sdfg_name = sdfg.name
+dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
+
+# remove the .dacecache folder
+shutil.rmtree(build_loc, ignore_errors=True)
+
+# Generate code
+try:
+    sdfg.compile()
+except Exception as e:
+    pass
+
+# TODO: Make manual changes to the generated code if necessary
+
+# compile the SDFG
+sdfg._regenerate_code = False
+sdfg.compile()
+
+# copy main_cpp_file to .dacecache/<name>/src/cpu/
+shutil.copy(f"main_gpu.cc", f"{build_loc}/src/cpu/main.cu")
+
+# copy header to .dacecache/<name>/include/
+shutil.copy(f"serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
+
 # To avoid link issues fastly for CUDA libs and have cuda compiler definition
 replace_cpp_with_cu(build_loc)
 
-os.system(
-    f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu \
-{build_loc}/src/cpu/{main_name.replace('.cc', '.cu')} -I {build_loc}/include -I {dace_include} \
--Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=native -O0 -o {sdfg_name}"
+# compile nvcc <SDFG cpp file> <SDFG cuda file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=native -O0 -w
+exit_code = os.system(
+    f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu {build_loc}/src/cpu/main.cu -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=native -O0 -w -o {sdfg_name}"
 )
 
-run = False
+# check if compilation was successful
+if exit_code != 0:
+    print("Compilation failed")
+    exit(1)
 
-if run:
-    os.system(f"./{sdfg_name}")
 
-    got_files = [f for f in os.listdir() if f.endswith(".got")]
+################################################################################
+### Execute and compare .got and .want files
+################################################################################
 
-    for got_file in got_files:
-        want_file = got_file.replace(".got", ".want")
+# execute the compiled program
+exit_code = os.system(f"./{sdfg_name}")
 
-        if os.path.isfile(want_file):
-            print(f"Comparing {got_file} with {want_file}...")
-            result = subprocess.run(
-                ["diff", got_file, want_file], capture_output=True, text=True
-            )
+# check if execution was successful
+if exit_code != 0:
+    print("Execution failed")
+    exit(1)
 
-            if result.stdout:  # If there's a difference
-                print("Verification failed")
-                with open(got_file + ".out", "w") as f:
-                    f.write(result.stdout)
-                if result.stderr:  # If there's an error
-                    with open(got_file + ".err", "w") as f:
-                        f.write(result.stderr)
-            else:
-                print("All good")
-        else:
-            print(f"Warning: No matching .want file for {got_file}")
+# Get list of .got and .want files
+got_files = [f for f in os.listdir() if f.endswith(".got")]
+want_files = [f.replace(".got", ".want") for f in got_files]
+
+# Compare each .got file with its corresponding .want file
+found_diff_all = False
+for got, want in zip(got_files, want_files):
+    found_diff = False
+    with open(got, "r") as got_file, open(want, "r") as want_file:
+        got_lines = got_file.readlines()
+        want_lines = want_file.readlines()
+
+        if len(got_lines) != len(want_lines):
+            print(f"{got} and {want} have different number of lines ❌")
+            found_diff = True
+            continue
+
+        # lines containing text should be identical, lines containing numbers should be close
+        for got_line, want_line in zip(got_lines, want_lines):
+            # Are the lines floating point numbers?
+            try:
+                got_num = float(got_line)
+                want_num = float(want_line)
+                # TODO: Adjust rel_tol and abs_tol
+                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=1e-10):
+                    print(f"{got} and {want} have numerical differences ❌")
+                    found_diff = True
+                    break
+
+            except ValueError:
+                # If not, they should be identical
+                if got_line != want_line:
+                    print(f"{got} and {want} have different text ❌")
+                    found_diff = True
+                    break
+    if not found_diff:
+        print(f"{got} and {want} are identical ✅")
+    found_diff_all = found_diff_all or found_diff
+
+
+if not found_diff_all:
+    print("No numerical differences found ✅")
+else:
+    print("Numerical differences found ❌")
+
+
+################################################################################
+### Measure performance
+################################################################################
+
+if run_benchmark:
+    # Warmup
+    for i in range(10):
+        os.system(f"./{sdfg_name}")
+
+    # Measure
+    times = []
+    for i in range(10):
+        sdfg.clear_instrumentation_reports()
+        os.system(f"./{sdfg_name}")
+        report = sdfg.get_latest_report()
+        assert report.events[-1].name == f"SDFG {sdfg.name}"
+        time = report.events[-1].duration  # in us
+        times.append(time)
+
+    for time in times:
+        print(f"GPU,{time}")
+
+################################################################################
+### Cleanup
+################################################################################
+
+# remove the compiled program
+os.remove(sdfg_name)
+
+# remove the .got files
+for got in got_files:
+    os.remove(got)
+
+# remove the .want files
+for want in want_files:
+    os.remove(want)
+
+# remove the .dacecache folder
+shutil.rmtree(build_loc)
