@@ -70,38 +70,38 @@ for node, state in sdfg.all_nodes_recursive():
 if Path("pipe_stage1.sdfg").exists():
     sdfg = dace.SDFG.from_file("pipe_stage1.sdfg")
 else:
-  StructToContainerGroups(
-      save_steps=False,
-      verbose=False,
-      simplify=False,
-      interface_with_struct_copy=True,
-      interface_to_gpu=False,
-  ).apply_pass(sdfg, {})
+    StructToContainerGroups(
+        save_steps=False,
+        verbose=False,
+        simplify=False,
+        interface_with_struct_copy=True,
+        interface_to_gpu=False,
+    ).apply_pass(sdfg, {})
 
-  sdfg.simplify() # w/o ArrayElimination
-  sdfg.apply_transformations_repeated(ContinueToCondition)
-  sdfg.simplify() # w/o ArrayElimination
-  # sdfg.apply_transformations_repeated(LoopNormalize)
-  # sdfg.simplify() # w/o ArrayElimination
-  SymbolPropagation().apply_pass(sdfg, {})
-  sdfg.simplify() # w/o ArrayElimination
+    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.apply_transformations_repeated(ContinueToCondition)
+    sdfg.simplify()  # w/o ArrayElimination
+    # sdfg.apply_transformations_repeated(LoopNormalize)
+    # sdfg.simplify() # w/o ArrayElimination
+    SymbolPropagation().apply_pass(sdfg, {})
+    sdfg.simplify()  # w/o ArrayElimination
 
-  # XXX: Order is important!
-  make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-  make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
-  make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
-  make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
+    # XXX: Order is important!
+    make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
+    make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
+    make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
 
-  sdfg.simplify() # w/o ArrayElimination
-  sdfg.save("pipe_stage1.sdfg")
+    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.save("pipe_stage1.sdfg")
 
 if Path("pipe_stage2.sdfg").exists():
     sdfg = dace.SDFG.from_file("pipe_stage2.sdfg")
 else:
-  # sdfg.apply_transformations_repeated(AugAssignToWCR)
-  sdfg.apply_transformations_repeated(LoopToMap)
-  sdfg.simplify() # w/o ArrayElimination & InlineSDFGs
-  sdfg.save("pipe_stage2.sdfg")
+    # sdfg.apply_transformations_repeated(AugAssignToWCR)
+    sdfg.apply_transformations_repeated(LoopToMap)
+    sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
+    sdfg.save("pipe_stage2.sdfg")
 
 # How many now?
 loops_post = 0
