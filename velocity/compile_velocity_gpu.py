@@ -13,6 +13,8 @@ from dace.transformation.passes import (
     DuplicateConstArrays,
 )
 from dace.sdfg.state import LoopRegion, ConditionalBlock, ControlFlowRegion
+from dace.libraries.standard import CodeLibraryNode
+from dace.properties import make_properties, Property
 
 use_cache = True
 run_benchmark = False
@@ -36,7 +38,7 @@ def put_host_prefixed_data_back_to_cpu(sdfg):
             arr.storage = dace.dtypes.StorageType.CPU_Heap
 
 
-def scalar_to_length_one_array(sdfg):
+def scalar_to_length_one_array(sdfg: dace.SDFG):
     scalar_to_arr_map = {}
     add_arrays = set()
     for arr_name, arr in sdfg.arrays.items():
@@ -785,6 +787,43 @@ def put_scalars_to_host(sdfg: dace.SDFG):
                             move_map_to_cpu(sdfg, state, e.src, node)
 
 
+@make_properties
+class MaxReduce(CodeLibraryNode):
+    code = Property(dtype=str, default="", allow_none=False)
+
+    def __init__(self, name, input_names, output_names, code):
+        super().__init__(name=name, input_names=input_names, output_names=output_names)
+        self.code = code
+
+    def generate_code(self, inputs, outputs):
+        return self.code
+
+def replace_loop_with_max_reduction(sdfg: dace.SDFG, loop_name: str):
+    loop_node = None
+    for node, state in sdfg.all_nodes_recursive():
+        if node.label == loop_name:
+            loop_node = node
+            break
+    assert loop_node is not None
+    red_state = sdfg.add_state_before(loop_node)
+    red_lib_node = MaxReduce(
+        name="max_reduce",
+        input_names=["in_arr"],
+        output_names=[],
+        code="""
+        // Max reduce
+        // TODO: Implement max reduce
+        // End of max reduce
+        """
+    )
+    red_lib_node.schedule = dace.ScheduleType.GPU_Device
+    red_state.add_node(red_lib_node)
+    red_state.add_edge(red_state.add_read("vcflmax"), None, red_lib_node, "in_arr", dace.Memlet("vcflmax"))
+    
+    post_state = sdfg.add_state_after(loop_node)
+    sdfg.remove_node(loop_node)
+    sdfg.add_edge(red_state, post_state, dace.InterstateEdge())
+
 # Replace cpp with cu
 def replace_cpp_with_cu(directory):
     directory = Path(directory)  # Convert to Path object
@@ -807,6 +846,13 @@ def replace_cpp_with_cu(directory):
 if Path("gpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfg")
 else:
+    sdfg.apply_transformations_repeated(ContinueToCondition)
+    sdfg.simplify()  # w/o ArrayElimination
+    # sdfg.apply_transformations_repeated(LoopNormalize)
+    # sdfg.simplify() # w/o ArrayElimination
+    SymbolPropagation().apply_pass(sdfg, {})
+    sdfg.simplify()  # w/o ArrayElimination
+
     scalar_to_length_one_array(sdfg)
     sdfg.validate()
 
@@ -817,10 +863,24 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=True,
     ).apply_pass(sdfg, {})
+    sdfg.simplify()  # w/o ArrayElimination
 
-    sdfg.apply_transformations_repeated(LoopToMap, validate=False)
-    sdfg.simplify(validate=False)
-    sdfg.apply_transformations_repeated(MapCollapse, validate=False)
+    # XXX: Order is important!
+    make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
+    make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
+    make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
+    sdfg.simplify()  # w/o ArrayElimination
+    if use_cache:
+        sdfg.save("gpu_pipe_stage1.sdfg")
+
+if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("gpu_pipe_stage2.sdfg")
+else:
+    sdfg.apply_transformations_repeated(LoopToMap)
+    sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
+    sdfg.apply_transformations_repeated(MapCollapse)
+    sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
 
     s_a_map = scalar_to_length_one_array(sdfg)
     sdfg.apply_gpu_transformations(
@@ -835,10 +895,10 @@ else:
     replace_gpu_scalar_outputs(sdfg, s_a_map)
     put_host_prefixed_data_back_to_cpu(sdfg)
     if use_cache:
-        sdfg.save("gpu_pipe_stage1.sdfg")
+        sdfg.save("gpu_pipe_stage2.sdfg")
 
-if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("gpu_pipe_stage2.sdfg")
+if Path("gpu_pipe_stage3.sdfg").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("gpu_pipe_stage3.sdfg")
 else:
     for arr_name, arr in sdfg.arrays.items():
         if "gpu_" + arr_name in sdfg.arrays:
@@ -865,11 +925,18 @@ else:
     set_scalar_storage_to_register(sdfg)
     rename_symbol_connector(sdfg, "nflatlev_jg")
     set_view_lifetime_to_scope(sdfg)
-    rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
+    # rename_on_if_conds(sdfg, "vcflmax", "host_vcflmax")
+    replace_loop_with_max_reduction(sdfg, "FOR_l_568_c_568")
 
     if use_cache:
-        sdfg.save("gpu_pipe_stage2.sdfg")
+        sdfg.save("gpu_pipe_stage3.sdfg")
 
+# How many loops?
+loops_post = 0
+for node, state in sdfg.all_nodes_recursive():
+    if isinstance(node, LoopRegion):
+        loops_post += 1
+print(f"Loops remaining: {loops_post}")
 
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
