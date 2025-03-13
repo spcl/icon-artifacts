@@ -1,20 +1,14 @@
-import copy
 from pathlib import Path
-import subprocess
 import dace
 import shutil
 import os
 import math
-from dace.transformation.passes.duplicate_const_arrays import DuplicateConstArrays
-from dace.transformation.passes.struct_to_container_group import StructToContainerGroups
-from dace.transformation.interstate import LoopToMap
-from dace.transformation.interstate import LoopNormalize
-from dace.transformation.interstate import ContinueToCondition
-from dace.transformation.passes import SymbolPropagation
-from dace.transformation.dataflow import AugAssignToWCR
-from dace.sdfg.state import LoopRegion, ContinueBlock, ConditionalBlock
-from dace.sdfg.utils import inline_control_flow_regions
+from dace.transformation.interstate import LoopToMap, ContinueToCondition
+from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
+from dace.sdfg.state import LoopRegion
 
+use_cache = True
+run_benchmark = False
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfg")
@@ -67,8 +61,8 @@ for node, state in sdfg.all_nodes_recursive():
         loops_prev += 1
 
 # Apply transformations
-if Path("pipe_stage1.sdfg").exists():
-    sdfg = dace.SDFG.from_file("pipe_stage1.sdfg")
+if Path("cpu_pipe_stage1.sdfg").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfg")
 else:
     StructToContainerGroups(
         save_steps=False,
@@ -93,15 +87,17 @@ else:
     make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
 
     sdfg.simplify()  # w/o ArrayElimination
-    sdfg.save("pipe_stage1.sdfg")
+    if use_cache:
+        sdfg.save("cpu_pipe_stage1.sdfg")
 
-if Path("pipe_stage2.sdfg").exists():
-    sdfg = dace.SDFG.from_file("pipe_stage2.sdfg")
+if Path("cpu_pipe_stage2.sdfg").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfg")
 else:
     # sdfg.apply_transformations_repeated(AugAssignToWCR)
     sdfg.apply_transformations_repeated(LoopToMap)
     sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
-    sdfg.save("pipe_stage2.sdfg")
+    if use_cache:
+        sdfg.save("cpu_pipe_stage2.sdfg")
 
 # How many now?
 loops_post = 0
@@ -216,22 +212,23 @@ else:
 ### Measure performance
 ################################################################################
 
-# # Warmup
-# for i in range(10):
-#     os.system(f"./{sdfg_name}")
+if run_benchmark:
+    # Warmup
+    for i in range(10):
+        os.system(f"./{sdfg_name}")
 
-# # Measure
-# times = []
-# for i in range(10):
-#     sdfg.clear_instrumentation_reports()
-#     os.system(f"./{sdfg_name}")
-#     report = sdfg.get_latest_report()
-#     assert report.events[-1].name == f"SDFG {sdfg.name}"
-#     time = report.events[-1].duration # in us
-#     times.append(time)
+    # Measure
+    times = []
+    for i in range(10):
+        sdfg.clear_instrumentation_reports()
+        os.system(f"./{sdfg_name}")
+        report = sdfg.get_latest_report()
+        assert report.events[-1].name == f"SDFG {sdfg.name}"
+        time = report.events[-1].duration  # in us
+        times.append(time)
 
-# for time in times:
-#     print(f"CPU,{time}")
+    for time in times:
+        print(f"CPU,{time}")
 
 ################################################################################
 ### Cleanup
