@@ -67,8 +67,8 @@ for node, state in sdfg.all_nodes_recursive():
         loops_prev += 1
 
 # Apply transformations
-if Path("pipe.sdfg").exists():
-    sdfg = dace.SDFG.from_file("pipe.sdfg")
+if Path("pipe_stage1.sdfg").exists():
+    sdfg = dace.SDFG.from_file("pipe_stage1.sdfg")
 else:
   StructToContainerGroups(
       save_steps=False,
@@ -78,13 +78,13 @@ else:
       interface_to_gpu=False,
   ).apply_pass(sdfg, {})
 
-  sdfg.simplify()
+  sdfg.simplify() # w/o ArrayElimination
   sdfg.apply_transformations_repeated(ContinueToCondition)
-  sdfg.simplify()
-  sdfg.apply_transformations_repeated(LoopNormalize)
-  sdfg.simplify()
+  sdfg.simplify() # w/o ArrayElimination
+  # sdfg.apply_transformations_repeated(LoopNormalize)
+  # sdfg.simplify() # w/o ArrayElimination
   SymbolPropagation().apply_pass(sdfg, {})
-  sdfg.simplify()
+  sdfg.simplify() # w/o ArrayElimination
 
   # XXX: Order is important!
   make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
@@ -92,22 +92,26 @@ else:
   make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
   make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
 
-  sdfg.simplify()
-  sdfg.save("pipe.sdfg")
+  sdfg.simplify() # w/o ArrayElimination
+  sdfg.save("pipe_stage1.sdfg")
 
-
-sdfg.apply_transformations_repeated(LoopToMap)
-# sdfg.apply_transformations_repeated(LoopToMap)
+if Path("pipe_stage2.sdfg").exists():
+    sdfg = dace.SDFG.from_file("pipe_stage2.sdfg")
+else:
+  # sdfg.apply_transformations_repeated(AugAssignToWCR)
+  sdfg.apply_transformations_repeated(LoopToMap)
+  sdfg.simplify() # w/o ArrayElimination & InlineSDFGs
+  sdfg.save("pipe_stage2.sdfg")
 
 # How many now?
 loops_post = 0
 for node, state in sdfg.all_nodes_recursive():
     if isinstance(node, LoopRegion):
-        print(node)
         loops_post += 1
 print(f"Loops before: {loops_prev}, Loops after: {loops_post}")
 
 sdfg.validate()
+sdfg.instrument = dace.InstrumentationType.Timer
 
 ################################################################################
 ### Compile the (optimized) SDFG with alterations
@@ -118,12 +122,16 @@ build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
 
+# remove the .dacecache folder
+shutil.rmtree(build_loc, ignore_errors=True)
+
 # Generate code
-sdfg.instrument = dace.InstrumentationType.Timer
 try:
     sdfg.compile()
 except Exception as e:
     pass
+
+# TODO: Make manual changes to the generated code if necessary
 
 # compile the SDFG
 sdfg._regenerate_code = False
