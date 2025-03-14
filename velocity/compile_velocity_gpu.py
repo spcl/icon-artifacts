@@ -21,7 +21,7 @@ run_benchmark = False
 save_steps = False
 
 # Load SDFG
-sdfg = dace.SDFG.from_file("velocity.sdfg")
+sdfg = dace.SDFG.from_file("velocity.sdfgz")
 sdfg.validate()
 
 ################################################################################
@@ -855,11 +855,11 @@ if Path("gpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfg")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
     # sdfg.apply_transformations_repeated(LoopNormalize)
-    # sdfg.simplify() # w/o ArrayElimination
+    # sdfg.simplify(skip=["ArrayElimination"]) # w/o ArrayElimination
     SymbolPropagation().apply_pass(sdfg, {})
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
 
     # scalar_to_length_one_array(sdfg)
     sdfg.validate()
@@ -871,14 +871,14 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=True,
     ).apply_pass(sdfg, {})
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=[ "ArrayElimination"])  # w/o ArrayElimination
 
     # XXX: Order is important!
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
     make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=[ "ArrayElimination"])  # w/o ArrayElimination
     if use_cache:
         sdfg.save("gpu_pipe_stage1.sdfg")
 
@@ -886,9 +886,17 @@ if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage2.sdfg")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
-    sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
+    sdfg.simplify(skip=[ "ArrayElimination", "InlineSDFG"], validate=False)  # w/o ArrayElimination & InlineSDFGs
+    if_map_has_direct_view_access_nodes_inside_put_into_nested_sdfg(sdfg,labels=[ ("single_state_body", "single_state_body_map"),
+                    ("single_state_body_1", "single_state_body_map"  ),
+                    ("single_state_body_0", "single_state_body_map"  ),
+                    ("single_state_body_1", "single_state_body_1_map"),
+                    ("single_state_body",   "single_state_body_0_map"),
+                    ("single_state_body_0", "single_state_body_0_map"),
+                    ("single_state_body_1", "single_state_body_2_map")])
+    sdfg.validate()
     # sdfg.apply_transformations_repeated(MapCollapse)
-    # sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
+    # sdfg.simplify(skip=[ "ArrayElimination", "InlineSDFG"])  # w/o ArrayElimination & InlineSDFGs
 
     s_a_map = scalar_to_length_one_array(sdfg)
     sdfg.apply_gpu_transformations(
