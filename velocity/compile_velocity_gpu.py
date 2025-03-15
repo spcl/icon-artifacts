@@ -1016,6 +1016,7 @@ if exit_code != 0:
 # Get list of .got and .want files
 got_files = [f for f in os.listdir() if f.endswith(".got")]
 want_files = [f.replace(".got", ".want") for f in got_files]
+assert len(got_files) == len([f for f in os.listdir() if f.endswith(".want")]), "Number of .got and .want files do not match"
 
 # Compare each .got file with its corresponding .want file
 found_diff_all = False
