@@ -11,7 +11,7 @@ use_cache = True
 run_benchmark = False
 
 # Load SDFG
-sdfg = dace.SDFG.from_file("velocity.sdfg")
+sdfg = dace.SDFG.from_file("velocity.sdfgz")
 sdfg.validate()
 
 ################################################################################
@@ -65,11 +65,11 @@ if Path("cpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfg")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
     # sdfg.apply_transformations_repeated(LoopNormalize)
-    # sdfg.simplify() # w/o ArrayElimination
+    # sdfg.simplify(skip=["ArrayElimination"]) # w/o ArrayElimination
     SymbolPropagation().apply_pass(sdfg, {})
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
 
     StructToContainerGroups(
         save_steps=False,
@@ -78,14 +78,14 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=False,
     ).apply_pass(sdfg, {})
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
 
     # XXX: Order is important!
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
     make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
-    sdfg.simplify()  # w/o ArrayElimination
+    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
     if use_cache:
         sdfg.save("cpu_pipe_stage1.sdfg")
 
@@ -93,7 +93,7 @@ if Path("cpu_pipe_stage2.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfg")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
-    sdfg.simplify()  # w/o ArrayElimination & InlineSDFGs
+    sdfg.simplify(skip=[ "ArrayElimination", "InlineSDFG"])  # w/o ArrayElimination & InlineSDFGs
     if use_cache:
         sdfg.save("cpu_pipe_stage2.sdfg")
 
@@ -163,6 +163,7 @@ if exit_code != 0:
 # Get list of .got and .want files
 got_files = [f for f in os.listdir() if f.endswith(".got")]
 want_files = [f.replace(".got", ".want") for f in got_files]
+assert len(got_files) == len([f for f in os.listdir() if f.endswith(".want")]), "Number of .got and .want files do not match"
 
 # Compare each .got file with its corresponding .want file
 found_diff_all = False
