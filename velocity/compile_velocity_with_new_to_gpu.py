@@ -21,7 +21,7 @@ run_benchmark = False
 save_steps = False
 
 # Load SDFG
-sdfg = dace.SDFG.from_file("/home/primrose/Work/IconGrounds/icon-artifacts/velocity/velocity.sdfgz")
+sdfg = dace.SDFG.from_file("velocity.sdfgz")
 sdfg.validate()
 
 ################################################################################
