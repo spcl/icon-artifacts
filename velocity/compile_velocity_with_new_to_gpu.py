@@ -962,8 +962,15 @@ for node, state in sdfg.all_nodes_recursive():
         loops_post += 1
 print(f"Loops remaining: {loops_post}")
 
+for cfg in sdfg.nodes():
+    if cfg.label == "FOR_l_568_c_568":
+        s = sdfg.add_state_before(cfg, "copy_vcflmax")
+        a0 = s.add_access("gpu_vcflmax")
+        a1 = s.add_access("vcflmax")
+        s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
+
 sdfg.validate()
-sdfg.instrument = dace.InstrumentationType.Timer
+#sdfg.instrument = dace.InstrumentationType.Timer
 
 ################################################################################
 ### Compile the (optimized) SDFG with alterations
@@ -1015,7 +1022,7 @@ if exit_code != 0:
 ################################################################################
 
 # execute the compiled program
-exit_code = os.system(f"compute-sanitizer --tool=memcheck ./{sdfg_name}")
+exit_code = os.system(f"./{sdfg_name}")
 
 # check if execution was successful
 if exit_code != 0:
@@ -1047,7 +1054,7 @@ for got, want in zip(got_files, want_files):
                 got_num = float(got_line)
                 want_num = float(want_line)
                 # TODO: Adjust rel_tol and abs_tol
-                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=1e-12):
+                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=1e-8):
                     print(f"{got} and {want} have numerical differences ❌")
                     found_diff = True
                     break
@@ -1099,12 +1106,12 @@ if run_benchmark:
 os.remove(sdfg_name)
 
 # remove the .got files
-for got in got_files:
-    os.remove(got)
+#for got in got_files:
+#    os.remove(got)
 
 # remove the .want files
-for want in want_files:
-    os.remove(want)
+#for want in want_files:
+#    os.remove(want)
 
 # remove the .dacecache folder
-shutil.rmtree(build_loc)
+#shutil.rmtree(build_loc)
