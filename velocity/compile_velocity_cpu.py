@@ -53,7 +53,6 @@ def make_array_loop_local(sdfg: dace.SDFG, array_name, loop_name):
     # Replace each occurrence of the array in the loop
     loop.replace(array_name, new_name)
 
-
 # How many for loops exist?
 loops_prev = 0
 for node, state in sdfg.all_nodes_recursive():
@@ -65,12 +64,9 @@ if Path("cpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfg")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
-    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
-    # sdfg.apply_transformations_repeated(LoopNormalize)
-    # sdfg.simplify(skip=["ArrayElimination"]) # w/o ArrayElimination
+    sdfg.simplify()
     SymbolPropagation().apply_pass(sdfg, {})
-    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
-
+    sdfg.simplify()
     StructToContainerGroups(
         save_steps=False,
         verbose=False,
@@ -78,14 +74,10 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=False,
     ).apply_pass(sdfg, {})
-    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
-
-    # XXX: Order is important!
+    sdfg.simplify(skip=["ArrayElimination"])
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_553_c_553")
-    make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_505_c_505")
-    make_array_loop_local(sdfg, "_if_cond_23", "FOR_l_503_c_503")
-    sdfg.simplify(skip=["ArrayElimination"])  # w/o ArrayElimination
+    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+    sdfg.simplify(skip=["ArrayElimination"]) 
     if use_cache:
         sdfg.save("cpu_pipe_stage1.sdfg")
 
@@ -93,7 +85,7 @@ if Path("cpu_pipe_stage2.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfg")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
-    sdfg.simplify(skip=[ "ArrayElimination", "InlineSDFG"])  # w/o ArrayElimination & InlineSDFGs
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     if use_cache:
         sdfg.save("cpu_pipe_stage2.sdfg")
 
@@ -135,7 +127,7 @@ sdfg.compile()
 shutil.copy(f"main.cc", f"{build_loc}/src/cpu/main.cc")
 
 # copy header to .dacecache/<name>/include/
-shutil.copy(f"serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
+shutil.copy(f"include/serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
 
 # compile c++ <SDFG cpp file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -std=c++20 -O0 -ggdb
 exit_code = os.system(
