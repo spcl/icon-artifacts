@@ -177,6 +177,14 @@ else:
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     ToGPU().apply_pass(sdfg, {})
+
+    for cfg in sdfg.nodes():
+      if cfg.label == "FOR_l_568_c_568":
+          s = sdfg.add_state_before(cfg, "copy_vcflmax")
+          a0 = s.add_access("gpu_vcflmax")
+          a1 = s.add_access("vcflmax")
+          s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
+
     if use_cache:
         sdfg.save("gpu_pipe_stage2.sdfg")
 
@@ -186,13 +194,6 @@ for node, state in sdfg.all_nodes_recursive():
     if isinstance(node, LoopRegion):
         loops_post += 1
 print(f"Loops remaining: {loops_post}")
-
-for cfg in sdfg.nodes():
-    if cfg.label == "FOR_l_568_c_568":
-        s = sdfg.add_state_before(cfg, "copy_vcflmax")
-        a0 = s.add_access("gpu_vcflmax")
-        a1 = s.add_access("vcflmax")
-        s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
 
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
