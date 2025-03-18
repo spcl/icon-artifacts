@@ -5,7 +5,7 @@ import os
 import math
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
-from dace.sdfg.state import LoopRegion
+from dace.sdfg.state import LoopRegion, ConditionalBlock
 
 use_cache = True
 run_benchmark = False
@@ -29,29 +29,48 @@ def make_array_loop_local(sdfg: dace.SDFG, array_name, loop_name):
         if isinstance(node, LoopRegion) and node.label == loop_name:
             loop = node
             break
-    assert loop is not None
+    assert loop is not None, f"Loop {loop_name} not found"
+
     # Creat a new array
-    assert array_name in sdfg.arrays
     array = sdfg.arrays[array_name]
-    new_name, _ = sdfg.add_array(
-        f"{array_name}_local",
-        shape=array.shape,
-        dtype=array.dtype,
-        storage=array.storage,
-        location=array.location,
-        transient=array.transient,
-        strides=array.strides,
-        offset=array.offset,
-        lifetime=array.lifetime,
-        debuginfo=array.debuginfo,
-        allow_conflicts=array.allow_conflicts,
-        total_size=array.total_size,
-        find_new_name=True,
-        alignment=array.alignment,
-        may_alias=array.may_alias,
-    )
+    if isinstance(array, dace.data.Scalar):
+        new_name, _ = sdfg.add_scalar(
+            f"{array_name}_local",
+            dtype=array.dtype,
+            storage=array.storage,
+            transient=array.transient,
+            lifetime=array.lifetime,
+            debuginfo=array.debuginfo,
+            find_new_name=True,
+        )
+    else:
+        new_name, _ = sdfg.add_array(
+            f"{array_name}_local",
+            shape=array.shape,
+            dtype=array.dtype,
+            storage=array.storage,
+            location=array.location,
+            transient=array.transient,
+            strides=array.strides,
+            offset=array.offset,
+            lifetime=array.lifetime,
+            debuginfo=array.debuginfo,
+            allow_conflicts=array.allow_conflicts,
+            total_size=array.total_size,
+            find_new_name=True,
+            alignment=array.alignment,
+            may_alias=array.may_alias,
+        )
+
     # Replace each occurrence of the array in the loop
     loop.replace(array_name, new_name)
+    nodelist = list(loop.nodes())
+    while nodelist:
+        node = nodelist.pop()
+        if isinstance(node, (LoopRegion, ConditionalBlock)):
+            nodelist.extend(node.nodes())
+            node.replace_meta_accesses({array_name: new_name})
+
 
 # How many for loops exist?
 loops_prev = 0
@@ -77,7 +96,7 @@ else:
     sdfg.simplify(skip=["ArrayElimination"])
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
-    sdfg.simplify(skip=["ArrayElimination"]) 
+    sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
         sdfg.save("cpu_pipe_stage1.sdfg")
 
@@ -155,7 +174,9 @@ if exit_code != 0:
 # Get list of .got and .want files
 got_files = [f for f in os.listdir() if f.endswith(".got")]
 want_files = [f.replace(".got", ".want") for f in got_files]
-assert len(got_files) == len([f for f in os.listdir() if f.endswith(".want")]), "Number of .got and .want files do not match"
+assert len(got_files) == len(
+    [f for f in os.listdir() if f.endswith(".want")]
+), "Number of .got and .want files do not match"
 
 # Compare each .got file with its corresponding .want file
 found_diff_all = False
