@@ -182,6 +182,8 @@ assert len(got_files) == len(
 found_diff_all = False
 for got, want in zip(got_files, want_files):
     found_diff = False
+    max_rel_diff = 0
+    max_abs_diff = 0
     with open(got, "r") as got_file, open(want, "r") as want_file:
         got_lines = got_file.readlines()
         want_lines = want_file.readlines()
@@ -197,6 +199,12 @@ for got, want in zip(got_files, want_files):
             try:
                 got_num = float(got_line)
                 want_num = float(want_line)
+                
+                abs_diff = abs(got_num - want_num)
+                if want_num != 0:
+                  max_rel_diff = max(max_rel_diff, abs_diff / want_num)
+                max_abs_diff = max(max_abs_diff, abs_diff)
+
                 # TODO: Adjust rel_tol and abs_tol
                 if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=0):
                     print(f"{got} and {want} have numerical differences ❌")
@@ -210,7 +218,8 @@ for got, want in zip(got_files, want_files):
                     found_diff = True
                     break
     if not found_diff:
-        print(f"{got} and {want} are identical ✅")
+        print(f"{got} and {want} are OK ✅")
+    print(f"  Rel: {max_rel_diff}, Abs: {max_abs_diff}")
     found_diff_all = found_diff_all or found_diff
 
 
