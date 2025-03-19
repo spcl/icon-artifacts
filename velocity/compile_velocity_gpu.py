@@ -5,6 +5,7 @@ import os
 import math
 import ast
 import copy
+from dace.codegen.control_flow import ContinueBlock, ControlFlowBlock
 from dace.transformation.interstate import LoopToMap, ContinueToCondition, LoopNormalize, ConditionFusion
 from dace.transformation.dataflow import MapCollapse
 from dace.transformation.passes import (
@@ -98,6 +99,62 @@ class LibNode(CodeLibraryNode):
     def generate_code(self, inputs, outputs):
         return self.code
 
+def setzero_transient_first_use(sdfg: dace.SDFG):
+    def setzero_impl_sdfg(sdfg):
+        initialized = dict()
+        uninitialized = dict()
+        for n in sdfg.bfs_nodes():
+            if isinstance(n, dace.SDFGState):
+                for nn in n.bfs_nodes():
+                    if isinstance(nn, dace.nodes.AccessNode):
+                        if nn.data == "gpu_cfl_clipping":
+                            raise Exception("Found cfl_clipping")
+                        if sdfg.arrays[nn.data].transient:
+                            if n.in_degree(nn) != 0:
+                                if nn.data not in initialized:
+                                    initialized[nn.data] = nn
+                            if n.in_degree(nn) == 0:
+                                if nn.data not in uninitialized and nn.data not in initialized:
+                                    uninitialized[nn.data] = nn
+                    if isinstance(nn, dace.nodes.NestedSDFG):
+                        setzero_impl_sdfg(nn.sdfg)
+            elif isinstance(n, ControlFlowRegion) and not isinstance(n, ContinueBlock):
+                setzero_impl_cfg(sdfg, n, initialized, uninitialized)
+
+        #unitiliazed = set([k for k, v in sdfg.arrays.items() if v.transient and isinstance(v, dace.data.Array) and not isinstance(v, dace.data.View)]) - set(initialized.keys())
+        for k in uninitialized:
+            v = uninitialized[k]
+            v.setzero = True
+
+    def setzero_impl_cfg(sdfg, cfg: ControlFlowRegion, initialized, uninitialized):
+        if cfg.label == "Conditional_l_0_c_0_0":
+            raise Exception("F1")
+        if isinstance(cfg, ConditionalBlock):
+            for _, cfg1 in cfg.branches():
+                setzero_impl_cfg(sdfg, cfg1, initialized, uninitialized)
+        #elif isinstance(cfg, LoopRegion):
+        #    #setzero_impl_sdfg(cfg.sdfg)
+        #    pass
+        else:
+            for n in cfg.bfs_nodes():
+                if isinstance(n, dace.SDFGState):
+                    for nn in n.bfs_nodes():
+                        if isinstance(nn, dace.nodes.AccessNode):
+                            if nn.data == "gpu_cfl_clipping":
+                                raise Exception("Found cfl_clipping")
+                            if sdfg.arrays[nn.data].transient:
+                                if n.in_degree(nn) != 0:
+                                    if nn.data not in initialized:
+                                        initialized[nn.data] = nn
+                                if n.in_degree(nn) == 0:
+                                    if nn.data not in uninitialized and nn.data not in initialized:
+                                        uninitialized[nn.data] = nn
+                        if isinstance(nn, dace.nodes.NestedSDFG):
+                            setzero_impl_sdfg(nn.sdfg)
+                elif isinstance(n, ControlFlowRegion) and not isinstance(n, ContinueBlock):
+                    setzero_impl_cfg(sdfg, n, initialized, uninitialized)
+
+    setzero_impl_sdfg(sdfg)
 
 def insert_reduction(
     sdfg: dace.SDFG,
@@ -270,6 +327,11 @@ else:
     if use_cache:
         sdfg.save("gpu_pipe_stage2.sdfg")
 
+setzero_transient_first_use(sdfg)
+for n, cfg in sdfg.all_nodes_recursive():
+    if isinstance(n, dace.nodes.AccessNode) and n.data == "gpu_cfl_clipping" and cfg.in_degree(n) == 0:
+        n.setzero = True
+
 # How many loops?
 loops_post = 0
 for node, state in sdfg.all_nodes_recursive():
@@ -321,7 +383,7 @@ replace_cpp_with_cu(build_loc)
 
 # compile nvcc <SDFG cpp file> <SDFG cuda file> <main file> -I../../include -I/<pathtodace>/dace/runtime/include/ -Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=native -O0 -w
 exit_code = os.system(
-    f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu {build_loc}/src/cpu/main.cu -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=native -O3 -Xcompiler=-O3 -Xcompiler=-fopenmp -lineinfo -w -o {sdfg_name}"
+    f"nvcc {build_loc}/src/cpu/{sdfg_name}.cu {build_loc}/src/cuda/{sdfg_name}_cuda.cu {build_loc}/src/cpu/main.cu -I {build_loc}/include -I {dace_include} -Xcompiler=-faligned-new --expt-relaxed-constexpr -std=c++20 -arch=sm_80 -O0 -Xcompiler=-O0 -Xcompiler=-fopenmp -lineinfo -w -o {sdfg_name}"
 )
 
 # check if compilation was successful
@@ -370,7 +432,7 @@ for got, want in zip(got_files, want_files):
             try:
                 got_num = float(got_line)
                 want_num = float(want_line)
-                
+
                 abs_diff = abs(got_num - want_num)
                 if want_num != 0:
                   max_rel_diff = max(max_rel_diff, abs_diff / want_num)
