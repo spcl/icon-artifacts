@@ -1,7 +1,12 @@
+import math
+import os
+import shutil
 from pathlib import Path
+
 import dace
 import shutil
 import os
+from dace.sdfg.state import LoopRegion, ConditionalBlock
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse
@@ -17,6 +22,8 @@ from utils import (
     count_loops,
 )
 
+
+from velocity.map_fissions import YoloMapFission
 
 use_cache = True
 run_benchmark = False
@@ -39,9 +46,9 @@ if Path("cpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfg")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
-    sdfg.simplify()
+    sdfg.simplify(verbose=True)
     SymbolPropagation().apply_pass(sdfg, {})
-    sdfg.simplify()
+    sdfg.simplify(verbose=True)
     StructToContainerGroups(
         save_steps=False,
         verbose=False,
@@ -49,10 +56,10 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=False,
     ).apply_pass(sdfg, {})
-    sdfg.simplify(skip=["ArrayElimination"])
+    sdfg.simplify(skip=["ArrayElimination"], verbose=True)
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
-    sdfg.simplify(skip=["ArrayElimination"])
+    sdfg.simplify(skip=["ArrayElimination"], verbose=True)
     loop_to_max_reduction(sdfg)
     cfl_clipping_to_reduction(sdfg)
     maxvcfl_to_reduction(sdfg)
@@ -66,11 +73,14 @@ if Path("cpu_pipe_stage2.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfg")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
-    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
     sdfg.apply_transformations_repeated(MapCollapse)
-    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
     if use_cache:
         sdfg.save("cpu_pipe_stage2.sdfg")
+
+sdfg.apply_transformations(YoloMapFission, validate=False)
+sdfg.validate()
 
 # How many loops?
 count_loops(sdfg)
