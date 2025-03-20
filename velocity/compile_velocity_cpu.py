@@ -119,18 +119,26 @@ def insert_reduction(
     )
 
     if out_expr is None:
-      arr_name, arr = red_state.sdfg.add_scalar(
-        "out_val", dtype=dace.float64, transient=True, find_new_name=True
-      )
-      red_state.add_edge(
-          red_lib_node, "out", red_state.add_write(arr_name), None, dace.Memlet(arr_name)
-      )
-      sdfg.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+        arr_name, arr = red_state.sdfg.add_scalar(
+            "out_val", dtype=dace.float64, transient=True, find_new_name=True
+        )
+        red_state.add_edge(
+            red_lib_node,
+            "out",
+            red_state.add_write(arr_name),
+            None,
+            dace.Memlet(arr_name),
+        )
+        sdfg.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
     else:
-      red_state.add_edge(
-          red_lib_node, "out", red_state.add_write(out_name), None, dace.Memlet(out_expr)
-      )
-        
+        red_state.add_edge(
+            red_lib_node,
+            "out",
+            red_state.add_write(out_name),
+            None,
+            dace.Memlet(out_expr),
+        )
+
     return red_state
 
 
@@ -140,7 +148,6 @@ def loop_to_max_reduction(sdfg: dace.SDFG):
     """
     loop_node, _ = find_node_by_name(sdfg, "FOR_l_568_c_568")
     insert_reduction(sdfg, loop_node, "vcflmax", "640", "tmp_call_18", "max")
-    sdfg.append_global_code("DACE_EXPORTED double reduce_max(double *d_in, int n);")
     pre_state = sdfg.add_state_before(loop_node)
     post_state = sdfg.add_state_after(loop_node)
     sdfg.remove_node(loop_node)
@@ -167,7 +174,6 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG):
         "sum",
         in_expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
     )
-    sdfg.append_global_code("DACE_EXPORTED int reduce_sum(int *d_in, int n);")
 
 
 def maxvcfl_to_reduction(sdfg: dace.SDFG):
@@ -205,7 +211,6 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG):
     insert_reduction(
         parent, loop, "maxvcfl_arr", "tmp_struct_symbol_7*91", "maxvcfl", "max"
     )
-    sdfg.append_global_code("DACE_EXPORTED double reduce_max(double *d_in, int n);")
 
 
 def tmp_call_13_to_reduction(sdfg: dace.SDFG):
@@ -226,7 +231,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG):
     post_state = parent.add_state_after(loop)
     parent.remove_node(loop)
     parent.add_edge(pre_state, post_state, dace.InterstateEdge())
-    sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
+
 
 def levmask_to_reduction(sdfg: dace.SDFG):
     """
@@ -247,8 +252,6 @@ def levmask_to_reduction(sdfg: dace.SDFG):
     task, parent = find_node_by_name(sdfg, "T_l472_c472")
     parent.remove_node(parent.successors(task)[0])
     parent.remove_node(task)
-    sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
-
 
 
 # Replace cpp with cu
