@@ -1,0 +1,35 @@
+#include <dace/dace.h>
+#include <omp.h>
+
+// max reduction interface
+DACE_EXPORTED double reduce_max(double *d_in, int size)
+{
+  double max_val = d_in[0];
+#pragma omp parallel for reduction(max : max_val)
+  for (int i = 1; i < size; i++)
+  {
+    if (d_in[i] > max_val)
+    {
+      max_val = d_in[i];
+    }
+  }
+  return max_val;
+}
+
+// sum reduction interface
+DACE_EXPORTED int reduce_sum(int *d_in, int size)
+{
+  double sum = 0.0;
+#pragma omp parallel for reduction(+ : sum)
+  for (int i = 0; i < size; i++)
+  {
+    sum += d_in[i];
+  }
+  return sum;
+}
+
+// scan reduction interface
+DACE_EXPORTED int reduce_scan(int *d_in, int size)
+{
+  return reduce_sum(d_in, size) > 0;
+}
