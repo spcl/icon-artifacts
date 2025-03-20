@@ -247,6 +247,7 @@ def levmask_to_reduction(sdfg: dace.SDFG):
     task, parent = find_node_by_name(sdfg, "T_l472_c472")
     parent.remove_node(parent.successors(task)[0])
     parent.remove_node(task)
+    sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
 
 
 
