@@ -293,7 +293,6 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=True,
     ).apply_pass(sdfg, {})
-    # TODO: Add these transformations back in:
     sdfg.simplify(skip=["ArrayElimination"])
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
