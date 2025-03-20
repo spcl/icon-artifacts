@@ -19,7 +19,7 @@ DACE_EXPORTED double reduce_max(double *d_in, int size)
 // sum reduction interface
 DACE_EXPORTED int reduce_sum(int *d_in, int size)
 {
-  double sum = 0.0;
+  int sum = 0.0;
 #pragma omp parallel for reduction(+ : sum)
   for (int i = 0; i < size; i++)
   {
@@ -29,7 +29,7 @@ DACE_EXPORTED int reduce_sum(int *d_in, int size)
 }
 
 // scan reduction interface
-DACE_EXPORTED int reduce_scan(int *d_in, int size)
+DACE_EXPORTED double reduce_scan(int *d_in, int size)
 {
-  return reduce_sum(d_in, size) > 0;
+  return (double)(reduce_sum(d_in, size) > 0);
 }

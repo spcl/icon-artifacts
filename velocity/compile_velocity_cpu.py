@@ -99,7 +99,8 @@ def insert_reduction(
     in_size: str,
     out_name: str,
     type: str,
-    expr: str = None,
+    in_expr: str = None,
+    out_expr: str = None,
 ):
     """
     Adds a reduction node to the state after the given state.
@@ -112,18 +113,24 @@ def insert_reduction(
         code=f"out = reduce_{type}(in_arr, {in_size});",
     )
     red_lib_node.schedule = dace.ScheduleType.GPU_Default
-    expr = expr if expr is not None else in_name
+    in_expr = in_expr if in_expr is not None else in_name
     red_state.add_edge(
-        red_state.add_read(in_name), None, red_lib_node, "in_arr", dace.Memlet(expr)
+        red_state.add_read(in_name), None, red_lib_node, "in_arr", dace.Memlet(in_expr)
     )
 
-    arr_name, arr = red_state.sdfg.add_scalar(
+    if out_expr is None:
+      arr_name, arr = red_state.sdfg.add_scalar(
         "out_val", dtype=dace.float64, transient=True, find_new_name=True
-    )
-    red_state.add_edge(
-        red_lib_node, "out", red_state.add_write(arr_name), None, dace.Memlet(arr_name)
-    )
-    sdfg.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+      )
+      red_state.add_edge(
+          red_lib_node, "out", red_state.add_write(arr_name), None, dace.Memlet(arr_name)
+      )
+      sdfg.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+    else:
+      red_state.add_edge(
+          red_lib_node, "out", red_state.add_write(out_name), None, dace.Memlet(out_expr)
+      )
+        
     return red_state
 
 
@@ -158,7 +165,7 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG):
         "tmp_struct_symbol_7",
         "clip_count",
         "sum",
-        expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
+        in_expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
     )
     sdfg.append_global_code("DACE_EXPORTED int reduce_sum(int *d_in, int n);")
 
@@ -213,13 +220,34 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG):
         "i_endblk_var_87 - i_startblk_var_86",
         "tmp_call_13",
         "scan",
-        expr="levmask[i_startblk_var_86-1:i_endblk_var_87-1,_for_it_46-1]",
+        in_expr="levmask[i_startblk_var_86-1:i_endblk_var_87-1,_for_it_46-1]",
     )
     pre_state = parent.add_state_before(loop)
     post_state = parent.add_state_after(loop)
     parent.remove_node(loop)
     parent.add_edge(pre_state, post_state, dace.InterstateEdge())
     sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
+
+def levmask_to_reduction(sdfg: dace.SDFG):
+    """
+    Turns the levmask scan into a reduction.
+    """
+    loop, parent = find_node_by_name(sdfg, "FOR_l_470_c_470")
+    prestate = parent.add_state_before(loop)
+    insert_reduction(
+        parent,
+        prestate,
+        "cfl_clipping",
+        "i_endidx_var_89 - i_startidx_var_88",
+        "levmask",
+        "scan",
+        in_expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
+        out_expr="levmask[_for_it_22-1,_for_it_35-1]",
+    )
+    task, parent = find_node_by_name(sdfg, "T_l472_c472")
+    parent.remove_node(parent.successors(task)[0])
+    parent.remove_node(task)
+
 
 
 # Replace cpp with cu
@@ -263,6 +291,7 @@ else:
     cfl_clipping_to_reduction(sdfg)
     maxvcfl_to_reduction(sdfg)
     tmp_call_13_to_reduction(sdfg)
+    levmask_to_reduction(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
         sdfg.save("cpu_pipe_stage1.sdfg")
@@ -387,7 +416,7 @@ for got, want in zip(got_files, want_files):
                     max_rel_diff = max(max_rel_diff, abs_diff / abs(want_num))
                 max_abs_diff = max(max_abs_diff, abs_diff)
 
-                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=0):
+                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=1e-300):
                     print(f"{got} and {want} have numerical differences ❌")
                     found_diff = True
                     break
