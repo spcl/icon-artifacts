@@ -202,7 +202,7 @@ for got, want in zip(got_files, want_files):
                 
                 abs_diff = abs(got_num - want_num)
                 if want_num != 0:
-                  max_rel_diff = max(max_rel_diff, abs_diff / want_num)
+                  max_rel_diff = max(max_rel_diff, abs_diff / abs(want_num))
                 max_abs_diff = max(max_abs_diff, abs_diff)
 
                 # TODO: Adjust rel_tol and abs_tol
