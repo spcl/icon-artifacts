@@ -6,12 +6,32 @@
 #include <format>
 #include <iostream>
 #include <istream>
+#include <map>
 #include <optional>
+#include <ranges>
+#include <set>
 #include <sstream>
+#include <string_view>
+#include <vector>
 
 #include "velocity_tendencies.h"
 
 namespace serde {
+std::vector<std::string_view> split(std::string_view s, char delim) {
+  std::vector<std::string_view> parts;
+  for (int start_pos = 0, next_pos; start_pos < s.length();
+       start_pos = next_pos + 1) {
+    next_pos = s.find(delim, start_pos);
+    if (next_pos == s.npos) {
+      parts.push_back({s.begin() + start_pos, s.length() - start_pos});
+      break;
+    }
+    parts.push_back(
+        {s.begin() + start_pos, static_cast<size_t>(next_pos - start_pos)});
+  }
+  return parts;
+}
+
 std::string scroll_space(std::istream& s) {
   std::string out;
   while (!s.eof() && (!s.peek() || isspace(s.peek()))) {
@@ -570,12 +590,12 @@ void deserialize(t_nh_prog* x, std::istream& s) {
 
   {
     auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w)>::type>(s);
-    x->__f2dace_SA_w_d_0_s_73 = m.size.at(0);
-    x->__f2dace_SA_w_d_1_s_74 = m.size.at(1);
-    x->__f2dace_SA_w_d_2_s_75 = m.size.at(2);
-    x->__f2dace_SOA_w_d_0_s_73 = m.lbound.at(0);
-    x->__f2dace_SOA_w_d_1_s_74 = m.lbound.at(1);
-    x->__f2dace_SOA_w_d_2_s_75 = m.lbound.at(2);
+    x->__f2dace_SA_w_d_0_s_91 = m.size.at(0);
+    x->__f2dace_SA_w_d_1_s_92 = m.size.at(1);
+    x->__f2dace_SA_w_d_2_s_93 = m.size.at(2);
+    x->__f2dace_SOA_w_d_0_s_91 = m.lbound.at(0);
+    x->__f2dace_SOA_w_d_1_s_92 = m.lbound.at(1);
+    x->__f2dace_SOA_w_d_2_s_93 = m.lbound.at(2);
     x->w = arr;
   }
 
@@ -586,12 +606,12 @@ void deserialize(t_nh_prog* x, std::istream& s) {
 
   {
     auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn)>::type>(s);
-    x->__f2dace_SA_vn_d_0_s_76 = m.size.at(0);
-    x->__f2dace_SA_vn_d_1_s_77 = m.size.at(1);
-    x->__f2dace_SA_vn_d_2_s_78 = m.size.at(2);
-    x->__f2dace_SOA_vn_d_0_s_76 = m.lbound.at(0);
-    x->__f2dace_SOA_vn_d_1_s_77 = m.lbound.at(1);
-    x->__f2dace_SOA_vn_d_2_s_78 = m.lbound.at(2);
+    x->__f2dace_SA_vn_d_0_s_94 = m.size.at(0);
+    x->__f2dace_SA_vn_d_1_s_95 = m.size.at(1);
+    x->__f2dace_SA_vn_d_2_s_96 = m.size.at(2);
+    x->__f2dace_SOA_vn_d_0_s_94 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_d_1_s_95 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_d_2_s_96 = m.lbound.at(2);
     x->vn = arr;
   }
 }
@@ -606,12 +626,12 @@ void deserialize(t_nh_diag* x, std::istream& s) {
 
   {
     auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vt)>::type>(s);
-    x->__f2dace_SA_vt_d_0_s_79 = m.size.at(0);
-    x->__f2dace_SA_vt_d_1_s_80 = m.size.at(1);
-    x->__f2dace_SA_vt_d_2_s_81 = m.size.at(2);
-    x->__f2dace_SOA_vt_d_0_s_79 = m.lbound.at(0);
-    x->__f2dace_SOA_vt_d_1_s_80 = m.lbound.at(1);
-    x->__f2dace_SOA_vt_d_2_s_81 = m.lbound.at(2);
+    x->__f2dace_SA_vt_d_0_s_97 = m.size.at(0);
+    x->__f2dace_SA_vt_d_1_s_98 = m.size.at(1);
+    x->__f2dace_SA_vt_d_2_s_99 = m.size.at(2);
+    x->__f2dace_SOA_vt_d_0_s_97 = m.lbound.at(0);
+    x->__f2dace_SOA_vt_d_1_s_98 = m.lbound.at(1);
+    x->__f2dace_SOA_vt_d_2_s_99 = m.lbound.at(2);
     x->vt = arr;
   }
 
@@ -623,12 +643,12 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
-    x->__f2dace_SA_vn_ie_d_0_s_82 = m.size.at(0);
-    x->__f2dace_SA_vn_ie_d_1_s_83 = m.size.at(1);
-    x->__f2dace_SA_vn_ie_d_2_s_84 = m.size.at(2);
-    x->__f2dace_SOA_vn_ie_d_0_s_82 = m.lbound.at(0);
-    x->__f2dace_SOA_vn_ie_d_1_s_83 = m.lbound.at(1);
-    x->__f2dace_SOA_vn_ie_d_2_s_84 = m.lbound.at(2);
+    x->__f2dace_SA_vn_ie_d_0_s_100 = m.size.at(0);
+    x->__f2dace_SA_vn_ie_d_1_s_101 = m.size.at(1);
+    x->__f2dace_SA_vn_ie_d_2_s_102 = m.size.at(2);
+    x->__f2dace_SOA_vn_ie_d_0_s_100 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_ie_d_1_s_101 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_ie_d_2_s_102 = m.lbound.at(2);
     x->vn_ie = arr;
   }
 
@@ -640,12 +660,12 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
-    x->__f2dace_SA_w_concorr_c_d_0_s_85 = m.size.at(0);
-    x->__f2dace_SA_w_concorr_c_d_1_s_86 = m.size.at(1);
-    x->__f2dace_SA_w_concorr_c_d_2_s_87 = m.size.at(2);
-    x->__f2dace_SOA_w_concorr_c_d_0_s_85 = m.lbound.at(0);
-    x->__f2dace_SOA_w_concorr_c_d_1_s_86 = m.lbound.at(1);
-    x->__f2dace_SOA_w_concorr_c_d_2_s_87 = m.lbound.at(2);
+    x->__f2dace_SA_w_concorr_c_d_0_s_103 = m.size.at(0);
+    x->__f2dace_SA_w_concorr_c_d_1_s_104 = m.size.at(1);
+    x->__f2dace_SA_w_concorr_c_d_2_s_105 = m.size.at(2);
+    x->__f2dace_SOA_w_concorr_c_d_0_s_103 = m.lbound.at(0);
+    x->__f2dace_SOA_w_concorr_c_d_1_s_104 = m.lbound.at(1);
+    x->__f2dace_SOA_w_concorr_c_d_2_s_105 = m.lbound.at(2);
     x->w_concorr_c = arr;
   }
 
@@ -657,14 +677,14 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_0_s_88 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_1_s_89 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_2_s_90 = m.size.at(2);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_3_s_91 = m.size.at(3);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_0_s_88 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_1_s_89 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_2_s_90 = m.lbound.at(2);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_3_s_91 = m.lbound.at(3);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_0_s_106 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_1_s_107 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_2_s_108 = m.size.at(2);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_3_s_109 = m.size.at(3);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_0_s_106 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_1_s_107 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_2_s_108 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_3_s_109 = m.lbound.at(3);
     x->ddt_vn_apc_pc = arr;
   }
 
@@ -676,14 +696,14 @@ void deserialize(t_nh_diag* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
-    x->__f2dace_SA_ddt_w_adv_pc_d_0_s_92 = m.size.at(0);
-    x->__f2dace_SA_ddt_w_adv_pc_d_1_s_93 = m.size.at(1);
-    x->__f2dace_SA_ddt_w_adv_pc_d_2_s_94 = m.size.at(2);
-    x->__f2dace_SA_ddt_w_adv_pc_d_3_s_95 = m.size.at(3);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_0_s_92 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_1_s_93 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_2_s_94 = m.lbound.at(2);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_3_s_95 = m.lbound.at(3);
+    x->__f2dace_SA_ddt_w_adv_pc_d_0_s_110 = m.size.at(0);
+    x->__f2dace_SA_ddt_w_adv_pc_d_1_s_111 = m.size.at(1);
+    x->__f2dace_SA_ddt_w_adv_pc_d_2_s_112 = m.size.at(2);
+    x->__f2dace_SA_ddt_w_adv_pc_d_3_s_113 = m.size.at(3);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_0_s_110 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_1_s_111 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_2_s_112 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_3_s_113 = m.lbound.at(3);
     x->ddt_w_adv_pc = arr;
   }
 
@@ -703,12 +723,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
-    x->__f2dace_SA_ddxn_z_full_d_0_s_96 = m.size.at(0);
-    x->__f2dace_SA_ddxn_z_full_d_1_s_97 = m.size.at(1);
-    x->__f2dace_SA_ddxn_z_full_d_2_s_98 = m.size.at(2);
-    x->__f2dace_SOA_ddxn_z_full_d_0_s_96 = m.lbound.at(0);
-    x->__f2dace_SOA_ddxn_z_full_d_1_s_97 = m.lbound.at(1);
-    x->__f2dace_SOA_ddxn_z_full_d_2_s_98 = m.lbound.at(2);
+    x->__f2dace_SA_ddxn_z_full_d_0_s_114 = m.size.at(0);
+    x->__f2dace_SA_ddxn_z_full_d_1_s_115 = m.size.at(1);
+    x->__f2dace_SA_ddxn_z_full_d_2_s_116 = m.size.at(2);
+    x->__f2dace_SOA_ddxn_z_full_d_0_s_114 = m.lbound.at(0);
+    x->__f2dace_SOA_ddxn_z_full_d_1_s_115 = m.lbound.at(1);
+    x->__f2dace_SOA_ddxn_z_full_d_2_s_116 = m.lbound.at(2);
     x->ddxn_z_full = arr;
   }
 
@@ -720,12 +740,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
-    x->__f2dace_SA_ddxt_z_full_d_0_s_99 = m.size.at(0);
-    x->__f2dace_SA_ddxt_z_full_d_1_s_100 = m.size.at(1);
-    x->__f2dace_SA_ddxt_z_full_d_2_s_101 = m.size.at(2);
-    x->__f2dace_SOA_ddxt_z_full_d_0_s_99 = m.lbound.at(0);
-    x->__f2dace_SOA_ddxt_z_full_d_1_s_100 = m.lbound.at(1);
-    x->__f2dace_SOA_ddxt_z_full_d_2_s_101 = m.lbound.at(2);
+    x->__f2dace_SA_ddxt_z_full_d_0_s_117 = m.size.at(0);
+    x->__f2dace_SA_ddxt_z_full_d_1_s_118 = m.size.at(1);
+    x->__f2dace_SA_ddxt_z_full_d_2_s_119 = m.size.at(2);
+    x->__f2dace_SOA_ddxt_z_full_d_0_s_117 = m.lbound.at(0);
+    x->__f2dace_SOA_ddxt_z_full_d_1_s_118 = m.lbound.at(1);
+    x->__f2dace_SOA_ddxt_z_full_d_2_s_119 = m.lbound.at(2);
     x->ddxt_z_full = arr;
   }
 
@@ -737,12 +757,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
-    x->__f2dace_SA_ddqz_z_full_e_d_0_s_102 = m.size.at(0);
-    x->__f2dace_SA_ddqz_z_full_e_d_1_s_103 = m.size.at(1);
-    x->__f2dace_SA_ddqz_z_full_e_d_2_s_104 = m.size.at(2);
-    x->__f2dace_SOA_ddqz_z_full_e_d_0_s_102 = m.lbound.at(0);
-    x->__f2dace_SOA_ddqz_z_full_e_d_1_s_103 = m.lbound.at(1);
-    x->__f2dace_SOA_ddqz_z_full_e_d_2_s_104 = m.lbound.at(2);
+    x->__f2dace_SA_ddqz_z_full_e_d_0_s_120 = m.size.at(0);
+    x->__f2dace_SA_ddqz_z_full_e_d_1_s_121 = m.size.at(1);
+    x->__f2dace_SA_ddqz_z_full_e_d_2_s_122 = m.size.at(2);
+    x->__f2dace_SOA_ddqz_z_full_e_d_0_s_120 = m.lbound.at(0);
+    x->__f2dace_SOA_ddqz_z_full_e_d_1_s_121 = m.lbound.at(1);
+    x->__f2dace_SOA_ddqz_z_full_e_d_2_s_122 = m.lbound.at(2);
     x->ddqz_z_full_e = arr;
   }
 
@@ -754,12 +774,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
-    x->__f2dace_SA_ddqz_z_half_d_0_s_105 = m.size.at(0);
-    x->__f2dace_SA_ddqz_z_half_d_1_s_106 = m.size.at(1);
-    x->__f2dace_SA_ddqz_z_half_d_2_s_107 = m.size.at(2);
-    x->__f2dace_SOA_ddqz_z_half_d_0_s_105 = m.lbound.at(0);
-    x->__f2dace_SOA_ddqz_z_half_d_1_s_106 = m.lbound.at(1);
-    x->__f2dace_SOA_ddqz_z_half_d_2_s_107 = m.lbound.at(2);
+    x->__f2dace_SA_ddqz_z_half_d_0_s_123 = m.size.at(0);
+    x->__f2dace_SA_ddqz_z_half_d_1_s_124 = m.size.at(1);
+    x->__f2dace_SA_ddqz_z_half_d_2_s_125 = m.size.at(2);
+    x->__f2dace_SOA_ddqz_z_half_d_0_s_123 = m.lbound.at(0);
+    x->__f2dace_SOA_ddqz_z_half_d_1_s_124 = m.lbound.at(1);
+    x->__f2dace_SOA_ddqz_z_half_d_2_s_125 = m.lbound.at(2);
     x->ddqz_z_half = arr;
   }
 
@@ -771,12 +791,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
-    x->__f2dace_SA_wgtfac_c_d_0_s_108 = m.size.at(0);
-    x->__f2dace_SA_wgtfac_c_d_1_s_109 = m.size.at(1);
-    x->__f2dace_SA_wgtfac_c_d_2_s_110 = m.size.at(2);
-    x->__f2dace_SOA_wgtfac_c_d_0_s_108 = m.lbound.at(0);
-    x->__f2dace_SOA_wgtfac_c_d_1_s_109 = m.lbound.at(1);
-    x->__f2dace_SOA_wgtfac_c_d_2_s_110 = m.lbound.at(2);
+    x->__f2dace_SA_wgtfac_c_d_0_s_126 = m.size.at(0);
+    x->__f2dace_SA_wgtfac_c_d_1_s_127 = m.size.at(1);
+    x->__f2dace_SA_wgtfac_c_d_2_s_128 = m.size.at(2);
+    x->__f2dace_SOA_wgtfac_c_d_0_s_126 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfac_c_d_1_s_127 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfac_c_d_2_s_128 = m.lbound.at(2);
     x->wgtfac_c = arr;
   }
 
@@ -788,12 +808,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
-    x->__f2dace_SA_wgtfac_e_d_0_s_111 = m.size.at(0);
-    x->__f2dace_SA_wgtfac_e_d_1_s_112 = m.size.at(1);
-    x->__f2dace_SA_wgtfac_e_d_2_s_113 = m.size.at(2);
-    x->__f2dace_SOA_wgtfac_e_d_0_s_111 = m.lbound.at(0);
-    x->__f2dace_SOA_wgtfac_e_d_1_s_112 = m.lbound.at(1);
-    x->__f2dace_SOA_wgtfac_e_d_2_s_113 = m.lbound.at(2);
+    x->__f2dace_SA_wgtfac_e_d_0_s_129 = m.size.at(0);
+    x->__f2dace_SA_wgtfac_e_d_1_s_130 = m.size.at(1);
+    x->__f2dace_SA_wgtfac_e_d_2_s_131 = m.size.at(2);
+    x->__f2dace_SOA_wgtfac_e_d_0_s_129 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfac_e_d_1_s_130 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfac_e_d_2_s_131 = m.lbound.at(2);
     x->wgtfac_e = arr;
   }
 
@@ -805,12 +825,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
-    x->__f2dace_SA_wgtfacq_e_d_0_s_114 = m.size.at(0);
-    x->__f2dace_SA_wgtfacq_e_d_1_s_115 = m.size.at(1);
-    x->__f2dace_SA_wgtfacq_e_d_2_s_116 = m.size.at(2);
-    x->__f2dace_SOA_wgtfacq_e_d_0_s_114 = m.lbound.at(0);
-    x->__f2dace_SOA_wgtfacq_e_d_1_s_115 = m.lbound.at(1);
-    x->__f2dace_SOA_wgtfacq_e_d_2_s_116 = m.lbound.at(2);
+    x->__f2dace_SA_wgtfacq_e_d_0_s_132 = m.size.at(0);
+    x->__f2dace_SA_wgtfacq_e_d_1_s_133 = m.size.at(1);
+    x->__f2dace_SA_wgtfacq_e_d_2_s_134 = m.size.at(2);
+    x->__f2dace_SOA_wgtfacq_e_d_0_s_132 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfacq_e_d_1_s_133 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfacq_e_d_2_s_134 = m.lbound.at(2);
     x->wgtfacq_e = arr;
   }
 
@@ -822,12 +842,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
-    x->__f2dace_SA_coeff_gradekin_d_0_s_117 = m.size.at(0);
-    x->__f2dace_SA_coeff_gradekin_d_1_s_118 = m.size.at(1);
-    x->__f2dace_SA_coeff_gradekin_d_2_s_119 = m.size.at(2);
-    x->__f2dace_SOA_coeff_gradekin_d_0_s_117 = m.lbound.at(0);
-    x->__f2dace_SOA_coeff_gradekin_d_1_s_118 = m.lbound.at(1);
-    x->__f2dace_SOA_coeff_gradekin_d_2_s_119 = m.lbound.at(2);
+    x->__f2dace_SA_coeff_gradekin_d_0_s_135 = m.size.at(0);
+    x->__f2dace_SA_coeff_gradekin_d_1_s_136 = m.size.at(1);
+    x->__f2dace_SA_coeff_gradekin_d_2_s_137 = m.size.at(2);
+    x->__f2dace_SOA_coeff_gradekin_d_0_s_135 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff_gradekin_d_1_s_136 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff_gradekin_d_2_s_137 = m.lbound.at(2);
     x->coeff_gradekin = arr;
   }
 
@@ -839,12 +859,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
-    x->__f2dace_SA_coeff1_dwdz_d_0_s_120 = m.size.at(0);
-    x->__f2dace_SA_coeff1_dwdz_d_1_s_121 = m.size.at(1);
-    x->__f2dace_SA_coeff1_dwdz_d_2_s_122 = m.size.at(2);
-    x->__f2dace_SOA_coeff1_dwdz_d_0_s_120 = m.lbound.at(0);
-    x->__f2dace_SOA_coeff1_dwdz_d_1_s_121 = m.lbound.at(1);
-    x->__f2dace_SOA_coeff1_dwdz_d_2_s_122 = m.lbound.at(2);
+    x->__f2dace_SA_coeff1_dwdz_d_0_s_138 = m.size.at(0);
+    x->__f2dace_SA_coeff1_dwdz_d_1_s_139 = m.size.at(1);
+    x->__f2dace_SA_coeff1_dwdz_d_2_s_140 = m.size.at(2);
+    x->__f2dace_SOA_coeff1_dwdz_d_0_s_138 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff1_dwdz_d_1_s_139 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff1_dwdz_d_2_s_140 = m.lbound.at(2);
     x->coeff1_dwdz = arr;
   }
 
@@ -856,12 +876,12 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
-    x->__f2dace_SA_coeff2_dwdz_d_0_s_123 = m.size.at(0);
-    x->__f2dace_SA_coeff2_dwdz_d_1_s_124 = m.size.at(1);
-    x->__f2dace_SA_coeff2_dwdz_d_2_s_125 = m.size.at(2);
-    x->__f2dace_SOA_coeff2_dwdz_d_0_s_123 = m.lbound.at(0);
-    x->__f2dace_SOA_coeff2_dwdz_d_1_s_124 = m.lbound.at(1);
-    x->__f2dace_SOA_coeff2_dwdz_d_2_s_125 = m.lbound.at(2);
+    x->__f2dace_SA_coeff2_dwdz_d_0_s_141 = m.size.at(0);
+    x->__f2dace_SA_coeff2_dwdz_d_1_s_142 = m.size.at(1);
+    x->__f2dace_SA_coeff2_dwdz_d_2_s_143 = m.size.at(2);
+    x->__f2dace_SOA_coeff2_dwdz_d_0_s_141 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff2_dwdz_d_1_s_142 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff2_dwdz_d_2_s_143 = m.lbound.at(2);
     x->coeff2_dwdz = arr;
   }
 
@@ -875,8 +895,8 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(
             s);
-    x->__f2dace_SA_deepatmo_gradh_mc_d_0_s_126 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_gradh_mc_d_0_s_126 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_gradh_mc_d_0_s_144 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_gradh_mc_d_0_s_144 = m.lbound.at(0);
     x->deepatmo_gradh_mc = arr;
   }
 
@@ -889,8 +909,8 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(
             s);
-    x->__f2dace_SA_deepatmo_invr_mc_d_0_s_127 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_invr_mc_d_0_s_127 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_invr_mc_d_0_s_145 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_invr_mc_d_0_s_145 = m.lbound.at(0);
     x->deepatmo_invr_mc = arr;
   }
 
@@ -903,8 +923,8 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
   {
     auto [m, arr] = read_pointer<
         std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(s);
-    x->__f2dace_SA_deepatmo_gradh_ifc_d_0_s_128 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_gradh_ifc_d_0_s_128 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_gradh_ifc_d_0_s_146 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_gradh_ifc_d_0_s_146 = m.lbound.at(0);
     x->deepatmo_gradh_ifc = arr;
   }
 
@@ -918,8 +938,8 @@ void deserialize(t_nh_metrics* x, std::istream& s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(
             s);
-    x->__f2dace_SA_deepatmo_invr_ifc_d_0_s_129 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_invr_ifc_d_0_s_129 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_invr_ifc_d_0_s_147 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_invr_ifc_d_0_s_147 = m.lbound.at(0);
     x->deepatmo_invr_ifc = arr;
   }
 }
@@ -934,7 +954,7 @@ void add_line(long long x, std::ostream& s, bool trailing_newline = true) {
   if (trailing_newline) s << std::endl;
 }
 void add_line(long double x, std::ostream& s, bool trailing_newline = true) {
-  s << std::setprecision(16) << x;
+  s << std::setprecision(20) << x;
   if (trailing_newline) s << std::endl;
 }
 void add_line(bool x, std::ostream& s, bool trailing_newline = true) {
@@ -963,17 +983,17 @@ std::string serialize(long long x) {
 }
 std::string serialize(float x) {
   std::stringstream s;
-  s << std::setprecision(16) << x;
+  s << std::setprecision(20) << x;
   return s.str();
 }
 std::string serialize(double x) {
   std::stringstream s;
-  s << std::setprecision(16) << x;
+  s << std::setprecision(20) << x;
   return s.str();
 }
 std::string serialize(long double x) {
   std::stringstream s;
-  s << std::setprecision(16) << x;
+  s << std::setprecision(20) << x;
   return s.str();
 }
 std::string serialize(bool x) { return serialize(int(x)); }
@@ -1927,21 +1947,6 @@ void deserialize_global_data(global_data_type* g, std::istream& s) {
     g->nflatlev = arr;
   }
 
-  read_line(s, "# lextra_diffu");
-  deserialize(g->lextra_diffu, s);
-
-  read_line(s, "# nproma");
-  deserialize(g->nproma, s);
-
-  read_line(s, "# timers_level");
-  deserialize(g->timers_level, s);
-
-  read_line(s, "# timer_solve_nh_veltend");
-  deserialize(g->timer_solve_nh_veltend, s);
-
-  read_line(s, "# timer_intp");
-  deserialize(g->timer_intp, s);
-
   {
     read_line(s, "# nrdmax");
     auto [m, arr] = read_array<int>(s);
@@ -1954,18 +1959,69 @@ std::string serialize_global_data(const global_data_type* g) {
 
   add_line(serialize_array(g->nflatlev), s);
 
-  add_line(serialize(g->lextra_diffu), s);
-
-  add_line(serialize(g->nproma), s);
-
-  add_line(serialize(g->timers_level), s);
-
-  add_line(serialize(g->timer_solve_nh_veltend), s);
-
-  add_line(serialize(g->timer_intp), s);
-
   add_line(serialize_array(g->nrdmax), s);
 
+  return s.str();
+}
+
+enum class SerializationType { INVALID, PLAIN, CONST_INJECTION, F90_MODULE };
+
+std::string serialize_consistent_global_data(
+    std::vector<const global_data_type*>& gs,
+    SerializationType serialization_type = SerializationType::INVALID) {
+  assert(serialization_type != SerializationType::INVALID);
+  if (gs.empty()) return "";
+
+  std::map<std::string, std::set<std::string>> consistent;
+  for (const auto* g : gs) {
+  }
+
+  std::stringstream s;
+  if (serialization_type == SerializationType::F90_MODULE) {
+    s << R"(
+module global_data_assertion
+contains
+subroutine assert_global_data()
+)";
+    for (const auto& [k, vs] : consistent) {
+      std::vector<std::string_view> parts = split(k, '.');
+      assert(parts.size() == 2);
+      const auto mname = std::string_view(parts[0]);
+      s << "use " << mname << std::endl;
+    }
+    s << R"(
+implicit none
+)";
+  }
+  for (const auto& [k, vs] : consistent) {
+    if (vs.size() != 1) continue;
+    const auto& v = *vs.begin();
+    if (serialization_type == SerializationType::PLAIN) {
+      s << k << " = " << v << std::endl;
+    } else if (serialization_type == SerializationType::CONST_INJECTION) {
+      const std::string vval =
+          (v == ".true." ? "1" : (v == ".false." ? "0" : v));
+      s << R"({ "type": "ConstInstanceInjection", "scope": null, )";
+      s << R"("root": ")" << k << R"(", "component": null, "value": ")" << vval
+        << R"(" })" << std::endl;
+    } else if (serialization_type == SerializationType::F90_MODULE) {
+      std::vector<std::string_view> parts = split(k, '.');
+      assert(parts.size() == 2);
+      const auto vname = std::string_view(parts[1]);
+      const auto neqop =
+          (v == ".true." || v == ".false.") ? " .neqv. " : " .ne. ";
+      s << "if (" << vname << neqop << v << ") then" << std::endl;
+      s << R"(	print *, "mismatched )" << vname << "; want " << v
+        << R"(, got: ", )" << vname << std::endl;
+      s << "	call abort" << std::endl << "endif" << std::endl;
+    }
+  }
+  if (serialization_type == SerializationType::F90_MODULE) {
+    s << R"(
+end subroutine assert_global_data
+end module global_data_assertion
+)";
+  }
   return s.str();
 }
 
