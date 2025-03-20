@@ -99,62 +99,6 @@ class LibNode(CodeLibraryNode):
     def generate_code(self, inputs, outputs):
         return self.code
 
-def setzero_transient_first_use(sdfg: dace.SDFG):
-    def setzero_impl_sdfg(sdfg):
-        initialized = dict()
-        uninitialized = dict()
-        for n in sdfg.bfs_nodes():
-            if isinstance(n, dace.SDFGState):
-                for nn in n.bfs_nodes():
-                    if isinstance(nn, dace.nodes.AccessNode):
-                        if nn.data == "gpu_cfl_clipping":
-                            raise Exception("Found cfl_clipping")
-                        if sdfg.arrays[nn.data].transient:
-                            if n.in_degree(nn) != 0:
-                                if nn.data not in initialized:
-                                    initialized[nn.data] = nn
-                            if n.in_degree(nn) == 0:
-                                if nn.data not in uninitialized and nn.data not in initialized:
-                                    uninitialized[nn.data] = nn
-                    if isinstance(nn, dace.nodes.NestedSDFG):
-                        setzero_impl_sdfg(nn.sdfg)
-            elif isinstance(n, ControlFlowRegion) and not isinstance(n, ContinueBlock):
-                setzero_impl_cfg(sdfg, n, initialized, uninitialized)
-
-        #unitiliazed = set([k for k, v in sdfg.arrays.items() if v.transient and isinstance(v, dace.data.Array) and not isinstance(v, dace.data.View)]) - set(initialized.keys())
-        for k in uninitialized:
-            v = uninitialized[k]
-            v.setzero = True
-
-    def setzero_impl_cfg(sdfg, cfg: ControlFlowRegion, initialized, uninitialized):
-        if cfg.label == "Conditional_l_0_c_0_0":
-            raise Exception("F1")
-        if isinstance(cfg, ConditionalBlock):
-            for _, cfg1 in cfg.branches():
-                setzero_impl_cfg(sdfg, cfg1, initialized, uninitialized)
-        #elif isinstance(cfg, LoopRegion):
-        #    #setzero_impl_sdfg(cfg.sdfg)
-        #    pass
-        else:
-            for n in cfg.bfs_nodes():
-                if isinstance(n, dace.SDFGState):
-                    for nn in n.bfs_nodes():
-                        if isinstance(nn, dace.nodes.AccessNode):
-                            if nn.data == "gpu_cfl_clipping":
-                                raise Exception("Found cfl_clipping")
-                            if sdfg.arrays[nn.data].transient:
-                                if n.in_degree(nn) != 0:
-                                    if nn.data not in initialized:
-                                        initialized[nn.data] = nn
-                                if n.in_degree(nn) == 0:
-                                    if nn.data not in uninitialized and nn.data not in initialized:
-                                        uninitialized[nn.data] = nn
-                        if isinstance(nn, dace.nodes.NestedSDFG):
-                            setzero_impl_sdfg(nn.sdfg)
-                elif isinstance(n, ControlFlowRegion) and not isinstance(n, ContinueBlock):
-                    setzero_impl_cfg(sdfg, n, initialized, uninitialized)
-
-    setzero_impl_sdfg(sdfg)
 
 def insert_reduction(
     sdfg: dace.SDFG,
@@ -163,7 +107,8 @@ def insert_reduction(
     in_size: str,
     out_name: str,
     type: str,
-    expr: str = None,
+    in_expr: str = None,
+    out_expr: str = None,
 ):
     """
     Adds a reduction node to the state after the given state.
@@ -176,18 +121,24 @@ def insert_reduction(
         code=f"out = reduce_{type}(in_arr, {in_size});",
     )
     red_lib_node.schedule = dace.ScheduleType.GPU_Default
-    expr = expr if expr is not None else in_name
+    in_expr = in_expr if in_expr is not None else in_name
     red_state.add_edge(
-        red_state.add_read(in_name), None, red_lib_node, "in_arr", dace.Memlet(expr)
+        red_state.add_read(in_name), None, red_lib_node, "in_arr", dace.Memlet(in_expr)
     )
 
-    arr_name, arr = red_state.sdfg.add_scalar(
+    if out_expr is None:
+      arr_name, arr = red_state.sdfg.add_scalar(
         "out_val", dtype=dace.float64, transient=True, find_new_name=True
-    )
-    red_state.add_edge(
-        red_lib_node, "out", red_state.add_write(arr_name), None, dace.Memlet(arr_name)
-    )
-    sdfg.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+      )
+      red_state.add_edge(
+          red_lib_node, "out", red_state.add_write(arr_name), None, dace.Memlet(arr_name)
+      )
+      sdfg.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+    else:
+      red_state.add_edge(
+          red_lib_node, "out", red_state.add_write(out_name), None, dace.Memlet(out_expr)
+      )
+        
     return red_state
 
 
@@ -206,7 +157,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG):
 
 def cfl_clipping_to_reduction(sdfg: dace.SDFG):
     """
-    Turns the cfl_clipping scan into a reduction.
+    Turns the cfl_clipping scan/sum into a reduction.
     """
     task, parent = find_node_by_name(sdfg, "T_l467_c467")
     parent.remove_node(parent.successors(task)[0])
@@ -215,14 +166,14 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG):
     parent.remove_node(cond_block)
     loop, parent = find_node_by_name(sdfg, "FOR_l_465_c_465")
     del parent.in_edges(loop)[0].data.assignments["clip_count"]
-    red_state = insert_reduction(
+    insert_reduction(
         parent,
         loop,
         "cfl_clipping",
         "tmp_struct_symbol_7",
         "clip_count",
         "sum",
-        expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
+        in_expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
     )
     sdfg.append_global_code("DACE_EXPORTED int reduce_sum(int *d_in, int n);")
 
@@ -260,14 +211,52 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG):
 
     loop, parent = find_node_by_name(sdfg, "FOR_l_463_c_463")
     insert_reduction(
-        parent,
-        loop,
-        "maxvcfl_arr",
-        "tmp_struct_symbol_7*91",
-        "maxvcfl",
-        "max",
+        parent, loop, "maxvcfl_arr", "tmp_struct_symbol_7*91", "maxvcfl", "max"
     )
     sdfg.append_global_code("DACE_EXPORTED double reduce_max(double *d_in, int n);")
+
+
+def tmp_call_13_to_reduction(sdfg: dace.SDFG):
+    """
+    Turns the tmp_call_13 scan into a reduction.
+    """
+    loop, parent = find_node_by_name(sdfg, "FOR_l_516_c_516")
+    insert_reduction(
+        parent,
+        loop,
+        "levmask",
+        "i_endblk_var_87 - i_startblk_var_86",
+        "tmp_call_13",
+        "scan",
+        in_expr="levmask[i_startblk_var_86-1:i_endblk_var_87-1,_for_it_46-1]",
+    )
+    pre_state = parent.add_state_before(loop)
+    post_state = parent.add_state_after(loop)
+    parent.remove_node(loop)
+    parent.add_edge(pre_state, post_state, dace.InterstateEdge())
+    sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
+
+def levmask_to_reduction(sdfg: dace.SDFG):
+    """
+    Turns the levmask scan into a reduction.
+    """
+    loop, parent = find_node_by_name(sdfg, "FOR_l_470_c_470")
+    prestate = parent.add_state_before(loop)
+    insert_reduction(
+        parent,
+        prestate,
+        "cfl_clipping",
+        "i_endidx_var_89 - i_startidx_var_88",
+        "levmask",
+        "scan",
+        in_expr="cfl_clipping[i_startidx_var_88-1:i_endidx_var_89-1,_for_it_35-1]",
+        out_expr="levmask[_for_it_22-1,_for_it_35-1]",
+    )
+    task, parent = find_node_by_name(sdfg, "T_l472_c472")
+    parent.remove_node(parent.successors(task)[0])
+    parent.remove_node(task)
+    sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
+
 
 
 # Replace cpp with cu
@@ -292,10 +281,10 @@ def replace_cpp_with_cu(directory):
 if Path("gpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfg")
 else:
-    # sdfg.apply_transformations_repeated(ContinueToCondition)
-    # sdfg.simplify()
-    # SymbolPropagation().apply_pass(sdfg, {})
-    # sdfg.simplify()
+    sdfg.apply_transformations_repeated(ContinueToCondition)
+    sdfg.simplify()
+    SymbolPropagation().apply_pass(sdfg, {})
+    sdfg.simplify()
     StructToContainerGroups(
         validate=False,
         save_steps=False,
@@ -306,13 +295,14 @@ else:
     ).apply_pass(sdfg, {})
     # TODO: Add these transformations back in:
     sdfg.simplify(skip=["ArrayElimination"])
-    # make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-    # make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
-    # sdfg.simplify(skip=["ArrayElimination"])
-    # loop_to_max_reduction(sdfg)
-    # cfl_clipping_to_reduction(sdfg)
-    # maxvcfl_to_reduction(sdfg)
-    # sdfg.simplify(skip=["ArrayElimination"])
+    make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+    loop_to_max_reduction(sdfg)
+    cfl_clipping_to_reduction(sdfg)
+    maxvcfl_to_reduction(sdfg)
+    tmp_call_13_to_reduction(sdfg)
+    levmask_to_reduction(sdfg)
+    sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
         sdfg.save("gpu_pipe_stage1.sdfg")
 
@@ -321,16 +311,12 @@ if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
-    # sdfg.apply_transformations_repeated(MapCollapse)
-    # sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
+    sdfg.apply_transformations_repeated(MapCollapse)
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     ToGPU().apply_pass(sdfg, {})
     if use_cache:
         sdfg.save("gpu_pipe_stage2.sdfg")
 
-setzero_transient_first_use(sdfg)
-for n, cfg in sdfg.all_nodes_recursive():
-    if isinstance(n, dace.nodes.AccessNode) and n.data == "gpu_cfl_clipping" and cfg.in_degree(n) == 0:
-        n.setzero = True
 
 # How many loops?
 loops_post = 0
