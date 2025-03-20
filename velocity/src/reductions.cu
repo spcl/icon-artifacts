@@ -75,3 +75,9 @@ DACE_EXPORTED int reduce_sum(int *d_in, int size) {
   cudaMemcpy(&result, d_out, sizeof(double), cudaMemcpyDeviceToHost);
   return result;
 }
+
+// scan reduction interface
+DACE_EXPORTED double reduce_scan(int *d_in, int size)
+{
+  return (double)(reduce_sum(d_in, size) > 0);
+}
