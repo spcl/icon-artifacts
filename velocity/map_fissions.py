@@ -86,19 +86,16 @@ class YoloMapFission(SingleStateTransformation):
                 s.remove_node(u)
 
     def apply(self, s: SDFGState, g: SDFG):
-        ordered_nodes = self._partition_nodes(self.nested_sdfg.sdfg)
-        ordered_nodes = [singular(u for u in us) for us in ordered_nodes]
-
         GUIDS = {self.map_entry.guid, self.nested_sdfg.guid, self.map_exit.guid}
-        for u in s.nodes():
-            if isinstance(u, AccessNode):
-                GUIDS.add(u.guid)
+        ACC_GUIDS = {u.guid for u in s.nodes() if isinstance(u, AccessNode)}
         nus = self._add_replica_state_after(s, g)
-        self._remove_all_nodes_except_guids(s, GUIDS)
+        self._remove_all_nodes_except_guids(s, GUIDS.union(ACC_GUIDS))
         self._remove_all_nodes_with_guids(nus, GUIDS)
         self._remove_isolated_access_nodes(s)
         self._remove_isolated_access_nodes(nus)
 
+        ordered_nodes = self._partition_nodes(self.nested_sdfg.sdfg)
+        ordered_nodes = [singular(u for u in us) for us in ordered_nodes]
         for _ in range(1):
             upto = len(ordered_nodes) - 1
             # Pt: 1
