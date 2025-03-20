@@ -219,6 +219,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG):
     post_state = parent.add_state_after(loop)
     parent.remove_node(loop)
     parent.add_edge(pre_state, post_state, dace.InterstateEdge())
+    sdfg.append_global_code("DACE_EXPORTED double reduce_scan(int *d_in, int n);")
 
 
 # Replace cpp with cu
