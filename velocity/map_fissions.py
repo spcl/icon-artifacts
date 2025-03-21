@@ -1,11 +1,14 @@
 from copy import deepcopy
-from typing import Union, Set
+from itertools import chain
+from typing import Union, List, Dict, Iterable, Set
 
 import networkx
-from dace import SDFGState, SDFG, InterstateEdge
+from dace import SDFGState, SDFG, Memlet, InterstateEdge
 from dace.frontend.fortran.ast_utils import singular
 from dace.properties import make_properties
-from dace.sdfg.nodes import MapEntry, NestedSDFG, MapExit, AccessNode
+from dace.sdfg.graph import generate_element_id
+from dace.sdfg.nodes import MapEntry, NestedSDFG, MapExit, Node, AccessNode
+from dace.sdfg.state import ControlFlowBlock, ConditionalBlock, ControlFlowRegion
 from dace.sdfg.utils import node_path_graph
 from dace.transformation import SingleStateTransformation, PatternNode
 
@@ -21,7 +24,10 @@ class YoloMapFission(SingleStateTransformation):
         return [node_path_graph(cls.map_entry, cls.nested_sdfg, cls.map_exit)]
 
     def can_be_applied(self, s: SDFGState, expr_index: int, g: SDFG, permissive: bool = False) -> bool:
-        if self.nested_sdfg.guid != 'f0bde8b1-75e2-4621-931a-aa6bd6b53c44':
+        if self.nested_sdfg.guid not in {
+            'd8426c5d-c0b9-4348-8be3-0c88380906bd',  # CPU
+            '89b077dc-e393-4c8f-a1e4-6aa01bda625e',  # GPU
+        }:
             return False
         return set(s.all_nodes_between(self.map_entry, self.map_exit)) == {self.nested_sdfg}
 
@@ -54,7 +60,7 @@ class YoloMapFission(SingleStateTransformation):
         return orderd_nodes
 
     @staticmethod
-    def _add_replica_state_after(s: SDFGState, g:SDFG) -> SDFGState:
+    def _add_replica_state_after(s: SDFGState, g: SDFG) -> SDFGState:
         nus = deepcopy(s)
         for u in nus.nodes():
             if isinstance(u, NestedSDFG):

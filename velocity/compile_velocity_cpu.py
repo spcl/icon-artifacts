@@ -58,7 +58,7 @@ else:
     ).apply_pass(sdfg, {})
     sdfg.simplify(skip=["ArrayElimination"], verbose=True)
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+    make_array_loop_local(sdfg, "_if_cond_22", "FOR_l_555_c_555")
     sdfg.simplify(skip=["ArrayElimination"], verbose=True)
     loop_to_max_reduction(sdfg)
     cfl_clipping_to_reduction(sdfg)
@@ -80,6 +80,7 @@ else:
         sdfg.save("cpu_pipe_stage2.sdfg")
 
 sdfg.apply_transformations(YoloMapFission, validate=False)
+sdfg.reset_cfg_list()
 sdfg.validate()
 
 # How many loops?

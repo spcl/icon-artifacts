@@ -1,3 +1,6 @@
+import math
+import os
+import shutil
 from pathlib import Path
 import shutil
 import dace
@@ -5,6 +8,22 @@ import os
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse
+
+import dace
+from dace.libraries.standard import CodeLibraryNode
+from dace.properties import make_properties, Property
+from dace.sdfg.state import LoopRegion, ConditionalBlock
+from dace.transformation.dataflow import MapCollapse
+from dace.transformation.interstate import (
+    ContinueToCondition,
+)
+from dace.transformation.interstate import LoopToMap
+from dace.transformation.passes import (
+    StructToContainerGroups,
+)
+from dace.transformation.passes import (
+    SymbolPropagation,
+)
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import (
     make_array_loop_local,
@@ -18,6 +37,8 @@ from utils import (
     count_loops,
 )
 
+
+from velocity.map_fissions import YoloMapFission
 
 use_cache = True
 run_benchmark = False
@@ -39,9 +60,9 @@ if Path("gpu_pipe_stage1.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfg")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
-    sdfg.simplify()
+    sdfg.simplify(verbose=True)
     SymbolPropagation().apply_pass(sdfg, {})
-    sdfg.simplify()
+    sdfg.simplify(verbose=True)
     StructToContainerGroups(
         validate=False,
         save_steps=False,
@@ -50,15 +71,15 @@ else:
         interface_with_struct_copy=True,
         interface_to_gpu=True,
     ).apply_pass(sdfg, {})
-    sdfg.simplify(skip=["ArrayElimination"])
+    sdfg.simplify(skip=["ArrayElimination"], verbose=True)
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+    make_array_loop_local(sdfg, "_if_cond_22", "FOR_l_555_c_555")
     loop_to_max_reduction(sdfg)
     cfl_clipping_to_reduction(sdfg)
     maxvcfl_to_reduction(sdfg)
     tmp_call_13_to_reduction(sdfg)
     levmask_to_reduction(sdfg)
-    sdfg.simplify(skip=["ArrayElimination"])
+    sdfg.simplify(skip=["ArrayElimination"], verbose=True)
     if use_cache:
         sdfg.save("gpu_pipe_stage1.sdfg")
 
@@ -66,13 +87,17 @@ if Path("gpu_pipe_stage2.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage2.sdfg")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
-    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
     sdfg.apply_transformations_repeated(MapCollapse)
-    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
     ToGPU().apply_pass(sdfg, {})
     if use_cache:
         sdfg.save("gpu_pipe_stage2.sdfg")
 
+
+sdfg.apply_transformations(YoloMapFission, validate=False)
+sdfg.reset_cfg_list()
+sdfg.validate()
 
 # How many loops?
 count_loops(sdfg)
