@@ -166,12 +166,14 @@ def loop_to_max_reduction(sdfg: dace.SDFG):
         "vcflmax",
         "640",
         "tmp_call_18",
-        "max",
+        "maxZ",
     )
     pre_state = sdfg.add_state_before(loop_node)
     post_state = sdfg.add_state_after(loop_node)
     sdfg.remove_node(loop_node)
     sdfg.add_edge(pre_state, post_state, dace.InterstateEdge())
+    task, _ = find_node_by_name(sdfg, "T_l568_c568")
+    task.code.as_string = "max_vcfl_dyn_var_94_out = tmp_call_18"
 
 
 def cfl_clipping_to_reduction(sdfg: dace.SDFG):
@@ -200,9 +202,6 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG):
     """
     Turns the maxvcfl max into a reduction.
     """
-    task, parent = find_node_by_name(sdfg, "T_l462_c462")
-    parent.remove_node(parent.successors(task)[0])
-    parent.remove_node(task)
     task, parent = find_node_by_name(sdfg, "T_l474_c474", skip=1)
     assert task.code.as_string == "maxvcfl_out = max(maxvcfl_0_in, tmp_call_8_0_in)"
     task.code.as_string = "maxvcfl_out = tmp_call_8_0_in"
@@ -234,7 +233,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG):
         "maxvcfl_arr",
         "tmp_struct_symbol_7*91",
         "maxvcfl",
-        "max",
+        "maxZ",
         out_expr="maxvcfl[0]",
     )
 
@@ -249,14 +248,18 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG):
         loop,
         "levmask",
         "i_endblk_var_87 - i_startblk_var_86",
-        "tmp_call_13",
+        "levelmask",
         "scan_gpu",
         in_expr="levmask[i_startblk_var_86-1:i_endblk_var_87-1,_for_it_46-1]",
+        out_expr="levelmask[_for_it_46-1]",
     )
     pre_state = parent.add_state_before(loop)
     post_state = parent.add_state_after(loop)
     parent.remove_node(loop)
     parent.add_edge(pre_state, post_state, dace.InterstateEdge())
+    task, parent = find_node_by_name(sdfg, "T_l516_c516")
+    parent.remove_node(parent.successors(task)[0])
+    parent.remove_node(task)
 
 
 def levmask_to_reduction(sdfg: dace.SDFG):

@@ -1,17 +1,12 @@
 #include <omp.h>
 
-// max reduction interface
-double reduce_max(const double *d_in, int size)
+// max zero reduction interface
+double reduce_maxZ(const double *d_in, int size)
 {
-  double max_val = d_in[0];
+  double max_val = 0;
 #pragma omp parallel for reduction(max : max_val)
-  for (int i = 1; i < size; i++)
-  {
-    if (d_in[i] > max_val)
-    {
-      max_val = d_in[i];
-    }
-  }
+  for (int i = 0; i < size; i++)
+    max_val = (d_in[i] > max_val) ? d_in[i] : max_val;
   return max_val;
 }
 
@@ -21,9 +16,7 @@ int reduce_sum(const int *d_in, int size)
   int sum = 0.0;
 #pragma omp parallel for reduction(+ : sum)
   for (int i = 0; i < size; i++)
-  {
     sum += d_in[i];
-  }
   return sum;
 }
 
