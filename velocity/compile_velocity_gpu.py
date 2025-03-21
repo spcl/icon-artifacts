@@ -234,7 +234,8 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG):
         "maxvcfl_arr",
         "tmp_struct_symbol_7*91",
         "maxvcfl",
-        "max_gpu",
+        "max",
+        out_expr="maxvcfl[0]",
     )
 
 

@@ -209,7 +209,13 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG):
 
     loop, parent = find_node_by_name(sdfg, "FOR_l_463_c_463")
     insert_reduction(
-        parent, loop, "maxvcfl_arr", "tmp_struct_symbol_7*91", "maxvcfl", "max"
+        parent,
+        loop,
+        "maxvcfl_arr",
+        "tmp_struct_symbol_7*91",
+        "maxvcfl",
+        "max",
+        out_expr="maxvcfl[0]",
     )
 
 
