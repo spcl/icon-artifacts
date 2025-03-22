@@ -2922,6 +2922,24 @@ void __program_solve_nh_internal(solve_nh_state_t*__state, global_data_type* glo
     int tmp_index_4170;
 
 
+    tmp_struct_symbol_41 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_42 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_43 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_44 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_45 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_46 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_47 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_48 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_33 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_34 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_35 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_36 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_37 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_38 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_39 = *v_global_data_nproma_var_103;
+    tmp_struct_symbol_40 = *v_global_data_nproma_var_103;
+
+
     {
         double tmp_call_19;
 
@@ -3594,14 +3612,6 @@ void __program_solve_nh_internal(solve_nh_state_t*__state, global_data_type* glo
 
 
                 }
-                tmp_struct_symbol_33 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_34 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_35 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_36 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_37 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_38 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_39 = *v_global_data_nproma_var_103;
-                tmp_struct_symbol_40 = *v_global_data_nproma_var_103;
                 tmp_parfor_0_1 = tmp_parfor_0;
                 {
 
@@ -5913,14 +5923,6 @@ void __program_solve_nh_internal(solve_nh_state_t*__state, global_data_type* glo
 
 
             }
-            tmp_struct_symbol_41 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_42 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_43 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_44 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_45 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_46 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_47 = *v_global_data_nproma_var_103;
-            tmp_struct_symbol_48 = *v_global_data_nproma_var_103;
             tmp_parfor_0_0 = tmp_parfor_0;
             {
 
