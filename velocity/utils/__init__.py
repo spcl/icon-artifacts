@@ -8,5 +8,5 @@ from utils.reductions import (
     levmask_to_reduction,
 )
 from utils.compare_got_and_want import compare_got_and_want
-from utils.compile import compile
+from utils.compile_sdfg import compile_sdfg
 from utils.count_loops import count_loops

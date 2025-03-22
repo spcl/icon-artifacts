@@ -1,47 +1,60 @@
-files = [
-    "z_vt_ie",
-    "z_kin_hor_e",
-    "z_w_concorr_me"
-]
+import os
+import math
 
-import numpy as np
-import re
+got_files = [f for f in os.listdir() if f.endswith(".got")]
+want_files = [f.replace(".got", ".want") for f in got_files]
+assert len(got_files) == len(
+    [f for f in os.listdir() if f.endswith(".want")]
+), "Number of .got and .want files do not match"
 
-def read_entries_from_file(filename):
-    with open(filename, 'r') as f:
-        lines = f.readlines()
+# Compare each .got file with its corresponding .want file
+found_diff_all = False
+for got, want in zip(got_files, want_files):
+    found_diff = False
+    max_rel_diff = 0
+    max_abs_diff = 0
+    with open(got, "r") as got_file, open(want, "r") as want_file:
+        got_lines = got_file.readlines()
+        want_lines = want_file.readlines()
 
-    entries = []
-    reading_entries = False
-    for line in lines:
-        line = line.strip()
-        if line.startswith("# entries"):
-            reading_entries = True
+        if len(got_lines) != len(want_lines):
+            print(f"{got} and {want} have different number of lines ❌")
+            found_diff = True
             continue
-        if reading_entries:
+
+        # lines containing text should be identical, lines containing numbers should be close
+        for got_line, want_line in zip(got_lines, want_lines):
+            # Are the lines floating point numbers?
             try:
-                entries.append(float(line))
+                got_num = float(got_line)
+                want_num = float(want_line)
+
+                abs_err = abs(got_num - want_num)
+                rel_err = abs_err / (max(abs(want_num), 1e-308))
+                if want_num != 0:
+                    max_rel_diff = max(max_rel_diff, rel_err)
+                max_abs_diff = max(max_abs_diff, abs_err)
+
+                # TODO: Adjust rel_tol and abs_tol
+
+                if rel_err > 1e-12 or abs_err > 1e-12:
+                    print(f"{got} and {want} have numerical differences ❌")
+                    found_diff = True
+                    break
+
             except ValueError:
-                break  # Stop reading if we reach a non-numeric line
+                # If not, they should be identical
+                if got_line != want_line:
+                    print(f"{got} and {want} have different text ❌")
+                    found_diff = True
+                    break
+    if not found_diff:
+        print(f"{got} and {want} are OK ✅")
+    print(f"  Rel: {max_rel_diff}, Abs: {max_abs_diff}")
+    found_diff_all = found_diff_all or found_diff
 
-    return np.array(entries)
 
-def max_abs_difference(file1, file2):
-    entries1 = read_entries_from_file(file1)
-    entries2 = read_entries_from_file(file2)
-
-    if entries1.shape != entries2.shape:
-        raise ValueError("Entry arrays have different sizes!")
-
-    return np.max(np.abs(entries1 - entries2))
-
-for f in files:
-    got_file = f"{f}.got"
-    want_file = f"{f}.want"
-
-    print(f"Comparing {got_file} with {want_file}...")
-    try:
-        difference = max_abs_difference(got_file, want_file)
-        print(f"Max absolute difference: {difference}")
-    except Exception as e:
-        print(f"Error: {e}")
+if not found_diff_all:
+    print("No numerical differences found ✅")
+else:
+    print("Numerical differences found ❌")

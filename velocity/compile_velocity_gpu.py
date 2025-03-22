@@ -1,10 +1,11 @@
 from pathlib import Path
-import dace
 import shutil
+import dace
 import os
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse
+from dace.transformation.passes.to_gpu import ToGPU
 from utils import (
     make_array_loop_local,
     loop_to_max_reduction,
@@ -13,13 +14,14 @@ from utils import (
     tmp_call_13_to_reduction,
     levmask_to_reduction,
     compare_got_and_want,
-    compile,
+    compile_sdfg,
     count_loops,
 )
 
 
 use_cache = True
 run_benchmark = False
+cleanup = False
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfgz")
@@ -82,7 +84,11 @@ sdfg.instrument = dace.InstrumentationType.Timer
 ################################################################################
 
 # Compile the SDFG
-compile(sdfg, gpu=True)
+compile_sdfg(sdfg, gpu=True, release=False)
+compile_sdfg(sdfg, gpu=True, release=True)
+compile_sdfg(sdfg, gpu=False, release=False)
+compile_sdfg(sdfg, gpu=False, release=True)
+
 
 # check if execution was successful
 if os.system(f"./{sdfg_name}") != 0:
@@ -119,12 +125,13 @@ if run_benchmark:
 ################################################################################
 
 # remove the compiled program
-os.remove(sdfg_name)
+if cleanup:
+    os.remove(sdfg_name)
 
-# remove .got and .want files
-for f in os.listdir():
-    if f.endswith(".got") or f.endswith(".want"):
-        os.remove(f)
+    # remove .got and .want files
+    for f in os.listdir():
+        if f.endswith(".got") or f.endswith(".want"):
+            os.remove(f)
 
-# remove the .dacecache folder
-# shutil.rmtree(build_loc)
+    # remove the .dacecache folder
+    shutil.rmtree(build_loc)
