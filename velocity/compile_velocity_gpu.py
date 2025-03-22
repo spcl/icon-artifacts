@@ -85,9 +85,6 @@ sdfg.instrument = dace.InstrumentationType.Timer
 
 # Compile the SDFG
 compile_sdfg(sdfg, gpu=True, release=False)
-compile_sdfg(sdfg, gpu=True, release=True)
-compile_sdfg(sdfg, gpu=False, release=False)
-compile_sdfg(sdfg, gpu=False, release=True)
 
 
 # check if execution was successful
