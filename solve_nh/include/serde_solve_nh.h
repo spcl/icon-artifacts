@@ -3682,6 +3682,8 @@ void deserialize_global_data(global_data_type* g, std::istream& s) {
     read_line(s, "# vct_a");
     auto [m, arr] = read_array<double>(s);
     g->vct_a = arr;
+    g->__f2dace_SA_vct_a_d_0_s_1 = m.size.at(0);
+    g->__f2dace_SOA_vct_a_d_0_s_1 = m.lbound.at(0);
   }
 
   {

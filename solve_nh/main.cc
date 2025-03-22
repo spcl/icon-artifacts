@@ -129,13 +129,13 @@ int main() {
         &global_data, &p_int, &p_nh, &p_patch, &prep_adv,
         /*__f2dace_OPTIONAL_lacc=*/0, dtime, idyn_timestep, jstep, l_init,
         l_recompute, lacc, lclean_mflx, lprep_adv, lsave_mflx, nnew, nnow,
-        /*tmp_index_1292=*/1, /*tmp_index_1293=*/1);
+        /*tmp_index_1292=*/0, /*tmp_index_1293=*/0);
 
     __program_solve_nh(h, &global_data, &p_int, &p_nh, &p_patch, &prep_adv,
                        /*__f2dace_OPTIONAL_lacc=*/0, dtime, idyn_timestep,
                        jstep, l_init, l_recompute, lacc, lclean_mflx, lprep_adv,
                        lsave_mflx, nnew, nnow,
-                       /*tmp_index_1292=*/1, /*tmp_index_1293=*/1);
+                       /*tmp_index_1292=*/0, /*tmp_index_1293=*/0);
 
     __dace_exit_solve_nh(h);
 
