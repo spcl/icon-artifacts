@@ -7,8 +7,8 @@
 #include "velocity_tendencies.h"
 
 int main() {
-  const std::filesystem::path ROOT{"data"};
-  const int max_n = 5;
+  const std::filesystem::path ROOT{"/Users/pmz/gitspace/icon-dace/experiments/exclaim_ape_R2B09"};
+  const int max_n = 1;
 
   for (int n = 1; n <= max_n; ++n) {
     std::cerr << "Reading data for " << n << "..." << std::endl;

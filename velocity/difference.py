@@ -1,5 +1,6 @@
-import os
+# Get list of .got and .want files
 import math
+import os
 
 got_files = [f for f in os.listdir() if f.endswith(".got")]
 want_files = [f.replace(".got", ".want") for f in got_files]
@@ -18,7 +19,7 @@ for got, want in zip(got_files, want_files):
         want_lines = want_file.readlines()
 
         if len(got_lines) != len(want_lines):
-            print(f"{got} and {want} have different number of lines ❌")
+            print(f"{got} and {want} have different number of lines ❌: {len(got_lines)} vs. {len(want_lines)}")
             found_diff = True
             continue
 
@@ -29,30 +30,27 @@ for got, want in zip(got_files, want_files):
                 got_num = float(got_line)
                 want_num = float(want_line)
 
-                abs_err = abs(got_num - want_num)
-                rel_err = abs_err / (max(abs(want_num), 1e-308))
+                abs_diff = abs(got_num - want_num)
                 if want_num != 0:
-                    max_rel_diff = max(max_rel_diff, rel_err)
-                max_abs_diff = max(max_abs_diff, abs_err)
+                    max_rel_diff = max(max_rel_diff, abs_diff / want_num)
+                max_abs_diff = max(max_abs_diff, abs_diff)
 
                 # TODO: Adjust rel_tol and abs_tol
-
-                if rel_err > 1e-12 or abs_err > 1e-12:
-                    print(f"{got} and {want} have numerical differences ❌")
+                if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=0):
+                    print(f"{got} and {want} have numerical differences ❌: {got_num} vs. {want_num}")
                     found_diff = True
                     break
 
             except ValueError:
                 # If not, they should be identical
                 if got_line != want_line:
-                    print(f"{got} and {want} have different text ❌")
+                    print(f"{got} and {want} have different text ❌: {got_line} vs. {want_line}")
                     found_diff = True
                     break
     if not found_diff:
         print(f"{got} and {want} are OK ✅")
     print(f"  Rel: {max_rel_diff}, Abs: {max_abs_diff}")
     found_diff_all = found_diff_all or found_diff
-
 
 if not found_diff_all:
     print("No numerical differences found ✅")

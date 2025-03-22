@@ -81,6 +81,7 @@ else:
 
 sdfg.apply_transformations(YoloMapFission, validate=False)
 sdfg.reset_cfg_list()
+sdfg.save('/Users/pmz/Downloads/foo.sdfgz')
 sdfg.validate()
 
 # How many loops?
