@@ -422,7 +422,7 @@ def split_map_cfg(sdfg: dace.SDFG,
             new_range = [(e, e, s)]
         map_entry.map.range = dace.subsets.Range(new_range)
 
-def move_in_if(sdfg: dace.SDFG, n):
+def move_in_if(sdfg: dace.SDFG, n: dace.nodes.NestedSDFG):
     # Super-specific If map -> nested SDFG with 1 state and CFG If goes into a -> another nested
     # SDFG with 1 state and CFG If then move the outside if inside.
     nodes = list(sdfg.bfs_nodes())
@@ -451,49 +451,79 @@ def move_in_if(sdfg: dace.SDFG, n):
                         inner_sdfg = nested.sdfg
                         if len(inner_sdfg.nodes()) == 2:
                             [s2, cfg2] = inner_sdfg.nodes()
+                            assignments_to_rm = copy.deepcopy(list(inner_sdfg.in_edges(cfg2)[0].data.assignments.keys()))
+                        elif len(inner_sdfg.nodes()) > 2:
+                            for inner_node in inner_sdfg.nodes():
+                                if (isinstance(inner_node, ConditionalBlock) and
+                                    inner_sdfg.in_degree(inner_node) == 1 and
+                                    isinstance(inner_sdfg.in_edges(inner_node)[0].src, dace.SDFGState)):
+                                    cfg2 = inner_node
+                                    s2 = inner_sdfg.in_edges(inner_node)[0].src
+                                    assignments_to_rm = copy.deepcopy(list(inner_sdfg.in_edges(inner_node)[0].data.assignments.keys()))
+                                    break
+                        else:
+                            return
+                        assert isinstance(cfg2, ConditionalBlock)
+                        if isinstance(cfg2, ConditionalBlock):
+                            if len(cfg2.branches) == 1:
+                                for k in move_in_assignments.keys():
+                                    #s = ast.unparse(condition.code[-1])
+                                    #print(s)
+                                    s = ast.unparse(cfg2.branches[0][0].code[-1])
+                                    cfg2.branches[0][0].code[-1] = ast.parse(f"({s}) and ({k} == 1)", mode="eval")
 
-                            assert isinstance(cfg2, ConditionalBlock)
-                            if isinstance(cfg2, ConditionalBlock):
-                                if len(cfg2.branches) == 1:
-                                    for k in move_in_assignments.keys():
-                                        s = ast.unparse(condition.code[-1])
-                                        cfg2.branches[0][0].code[-1] = ast.parse(f"({s}) and ({k} == 1)", mode="eval")
+                                edge = inner_sdfg.edges()[0]
+                                edge.data.assignments.update(move_in_assignments)
 
-                                    edge = inner_sdfg.edges()[0]
-                                    edge.data.assignments.update(move_in_assignments)
+                                # Mv state up
+                                s2 = copy.deepcopy(s1)
+                                sdfg.add_node(s2)
 
-                                    # Mv state up
-                                    s2 = copy.deepcopy(s1)
-                                    sdfg.add_node(s2)
+                                sdfg.remove_node(s1)
+                                sdfg.remove_node(cfg0)
+                                sdfg.remove_node(s0)
+                                nested = [n for n in s2.nodes() if isinstance(n, dace.nodes.NestedSDFG)][0]
 
-                                    sdfg.remove_node(s1)
-                                    sdfg.remove_node(cfg0)
-                                    sdfg.remove_node(s0)
-                                    nested = [n for n in s2.nodes() if isinstance(n, dace.nodes.NestedSDFG)][0]
+                                # Pass outside data passed from outer sdfg to inner sdfg
+                                for in_conn in n.in_connectors:
+                                    if in_conn not in nested.in_connectors:
+                                        nested.add_in_connector(in_conn)
+                                        src = list(set([e.src for e in s2.in_edges(nested)]))
+                                        assert len(src) == 1
+                                        src = src[0]
+                                        arr = sdfg.arrays[in_conn]
+                                        s2.add_edge(src, "OUT_" + in_conn, nested, in_conn, dace.memlet.Memlet.from_array(in_conn, arr))
+                                        src.add_out_connector("OUT_" + in_conn)
+                                        src.add_in_connector("IN_" + in_conn)
+                                        an = s2.add_access(in_conn)
+                                        s2.add_edge(an, None, src, "IN_" + in_conn, dace.memlet.Memlet.from_array(in_conn, arr))
+                                        if in_conn not in nested.sdfg.arrays:
+                                            copy_desc = copy.deepcopy(arr)
+                                            copy_desc.transient = False
+                                            nested.sdfg.add_datadesc(in_conn, copy_desc)
 
-                                    # Pass outside data passed from outer sdfg to inner sdfg
-                                    for in_conn in n.in_connectors:
-                                        if in_conn not in nested.in_connectors:
-                                            nested.add_in_connector(in_conn)
-                                            src = list(set([e.src for e in s2.in_edges(nested)]))
-                                            assert len(src) == 1
-                                            src = src[0]
-                                            arr = sdfg.arrays[in_conn]
-                                            s2.add_edge(src, "OUT_" + in_conn, nested, in_conn, dace.memlet.Memlet.from_array(in_conn, arr))
-                                            src.add_out_connector("OUT_" + in_conn)
-                                            src.add_in_connector("IN_" + in_conn)
-                                            an = s2.add_access(in_conn)
-                                            s2.add_edge(an, None, src, "IN_" + in_conn, dace.memlet.Memlet.from_array(in_conn, arr))
-                                            if in_conn not in nested.sdfg.arrays:
-                                                copy_desc = copy.deepcopy(arr)
-                                                copy_desc.transient = False
-                                                nested.sdfg.add_datadesc(in_conn, copy_desc)
+                                for _n in s2.nodes():
+                                    if isinstance(_n, dace.nodes.NestedSDFG):
+                                        _n.sdfg.parent_graph = s2.parent_graph
+                                        _n.sdfg.parent_sdfg = sdfg
+                                        _n.sdfg.parent = s2
 
-                                    for n in s2.nodes():
-                                        if isinstance(n, dace.nodes.NestedSDFG):
-                                            n.sdfg.parent_graph = s2.parent_graph
-                                            n.sdfg.parent_sdfg = sdfg
-                                            n.sdfg.parent = s2
+                                #print("SymMap", n.symbol_mapping)
+                                #print("FreeSym", n.sdfg.free_symbols)
+                                # DANGEROUS TODO: WHY MISSING SYMBOLS APPEAR AND WHY DOES IT COMPILE AFTER REMOVING THEM?
+                                symbols = set(k for k in n.sdfg.free_symbols if k not in n.in_connectors and k not in n.out_connectors)
+                                missing_symbols = [s for s in symbols if s not in n.symbol_mapping]
+                                #print("Missing", missing_symbols)
+                                #print(nested.guid, "\n", nested.sdfg.guid, "\n", inner_sdfg.guid, "\n", sdfg.guid,
+                                #      s2.sdfg.guid, "\n", n.guid)
+
+                                #for assignment in assignments_to_rm:
+                                #    if assignment in inner_sdfg.free_symbols:
+                                #        inner_sdfg.remove_symbol(assignment)
+                                #        print(assignment)
+                                #        assert assignment not in inner_sdfg.parent_nsdfg_node.symbol_mapping
+                                for sym in missing_symbols:
+                                    n.sdfg.remove_symbol(sym)
 
 
 def untangle_if_sdfg(sdfg: dace.SDFG):
