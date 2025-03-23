@@ -25,7 +25,7 @@ from utils import (
 
 from utils.map_fissions import YoloMapFission
 
-from utils.config import use_cache, run_benchmark, cleanup
+from utils.config import use_cache, run_benchmark, cleanup, release
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfgz")
@@ -96,7 +96,7 @@ for node, state in sdfg.all_nodes_recursive():
 ################################################################################
 
 # Compile the SDFG
-compile_sdfg(sdfg, gpu=False, release=False)
+compile_sdfg(sdfg, gpu=False, release=release)
 
 # check if execution was successful
 if os.system(f"./{sdfg_name}") != 0:

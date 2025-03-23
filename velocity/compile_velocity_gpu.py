@@ -19,7 +19,7 @@ from utils import (
     move_transients_to_top_level,
 )
 
-from utils.config import use_cache, run_benchmark, cleanup, reduction
+from utils.config import use_cache, run_benchmark, cleanup, reduction, release
 
 
 # Load SDFG
@@ -101,7 +101,7 @@ sdfg.instrument = dace.InstrumentationType.Timer
 ################################################################################
 
 # Compile the SDFG
-compile_sdfg(sdfg, gpu=True, release=False)
+compile_sdfg(sdfg, gpu=True, release=release)
 
 
 # check if execution was successful
