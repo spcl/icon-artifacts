@@ -20,12 +20,15 @@ from utils import (
     compare_got_and_want,
     compile_sdfg,
     count_loops,
+    split_map_sdfg,
+    untangle_if_sdfg,
+    move_transients_to_top_level
 )
 
 
 from utils.map_fissions import YoloMapFission
 
-from utils.config import use_cache, run_benchmark, cleanup, release
+from utils.config import use_cache, run_benchmark, cleanup, release, reduction
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfgz")
@@ -58,14 +61,23 @@ else:
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
     sdfg.simplify(skip=["ArrayElimination"], verbose=True)
-    loop_to_max_reduction(sdfg)
-    cfl_clipping_to_reduction(sdfg)
-    maxvcfl_to_reduction(sdfg)
-    tmp_call_13_to_reduction(sdfg)
-    levmask_to_reduction(sdfg)
+    if reduction:
+        loop_to_max_reduction(sdfg)
+        cfl_clipping_to_reduction(sdfg)
+        maxvcfl_to_reduction(sdfg)
+        tmp_call_13_to_reduction(sdfg)
+        levmask_to_reduction(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
         sdfg.save("cpu_pipe_stage1.sdfg")
+    move_transients_to_top_level(root=sdfg,
+                                 upper_bounds={
+                                     "z_w_con_c": 960,
+                                     "maxvcfl_arr": 960,
+                                     "cfl_clipping": 960,
+                                     "z_w_concorr_mc": 960,
+                                 }
+                                )
 
 if Path("cpu_pipe_stage2.sdfg").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfg")
@@ -77,7 +89,12 @@ else:
     if use_cache:
         sdfg.save("cpu_pipe_stage2.sdfg")
 
+
 sdfg.apply_transformations(YoloMapFission, validate=False)
+sdfg.validate()
+
+untangle_if_sdfg(sdfg)
+split_map_sdfg(sdfg, False)
 sdfg.validate()
 
 # How many loops?
@@ -89,6 +106,8 @@ sdfg.instrument = dace.InstrumentationType.Timer
 for node, state in sdfg.all_nodes_recursive():
     if isinstance(node, dace.nodes.MapEntry):
         node.map.schedule = dace.ScheduleType.CPU_Multicore
+
+sdfg.save("cpu_velocity.sdfgz", compress=True)
 
 
 ################################################################################

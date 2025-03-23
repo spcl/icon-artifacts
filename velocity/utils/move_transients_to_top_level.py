@@ -36,7 +36,7 @@ def move_transients_to_top_level(root: dace.SDFG,
                     while _sdfg is not None and _sdfg != root:
                         _sdfg = _sdfg.parent_sdfg
                         ways_up += 1
-                    print(f"{arr_name} needs to be moved {ways_up} level{'s' if ways_up == 1 else ''} up")
+                    #print(f"{arr_name} needs to be moved {ways_up} level{'s' if ways_up == 1 else ''} up")
                     if ways_up != 1:
                         raise Exception("Moving transients to top level only supports if the transient needs to be moved once currently")
 
@@ -53,7 +53,7 @@ def move_transients_to_top_level(root: dace.SDFG,
                                             if _n not in map_chain:
                                                 map_chain.append((parent, _n.sdfg, _n, node, arr_name))
                         _sdfg = _sdfg.parent_sdfg
-                    print(f"{arr_name} needs to be moved {ways_up} through {map_chain}")
+                    #print(f"{arr_name} needs to be moved {ways_up} through {map_chain}")
 
                     """
                     _sdfg = sdfg
@@ -85,7 +85,6 @@ def move_transients_to_top_level(root: dace.SDFG,
     if upper_bounds is None:
         upper_bounds = dict()
 
-    print(root.constants)
     for parent_sdfg, child_sdfg, nsdfg, map_entry, arr_name in map_chain:
         assert type(map_entry) == dace.nodes.MapEntry
         assert type(parent_sdfg) == dace.SDFG

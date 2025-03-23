@@ -17,7 +17,11 @@ from utils import (
     compile_sdfg,
     count_loops,
     move_transients_to_top_level,
+    split_map_sdfg,
+    untangle_if_sdfg
 )
+
+from utils.map_fissions import YoloMapFission
 
 from utils.config import use_cache, run_benchmark, cleanup, reduction, release
 
@@ -91,6 +95,13 @@ else:
         sdfg.save("gpu_pipe_stage2.sdfg")
 
 
+sdfg.apply_transformations(YoloMapFission, validate=False)
+sdfg.validate()
+
+untangle_if_sdfg(sdfg)
+split_map_sdfg(sdfg, False)
+sdfg.validate()
+
 # How many loops?
 count_loops(sdfg)
 sdfg.validate()
@@ -103,6 +114,8 @@ sdfg.instrument = dace.InstrumentationType.Timer
 # Compile the SDFG
 compile_sdfg(sdfg, gpu=True, release=release)
 
+
+sdfg.save("gpu_velocity.sdfgz", compress=True)
 
 # check if execution was successful
 if os.system(f"./{sdfg_name}") != 0:

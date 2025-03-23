@@ -31,6 +31,7 @@ def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     try:
         sdfg.compile()
     except Exception as e:
+        print("Compiling failed:", e)
         pass
 
     # Prepend reduction library to .dacecache/<name>/src/cpu/<name>.cpp

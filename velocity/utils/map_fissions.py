@@ -21,8 +21,6 @@ class YoloMapFission(SingleStateTransformation):
         return [node_path_graph(cls.map_entry, cls.nested_sdfg, cls.map_exit)]
 
     def can_be_applied(self, s: SDFGState, expr_index: int, g: SDFG, permissive: bool = False) -> bool:
-        if self.nested_sdfg.guid != 'f0bde8b1-75e2-4621-931a-aa6bd6b53c44':
-            return False
         return set(s.all_nodes_between(self.map_entry, self.map_exit)) == {self.nested_sdfg}
 
     @staticmethod
