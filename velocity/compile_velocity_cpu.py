@@ -22,7 +22,8 @@ from utils import (
     count_loops,
     split_map_sdfg,
     untangle_if_sdfg,
-    move_transients_to_top_level
+    move_transients_to_top_level,
+    raise_loop_invariant_if
 )
 
 
@@ -96,6 +97,10 @@ sdfg.validate()
 untangle_if_sdfg(sdfg)
 split_map_sdfg(sdfg, False)
 sdfg.validate()
+
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
+                             copy_edge_before = [False, True])
+sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
 
 # How many loops?
 count_loops(sdfg)
