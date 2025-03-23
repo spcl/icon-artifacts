@@ -2,7 +2,7 @@ MODULE serde_solve_nh
   IMPLICIT NONE
   INTERFACE serialize
     MODULE PROCEDURE :: W_string
-    MODULE PROCEDURE W_t_grid_domain_decomp_info, W_t_int_state, W_t_tangent_vectors, W_t_grid_cells, W_t_grid_edges, W_t_grid_vertices, W_t_patch, W_t_nh_prog, W_t_nh_diag, W_t_nh_ref, W_t_nh_metrics, W_t_nh_state, W_t_prepare_adv, W_logical_R_1, W_integer__1_R_1, W_integer__2_R_1, W_integer__4_R_1, W_integer__8_R_1, W_real__4_R_1, W_real__8_R_1, W_logical_R_2, W_integer__1_R_2, W_integer__2_R_2, W_integer__4_R_2, W_integer__8_R_2, W_real__4_R_2, W_real__8_R_2, W_logical_R_3, W_integer__1_R_3, W_integer__2_R_3, W_integer__4_R_3, W_integer__8_R_3, W_real__4_R_3, W_real__8_R_3, W_logical_R_4, W_integer__1_R_4, W_integer__2_R_4, W_integer__4_R_4, W_integer__8_R_4, W_real__4_R_4, W_real__8_R_4, W_dt_t_tangent_vectors_R_3, W_dt_t_nh_prog_R_1, W_logical, W_integer1, W_integer2, W_integer4, W_integer8, W_real4, W_real8
+    MODULE PROCEDURE W_global_data_type, W_t_grid_domain_decomp_info, W_t_int_state, W_t_tangent_vectors, W_t_grid_cells, W_t_grid_edges, W_t_grid_vertices, W_t_patch, W_t_nh_prog, W_t_nh_diag, W_t_nh_ref, W_t_nh_metrics, W_t_nh_state, W_t_prepare_adv, W_logical_R_1, W_integer__1_R_1, W_integer__2_R_1, W_integer__4_R_1, W_integer__8_R_1, W_real__4_R_1, W_real__8_R_1, W_logical_R_2, W_integer__1_R_2, W_integer__2_R_2, W_integer__4_R_2, W_integer__8_R_2, W_real__4_R_2, W_real__8_R_2, W_logical_R_3, W_integer__1_R_3, W_integer__2_R_3, W_integer__4_R_3, W_integer__8_R_3, W_real__4_R_3, W_real__8_R_3, W_logical_R_4, W_integer__1_R_4, W_integer__2_R_4, W_integer__4_R_4, W_integer__8_R_4, W_real__4_R_4, W_real__8_R_4, W_dt_t_tangent_vectors_R_3, W_dt_t_nh_prog_R_1, W_logical, W_integer1, W_integer2, W_integer4, W_integer8, W_real4, W_real8
   END INTERFACE serialize
   INTEGER :: generation = 0
   CONTAINS
@@ -51,6 +51,172 @@ MODULE serde_solve_nh
     IF (nline_local) WRITE(io, '(g0)', ADVANCE = 'no') NEW_LINE('A')
     IF (cleanup_local) CLOSE(UNIT = io)
   END SUBROUTINE W_string
+  SUBROUTINE W_global_data_type(io, x, cleanup, nline)
+    USE global_mod, ONLY: global_data_type
+    INTEGER :: io
+    TYPE(global_data_type), TARGET, INTENT(IN) :: x
+    LOGICAL, OPTIONAL, INTENT(IN) :: cleanup, nline
+    INTEGER :: kmeta, kmeta_0, kmeta_1, kmeta_2, kmeta_3, kmeta_4, kmeta_5, kmeta_6, kmeta_7, kmeta_8, kmeta_9
+    LOGICAL :: cleanup_local, nline_local
+    cleanup_local = .TRUE.
+    nline_local = .TRUE.
+    IF (PRESENT(cleanup)) cleanup_local = cleanup
+    IF (PRESENT(nline)) nline_local = nline
+    CALL serialize(io, '# ldeepatmo_var_0', cleanup = .FALSE.)
+    CALL serialize(io, x % ldeepatmo_var_0, cleanup = .FALSE.)
+    CALL serialize(io, '# l_limited_area', cleanup = .FALSE.)
+    CALL serialize(io, x % l_limited_area, cleanup = .FALSE.)
+    CALL serialize(io, '# nflatlev', cleanup = .FALSE.)
+    CALL serialize(io, "# rank", cleanup = .FALSE.)
+    CALL serialize(io, 1, cleanup = .FALSE.)
+    CALL serialize(io, "# size", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, SIZE(x % nflatlev, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, "# lbound", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, LBOUND(x % nflatlev, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, x % nflatlev, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    CALL serialize(io, '# is_iau_active', cleanup = .FALSE.)
+    CALL serialize(io, x % is_iau_active, cleanup = .FALSE.)
+    CALL serialize(io, '# iau_wgt_dyn', cleanup = .FALSE.)
+    CALL serialize(io, x % iau_wgt_dyn, cleanup = .FALSE.)
+    CALL serialize(io, '# nudge_max_coeff', cleanup = .FALSE.)
+    CALL serialize(io, x % nudge_max_coeff, cleanup = .FALSE.)
+    CALL serialize(io, '# process_mpi_all_size', cleanup = .FALSE.)
+    CALL serialize(io, x % process_mpi_all_size, cleanup = .FALSE.)
+    CALL serialize(io, '# i_am_accel_node', cleanup = .FALSE.)
+    CALL serialize(io, x % i_am_accel_node, cleanup = .FALSE.)
+    CALL serialize(io, '# itime_scheme', cleanup = .FALSE.)
+    CALL serialize(io, x % itime_scheme, cleanup = .FALSE.)
+    CALL serialize(io, '# ndyn_substeps_var', cleanup = .FALSE.)
+    CALL serialize(io, "# rank", cleanup = .FALSE.)
+    CALL serialize(io, 1, cleanup = .FALSE.)
+    CALL serialize(io, "# size", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, SIZE(x % ndyn_substeps_var, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, "# lbound", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, LBOUND(x % ndyn_substeps_var, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, x % ndyn_substeps_var, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    CALL serialize(io, '# lextra_diffu', cleanup = .FALSE.)
+    CALL serialize(io, x % lextra_diffu, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_fac', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_fac, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_fac2', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_fac2, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_fac3', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_fac3, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_fac4', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_fac4, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_z', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_z, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_z2', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_z2, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_z3', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_z3, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_z4', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_z4, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_fac_o2', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_fac_o2, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_order', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_order, cleanup = .FALSE.)
+    CALL serialize(io, '# divdamp_type', cleanup = .FALSE.)
+    CALL serialize(io, x % divdamp_type, cleanup = .FALSE.)
+    CALL serialize(io, '# rayleigh_type', cleanup = .FALSE.)
+    CALL serialize(io, x % rayleigh_type, cleanup = .FALSE.)
+    CALL serialize(io, '# rhotheta_offctr', cleanup = .FALSE.)
+    CALL serialize(io, x % rhotheta_offctr, cleanup = .FALSE.)
+    CALL serialize(io, '# veladv_offctr', cleanup = .FALSE.)
+    CALL serialize(io, x % veladv_offctr, cleanup = .FALSE.)
+    CALL serialize(io, '# iadv_rhotheta', cleanup = .FALSE.)
+    CALL serialize(io, x % iadv_rhotheta, cleanup = .FALSE.)
+    CALL serialize(io, '# igradp_method', cleanup = .FALSE.)
+    CALL serialize(io, x % igradp_method, cleanup = .FALSE.)
+    CALL serialize(io, '# kstart_dd3d', cleanup = .FALSE.)
+    CALL serialize(io, "# rank", cleanup = .FALSE.)
+    CALL serialize(io, 1, cleanup = .FALSE.)
+    CALL serialize(io, "# size", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, SIZE(x % kstart_dd3d, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, "# lbound", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, LBOUND(x % kstart_dd3d, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, x % kstart_dd3d, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    CALL serialize(io, '# kstart_moist', cleanup = .FALSE.)
+    CALL serialize(io, "# rank", cleanup = .FALSE.)
+    CALL serialize(io, 1, cleanup = .FALSE.)
+    CALL serialize(io, "# size", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, SIZE(x % kstart_moist, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, "# lbound", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, LBOUND(x % kstart_moist, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, x % kstart_moist, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    CALL serialize(io, '# nproma_var_103', cleanup = .FALSE.)
+    CALL serialize(io, x % nproma_var_103, cleanup = .FALSE.)
+    CALL serialize(io, '# p_test_run', cleanup = .FALSE.)
+    CALL serialize(io, x % p_test_run, cleanup = .FALSE.)
+    CALL serialize(io, '# timers_level', cleanup = .FALSE.)
+    CALL serialize(io, x % timers_level, cleanup = .FALSE.)
+    CALL serialize(io, '# timer_solve_nh_veltend', cleanup = .FALSE.)
+    CALL serialize(io, x % timer_solve_nh_veltend, cleanup = .FALSE.)
+    CALL serialize(io, '# timer_solve_nh_cellcomp', cleanup = .FALSE.)
+    CALL serialize(io, x % timer_solve_nh_cellcomp, cleanup = .FALSE.)
+    CALL serialize(io, '# timer_solve_nh_exch', cleanup = .FALSE.)
+    CALL serialize(io, x % timer_solve_nh_exch, cleanup = .FALSE.)
+    CALL serialize(io, '# timer_intp', cleanup = .FALSE.)
+    CALL serialize(io, x % timer_intp, cleanup = .FALSE.)
+    CALL serialize(io, '# vct_a', cleanup = .FALSE.)
+    CALL serialize(io, '# alloc', cleanup = .FALSE.)
+    CALL serialize(io, ALLOCATED(x % vct_a), cleanup = .FALSE.)
+    IF (ALLOCATED(x % vct_a)) THEN
+      CALL serialize(io, "# rank", cleanup = .FALSE.)
+      CALL serialize(io, 1, cleanup = .FALSE.)
+      CALL serialize(io, "# size", cleanup = .FALSE.)
+      DO kmeta = 1, 1
+        CALL serialize(io, SIZE(x % vct_a, kmeta), cleanup = .FALSE.)
+      END DO
+      CALL serialize(io, "# lbound", cleanup = .FALSE.)
+      DO kmeta = 1, 1
+        CALL serialize(io, LBOUND(x % vct_a, kmeta), cleanup = .FALSE.)
+      END DO
+      CALL serialize(io, x % vct_a, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    END IF
+    CALL serialize(io, '# nrdmax', cleanup = .FALSE.)
+    CALL serialize(io, "# rank", cleanup = .FALSE.)
+    CALL serialize(io, 1, cleanup = .FALSE.)
+    CALL serialize(io, "# size", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, SIZE(x % nrdmax, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, "# lbound", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, LBOUND(x % nrdmax, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, x % nrdmax, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    CALL serialize(io, '# nflat_gradp', cleanup = .FALSE.)
+    CALL serialize(io, "# rank", cleanup = .FALSE.)
+    CALL serialize(io, 1, cleanup = .FALSE.)
+    CALL serialize(io, "# size", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, SIZE(x % nflat_gradp, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, "# lbound", cleanup = .FALSE.)
+    DO kmeta = 1, 1
+      CALL serialize(io, LBOUND(x % nflat_gradp, kmeta), cleanup = .FALSE.)
+    END DO
+    CALL serialize(io, x % nflat_gradp, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
+    IF (nline_local) WRITE(io, '(g0)', ADVANCE = 'no') NEW_LINE('A')
+    IF (cleanup_local) CLOSE(UNIT = io)
+  END SUBROUTINE W_global_data_type
   SUBROUTINE W_t_grid_domain_decomp_info(io, x, cleanup, nline)
     USE mo_decomposition_tools, ONLY: t_grid_domain_decomp_info
     INTEGER :: io
@@ -2678,124 +2844,7 @@ MODULE serde_solve_nh
     IF (cleanup_local) CLOSE(UNIT = io)
   END SUBROUTINE W_real8
   SUBROUTINE serialize_global_data(io)
-    USE mo_dynamics_config, ONLY: ldeepatmo_var_0 => ldeepatmo
-    USE mo_grid_config, ONLY: l_limited_area => l_limited_area
-    USE mo_init_vgrid, ONLY: nflatlev => nflatlev
-    USE mo_initicon_config, ONLY: is_iau_active => is_iau_active
-    USE mo_initicon_config, ONLY: iau_wgt_dyn => iau_wgt_dyn
-    USE mo_interpol_config, ONLY: nudge_max_coeff => nudge_max_coeff
-    USE mo_mpi, ONLY: process_mpi_all_size => process_mpi_all_size
-    USE mo_mpi, ONLY: i_am_accel_node => i_am_accel_node
-    USE mo_nonhydrostatic_config, ONLY: itime_scheme => itime_scheme
-    USE mo_nonhydrostatic_config, ONLY: ndyn_substeps_var => ndyn_substeps_var
-    USE mo_nonhydrostatic_config, ONLY: lextra_diffu => lextra_diffu
-    USE mo_nonhydrostatic_config, ONLY: divdamp_fac => divdamp_fac
-    USE mo_nonhydrostatic_config, ONLY: divdamp_fac2 => divdamp_fac2
-    USE mo_nonhydrostatic_config, ONLY: divdamp_fac3 => divdamp_fac3
-    USE mo_nonhydrostatic_config, ONLY: divdamp_fac4 => divdamp_fac4
-    USE mo_nonhydrostatic_config, ONLY: divdamp_z => divdamp_z
-    USE mo_nonhydrostatic_config, ONLY: divdamp_z2 => divdamp_z2
-    USE mo_nonhydrostatic_config, ONLY: divdamp_z3 => divdamp_z3
-    USE mo_nonhydrostatic_config, ONLY: divdamp_z4 => divdamp_z4
-    USE mo_nonhydrostatic_config, ONLY: divdamp_fac_o2 => divdamp_fac_o2
-    USE mo_nonhydrostatic_config, ONLY: divdamp_order => divdamp_order
-    USE mo_nonhydrostatic_config, ONLY: divdamp_type => divdamp_type
-    USE mo_nonhydrostatic_config, ONLY: rayleigh_type => rayleigh_type
-    USE mo_nonhydrostatic_config, ONLY: rhotheta_offctr => rhotheta_offctr
-    USE mo_nonhydrostatic_config, ONLY: veladv_offctr => veladv_offctr
-    USE mo_nonhydrostatic_config, ONLY: iadv_rhotheta => iadv_rhotheta
-    USE mo_nonhydrostatic_config, ONLY: igradp_method => igradp_method
-    USE mo_nonhydrostatic_config, ONLY: kstart_dd3d => kstart_dd3d
-    USE mo_nonhydrostatic_config, ONLY: kstart_moist => kstart_moist
-    USE mo_parallel_config, ONLY: nproma_var_103 => nproma
-    USE mo_parallel_config, ONLY: p_test_run => p_test_run
-    USE mo_run_config, ONLY: timers_level => timers_level
-    USE mo_timer, ONLY: timer_solve_nh_veltend => timer_solve_nh_veltend
-    USE mo_timer, ONLY: timer_solve_nh_cellcomp => timer_solve_nh_cellcomp
-    USE mo_timer, ONLY: timer_solve_nh_exch => timer_solve_nh_exch
-    USE mo_timer, ONLY: timer_intp => timer_intp
-    USE mo_vertical_coord_table, ONLY: vct_a => vct_a
-    USE mo_vertical_grid, ONLY: nrdmax => nrdmax
-    USE mo_vertical_grid, ONLY: nflat_gradp => nflat_gradp
     INTEGER :: io
-    CALL serialize(io, "# ldeepatmo_var_0", cleanup = .FALSE.)
-    CALL serialize(io, ldeepatmo_var_0, cleanup = .FALSE.)
-    CALL serialize(io, "# l_limited_area", cleanup = .FALSE.)
-    CALL serialize(io, l_limited_area, cleanup = .FALSE.)
-    CALL serialize(io, "# nflatlev", cleanup = .FALSE.)
-    CALL serialize(io, nflatlev, cleanup = .FALSE.)
-    CALL serialize(io, "# is_iau_active", cleanup = .FALSE.)
-    CALL serialize(io, is_iau_active, cleanup = .FALSE.)
-    CALL serialize(io, "# iau_wgt_dyn", cleanup = .FALSE.)
-    CALL serialize(io, iau_wgt_dyn, cleanup = .FALSE.)
-    CALL serialize(io, "# nudge_max_coeff", cleanup = .FALSE.)
-    CALL serialize(io, nudge_max_coeff, cleanup = .FALSE.)
-    CALL serialize(io, "# process_mpi_all_size", cleanup = .FALSE.)
-    CALL serialize(io, process_mpi_all_size, cleanup = .FALSE.)
-    CALL serialize(io, "# i_am_accel_node", cleanup = .FALSE.)
-    CALL serialize(io, i_am_accel_node, cleanup = .FALSE.)
-    CALL serialize(io, "# itime_scheme", cleanup = .FALSE.)
-    CALL serialize(io, itime_scheme, cleanup = .FALSE.)
-    CALL serialize(io, "# ndyn_substeps_var", cleanup = .FALSE.)
-    CALL serialize(io, ndyn_substeps_var, cleanup = .FALSE.)
-    CALL serialize(io, "# lextra_diffu", cleanup = .FALSE.)
-    CALL serialize(io, lextra_diffu, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_fac", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_fac, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_fac2", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_fac2, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_fac3", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_fac3, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_fac4", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_fac4, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_z", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_z, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_z2", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_z2, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_z3", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_z3, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_z4", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_z4, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_fac_o2", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_fac_o2, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_order", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_order, cleanup = .FALSE.)
-    CALL serialize(io, "# divdamp_type", cleanup = .FALSE.)
-    CALL serialize(io, divdamp_type, cleanup = .FALSE.)
-    CALL serialize(io, "# rayleigh_type", cleanup = .FALSE.)
-    CALL serialize(io, rayleigh_type, cleanup = .FALSE.)
-    CALL serialize(io, "# rhotheta_offctr", cleanup = .FALSE.)
-    CALL serialize(io, rhotheta_offctr, cleanup = .FALSE.)
-    CALL serialize(io, "# veladv_offctr", cleanup = .FALSE.)
-    CALL serialize(io, veladv_offctr, cleanup = .FALSE.)
-    CALL serialize(io, "# iadv_rhotheta", cleanup = .FALSE.)
-    CALL serialize(io, iadv_rhotheta, cleanup = .FALSE.)
-    CALL serialize(io, "# igradp_method", cleanup = .FALSE.)
-    CALL serialize(io, igradp_method, cleanup = .FALSE.)
-    CALL serialize(io, "# kstart_dd3d", cleanup = .FALSE.)
-    CALL serialize(io, kstart_dd3d, cleanup = .FALSE.)
-    CALL serialize(io, "# kstart_moist", cleanup = .FALSE.)
-    CALL serialize(io, kstart_moist, cleanup = .FALSE.)
-    CALL serialize(io, "# nproma_var_103", cleanup = .FALSE.)
-    CALL serialize(io, nproma_var_103, cleanup = .FALSE.)
-    CALL serialize(io, "# p_test_run", cleanup = .FALSE.)
-    CALL serialize(io, p_test_run, cleanup = .FALSE.)
-    CALL serialize(io, "# timers_level", cleanup = .FALSE.)
-    CALL serialize(io, timers_level, cleanup = .FALSE.)
-    CALL serialize(io, "# timer_solve_nh_veltend", cleanup = .FALSE.)
-    CALL serialize(io, timer_solve_nh_veltend, cleanup = .FALSE.)
-    CALL serialize(io, "# timer_solve_nh_cellcomp", cleanup = .FALSE.)
-    CALL serialize(io, timer_solve_nh_cellcomp, cleanup = .FALSE.)
-    CALL serialize(io, "# timer_solve_nh_exch", cleanup = .FALSE.)
-    CALL serialize(io, timer_solve_nh_exch, cleanup = .FALSE.)
-    CALL serialize(io, "# timer_intp", cleanup = .FALSE.)
-    CALL serialize(io, timer_intp, cleanup = .FALSE.)
-    CALL serialize(io, "# vct_a", cleanup = .FALSE.)
-    CALL serialize(io, vct_a, cleanup = .FALSE.)
-    CALL serialize(io, "# nrdmax", cleanup = .FALSE.)
-    CALL serialize(io, nrdmax, cleanup = .FALSE.)
-    CALL serialize(io, "# nflat_gradp", cleanup = .FALSE.)
-    CALL serialize(io, nflat_gradp, cleanup = .FALSE.)
     CLOSE(UNIT = io)
   END SUBROUTINE serialize_global_data
 END MODULE serde_solve_nh
