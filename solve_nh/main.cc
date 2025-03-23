@@ -1,30 +1,45 @@
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include "serde_solve_nh.h"
 #include "solve_nh.h"
 
+const std::filesystem::path ROOT{
+    "/Users/pmz/gitspace/icon-dace/experiments/exclaim_ape_R2B09/"};
+
+std::filesystem::path versioned_data(const std::string& name, int version) {
+  auto file_name = name + "." + std::to_string(version) + ".data";
+  return ROOT / file_name;
+}
+
+std::ifstream read_from(const std::filesystem::path &p) {
+  std::ifstream fs{p};
+  if (!fs.good()) {
+    std::cerr << "Cannot open: " << p << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return fs;
+}
+
 int main() {
-  const std::filesystem::path ROOT{
-      "/Users/pmz/gitspace/icon-dace/experiments/exclaim_ape_R2B09/"};
-  const int max_n = 5;
+  const int max_n = 1;
 
   for (int n = 1; n <= max_n; ++n) {
     std::cerr << "Reading data for " << n << "..." << std::endl;
 
     global_data_type global_data;
     {
-      std::ifstream data(ROOT /
-                         ("global_data.t0." + std::to_string(n) + ".data"));
-      serde::deserialize_global_data(&global_data, data);
+      auto data = read_from(versioned_data("global_data.t0", n));
+      serde::deserialize(&global_data, data);
     }
     global_data_type global_data_want;
     {
-      std::ifstream data(ROOT /
-                         ("global_data.t1." + std::to_string(n) + ".data"));
-      serde::deserialize_global_data(&global_data_want, data);
+      auto data = read_from(versioned_data("global_data.t1", n));
+      serde::deserialize(&global_data_want, data);
     }
     /*
     std::vector<const global_data_type*> gs{&global_data, &global_data_want};
@@ -38,88 +53,87 @@ int main() {
 
     t_int_state p_int;
     {
-      std::ifstream data(ROOT / ("p_int." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("p_int", n));
       serde::deserialize(&p_int, data);
     }
 
     t_patch p_patch;
     {
-      std::ifstream data(ROOT / ("p_patch.t0." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("p_patch.t0", n));
       serde::deserialize(&p_patch, data);
     }
     t_patch p_patch_want;
     {
-      std::ifstream data(ROOT / ("p_patch.t1." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("p_patch.t1", n));
       serde::deserialize(&p_patch_want, data);
     }
 
     t_prepare_adv prep_adv;
     {
-      std::ifstream data(ROOT / ("prep_adv.t0." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("prep_adv.t0", n));
       serde::deserialize(&prep_adv, data);
     }
     t_prepare_adv prep_adv_want;
     {
-      std::ifstream data(ROOT / ("prep_adv.t1." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("prep_adv.t1", n));
       serde::deserialize(&prep_adv_want, data);
     }
 
     t_nh_state p_nh;
     {
-      std::ifstream data(ROOT / ("p_nh.t0." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("p_nh.t0", n));
       serde::deserialize(&p_nh, data);
     }
     t_nh_state p_nh_want;
     {
-      std::ifstream data(ROOT / ("p_nh.t1." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("p_nh.t1", n));
       serde::deserialize(&p_nh_want, data);
     }
 
     int jstep, idyn_timestep, l_init, l_recompute, nnew, nnow;
     {
-      std::ifstream data(ROOT / ("jstep." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("jstep", n));
       serde::deserialize(&jstep, data);
     }
     {
-      std::ifstream data(ROOT /
-                         ("idyn_timestep." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("idyn_timestep", n));
       serde::deserialize(&idyn_timestep, data);
     }
     {
-      std::ifstream data(ROOT / ("l_init." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("l_init", n));
       serde::deserialize(&l_init, data);
     }
     {
-      std::ifstream data(ROOT / ("l_recompute." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("l_recompute", n));
       serde::deserialize(&l_recompute, data);
     }
     {
-      std::ifstream data(ROOT / ("nnew." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("nnew", n));
       serde::deserialize(&nnew, data);
     }
     {
-      std::ifstream data(ROOT / ("nnow." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("nnow", n));
       serde::deserialize(&nnow, data);
     }
     double lacc, dtime, lclean_mflx, lprep_adv, lsave_mflx;
     {
-      std::ifstream data(ROOT / ("lacc." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("lacc", n));
       serde::deserialize(&lacc, data);
     }
     {
-      std::ifstream data(ROOT / ("dtime." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("dtime", n));
       serde::deserialize(&dtime, data);
     }
     {
-      std::ifstream data(ROOT / ("lclean_mflx." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("lclean_mflx", n));
       serde::deserialize(&lclean_mflx, data);
     }
     {
-      std::ifstream data(ROOT / ("lprep_adv." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("lprep_adv", n));
       serde::deserialize(&lprep_adv, data);
     }
     {
-      std::ifstream data(ROOT / ("lsave_mflx." + std::to_string(n) + ".data"));
+      auto data = read_from(versioned_data("lsave_mflx", n));
       serde::deserialize(&lsave_mflx, data);
     }
 
@@ -141,11 +155,38 @@ int main() {
 
     {
       std::ofstream data("global_data_" + std::to_string(n) + ".got");
-      data << serde::serialize_global_data(&global_data) << std::endl;
+      data << serde::serialize(&global_data) << std::endl;
     }
     {
       std::ofstream data("global_data_" + std::to_string(n) + ".want");
-      data << serde::serialize_global_data(&global_data_want) << std::endl;
+      data << serde::serialize(&global_data_want) << std::endl;
+    }
+
+    {
+      std::ofstream data("p_patch_" + std::to_string(n) + ".got");
+      data << serde::serialize(&p_patch) << std::endl;
+    }
+    {
+      std::ofstream data("p_patch_" + std::to_string(n) + ".want");
+      data << serde::serialize(&p_patch_want) << std::endl;
+    }
+
+    {
+      std::ofstream data("prep_adv_" + std::to_string(n) + ".got");
+      data << serde::serialize(&prep_adv) << std::endl;
+    }
+    {
+      std::ofstream data("prep_adv_" + std::to_string(n) + ".want");
+      data << serde::serialize(&prep_adv_want) << std::endl;
+    }
+
+    {
+      std::ofstream data("p_nh_" + std::to_string(n) + ".got");
+      data << serde::serialize(&p_nh) << std::endl;
+    }
+    {
+      std::ofstream data("p_nh_" + std::to_string(n) + ".want");
+      data << serde::serialize(&p_nh_want) << std::endl;
     }
   }
   return EXIT_SUCCESS;
