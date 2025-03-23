@@ -25,9 +25,7 @@ from utils import (
 
 from velocity.map_fissions import YoloMapFission
 
-use_cache = True
-run_benchmark = False
-cleanup = False
+from utils.config import use_cache, run_benchmark, cleanup
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfgz")
