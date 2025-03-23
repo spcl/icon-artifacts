@@ -1,0 +1,211 @@
+import dace
+import copy
+
+def move_transients_to_top_level(root: dace.SDFG,
+                                 upper_bounds = dict[str, int]):
+    # If we have a transient array, make it live on the top level SDFG
+    # For this, collect all transients that do not exist on top level SDFG
+    # Add them to top level SDFG, if they are arrays and have storage location Default
+    #
+    # for s in sdfg.states():
+    #    for n in s.nodes():
+    #        if isinstance(n, dace.nodes.NestedSDFG):
+    #            self.move_transients_to_top_level(roots + [sdfg], n.sdfg)
+
+    # Add arrays from bottom to up
+    arrays_added = dict()
+    map_chain = []
+    for sdfg, arr_name, arr in root.arrays_recursive():
+        if sdfg != root:
+            if (
+                arr.transient
+                and isinstance(arr, dace.data.Array)
+                and arr.shape != (1,)
+            ):
+                if (
+                    arr.storage == dace.dtypes.StorageType.Default
+                    or arr.storage == dace.dtypes.CPU_Heap
+                    or arr.storage == dace.dtypes.GPU_Global
+                ):
+                    arr.transient = False
+                    # As we go up, we need to understand how this array used
+                    # Map with N threads using a (S1, S2) shape array will need
+                    # (S1, S2, N) shape which each thread assigned to one of the Ns
+                    ways_up = 0
+                    _sdfg = sdfg
+                    while _sdfg is not None and _sdfg != root:
+                        _sdfg = _sdfg.parent_sdfg
+                        ways_up += 1
+                    print(f"{arr_name} needs to be moved {ways_up} level{'s' if ways_up == 1 else ''} up")
+                    if ways_up != 1:
+                        raise Exception("Moving transients to top level only supports if the transient needs to be moved once currently")
+
+                    # To support more than 1 level need to check nested SDFGs and the map chain
+                    _sdfg = sdfg
+                    while _sdfg is not None and _sdfg != root:
+                        parent = _sdfg.parent_sdfg
+                        for state in parent.all_states():
+                            for node in state.nodes():
+                                if isinstance(node, dace.nodes.MapEntry):
+                                    _nodes = [_n for _n in state.all_nodes_between(node, state.exit_node(node))]
+                                    for _n in _nodes:
+                                        if isinstance(_n, dace.nodes.NestedSDFG) and arr_name in _n.sdfg.arrays:
+                                            if _n not in map_chain:
+                                                map_chain.append((parent, _n.sdfg, _n, node, arr_name))
+                        _sdfg = _sdfg.parent_sdfg
+                    print(f"{arr_name} needs to be moved {ways_up} through {map_chain}")
+
+                    """
+                    _sdfg = sdfg
+                    while _sdfg is not None:
+                        if _sdfg == root:
+                            if arr_name not in _sdfg.arrays:
+                                arr2 = copy.deepcopy(arr)
+                                if sdfg == root:
+                                    arr2.transient = True
+                                else:
+                                    arr2.transient = False
+                                _sdfg.add_datadesc(arr_name, arr2)
+                        else:
+                            if arr_name not in sdfg.arrays:
+                                arr2 = copy.deepcopy(arr)
+                                if sdfg == root:
+                                    arr2.transient = True
+                                else:
+                                    arr2.transient = False
+                                _sdfg.add_datadesc(arr_name, arr2)
+                        if _sdfg not in arrays_added:
+                            arrays_added[_sdfg] = set([arr_name])
+                        else:
+                            arrays_added[_sdfg].add(arr_name)
+
+                        _sdfg = _sdfg.parent_sdfg
+                    """
+
+    if upper_bounds is None:
+        upper_bounds = dict()
+
+    print(root.constants)
+    for parent_sdfg, child_sdfg, nsdfg, map_entry, arr_name in map_chain:
+        assert type(map_entry) == dace.nodes.MapEntry
+        assert type(parent_sdfg) == dace.SDFG
+        assert type(child_sdfg) == dace.SDFG
+        assert type(nsdfg) == dace.nodes.NestedSDFG
+        arr_desc: dace.data.Data = child_sdfg.arrays[arr_name]
+        assert len(map_entry.map.range) == 1
+        if arr_name in upper_bounds:
+            bound = upper_bounds[arr_name]
+            lifetime = dace.AllocationLifetime.SDFG
+        else:
+            b, e, s = map_entry.map.range[0]
+            bound = (e+1-b)//s
+            lifetime = dace.AllocationLifetime.Scope
+
+        assert arr_desc.start_offset == 0, f"{arr_desc}, {arr_desc.start_offset}"
+        new_desc = dace.data.Array(
+            dtype=arr_desc.dtype,
+            shape=list(arr_desc.shape) + [bound],
+            strides=list(arr_desc.strides) + [arr_desc.total_size],
+            transient=True,
+            storage=arr_desc.storage,
+            location=arr_desc.location,
+            allow_conflicts=arr_desc.allow_conflicts,
+            offset=list(arr_desc.offset) + [0],
+            may_alias=arr_desc.may_alias,
+            lifetime=lifetime,
+            alignment=arr_desc.alignment,
+            debuginfo=arr_desc.debuginfo,
+            total_size=bound * arr_desc.total_size,
+            start_offset=0,
+        )
+        copy_new_desc = copy.deepcopy(new_desc)
+        copy_new_desc.transient = False
+        child_sdfg.remove_data(arr_name, False)
+        if arr_name in parent_sdfg.arrays:
+            parent_sdfg.remove_data(arr_name, False)
+        parent_sdfg.add_datadesc(arr_name, new_desc)
+        child_sdfg.add_datadesc(arr_name, copy_new_desc)
+
+        # Add the final dimension that depends on the map iterator
+        map_param_strs = map_entry.map.params
+        assert len(map_param_strs) == 1
+        map_param_str = map_param_strs[0]
+        param_sym = dace.symbolic.symbol(map_param_str)
+
+        # Replace all memlets
+        for state in child_sdfg.all_states():
+            for edge in state.edges():
+                if edge.data.data == arr_name:
+                    mem_range = copy.deepcopy(edge.data.subset)
+                    mem_range_list = []
+                    for b,e,s in mem_range.ranges:
+                        mem_range_list += [(b, e, s)]
+                    mem_range_list += [(param_sym, param_sym, 1)]
+                    state.remove_edge(edge)
+                    state.add_edge(
+                        edge.src,
+                        edge.src_conn,
+                        edge.dst,
+                        edge.dst_conn,
+                        dace.memlet.Memlet(data=edge.data.data,
+                                            subset=dace.subsets.Range(mem_range_list))
+                    )
+
+
+        # Pass accesses
+
+        # Check if we have a write, if we have a write, then add exit edge too
+        has_write = False
+        for state in child_sdfg.all_states():
+            for edge in state.edges():
+                if isinstance(edge.dst, dace.nodes.AccessNode):
+                    if edge.dst.data == arr_name:
+                        has_write = True
+                        break
+
+        parent_state = [s for s in parent_sdfg.all_states() if map_entry in s.nodes()]
+        assert len(parent_state) == 1
+        parent_state = parent_state[0]
+
+        a0 = parent_state.add_access(arr_name)
+        a1 = parent_state.add_access(arr_name)
+        map_entry.add_in_connector("IN_" + arr_name)
+        map_entry.add_out_connector("OUT_" + arr_name)
+        map_exit = parent_state.exit_node(map_entry)
+        nsdfg.add_in_connector(arr_name)
+
+        parent_state.add_edge(
+            a0,
+            None,
+            map_entry,
+            "IN_" + arr_name,
+            dace.memlet.Memlet.from_array(arr_name, new_desc),
+        )
+        parent_state.add_edge(
+            map_entry,
+            "OUT_" + arr_name,
+            nsdfg,
+            arr_name,
+            dace.memlet.Memlet.from_array(arr_name, new_desc),
+        )
+        if has_write:
+            map_exit.add_in_connector("IN_" + arr_name)
+            map_exit.add_out_connector("OUT_" + arr_name)
+            nsdfg.add_out_connector(arr_name, force=True)
+            parent_state.add_edge(
+                nsdfg,
+                arr_name,
+                map_exit,
+                "IN_" + arr_name,
+                dace.memlet.Memlet.from_array(arr_name, new_desc),
+            )
+            parent_state.add_edge(
+                map_exit,
+                "OUT_" + arr_name,
+                a1,
+                None,
+                dace.memlet.Memlet.from_array(arr_name, new_desc),
+            )
+
+    root.validate()
+    return arrays_added
