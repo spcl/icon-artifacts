@@ -23,7 +23,7 @@ from utils import (
 )
 
 
-from velocity.map_fissions import YoloMapFission
+from utils.map_fissions import YoloMapFission
 
 from utils.config import use_cache, run_benchmark, cleanup
 
