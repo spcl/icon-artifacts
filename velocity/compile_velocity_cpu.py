@@ -73,8 +73,8 @@ if Path("cpu_pipe_stage3.sdfgz").exists() and use_cache:
 else:
     sdfg.apply_transformations(YoloMapFission, validate=False)
     sdfg.validate()
-    untangle_if_sdfg(sdfg)
-    split_map_sdfg(sdfg, False)
+    untangle_if_sdfg(sdfg, verbose=verbose)
+    split_map_sdfg(sdfg, False, verbose=verbose)
     sdfg.validate()
 
     raise_loop_invariant_if(
