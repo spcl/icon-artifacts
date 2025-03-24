@@ -33,6 +33,11 @@ def benchmark_sdfg(
             kernel.instrument = dace.InstrumentationType.Timer
         sdfg.save(f"{sdfg_name}_named_kernels.sdfg")
 
+    # Add timing function
+    with open("include/timer.h", "r") as file:
+        timing_function = file.read()   
+    sdfg.append_global_code(timing_function)
+
     # Generate code with injections
     _pre_injection(sdfg, gpu=gpu, release=release)
     _injection(sdfg, gpu=gpu, release=release)
@@ -45,30 +50,15 @@ def benchmark_sdfg(
     assert "// End flatten" in code
     assert "// Start deflatten" in code
 
-    # Find // End flatten, then continue until we are past two closing brackets
+    # Find // End flatten
     end_flatten = code.find("// End flatten")
-    end_flatten = code.find("}", end_flatten) + 1 # Skip the bracket
-    end_flatten = code.find("}", end_flatten) + 1 # Skip the bracket
-    code = (
-        code[:end_flatten]
-        + f"""
-    auto __dace_tbegin_wo_flattener = std::chrono::high_resolution_clock::now();
-    """
-        + code[end_flatten:]
-    )
+    code = code[:end_flatten] + f"measure_time();" + code[end_flatten:]
 
-    # Find // Start deflatten, then go back until we are past two opening brackets
+    # Find // Start deflatten
     start_deflatten = code.find("// Start deflatten")
-    start_deflatten = code.rfind("{", 0, start_deflatten)
-    start_deflatten = code.rfind("{", 0, start_deflatten)
     code = (
         code[:start_deflatten]
-        + f"""
-        auto __dace_tend_wo_flattener = std::chrono::high_resolution_clock::now();
-        unsigned long int __dace_ts_start_wo_flattener = std::chrono::duration_cast<std::chrono::microseconds>(__dace_tbegin_wo_flattener.time_since_epoch()).count();
-        unsigned long int __dace_ts_end_wo_flattener = std::chrono::duration_cast<std::chrono::microseconds>(__dace_tend_wo_flattener.time_since_epoch()).count();
-        __state->report.add_completion("SDFG w/o flattening", "Timer", __dace_ts_start_wo_flattener, __dace_ts_end_wo_flattener, 0, 0, 0);
-        """
+        + f'measure_time(__state,"SDFG w/o flattening");'
         + code[start_deflatten:]
     )
 
