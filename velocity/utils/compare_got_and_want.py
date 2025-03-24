@@ -1,8 +1,13 @@
 import os
 import math
+import numpy as np
 
 
 def compare_got_and_want():
+    # Precision for double precision floating point numbers
+    abs_tol = 1e-12
+    rel_tol = np.finfo(np.float64).eps
+
     # Get list of .got and .want files
     got_files = [f for f in os.listdir() if f.endswith(".got")]
     want_files = [f.replace(".got", ".want") for f in got_files]
@@ -37,8 +42,9 @@ def compare_got_and_want():
                         max_rel_diff = max(max_rel_diff, abs_diff / abs(want_num))
                     max_abs_diff = max(max_abs_diff, abs_diff)
 
-                    # TODO: Adjust rel_tol and abs_tol
-                    if not math.isclose(got_num, want_num, rel_tol=0, abs_tol=1e-12):
+                    if not math.isclose(
+                        got_num, want_num, rel_tol=rel_tol, abs_tol=abs_tol
+                    ):
                         print(f"{got} and {want} have numerical differences ❌")
                         found_diff = True
                         break

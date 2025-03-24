@@ -17,6 +17,58 @@ def _replace_cpp_with_cu(directory):
         print(f"Renamed: {file} -> {new_name}")
 
 
+# Generate code
+# From dace/dace/sdfg/sdfg.py:compile
+def _generate_code(sdfg: dace.SDFG, validate: bool = True):
+    # Importing these outside creates an import loop
+    from dace.codegen import codegen, compiler
+    import copy
+    import warnings
+
+    build_folder = sdfg.build_folder
+
+    ############################
+    # DaCe Compilation Process #
+
+    # Clone SDFG as the other modules may modify its contents
+    sdfg = copy.deepcopy(sdfg)
+    # Fix the build folder name on the copied SDFG to avoid it changing
+    # if the codegen modifies the SDFG (thereby changing its hash)
+    sdfg.build_folder = build_folder
+
+    # Ensure external nested SDFGs are loaded.
+    for _ in sdfg.all_sdfgs_recursive(load_ext=True):
+        pass
+
+    # Rename SDFG to avoid runtime issues with clashing names
+    index = 0
+    while sdfg.is_loaded():
+        sdfg.name = f"{sdfg.name}_{index}"
+        index += 1
+    if sdfg.name != sdfg.name:
+        warnings.warn(
+            f"SDFG '{sdfg.name}' is already loaded by another object, recompiling under a different "
+            f"name '{sdfg.name}'."
+        )
+
+    try:
+        # Fill in scope entry/exit connectors
+        sdfg.fill_scope_connectors()
+
+        # Generate code for the program by traversing the SDFG state by state
+        program_objects = codegen.generate_code(sdfg, validate=validate)
+    except Exception:
+        fpath = os.path.join("_dacegraphs", "failing.sdfgz")
+        sdfg.save(fpath, compress=True)
+        print(f"Failing SDFG saved for inspection in {os.path.abspath(fpath)}")
+        raise
+
+    # Generate the program folder and write the source files
+    compiler.generate_program_folder(
+        sdfg, program_objects, build_folder
+    )
+
+
 def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     # get build location and dace location
     build_loc = sdfg.build_folder
@@ -27,12 +79,7 @@ def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     shutil.rmtree(build_loc, ignore_errors=True)
 
     # Generate code
-    # TODO: Find a way to generate code with .dacecache
-    try:
-        sdfg.compile()
-    except Exception as e:
-        print("Compiling failed:", e)
-        pass
+    _generate_code(sdfg)
 
     # Prepend reduction library to .dacecache/<name>/src/cpu/<name>.cpp
     with open(f"src/reductions.cpp", "r") as file:

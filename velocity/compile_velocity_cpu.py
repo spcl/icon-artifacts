@@ -45,8 +45,6 @@ else:
         tmp_call_13_to_reduction(sdfg)
         levmask_to_reduction(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
-    if use_cache:
-        sdfg.save("cpu_pipe_stage1.sdfgz", compress=True)
     move_transients_to_top_level(
         root=sdfg,
         upper_bounds={
@@ -56,6 +54,8 @@ else:
             "z_w_concorr_mc": 960,
         },
     )
+    if use_cache:
+        sdfg.save("cpu_pipe_stage1.sdfgz", compress=True)
 
 if Path("cpu_pipe_stage2.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfgz")
@@ -97,7 +97,7 @@ for node, state in sdfg.all_nodes_recursive():
         node.map.schedule = dace.ScheduleType.CPU_Multicore
 
 # How many loops?
-count_loops(sdfg)
+count_loops(sdfg, assert_loops=True)
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("cpu_velocity.sdfgz", compress=True)
