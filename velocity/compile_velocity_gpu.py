@@ -145,7 +145,6 @@ count_loops(sdfg, assert_loops=True)
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("gpu_velocity.sdfgz", compress=True)
-exit(0)
 
 ################################################################################
 ### Numerically validate the SDFG
