@@ -36,7 +36,7 @@ else:
     StructToContainerGroups(
         validate=False,
         save_steps=False,
-        verbose=False,
+        verbose=verbose,
         simplify=False,
         interface_with_struct_copy=True,
         interface_to_gpu=True,
@@ -61,7 +61,8 @@ else:
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
-    sdfg.save("parallel.sdfgz", compress=True)
+    if verbose:
+      sdfg.save("parallel.sdfgz", compress=True)
     move_transients_to_top_level(
         root=sdfg,
         upper_bounds={
@@ -71,7 +72,8 @@ else:
             "z_w_concorr_mc": 960,
         },
     )
-    sdfg.save("transients_moved.sdfgz", compress=True)
+    if verbose:
+      sdfg.save("transients_moved.sdfgz", compress=True)
     ToGPU().apply_pass(sdfg, {})
     if not reduction:
         for cfg in sdfg.nodes():
@@ -137,7 +139,6 @@ else:
 count_loops(sdfg, verbose=verbose, assert_loops=True)
 count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
 sdfg.validate()
-sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("gpu_velocity.sdfgz", compress=True)
 
 ################################################################################
@@ -160,22 +161,15 @@ compare_got_and_want()
 ################################################################################
 
 if run_benchmark:
-    # Warmup
-    for i in range(10):
-        os.system(f"./{sdfg_name}")
-
-    # Measure
-    times = []
-    for i in range(10):
-        sdfg.clear_instrumentation_reports()
-        os.system(f"./{sdfg_name}")
-        report = sdfg.get_latest_report()
-        assert report.events[-1].name == f"SDFG {sdfg.name}"
-        time = report.events[-1].duration  # in us
-        times.append(time)
-
-    for time in times:
-        print(f"GPU,{time}")
+    benchmark_sdfg(
+        sdfg,
+        "GPU",
+        gpu=True,
+        release=release,
+        warmups=1,
+        measurements=1,
+        profile=True,
+    )
 
 ################################################################################
 ### Cleanup

@@ -18,3 +18,4 @@ from utils.raise_loop_invariant_if import raise_loop_invariant_if
 from utils.gpu_kernel_launch_fix import wrap_reduction_and_T_l488_c488in_gpumap
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.map_state_fission import MapStateFission, AccessDuplicate
+from utils.benchmark_sdfg import benchmark_sdfg

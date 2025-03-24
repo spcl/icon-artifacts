@@ -24,20 +24,20 @@ if Path("cpu_pipe_stage1.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfgz")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
-    sdfg.simplify(verbose=True)
+    sdfg.simplify(verbose=verbose)
     SymbolPropagation().apply_pass(sdfg, {})
-    sdfg.simplify(verbose=True)
+    sdfg.simplify(verbose=verbose)
     StructToContainerGroups(
         save_steps=False,
-        verbose=False,
+        verbose=verbose,
         simplify=False,
         interface_with_struct_copy=True,
         interface_to_gpu=False,
     ).apply_pass(sdfg, {})
-    sdfg.simplify(skip=["ArrayElimination"], verbose=True)
+    sdfg.simplify(skip=["ArrayElimination"], verbose=verbose)
     make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
     make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
-    sdfg.simplify(skip=["ArrayElimination"], verbose=True)
+    sdfg.simplify(skip=["ArrayElimination"], verbose=verbose)
     if reduction:
         loop_to_max_reduction(sdfg)
         cfl_clipping_to_reduction(sdfg)
@@ -61,9 +61,9 @@ if Path("cpu_pipe_stage2.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfgz")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
-    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
     sdfg.apply_transformations_repeated(MapCollapse)
-    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
+    sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
     if use_cache:
         sdfg.save("cpu_pipe_stage2.sdfgz", compress=True)
 
@@ -103,7 +103,6 @@ for node, state in sdfg.all_nodes_recursive():
 count_loops(sdfg, verbose=verbose, assert_loops=True)
 count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
 sdfg.validate()
-sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("cpu_velocity.sdfgz", compress=True)
 
 
@@ -127,22 +126,15 @@ compare_got_and_want()
 ################################################################################
 
 if run_benchmark:
-    # Warmup
-    for i in range(10):
-        os.system(f"./{sdfg_name}")
-
-    # Measure
-    times = []
-    for i in range(10):
-        sdfg.clear_instrumentation_reports()
-        os.system(f"./{sdfg_name}")
-        report = sdfg.get_latest_report()
-        assert report.events[-1].name == f"SDFG {sdfg.name}"
-        time = report.events[-1].duration  # in us
-        times.append(time)
-
-    for time in times:
-        print(f"CPU,{time}")
+    benchmark_sdfg(
+        sdfg,
+        "CPU",
+        gpu=False,
+        release=release,
+        warmups=1,
+        measurements=1,
+        profile=True,
+    )
 
 ################################################################################
 ### Cleanup
