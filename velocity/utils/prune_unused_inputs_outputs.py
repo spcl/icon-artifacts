@@ -14,7 +14,7 @@ def prune_unused_inputs_outputs(sdfg: dace.SDFG):
                         # NestedSDFG should have 1 state only and 1 map + 1 nested SDFG + some acess nodes
                         nsdfg = map_body_nodes[0]
                         inner_sdfg = map_body_nodes[0].sdfg
-                        print("1.5", inner_sdfg.nodes())
+                        #print("1.5", inner_sdfg.nodes())
                         if len(inner_sdfg.nodes()) == 1 and isinstance(inner_sdfg.nodes()[0], dace.SDFGState):
                             inner_state = inner_sdfg.nodes()[0]
                             maps_and_nested_sdfg = [n for n in inner_state.nodes()
