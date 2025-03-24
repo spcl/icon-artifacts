@@ -3,8 +3,8 @@ import shutil
 import dace
 import os
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
-from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
-from dace.transformation.dataflow import MapCollapse
+from dace.transformation.passes import InlineSDFGs, SymbolPropagation, StructToContainerGroups
+from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import (
     make_array_loop_local,
@@ -18,7 +18,8 @@ from utils import (
     count_loops,
     move_transients_to_top_level,
     split_map_sdfg,
-    untangle_if_sdfg
+    untangle_if_sdfg,
+    raise_loop_invariant_if
 )
 
 from utils.map_fissions import YoloMapFission
@@ -102,6 +103,34 @@ untangle_if_sdfg(sdfg)
 split_map_sdfg(sdfg, False)
 sdfg.validate()
 
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
+                             copy_edge_before = [False, True])
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["not (lvn_only == 1)"],
+                             copy_edge_before = [False])
+# Nested Case extend support for this
+#raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["not (lvn_only == 1)", "_if_cond_27 == 1"],
+#                             copy_edge_before = [False, True])
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["(1 - lvn_only) == 1"],
+                             copy_edge_before = [False])
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["(istep == 1) == 1"],
+                             copy_edge_before = [False])
+
+InlineSDFGs().apply_pass(sdfg, {})
+k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+print(f"Applied MapCollapse {k} time(s)")
+k = sdfg.apply_transformations_repeated(MapFusion)
+for s in sdfg.states():
+    for n in s.nodes():
+        if isinstance(n, dace.nodes.NestedSDFG):
+            k = n.sdfg.apply_transformations_repeated(MapFusion, permissive=True)
+            print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
+print(f"Applied MapFusion {k} time(s)")
+k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+print(f"Applied MapCollapse {k} time(s)")
+sdfg.simplify()
+
+sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)
+
 # How many loops?
 count_loops(sdfg)
 sdfg.validate()
@@ -113,7 +142,7 @@ sdfg.instrument = dace.InstrumentationType.Timer
 
 # Compile the SDFG
 compile_sdfg(sdfg, gpu=True, release=release)
-
+exit()
 
 sdfg.save("gpu_velocity.sdfgz", compress=True)
 

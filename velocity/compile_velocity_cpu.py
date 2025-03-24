@@ -100,6 +100,10 @@ sdfg.validate()
 
 raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
                              copy_edge_before = [False, True])
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["not (lvn_only == 1)"],
+                             copy_edge_before = [False])
+raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["(istep == 1) == 1"],
+                             copy_edge_before = [False])
 sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
 
 # How many loops?
