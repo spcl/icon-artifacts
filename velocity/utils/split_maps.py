@@ -551,17 +551,26 @@ def move_in_if(sdfg: dace.SDFG, n: dace.nodes.NestedSDFG):
                                     n.sdfg.remove_symbol(sym)
 
 
-def untangle_if_sdfg(sdfg: dace.SDFG):
-    for state in sdfg.states():
-        for n in state.nodes():
-            if isinstance(n, dace.nodes.NestedSDFG):
-                nested_nodes = n.sdfg.nodes()
-                if len(nested_nodes) > 3:
-                    simplify_state_if_if_pattern(n.sdfg)
-                if len(nested_nodes) >= 2:
-                    [n1, n2] = nested_nodes[0:2]
-                    if isinstance(n1, ConditionalBlock) and isinstance(n2, dace.SDFGState):
-                        untangle_if(n.sdfg, n1)
+def untangle_if_sdfg(sdfg: dace.SDFG, verbose: bool):
+    for state, graph in sdfg.all_nodes_recursive():
+        if isinstance(state, dace.SDFGState):
+            for n in state.nodes():
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    nested_nodes = n.sdfg.nodes()
+                    if len(nested_nodes) > 3:
+                        simplify_state_if_if_pattern(n.sdfg)
+                    if len(nested_nodes) >= 2:
+                        [n1, n2] = nested_nodes[0:2]
+                        if isinstance(n1, ConditionalBlock):
+                            if isinstance(n2, dace.SDFGState):
+                                untangle_if(n.sdfg, n1)
+                            elif isinstance(n2, ConditionalBlock):
+                                s = ""
+                                for i in range(len(n2.branches[0][0].code)):
+                                    s += " " + ast.unparse(n2.branches[0][0].code[i])
+                                if "endblk" not in s:
+                                    print(s)
+                                    untangle_if(n.sdfg, n1)
 
     sdfg.validate()
 
@@ -569,10 +578,11 @@ def untangle_if_sdfg(sdfg: dace.SDFG):
         if isinstance(_n, dace.nodes.NestedSDFG):
             move_in_if(_n.sdfg, _n)
 
+
     sdfg.save("ifs_untangled.sdfgz", compress=True)
     sdfg.validate()
 
-def split_map_sdfg(sdfg: dace.SDFG, gpu: bool):
+def split_map_sdfg(sdfg: dace.SDFG, gpu: bool, verbose: bool):
     applied = 0
     for state in sdfg.states():
         for n in state.bfs_nodes():
