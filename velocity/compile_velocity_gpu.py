@@ -113,7 +113,8 @@ else:
     raise_loop_invariant_if(
         sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
     )
-
+    # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
+    split_map_sdfg(sdfg, True, verbose)
 
     InlineSDFGs().apply_pass(sdfg, {})
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)

@@ -328,129 +328,6 @@ def split_map(cfg: dace.SDFG | ControlFlowBlock, state: dace.SDFGState,
             map_entry._cs_childpath = False
         i += 1
 
-def split_map_cfg(sdfg: dace.SDFG,
-                  cfg: ControlFlowBlock,
-                  map_entry: dace.nodes.MapEntry,
-                  range_dict: typing.Dict,
-                  gpu: bool):
-
-    sym_names = ["beg_blk_range_beg", "beg_blk_range_end",
-                 "middle_blk_range_beg", "middle_blk_range_end",
-                 "end_blk_range_beg", "end_blk_range_end"]
-    for sym_name in sym_names:
-        if sym_name not in sdfg.symbols:
-            sdfg.add_symbol(sym_name, dace.int64)
-
-    d = {}
-    for part in ["beg", "middle", "end"]:
-        assert part + "_blk_range_beg" not in d
-        assert part + "_blk_range_end" not in d
-        d[part + "_blk_range_beg"] = range_dict[part]["beg"]
-        d[part + "_blk_range_end"] = range_dict[part]["end"]
-
-    symbol_define_state = cfg.parent_graph.add_state_before(cfg, assignments=d)
-
-    inner_nodes = list(cfg.all_nodes_between(map_entry, cfg.exit_node(map_entry)))
-    assert len(inner_nodes) == 1
-    inner_sdfg = inner_nodes[0].sdfg
-
-    n1, n2 = inner_nodes[0], inner_nodes[1]
-    inner_sdfg.remove_node(n1)
-    inner_sdfg.remove_node(n2)
-
-    # Duplicate it 2 times
-    duplicates = []
-    for i in range(2):
-        node_map = dict()
-        inner_nodes = list(cfg.all_nodes_between(map_entry, cfg.exit_node(map_entry))) + [map_entry, cfg.exit_node(map_entry)]
-        inner_edges = cfg.all_edges(*inner_nodes)
-        for n in inner_nodes:
-            node_map[n] = copy.deepcopy(n)
-            cfg.add_node(node_map[n])
-        for e in inner_edges:
-            if e.src not in node_map:
-                if cfg.in_degree(e.src) == 0:
-                    node_map[e.src] = copy.deepcopy(e.src)
-                    cfg.add_node(node_map[e.src])
-            if e.dst not in node_map:
-                if cfg.out_degree(e.dst) == 0:
-                    node_map[e.dst] = copy.deepcopy(e.dst)
-                    cfg.add_node(node_map[e.dst])
-            src = e.src if e.src not in node_map else node_map[e.src]
-            dst = e.dst if e.dst not in node_map else node_map[e.dst]
-            cfg.add_edge(src, e.src_conn, dst, e.dst_conn, copy.deepcopy(e.data))
-
-        duplicates.append(node_map[map_entry])
-
-    duplicates.append(map_entry)
-
-    i = 0
-    for map_entry, part in zip(duplicates, ["beg", "middle", "end"]):
-        if gpu:
-            map_entry._cuda_stream = i
-            map_entry._cs_childpath = False
-        inner_nodes = list(cfg.all_nodes_between(map_entry, cfg.exit_node(map_entry))) + [map_entry, cfg.exit_node(map_entry)]
-        for n in inner_nodes:
-            if isinstance(n, dace.nodes.NestedSDFG):
-                old_beg = range_dict["old_ranges"]["beg"]
-                old_end = range_dict["old_ranges"]["end"]
-                n.sdfg.replace_dict({old_beg: part + "_blk_range_beg", old_end: part + "_blk_range_end"})
-                n.symbol_mapping[part + "_blk_range_beg"] = part + "_blk_range_beg"
-                n.symbol_mapping[part + "_blk_range_end"] = part + "_blk_range_end"
-                n.sdfg.add_symbol(part + "_blk_range_beg", dace.int64)
-                n.sdfg.add_symbol(part + "_blk_range_end", dace.int64)
-
-        i += 1
-
-    unused_inputs = set()
-    for part in ["beg", "middle", "end"]:
-        for _, expr in range_dict[part].items():
-            if expr.isdigit():
-                continue
-            else:
-                def get_variable_name(expr):
-                    # Hack for max(1, var[]) case
-                    expr = expr.split(",")[-1]
-                    match = re.match(r"^\s*([a-zA-Z_]\w*)\s*\[", expr)
-                    return match.group(1) if match else expr
-                var_name = get_variable_name(expr)
-                unused_inputs.add(var_name)
-
-    # Clean the map edge connections
-    for map_entry, part in zip(duplicates, ["beg", "middle", "end"]):
-        inner_nodes = list(cfg.all_nodes_between(map_entry, cfg.exit_node(map_entry))) + [map_entry, cfg.exit_node(map_entry)]
-        for n in inner_nodes:
-            if isinstance(n, dace.nodes.NestedSDFG):
-                for conn in unused_inputs:
-                    edges = list(cfg.in_edges_by_connector(n, conn))
-                    assert len(edges) == 1, f"{edges}, {n}, {conn}"
-                    edge = edges[0]
-                    cfg.remove_edge(edge)
-                    inedges = list(cfg.in_edges_by_connector(edge.src, edge.src_conn.replace("OUT_", "IN_")))
-                    edge.src.remove_out_connector(edge.src_conn)
-                    edge.dst.remove_in_connector(edge.dst_conn)
-                    n.sdfg.remove_data(edge.dst_conn)
-                    assert len(inedges) == 1
-                    inedge = inedges[0]
-                    inedge.dst.remove_in_connector(inedge.dst_conn)
-                    if inedge.src_conn is not None:
-                        inedge.src.remove_out_connector(inedge.src_conn)
-                    cfg.remove_edge(inedge)
-                    if cfg.in_degree(inedge.src) == 0 and cfg.out_degree(inedge.src) == 0:
-                        cfg.remove_node(inedge.src)
-
-    for map_entry, part in zip(duplicates, ["beg", "middle", "end"]):
-        new_range = []
-        assert len(map_entry.map.range) == 1
-        b, e, s = map_entry.map.range[0]
-        if part == "beg":
-            assert s == 1
-            new_range = [(b, b, s)]
-        elif part == "middle":
-            new_range = [(b+1, e-1, s)]
-        elif part == "end":
-            new_range = [(e, e, s)]
-        map_entry.map.range = dace.subsets.Range(new_range)
 
 def move_in_if(sdfg: dace.SDFG, n: dace.nodes.NestedSDFG):
     # Super-specific If map -> nested SDFG with 1 state and CFG If goes into a -> another nested
@@ -589,36 +466,80 @@ def untangle_if_sdfg(sdfg: dace.SDFG, verbose: bool):
     sdfg.save("ifs_untangled.sdfgz", compress=True)
     sdfg.validate()
 
+def remove_empty_kernel(sdfg: dace.SDFG):
+    for n, graph in sdfg.all_nodes_recursive():
+        nodes_to_rm = set()
+        if isinstance(n, dace.nodes.MapEntry):
+            all_nodes = list(graph.all_nodes_between(n, graph.exit_node(n)))
+            if len(all_nodes) == 1:
+                n = all_nodes[0]
+                if isinstance(n, dace.SDFGState):
+                    if len(n.nodes()) == 0:
+                        nodes_to_rm.add(n)
+                        for _n in all_nodes:
+                            nodes_to_rm.add(_n)
+                        for _n in [e.src for e in graph.in_edges(n)]:
+                            nodes_to_rm.add(_n)
+                        for _n in [e.dst for e in graph.out_edges(n)]:
+                            nodes_to_rm.add(_n)
+        if isinstance(n, dace.nodes.NestedSDFG):
+            remove_empty_kernel(n.sdfg)
+        for _n in nodes_to_rm:
+            graph.remove_node(_n)
+
+def remove_empty_cfg(sdfg: dace.SDFG):
+    for n, graph in sdfg.all_nodes_recursive():
+        nodes_to_rm = set()
+        if isinstance(n, ControlFlowBlock):
+            if n in graph.nodes():
+                if len(n.nodes()) == 1:
+                    _n = list(n.nodes())[0]
+                    if isinstance(_n, dace.SDFGState):
+                        _n2 = copy.deepcopy(_n)
+                        graph.add_node(_n2)
+
+                        for _n3 in _n2.nodes():
+                            if isinstance(_n3, dace.nodes.NestedSDFG):
+                                _n3.sdfg.parent_graph = _n2.parent_graph
+                                _n3.sdfg.parent_sdfg = _n2.sdfg
+                                _n3.sdfg.parent = _n2
+
+                        for e in graph.in_edges(n):
+                            graph.add_edge(e.src, _n2, copy.deepcopy(e.data))
+                        for e in graph.out_edges(n):
+                            graph.add_edge(_n2, e.dst, copy.deepcopy(e.data))
+                        nodes_to_rm.add(n)
+        for _n in nodes_to_rm:
+            graph.remove_node(_n)
+
+        if isinstance(n, dace.nodes.NestedSDFG):
+            remove_empty_cfg(n.sdfg)
+
+
+
 def split_map_sdfg(sdfg: dace.SDFG, gpu: bool, verbose: bool):
     applied = 0
+    remove_empty_kernel(sdfg)
+    remove_empty_cfg(sdfg)
+
     for sn, parent in sdfg.all_nodes_recursive():
         if isinstance(sn, dace.SDFGState):
-            for state in parent.all_states():
-                for n in state.bfs_nodes():
-                    if isinstance(n, dace.nodes.NestedSDFG):
-                        nested_nodes = list(n.sdfg.bfs_nodes())
-                        if len(nested_nodes) >= 3:
-                            [cfg1, cfg2, s1] = nested_nodes[0:3]
-                            if (isinstance(cfg1, ConditionalBlock) and
-                                isinstance(cfg2, ConditionalBlock) and
-                                isinstance(s1, dace.SDFGState)):
-                                isrcs = list(set([e.src for e in state.in_edges(n)]))
-                                if len(isrcs) == 1 and isinstance(isrcs[0], dace.nodes.MapEntry):
-                                    map_entry = isrcs[0]
-                                    range_dict = parse_range_dict_from_if(n.sdfg, cfg1, cfg2)
-                                    split_map(parent, state, map_entry, range_dict, gpu)
-                                    applied += 1
-                            elif (isinstance(cfg1, ConditionalBlock) and
-                                isinstance(cfg2, ConditionalBlock) and
-                                isinstance(s1, ControlFlowBlock)):
-                                #continue
-                                #isrcs = list(set([e.src for e in state.in_edges(n)]))
-                                #if len(isrcs) == 1 and isinstance(isrcs[0], dace.nodes.MapEntry):
-                                #    map_entry = isrcs[0]
-                                #    range_dict = parse_range_dict_from_if(n.sdfg, cfg1, cfg2)
-                                #    split_map(sdfg, state, map_entry, range_dict)
-                                #    applied += 1
-                                pass
+            state = sn
+            for n in state.bfs_nodes():
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    nested_nodes = list(n.sdfg.bfs_nodes())
+                    if len(nested_nodes) >= 3:
+                        [cfg1, cfg2, s1] = nested_nodes[0:3]
+                        if (isinstance(cfg1, ConditionalBlock) and
+                            isinstance(cfg2, ConditionalBlock) and
+                            isinstance(s1, dace.SDFGState)):
+                            isrcs = list(set([e.src for e in state.in_edges(n)]))
+                            #print(isrcs)
+                            if len(isrcs) == 1 and isinstance(isrcs[0], dace.nodes.MapEntry):
+                                map_entry = isrcs[0]
+                                range_dict = parse_range_dict_from_if(n.sdfg, cfg1, cfg2)
+                                split_map(state.parent_graph, state, map_entry, range_dict, gpu)
+                                applied += 1
 
     print(f"Applied, split-map {applied} times.")
     sdfg.save("maps_split.sdfgz", compress=True)
