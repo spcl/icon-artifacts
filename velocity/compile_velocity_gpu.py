@@ -61,7 +61,8 @@ else:
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
-    sdfg.save("parallel.sdfgz", compress=True)
+    if verbose:
+      sdfg.save("parallel.sdfgz", compress=True)
     move_transients_to_top_level(
         root=sdfg,
         upper_bounds={
@@ -71,7 +72,8 @@ else:
             "z_w_concorr_mc": 960,
         },
     )
-    sdfg.save("transients_moved.sdfgz", compress=True)
+    if verbose:
+      sdfg.save("transients_moved.sdfgz", compress=True)
     ToGPU().apply_pass(sdfg, {})
     if not reduction:
         for cfg in sdfg.nodes():
@@ -144,7 +146,6 @@ else:
 count_loops(sdfg, verbose=verbose, assert_loops=True)
 count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
 sdfg.validate()
-sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("gpu_velocity.sdfgz", compress=True)
 
 ################################################################################

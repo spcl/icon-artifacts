@@ -15,6 +15,7 @@ def benchmark_sdfg(
     profile=True,
     output_file=None,
 ):
+    sdfg.instrument = dace.InstrumentationType.Timer
     sdfg_name = sdfg.name
 
     # Add timing calls for profiling
