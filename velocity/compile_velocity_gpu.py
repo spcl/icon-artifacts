@@ -36,7 +36,7 @@ else:
     StructToContainerGroups(
         validate=False,
         save_steps=False,
-        verbose=False,
+        verbose=verbose,
         simplify=False,
         interface_with_struct_copy=True,
         interface_to_gpu=True,
@@ -167,22 +167,15 @@ compare_got_and_want()
 ################################################################################
 
 if run_benchmark:
-    # Warmup
-    for i in range(10):
-        os.system(f"./{sdfg_name}")
-
-    # Measure
-    times = []
-    for i in range(10):
-        sdfg.clear_instrumentation_reports()
-        os.system(f"./{sdfg_name}")
-        report = sdfg.get_latest_report()
-        assert report.events[-1].name == f"SDFG {sdfg.name}"
-        time = report.events[-1].duration  # in us
-        times.append(time)
-
-    for time in times:
-        print(f"GPU,{time}")
+    benchmark_sdfg(
+        sdfg,
+        "GPU",
+        gpu=True,
+        release=release,
+        warmups=1,
+        measurements=1,
+        profile=True,
+    )
 
 ################################################################################
 ### Cleanup
