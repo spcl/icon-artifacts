@@ -68,18 +68,17 @@ def _generate_code(sdfg: dace.SDFG, validate: bool = True):
         sdfg, program_objects, build_folder
     )
 
+def _pre_injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
+    build_loc = sdfg.build_folder
+    # remove the .dacecache folder
+    shutil.rmtree(build_loc, ignore_errors=True)
+    # Generate code
+    _generate_code(sdfg)
 
-def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
+def _injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     # get build location and dace location
     build_loc = sdfg.build_folder
     sdfg_name = sdfg.name
-    dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
-
-    # remove the .dacecache folder
-    shutil.rmtree(build_loc, ignore_errors=True)
-
-    # Generate code
-    _generate_code(sdfg)
 
     # Prepend reduction library to .dacecache/<name>/src/cpu/<name>.cpp
     with open(f"src/reductions.cpp", "r") as file:
@@ -97,6 +96,12 @@ def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
             main_cpp_code = file.read()
         with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
             file.write(reduction_code + main_cpp_code)
+
+def _post_injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
+    # get build location and dace location
+    build_loc = sdfg.build_folder
+    sdfg_name = sdfg.name
+    dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
 
     # compile the SDFG
     sdfg._regenerate_code = False
@@ -140,3 +145,8 @@ def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     if exit_code != 0:
         print("Compilation failed")
         exit(1)
+
+def compile_sdfg(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
+    _pre_injection(sdfg, gpu=gpu, release=release)
+    _injection(sdfg, gpu=gpu, release=release)
+    _post_injection(sdfg, gpu=gpu, release=release)
