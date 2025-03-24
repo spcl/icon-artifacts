@@ -1,35 +1,11 @@
-import math
 import os
 import shutil
 from pathlib import Path
-
 import dace
-import shutil
-import os
-from dace.sdfg.state import LoopRegion, ConditionalBlock
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse
-from utils import (
-    make_array_loop_local,
-    loop_to_max_reduction,
-    cfl_clipping_to_reduction,
-    maxvcfl_to_reduction,
-    tmp_call_13_to_reduction,
-    levmask_to_reduction,
-    compare_got_and_want,
-    compile_sdfg,
-    count_loops,
-    split_map_sdfg,
-    untangle_if_sdfg,
-    move_transients_to_top_level,
-    raise_loop_invariant_if
-)
-
-
-from utils.map_fissions import YoloMapFission
-
-from utils.config import use_cache, run_benchmark, cleanup, release, reduction
+from utils import *
 
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfgz")
@@ -44,8 +20,8 @@ sdfg_name = sdfg.name
 
 
 # Apply transformations
-if Path("cpu_pipe_stage1.sdfg").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfg")
+if Path("cpu_pipe_stage1.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfgz")
 else:
     sdfg.apply_transformations_repeated(ContinueToCondition)
     sdfg.simplify(verbose=True)
@@ -70,52 +46,60 @@ else:
         levmask_to_reduction(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
-        sdfg.save("cpu_pipe_stage1.sdfg")
-    move_transients_to_top_level(root=sdfg,
-                                 upper_bounds={
-                                     "z_w_con_c": 960,
-                                     "maxvcfl_arr": 960,
-                                     "cfl_clipping": 960,
-                                     "z_w_concorr_mc": 960,
-                                 }
-                                )
+        sdfg.save("cpu_pipe_stage1.sdfgz", compress=True)
+    move_transients_to_top_level(
+        root=sdfg,
+        upper_bounds={
+            "z_w_con_c": 960,
+            "maxvcfl_arr": 960,
+            "cfl_clipping": 960,
+            "z_w_concorr_mc": 960,
+        },
+    )
 
-if Path("cpu_pipe_stage2.sdfg").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfg")
+if Path("cpu_pipe_stage2.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfgz")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=True)
     if use_cache:
-        sdfg.save("cpu_pipe_stage2.sdfg")
+        sdfg.save("cpu_pipe_stage2.sdfgz", compress=True)
 
 
-sdfg.apply_transformations(YoloMapFission, validate=False)
-sdfg.validate()
+if Path("cpu_pipe_stage3.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file("cpu_pipe_stage3.sdfgz")
+else:
+    sdfg.apply_transformations(YoloMapFission, validate=False)
+    sdfg.validate()
+    untangle_if_sdfg(sdfg)
+    split_map_sdfg(sdfg, False)
+    sdfg.validate()
 
-untangle_if_sdfg(sdfg)
-split_map_sdfg(sdfg, False)
-sdfg.validate()
-
-raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
-                             copy_edge_before = [False, True])
-raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["not (lvn_only == 1)"],
-                             copy_edge_before = [False])
-raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["(istep == 1) == 1"],
-                             copy_edge_before = [False])
-sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
-
-# How many loops?
-count_loops(sdfg)
-sdfg.validate()
-sdfg.instrument = dace.InstrumentationType.Timer
+    raise_loop_invariant_if(
+        sdfg,
+        check_invariant_if_conds=["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
+        copy_edge_before=[False, True],
+    )
+    raise_loop_invariant_if(
+        sdfg, check_invariant_if_conds=["not (lvn_only == 1)"], copy_edge_before=[False]
+    )
+    raise_loop_invariant_if(
+        sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
+    )
+    if use_cache:
+        sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
 
 # Turn all maps to CPU_Multicore
 for node, state in sdfg.all_nodes_recursive():
     if isinstance(node, dace.nodes.MapEntry):
         node.map.schedule = dace.ScheduleType.CPU_Multicore
 
+# How many loops?
+count_loops(sdfg)
+sdfg.validate()
+sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("cpu_velocity.sdfgz", compress=True)
 
 

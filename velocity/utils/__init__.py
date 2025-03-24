@@ -11,7 +11,7 @@ from utils.compare_got_and_want import compare_got_and_want
 from utils.compile_sdfg import compile_sdfg
 from utils.count_loops import count_loops
 from utils.move_transients_to_top_level import move_transients_to_top_level
-from utils.config import use_cache, run_benchmark, cleanup, reduction
+from utils.config import use_cache, run_benchmark, cleanup, reduction, release
 from utils.map_fissions import YoloMapFission
 from utils.split_maps import split_map_sdfg, untangle_if_sdfg
 from utils.raise_loop_invariant_if import raise_loop_invariant_if
