@@ -4,6 +4,7 @@ import dace
 import os
 from dace.transformation.interstate import LoopToMap, ContinueToCondition
 from dace.transformation.passes import InlineSDFGs, SymbolPropagation, StructToContainerGroups
+# from dace.transformation.passes import GPUKernelLaunchRestructure
 from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import (
@@ -19,7 +20,8 @@ from utils import (
     move_transients_to_top_level,
     split_map_sdfg,
     untangle_if_sdfg,
-    raise_loop_invariant_if
+    raise_loop_invariant_if,
+    # wrap_reduction_and_T_l488_c488in_gpumap,
 )
 
 from utils.map_fissions import YoloMapFission
@@ -92,6 +94,8 @@ else:
                 a0 = s.add_access("gpu_vcflmax")
                 a1 = s.add_access("vcflmax")
                 s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
+    # sdfg.apply_transformations_repeated(GPUKernelLaunchRestructure)
+    # wrap_reduction_and_T_l488_c488in_gpumap(sdfg)
     if use_cache:
         sdfg.save("gpu_pipe_stage2.sdfg")
 
