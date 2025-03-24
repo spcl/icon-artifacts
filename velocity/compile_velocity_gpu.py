@@ -100,7 +100,16 @@ sdfg.apply_transformations(YoloMapFission, validate=False)
 sdfg.validate()
 
 untangle_if_sdfg(sdfg)
-split_map_sdfg(sdfg, False)
+split_map_sdfg(sdfg, True)
+
+for n, g in sdfg.all_nodes_recursive():
+    if isinstance(n, dace.nodes.NestedSDFG):
+        untangle_if_sdfg(n.sdfg)
+
+for n, g in sdfg.all_nodes_recursive():
+    if isinstance(n, dace.nodes.NestedSDFG):
+        split_map_sdfg(n.sdfg, True)
+
 sdfg.validate()
 
 raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
@@ -119,8 +128,8 @@ InlineSDFGs().apply_pass(sdfg, {})
 k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
 print(f"Applied MapCollapse {k} time(s)")
 k = sdfg.apply_transformations_repeated(MapFusion)
-for s in sdfg.states():
-    for n in s.nodes():
+for n, g in sdfg.all_nodes_recursive():
+    if isinstance(n, dace.nodes.NestedSDFG):
         if isinstance(n, dace.nodes.NestedSDFG):
             k = n.sdfg.apply_transformations_repeated(MapFusion, permissive=True)
             print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
@@ -142,7 +151,6 @@ sdfg.instrument = dace.InstrumentationType.Timer
 
 # Compile the SDFG
 compile_sdfg(sdfg, gpu=True, release=release)
-exit()
 
 sdfg.save("gpu_velocity.sdfgz", compress=True)
 
