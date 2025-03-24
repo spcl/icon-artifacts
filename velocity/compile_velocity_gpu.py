@@ -90,16 +90,8 @@ if Path("gpu_pipe_stage3.sdfgz").exists() and use_cache:
 else:
     sdfg.apply_transformations(YoloMapFission, validate=False)
     sdfg.validate()
-    untangle_if_sdfg(sdfg)
-    split_map_sdfg(sdfg, True)
-
-    for n, g in sdfg.all_nodes_recursive():
-        if isinstance(n, dace.nodes.NestedSDFG):
-            untangle_if_sdfg(n.sdfg)
-
-    for n, g in sdfg.all_nodes_recursive():
-        if isinstance(n, dace.nodes.NestedSDFG):
-            split_map_sdfg(n.sdfg, True)
+    untangle_if_sdfg(sdfg, verbose)
+    split_map_sdfg(sdfg, True, verbose)
 
     sdfg.validate()
     raise_loop_invariant_if(
@@ -119,6 +111,7 @@ else:
     raise_loop_invariant_if(
         sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
     )
+
 
     InlineSDFGs().apply_pass(sdfg, {})
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
