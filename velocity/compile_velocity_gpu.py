@@ -141,8 +141,8 @@ else:
         sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)
 
 # How many loops?
-count_loops(sdfg, verbose=False, assert_loops=True)
-count_max_maps_per_state(sdfg, verbose=False, assert_maps=False)
+count_loops(sdfg, verbose=verbose, assert_loops=True)
+count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("gpu_velocity.sdfgz", compress=True)

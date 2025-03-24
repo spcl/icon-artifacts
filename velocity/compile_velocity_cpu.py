@@ -97,8 +97,8 @@ for node, state in sdfg.all_nodes_recursive():
         node.map.schedule = dace.ScheduleType.CPU_Multicore
 
 # How many loops?
-count_loops(sdfg, verbose=False, assert_loops=True)
-count_max_maps_per_state(sdfg, verbose=False, assert_maps=False)
+count_loops(sdfg, verbose=verbose, assert_loops=True)
+count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("cpu_velocity.sdfgz", compress=True)
