@@ -3,3 +3,4 @@ run_benchmark = False
 cleanup = False
 reduction = True
 release = False
+verbose = False
