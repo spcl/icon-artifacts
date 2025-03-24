@@ -237,12 +237,35 @@ def split_map(sdfg: dace.SDFG, state: dace.SDFGState,
             if isinstance(n, dace.nodes.NestedSDFG):
                 old_beg = range_dict["old_ranges"]["beg"]
                 old_end = range_dict["old_ranges"]["end"]
-                n.sdfg.replace_dict({old_beg: part + "_blk_range_beg", old_end: part + "_blk_range_end"})
-                n.symbol_mapping[part + "_blk_range_beg"] = part + "_blk_range_beg"
-                n.symbol_mapping[part + "_blk_range_end"] = part + "_blk_range_end"
-                n.sdfg.add_symbol(part + "_blk_range_beg", dace.int64)
-                n.sdfg.add_symbol(part + "_blk_range_end", dace.int64)
-
+                # Keep the symbol name in the nested SDFG same - to make it easier with multiple nested SDFGs
+                #n.sdfg.replace_dict({old_beg: part + "_blk_range_beg", old_end: part + "_blk_range_end"})
+                """
+                if old_beg in n.symbol_mapping.keys():
+                    n.symbol_mapping.pop(old_beg)
+                if old_beg in n.symbol_mapping.values():
+                    k = list(n.symbol_mapping.keys())[list(n.symbol_mapping.values()).index(old_beg)]
+                    n.symbol_mapping.pop(k)
+                if old_end in n.symbol_mapping.keys():
+                    n.symbol_mapping.pop(old_end)
+                if old_end in n.symbol_mapping.values():
+                    k = list(n.symbol_mapping.keys())[list(n.symbol_mapping.values()).index(old_end)]
+                    n.symbol_mapping.pop(k)"
+                """
+                #if old_beg not in n.sdfg.symbols:
+                #    n.sdfg.add_symbol(old_beg, dace.int64)
+                #if old_end not in n.sdfg.symbols:
+                #    n.sdfg.add_symbol(old_end, dace.int64)
+                if old_beg not in n.sdfg.symbols:
+                    n.sdfg.add_symbol(old_beg, dace.int64)
+                if old_end not in n.sdfg.symbols:
+                    n.sdfg.add_symbol(old_end, dace.int64)
+                n.symbol_mapping[old_beg] = part + "_blk_range_beg" #part + "_blk_range_beg"
+                n.symbol_mapping[old_end] = part + "_blk_range_end" #part + "_blk_range_end"
+                #n.sdfg.add_symbol(part + "_blk_range_beg", dace.int64)
+                #n.sdfg.add_symbol(part + "_blk_range_end", dace.int64)
+                #symbols = set(k for k in n.sdfg.free_symbols if k not in n.in_connectors and k not in n.out_connectors)
+                #missing_symbols = [s for s in symbols if s not in n.symbol_mapping]
+                #print("MissingSymbols: ", missing_symbols, [old_beg, old_end])
         i += 1
 
     unused_inputs = set()
