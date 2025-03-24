@@ -35,10 +35,10 @@ def _insert_reduction(
         input_names=["in_arr"],
         output_names=["out"],
         code=f"""
-        #ifdef __CUDA_ARCH__
+        #ifdef __REDUCE_GPU__
           out = reduce_{type}_gpu(in_arr, {in_size});
         #else
-          out = reduce_{type}(in_arr, {in_size});
+          out = reduce_{type}_cpu(in_arr, {in_size});
         #endif
         """,
     )

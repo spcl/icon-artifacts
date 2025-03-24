@@ -1,5 +1,7 @@
 #include <cuda_runtime.h>
 
+#define __REDUCE_GPU__
+
 ////////////////////////
 // Device functions
 ////////////////////////
