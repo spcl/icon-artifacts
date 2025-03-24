@@ -91,6 +91,9 @@ else:
     if use_cache:
         sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
 
+# Put each kernel (top-level map) into a different state
+sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
+
 # Turn all maps to CPU_Multicore
 for node, state in sdfg.all_nodes_recursive():
     if isinstance(node, dace.nodes.MapEntry):
