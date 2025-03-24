@@ -452,7 +452,6 @@ def untangle_if_sdfg(sdfg: dace.SDFG, verbose: bool):
                                     s += " " + ast.unparse(n2.branches[0][0].code[i])
                                 if ((n1.label == "Conditional_l_0_c_0_4_0_0" or
                                     n1.label == "Conditional_l_0_c_0_4")):
-                                    print(s)
                                     #raise Exception("A")
                                     untangle_if(n1)
 
@@ -462,8 +461,8 @@ def untangle_if_sdfg(sdfg: dace.SDFG, verbose: bool):
         if isinstance(_n, dace.nodes.NestedSDFG):
             move_in_if(_n.sdfg, _n)
 
-
-    sdfg.save("ifs_untangled.sdfgz", compress=True)
+    if verbose:
+        sdfg.save("ifs_untangled.sdfgz", compress=True)
     sdfg.validate()
 
 def remove_empty_kernel(sdfg: dace.SDFG):
@@ -541,7 +540,11 @@ def split_map_sdfg(sdfg: dace.SDFG, gpu: bool, verbose: bool):
                                 split_map(state.parent_graph, state, map_entry, range_dict, gpu)
                                 applied += 1
 
-    print(f"Applied, split-map {applied} times.")
-    sdfg.save("maps_split.sdfgz", compress=True)
+    if verbose:
+        print(f"Applied, split-map {applied} times.")
+
+    sdfg.reset_sdfg_list()
+    if verbose:
+        sdfg.save("maps_split.sdfgz", compress=True)
     sdfg.validate()
     return applied

@@ -118,21 +118,32 @@ else:
 
     InlineSDFGs().apply_pass(sdfg, {})
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
-    print(f"Applied MapCollapse {k} time(s)")
+    if verbose:
+        print(f"Applied MapCollapse {k} time(s)")
     k = sdfg.apply_transformations_repeated(MapFusion)
     for n, g in sdfg.all_nodes_recursive():
         if isinstance(n, dace.nodes.NestedSDFG):
             if isinstance(n, dace.nodes.NestedSDFG):
                 k = n.sdfg.apply_transformations_repeated(MapFusion, permissive=True)
-                print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
-    print(f"Applied MapFusion {k} time(s)")
+                if verbose:
+                    print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
+    if verbose:
+        print(f"Applied MapFusion {k} time(s)")
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
-    print(f"Applied MapCollapse {k} time(s)")
+    if verbose:
+        print(f"Applied MapCollapse {k} time(s)")
     sdfg.simplify()
     prune_unused_inputs_outputs(sdfg)
     InlineSDFGs().apply_pass(sdfg, {})
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
-    print(f"Applied MapCollapse {k} time(s)")
+    if verbose:
+        print(f"Applied MapCollapse {k} time(s)")
+
+    #if reduction:
+    #    for n, graph in sdfg.all_nodes_recursive():
+    #        if isinstance(n, dace.nodes.LibraryNode):
+    #            pass
+
     if use_cache:
         sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)
 
