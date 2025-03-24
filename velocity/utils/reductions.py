@@ -31,14 +31,14 @@ def _insert_reduction(
     """
     red_state = sdfg.add_state_after(state)
     red_lib_node = LibNode(
-        name="reduce",
-        input_names=["in_arr"],
+        name=f"reduce_{type}",
+        input_names=["in_arr", "in_size"],
         output_names=["out"],
         code=f"""
         #ifdef __REDUCE_GPU__
-          out = reduce_{type}_gpu(in_arr, {in_size});
+          out = reduce_{type}_gpu(in_arr, in_size);
         #else
-          out = reduce_{type}_cpu(in_arr, {in_size});
+          out = reduce_{type}_cpu(in_arr, in_size);
         #endif
         """,
     )
@@ -46,6 +46,17 @@ def _insert_reduction(
     in_expr = in_expr if in_expr is not None else in_name
     red_state.add_edge(
         red_state.add_read(in_name), None, red_lib_node, "in_arr", dace.Memlet(in_expr)
+    )
+
+    size_task = red_state.add_tasklet(f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}")
+    size_name, _ = red_state.sdfg.add_scalar(
+        f"reduce_{type}_size", dtype=dace.int32, transient=True, find_new_name=True
+    )
+    size_access = red_state.add_access(size_name)
+
+    red_state.add_edge(size_task, "size", size_access, None, dace.Memlet(size_name))
+    red_state.add_edge(
+        size_access, None, red_lib_node, "in_size", dace.Memlet(size_name)
     )
 
     if out_expr is None:
