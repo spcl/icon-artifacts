@@ -115,7 +115,7 @@ else:
     )
     # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
     split_map_sdfg(sdfg, True, verbose)
-
+    prune_unused_inputs_outputs(sdfg)
     InlineSDFGs().apply_pass(sdfg, {})
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
     if verbose:
@@ -138,11 +138,6 @@ else:
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
     if verbose:
         print(f"Applied MapCollapse {k} time(s)")
-
-    #if reduction:
-    #    for n, graph in sdfg.all_nodes_recursive():
-    #        if isinstance(n, dace.nodes.LibraryNode):
-    #            pass
 
     if use_cache:
         sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)

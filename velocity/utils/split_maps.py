@@ -472,15 +472,21 @@ def remove_empty_kernel(sdfg: dace.SDFG):
             all_nodes = list(graph.all_nodes_between(n, graph.exit_node(n)))
             if len(all_nodes) == 1:
                 n = all_nodes[0]
-                if isinstance(n, dace.SDFGState):
-                    if len(n.nodes()) == 0:
-                        nodes_to_rm.add(n)
-                        for _n in all_nodes:
-                            nodes_to_rm.add(_n)
-                        for _n in [e.src for e in graph.in_edges(n)]:
-                            nodes_to_rm.add(_n)
-                        for _n in [e.dst for e in graph.out_edges(n)]:
-                            nodes_to_rm.add(_n)
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    if len(n.sdfg.nodes()) == 1:
+                        inner_state = n.sdfg.nodes()[0]
+                        if len(inner_state.nodes()) == 0:
+                            nodes_to_rm.add(n)
+                            for _n in all_nodes:
+                                nodes_to_rm.add(_n)
+                            for _n in [e.src for e in graph.in_edges(n)]:
+                                nodes_to_rm.add(_n)
+                                for __n in [e.src for e in graph.in_edges(_n)]:
+                                    nodes_to_rm.add(__n)
+                            for _n in [e.dst for e in graph.out_edges(n)]:
+                                nodes_to_rm.add(_n)
+                                for __n in [e.dst for e in graph.out_edges(_n)]:
+                                    nodes_to_rm.add(__n)
         if isinstance(n, dace.nodes.NestedSDFG):
             remove_empty_kernel(n.sdfg)
         for _n in nodes_to_rm:
@@ -543,6 +549,8 @@ def split_map_sdfg(sdfg: dace.SDFG, gpu: bool, verbose: bool):
     if verbose:
         print(f"Applied, split-map {applied} times.")
 
+    remove_empty_kernel(sdfg)
+    remove_empty_cfg(sdfg)
     sdfg.reset_sdfg_list()
     if verbose:
         sdfg.save("maps_split.sdfgz", compress=True)
