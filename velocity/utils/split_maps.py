@@ -56,6 +56,8 @@ def untangle_if(sdfg: dace.SDFG, cfg: ConditionalBlock):
         if condition is not None: # if (startblk)
             for node in body.nodes():
                 if isinstance(node, dace.SDFGState):
+                    if len(body.out_edges(node)) == 0:
+                        return
                     oe = body.out_edges(node)[0]
                     new_assignments = { k: v for k, v in oe.data.assignments.items() if "endidx" not in k}
                     rmed_symbols = rmed_symbols.union(set(oe.data.assignments.keys()))
