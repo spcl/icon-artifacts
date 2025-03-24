@@ -16,3 +16,4 @@ from utils.map_fissions import YoloMapFission
 from utils.split_maps import split_map_sdfg, untangle_if_sdfg
 from utils.raise_loop_invariant_if import raise_loop_invariant_if
 from utils.gpu_kernel_launch_fix import wrap_reduction_and_T_l488_c488in_gpumap
+from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs

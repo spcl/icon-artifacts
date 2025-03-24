@@ -133,7 +133,10 @@ else:
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
     print(f"Applied MapCollapse {k} time(s)")
     sdfg.simplify()
-
+    prune_unused_inputs_outputs(sdfg)
+    InlineSDFGs().apply_pass(sdfg, {})
+    k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+    print(f"Applied MapCollapse {k} time(s)")
     if use_cache:
         sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)
 
@@ -142,6 +145,7 @@ count_loops(sdfg)
 sdfg.validate()
 sdfg.instrument = dace.InstrumentationType.Timer
 sdfg.save("gpu_velocity.sdfgz", compress=True)
+exit(0)
 
 ################################################################################
 ### Numerically validate the SDFG
