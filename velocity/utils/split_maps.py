@@ -568,7 +568,9 @@ def untangle_if_sdfg(sdfg: dace.SDFG, verbose: bool):
                                 s = ""
                                 for i in range(len(n2.branches[0][0].code)):
                                     s += " " + ast.unparse(n2.branches[0][0].code[i])
-                                if "endblk" not in s:
+                                if ("endblk" not in s and
+                                    (n1.label == "Conditional_l_0_c_0_4_0_0" or
+                                    n1.label == "Conditional_l_0_c_0_4")):
                                     print(s)
                                     untangle_if(n.sdfg, n1)
 
