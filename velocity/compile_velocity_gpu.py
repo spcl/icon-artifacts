@@ -96,6 +96,7 @@ if Path("gpu_pipe_stage3.sdfgz").exists() and use_cache:
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
+    preprocess_tough_nut(sdfg)
     sdfg.validate()
     untangle_if_sdfg(sdfg, verbose)
     split_map_sdfg(sdfg, True, verbose)
