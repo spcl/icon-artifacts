@@ -140,7 +140,12 @@ def benchmark_sdfg(
 
     # Output to file
     if output_file:
-        for name, time in times:
+        if not os.path.exists(output_file):
+            with open(output_file, "w") as f:
+                f.write("tag,name,time(us)\n")
+
+        sorted_times = sorted(times, key=lambda x: x[1])
+        for name, time in sorted_times:
             with open(output_file, "a") as f:
                 f.write(f"{prefix},{name},{time}\n")
 
@@ -154,5 +159,6 @@ def benchmark_sdfg(
                 min_times[name] = min(min_times[name], time)
 
         min_times = dict(sorted(min_times.items(), key=lambda item: item[1]))
+        print("tag,name,time(us)")
         for name, time in min_times.items():
             print(f"{name},{time}")
