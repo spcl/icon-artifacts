@@ -43,7 +43,9 @@ def compare_got_and_want():
                     max_abs_diff = max(max_abs_diff, abs_diff)
 
                     if not math.isclose(
-                        got_num, want_num, rel_tol=rel_tol, abs_tol=abs_tol
+                        got_num, want_num, rel_tol=rel_tol, abs_tol=0.0
+                    ) or not math.isclose(
+                        got_num, want_num, rel_tol=0.0, abs_tol=abs_tol
                     ):
                         print(f"{got} and {want} have numerical differences ❌")
                         found_diff = True

@@ -2,7 +2,11 @@ import os
 import shutil
 from pathlib import Path
 import dace
-from dace.transformation.interstate import LoopToMap, ContinueToCondition
+from dace.transformation.interstate import (
+    LoopToMap,
+    ContinueToCondition,
+    ConditionFusion,
+)
 from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse
 from utils import *
@@ -71,6 +75,7 @@ else:
 if Path("cpu_pipe_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage3.sdfgz")
 else:
+    sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
     sdfg.validate()
     untangle_if_sdfg(sdfg, verbose=verbose)
@@ -88,11 +93,9 @@ else:
     raise_loop_invariant_if(
         sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
     )
+    sdfg.apply_transformations_repeated(ConditionFusion)
     if use_cache:
         sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
-
-# Put each kernel (top-level map) into a different state
-sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
 
 # Turn all maps to CPU_Multicore
 for node, state in sdfg.all_nodes_recursive():

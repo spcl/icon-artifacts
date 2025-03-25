@@ -2,7 +2,11 @@ from pathlib import Path
 import shutil
 import dace
 import os
-from dace.transformation.interstate import LoopToMap, ContinueToCondition
+from dace.transformation.interstate import (
+    LoopToMap,
+    ContinueToCondition,
+    ConditionFusion,
+)
 from dace.transformation.passes import (
     InlineSDFGs,
     SymbolPropagation,
@@ -62,7 +66,7 @@ else:
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     if verbose:
-      sdfg.save("parallel.sdfgz", compress=True)
+        sdfg.save("parallel.sdfgz", compress=True)
     move_transients_to_top_level(
         root=sdfg,
         upper_bounds={
@@ -73,7 +77,7 @@ else:
         },
     )
     if verbose:
-      sdfg.save("transients_moved.sdfgz", compress=True)
+        sdfg.save("transients_moved.sdfgz", compress=True)
     ToGPU().apply_pass(sdfg, {"verbose": verbose})
     if not reduction:
         for cfg in sdfg.nodes():
@@ -90,6 +94,7 @@ else:
 if Path("gpu_pipe_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage3.sdfgz")
 else:
+    sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
     sdfg.validate()
     untangle_if_sdfg(sdfg, verbose)
@@ -113,6 +118,7 @@ else:
     raise_loop_invariant_if(
         sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
     )
+    sdfg.apply_transformations_repeated(ConditionFusion)
     # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
     split_map_sdfg(sdfg, True, verbose)
     prune_unused_inputs_outputs(sdfg)
