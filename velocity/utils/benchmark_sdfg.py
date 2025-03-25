@@ -37,6 +37,50 @@ def benchmark_sdfg(
     sdfg.instrument = dace.InstrumentationType.Timer
     sdfg_name = sdfg.name
 
+    # Add timing calls for profiling
+    if profile:
+        kernels = []
+        lib_nodes = []
+        for state in sdfg.all_states():
+            maps = [
+                n
+                for n in state.nodes()
+                if isinstance(n, dace.nodes.MapEntry) and state.entry_node(n) is None
+            ]
+            libs = [
+                n
+                for n in state.nodes()
+                if isinstance(n, dace.nodes.LibraryNode) and state.entry_node(n) is None
+            ]
+            kernels.extend(maps)
+            lib_nodes.extend(libs)
+
+        for i, kernel in enumerate(kernels):
+            if (
+                kernel.map.schedule == dace.ScheduleType.GPU_Default
+                or kernel.map.schedule == dace.ScheduleType.GPU_Device
+                or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock
+                or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock_Dynamic
+                or kernel.map.schedule == dace.ScheduleType.GPU_Persistent
+            ):
+                kernel.map.label = f"GPU_Kernel_{i}"
+                kernel.instrument = dace.InstrumentationType.GPU_Events
+            else:
+                kernel.map.label = f"CPU_Kernel_{i}"
+                kernel.instrument = dace.InstrumentationType.Timer
+
+        for i, lib_node in enumerate(lib_nodes):
+            lib_node: CodeLibraryNode
+            lib_node.name = f"{lib_node.name}_{i}"
+            lib_node.code = f"""
+            auto lib_startT_{i} = std::chrono::high_resolution_clock::now();
+            {lib_node.code}
+            auto lib_endT_{i} = std::chrono::high_resolution_clock::now();
+            unsigned long int lib_start_{i} = std::chrono::duration_cast<std::chrono::microseconds>(lib_startT_{i}.time_since_epoch()).count();
+            unsigned long int lib_end_{i} = std::chrono::duration_cast<std::chrono::microseconds>(lib_endT_{i}.time_since_epoch()).count();
+            __state->report.add_completion("{lib_node.name}", "Timer", lib_start_{i}, lib_end_{i}, 0, 0, 0);
+            """
+
     # Start timer after the first state, and stop before the last state
     start_timer_state = sdfg.add_state_after(sdfg.start_state)
     dummy_array = None
@@ -61,38 +105,16 @@ def benchmark_sdfg(
         dace.Memlet(),
     )
 
-    # Add timing calls for profiling
-    if profile:
-        kernels = []
-        for state in sdfg.all_states():
-            maps = [
-                n
-                for n in state.nodes()
-                if isinstance(n, dace.nodes.MapEntry) and state.entry_node(n) is None
-            ]
-            kernels.extend(maps)
-
-        for i, kernel in enumerate(kernels):
-            if (
-                kernel.map.schedule == dace.ScheduleType.GPU_Default
-                or kernel.map.schedule == dace.ScheduleType.GPU_Device
-                or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock
-                or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock_Dynamic
-                or kernel.map.schedule == dace.ScheduleType.GPU_Persistent
-            ):
-                kernel.map.label = f"GPU_Kernel_{i}"
-                kernel.instrument = dace.InstrumentationType.GPU_Events
-            else:
-                kernel.map.label = f"CPU_Kernel_{i}"
-                kernel.instrument = dace.InstrumentationType.Timer
-
+    # Save modified SDFG
     if save_kernel_sdfg:
         sdfg.save(f"{sdfg_name}_kernels.sdfg")
 
     # Add timing function
     with open("include/timer.h", "r") as file:
         timing_function = file.read()
+    sdfg.append_global_code("\n")
     sdfg.append_global_code(timing_function)
+    sdfg.append_global_code("\n")
 
     # Compile
     compile_sdfg(sdfg, gpu=gpu, release=release)
