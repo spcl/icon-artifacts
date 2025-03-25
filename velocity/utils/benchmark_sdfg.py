@@ -14,6 +14,7 @@ def benchmark_sdfg(
     measurements: int = 1,
     profile=True,
     output_file=None,
+    save_kernel_sdfg=False,
 ):
     sdfg.instrument = dace.InstrumentationType.Timer
     sdfg_name = sdfg.name
@@ -37,7 +38,8 @@ def benchmark_sdfg(
               kernel.map.label = f"kernel_{i}_CPU"
               kernel.instrument = dace.InstrumentationType.Timer
 
-        sdfg.save(f"{sdfg_name}_named_kernels.sdfg")
+        if save_kernel_sdfg:
+          sdfg.save(f"{sdfg_name}_named_kernels.sdfg")
 
     # Add timing function
     with open("include/timer.h", "r") as file:

@@ -134,6 +134,7 @@ if run_benchmark:
         warmups=1,
         measurements=1,
         profile=True,
+        save_kernel_sdfg=False,
     )
 
 ################################################################################
