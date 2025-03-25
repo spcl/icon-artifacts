@@ -1,8 +1,26 @@
 import dace
 import os
-import shutil
-from pathlib import Path
-from utils.compile_sdfg import _pre_injection, _injection, _post_injection
+from dace.libraries.standard import CodeLibraryNode
+from dace.properties import make_properties, Property
+from utils.compile_sdfg import compile_sdfg
+
+
+@make_properties
+class TimeStartNode(CodeLibraryNode):
+    def __init__(self):
+        super().__init__(name="time_start", input_names=[], output_names=[])
+
+    def generate_code(self, inputs, outputs):
+        return "measure_time();"
+
+
+@make_properties
+class TimeEndNode(CodeLibraryNode):
+    def __init__(self):
+        super().__init__(name="time_end", input_names=[], output_names=[])
+
+    def generate_code(self, inputs, outputs):
+        return 'measure_time(__state, "SDFG w/o flatten & copy");'
 
 
 def benchmark_sdfg(
@@ -19,6 +37,30 @@ def benchmark_sdfg(
     sdfg.instrument = dace.InstrumentationType.Timer
     sdfg_name = sdfg.name
 
+    # Start timer after the first state, and stop before the last state
+    start_timer_state = sdfg.add_state_after(sdfg.start_state)
+    dummy_array = None
+    for a, k in sdfg.arrays.items():
+        if not isinstance(k, dace.data.View):
+            dummy_array = a
+            break
+    start_timer_state.add_edge(
+        start_timer_state.add_read(dummy_array),
+        None,
+        TimeStartNode(),
+        None,
+        dace.Memlet(),
+    )
+    assert len(sdfg.sink_nodes()) == 1, "Only one sink node supported"
+    stop_timer_state = sdfg.add_state_before(sdfg.sink_nodes()[0])
+    stop_timer_state.add_edge(
+        stop_timer_state.add_read(dummy_array),
+        None,
+        TimeEndNode(),
+        None,
+        dace.Memlet(),
+    )
+
     # Add timing calls for profiling
     if profile:
         kernels = []
@@ -31,50 +73,29 @@ def benchmark_sdfg(
             kernels.extend(maps)
 
         for i, kernel in enumerate(kernels):
-            if kernel.map.schedule == dace.ScheduleType.GPU_Default or kernel.map.schedule == dace.ScheduleType.GPU_Device or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock_Dynamic or kernel.map.schedule == dace.ScheduleType.GPU_Persistent:
-              kernel.map.label = f"kernel_{i}_GPU"
-              kernel.instrument = dace.InstrumentationType.GPU_Events
+            if (
+                kernel.map.schedule == dace.ScheduleType.GPU_Default
+                or kernel.map.schedule == dace.ScheduleType.GPU_Device
+                or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock
+                or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock_Dynamic
+                or kernel.map.schedule == dace.ScheduleType.GPU_Persistent
+            ):
+                kernel.map.label = f"GPU_Kernel_{i}"
+                kernel.instrument = dace.InstrumentationType.GPU_Events
             else:
-              kernel.map.label = f"kernel_{i}_CPU"
-              kernel.instrument = dace.InstrumentationType.Timer
+                kernel.map.label = f"CPU_Kernel_{i}"
+                kernel.instrument = dace.InstrumentationType.Timer
 
-        if save_kernel_sdfg:
-          sdfg.save(f"{sdfg_name}_named_kernels.sdfg")
+    if save_kernel_sdfg:
+        sdfg.save(f"{sdfg_name}_kernels.sdfg")
 
     # Add timing function
     with open("include/timer.h", "r") as file:
-        timing_function = file.read()   
+        timing_function = file.read()
     sdfg.append_global_code(timing_function)
 
-    # Generate code with injections
-    _pre_injection(sdfg, gpu=gpu, release=release)
-    _injection(sdfg, gpu=gpu, release=release)
-
-    # Add timing calls without flattener
-    with open(f"{sdfg.build_folder}/src/cpu/{sdfg_name}.cpp", "r") as file:
-        code = file.read()
-
-    # Check that // End flatten and // Start deflatten are present
-    assert "// End flatten" in code
-    assert "// Start deflatten" in code
-
-    # Find // End flatten
-    end_flatten = code.find("// End flatten")
-    code = code[:end_flatten] + f"measure_time();" + code[end_flatten:]
-
-    # Find // Start deflatten
-    start_deflatten = code.find("// Start deflatten")
-    code = (
-        code[:start_deflatten]
-        + f'measure_time(__state,"SDFG w/o flattening");'
-        + code[start_deflatten:]
-    )
-
-    with open(f"{sdfg.build_folder}/src/cpu/{sdfg_name}.cpp", "w") as file:
-        file.write(code)
-
     # Compile
-    _post_injection(sdfg, gpu=gpu, release=release)
+    compile_sdfg(sdfg, gpu=gpu, release=release)
 
     # Warmup
     for i in range(warmups):
