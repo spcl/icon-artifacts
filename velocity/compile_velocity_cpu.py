@@ -11,11 +11,14 @@ from dace.transformation.passes import SymbolPropagation, StructToContainerGroup
 from dace.transformation.dataflow import MapCollapse
 from utils import *
 
+sdfg_name = "velocity_nproma20480.sdfgz"
+
 # Load SDFG
-sdfg = dace.SDFG.from_file("velocity.sdfgz")
+sdfg = dace.SDFG.from_file("velocity_nproma20480.sdfgz")
 sdfg.validate()
-clean_bad_views(sdfg)
-sdfg.validate()
+if sdfg_name == "velocity_nproma20480.sdfgz":
+    clean_bad_views(sdfg)
+    sdfg.validate()
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 

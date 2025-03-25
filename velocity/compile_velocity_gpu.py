@@ -18,11 +18,14 @@ from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 
+sdfg_name = "velocity_nproma20480.sdfgz"
+
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity_nproma20480.sdfgz")
 sdfg.validate()
-clean_bad_views(sdfg)
-sdfg.validate()
+if sdfg_name == "velocity_nproma20480.sdfgz":
+    clean_bad_views(sdfg)
+    sdfg.validate()
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 
