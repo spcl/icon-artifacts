@@ -13,6 +13,13 @@ class LibNode(CodeLibraryNode):
         self.code = code
 
     def generate_code(self, inputs, outputs):
+        if inputs['in_arr'].storage == dace.StorageType.GPU_Global or inputs['in_size'].storage == dace.StorageType.GPU_Shared:
+            return f"""
+            #define __REDUCE_GPU__
+            {self.code}
+            #undef __REDUCE_GPU__
+            """
+
         return self.code
 
 
@@ -35,14 +42,15 @@ def _insert_reduction(
         input_names=["in_arr", "in_size"],
         output_names=["out"],
         code=f"""
-        #ifdef __REDUCE_GPU__
+        #ifdef __REDUCE_DEVICE__
+          out = reduce_{type}_device(in_arr, in_size);
+        #elif defined(__REDUCE_GPU__)
           out = reduce_{type}_gpu(in_arr, in_size);
         #else
           out = reduce_{type}_cpu(in_arr, in_size);
         #endif
         """,
     )
-    red_lib_node.schedule = dace.ScheduleType.GPU_Default
     in_expr = in_expr if in_expr is not None else in_name
     red_state.add_edge(
         red_state.add_read(in_name), None, red_lib_node, "in_arr", dace.Memlet(in_expr)

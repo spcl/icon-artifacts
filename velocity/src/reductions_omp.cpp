@@ -1,5 +1,9 @@
 #include <omp.h>
 
+////////////////////////////////////////////////////
+// We are running on host and the data is on host
+////////////////////////////////////////////////////
+
 // max zero reduction interface
 double reduce_maxZ_cpu(const double *d_in, int size)
 {

@@ -1,14 +1,13 @@
 #include <cuda_runtime.h>
 
-#define __REDUCE_GPU__
+////////////////////////////////////////////////////
+// We are running on device and the data is on device
+////////////////////////////////////////////////////
 
-////////////////////////
-// Device functions
-////////////////////////
-
+#define __REDUCE_DEVICE__
 
 // max zero reduction interface
-__device__ double reduce_maxZ_gpu(const double *d_in, int size) {
+__device__ double reduce_maxZ_device(const double *d_in, int size) {
   double max_val = 0;
   for (int i = 0; i < size; i++)
     max_val = (d_in[i] > max_val) ? d_in[i] : max_val;
@@ -16,7 +15,7 @@ __device__ double reduce_maxZ_gpu(const double *d_in, int size) {
 }
 
 // sum reduction interface
-__device__ int reduce_sum_gpu(const int *d_in, int size) {
+__device__ int reduce_sum_device(const int *d_in, int size) {
   int sum = 0.0;
   for (int i = 0; i < size; i++)
     sum += d_in[i];
@@ -24,7 +23,7 @@ __device__ int reduce_sum_gpu(const int *d_in, int size) {
 }
 
 // scan reduction interface
-__device__ double reduce_scan_gpu(const int *d_in, int size)
+__device__ double reduce_scan_device(const int *d_in, int size)
 {
-  return (double)(reduce_sum_gpu(d_in, size) > 0);
+  return (double)(reduce_sum_device(d_in, size) > 0);
 }
