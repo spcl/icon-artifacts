@@ -37,9 +37,6 @@ class MapStateFission(transformation.SingleStateTransformation):
         sdfg: dace.SDFG,
         permissive: bool = False,
     ):
-        if sdfg.parent is not None:
-            return False
-
         # Split concurrent initialization maps
         if expr_index == 1:
             return (
@@ -208,10 +205,6 @@ class AccessDuplicate(transformation.SingleStateTransformation):
         sdfg: dace.SDFG,
         permissive: bool = False,
     ):
-        # Skip nested SDFGs
-        if sdfg.parent is not None:
-            return False
-
         # Node must have only incoming or outgoing edges
         if (
             state.in_degree(self.access_node) != 0
