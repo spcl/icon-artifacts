@@ -19,7 +19,9 @@ from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 
 # Load SDFG
-sdfg = dace.SDFG.from_file("velocity.sdfgz")
+sdfg = dace.SDFG.from_file("velocity_nproma20480.sdfgz")
+sdfg.validate()
+clean_bad_views(sdfg)
 sdfg.validate()
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
@@ -96,7 +98,7 @@ if Path("gpu_pipe_stage3.sdfgz").exists() and use_cache:
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
-    preprocess_tough_nut(sdfg)
+    #preprocess_tough_nut(sdfg)
     sdfg.validate()
     untangle_if_sdfg(sdfg, verbose)
     split_map_sdfg(sdfg, True, verbose)

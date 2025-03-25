@@ -14,6 +14,8 @@ from utils import *
 # Load SDFG
 sdfg = dace.SDFG.from_file("velocity.sdfgz")
 sdfg.validate()
+clean_bad_views(sdfg)
+sdfg.validate()
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 
