@@ -5,7 +5,7 @@ import numpy as np
 
 def compare_got_and_want():
     # Precision for double precision floating point numbers
-    abs_tol = 1e-12
+    abs_tol = np.finfo(np.float64).eps
     rel_tol = np.finfo(np.float64).eps
 
     # Get list of .got and .want files
