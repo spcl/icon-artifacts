@@ -28,9 +28,15 @@ def benchmark_sdfg(
                 if isinstance(n, dace.nodes.MapEntry) and state.entry_node(n) is None
             ]
             kernels.extend(maps)
+
         for i, kernel in enumerate(kernels):
-            kernel.map.label = f"kernel_{i}"
-            kernel.instrument = dace.InstrumentationType.Timer
+            if kernel.map.schedule == dace.ScheduleType.GPU_Default or kernel.map.schedule == dace.ScheduleType.GPU_Device or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock or kernel.map.schedule == dace.ScheduleType.GPU_ThreadBlock_Dynamic or kernel.map.schedule == dace.ScheduleType.GPU_Persistent:
+              kernel.map.label = f"kernel_{i}_GPU"
+              kernel.instrument = dace.InstrumentationType.GPU_Events
+            else:
+              kernel.map.label = f"kernel_{i}_CPU"
+              kernel.instrument = dace.InstrumentationType.Timer
+
         sdfg.save(f"{sdfg_name}_named_kernels.sdfg")
 
     # Add timing function
