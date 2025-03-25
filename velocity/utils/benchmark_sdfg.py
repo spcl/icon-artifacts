@@ -78,7 +78,7 @@ def benchmark_sdfg(
             auto lib_endT_{i} = std::chrono::high_resolution_clock::now();
             unsigned long int lib_start_{i} = std::chrono::duration_cast<std::chrono::microseconds>(lib_startT_{i}.time_since_epoch()).count();
             unsigned long int lib_end_{i} = std::chrono::duration_cast<std::chrono::microseconds>(lib_endT_{i}.time_since_epoch()).count();
-            __state->report.add_completion("{lib_node.name}", "Timer", lib_start_{i}, lib_end_{i}, 0, 0, 0);
+            __state->report.add_completion("Lib {lib_node.name}", "Timer", lib_start_{i}, lib_end_{i}, 0, 0, 0);
             """
 
     # Start timer after the first state, and stop before the last state
