@@ -105,16 +105,19 @@ def benchmark_sdfg(
         dace.Memlet(),
     )
 
-    # Save modified SDFG
-    if save_kernel_sdfg:
-        sdfg.save(f"{sdfg_name}_kernels.sdfg")
-
     # Add timing function
     with open("include/timer.h", "r") as file:
         timing_function = file.read()
     sdfg.append_global_code("\n")
     sdfg.append_global_code(timing_function)
     sdfg.append_global_code("\n")
+
+    # Add early abort
+    sdfg.append_exit_code("__err = -1;")
+
+    # Save modified SDFG
+    if save_kernel_sdfg:
+        sdfg.save(f"{sdfg_name}_kernels.sdfg")
 
     # Compile
     compile_sdfg(sdfg, gpu=gpu, release=release)
@@ -128,12 +131,12 @@ def benchmark_sdfg(
     for i in range(measurements):
         sdfg.clear_instrumentation_reports()
         os.system(f"./{sdfg_name}")
-        report = sdfg.get_latest_report()
 
-        for event in report.events:
-            name = event.name
-            duration = event.duration
-            times.append((name, duration))
+        for report in sdfg.get_instrumentation_reports():
+            for event in report.events:
+                name = event.name
+                duration = event.duration
+                times.append((name, duration))
 
     # Output to file
     if output_file:

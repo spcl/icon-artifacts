@@ -212,7 +212,8 @@ int main() {
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
 
-    __dace_exit_velocity_tendencies(h);
+    int err = __dace_exit_velocity_tendencies(h);
+    if (err == -1) continue;
 
     {
       std::ofstream data("global_data_" + std::to_string(n) + ".got");
