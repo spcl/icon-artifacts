@@ -1,5 +1,4 @@
 import os
-import math
 import numpy as np
 
 
@@ -38,15 +37,13 @@ def compare_got_and_want():
                     want_num = float(want_line)
 
                     abs_diff = abs(got_num - want_num)
+                    rel_diff = 0
                     if want_num != 0:
-                        max_rel_diff = max(max_rel_diff, abs_diff / abs(want_num))
+                        rel_diff = abs_diff / abs(want_num)
+                    max_rel_diff = max(max_rel_diff, rel_diff)
                     max_abs_diff = max(max_abs_diff, abs_diff)
 
-                    if not math.isclose(
-                        got_num, want_num, rel_tol=rel_tol, abs_tol=0.0
-                    ) or not math.isclose(
-                        got_num, want_num, rel_tol=0.0, abs_tol=abs_tol
-                    ):
+                    if abs_diff > abs_tol or rel_diff > rel_tol:
                         print(f"{got} and {want} have numerical differences ❌")
                         found_diff = True
                         break
