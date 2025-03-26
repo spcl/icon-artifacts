@@ -71,6 +71,7 @@ def _pre_injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     build_loc = sdfg.build_folder
     shutil.rmtree(build_loc, ignore_errors=True)  # remove the .dacecache folder
     _generate_code(sdfg)  # Generate code
+    os.makedirs(f"{build_loc}/perf", exist_ok=True) # Create perf folder
 
 
 def _injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
