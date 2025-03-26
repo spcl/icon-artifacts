@@ -60,7 +60,8 @@ else:
 if Path(f"gpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage2.sdfgz")
 else:
-    sdfg.apply_transformations_repeated(LoopToMap)
+    # XXX: Permissive will ignore any read/write conflicts.
+    sdfg.apply_transformations_repeated(LoopToMap, permissive=True)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
@@ -91,7 +92,7 @@ else:
         sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
 # Shouldn't have any loops left
-count_loops(sdfg, verbose=verbose, assert_loops=False)
+count_loops(sdfg, verbose=verbose, assert_loops=True)
 
 if Path(f"gpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
@@ -101,7 +102,7 @@ else:
     # sdfg.apply_transformations(YoloMapFission)
     # preprocess_tough_nut(sdfg)
     untangle_if_sdfg(sdfg, verbose)
-    split_map_sdfg(sdfg, True, verbose)
+    # split_map_sdfg(sdfg, True, verbose)
 
     sdfg.validate()
     raise_loop_invariant_if(
@@ -123,7 +124,7 @@ else:
     )
     sdfg.apply_transformations_repeated(ConditionFusion)
     # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
-    split_map_sdfg(sdfg, True, verbose)
+    # split_map_sdfg(sdfg, True, verbose)
     prune_unused_inputs_outputs(sdfg)
     InlineSDFGs().apply_pass(sdfg, {})
     k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)

@@ -62,7 +62,8 @@ else:
 if Path(f"cpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage2.sdfgz")
 else:
-    sdfg.apply_transformations_repeated(LoopToMap)
+    # XXX: Permissive will ignore any read/write conflicts.
+    sdfg.apply_transformations_repeated(LoopToMap, permissive=True)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
@@ -70,7 +71,7 @@ else:
         sdfg.save(f"cpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
 # Shouldn't have any loops left
-count_loops(sdfg, verbose=verbose, assert_loops=False)
+count_loops(sdfg, verbose=verbose, assert_loops=True)
 
 if Path(f"cpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
