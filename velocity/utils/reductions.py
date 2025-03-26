@@ -100,7 +100,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     """
     Turns the max loop at the end of the SDFG into a reduction.
     """
-    loop_node, _ = find_node_by_name(sdfg, "FOR_l_568_c_568")
+    loop_node, _ = find_node_by_name(sdfg, loop_name)
     _insert_reduction(
         sdfg,
         loop_node,
@@ -113,7 +113,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     post_state = sdfg.add_state_after(loop_node)
     sdfg.remove_node(loop_node)
     sdfg.add_edge(pre_state, post_state, dace.InterstateEdge())
-    task, _ = find_node_by_name(sdfg, "T_l568_c568")
+    task, _ = find_node_by_name(sdfg, task_name)
     task.code.as_string = "max_vcfl_dyn_var_94_out = tmp_call_18"
     sdfg.append_global_code(
         "\nDACE_EXPORTED double reduce_maxZ_gpu(const double *d_in, int size);\n"
