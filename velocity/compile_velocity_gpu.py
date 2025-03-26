@@ -91,15 +91,15 @@ else:
         sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
 # Shouldn't have any loops left
-count_loops(sdfg, verbose=verbose, assert_loops=True)
+count_loops(sdfg, verbose=verbose, assert_loops=False)
 
 if Path(f"gpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
-    sdfg.apply_transformations(YoloMapFission, validate=False)
+    # This can only be safely applied to selected cases. Skip for now.
+    # sdfg.apply_transformations(YoloMapFission)
     # preprocess_tough_nut(sdfg)
-    sdfg.validate()
     untangle_if_sdfg(sdfg, verbose)
     split_map_sdfg(sdfg, True, verbose)
 

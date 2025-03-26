@@ -76,8 +76,8 @@ if Path(f"cpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
-    sdfg.apply_transformations(YoloMapFission, validate=False)
-    sdfg.validate()
+    # This can only be safely applied to selected cases. Skip for now.
+    # sdfg.apply_transformations(YoloMapFission)
     untangle_if_sdfg(sdfg, verbose=verbose)
     split_map_sdfg(sdfg, False, verbose=verbose)
     sdfg.validate()
