@@ -151,6 +151,10 @@ def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegio
                     simplified = "0"
                 if simplified == "True":
                     simplified = "1"
+                if "(1 == 1) == 1" == simplified:
+                    simplified = "1"
+                if "((1 == 1) == 1)" == simplified:
+                    simplified = "1"
                 if simplified != expr_str:
                     if verbose:
                         print(f"{assignment}: {expr_str} ({type(expr_str)}) -> {simplified}")
