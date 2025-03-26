@@ -19,6 +19,11 @@ __device__ double reduce_maxZ_device(const double *d_in, int size)
   return max_val;
 }
 
+double reduce_maxZ_device(const double d_in, int size)
+{
+  return (d_in > 0) ? d_in : 0;
+}
+
 // sum reduction interface
 __device__ int reduce_sum_device(const int *d_in, int size)
 {
@@ -28,8 +33,18 @@ __device__ int reduce_sum_device(const int *d_in, int size)
   return sum;
 }
 
+int reduce_sum_device(const int d_in, int size)
+{
+  return d_in;
+}
+
 // scan reduction interface
 __device__ double reduce_scan_device(const int *d_in, int size)
+{
+  return (double)(reduce_sum_device(d_in, size) > 0);
+}
+
+double reduce_scan_device(const int d_in, int size)
 {
   return (double)(reduce_sum_device(d_in, size) > 0);
 }
