@@ -108,6 +108,7 @@ def benchmark_sdfg(
     # Add timing function
     with open("include/timer.h", "r") as file:
         timing_function = file.read()
+    timing_function = timing_function.replace("velocity_tendencies", sdfg_name)
     sdfg.append_global_code("\n")
     sdfg.append_global_code(timing_function)
     sdfg.append_global_code("\n")
