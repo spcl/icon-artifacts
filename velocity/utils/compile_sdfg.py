@@ -117,7 +117,8 @@ def _injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
                 file.write(line)
 
     # copy header to .dacecache/<name>/include/
-    shutil.copy(f"include/serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
+    assert os.path.exists(f"include/serde_velocity_{tag}.h"), f"serde_velocity_{tag}.h does not exist"
+    shutil.copy(f"include/serde_velocity_{tag}.h", f"{build_loc}/include/serde_velocity.h")
 
     # Replace "veloctiy_tendencies" with "<sdfg name>"
     with open(f"{build_loc}/include/serde_velocity.h", "r") as file:
