@@ -50,14 +50,9 @@ else:
         interface_to_gpu=True,
     ).apply_pass(sdfg, {})
     sdfg.simplify(skip=["ArrayElimination"])
-    make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+    apply_loop_locality_pass(sdfg)
     if reduction:
-        loop_to_max_reduction(sdfg)
-        cfl_clipping_to_reduction(sdfg)
-        maxvcfl_to_reduction(sdfg)
-        tmp_call_13_to_reduction(sdfg)
-        levmask_to_reduction(sdfg)
+        add_all_reductions(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
         sdfg.save(f"gpu_{sdfg_name}_stage1.sdfgz", compress=True)

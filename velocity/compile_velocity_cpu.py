@@ -42,15 +42,10 @@ else:
         interface_to_gpu=False,
     ).apply_pass(sdfg, {})
     sdfg.simplify(skip=["ArrayElimination"], verbose=verbose)
-    make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-    make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+    apply_loop_locality_pass(sdfg)
     sdfg.simplify(skip=["ArrayElimination"], verbose=verbose)
     if reduction:
-        loop_to_max_reduction(sdfg)
-        cfl_clipping_to_reduction(sdfg)
-        maxvcfl_to_reduction(sdfg)
-        tmp_call_13_to_reduction(sdfg)
-        levmask_to_reduction(sdfg)
+        add_all_reductions(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
     move_transients_to_top_level(
         root=sdfg,

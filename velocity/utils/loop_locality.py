@@ -49,3 +49,16 @@ def make_array_loop_local(sdfg: dace.SDFG, array_name, loop_name):
         if isinstance(node, (LoopRegion, ConditionalBlock)):
             nodelist.extend(node.nodes())
             node.replace_meta_accesses({array_name: new_name})
+
+
+def apply_loop_locality_pass(sdfg: dace.SDFG):
+    if sdfg.name.split("_")[-1] == "nproma32":
+        make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+        make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+
+    elif sdfg.name.split("_")[-1] == "nproma20480":
+        make_array_loop_local(sdfg, "difcoef", "FOR_l_589_c_589")
+        make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_639_c_639")
+
+    else:
+        raise ValueError("Unknown NPROMA size")
