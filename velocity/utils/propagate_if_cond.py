@@ -1,5 +1,6 @@
+import copy
 import dace
-from dace.codegen.control_flow import ConditionalBlock, ControlFlowRegion
+from dace.codegen.control_flow import ConditionalBlock, ContinueBlock, ControlFlowBlock, ControlFlowRegion
 from dace.codegen.targets.unroller import product
 from dace.transformation.passes import DeadStateElimination
 from dace.transformation.passes.constant_propagation import ConstantPropagation
@@ -143,18 +144,26 @@ def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegio
                     simplified = expr_str
                 if "(1 - 0)" == simplified:
                     simplified = "1"
-                if simplified is False:
+                elif simplified is False:
                     simplified = "0"
-                if simplified is True:
+                elif simplified is True:
                     simplified = "1"
-                if simplified == "False":
+                elif simplified == "False":
                     simplified = "0"
-                if simplified == "True":
+                elif simplified == "True":
                     simplified = "1"
-                if "(1 == 1) == 1" == simplified:
+                elif "(1 == 1) == 1" == simplified:
                     simplified = "1"
-                if "((1 == 1) == 1)" == simplified:
+                elif "((1 == 1) == 1)" == simplified:
                     simplified = "1"
+                elif "((1 - 0) and 0)" == simplified:
+                    simplified = "0"
+                elif "(1 - 0) and 0" == simplified:
+                    simplified = "0"
+                elif "(1 - 1) and 0" == simplified:
+                    simplified = "0"
+                elif "((1 - 1) and 0)" == simplified:
+                    simplified = "0"
                 if simplified != expr_str:
                     if verbose:
                         print(f"{assignment}: {expr_str} ({type(expr_str)}) -> {simplified}")
@@ -284,6 +293,92 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, verb
 
     # All non trurthy ifs have been removed, now copy-out the body of trurthy ifs
     # e.g. cond is 1 == 1
+    for cfg in sdfg.all_control_flow_blocks():
+        if isinstance(cfg, ConditionalBlock):
+            ss = []
+            #if cfg.branches is not None:
+            for j in range(len(cfg.branches)):
+                s = ""
+                if cfg.branches[j][0] is not None:
+                    for i in range(len(cfg.branches[j][0].code)):
+                        s += " " + ast.unparse(cfg.branches[j][0].code[i])
+                ss.append(s[1:])
+
+            # If length of ss is 1 and we have 1 == 1 or (1 == 1) == 1 then we can cut out body
+            if len(ss) == 1:
+                if ss[0] == "1 == 1" or ss[0] == "(1 == 1) == 1":
+                    node_map = dict()
+                    assert len(cfg.branches) == 1
+                    body = cfg.branches[0][1]
+                    parent_graph = cfg.parent_graph
+                    src_edges = set()
+                    dst_edges = set()
+                    for ie in parent_graph.in_edges(cfg):
+                        src_edges.add(ie)
+                    for oe in parent_graph.out_edges(cfg):
+                        dst_edges.add(oe)
+
+                    #sdfg.remove_node(cfg)
+                    parent_graph.remove_node(cfg)
+                    #print(cfg)
+
+
+                    for n in body.nodes():
+                        node_map[n] = copy.deepcopy(n)
+                        for _s in node_map[n].all_states() if (not isinstance(node_map[n], dace.SDFGState) and not isinstance(node_map[n], ContinueBlock)) else [node_map[n]]:
+                            for _n in _s.nodes():
+                                if isinstance(_n, dace.nodes.NestedSDFG):
+                                    node_map[_n].sdfg.parent_graph = parent_graph
+                                    node_map[_n].sdfg.parent_sdfg = sdfg
+
+                        parent_graph.add_node(node_map[n])
+
+                    for e in body.edges():
+                        assert e.src in node_map
+                        assert e.dst in node_map
+                        parent_graph.add_edge(node_map[e.src], node_map[e.dst], copy.deepcopy(e.data))
+
+                    new_src_nodes = set([n for n in node_map.values() if parent_graph.in_degree(n) == 0])
+                    new_dst_nodes = set([n for n in node_map.values() if parent_graph.out_degree(n) == 0])
+
+                    assert len(new_src_nodes) == 1
+                    assert len(new_dst_nodes) == 1
+                    #assert len(src_edges) <= 1, f"{[(e.src, e.dst) for e in src_edges]}"
+                    assert len(dst_edges) <= 1, f"{[(e.src, e.dst) for e in dst_edges]}"
+
+                    new_src_node = new_src_nodes.pop()
+                    if len(src_edges) > 0:
+                        for src_edge in src_edges:
+                            parent_graph.add_edge(src_edge.src, new_src_node, copy.deepcopy(src_edge.data))
+
+                    if len(dst_edges) == 1:
+                        dst_edge = dst_edges.pop()
+                        new_dst_node = new_dst_nodes.pop()
+                        parent_graph.add_edge(new_dst_node, dst_edge.dst, copy.deepcopy(dst_edge.data))
+
+    sdfg.validate()
+
+    # If continue block remove all following nodes
+    # Clean all nodes reachable from a continue block
+    fixpoint = True
+    while fixpoint:
+        fixpoint = False
+        for n in sdfg.all_control_flow_blocks():
+            if isinstance(n, ContinueBlock):
+                parent = n.parent_graph
+                if parent.out_degree(n) > 0:
+                    fixpoint = True
+                    nodes_to_rm = set()
+
+                    stack = set([n])
+                    while len(stack) > 0:
+                        _n = stack.pop()
+                        nodes_to_rm.add(_n)
+                        for e in parent.out_edges(_n):
+                            stack.add(e.dst)
+                    for _n in nodes_to_rm:
+                        parent.remove_node(_n)
+                    break
 
     #for cfg in sdfg.all_control_flow_blocks():
     #    if isinstance(cfg, ConditionalBlock):
@@ -291,3 +386,4 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, verb
     #        s = ""
     #        for i in range(len(cfg.branches[0][0].code)):
     #        s += " " + ast.unparse(cfg.branches[0][0].code[i]) + "\n"
+    sdfg.validate()
