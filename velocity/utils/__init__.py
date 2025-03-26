@@ -22,3 +22,4 @@ from utils.map_state_fission import MapStateFission, AccessDuplicate
 from utils.benchmark_sdfg import benchmark_sdfg
 from utils.preprocess_tough_nut import preprocess_tough_nut
 from utils.clean_bad_views import clean_bad_views
+from utils.propagate_if_cond import propagate_if_cond
