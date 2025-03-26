@@ -18,7 +18,7 @@ def _replace_cpp_with_cu(directory):
 
 
 # Generate code
-# From dace/dace/sdfg/sdfg.py:compile
+# Copied and adjusted from dace/dace/sdfg/sdfg.py:compile
 def _generate_code(sdfg: dace.SDFG, validate: bool = True):
     # Importing these outside creates an import loop
     from dace.codegen import codegen, compiler
@@ -69,10 +69,8 @@ def _generate_code(sdfg: dace.SDFG, validate: bool = True):
 
 def _pre_injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     build_loc = sdfg.build_folder
-    # remove the .dacecache folder
-    shutil.rmtree(build_loc, ignore_errors=True)
-    # Generate code
-    _generate_code(sdfg)
+    shutil.rmtree(build_loc, ignore_errors=True)  # remove the .dacecache folder
+    _generate_code(sdfg)  # Generate code
 
 
 def _injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
@@ -80,8 +78,8 @@ def _injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     build_loc = sdfg.build_folder
     sdfg_name = sdfg.name
 
+    # Prepend reduction library to .dacecache/<name>/src/cuda/<name>_cuda.cu
     if gpu:
-        # Prepend reduction library to .dacecache/<name>/src/cuda/<name>_cuda.cu
         with open(f"src/reductions.cu", "r") as file:
             reduction_code = file.read()
         with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
@@ -97,30 +95,50 @@ def _injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "w") as file:
         file.write(reduction_code + main_cpp_code)
 
+    # Copy main file to .dacecache/<name>/src/
+    if gpu:
+        shutil.copy(f"main_gpu.cc", f"{build_loc}/src/cpu/main.cc")
+    else:
+        shutil.copy(f"main.cc", f"{build_loc}/src/cpu/main.cc")
+
+    # Replace const std::filesystem::path ROOT{"data"}; in main.cc with data_<sdfg tag> and replace "veloctiy_tendencies" with "<sdfg name>"
+    tag = sdfg_name.split("_")[-1]
+    assert tag != "", "SDFG name must end with a tag"
+    assert os.path.exists(f"data_{tag}"), f"data_{tag} folder does not exist"
+    with open(f"{build_loc}/src/cpu/main.cc", "r") as file:
+        lines = file.readlines()
+    with open(f"{build_loc}/src/cpu/main.cc", "w") as file:
+        for line in lines:
+            if "const std::filesystem::path ROOT{" in line:
+                file.write(f'const std::filesystem::path ROOT{{"data_{tag}"}};\n')
+            elif "velocity_tendencies" in line:
+                file.write(line.replace("velocity_tendencies", sdfg_name))
+            else:
+                file.write(line)
+
+    # copy header to .dacecache/<name>/include/
+    shutil.copy(f"include/serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
+
+    # Replace "veloctiy_tendencies" with "<sdfg name>"
+    with open(f"{build_loc}/include/serde_velocity.h", "r") as file:
+        lines = file.readlines()
+    with open(f"{build_loc}/include/serde_velocity.h", "w") as file:
+        for line in lines:
+            if "velocity_tendencies" in line:
+                file.write(line.replace("velocity_tendencies", sdfg_name))
+            else:
+                file.write(line)
+
+    # To avoid link issues fastly for CUDA libs and have cuda compiler definition
+    if gpu:
+        _replace_cpp_with_cu(build_loc)
+
 
 def _post_injection(sdfg: dace.SDFG, gpu: bool = False, release: bool = False):
     # get build location and dace location
     build_loc = sdfg.build_folder
     sdfg_name = sdfg.name
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
-
-    # compile the SDFG
-    sdfg._regenerate_code = False
-    sdfg.compile()
-
-    if gpu:
-        # copy main_cpp_file to .dacecache/<name>/src/cpu/
-        shutil.copy(f"main_gpu.cc", f"{build_loc}/src/cpu/main.cu")
-    else:
-        # copy main_cpp_file to .dacecache/<name>/src/cpu/
-        shutil.copy(f"main.cc", f"{build_loc}/src/cpu/main.cc")
-
-    # copy header to .dacecache/<name>/include/
-    shutil.copy(f"include/serde_velocity.h", f"{build_loc}/include/serde_velocity.h")
-
-    if gpu:
-        # To avoid link issues fastly for CUDA libs and have cuda compiler definition
-        _replace_cpp_with_cu(build_loc)
 
     if gpu:
         if release:
