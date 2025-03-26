@@ -16,16 +16,12 @@ import copy
 @make_properties
 class MapStateFission(transformation.SingleStateTransformation):
     access_node = transformation.PatternNode(dace.nodes.AccessNode)
-    map_entry = transformation.PatternNode(dace.nodes.MapEntry)
 
     allow_transients = Property(dtype=bool, default=False)
 
     @classmethod
     def expressions(cls):
-        return [
-            sdutil.node_path_graph(cls.access_node),
-            sdutil.node_path_graph(cls.map_entry),
-        ]
+        return [sdutil.node_path_graph(cls.access_node)]
 
     def annotates_memlets(self) -> bool:
         return True
@@ -37,13 +33,6 @@ class MapStateFission(transformation.SingleStateTransformation):
         sdfg: dace.SDFG,
         permissive: bool = False,
     ):
-        # Split concurrent initialization maps
-        if expr_index == 1:
-            return (
-                len(sdutil.concurrent_subgraphs(state)) > 1
-                and state.in_degree(self.map_entry) == 0
-            )
-
         # Don't split if the access node is wrapped in a subgraph
         if state.entry_node(self.access_node) is not None:
             return False
@@ -55,28 +44,22 @@ class MapStateFission(transformation.SingleStateTransformation):
         ):
             return False
 
-        # If there is a subgraph that can run concurrently, we split the state
-        if (
-            len(sdutil.concurrent_subgraphs(state)) > 1
-            and state.in_degree(self.access_node) == 0
-            and state.out_degree(self.access_node) == 1
-        ):
-            return True
+        # Must have exactly one predecessor and one successor
+        preds = state.predecessors(self.access_node)
+        succs = state.successors(self.access_node)
+        if len(preds) != 1 or len(succs) != 1:
+            return False
 
-        # If there the access node is sandwiched between two maps, we split the state
-        if (
-            state.in_degree(self.access_node) == 1
-            and state.out_degree(self.access_node) >= 1
+        # Predecessor and successor must be maps
+        if not isinstance(preds[0], dace.nodes.MapExit) or not isinstance(
+            succs[0], dace.nodes.MapEntry
         ):
-            return True
+            return False
 
-        return False
+        return True
 
     def apply(self, state: SDFGState, sdfg: SDFG):
-        if self.expr_index == 0:
-            node = self.access_node
-        else:
-            node = self.map_entry
+        node = self.access_node
         label = state.label + "_F"
         MapStateFission.state_fission_after_deterministic(state, node, label)
 
