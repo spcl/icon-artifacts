@@ -4,3 +4,5 @@ __pycache__
 .dacecache
 _dacegraphs
 utils/config.py
+data_*/
+data/

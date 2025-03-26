@@ -18,14 +18,12 @@ from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 
-sdfg_name = "velocity_nproma20480.sdfgz"
 
 # Load SDFG
-sdfg = dace.SDFG.from_file("velocity_nproma20480.sdfgz")
+sdfg_name = "velocity_nproma20480.sdfgz"
+sdfg = dace.SDFG.from_file(sdfg_name)
+sdfg.name = sdfg_name.split(".")[0]
 sdfg.validate()
-if sdfg_name == "velocity_nproma20480.sdfgz":
-    clean_bad_views(sdfg)
-    sdfg.validate()
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 
@@ -38,6 +36,7 @@ sdfg_name = sdfg.name
 if Path("gpu_pipe_stage1.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfgz")
 else:
+    clean_bad_views(sdfg)
     sdfg.apply_transformations_repeated(ContinueToCondition)
     sdfg.simplify()
     SymbolPropagation().apply_pass(sdfg, {})
@@ -96,12 +95,15 @@ else:
     if use_cache:
         sdfg.save("gpu_pipe_stage2.sdfgz", compress=True)
 
+# Shouldn't have any loops left
+count_loops(sdfg, verbose=verbose, assert_loops=True)
+
 if Path("gpu_pipe_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("gpu_pipe_stage3.sdfgz")
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
-    #preprocess_tough_nut(sdfg)
+    # preprocess_tough_nut(sdfg)
     sdfg.validate()
     untangle_if_sdfg(sdfg, verbose)
     split_map_sdfg(sdfg, True, verbose)
@@ -154,11 +156,10 @@ else:
     if use_cache:
         sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)
 
-# How many loops?
-count_loops(sdfg, verbose=verbose, assert_loops=True)
-count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
+# Validate the SDFG
 sdfg.validate()
 sdfg.save("gpu_velocity.sdfgz", compress=True)
+
 
 ################################################################################
 ### Numerically validate the SDFG

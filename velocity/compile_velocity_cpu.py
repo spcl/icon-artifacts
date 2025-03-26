@@ -11,14 +11,11 @@ from dace.transformation.passes import SymbolPropagation, StructToContainerGroup
 from dace.transformation.dataflow import MapCollapse
 from utils import *
 
-sdfg_name = "velocity_nproma20480.sdfgz"
-
 # Load SDFG
-sdfg = dace.SDFG.from_file("velocity_nproma20480.sdfgz")
+sdfg_name = "velocity_nproma20480.sdfgz"
+sdfg = dace.SDFG.from_file(sdfg_name)
+sdfg.name = sdfg_name.split(".")[0]
 sdfg.validate()
-if sdfg_name == "velocity_nproma20480.sdfgz":
-    clean_bad_views(sdfg)
-    sdfg.validate()
 build_loc = sdfg.build_folder
 sdfg_name = sdfg.name
 
@@ -32,6 +29,7 @@ sdfg_name = sdfg.name
 if Path("cpu_pipe_stage1.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfgz")
 else:
+    clean_bad_views(sdfg)
     sdfg.apply_transformations_repeated(ContinueToCondition)
     sdfg.simplify(verbose=verbose)
     SymbolPropagation().apply_pass(sdfg, {})
@@ -76,6 +74,8 @@ else:
     if use_cache:
         sdfg.save("cpu_pipe_stage2.sdfgz", compress=True)
 
+# Shouldn't have any loops left
+count_loops(sdfg, verbose=verbose, assert_loops=True)
 
 if Path("cpu_pipe_stage3.sdfgz").exists() and use_cache:
     sdfg = dace.SDFG.from_file("cpu_pipe_stage3.sdfgz")
@@ -107,9 +107,7 @@ for node, state in sdfg.all_nodes_recursive():
     if isinstance(node, dace.nodes.MapEntry):
         node.map.schedule = dace.ScheduleType.CPU_Multicore
 
-# How many loops?
-count_loops(sdfg, verbose=verbose, assert_loops=True)
-count_max_maps_per_state(sdfg, verbose=verbose, assert_maps=False)
+# Validate the SDFG
 sdfg.validate()
 sdfg.save("cpu_velocity.sdfgz", compress=True)
 
