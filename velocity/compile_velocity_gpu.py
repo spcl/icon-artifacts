@@ -33,8 +33,8 @@ sdfg_name = sdfg.name
 
 
 # Apply transformations
-if Path("gpu_pipe_stage1.sdfgz").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("gpu_pipe_stage1.sdfgz")
+if Path(f"gpu_{sdfg_name}_stage1.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage1.sdfgz")
 else:
     clean_bad_views(sdfg)
     sdfg.apply_transformations_repeated(ContinueToCondition)
@@ -60,10 +60,10 @@ else:
         levmask_to_reduction(sdfg)
     sdfg.simplify(skip=["ArrayElimination"])
     if use_cache:
-        sdfg.save("gpu_pipe_stage1.sdfgz", compress=True)
+        sdfg.save(f"gpu_{sdfg_name}_stage1.sdfgz", compress=True)
 
-if Path("gpu_pipe_stage2.sdfgz").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("gpu_pipe_stage2.sdfgz")
+if Path(f"gpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage2.sdfgz")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
@@ -93,13 +93,13 @@ else:
     # sdfg.apply_transformations_repeated(GPUKernelLaunchRestructure)
     # wrap_reduction_and_T_l488_c488in_gpumap(sdfg)
     if use_cache:
-        sdfg.save("gpu_pipe_stage2.sdfgz", compress=True)
+        sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
 # Shouldn't have any loops left
 count_loops(sdfg, verbose=verbose, assert_loops=True)
 
-if Path("gpu_pipe_stage3.sdfgz").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("gpu_pipe_stage3.sdfgz")
+if Path(f"gpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
@@ -154,11 +154,11 @@ else:
         print(f"Applied MapCollapse {k} time(s)")
 
     if use_cache:
-        sdfg.save("gpu_pipe_stage3.sdfgz", compress=True)
+        sdfg.save(f"gpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
 # Validate the SDFG
 sdfg.validate()
-sdfg.save("gpu_velocity.sdfgz", compress=True)
+sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)
 
 
 ################################################################################

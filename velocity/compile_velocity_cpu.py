@@ -26,8 +26,8 @@ sdfg_name = sdfg.name
 
 
 # Apply transformations
-if Path("cpu_pipe_stage1.sdfgz").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("cpu_pipe_stage1.sdfgz")
+if Path(f"cpu_{sdfg_name}_stage1.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage1.sdfgz")
 else:
     clean_bad_views(sdfg)
     sdfg.apply_transformations_repeated(ContinueToCondition)
@@ -62,23 +62,23 @@ else:
         },
     )
     if use_cache:
-        sdfg.save("cpu_pipe_stage1.sdfgz", compress=True)
+        sdfg.save(f"cpu_{sdfg_name}_stage1.sdfgz", compress=True)
 
-if Path("cpu_pipe_stage2.sdfgz").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("cpu_pipe_stage2.sdfgz")
+if Path(f"cpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage2.sdfgz")
 else:
     sdfg.apply_transformations_repeated(LoopToMap)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
     if use_cache:
-        sdfg.save("cpu_pipe_stage2.sdfgz", compress=True)
+        sdfg.save(f"cpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
 # Shouldn't have any loops left
 count_loops(sdfg, verbose=verbose, assert_loops=True)
 
-if Path("cpu_pipe_stage3.sdfgz").exists() and use_cache:
-    sdfg = dace.SDFG.from_file("cpu_pipe_stage3.sdfgz")
+if Path(f"cpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
+    sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
 else:
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
     sdfg.apply_transformations(YoloMapFission, validate=False)
@@ -100,7 +100,7 @@ else:
     )
     sdfg.apply_transformations_repeated(ConditionFusion)
     if use_cache:
-        sdfg.save("cpu_pipe_stage3.sdfgz", compress=True)
+        sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
 # Turn all maps to CPU_Multicore
 for node, state in sdfg.all_nodes_recursive():
@@ -109,7 +109,7 @@ for node, state in sdfg.all_nodes_recursive():
 
 # Validate the SDFG
 sdfg.validate()
-sdfg.save("cpu_velocity.sdfgz", compress=True)
+sdfg.save(f"cpu_{sdfg_name}_result.sdfgz", compress=True)
 
 
 ################################################################################
