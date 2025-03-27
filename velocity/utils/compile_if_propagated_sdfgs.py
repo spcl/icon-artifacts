@@ -56,9 +56,22 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
         sources.add("src/reductions_device.cu")
     headers = set()
     headers.add("-Iinclude")
-
+    from dace.codegen import codegen, compiler
     for sdfg in sdfgs:
-        sdfg.compile()
+        try:
+            # Fill in scope entry/exit connectors
+            sdfg.fill_scope_connectors()
+
+            # Generate code for the program by traversing the SDFG state by state
+            program_objects = codegen.generate_code(sdfg, validate=False)
+        except Exception:
+            fpath = os.path.join("_dacegraphs", "failing.sdfgz")
+            sdfg.save(fpath, compress=True)
+            print(f"Failing SDFG saved for inspection in {os.path.abspath(fpath)}")
+            raise
+
+        # Generate the program folder and write the source files
+        compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
         sdfg_name = sdfg.name
         build_loc = sdfg.build_folder
         modify_files_in_directory(build_loc)

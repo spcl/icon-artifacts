@@ -53,11 +53,23 @@ def make_array_loop_local(sdfg: dace.SDFG, array_name, loop_name):
 
 def apply_loop_locality_pass(sdfg: dace.SDFG):
     if "nproma32" in sdfg.name:
-        make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
-        #make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+        try:
+            make_array_loop_local(sdfg, "difcoef", "FOR_l_505_c_505")
+        except Exception as e:
+            print("Make Array Loop Local failed for difcoef, For_l505_c_505:", e)
+        try:
+            make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+        except Exception as e:
+            print("Make Array Loop Local failed for _if_cond_27, For_l555_c_555:", e)
     elif "nproma20480" in sdfg.name:
-        make_array_loop_local(sdfg, "difcoef", "FOR_l_589_c_589")
-        #make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_639_c_639")
+        try:
+            make_array_loop_local(sdfg, "difcoef", "FOR_l_589_c_589")
+        except Exception as e:
+            print("Make Array Loop Local failed for difcoef, FOR_l_589_c_589:", e)
+        try:
+            make_array_loop_local(sdfg, "_if_cond_27", "FOR_l_555_c_555")
+        except Exception as e:
+            print("Make Array Loop Local failed for _if_cond_27, FOR_l_639_c_639:", e)
 
     else:
         raise ValueError("Unknown NPROMA size")

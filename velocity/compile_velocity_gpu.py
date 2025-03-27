@@ -86,6 +86,7 @@ for sdfg_name in sdfg_names:
         if verbose:
             sdfg.save("transients_moved.sdfgz", compress=True)
         ToGPU().apply_pass(sdfg, {"verbose": verbose})
+
         if not reduction:
             for cfg in sdfg.nodes():
                 if cfg.label == "FOR_l_568_c_568":
