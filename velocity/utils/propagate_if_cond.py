@@ -2,12 +2,11 @@ import copy
 import dace
 from dace.codegen.control_flow import ConditionalBlock, ContinueBlock, ControlFlowBlock, ControlFlowRegion
 from dace.codegen.targets.unroller import product
-from dace.transformation.passes import DeadStateElimination
+from dace.properties import CodeBlock
+from dace.transformation.passes import DeadStateElimination, SymbolPropagation
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 import ast
 import operator as op
-#lextra_diffu = 1
-#ldeepatmo = 0
 
 def extract_variables_from_ast(expr_str):
     """
@@ -100,12 +99,13 @@ def eval_expr_any_value(expr_str, env=None):
 
     return eval_node(tree.body, env)
 
-def evaluate_with_0_and_1(expr_str):
+def evaluate_with_possible_values(expr_str, possible_values):
     # Extract variables from the expression
     variables = extract_variables_from_ast(expr_str)
 
     # Create all combinations of 0 and 1 for the variables
-    all_combinations = list(product([0, 1], repeat=len(variables)))
+    value_lists = [[int(possible_values[var])] for var in variables]
+    all_combinations = list(product(*value_lists))
 
     # Store the results for each combination
     results = {}
@@ -124,7 +124,7 @@ def evaluate_with_0_and_1(expr_str):
     results_eval = set(results.values())
     return results_eval
 
-def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegion, verbose):
+def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegion, prop_dict, verbose):
     for e in graph.edges():
         if isinstance(e.data, dace.InterstateEdge):
             new_assignments = dict()
@@ -133,7 +133,7 @@ def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegio
                     variables = extract_variables_from_ast(expr_str)
                     if len(variables) == 0:
                         raise Exception("No variables")
-                    simplified = evaluate_with_0_and_1(expr_str)
+                    simplified = evaluate_with_possible_values(expr_str, prop_dict)
                     if len(simplified) == 1:
                         simplified = simplified.pop()
                         if isinstance(simplified, int):
@@ -142,6 +142,10 @@ def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegio
                         raise ValueError("Eval Error")
                 except Exception as ex:
                     simplified = expr_str
+                try:
+                    simplified=  str(eval(simplified))
+                except Exception as ex:
+                    simplified = simplified
                 if "(1 - 0)" == simplified:
                     simplified = "1"
                 elif simplified is False:
@@ -169,7 +173,7 @@ def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegio
                         print(f"{assignment}: {expr_str} ({type(expr_str)}) -> {simplified}")
 
 
-                if simplified == False or simplified == 0:
+                if simplified == False or simplified == 0 or simplified == "0":
                     new_assignments[assignment] = "0"
                 else:
                     new_assignments[assignment] = str(simplified)
@@ -204,11 +208,11 @@ def rename_on_if_conds(node: ConditionalBlock, src: str, dst: str):
 # having the name "if*" in this case we can be pretty sure it is if
 # access on what we want then I can assign the value on the interstate
 # edge and rely on simplify, I hope this will work
-def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, verbose):
+def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, possible_values: dict, verbose):
     sdfg.validate()
 
     sdfg.replace_dict(replace_dict)
-
+    prop_dict = replace_dict
     # It makes global_data.lextra_diffu
     # to global_data.1 on an edge fix that
     for s in sdfg.states():
@@ -244,18 +248,20 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, verb
                                         oes = s.parent_graph.out_edges(s)
                                         oe = oes[0]
                                         assert dst2.data not in oe.data.assignments
-                                        oe.data.assignments[dst2.data + "_sym"] = dstexpr
                                         for ie in ies:
                                             if s.in_degree(ie.src) == 0 and s.out_degree(ie.src) == 0:
                                                 s.remove_node(ie.src)
                                         d = sdfg.arrays[dst2.data]
                                         #sdfg.remove_data(dst2.data, validate=False)
-                                        sdfg.add_symbol(name=dst2.data + "_sym", stype=d.dtype)
+                                        oname = dst2.data
+                                        sdfg.remove_data(dst2.data, validate=False)
+                                        sdfg.add_symbol(name=oname + "_sym", stype=d.dtype)
+                                        oe.data.assignments[oname + "_sym"] = dstexpr
 
                                         for oe in oes:
                                             dst_node = oe.dst
                                             if isinstance(dst_node, ConditionalBlock):
-                                                rename_on_if_conds(dst_node, dst2.data, dst2.data + "_sym")
+                                                rename_on_if_conds(dst_node, oname, oname + "_sym")
     if root == sdfg:
         repl_assign_if(sdfg)
     #for state in sdfg.states():
@@ -268,28 +274,159 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, verb
     for state in sdfg.states():
         for node in state.nodes():
             if isinstance(node, dace.nodes.NestedSDFG):
-                propagate_if_cond(sdfg, node.sdfg, replace_dict, verbose)
+                propagate_if_cond(sdfg, node.sdfg, replace_dict, prop_dict, verbose)
     sdfg.validate()
 
     # Evaluate interstate assignments everywhere
-    evaluate_interstate_assignments_and_ifs(sdfg, verbose)
+    evaluate_interstate_assignments_and_ifs(sdfg, prop_dict, verbose)
     for node, graph in sdfg.all_nodes_recursive():
         if isinstance(node, ControlFlowRegion):
-            evaluate_interstate_assignments_and_ifs(node, verbose)
+            evaluate_interstate_assignments_and_ifs(node, prop_dict, verbose)
         if isinstance(node, dace.nodes.NestedSDFG):
-            evaluate_interstate_assignments_and_ifs(node.sdfg, verbose)
+            evaluate_interstate_assignments_and_ifs(node.sdfg, prop_dict, verbose)
     sdfg.validate()
 
-    sdfg.simplify()
+    # return # here validates
 
+    #SymbolPropagation().apply_pass(sdfg, {})
+    if verbose:
+        sdfg.save(f"test0_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
 
     ConstantPropagation().apply_pass(sdfg, {})
     sdfg.validate()
 
-    # Remove all cfg nodes that are 0 == 1
-    DeadStateElimination().apply_pass(sdfg, {})
+    if verbose:
+        sdfg.save(f"test1_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
+
+    #return # here validates
+
+    for cfg in sdfg.all_control_flow_blocks():
+        if cfg not in sdfg.all_control_flow_blocks():
+            continue
+        if isinstance(cfg, ConditionalBlock):
+            ss = []
+            #if cfg.branches is not None:
+            assert len(cfg.branches) == 1 or len(cfg.branches) == 2
+
+            if len(cfg.branches) == 1:
+                s = ""
+                if cfg.branches[0][0] is not None:
+                    for i in range(len(cfg.branches[0][0].code)):
+                        s += " and " + ast.unparse(cfg.branches[0][0].code[i])
+                ss.append(s[len(" and "):])
+                assert len(ss) == 1
+                # If length of ss is 1 and we have 1 == 1 or (1 == 1) == 1 then we can cut out body
+                if len(ss) == 1:
+                    always_true = False
+                    always_false = False
+                    try:
+                        if eval(ss[0]) is True:
+                            always_true = True
+                            print(cond, "is True")
+                        if eval(ss[0]) is False:
+                            always_false = True
+                            print(cond, "is True")
+                    except Exception as ex:
+                        print(ex, ss)
+                        pass
+                    if always_false:
+                        branch, body =  cfg.branches[0]
+                        for n in body.nodes():
+                            body.remove_node(n)
+                        cfg.remove_branch(body)
+                        s = cfg.parent_graph.add_state("cond_repl")
+                        for ie in cfg.parent_graph.in_edges(cfg):
+                            cfg.parent_graph.add_edge(ie.src, s, copy.deepcopy(ie.data))
+                        for oe in cfg.parent_graph.out_edges(cfg):
+                            cfg.parent_graph.add_edge(s, oe.dst, copy.deepcopy(oe.data))
+                        cfg.parent_graph.remove_node(cfg)
+            if len(cfg.branches) == 2:
+                branch0, body0 = cfg.branches[0]
+                branch1, body1 = cfg.branches[1]
+                s0 = ""
+                if branch0 is not None:
+                    for i in range(len(branch0.code)):
+                        s0 += " and " + ast.unparse(branch0.code[i])
+                if s0 != "":
+                    s0 = s0[len(" and "):]
+                s1 = ""
+                if branch1 is not None:
+                    for i in range(len(branch1.code)):
+                        s1 += " and " + ast.unparse(branch1.code[i])
+                if s1 != "":
+                    s1 = s1[len(" and "):]
+                assert not(s0 == "" and s1 == "")
+                assert not(s0 != "" and s1 != "")
+
+                else_branch, else_body = None, None
+                c_branch, c_body = None, None
+                cond = None
+                if s0 == "":
+                    else_branch = branch0
+                    else_body = body0
+                    c_branch = branch1
+                    c_body = body1
+                    cond = s1
+                if s1 == "":
+                    else_branch = branch1
+                    else_body = body1
+                    c_branch = branch0
+                    c_body = body0
+                    cond = s0
+                always_true = False
+                always_false = False
+                try:
+                    if eval(cond) is True:
+                        always_true = True
+                        print(cond, "is True")
+                    if eval(cond) is False:
+                        always_false = True
+                        print(cond, "is False")
+                except Exception as ex:
+                    print(ex, cond)
+                    pass
+                assert always_false or always_true or (not always_false and not always_true)
+                # if always_false add the else branch
+                if always_false or always_true:
+                    ncfg = ConditionalBlock(cfg.label, cfg.sdfg, cfg.parent_graph)
+
+                if always_false:
+                    copy_else_body = copy.deepcopy(else_body)
+                    for s in copy_else_body.all_states():
+                        for n in s.nodes():
+                            if isinstance(n, dace.nodes.NestedSDFG):
+                                n.sdfg.parent_graph = copy_else_body
+                                n.sdfg.parent_sdfg = copy_else_body.sdfg
+                    ncfg.add_branch(CodeBlock("1 == 1"), copy_else_body)
+                elif always_true:
+                    copy_c_body = copy.deepcopy(c_body)
+                    for s in copy_c_body.all_states():
+                        for n in s.nodes():
+                            if isinstance(n, dace.nodes.NestedSDFG):
+                                n.sdfg.parent_graph = copy_c_body
+                                n.sdfg.parent_sdfg = copy_c_body.sdfg
+                    ncfg.add_branch(CodeBlock("1 == 1"), copy_c_body)
+
+                if always_false or always_true:
+                    ies = cfg.parent_graph.in_edges(cfg)
+                    oes = cfg.parent_graph.out_edges(cfg)
+                    for ie in ies:
+                        cfg.parent_graph.add_edge(ie.src, ncfg, copy.deepcopy(ie.data))
+                    for oe in oes:
+                        cfg.parent_graph.add_edge(ncfg, oe.dst, copy.deepcopy(oe.data))
+                    cfg.parent_graph.remove_node(cfg)
+
+    sdfg.reset_cfg_list()
+    if verbose:
+        sdfg.save(f"test2_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
     sdfg.validate()
 
+    # Remove all cfg nodes that are 0 == 1
+    #DeadStateElimination().apply_pass(sdfg, {})
+    sdfg.validate()
+
+    # return # here validates
+    # return
 
     # All non trurthy ifs have been removed, now copy-out the body of trurthy ifs
     # e.g. cond is 1 == 1
@@ -306,6 +443,8 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, verb
 
             # If length of ss is 1 and we have 1 == 1 or (1 == 1) == 1 then we can cut out body
             if len(ss) == 1:
+                if verbose:
+                    print(cfg.label, ", cond:", ss)
                 if ss[0] == "1 == 1" or ss[0] == "(1 == 1) == 1":
                     node_map = dict()
                     assert len(cfg.branches) == 1

@@ -15,7 +15,7 @@
 #include <string_view>
 #include <vector>
 
-#include "velocity_tendencies.h"
+#include "velocity_tendencies_nproma20480.h"
 
 namespace serde {
 std::vector<std::string_view> split(std::string_view s, char delim) {
