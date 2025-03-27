@@ -44,7 +44,14 @@ def modify_file(file_path, pattern):
             f.writelines(new_lines)
         print(f"Modified: {file_path}")
 
-
+# Can't make all them static
+# DACE_EXPORTED void __dace_init_cuda
+# DACE_EXPORTED void __dace_exit_cuda
+# DACE_EXPORTED void __dace_gpu_set_all_streams
+# DACE_EXPORTED void __dace_init_cuda
+# DACE_EXPORTED void __dace_exit_cuda
+# DACE_EXPORTED void __dace_runkernel_
+# DACE_DFI void single_state
 
 def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False):
     sources = set()
