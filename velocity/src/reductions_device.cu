@@ -11,6 +11,7 @@
 
 
 // max zero reduction interface
+extern "C" {
 __device__ double reduce_maxZ_device(const double *d_in, int size)
 {
   double max_val = 0;
@@ -32,4 +33,5 @@ __device__ int reduce_sum_device(const int *d_in, int size)
 __device__ double reduce_scan_device(const int *d_in, int size)
 {
   return (double)(reduce_sum_device(d_in, size) > 0);
+}
 }
