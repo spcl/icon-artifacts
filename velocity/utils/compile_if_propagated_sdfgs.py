@@ -46,7 +46,7 @@ def modify_file(file_path, pattern):
 
 
 
-def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False, nproma="20480"):
+def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False):
     sources = set()
     if not gpu:
         sources.add("src/reductions.cpp")

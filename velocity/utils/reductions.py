@@ -268,7 +268,7 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
 
 def add_all_reductions(sdfg: dace.SDFG):
     # We assume the array names and iteration variable names never change
-    if sdfg.name.split("_")[-1] == "nproma32":
+    if "nproma32" in sdfg.name:
         loop_to_max_reduction(sdfg, "FOR_l_568_c_568", "T_l568_c568")
         cfl_clipping_to_reduction(
             sdfg,
@@ -283,7 +283,7 @@ def add_all_reductions(sdfg: dace.SDFG):
         tmp_call_13_to_reduction(sdfg, "FOR_l_516_c_516", "T_l516_c516")
         levmask_to_reduction(sdfg, "FOR_l_470_c_470", "T_l472_c472")
 
-    elif sdfg.name.split("_")[-1] == "nproma20480":
+    elif "nproma20480" in sdfg.name:
         loop_to_max_reduction(sdfg, "FOR_l_652_c_652", "T_l652_c652")
         cfl_clipping_to_reduction(
             sdfg,
