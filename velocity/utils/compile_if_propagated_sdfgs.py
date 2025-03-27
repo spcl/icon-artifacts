@@ -53,7 +53,6 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
     else:
         sources.add("src/reductions.cpp")
         sources.add("src/reductions_kernel.cu")
-        sources.add("src/reductions_device.cu")
     headers = set()
     headers.add("-Iinclude")
     from dace.codegen import codegen, compiler
