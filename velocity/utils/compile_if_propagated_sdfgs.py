@@ -44,14 +44,6 @@ def modify_file(file_path, pattern):
             f.writelines(new_lines)
         print(f"Modified: {file_path}")
 
-# Can't make all them static
-# DACE_EXPORTED void __dace_init_cuda
-# DACE_EXPORTED void __dace_exit_cuda
-# DACE_EXPORTED void __dace_gpu_set_all_streams
-# DACE_EXPORTED void __dace_init_cuda
-# DACE_EXPORTED void __dace_exit_cuda
-# DACE_EXPORTED void __dace_runkernel_
-# DACE_DFI void single_state
 
 def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False):
     sources = set()
@@ -119,11 +111,11 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
         exit_code = os.system(
-            f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o {sdfg_name}"
+            f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
         )
     else:
         exit_code = os.system(
-            f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o {sdfg_name}"
+            f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
         )
 
     # check if compilation was successful

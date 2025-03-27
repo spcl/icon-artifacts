@@ -3,11 +3,20 @@ import typing
 
 def unique_names(sdfgs: typing.List[dace.SDFG]):
     for i, sdfg in enumerate(sdfgs):
-        sdfg.function_suffix = str(i)
+        sdfg.function_suffix = "_" + str(i)
+        visited = set()
         for n, parent in sdfg.all_nodes_recursive():
-            if hasattr(n, "label") and not isinstance(n, dace.nodes.AccessNode):
-                n.label = f"{n.label}_s{i}"
+            if n in visited:
+                continue
+            # Add unique names for anything that can become CUDA functions to avoid name conflicts
             if isinstance(n, dace.nodes.MapEntry):
-                n.map.label = f"{n.map.label}_s{i}"
+                n.map.label = f"{n.map.label}{sdfg.function_suffix}"
+                n.label = f"{n.label}{sdfg.function_suffix}"
+                visited.add(n.map)
+                visited.add(n)
+            #if isinstance(n, dace.nodes.MapExit):
+            #    n.label = f"{n.label}{sdfg.function_suffix}"
+            #    visited.add(n)
             if isinstance(n, dace.nodes.NestedSDFG):
-                n.sdfg.function_suffix = str(i)
+                n.sdfg.function_suffix = "_" + str(i)
+                visited.add(n)

@@ -269,22 +269,22 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
 def add_all_reductions(sdfg: dace.SDFG):
     # We assume the array names and iteration variable names never change
     if "nproma32" in sdfg.name:
-        loop_to_max_reduction(sdfg, "FOR_l_568_c_568", "T_l568_c568")
+        loop_to_max_reduction(sdfg, f"FOR_l_568_c_568", "T_l568_c568")
         cfl_clipping_to_reduction(
             sdfg,
             "T_l467_c467",
             "Conditional_l_467_c_467",
-            "FOR_l_465_c_465",
+            f"FOR_l_465_c_465",
             "tmp_struct_symbol_7",
         )
         maxvcfl_to_reduction(
-            sdfg, "T_l474_c474", "FOR_l_463_c_463", "tmp_struct_symbol_7"
+            sdfg, "T_l474_c474", f"FOR_l_463_c_463", "tmp_struct_symbol_7"
         )
-        tmp_call_13_to_reduction(sdfg, "FOR_l_516_c_516", "T_l516_c516")
-        levmask_to_reduction(sdfg, "FOR_l_470_c_470", "T_l472_c472")
+        tmp_call_13_to_reduction(sdfg, f"FOR_l_516_c_516", "T_l516_c516")
+        levmask_to_reduction(sdfg, f"FOR_l_470_c_470", "T_l472_c472")
 
     elif "nproma20480" in sdfg.name:
-        loop_to_max_reduction(sdfg, "FOR_l_652_c_652", "T_l652_c652")
+        loop_to_max_reduction(sdfg, f"FOR_l_652_c_652", "T_l652_c652")
         cfl_clipping_to_reduction(
             sdfg,
             "T_l551_c551",
@@ -293,10 +293,10 @@ def add_all_reductions(sdfg: dace.SDFG):
             "tmp_struct_symbol_7",
         )
         maxvcfl_to_reduction(
-            sdfg, "T_l558_c558", "FOR_l_547_c_547", "tmp_struct_symbol_7"
+            sdfg, "T_l558_c558", f"FOR_l_547_c_547", "tmp_struct_symbol_7"
         )
-        tmp_call_13_to_reduction(sdfg, "FOR_l_600_c_600", "T_l600_c600")
-        levmask_to_reduction(sdfg, "FOR_l_554_c_554", "T_l556_c556")
+        tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
+        levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
 
     else:
         raise ValueError("Unknown NPROMA size")

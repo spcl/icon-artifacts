@@ -89,7 +89,7 @@ for sdfg_name in sdfg_names:
 
         if not reduction:
             for cfg in sdfg.nodes():
-                if cfg.label == "FOR_l_568_c_568":
+                if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
                     s = sdfg.add_state_before(cfg, "copy_vcflmax")
                     a0 = s.add_access("gpu_vcflmax")
                     a1 = s.add_access("vcflmax")
@@ -170,6 +170,7 @@ for sdfg_name in sdfg_names:
 ################################################################################
 
 # Compile the SDFG
+unique_names(resulting_sdfgs)
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release)
 
 # check if execution was successful
