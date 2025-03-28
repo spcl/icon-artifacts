@@ -18,6 +18,7 @@ sdfg_names = [
     "velocity_nproma20480_if_prop_lvn_only_1_istep_2.sdfgz",
     "velocity_nproma20480_if_prop_lvn_only_0_istep_2.sdfgz",
 ]
+use_cache = False
 resulting_sdfgs = []
 for sdfg_name in sdfg_names:
     sdfg = dace.SDFG.from_file(sdfg_name)
@@ -57,10 +58,10 @@ for sdfg_name in sdfg_names:
         move_transients_to_top_level(
             root=sdfg,
             upper_bounds={
-                "z_w_con_c": 960,
-                "maxvcfl_arr": 960,
-                "cfl_clipping": 960,
-                "z_w_concorr_mc": 960,
+                "z_w_con_c": 1,
+                "maxvcfl_arr": 1,
+                "cfl_clipping": 1,
+                "z_w_concorr_mc": 1,
             },
         )
         if use_cache:
@@ -86,21 +87,10 @@ for sdfg_name in sdfg_names:
         sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
         # This can only be safely applied to selected cases. Skip for now.
         # sdfg.apply_transformations(YoloMapFission)
-        untangle_if_sdfg(sdfg, verbose=verbose)
-        split_map_sdfg(sdfg, False, verbose=verbose)
+        #untangle_if_sdfg(sdfg, verbose=verbose)
+        #split_map_sdfg(sdfg, False, verbose=verbose)
         sdfg.validate()
 
-        raise_loop_invariant_if(
-            sdfg,
-            check_invariant_if_conds=["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
-            copy_edge_before=[False, True],
-        )
-        raise_loop_invariant_if(
-            sdfg, check_invariant_if_conds=["not (lvn_only == 1)"], copy_edge_before=[False]
-        )
-        raise_loop_invariant_if(
-            sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
-        )
         sdfg.apply_transformations_repeated(ConditionFusion)
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)

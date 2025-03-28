@@ -18,7 +18,9 @@ from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 
-
+use_cache = False
+reduction = False
+verbose = True
 # Load SDFG
 sdfg_names = [
     "velocity_nproma20480_if_prop_lvn_only_0_istep_1.sdfgz",
@@ -77,30 +79,33 @@ for sdfg_name in sdfg_names:
         move_transients_to_top_level(
             root=sdfg,
             upper_bounds={
-                "z_w_con_c": 960,
-                "maxvcfl_arr": 960,
-                "cfl_clipping": 960,
-                "z_w_concorr_mc": 960,
+                "z_w_con_c": 1, # Within cell kernel, 1 block
+                "maxvcfl_arr": 1, # Within cell kernel, 1 block
+                "cfl_clipping": 1, # Within cell kernel, 1 block
+                "z_w_concorr_mc": 1, # Within cell kernel, 1 block
             },
+            verbose=verbose,
         )
         if verbose:
             sdfg.save("transients_moved.sdfgz", compress=True)
         ToGPU().apply_pass(sdfg, {"verbose": verbose})
 
-        if not reduction:
-            for cfg in sdfg.nodes():
-                if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
-                    s = sdfg.add_state_before(cfg, "copy_vcflmax")
-                    a0 = s.add_access("gpu_vcflmax")
-                    a1 = s.add_access("vcflmax")
-                    s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
+        #if not reduction:
+        #    for cfg in sdfg.nodes():
+        #        if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
+        #            s = sdfg.add_state_before(cfg, "copy_vcflmax")
+        #            a0 = s.add_access("gpu_vcflmax")
+        #            a1 = s.add_access("vcflmax")
+        #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
+
         # sdfg.apply_transformations_repeated(GPUKernelLaunchRestructure)
         # wrap_reduction_and_T_l488_c488in_gpumap(sdfg)
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
     # Shouldn't have any loops left
-    count_loops(sdfg, verbose=verbose, assert_loops=True)
+    #count_loops(sdfg, verbose=verbose, assert_loops=True)
+
 
     if Path(f"gpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
@@ -109,27 +114,11 @@ for sdfg_name in sdfg_names:
         # This can only be safely applied to selected cases. Skip for now.
         # sdfg.apply_transformations(YoloMapFission)
         # preprocess_tough_nut(sdfg)
-        untangle_if_sdfg(sdfg, verbose)
-        # split_map_sdfg(sdfg, True, verbose)
 
         sdfg.validate()
-        raise_loop_invariant_if(
-            sdfg,
-            check_invariant_if_conds=["1 - ldeepatmo == 1", "_if_cond_27 == 1"],
-            copy_edge_before=[False, True],
-        )
-        raise_loop_invariant_if(
-            sdfg, check_invariant_if_conds=["not (lvn_only == 1)"], copy_edge_before=[False]
-        )
-        # Nested Case extend support for this
-        # raise_loop_invariant_if(sdfg,check_invariant_if_conds = ["not (lvn_only == 1)", "_if_cond_27 == 1"],
-        #                             copy_edge_before = [False, True])
-        raise_loop_invariant_if(
-            sdfg, check_invariant_if_conds=["(1 - lvn_only) == 1"], copy_edge_before=[False]
-        )
-        raise_loop_invariant_if(
-            sdfg, check_invariant_if_conds=["(istep == 1) == 1"], copy_edge_before=[False]
-        )
+
+
+        #sdfg.apply_transformations_repeated(ConditionFusion)
         sdfg.apply_transformations_repeated(ConditionFusion)
         # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
         # split_map_sdfg(sdfg, True, verbose)
