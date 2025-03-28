@@ -46,7 +46,7 @@ def simplify_recursive(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
     for s in sdfg.states():
         for n in s.nodes():
             if isinstance(n, dace.nodes.NestedSDFG):
-                simplify_recursive(root, n.sdfg)
+                simplify_recursive(root, n.sdfg, verbose)
 
 def move_transients_to_top_level(root: dace.SDFG,
                                  upper_bounds = dict[str, int],
