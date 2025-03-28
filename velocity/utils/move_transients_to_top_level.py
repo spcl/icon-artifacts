@@ -1,8 +1,11 @@
 import dace
 import copy
 
+from dace.transformation.dataflow import PruneConnectors
+from dace.transformation.dataflow.prune_connectors import PruneSymbols
 
-def clean_unused_array(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
+
+def clean_unused_array(root: dace.SDFG, parent_state, sdfg: dace.SDFG, verbose: bool):
     #for arr_name, arr in sdfg.arrays.items():
     used_arrays = set()
     for s in sdfg.states():
@@ -10,13 +13,47 @@ def clean_unused_array(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
             if isinstance(n, dace.nodes.AccessNode):
                 used_arrays.add(n.data)
             if isinstance(n, dace.nodes.NestedSDFG):
-                clean_unused_array(root, n.sdfg)
-                for ie in s.in_edges(n):
-                    if ie.data is not None and ie.data.data is not None:
-                        used_arrays.add(ie.data.data)
+                if n in s.nodes():
+                    for ie in s.in_edges(n):
+                        if ie.data is not None and ie.data.data is not None:
+                            used_arrays.add(ie.data.data)
+
         for e in s.edges():
             if e.data is not None and e.data.data is not None:
-                used_arrays.add(e.data.data)
+                for arr_name in sdfg.arrays.keys():
+                    if arr_name in str(e.data.data):
+                        used_arrays.add(arr_name)
+
+    """
+    for s in sdfg.all_states():
+        for e in s.parent_graph.in_edges(s) + s.parent_graph.out_edges(s):
+            if e.data is not None and e.data.data is not None:
+                for arr_name in sdfg.arrays.keys():
+                    if arr_name in str(e.data.data):
+                        used_arrays.add(arr_name)
+    """
+    for cfg in sdfg.all_control_flow_regions():
+        if not isinstance(cfg, dace.SDFGState):
+            for e in cfg.edges():
+                if e.data is not None and e.data.assignments is not None:
+                    for assignment, src in e.data.assignments.items():
+                        for arr_name in sdfg.arrays.keys():
+                            if arr_name in str(assignment) or arr_name in str(src):
+                                used_arrays.add(arr_name)
+    for s in sdfg.all_states():
+        for e in s.parent_graph.in_edges(s) + s.parent_graph.out_edges(s):
+            if e.data is not None and e.data.assignments is not None:
+                for assignment, src in e.data.assignments.items():
+                    for arr_name in sdfg.arrays.keys():
+                        if arr_name in str(assignment) or arr_name in str(src):
+                            used_arrays.add(arr_name)
+    for e in sdfg.edges():
+        if e.data is not None and e.data.assignments is not None:
+            for assignment, src in e.data.assignments.items():
+                for arr_name in sdfg.arrays.keys():
+                    if arr_name in str(assignment) or arr_name in str(src):
+                        used_arrays.add(arr_name)
+
 
     unused_arrays = set(sdfg.arrays.keys()) - used_arrays
     removed_arrays = set()
@@ -24,21 +61,69 @@ def clean_unused_array(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
         if unused_arr_name in unused_arrays:
             if (isinstance(sdfg.arrays[unused_arr_name], dace.data.Array) or
                 isinstance(sdfg.arrays[unused_arr_name], dace.data.Scalar) ):
-                if sdfg == root and (sdfg.arrays[unused_arr_name].transient is False):
+                #if sdfg == root and (sdfg.arrays[unused_arr_name].transient is False):
+                if sdfg.arrays[unused_arr_name].transient is False:
                     continue
                 if "." in unused_arr_name:
                     continue
                 if verbose:
                     print(f"Remove {unused_arr_name} from {sdfg.name}")
+                arr = sdfg.arrays[unused_arr_name]
                 sdfg.remove_data(unused_arr_name)
-                removed_arrays.add(unused_arr_name)
-    # If not root we need to remove in connectors
-    for rmed in removed_arrays:
-        pass
-        sdfg.parent_nsdfg_node
+                removed_arrays.add((unused_arr_name, arr.transient))
 
+    # If not root we need to remove in connectors and the inputs
+    if root != sdfg:
+        for rmed, transient in removed_arrays:
+        #    nsdfg = sdfg.parent_nsdfg_node
+        #if PruneConnectors().can_be_applied_to(sdfg=sdfg.parent_sdfg, nsdfg=sdfg.parent_nsdfg_node):
+        #    PruneConnectors().apply_to(sdfg=sdfg.parent_sdfg, nsdfg=sdfg.parent_nsdfg_node)
+        #if PruneSymbols().can_be_applied_to(sdfg=sdfg.parent_sdfg, nsdfg=sdfg.parent_nsdfg_node):
+        #    PruneSymbols().apply_to(sdfg=sdfg.parent_sdfg, nsdfg=sdfg.parent_nsdfg_node)
+        #    """
+            # TODO fix this
+            if not transient:
+                continue
+
+            nsdfg = sdfg.parent_nsdfg_node
+            assert nsdfg is not None
+            parent_graph: dace.SDFGState = parent_state
+            assert parent_graph is not None
+
+            stack = [(nsdfg, rmed)]
+            assert transient or rmed in nsdfg.in_connectors or rmed in nsdfg.out_connectors, f"{rmed} not in {nsdfg.in_connectors} or {nsdfg.out_connectors}"
+            """
+            print(stack)
+            while len(stack) > 0:
+                n, dst_conn = stack.pop()
+                if dst_conn is not None:
+                    ies = list(parent_graph.in_edges_by_connector(n, dst_conn))
+                    print(ies)
+                else:
+                    ies = list(parent_graph.in_edges(n))
+                if dst_conn is not None:
+                    for ie in ies:
+                        stack.append((ie.src, ie.src_conn.replace("OUT_", "IN_") if ie.src_conn is not None else ie.src_conn))
+                for ie in ies:
+                    print(f"Remove {ie}")
+                    parent_graph.remove_edge(ie)
+                    ie.src.remove_out_connector(ie.src_conn)
+                    ie.dst.remove_in_connector(ie.dst_conn)
+                print(stack)
+            """
+
+        for n in parent_state.nodes():
+            if parent_state.in_degree(n) == 0 and parent_state.out_degree(n) == 0:
+                parent_state.remove_node(n)
+                print(f"Remove {n}")
     if verbose:
         print(f"Cleaned {len(removed_arrays)} ({removed_arrays} of {unused_arrays}) from {sdfg.name}")
+
+    for s in sdfg.states():
+        for n in s.nodes():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                if n in s.nodes():
+                    clean_unused_array(root, s, n.sdfg, verbose)
 
 
 def simplify_recursive(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
@@ -60,7 +145,9 @@ def move_transients_to_top_level(root: dace.SDFG,
     #        if isinstance(n, dace.nodes.NestedSDFG):
     #            self.move_transients_to_top_level(roots + [sdfg], n.sdfg)
     simplify_recursive(root, root, verbose)
-    clean_unused_array(root, root, verbose)
+    clean_unused_array(root, None, root, verbose)
+    root.save("uwu.sdfgz", compress=True)
+    root.validate()
 
     # Add arrays from bottom to up
     arrays_added = dict()
