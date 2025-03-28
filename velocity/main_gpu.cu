@@ -150,26 +150,6 @@ int main() {
     }
     std::cout << "Step " << n << " variables, extra_diffu: " << global_data.lextra_diffu << ", istep: ";
     std::cout << istep << ", lvn_only: " << lvn_only << ", ldeepatmo: " << ldeepatmo << std::endl;
-    printf("z_kin_hor_e size[0] = %ld\n", serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0));
-    printf("z_kin_hor_e size[1] = %ld\n", serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1));
-    printf("z_kin_hor_e lbound[0] = %ld\n", serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0));
-    printf("z_kin_hor_e lbound[1] = %ld\n", serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1));
-    printf("z_kin_hor_e lbound[2] = %ld\n", serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2));
-  
-    // Print metadata sizes for z_vt_ie
-    printf("z_vt_ie size[0] = %ld\n", serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0));
-    printf("z_vt_ie size[1] = %ld\n", serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1));
-    printf("z_vt_ie lbound[0] = %ld\n", serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0));
-    printf("z_vt_ie lbound[1] = %ld\n", serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1));
-    printf("z_vt_ie lbound[2] = %ld\n", serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2));
-  
-    // Print metadata sizes for z_w_concorr_me
-    printf("z_w_concorr_me size[0] = %ld\n", serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0));
-    printf("z_w_concorr_me size[1] = %ld\n", serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1));
-    printf("z_w_concorr_me lbound[0] = %ld\n", serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0));
-    printf("z_w_concorr_me lbound[1] = %ld\n", serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1));
-    printf("z_w_concorr_me lbound[2] = %ld\n", serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2));
-
 
     if (lvn_only == 1 && istep == 1){
       
