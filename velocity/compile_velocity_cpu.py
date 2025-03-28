@@ -18,7 +18,6 @@ sdfg_names = [
     "velocity_nproma20480_if_prop_lvn_only_1_istep_2.sdfgz",
     "velocity_nproma20480_if_prop_lvn_only_0_istep_2.sdfgz",
 ]
-use_cache = False
 resulting_sdfgs = []
 for sdfg_name in sdfg_names:
     sdfg = dace.SDFG.from_file(sdfg_name)

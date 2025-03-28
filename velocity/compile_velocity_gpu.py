@@ -18,9 +18,7 @@ from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 
-use_cache = False
-reduction = False
-verbose = True
+
 # Load SDFG
 sdfg_names = [
     "velocity_nproma20480_if_prop_lvn_only_0_istep_1.sdfgz",
