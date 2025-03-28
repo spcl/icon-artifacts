@@ -8,7 +8,7 @@
 
 int main() {
   const std::filesystem::path ROOT{"data"};
-  const int max_n = 1;
+  const int max_n = 5;
 
   for (int n = 1; n <= max_n; ++n) {
     std::cerr << "Reading data for " << n << "..." << std::endl;
