@@ -109,6 +109,8 @@ for sdfg_name in sdfg_names:
 ################################################################################
 
 # Compile the SDFG
+for sdfg in resulting_sdfgs:
+    propagate_block_var(sdfg)
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release)
 
 # check if execution was successful
