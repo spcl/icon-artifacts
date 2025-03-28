@@ -77,10 +77,10 @@ for sdfg_name in sdfg_names:
         move_transients_to_top_level(
             root=sdfg,
             upper_bounds={
-                "z_w_con_c": 1, # Within cell kernel, 1 block
-                "maxvcfl_arr": 1, # Within cell kernel, 1 block
-                "cfl_clipping": 1, # Within cell kernel, 1 block
-                "z_w_concorr_mc": 1, # Within cell kernel, 1 block
+                "z_w_con_c": 2, # Within cell kernel, 1 block
+                "maxvcfl_arr": 2, # Within cell kernel, 1 block
+                "cfl_clipping": 2, # Within cell kernel, 1 block
+                "z_w_concorr_mc": 2, # Within cell kernel, 1 block
             },
             verbose=verbose,
         )
@@ -96,8 +96,7 @@ for sdfg_name in sdfg_names:
         #            a1 = s.add_access("vcflmax")
         #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
 
-        # sdfg.apply_transformations_repeated(GPUKernelLaunchRestructure)
-        # wrap_reduction_and_T_l488_c488in_gpumap(sdfg)
+        # GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
