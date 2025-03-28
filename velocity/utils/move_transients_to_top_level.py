@@ -1,8 +1,56 @@
 import dace
 import copy
 
+
+def clean_unused_array(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
+    #for arr_name, arr in sdfg.arrays.items():
+    used_arrays = set()
+    for s in sdfg.states():
+        for n in s.nodes():
+            if isinstance(n, dace.nodes.AccessNode):
+                used_arrays.add(n.data)
+            if isinstance(n, dace.nodes.NestedSDFG):
+                clean_unused_array(root, n.sdfg)
+                for ie in s.in_edges(n):
+                    if ie.data is not None and ie.data.data is not None:
+                        used_arrays.add(ie.data.data)
+        for e in s.edges():
+            if e.data is not None and e.data.data is not None:
+                used_arrays.add(e.data.data)
+
+    unused_arrays = set(sdfg.arrays.keys()) - used_arrays
+    removed_arrays = set()
+    for unused_arr_name in unused_arrays:
+        if unused_arr_name in unused_arrays:
+            if (isinstance(sdfg.arrays[unused_arr_name], dace.data.Array) or
+                isinstance(sdfg.arrays[unused_arr_name], dace.data.Scalar) ):
+                if sdfg == root and (sdfg.arrays[unused_arr_name].transient is False):
+                    continue
+                if "." in unused_arr_name:
+                    continue
+                if verbose:
+                    print(f"Remove {unused_arr_name} from {sdfg.name}")
+                sdfg.remove_data(unused_arr_name)
+                removed_arrays.add(unused_arr_name)
+    # If not root we need to remove in connectors
+    for rmed in removed_arrays:
+        pass
+        sdfg.parent_nsdfg_node
+
+    if verbose:
+        print(f"Cleaned {len(removed_arrays)} ({removed_arrays} of {unused_arrays}) from {sdfg.name}")
+
+
+def simplify_recursive(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
+    sdfg.simplify()
+    for s in sdfg.states():
+        for n in s.nodes():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                simplify_recursive(root, n.sdfg)
+
 def move_transients_to_top_level(root: dace.SDFG,
-                                 upper_bounds = dict[str, int]):
+                                 upper_bounds = dict[str, int],
+                                 verbose= True):
     # If we have a transient array, make it live on the top level SDFG
     # For this, collect all transients that do not exist on top level SDFG
     # Add them to top level SDFG, if they are arrays and have storage location Default
@@ -11,6 +59,8 @@ def move_transients_to_top_level(root: dace.SDFG,
     #    for n in s.nodes():
     #        if isinstance(n, dace.nodes.NestedSDFG):
     #            self.move_transients_to_top_level(roots + [sdfg], n.sdfg)
+    simplify_recursive(root, root, verbose)
+    clean_unused_array(root, root, verbose)
 
     # Add arrays from bottom to up
     arrays_added = dict()
@@ -38,7 +88,8 @@ def move_transients_to_top_level(root: dace.SDFG,
                         ways_up += 1
                     #print(f"{arr_name} needs to be moved {ways_up} level{'s' if ways_up == 1 else ''} up")
                     if ways_up != 1:
-                        raise Exception("Moving transients to top level only supports if the transient needs to be moved once currently")
+                        root.save("move_transient_failing.sdfgz", compress=True)
+                        raise Exception(f"Moving transients to top level only supports if the transient needs to be moved once currently, {arr_name}, {arr}, {ways_up} in sdfg: {root.name}")
 
                     # To support more than 1 level need to check nested SDFGs and the map chain
                     _sdfg = sdfg
