@@ -14,7 +14,7 @@ from dace.transformation.passes import (
     StructToContainerGroups,
 )
 
-# from dace.transformation.passes import GPUKernelLaunchRestructure
+from dace.transformation.passes import GPUKernelLaunchRestructure
 from dace.transformation.dataflow import MapCollapse, MapFusion, TrivialMapElimination
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
@@ -109,7 +109,7 @@ for sdfg_name in sdfg_names:
         #            a1 = s.add_access("vcflmax")
         #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
 
-        # GPUKernelLaunchRestructure().apply_pass(sdfg, {})
+        GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
