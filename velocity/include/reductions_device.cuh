@@ -4,18 +4,20 @@
 
 __device__ __inline__ double reduce_maxZ_device(const double *d_in, int size)
 {
-    double max_val = 0;
-    for (int i = 0; i < size; i++)
-    max_val = (d_in[i] > max_val) ? d_in[i] : max_val;
+    double max_val = 0.0;
+    for (int i = 0; i < size; i++){
+        max_val = (d_in[i] > max_val) ? d_in[i] : max_val;
+    }
     return max_val;
 }
 
 // sum reduction interface
 __device__ __inline__ int reduce_sum_device(const int *d_in, int size)
 {
-    int sum = 0.0;
-    for (int i = 0; i < size; i++)
-    sum += d_in[i];
+    int sum = 0;
+    for (int i = 0; i < size; i++){
+        sum += d_in[i];
+    }
     return sum;
 }
 

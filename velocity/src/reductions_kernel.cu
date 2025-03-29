@@ -25,7 +25,8 @@ int reduce_sum_gpu(const int *d_in, int size)
 }
 
 // scan reduction interface
-double reduce_scan_gpu(const int *d_in, int size)
+int reduce_scan_gpu(const int *d_in, int size)
 {
-  return (double)(reduce_sum_gpu(d_in, size) > 0);
+  return (reduce_sum_gpu(d_in, size) > 0)? 1 : 0;
 }
+

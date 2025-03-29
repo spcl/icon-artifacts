@@ -82,12 +82,15 @@ for sdfg_name in sdfg_names:
                 "maxvcfl_arr": 2, # Within cell kernel, 1 block
                 "cfl_clipping": 2, # Within cell kernel, 1 block
                 "z_w_concorr_mc": 2, # Within cell kernel, 1 block
+                "levmask": 2
             },
             verbose=verbose,
         )
         if verbose:
             sdfg.save("transients_moved.sdfgz", compress=True)
 
+        # Creates segfault with 2GPU applied
+        """
         for s in sdfg.states():
             for n in s.nodes():
                 if isinstance(n, dace.nodes.MapEntry):
@@ -98,6 +101,7 @@ for sdfg_name in sdfg_names:
                         TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
                         #else:
                         #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")
+        """
 
         ToGPU().apply_pass(sdfg, {"verbose": verbose})
 
@@ -115,8 +119,6 @@ for sdfg_name in sdfg_names:
 
     # Shouldn't have any loops left
     #count_loops(sdfg, verbose=verbose, assert_loops=True)
-
-
     if Path(f"gpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
     else:
@@ -127,41 +129,44 @@ for sdfg_name in sdfg_names:
 
         sdfg.validate()
 
-
+        # Do not call mapcollapse or mapfusion with permissive=True, because collapsing
+        # Sequential -> GPU _ Device map into one will not result well
         #sdfg.apply_transformations_repeated(ConditionFusion)
         sdfg.apply_transformations_repeated(ConditionFusion)
         # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
         # split_map_sdfg(sdfg, True, verbose)
         prune_unused_inputs_outputs(sdfg)
         InlineSDFGs().apply_pass(sdfg, {})
-        k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+        k = sdfg.apply_transformations_repeated(MapCollapse)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
         k = sdfg.apply_transformations_repeated(MapFusion)
         for n, g in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.NestedSDFG):
                 if isinstance(n, dace.nodes.NestedSDFG):
-                    k = n.sdfg.apply_transformations_repeated(MapFusion, permissive=True)
+                    k = n.sdfg.apply_transformations_repeated(MapFusion)
                     if verbose:
                         print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
         if verbose:
             print(f"Applied MapFusion {k} time(s)")
-        k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+        k = sdfg.apply_transformations_repeated(MapCollapse)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
         sdfg.simplify()
         prune_unused_inputs_outputs(sdfg)
         InlineSDFGs().apply_pass(sdfg, {})
-        k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+        k = sdfg.apply_transformations_repeated(MapCollapse)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
 
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage3.sdfgz", compress=True)
-
+    # Currently makes the SDFG invalid, thrust error illegal address
+    """
     if Path(f"gpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
+
         propagate_block_var(sdfg)
         sdfg.validate()
         sdfg.simplify()
@@ -244,8 +249,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage4.sdfgz", compress=True)
-
-
+    """
     # Validate the SDFG
     sdfg.validate()
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)

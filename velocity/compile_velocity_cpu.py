@@ -58,10 +58,10 @@ for sdfg_name in sdfg_names:
         move_transients_to_top_level(
             root=sdfg,
             upper_bounds={
-                "z_w_con_c": 1,
-                "maxvcfl_arr": 1,
-                "cfl_clipping": 1,
-                "z_w_concorr_mc": 1,
+                "z_w_con_c": 2,
+                "maxvcfl_arr": 2,
+                "cfl_clipping": 2,
+                "z_w_concorr_mc": 2,
             },
         )
         if use_cache:
