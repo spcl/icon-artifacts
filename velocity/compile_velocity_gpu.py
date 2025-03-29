@@ -243,7 +243,7 @@ for sdfg_name in sdfg_names:
 
         sdfg.validate()
         if use_cache:
-            sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
+            sdfg.save(f"gpu_{sdfg_name}_stage4.sdfgz", compress=True)
 
 
     # Validate the SDFG
