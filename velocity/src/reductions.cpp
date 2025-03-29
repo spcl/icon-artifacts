@@ -1,4 +1,3 @@
-#include <omp.h>
 
 ////////////////////////////////////////////////////
 // We are running on host and the data is on host

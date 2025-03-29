@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////
 
 // max zero reduction interface
-extern "C" {
 double reduce_maxZ_gpu(const double *d_in, int size)
 {
   thrust::device_vector<double> data(d_in, d_in + size);

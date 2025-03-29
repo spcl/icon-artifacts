@@ -1,14 +1,7 @@
 #pragma once
 
-#include <cuda_runtime.h>
-#include <thrust/reduce.h>
-#include <thrust/functional.h>
-#include <thrust/execution_policy.h>
-#include <thrust/device_vector.h>
-
 #define __REDUCE_DEVICE__
 
-extern "C" {
 __device__ __inline__ double reduce_maxZ_device(const double *d_in, int size)
 {
     double max_val = 0;
@@ -27,8 +20,24 @@ __device__ __inline__ int reduce_sum_device(const int *d_in, int size)
 }
 
 // scan reduction interface
-__device__ __inline__ double reduce_scan_device(const int *d_in, int size)
+__device__ __inline__ int reduce_scan_device(const int *d_in, int size)
 {
-    return (double)(reduce_sum_device(d_in, size) > 0);
+    return (reduce_sum_device(d_in, size) > 0) ? 1 : 0;
 }
+
+__device__ __inline__ double reduce_maxZ_device(const double d_in, int size)
+{
+    return d_in;
+}
+
+// sum reduction interface
+__device__ __inline__ int reduce_sum_device(const int d_in, int size)
+{
+    return d_in;
+}
+
+// scan reduction interface
+__device__ __inline__ int reduce_scan_device(const int d_in, int size)
+{
+    return (d_in > 0) ? 1 : 0;
 }

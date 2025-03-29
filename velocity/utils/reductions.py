@@ -135,7 +135,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     task, _ = find_node_by_name(sdfg, task_name)
     task.code.as_string = "max_vcfl_dyn_var_94_out = tmp_call_18"
     sdfg.append_global_code(
-        "\nDACE_EXPORTED double reduce_maxZ_gpu(const double *d_in, int size);\n"
+        "\ndouble reduce_maxZ_gpu(const double *d_in, int size);\n"
     )
 
 
@@ -164,7 +164,7 @@ def cfl_clipping_to_reduction(
         in_expr=f"cfl_clipping[{start}-1:{end}-1,_for_it_35-1]",
     )
     sdfg.append_global_code(
-        "\nDACE_EXPORTED int reduce_sum_gpu(const int *d_in, int size);\n"
+        "\nint reduce_sum_gpu(const int *d_in, int size);\n"
     )
 
 
@@ -207,7 +207,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name, tmp_name):
         out_expr="maxvcfl[0]",
     )
     sdfg.append_global_code(
-        "\nDACE_EXPORTED double reduce_maxZ_gpu(const double *d_in, int size);\n"
+        "\ndouble reduce_maxZ_gpu(const double *d_in, int size);\n"
     )
 
 
@@ -236,7 +236,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     parent.remove_node(parent.successors(task)[0])
     parent.remove_node(task)
     sdfg.append_global_code(
-        "\nDACE_EXPORTED double reduce_scan_gpu(const int *d_in, int size);\n"
+        "\ndouble reduce_scan_gpu(const int *d_in, int size);\n"
     )
 
 
@@ -262,7 +262,7 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     parent.remove_node(parent.successors(task)[0])
     parent.remove_node(task)
     sdfg.append_global_code(
-        "\nDACE_EXPORTED double reduce_scan_gpu(const int *d_in, int size);\n"
+        "\ndouble reduce_scan_gpu(const int *d_in, int size);\n"
     )
 
 
