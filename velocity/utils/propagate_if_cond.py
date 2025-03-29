@@ -332,10 +332,10 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                         cond = eval(ss[0])
                         if cond is True:
                             always_true = True
-                            print(cond, "is True")
+                            print(ss[0], "->", cond, "is True")
                         if cond is False:
                             always_false = True
-                            print(cond, "is True")
+                            print(ss[0], "->", cond, "is True")
                     except Exception as ex:
                         print(ex, ss)
                         pass
@@ -350,6 +350,11 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                         for oe in cfg.parent_graph.out_edges(cfg):
                             cfg.parent_graph.add_edge(s, oe.dst, copy.deepcopy(oe.data))
                         cfg.parent_graph.remove_node(cfg)
+                    # Makes access problematic key not found
+                    #if always_true:
+                    #    cfg.branches[0][0].code = ["1 == 1"]
+                    #if always_true:
+                    #    cfg.branches[0] = (CodeBlock("1 == 1"), cfg.branches[0][1])
             if len(cfg.branches) == 2:
                 branch0, body0 = cfg.branches[0]
                 branch1, body1 = cfg.branches[1]
@@ -432,7 +437,7 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
     sdfg.validate()
 
     # Remove all cfg nodes that are 0 == 1
-    DeadStateElimination().apply_pass(sdfg, {})
+    # DeadStateElimination().apply_pass(sdfg, {})
     sdfg.validate()
 
     # return # here validates
@@ -455,7 +460,11 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
             if len(ss) == 1:
                 if verbose:
                     print(cfg.label, ", cond:", ss)
-                if ss[0] == "1 == 1" or ss[0] == "(1 == 1) == 1":
+                try:
+                    evaluated = eval(ss[0]) is True
+                except Exception as ex:
+                    evaluated = False
+                if ss[0] == "1 == 1" or ss[0] == "(1 == 1) == 1" or evaluated:
                     node_map = dict()
                     assert len(cfg.branches) == 1
                     body = cfg.branches[0][1]
@@ -471,14 +480,13 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                     parent_graph.remove_node(cfg)
                     #print(cfg)
 
-
                     for n in body.nodes():
                         node_map[n] = copy.deepcopy(n)
                         for _s in node_map[n].all_states() if (not isinstance(node_map[n], dace.SDFGState) and not isinstance(node_map[n], ContinueBlock)) else [node_map[n]]:
                             for _n in _s.nodes():
                                 if isinstance(_n, dace.nodes.NestedSDFG):
-                                    node_map[_n].sdfg.parent_graph = parent_graph
-                                    node_map[_n].sdfg.parent_sdfg = sdfg
+                                    _n.sdfg.parent_graph = parent_graph
+                                    _n.sdfg.parent_sdfg = sdfg
 
                         parent_graph.add_node(node_map[n])
 

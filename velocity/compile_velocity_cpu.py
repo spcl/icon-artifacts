@@ -6,9 +6,10 @@ from dace.transformation.interstate import (
     LoopToMap,
     ContinueToCondition,
     ConditionFusion,
+    StateFusion,
 )
-from dace.transformation.passes import SymbolPropagation, StructToContainerGroups
-from dace.transformation.dataflow import MapCollapse
+from dace.transformation.passes import InlineSDFGs, SymbolPropagation, StructToContainerGroups
+from dace.transformation.dataflow import MapCollapse, MapFusion, MapUnroll, TrivialMapElimination
 from utils import *
 
 # Load SDFG
@@ -99,18 +100,111 @@ for sdfg_name in sdfg_names:
         if isinstance(node, dace.nodes.MapEntry):
             node.map.schedule = dace.ScheduleType.CPU_Multicore
 
+    if Path(f"cpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
+        sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
+    else:
+        propagate_block_var(sdfg)
+        sdfg.validate()
+        sdfg.simplify()
+        sdfg.validate()
+        for s in sdfg.states():
+            for n in s.nodes():
+                if isinstance(n, dace.nodes.MapEntry):
+                    if (n.map.range == dace.subsets.Range([[1, 1, 1]]) or
+                        n.map.range == dace.subsets.Range([[0, 0, 1]])):
+                        #return self._subgraph_user fails checking can be applied??
+                        #if TrivialMapElimination().can_be_applied(s, s.node_id(n), sdfg):
+                        TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
+                        #else:
+                        #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")
+        sdfg.validate()
+        for s in sdfg.states():
+            for n in s.nodes():
+                if isinstance(n, dace.nodes.MapEntry):
+                    if (len(n.map.range) == 1):
+                        b,e,s = n.map.range[0]
+                        expr = (e+1-b)//s
+                        try:
+                            expr = int(expr)
+                            # Makes the SDFG invalid, missing inconnectors
+                            # MapUnroll().apply_to(sdfg=sdfg, map_entry=n)
+                            n.map.unroll = True
+                            n.map.unroll_factor = expr
+                            n.map.schedule = dace.ScheduleType.Sequential
+                        except:
+                            pass
+                            #n.map.unroll = True
+                            #n.map.unroll_factor = int(expr)
+                            #n.map.schedule = dace.ScheduleType.Sequential
+                    #return self._subgraph_user ?? same
+                    #AttributeError: 'TrivialMapElimination' object has no attribute '_subgraph_user'
+                    #if MapUnroll().can_be_applied(s, s.node_id(n), sdfg):
+
+        prune_unused_inputs_outputs(sdfg)
+        sdfg.apply_transformations_repeated(StateFusion)
+        for n, g in sdfg.all_nodes_recursive():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    n.sdfg.apply_transformations_repeated(StateFusion, permissive=True)
+        InlineSDFGs().apply_pass(sdfg, {})
+        k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+        if verbose:
+            print(f"Applied MapCollapse {k} time(s)")
+        k = sdfg.apply_transformations_repeated(MapFusion)
+        for n, g in sdfg.all_nodes_recursive():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    k = n.sdfg.apply_transformations_repeated(MapFusion, permissive=True)
+                    if verbose:
+                        print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
+        if verbose:
+            print(f"Applied MapFusion {k} time(s)")
+        k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+        if verbose:
+            print(f"Applied MapCollapse {k} time(s)")
+        sdfg.simplify()
+        prune_unused_inputs_outputs(sdfg)
+        InlineSDFGs().apply_pass(sdfg, {})
+        k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
+        if verbose:
+            print(f"Applied MapCollapse {k} time(s)")
+
+        sdfg.simplify()
+        # I saw trurthy ifs, propagate those conditions and try to fuse states agian
+        propagate_if_cond(sdfg, sdfg, None, None, verbose)
+        sdfg.apply_transformations_repeated(StateFusion)
+        for n, g in sdfg.all_nodes_recursive():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    n.sdfg.apply_transformations_repeated(StateFusion, permissive=True)
+        propagate_if_cond(sdfg, sdfg, None, None, verbose)
+        sdfg.apply_transformations_repeated(StateFusion)
+        sdfg.validate()
+
+        # Breaks the SDFG
+        #sdfg.apply_transformations_once_everywhere(MapFusion)
+        #for n, g in sdfg.all_nodes_recursive():
+        #    if isinstance(n, dace.nodes.NestedSDFG):
+        #        if isinstance(n, dace.nodes.NestedSDFG):
+        #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
+
+        sdfg.simplify()
+
+        sdfg.validate()
+        if use_cache:
+            sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
+
     # Validate the SDFG
     sdfg.validate()
     sdfg.save(f"cpu_{sdfg_name}_result.sdfgz", compress=True)
     resulting_sdfgs.append(sdfg)
 
+
+
 ################################################################################
 ### Numerically validate the SDFG
 ################################################################################
 
-# Compile the SDFG
-for sdfg in resulting_sdfgs:
-    propagate_block_var(sdfg)
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release)
 
 # check if execution was successful
