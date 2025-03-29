@@ -29,4 +29,3 @@ double reduce_scan_gpu(const int *d_in, int size)
 {
   return (double)(reduce_sum_gpu(d_in, size) > 0);
 }
-}
