@@ -172,6 +172,7 @@ for sdfg_name in sdfg_names:
         sdfg.simplify()
         # I saw trurthy ifs, propagate those conditions and try to fuse states agian
         propagate_if_cond(sdfg, sdfg, None, None, verbose)
+        demote_symbol_to_scalar(sdfg, "tmp_call_18")
         sdfg.apply_transformations_repeated(StateFusion)
         for n, g in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.NestedSDFG):
@@ -193,6 +194,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
+
 
     # Validate the SDFG
     sdfg.validate()

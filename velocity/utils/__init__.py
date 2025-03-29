@@ -27,3 +27,4 @@ from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
 from utils.unique_names import unique_names
 from utils.propagate_block_var import propagate_block_var
 from utils.rename_on_if import rename_on_if
+from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
