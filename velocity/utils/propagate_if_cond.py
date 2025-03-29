@@ -168,6 +168,14 @@ def evaluate_interstate_assignments_and_ifs(graph : dace.SDFG | ControlFlowRegio
                     simplified = "0"
                 elif "((1 - 1) and 0)" == simplified:
                     simplified = "0"
+                elif "not (((1 < 1))) or (1 > 2))" == simplified:
+                    simplified = "0"
+                elif "(not (((1 < 1) or (1 > 2))))" == simplified:
+                    simplified = "0"
+                elif "not (((1 < 1) or (1 > 2)) == 1)" == simplified:
+                    simplified = "1"
+                elif "(not (((1 < 1) or (1 > 2)) == 1))" == simplified:
+                    simplified = "1"
                 if simplified != expr_str:
                     if verbose:
                         print(f"{assignment}: {expr_str} ({type(expr_str)}) -> {simplified}")
@@ -208,95 +216,96 @@ def rename_on_if_conds(node: ConditionalBlock, src: str, dst: str):
 # having the name "if*" in this case we can be pretty sure it is if
 # access on what we want then I can assign the value on the interstate
 # edge and rely on simplify, I hope this will work
-def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, possible_values: dict, verbose):
+def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dict, possible_values: dict, verbose):
     sdfg.validate()
 
-    sdfg.replace_dict(replace_dict)
-    prop_dict = replace_dict
-    # It makes global_data.lextra_diffu
-    # to global_data.1 on an edge fix that
-    for s in sdfg.states():
-        for e in s.edges():
-            for src, dst in replace_dict.items():
-                if e.data.data.endswith(f".{dst}"):
-                    e.data.data = e.data.data.replace(f".{dst}", f".{src}")
-
-    def repl_assign_if(sdfg: dace.SDFG):
+    if replace_dict is not None:
+        sdfg.replace_dict(replace_dict)
+        prop_dict = replace_dict
+        # It makes global_data.lextra_diffu
+        # to global_data.1 on an edge fix that
         for s in sdfg.states():
-            for n in s.nodes():
-                if n not in s.nodes():
-                    continue
-                if isinstance(n, dace.nodes.AccessNode):
-                    if len(s.out_edges(n)) == 1:
-                        dst1 = s.out_edges(n)[0].dst
-                        if (len(s.out_edges(dst1)) == 1 and
-                            isinstance(dst1, dace.nodes.Tasklet)):
-                            dst2 = s.out_edges(dst1)[0].dst
-                            if (len(s.out_edges(dst2)) == 0 and
-                                isinstance(dst2, dace.nodes.AccessNode) and
-                                dst2.label.startswith("_if")):
-                                # We have a match
-                                # Access node -> Tasklet -> Access node
-                                for name, dstexpr in replace_dict.items():
-                                    if name in n.data:
-                                        if verbose:
-                                            print(f"Matched: {n.data} -> {dst1.label} -> {dst2.data} on name {name}")
-                                        s.remove_node(dst1)
-                                        s.remove_node(dst2)
-                                        ies = s.in_edges(n)
-                                        s.remove_node(n)
-                                        oes = s.parent_graph.out_edges(s)
-                                        oe = oes[0]
-                                        assert dst2.data not in oe.data.assignments
-                                        for ie in ies:
-                                            if s.in_degree(ie.src) == 0 and s.out_degree(ie.src) == 0:
-                                                s.remove_node(ie.src)
-                                        d = sdfg.arrays[dst2.data]
-                                        #sdfg.remove_data(dst2.data, validate=False)
-                                        oname = dst2.data
-                                        sdfg.remove_data(dst2.data, validate=False)
-                                        sdfg.add_symbol(name=oname + "_sym", stype=d.dtype)
-                                        oe.data.assignments[oname + "_sym"] = dstexpr
+            for e in s.edges():
+                for src, dst in replace_dict.items():
+                    if e.data.data.endswith(f".{dst}"):
+                        e.data.data = e.data.data.replace(f".{dst}", f".{src}")
 
-                                        for oe in oes:
-                                            dst_node = oe.dst
-                                            if isinstance(dst_node, ConditionalBlock):
-                                                rename_on_if_conds(dst_node, oname, oname + "_sym")
-    if root == sdfg:
-        repl_assign_if(sdfg)
-    #for state in sdfg.states():
-    #    for node in state.nodes():
-    #        if isinstance(node, dace.nodes.NestedSDFG):
-    #            repl_assign_if(node.sdfg)
+        def repl_assign_if(sdfg: dace.SDFG):
+            for s in sdfg.states():
+                for n in s.nodes():
+                    if n not in s.nodes():
+                        continue
+                    if isinstance(n, dace.nodes.AccessNode):
+                        if len(s.out_edges(n)) == 1:
+                            dst1 = s.out_edges(n)[0].dst
+                            if (len(s.out_edges(dst1)) == 1 and
+                                isinstance(dst1, dace.nodes.Tasklet)):
+                                dst2 = s.out_edges(dst1)[0].dst
+                                if (len(s.out_edges(dst2)) == 0 and
+                                    isinstance(dst2, dace.nodes.AccessNode) and
+                                    dst2.label.startswith("_if")):
+                                    # We have a match
+                                    # Access node -> Tasklet -> Access node
+                                    for name, dstexpr in replace_dict.items():
+                                        if name in n.data:
+                                            if verbose:
+                                                print(f"Matched: {n.data} -> {dst1.label} -> {dst2.data} on name {name}")
+                                            s.remove_node(dst1)
+                                            s.remove_node(dst2)
+                                            ies = s.in_edges(n)
+                                            s.remove_node(n)
+                                            oes = s.parent_graph.out_edges(s)
+                                            oe = oes[0]
+                                            assert dst2.data not in oe.data.assignments
+                                            for ie in ies:
+                                                if s.in_degree(ie.src) == 0 and s.out_degree(ie.src) == 0:
+                                                    s.remove_node(ie.src)
+                                            d = sdfg.arrays[dst2.data]
+                                            #sdfg.remove_data(dst2.data, validate=False)
+                                            oname = dst2.data
+                                            sdfg.remove_data(dst2.data, validate=False)
+                                            sdfg.add_symbol(name=oname + "_sym", stype=d.dtype)
+                                            oe.data.assignments[oname + "_sym"] = dstexpr
 
-    sdfg.validate()
+                                            for oe in oes:
+                                                dst_node = oe.dst
+                                                if isinstance(dst_node, ConditionalBlock):
+                                                    rename_on_if_conds(dst_node, oname, oname + "_sym")
+        if root == sdfg:
+            repl_assign_if(sdfg)
+        #for state in sdfg.states():
+        #    for node in state.nodes():
+        #        if isinstance(node, dace.nodes.NestedSDFG):
+        #            repl_assign_if(node.sdfg)
 
-    for state in sdfg.states():
-        for node in state.nodes():
+        sdfg.validate()
+
+        for state in sdfg.states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    propagate_if_cond(sdfg, node.sdfg, replace_dict, prop_dict, verbose)
+        sdfg.validate()
+
+        # Evaluate interstate assignments everywhere
+        evaluate_interstate_assignments_and_ifs(sdfg, prop_dict, verbose)
+        for node, graph in sdfg.all_nodes_recursive():
+            if isinstance(node, ControlFlowRegion):
+                evaluate_interstate_assignments_and_ifs(node, prop_dict, verbose)
             if isinstance(node, dace.nodes.NestedSDFG):
-                propagate_if_cond(sdfg, node.sdfg, replace_dict, prop_dict, verbose)
-    sdfg.validate()
+                evaluate_interstate_assignments_and_ifs(node.sdfg, prop_dict, verbose)
+        sdfg.validate()
 
-    # Evaluate interstate assignments everywhere
-    evaluate_interstate_assignments_and_ifs(sdfg, prop_dict, verbose)
-    for node, graph in sdfg.all_nodes_recursive():
-        if isinstance(node, ControlFlowRegion):
-            evaluate_interstate_assignments_and_ifs(node, prop_dict, verbose)
-        if isinstance(node, dace.nodes.NestedSDFG):
-            evaluate_interstate_assignments_and_ifs(node.sdfg, prop_dict, verbose)
-    sdfg.validate()
+        # return # here validates
 
-    # return # here validates
+        #SymbolPropagation().apply_pass(sdfg, {})
+        if verbose:
+            sdfg.save(f"test0_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
 
-    #SymbolPropagation().apply_pass(sdfg, {})
-    if verbose:
-        sdfg.save(f"test0_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
+        ConstantPropagation().apply_pass(sdfg, {})
+        sdfg.validate()
 
-    ConstantPropagation().apply_pass(sdfg, {})
-    sdfg.validate()
-
-    if verbose:
-        sdfg.save(f"test1_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
+        if verbose:
+            sdfg.save(f"test1_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
 
     #return # here validates
 
@@ -320,10 +329,11 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, poss
                     always_true = False
                     always_false = False
                     try:
-                        if eval(ss[0]) is True:
+                        cond = eval(ss[0])
+                        if cond is True:
                             always_true = True
                             print(cond, "is True")
-                        if eval(ss[0]) is False:
+                        if cond is False:
                             always_false = True
                             print(cond, "is True")
                     except Exception as ex:
@@ -422,7 +432,7 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: dict, poss
     sdfg.validate()
 
     # Remove all cfg nodes that are 0 == 1
-    #DeadStateElimination().apply_pass(sdfg, {})
+    DeadStateElimination().apply_pass(sdfg, {})
     sdfg.validate()
 
     # return # here validates
