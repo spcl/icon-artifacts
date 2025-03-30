@@ -82,14 +82,14 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "w") as file:
-                file.write('#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n' + main_cu_code)
+                file.write('#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n' + '#include "macro_timer.h"\n' + main_cu_code)
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
             sources.add(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu")
         else:
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "w") as file:
-                file.write('#include "reductions_cpu.h"\n' + main_cu_code)
+                file.write('#include "reductions_cpu.h"\n' + '#include "macro_timer.h"\n' + main_cu_code)
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
 
     if not gpu:
