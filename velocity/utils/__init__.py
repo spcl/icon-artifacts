@@ -12,14 +12,14 @@ from utils.compare_got_and_want import compare_got_and_want
 from utils.compile_sdfg import compile_sdfg
 from utils.count import count_loops, count_max_maps_per_state
 from utils.move_transients_to_top_level import move_transients_to_top_level
-from utils.config import use_cache, run_benchmark, cleanup, reduction, release, verbose
+from utils.config import use_cache, cleanup, reduction, release, verbose, instrument
 from utils.map_fissions import YoloMapFission
 from utils.split_maps import split_map_sdfg, untangle_if_sdfg
 from utils.raise_loop_invariant_if import raise_loop_invariant_if
 from utils.gpu_kernel_launch_fix import wrap_reduction_and_T_l488_c488in_gpumap
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.map_state_fission import MapStateFission, AccessDuplicate
-from utils.benchmark_sdfg import benchmark_sdfg
+from utils.benchmark_sdfg import instrument_sdfg, collect_reports
 from utils.preprocess_tough_nut import preprocess_tough_nut
 from utils.clean_bad_views import clean_bad_views
 from utils.propagate_if_cond import propagate_if_cond

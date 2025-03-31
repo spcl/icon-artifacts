@@ -1,5 +1,5 @@
 use_cache = True
-run_benchmark = False
+instrument = True
 cleanup = False
 reduction = True
 release = False

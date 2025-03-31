@@ -44,13 +44,45 @@ def modify_file(file_path, pattern):
             f.writelines(new_lines)
         print(f"Modified: {file_path}")
 
+import re
+
+def _insert_measure_time(filename, path, hash):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+
+    pattern = re.compile(r"nrdmax_jg =")
+    pattern2 = re.compile(r"p_diag_out_max_vcfl_dyn =") # Final tasklet
+    new_lines = []
+
+    for line in lines:
+        new_lines.append(line)
+        if pattern.search(line) or pattern2.search(line):
+            new_lines.append('measure_time("Kernels"); // Measure time\n')
+            new_lines.append(f'__state->report.save("{path}", "{hash}");\n')
+    with open(filename, 'w') as f:
+        f.writelines(new_lines)
+
+def _process_folder(directory, sdfg: dace.SDFG):
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".cpp") or file.endswith(".cu"):
+                filepath = os.path.join(root, file)
+                print(filepath)
+                _insert_measure_time(filepath, os.path.join(root, "perf"), sdfg.hash_sdfg())
+
+def insert_measure_time_calls(path, sdfg:dace.SDFG):
+    # this file is at utils/../.dacecache
+    if path is None:
+        script_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".dacecache")
+    else:
+        script_dir = path
+    _process_folder(script_dir, sdfg)
 
 def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False):
     sources = set()
-    if not gpu:
-        sources.add("src/reductions.cpp")
-    else:
-        sources.add("src/reductions.cpp")
+    sources.add("src/reductions.cpp")
+    sources.add("src/timer.cpp")
+    if gpu:
         sources.add("src/reductions_kernel.cu")
     headers = set()
     headers.add("-Iinclude")
@@ -73,6 +105,7 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
         sdfg_name = sdfg.name
         build_loc = sdfg.build_folder
         modify_files_in_directory(build_loc)
+        insert_measure_time_calls(build_loc, sdfg)
         if gpu:
             _replace_cpp_with_cu(build_loc)
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
@@ -82,14 +115,14 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "w") as file:
-                file.write('#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n' + main_cu_code)
+                file.write('#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n#include "timer.h"\n' + main_cu_code)
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
             sources.add(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu")
         else:
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "w") as file:
-                file.write('#include "reductions_cpu.h"\n' + main_cu_code)
+                file.write('#include "reductions_cpu.h"\n#include "timer.h"\n' + main_cu_code)
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
 
     if not gpu:

@@ -207,6 +207,10 @@ for sdfg_name in sdfg_names:
 ### Numerically validate the SDFG
 ################################################################################
 
+if instrument is True:
+    # instrument the SDFG
+    instrument_sdfg(resulting_sdfgs)
+
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release)
 
 # check if execution was successful
@@ -214,24 +218,15 @@ if os.system(f"./velocity_cpu") != 0:
     print("Execution failed")
     exit(1)
 
+if instrument is True:
+    # collect reports
+    for sdfg in resulting_sdfgs:
+        sdfg.save_report(sdfg.get_latest_report_path())
+    collect_reports(resulting_sdfgs)
+
 # Compare .got and .want files
 compare_got_and_want()
 
-################################################################################
-### Measure performance
-################################################################################
-
-if run_benchmark:
-    benchmark_sdfg(
-        sdfg,
-        "CPU",
-        gpu=False,
-        release=release,
-        warmups=1,
-        measurements=1,
-        profile=True,
-        save_kernel_sdfg=False,
-    )
 
 ################################################################################
 ### Cleanup
