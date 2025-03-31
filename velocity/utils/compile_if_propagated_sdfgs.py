@@ -57,8 +57,11 @@ def _insert_measure_time(filename, path, hash):
     for line in lines:
         new_lines.append(line)
         if pattern.search(line) or pattern2.search(line):
+            #if pattern.search(line):
+            #    new_lines.append(f'__state->report.init("{path}", "{hash}");\n')
             new_lines.append('measure_time("Kernels"); // Measure time\n')
-            new_lines.append(f'__state->report.save("{path}", "{hash}");\n')
+            if pattern2.search(line):
+                new_lines.append(f'__state->report.save("{path}", "{hash}");\n')
     with open(filename, 'w') as f:
         f.writelines(new_lines)
 
@@ -68,7 +71,11 @@ def _process_folder(directory, sdfg: dace.SDFG):
             if file.endswith(".cpp") or file.endswith(".cu"):
                 filepath = os.path.join(root, file)
                 print(filepath)
-                _insert_measure_time(filepath, os.path.join(root, "perf"), sdfg.hash_sdfg())
+                try:
+                    os.mkdir(os.path.join(os.path.abspath(root), "../../../perf"))
+                except FileExistsError:
+                    pass
+                _insert_measure_time(filepath,  os.path.join(os.path.abspath(root), "../../../perf"), sdfg.hash_sdfg())
 
 def insert_measure_time_calls(path, sdfg:dace.SDFG):
     # this file is at utils/../.dacecache

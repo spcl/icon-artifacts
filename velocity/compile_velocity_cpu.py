@@ -220,8 +220,8 @@ if os.system(f"./velocity_cpu") != 0:
 
 if instrument is True:
     # collect reports
-    for sdfg in resulting_sdfgs:
-        sdfg.save_report(sdfg.get_latest_report_path())
+    #for sdfg in resulting_sdfgs:
+    #    sdfg.save_report(sdfg.get_latest_report_path())
     collect_reports(resulting_sdfgs)
 
 # Compare .got and .want files
