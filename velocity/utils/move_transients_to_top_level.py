@@ -135,7 +135,7 @@ def simplify_recursive(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
 
 def move_transients_to_top_level(root: dace.SDFG,
                                  upper_bounds = dict[str, int],
-                                 verbose= True):
+                                 verbose=False):
     # If we have a transient array, make it live on the top level SDFG
     # For this, collect all transients that do not exist on top level SDFG
     # Add them to top level SDFG, if they are arrays and have storage location Default
@@ -146,7 +146,7 @@ def move_transients_to_top_level(root: dace.SDFG,
     #            self.move_transients_to_top_level(roots + [sdfg], n.sdfg)
     simplify_recursive(root, root, verbose)
     clean_unused_array(root, None, root, verbose)
-    root.save("uwu.sdfgz", compress=True)
+    # root.save("uwu.sdfgz", compress=True)
     root.validate()
 
     # Add arrays from bottom to up
@@ -175,7 +175,7 @@ def move_transients_to_top_level(root: dace.SDFG,
                         ways_up += 1
                     #print(f"{arr_name} needs to be moved {ways_up} level{'s' if ways_up == 1 else ''} up")
                     if ways_up != 1:
-                        root.save("move_transient_failing.sdfgz", compress=True)
+                        # root.save("move_transient_failing.sdfgz", compress=True)
                         raise Exception(f"Moving transients to top level only supports if the transient needs to be moved once currently, {arr_name}, {arr}, {ways_up} in sdfg: {root.name}")
 
                     # To support more than 1 level need to check nested SDFGs and the map chain

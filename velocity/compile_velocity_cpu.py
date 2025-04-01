@@ -7,6 +7,7 @@ from dace.transformation.interstate import (
     ContinueToCondition,
     ConditionFusion,
     StateFusion,
+    ConditionNesting,
 )
 from dace.transformation.passes import InlineSDFGs, SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse, MapFusion, MapUnroll, TrivialMapElimination
@@ -94,6 +95,9 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
 
         sdfg.apply_transformations_repeated(ConditionFusion)
+
+        # This could be worth adding:
+        # sdfg.apply_transformations_repeated(ConditionNesting)
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
@@ -179,8 +183,8 @@ for sdfg_name in sdfg_names:
         #        if isinstance(n, dace.nodes.NestedSDFG):
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
+        ComputationMapNesting().apply_pass(sdfg, {})
         sdfg.simplify()
-
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
