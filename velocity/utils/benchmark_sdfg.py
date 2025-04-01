@@ -37,14 +37,26 @@ def instrument_sdfg(
                 if not is_devicelevel_gpu(_sdfg, state, kernel):
                     kernel.instrument = dace.InstrumentationType.Timer
 
+import json
+def get_all_paths(directory):
+    paths = []
+    for root, _, files in os.walk(directory):
+        for name in files:
+            paths.append(os.path.join(root, name))
+    return paths
 
 def collect_reports(
     sdfgs: typing.List[dace.SDFG],
 ):
+    paths = get_all_paths(".dacecache/perf")
     for sdfg in sdfgs:
-        report = sdfg.get_latest_report()
+        for path in paths:
+            json_output = json.dumps(path, indent=4)
+            if "sdfgHash" in json_output:
+                print(json_output["sdfgHash"], sdfg.hash(), json_output["sdfgHash"] == sdfg.hash())
+                if json_output["sdfgHash"] == sdfg.hash():
+                    report = json_output
         print(f"Report or SDFG: {sdfg.name}, {sdfg.label}")
-        print(f"Report path: {sdfg.get_latest_report_path()}")
         print(report)
         print(f"=" * 80)
 
