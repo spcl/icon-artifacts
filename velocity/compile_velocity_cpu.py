@@ -123,8 +123,9 @@ for sdfg_name in sdfg_names:
         for s in sdfg.states():
             for n in s.nodes():
                 if isinstance(n, dace.nodes.MapEntry):
-                    n.map.unroll_factor = 4
                     n.map.schedule = dace.ScheduleType.Sequential
+                    n.map.unroll = True
+                    n.map.unroll_factor = 4
 
         prune_unused_inputs_outputs(sdfg)
         sdfg.apply_transformations_repeated(StateFusion)

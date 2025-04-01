@@ -2,6 +2,8 @@ import typing
 import dace
 import os
 
+from dace.sdfg import is_devicelevel_gpu
+
 
 def instrument_sdfg(
     sdfgs: typing.List[dace.SDFG],
@@ -17,10 +19,23 @@ def instrument_sdfg(
                 kernels.append(node)
 
         for i, kernel in enumerate(kernels):
+            assert isinstance(kernel, dace.nodes.MapEntry)
             if kernel.map.schedule == dace.ScheduleType.GPU_Device:
                 kernel.instrument = dace.InstrumentationType.GPU_Events
             else:
-                kernel.instrument = dace.InstrumentationType.Timer
+                if not isinstance(graph, dace.SDFGState):
+                    for node, graph in sdfg.all_nodes_recursive():
+                        if isinstance(node, dace.SDFGState):
+                            if kernel in node.nodes():
+                                state = node
+                else:
+                    state = graph
+                    assert kernel in state.nodes()
+
+                _sdfg = state.sdfg
+                assert state in _sdfg.all_states()
+                if not is_devicelevel_gpu(_sdfg, state, kernel):
+                    kernel.instrument = dace.InstrumentationType.Timer
 
 
 def collect_reports(
