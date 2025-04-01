@@ -80,7 +80,7 @@ def _process_folder(directory, sdfg: dace.SDFG, instrument: bool = False):
                         os.mkdir(os.path.join(os.path.abspath(root), "../../../perf"))
                     except FileExistsError:
                         pass
-                    _insert_measure_time(filepath,  os.path.join(os.path.abspath(root), "../../../perf"), sdfg.hash_sdfg())
+                    _insert_measure_time(filepath,  os.path.join(os.path.abspath(root), "../../../perf"), sdfg.label)
 
 def insert_measure_time_calls(path, sdfg:dace.SDFG, instrument: bool = False):
     # this file is at utils/../.dacecache

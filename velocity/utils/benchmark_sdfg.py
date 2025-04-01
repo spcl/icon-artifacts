@@ -50,13 +50,16 @@ def collect_reports(
 ):
     paths = get_all_paths(".dacecache/perf")
     for sdfg in sdfgs:
+        report = None
         for path in paths:
-            json_output = json.dumps(path, indent=4)
-            if "sdfgHash" in json_output:
-                print(json_output["sdfgHash"], sdfg.hash(), json_output["sdfgHash"] == sdfg.hash())
-                if json_output["sdfgHash"] == sdfg.hash():
+            with open(path, "r") as f:
+                _input = "\n".join(f.readlines())
+                json_output = json.loads(_input)
+                assert "sdfgHash" in json_output
+                print(json_output["sdfgHash"], sdfg.label, json_output["sdfgHash"] == sdfg.label)
+                if json_output["sdfgHash"] == sdfg.label:
                     report = json_output
-        print(f"Report or SDFG: {sdfg.name}, {sdfg.label}")
+        print(f"Report or SDFG: {sdfg.name} ({sdfg.label})")
         print(report)
         print(f"=" * 80)
 
