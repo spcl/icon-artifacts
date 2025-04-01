@@ -11,7 +11,14 @@ from dace.transformation import pass_pipeline as ppl, transformation
 from dace import SDFG, properties, SDFGState
 from typing import Dict, Set, Optional
 from dace import data as dt
-from dace.sdfg.nodes import AccessNode, Tasklet, LibraryNode, MapEntry,MapExit, NestedSDFG
+from dace.sdfg.nodes import (
+    AccessNode,
+    Tasklet,
+    LibraryNode,
+    MapEntry,
+    MapExit,
+    NestedSDFG,
+)
 from dace.subsets import Range
 import re
 from functools import lru_cache
@@ -76,7 +83,6 @@ class ComputationMapNesting(ppl.Pass):
                 if new_in_table != in_table[cfgb]:
                     changed = True
                     in_table[cfgb] = new_in_table
-                    print(f"Updated in table for {cfgb}: {in_table[cfgb]}")
 
             # Update outgoing table
             for cfgb, parent in all_cfgb.items():
@@ -88,7 +94,6 @@ class ComputationMapNesting(ppl.Pass):
                 if new_out_table != out_table[cfgb]:
                     changed = True
                     out_table[cfgb] = new_out_table
-                    print(f"Updated out table for {cfgb}: {out_table[cfgb]}")
 
         # Clean up the tables (remove None entries)
         for cfgb, parent in all_cfgb.items():
@@ -96,7 +101,6 @@ class ComputationMapNesting(ppl.Pass):
             out_table[cfgb] = {
                 k: v for k, v in out_table[cfgb].items() if v is not None
             }
-            print(f"Cleaned in table for {cfgb}: {in_table[cfgb]}")
 
         # Compute set of arrays that are being considered for replacement
         considered = set()
@@ -110,17 +114,11 @@ class ComputationMapNesting(ppl.Pass):
         for cfgb, parent in all_cfgb.items():
             if cfgb.sdfg is sdfg:
                 map_arrays |= ComputationMapNesting._get_map_arrays(cfgb)
-
         considered = considered & map_arrays
-        print(f"Arrays considered for replacement: ")
-        for k in considered:
-            print(f"\t{k}")
 
         # Perform replacement of the arrays
         for i, (cfgb, parent) in enumerate(all_cfgb.items()):
             self._replace(sdfg, cfgb, parent, in_table, out_table)
-            sdfg.save(f"{sdfg.name}_cmn{i}.sdfgz", compress=True)
-        sdfg.save(f"{sdfg.name}_cmn_final.sdfgz", compress=True)
         return set()
 
     # Given a CFGB, builds the incoming table
@@ -380,7 +378,6 @@ class ComputationMapNesting(ppl.Pass):
                 src_acc = in_table[cfgb][arr_name][0]
                 src_parent: SDFGState = in_table[cfgb][arr_name][1]
                 assert isinstance(src_parent, SDFGState)
-                print(f"Replacing {arr_name} in {cfgb} with {src_acc} in {src_parent}")
 
                 # Keep a mapping of the original nodes and the new nodes
                 node_map = {src_acc: acc_node}
