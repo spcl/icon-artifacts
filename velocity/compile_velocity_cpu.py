@@ -217,6 +217,12 @@ compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release, instrum
 if os.system(f"./velocity_cpu") != 0:
     print("Execution failed")
     exit(1)
+if instrument is True:
+    # Run agian
+    clean_reports(resulting_sdfgs)
+    if os.system(f"./velocity_cpu") != 0:
+        print("Execution failed")
+        exit(1)
 
 if instrument is True:
     # collect reports
