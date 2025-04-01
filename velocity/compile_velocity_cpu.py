@@ -176,8 +176,8 @@ for sdfg_name in sdfg_names:
         #        if isinstance(n, dace.nodes.NestedSDFG):
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
+        ComputationMapNesting().apply_pass(sdfg, {})
         sdfg.simplify()
-
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
