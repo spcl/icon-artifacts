@@ -267,9 +267,9 @@ if instrument:
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument, generate_code=True)
 
 # check if execution was successful
-#if os.system(f"./velocity_gpu") != 0:
-#    print("Execution failed")
-#    exit(1)
+if os.system(f"./velocity_gpu") != 0:
+    print("Execution failed")
+    exit(1)
 
 # Compare .got and .want files
 compare_got_and_want()
