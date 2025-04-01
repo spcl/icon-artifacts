@@ -115,7 +115,7 @@ def clean_unused_array(root: dace.SDFG, parent_state, sdfg: dace.SDFG, verbose: 
         for n in parent_state.nodes():
             if parent_state.in_degree(n) == 0 and parent_state.out_degree(n) == 0:
                 parent_state.remove_node(n)
-                print(f"Remove {n}")
+                # print(f"Remove {n}")
     if verbose:
         print(f"Cleaned {len(removed_arrays)} ({removed_arrays} of {unused_arrays}) from {sdfg.name}")
 

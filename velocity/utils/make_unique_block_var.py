@@ -87,4 +87,4 @@ def make_unique_block_var(sdfg: dace.SDFG, verbose=False):
         print(sdfg.free_symbols)
 
     sdfg.validate()
-    sdfg.save("test.sdfg")
+    # sdfg.save("test.sdfg")

@@ -326,10 +326,10 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                         cond = eval(ss[0])
                         if cond is True:
                             always_true = True
-                            print(ss[0], "->", cond, "is True")
+                            # print(ss[0], "->", cond, "is True")
                         if cond is False:
                             always_false = True
-                            print(ss[0], "->", cond, "is True")
+                            # print(ss[0], "->", cond, "is True")
                     except Exception as ex:
                         print(ex, ss)
                         pass
@@ -387,10 +387,10 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                 try:
                     if eval(cond) is True:
                         always_true = True
-                        print(cond, "is True")
+                        # print(cond, "is True")
                     if eval(cond) is False:
                         always_false = True
-                        print(cond, "is False")
+                        # print(cond, "is False")
                 except Exception as ex:
                     print(ex, cond)
                     pass

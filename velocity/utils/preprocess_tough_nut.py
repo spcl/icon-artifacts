@@ -150,7 +150,7 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
                         _n.sdfg.parent_sdfg = n.sdfg
             symbols = set(k for k in n.sdfg.free_symbols if k not in n.in_connectors and k not in n.out_connectors)
             missing_symbols = [s for s in symbols if s not in n.symbol_mapping]
-            print("MissingSymbols: ", missing_symbols)
+            # print("MissingSymbols: ", missing_symbols)
             for ms in missing_symbols:
                 n.symbol_mapping[ms] = ms
 
