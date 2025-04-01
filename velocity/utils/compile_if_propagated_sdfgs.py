@@ -62,23 +62,24 @@ def _insert_measure_time(filename, path, hash):
     with open(filename, 'w') as f:
         f.writelines(new_lines)
 
-def _process_folder(directory, sdfg: dace.SDFG):
+def _process_folder(directory, sdfg: dace.SDFG, instrument: bool = False):
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".cpp") or file.endswith(".cu"):
                 filepath = os.path.join(root, file)
                 print(filepath)
-                _insert_measure_time(filepath, os.path.join(root, "perf"), sdfg.hash_sdfg())
+                if instrument:
+                  _insert_measure_time(filepath, os.path.join(root, "perf"), sdfg.hash_sdfg())
 
-def insert_measure_time_calls(path, sdfg:dace.SDFG):
+def insert_measure_time_calls(path, sdfg:dace.SDFG, instrument: bool = False):
     # this file is at utils/../.dacecache
     if path is None:
         script_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".dacecache")
     else:
         script_dir = path
-    _process_folder(script_dir, sdfg)
+    _process_folder(script_dir, sdfg, instrument)
 
-def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False):
+def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False, instrument: bool = False):
     sources = set()
     sources.add("src/reductions.cpp")
     sources.add("src/timer.cpp")
@@ -105,7 +106,7 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
         sdfg_name = sdfg.name
         build_loc = sdfg.build_folder
         modify_files_in_directory(build_loc)
-        insert_measure_time_calls(build_loc, sdfg)
+        insert_measure_time_calls(build_loc, sdfg, instrument)
         if gpu:
             _replace_cpp_with_cu(build_loc)
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:

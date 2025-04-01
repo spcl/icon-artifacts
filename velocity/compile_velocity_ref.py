@@ -24,7 +24,7 @@ for sdfg_name in sdfg_names:
     sdfg.validate()
     resulting_sdfgs.append(sdfg)
 
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release)
+compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release, instrument=instrument)
 
 # check if execution was successful
 if os.system(f"./velocity_cpu") != 0:
