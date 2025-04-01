@@ -121,7 +121,7 @@ for sdfg_name in sdfg_names:
     else:
         #propagate_block_var(sdfg) # We do not know if the map length is 1 or 2 always
         make_unique_block_var(sdfg)
-        """
+
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
@@ -135,8 +135,7 @@ for sdfg_name in sdfg_names:
                         TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
                         #else:
                         #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")"
-        """
-        """
+
         sdfg.validate()
         for s in sdfg.states():
             for n in s.nodes():
@@ -199,7 +198,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
-        """
+
 
     # Validate the SDFG
     sdfg.validate()
