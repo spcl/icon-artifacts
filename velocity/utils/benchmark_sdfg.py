@@ -63,12 +63,13 @@ def collect_reports(
                 #print(json_output["sdfgHash"], sdfg.label, json_output["sdfgHash"] == sdfg.label)
                 if json_output["sdfgHash"] == sdfg.label:
                     report = json_output
-                newperfpath = f".dacecache/{sdfg.label}/perf"
-                os.makedirs(newperfpath, exist_ok=True)
-                p = Path(path)
-                filename = p.name
-                shutil.copy(path, newperfpath + f"/{filename}")
+                    newperfpath = f".dacecache/{sdfg.label}/perf"
+                    os.makedirs(newperfpath, exist_ok=True)
+                    p = Path(path)
+                    filename = p.name
+                    shutil.copy(path, newperfpath + f"/{filename}")
         print(f"Report or SDFG: {sdfg.name} ({sdfg.label})")
+        print(sdfg.get_latest_report_path())
         print(sdfg.get_latest_report())
         print(f"=" * 80)
 
