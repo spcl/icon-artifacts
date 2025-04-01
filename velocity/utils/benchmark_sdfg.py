@@ -32,3 +32,9 @@ def collect_reports(
         print(f"Report path: {sdfg.get_latest_report_path()}")
         print(report)
         print(f"=" * 80)
+
+def clean_reports(
+    sdfgs: typing.List[dace.SDFG],
+):
+    for sdfg in sdfgs:
+        sdfg.clear_instrumentation_reports()
