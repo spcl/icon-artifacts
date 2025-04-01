@@ -52,10 +52,14 @@ def _insert_measure_time(filename, path, hash):
 
     pattern = re.compile(r"nrdmax_jg =")
     pattern2 = re.compile(r"p_diag_out_max_vcfl_dyn =") # Final tasklet
+    pattern3 = re.compile(r"__state->report.reset")
     new_lines = []
 
     for line in lines:
-        new_lines.append(line)
+        if not pattern3.search(line):
+            new_lines.append(line)
+        else:
+            new_lines.append(f'//' + line)
         if pattern.search(line) or pattern2.search(line):
             #if pattern.search(line):
             #    new_lines.append(f'__state->report.init("{path}", "{hash}");\n')
