@@ -80,7 +80,7 @@ def _process_folder(directory, sdfg: dace.SDFG, instrument: bool = False):
                         os.mkdir(os.path.join(os.path.abspath(root), "../../../perf"))
                     except FileExistsError:
                         pass
-                    _insert_measure_time(filepath,  os.path.join(os.path.abspath(root), "../../../perf"), sdfg.label)
+                    _insert_measure_time(filepath,  os.path.join(os.path.abspath(root), "../../../perf"), sdfg.hash_sdfg())
 
 def insert_measure_time_calls(path, sdfg:dace.SDFG, instrument: bool = False):
     # this file is at utils/../.dacecache
@@ -90,7 +90,7 @@ def insert_measure_time_calls(path, sdfg:dace.SDFG, instrument: bool = False):
         script_dir = path
     _process_folder(script_dir, sdfg, instrument)
 
-def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False, instrument: bool = False):
+def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False, release: bool = False, instrument: bool = False, generate_code: bool = True):
     sources = set()
     sources.add("src/reductions.cpp")
     sources.add("src/timer.cpp")
@@ -100,24 +100,26 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
     headers.add("-Iinclude")
     from dace.codegen import codegen, compiler
     for sdfg in sdfgs:
-        try:
-            # Fill in scope entry/exit connectors
-            sdfg.fill_scope_connectors()
-
-            # Generate code for the program by traversing the SDFG state by state
-            program_objects = codegen.generate_code(sdfg, validate=False)
-        except Exception:
-            fpath = os.path.join("_dacegraphs", "failing.sdfgz")
-            sdfg.save(fpath, compress=True)
-            print(f"Failing SDFG saved for inspection in {os.path.abspath(fpath)}")
-            raise
-
-        # Generate the program folder and write the source files
-        compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
         sdfg_name = sdfg.name
         build_loc = sdfg.build_folder
-        modify_files_in_directory(build_loc)
-        insert_measure_time_calls(build_loc, sdfg, instrument)
+        if generate_code:
+            try:
+                # Fill in scope entry/exit connectors
+                sdfg.fill_scope_connectors()
+
+                # Generate code for the program by traversing the SDFG state by state
+                program_objects = codegen.generate_code(sdfg, validate=False)
+            except Exception:
+                fpath = os.path.join("_dacegraphs", "failing.sdfgz")
+                sdfg.save(fpath, compress=True)
+                print(f"Failing SDFG saved for inspection in {os.path.abspath(fpath)}")
+                raise
+
+            # Generate the program folder and write the source files
+            compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
+            
+            modify_files_in_directory(build_loc)
+            insert_measure_time_calls(build_loc, sdfg, instrument)
         if gpu:
             _replace_cpp_with_cu(build_loc)
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
