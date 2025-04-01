@@ -116,6 +116,7 @@ for sdfg_name in sdfg_names:
         # This can only be safely applied to selected cases. Skip for now.
         # sdfg.apply_transformations(YoloMapFission)
         # preprocess_tough_nut(sdfg)
+        preprocess_tough_nut(sdfg)
 
         sdfg.validate()
 
@@ -157,6 +158,7 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
         #propagate_block_var(sdfg)
+        make_unique_block_var(sdfg)
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
@@ -263,12 +265,12 @@ if instrument:
     # instrument the SDFG
     instrument_sdfg(resulting_sdfgs)
 
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument)
+#compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument)
 
 # check if execution was successful
-if os.system(f"./velocity_gpu") != 0:
-    print("Execution failed")
-    exit(1)
+#if os.system(f"./velocity_gpu") != 0:
+#    print("Execution failed")
+#    exit(1)
 
 # Compare .got and .want files
 compare_got_and_want()

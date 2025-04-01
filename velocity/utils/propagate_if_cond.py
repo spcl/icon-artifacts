@@ -297,15 +297,9 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
 
         # return # here validates
 
-        #SymbolPropagation().apply_pass(sdfg, {})
-        if verbose:
-            sdfg.save(f"test0_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
-
         ConstantPropagation().apply_pass(sdfg, {})
         sdfg.validate()
 
-        if verbose:
-            sdfg.save(f"test1_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
 
     #return # here validates
 
@@ -432,8 +426,6 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                     cfg.parent_graph.remove_node(cfg)
 
     sdfg.reset_cfg_list()
-    if verbose:
-        sdfg.save(f"test2_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
     sdfg.validate()
 
     # Remove all cfg nodes that are 0 == 1

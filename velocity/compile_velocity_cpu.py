@@ -40,6 +40,7 @@ for sdfg_name in sdfg_names:
         clean_bad_views(sdfg)
         sdfg.apply_transformations_repeated(ContinueToCondition)
         sdfg.simplify(verbose=verbose)
+
         SymbolPropagation().apply_pass(sdfg, {})
         sdfg.simplify(verbose=verbose)
         StructToContainerGroups(
@@ -89,6 +90,7 @@ for sdfg_name in sdfg_names:
         # sdfg.apply_transformations(YoloMapFission)
         #untangle_if_sdfg(sdfg, verbose=verbose)
         #split_map_sdfg(sdfg, False, verbose=verbose)
+        preprocess_tough_nut(sdfg)
         sdfg.validate()
 
         sdfg.apply_transformations_repeated(ConditionFusion)
@@ -104,6 +106,7 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
         #propagate_block_var(sdfg) # We do not know if the map length is 1 or 2 always
+        make_unique_block_var(sdfg)
         """
         sdfg.validate()
         sdfg.simplify()

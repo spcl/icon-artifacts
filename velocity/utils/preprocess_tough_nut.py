@@ -17,7 +17,7 @@ from dace.sdfg.sdfg import ConditionalBlock
 # Remove ifBlock 2 with the map
 # (Map is the first node connecting to the SDFG)
 # rest is the same
-outer_cond_str = "not lvn_only == 1"
+#outer_cond_str = "not lvn_only == 1"
 inner_cond_str = "not (_for_it_22 < i_startblk_2 or _for_it_22 > i_endblk_2) == 1"
 oldsym1 = dace.symbolic.symbol("i_startblk_var_86")
 oldsym2 = dace.symbolic.symbol("i_startblk_var_87")
@@ -32,23 +32,15 @@ def find_tough_nut(sdfg: dace.SDFG):
             if len(cond0.code) == 1:
                 cond0_str = ast.unparse(cond0.code[0])
                 #print(cond0_str, outer_cond_str, cond0_str == outer_cond_str)
-                if cond0_str == outer_cond_str:
-                    #print(body0.nodes())
-                    if len(body0.nodes()) == 1:
-                        inner_cfg = body0.nodes()[0]
-                        if isinstance(inner_cfg, ConditionalBlock):
-                            cond1, body1 = inner_cfg.branches[0]
-                            if len(cond1.code) == 1:
-                                cond1_str = ast.unparse(cond1.code[0])
-                                #coprint("\t", cond1_str, inner_cond_str)
-                                if cond1_str == inner_cond_str:
-                                    # Finally, we have found the tough nut
-                                    return node, inner_cfg, parent
-    return None, None
+                if cond0_str == inner_cond_str:
+                    return node, body0, parent
+    return None, None, None
 
 def preprocess_tough_nut(sdfg: dace.SDFG):
     outer_node, node, parent = find_tough_nut(sdfg)
-    assert node is not None
+    if node is None:
+        print("Warning: the if condition and index reassignment not found (possible lvn_only is False)")
+        return
 
     inner_sdfg: dace.SDFG = node.sdfg
     nsdfg: dace.nodes.NestedSDFG = inner_sdfg.parent_nsdfg_node
@@ -66,6 +58,8 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
 
     c = ConditionalBlock(label="extract_conditional", sdfg=parent_sdfg, parent=parent_graph)
     for oe in parent_sdfg.out_edges(parent_graph):
+        for ie in parent_sdfg.in_edges(oe.dst):
+            parent_sdfg.remove_edge(ie)
         parent_sdfg.add_edge(c, oe.dst, copy.deepcopy(oe.data))
     #for ie in parent_sdfg.in_edges(parent_graph):
     parent_sdfg.add_edge(parent_graph, c, dace.InterstateEdge())
@@ -73,7 +67,7 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
     cfg = ControlFlowRegion(label="extract_cfg", sdfg=sdfg, parent=c)
     after_state = dace.SDFGState(label="extract_state", sdfg=sdfg)
     cfg.add_node(after_state)
-    c.add_branch(condition=CodeBlock(code=outer_cond_str), branch=cfg)
+    c.add_branch(condition=CodeBlock(code="1 == 1"), branch=cfg)
 
     #after_state = parent_sdfg.add_state_after(parent_graph, "extract")
 
@@ -146,11 +140,16 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
                 node_map2[_n] = copy.deepcopy(_n)
                 n.sdfg.add_node(node_map2[_n])
             for e in node.edges():
-                n.sdfg.add_edge(node_map2[e.src], e.src_conn, node_map2[e.dst], e.dst_conn, copy.deepcopy(e.data))
+                n.sdfg.add_edge(node_map2[e.src], node_map2[e.dst], copy.deepcopy(e.data))
             for _s in n.sdfg.states():
                 for _n in _s.nodes():
                     if isinstance(_n, dace.nodes.NestedSDFG):
                         _n.sdfg.parent_sdfg = n.sdfg
+            symbols = set(k for k in n.sdfg.free_symbols if k not in n.in_connectors and k not in n.out_connectors)
+            missing_symbols = [s for s in symbols if s not in n.symbol_mapping]
+            print("MissingSymbols: ", missing_symbols)
+            for ms in missing_symbols:
+                n.symbol_mapping[ms] = ms
 
     sdfg.reset_cfg_list()
     parent.remove_node(outer_node)
@@ -163,8 +162,9 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
             #c.add_state("empty_state")
             parent.add_state("empty_state")
 
+    sdfg.validate()
     from .split_maps import remove_empty_kernel
-
+    from .propagate_if_cond import propagate_if_cond
     remove_empty_kernel(sdfg)
-
+    propagate_if_cond(sdfg, sdfg, None, None, True)
     sdfg.validate()

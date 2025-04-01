@@ -20,9 +20,9 @@ def instrument_sdfg(
         lib_nodes = []
         for node, graph in sdfg.all_nodes_recursive():
             if isinstance(node, dace.nodes.MapEntry):
-                kernels.append(node)
+                kernels.append((node, graph))
 
-        for i, kernel in enumerate(kernels):
+        for i, (kernel, graph) in enumerate(kernels):
             assert isinstance(kernel, dace.nodes.MapEntry)
             if kernel.map.schedule == dace.ScheduleType.GPU_Device:
                 kernel.instrument = dace.InstrumentationType.GPU_Events

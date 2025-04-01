@@ -109,5 +109,4 @@ def propagate_block_var(sdfg: dace.SDFG):
         sdfg.remove_symbol(sym)
     print(sdfg.free_symbols)
 
-    sdfg.save("prop_block_var.sdfg", compress=False)
     sdfg.validate()
