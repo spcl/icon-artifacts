@@ -1,5 +1,7 @@
 #include <chrono>
 #include <cstdlib>
+#include <cstdio>
+#include <iostream>
 
 #include <cloudsc_driver.h>
 #include <dace/dace.h>
@@ -119,6 +121,7 @@ extern "C" void cloudsc_driver_wrapper_(
     int __f2dace_OA_tendency_tmp_q_d_0_s_9,
     int __f2dace_OA_tendency_tmp_t_d_0_s_6, int kfldx, int ngptot, int ngptotg,
     int nlev, int nproma, int numomp, double ptsphy) {
+std::cout << "init" << std::endl;
   auto *h = __dace_init_cloudsc_driver(
       ktype, ldcum, pa, pap, paph, pccn, pclv, pcovptot, pdyna, pdyni, pdynl,
       pfcqlng, pfcqnng, pfcqrng, pfcqsng, pfhpsl, pfhpsn, pfplsl, pfplsn,
@@ -204,6 +207,7 @@ extern "C" void cloudsc_driver_wrapper_(
       __f2dace_OA_tendency_tmp_cld_d_0_s_15, __f2dace_OA_tendency_tmp_q_d_0_s_9,
       __f2dace_OA_tendency_tmp_t_d_0_s_6, kfldx, ngptot, ngptotg, nlev, nproma,
       numomp, ptsphy);
+std::cout << "prog" << std::endl;
   __program_cloudsc_driver(
       h, ktype, ldcum, pa, pap, paph, pccn, pclv, pcovptot, pdyna,
       pdyni, pdynl, pfcqlng, pfcqnng, pfcqrng, pfcqsng, pfhpsl, pfhpsn, pfplsl,
@@ -289,5 +293,6 @@ extern "C" void cloudsc_driver_wrapper_(
       __f2dace_OA_tendency_tmp_cld_d_0_s_15, __f2dace_OA_tendency_tmp_q_d_0_s_9,
       __f2dace_OA_tendency_tmp_t_d_0_s_6, kfldx, ngptot, ngptotg, nlev, nproma,
       numomp, ptsphy);
+std::cout << "done" << std::endl;
   __dace_exit_cloudsc_driver(h);
 }
