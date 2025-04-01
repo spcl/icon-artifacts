@@ -261,7 +261,7 @@ for sdfg_name in sdfg_names:
 
 # Compile the SDFG
 unique_names(resulting_sdfgs)
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release)
+compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument)
 
 # check if execution was successful
 if os.system(f"./velocity_gpu") != 0:
