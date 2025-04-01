@@ -261,6 +261,12 @@ for sdfg_name in sdfg_names:
 
 # Compile the SDFG
 unique_names(resulting_sdfgs)
+
+# Add instrumentation
+if instrument:
+    # instrument the SDFG
+    instrument_sdfg(resulting_sdfgs)
+    
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument)
 
 # check if execution was successful
@@ -275,18 +281,12 @@ compare_got_and_want()
 ### Measure performance
 ################################################################################
 
-if run_benchmark:
-    benchmark_sdfg(
-        sdfg,
-        "GPU",
-        gpu=True,
-        release=release,
-        warmups=1,
-        measurements=1,
-        profile=True,
-        save_kernel_sdfg=False,
-    )
-
+if instrument:
+    # collect reports
+    #for sdfg in resulting_sdfgs:
+    #    sdfg.save_report(sdfg.get_latest_report_path())
+    collect_reports(resulting_sdfgs)
+    
 ################################################################################
 ### Cleanup
 ################################################################################
