@@ -19,8 +19,8 @@ from dace.sdfg.sdfg import ConditionalBlock
 # rest is the same
 #outer_cond_str = "not lvn_only == 1"
 inner_cond_str = "not (_for_it_22 < i_startblk_2 or _for_it_22 > i_endblk_2) == 1"
-oldsym1 = dace.symbolic.symbol("i_startblk_var_86")
-oldsym2 = dace.symbolic.symbol("i_startblk_var_87")
+oldsym1 = dace.symbolic.symbol("i_startblk_var_146")
+oldsym2 = dace.symbolic.symbol("i_endblk_var_147")
 newsym1 = dace.symbolic.symbol("i_startblk_2")
 newsym2 = dace.symbolic.symbol("i_endblk_2")
 
@@ -83,11 +83,14 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
         _e = e
         _s = s
         for osym, nsym in [(oldsym1, newsym1), (oldsym2, newsym2)]:
+            #print(_b, _e, _s)
             _b = _b.subs(osym, nsym)
             _e = _e.subs(osym, nsym)
             _s = _s.subs(osym, nsym)
+            #print(_b, _e, _s)
         newranges.append((_b, _e, _s))
     em1.map.range = dace.subsets.Range(newranges)
+    #raise Exception(em1.map.range, [(oldsym1, newsym1), (oldsym2, newsym2)], newranges)
 
 
     after_state.add_node(node_map[entry_map])

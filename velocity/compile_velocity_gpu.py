@@ -75,19 +75,6 @@ for sdfg_name in sdfg_names:
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
         if verbose:
             sdfg.save("parallel.sdfgz", compress=True)
-        move_transients_to_top_level(
-            root=sdfg,
-            upper_bounds={
-                "z_w_con_c": 2, # Within cell kernel, 1 block
-                "maxvcfl_arr": 2, # Within cell kernel, 1 block
-                "cfl_clipping": 2, # Within cell kernel, 1 block
-                "z_w_concorr_mc": 2, # Within cell kernel, 1 block
-                "levmask": 2
-            },
-            verbose=verbose,
-        )
-        if verbose:
-            sdfg.save("transients_moved.sdfgz", compress=True)
 
         # Creates segfault with 2GPU applied
         """
@@ -116,8 +103,17 @@ for sdfg_name in sdfg_names:
         # This can only be safely applied to selected cases. Skip for now.
         # sdfg.apply_transformations(YoloMapFission)
         # preprocess_tough_nut(sdfg)
+        move_transients_to_top_level(
+            root=sdfg,
+            upper_bounds={
+                "z_w_con_c": 2,
+                "maxvcfl_arr": 2,
+                "cfl_clipping": 2,
+                "z_w_concorr_mc": 2,
+                "levmask": 2,
+            },
+        )
         preprocess_tough_nut(sdfg)
-
         sdfg.validate()
 
         # Do not call mapcollapse or mapfusion with permissive=True, because collapsing
