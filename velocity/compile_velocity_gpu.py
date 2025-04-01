@@ -103,17 +103,7 @@ for sdfg_name in sdfg_names:
                         #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")
         """
 
-        ToGPU().apply_pass(sdfg, {"verbose": verbose})
 
-        #if not reduction:
-        #    for cfg in sdfg.nodes():
-        #        if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
-        #            s = sdfg.add_state_before(cfg, "copy_vcflmax")
-        #            a0 = s.add_access("gpu_vcflmax")
-        #            a1 = s.add_access("vcflmax")
-        #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
-
-        GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
@@ -162,12 +152,11 @@ for sdfg_name in sdfg_names:
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage3.sdfgz", compress=True)
     # Currently makes the SDFG invalid, thrust error illegal address
-    """
+
     if Path(f"gpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
-
-        propagate_block_var(sdfg)
+        #propagate_block_var(sdfg)
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
@@ -175,25 +164,11 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         for s in sdfg.states():
             for n in s.nodes():
-                if isinstance(n, dace.nodes.MapEntry):
-                    if (len(n.map.range) == 1) and n.map.schedule != dace.dtypes.ScheduleType.GPU_Device:
-                        b,e,s = n.map.range[0]
-                        expr = (e+1-b)//s
-                        try:
-                            expr = int(expr)
-                            # Makes the SDFG invalid, missing inconnectors
-                            # MapUnroll().apply_to(sdfg=sdfg, map_entry=n)
-                            n.map.unroll = True
-                            n.map.unroll_factor = expr
-                            n.map.schedule = dace.ScheduleType.Sequential
-                        except:
-                            pass
-                            #n.map.unroll = True
-                            #n.map.unroll_factor = int(expr)
-                            #n.map.schedule = dace.ScheduleType.Sequential
-                    #return self._subgraph_user ?? same
-                    #AttributeError: 'TrivialMapElimination' object has no attribute '_subgraph_user'
-                    #if MapUnroll().can_be_applied(s, s.node_id(n), sdfg):
+                if isinstance(n, dace.nodes.MapEntry) and s.scope_dict().get(n) is None:
+                    if n.map.schedule != dace.dtypes.ScheduleType.GPU_Device:
+                        n.map.unroll = True
+                        n.map.unroll_factor = 8
+                        n.map.schedule = dace.ScheduleType.Sequential
 
         prune_unused_inputs_outputs(sdfg)
         sdfg.apply_transformations_repeated(StateFusion)
@@ -246,10 +221,31 @@ for sdfg_name in sdfg_names:
 
         sdfg.simplify()
 
-        sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage4.sdfgz", compress=True)
-    """
+
+    if Path(f"gpu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
+        sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage5.sdfgz")
+    else:
+
+        ToGPU().apply_pass(sdfg, {"verbose": verbose})
+
+        #if not reduction:
+        #    for cfg in sdfg.nodes():
+        #        if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
+        #            s = sdfg.add_state_before(cfg, "copy_vcflmax")
+        #            a0 = s.add_access("gpu_vcflmax")
+        #            a1 = s.add_access("vcflmax")
+        #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
+
+        GPUKernelLaunchRestructure().apply_pass(sdfg, {})
+        prune_unused_inputs_outputs(sdfg)
+
+        sdfg.validate()
+        if use_cache:
+            sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
+
+
     # Validate the SDFG
     sdfg.validate()
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)
@@ -266,7 +262,7 @@ unique_names(resulting_sdfgs)
 if instrument:
     # instrument the SDFG
     instrument_sdfg(resulting_sdfgs)
-    
+
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument)
 
 # check if execution was successful
@@ -286,7 +282,7 @@ if instrument:
     #for sdfg in resulting_sdfgs:
     #    sdfg.save_report(sdfg.get_latest_report_path())
     collect_reports(resulting_sdfgs)
-    
+
 ################################################################################
 ### Cleanup
 ################################################################################
