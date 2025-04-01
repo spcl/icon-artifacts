@@ -4,6 +4,10 @@ import os
 
 from dace.sdfg import is_devicelevel_gpu
 
+import json
+
+import shutil
+from pathlib import Path
 
 def instrument_sdfg(
     sdfgs: typing.List[dace.SDFG],
@@ -37,7 +41,6 @@ def instrument_sdfg(
                 if not is_devicelevel_gpu(_sdfg, state, kernel):
                     kernel.instrument = dace.InstrumentationType.Timer
 
-import json
 def get_all_paths(directory):
     paths = []
     for root, _, files in os.walk(directory):
@@ -45,19 +48,28 @@ def get_all_paths(directory):
             paths.append(os.path.join(root, name))
     return paths
 
+
 def collect_reports(
     sdfgs: typing.List[dace.SDFG],
 ):
     paths = get_all_paths(".dacecache/perf")
     for sdfg in sdfgs:
+        report = None
         for path in paths:
-            json_output = json.dumps(path, indent=4)
-            if "sdfgHash" in json_output:
-                print(json_output["sdfgHash"], sdfg.hash(), json_output["sdfgHash"] == sdfg.hash())
-                if json_output["sdfgHash"] == sdfg.hash():
+            with open(path, "r") as f:
+                _input = "\n".join(f.readlines())
+                json_output = json.loads(_input)
+                assert "sdfgHash" in json_output
+                #print(json_output["sdfgHash"], sdfg.label, json_output["sdfgHash"] == sdfg.label)
+                if json_output["sdfgHash"] == sdfg.label:
                     report = json_output
-        print(f"Report or SDFG: {sdfg.name}, {sdfg.label}")
-        print(report)
+                newperfpath = f".dacecache/{sdfg.label}/perf"
+                os.makedirs(newperfpath, exist_ok=True)
+                p = Path(path)
+                filename = p.name
+                shutil.copy(path, newperfpath + f"/{filename}")
+        print(f"Report or SDFG: {sdfg.name} ({sdfg.label})")
+        print(sdfg.get_latest_report())
         print(f"=" * 80)
 
 def clean_reports(
