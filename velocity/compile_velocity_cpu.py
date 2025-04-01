@@ -103,7 +103,8 @@ for sdfg_name in sdfg_names:
     if Path(f"cpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
-        propagate_block_var(sdfg)
+        #propagate_block_var(sdfg) # We do not know if the map length is 1 or 2 always
+        """
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
@@ -116,29 +117,14 @@ for sdfg_name in sdfg_names:
                         #if TrivialMapElimination().can_be_applied(s, s.node_id(n), sdfg):
                         TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
                         #else:
-                        #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")
+                        #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")"
+        """
         sdfg.validate()
         for s in sdfg.states():
             for n in s.nodes():
                 if isinstance(n, dace.nodes.MapEntry):
-                    if (len(n.map.range) == 1):
-                        b,e,s = n.map.range[0]
-                        expr = (e+1-b)//s
-                        try:
-                            expr = int(expr)
-                            # Makes the SDFG invalid, missing inconnectors
-                            # MapUnroll().apply_to(sdfg=sdfg, map_entry=n)
-                            n.map.unroll = True
-                            n.map.unroll_factor = expr
-                            n.map.schedule = dace.ScheduleType.Sequential
-                        except:
-                            pass
-                            #n.map.unroll = True
-                            #n.map.unroll_factor = int(expr)
-                            #n.map.schedule = dace.ScheduleType.Sequential
-                    #return self._subgraph_user ?? same
-                    #AttributeError: 'TrivialMapElimination' object has no attribute '_subgraph_user'
-                    #if MapUnroll().can_be_applied(s, s.node_id(n), sdfg):
+                    n.map.unroll_factor = 4
+                    n.map.schedule = dace.ScheduleType.Sequential
 
         prune_unused_inputs_outputs(sdfg)
         sdfg.apply_transformations_repeated(StateFusion)
