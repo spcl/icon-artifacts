@@ -11,7 +11,7 @@ from dace.transformation import pass_pipeline as ppl, transformation
 from dace import SDFG, properties, SDFGState
 from typing import Dict, Set, Optional
 from dace import data as dt
-from dace.sdfg.nodes import AccessNode, Tasklet, LibraryNode, MapEntry
+from dace.sdfg.nodes import AccessNode, Tasklet, LibraryNode, MapEntry, NestedSDFG
 from dace.subsets import Range
 from dace.sdfg import utils as sdutils
 import re
@@ -68,7 +68,9 @@ class ComputationMapNesting(ppl.Pass):
 
             # Update incoming table
             for cfgb, parent in all_cfgb.items():
-                new_in_table = self._get_in_table(cfgb, parent, in_table, out_table)
+                new_in_table = self._get_in_table(
+                    sdfg, cfgb, parent, in_table, out_table
+                )
 
                 # Check if the incoming table have changed
                 if new_in_table != in_table[cfgb]:
@@ -86,13 +88,30 @@ class ComputationMapNesting(ppl.Pass):
                     changed = True
                     out_table[cfgb] = new_out_table
 
-          
         # Clean up the tables (remove None entries)
         for cfgb, parent in all_cfgb.items():
             in_table[cfgb] = {k: v for k, v in in_table[cfgb].items() if v is not None}
             out_table[cfgb] = {
                 k: v for k, v in out_table[cfgb].items() if v is not None
             }
+
+        # Compute set of arrays that are being considered for replacement
+        considered = set()
+        for cfgb, parent in all_cfgb.items():
+            for k in in_table[cfgb].keys():
+                considered.add(k)
+            for k in out_table[cfgb].keys():
+                considered.add(k)
+
+        map_arrays = set()
+        for cfgb, parent in all_cfgb.items():
+            if cfgb.sdfg is sdfg:
+              map_arrays |= ComputationMapNesting._get_map_arrays(cfgb)
+        
+        considered = considered & map_arrays
+        print(f"Arrays considered for replacement: ")
+        for k in considered:
+            print(f"\t{k}")
 
         # Perform replacement of the arrays
         for cfgb, parent in all_cfgb.items():
@@ -102,6 +121,7 @@ class ComputationMapNesting(ppl.Pass):
     # Given a CFGB, builds the incoming table
     def _get_in_table(
         self,
+        sdfg: SDFG,
         cfgb: ControlFlowBlock,
         parent: ControlFlowRegion,
         in_table: Dict[
@@ -166,17 +186,18 @@ class ComputationMapNesting(ppl.Pass):
             return new_out_table
 
         elif isinstance(cfgb, SDFGState):
-            # Add any array that is completely written in the current state
             new_out_table = in_table[cfgb].copy()
-            for arr, node in ComputationMapNesting._get_overwritten_arrays(
-                cfgb
-            ).items():
-                new_out_table[arr] = (node, cfgb)
 
             # Remove (None) any array that is partially written in the current state
             for arr in ComputationMapNesting._get_partially_written_arrays(cfgb):
                 if arr in new_out_table:
                     new_out_table[arr] = None
+
+            # Add any array that is completely written in the current state
+            for arr, node in ComputationMapNesting._get_overwritten_arrays(
+                cfgb
+            ).items():
+                new_out_table[arr] = (node, cfgb)
 
             return new_out_table
 
@@ -204,7 +225,7 @@ class ComputationMapNesting(ppl.Pass):
         out = {}
         for k, v in e1.items():
             if v is None:
-                out[k] = None 
+                out[k] = None
             elif k not in e2 or v[0] is not e2[k][0] or v[1] is not e2[k][1]:
                 out[k] = None
             else:
@@ -237,16 +258,26 @@ class ComputationMapNesting(ppl.Pass):
             # Skip view nodes
             if isinstance(node.desc(state.sdfg), dt.View):
                 continue
+            
+            # Skip non-transient nodes
+            if not node.desc(state.sdfg).transient:
+                continue
 
             # Skip nodes that are not end-of-chain
             if state.out_degree(node) > 0:
                 continue
+            
+            # Node should only have a single predecessor
+            if len(state.predecessors(node)) != 1:
+                continue
+            pred = state.predecessors(node)[0]
 
             # Skip nodes that don't directly depend on a tasklet or library node
-            if not all(
-                isinstance(pred, (Tasklet, LibraryNode))
-                for pred in state.predecessors(node)
-            ):
+            if not isinstance(pred, (Tasklet, LibraryNode)):
+                continue
+            
+            # The tasklet or library node should only have one successor
+            if len(state.successors(pred)) != 1:
                 continue
 
             # Check if the node is completely written
@@ -255,7 +286,7 @@ class ComputationMapNesting(ppl.Pass):
                 assert node.data not in overwritten
                 overwritten[node.data] = node
         return overwritten
-    
+
     # Given a state, returns all partially written array names
     @staticmethod  # To make it cacheable
     @lru_cache(maxsize=None)
@@ -267,9 +298,51 @@ class ComputationMapNesting(ppl.Pass):
             if isinstance(node.desc(state.sdfg), dt.View):
                 continue
             # Check if the node is partially written
-            if not ComputationMapNesting._is_overwritten(state, node):
+            if state.in_degree(node) > 0:
                 partially_written.add(node.data)
         return partially_written
+    
+    # Given a CFGB return the top-level nsdfg node
+    @staticmethod # To make it cacheable
+    @lru_cache(maxsize=None)
+    def _get_top_level_nsdfg_node(cfgb: ControlFlowBlock, sdfg: SDFG) -> Optional[ControlFlowBlock]:
+        # Map nsdfg nodes to their parent
+        nsdfg_nodes = {}
+        for n, p in sdfg.all_nodes_recursive():
+            if isinstance(n, NestedSDFG):
+                nsdfg_nodes[n] = p
+
+        # Get the top-level nsdfg node
+        tlp = cfgb
+        tlsdfg = tlp.sdfg.parent_nsdfg_node
+        while tlp.sdfg is not sdfg:
+            tlsdfg = tlp.sdfg.parent_nsdfg_node
+            tlp = nsdfg_nodes[tlsdfg]
+        return tlsdfg
+
+    # Given a CFGB, gets all arrays names that are read in a map
+    @staticmethod # To make it cacheable
+    @lru_cache(maxsize=None)
+    def _get_map_arrays(cfgb: ControlFlowBlock) -> Set[str]:
+        map_arrays = set()
+        for node, parent in cfgb.all_nodes_recursive():
+            if not isinstance(node, AccessNode):
+                continue
+            if parent.out_degree(node) == 0:
+                continue
+            if parent.entry_node(node) is not None:
+                map_arrays.add(node.data)
+                continue
+            
+            if parent.sdfg is cfgb.sdfg:
+                continue
+            
+            tlp = ComputationMapNesting._get_top_level_nsdfg_node(parent, cfgb.sdfg)
+            if cfgb.entry_node(tlp) is not None:
+                map_arrays.add(node.data)
+                continue
+
+        return map_arrays
 
     # Given a CFGB, replaces all reads in maps with the computation
     def _replace(
@@ -291,14 +364,10 @@ class ComputationMapNesting(ppl.Pass):
                 if acc_node.data != arr_name:
                     continue
 
-                if cfgb.in_degree(acc_node) != 0:
-                    continue
-                
                 if cfgb.entry_node(acc_node) is None:
                     continue
-                
+
                 src_acc = in_table[cfgb][arr_name][0]
                 src_parent = in_table[cfgb][arr_name][1]
 
                 print(f"Replacing {arr_name} in {cfgb} with {src_acc} in {src_parent}")
-
