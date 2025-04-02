@@ -460,6 +460,9 @@ void __program_cloudsc_driver_internal(
   v_ydecldp_var_49_ncldtop = (int *)(&((*ydecldp_var_49_0)->ncldtop));
 std::cerr << "ydecldp . ramid = " << (ydecldp->ramid) << std::endl;
 std::cerr << "ydecldp . ncldtop = " << *v_ydecldp_var_49_ncldtop << " <- " << (ydecldp->ncldtop) << std::endl;
+std::cerr << "ydecldp . nbeta = " << (ydecldp->nbeta) << std::endl;
+std::cerr << "ydomcst . rgamd = " << (ydomcst->rgamd) << std::endl;
+std::cerr << "ydoethf . rkoop2 = " << (ydoethf->rkoop2) << std::endl;
   double *v_ydcst_var_47_rtt;
   v_ydcst_var_47_rtt = (double *)(&((*ydcst_var_47_0)->rtt));
   int *v_ydecldp_var_49_nssopt;
@@ -1056,6 +1059,8 @@ std::cerr << "ydecldp . ncldtop = " << *v_ydecldp_var_49_ncldtop << " <- " << (y
   std::cerr << "ngptot = " << ngptot << " | "
             << "nlev = " << nlev << " | "
             << "icend = " << icend << std::endl;
+    sym_klev_0 = nlev;
+    sym_klon_0 = nproma;
   for (_for_it_129 = 1; (_for_it_129 <= ngptot);
        _for_it_129 = (_for_it_129 + nproma)) {
 
@@ -1131,8 +1136,6 @@ std::cerr << "ydecldp . ncldtop = " << *v_ydecldp_var_49_ncldtop << " <- " << (y
         }
       }
     }
-    sym_klev_0 = nlev;
-    sym_klon_0 = nproma;
     {
 
         {double zepsilon_out;
