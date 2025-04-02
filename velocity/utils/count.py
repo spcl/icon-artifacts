@@ -54,7 +54,7 @@ def count_symbols_use_defs(
 
     for node, parent in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.NestedSDFG):
-            used_syms = node.sdfg.free_symbols
+            used_syms = node.sdfg.used_symbols(all_symbols=False)
             def_syms = set()
             for edge, p in node.sdfg.all_edges_recursive():
                 if p.sdfg == node.sdfg:
@@ -65,7 +65,7 @@ def count_symbols_use_defs(
             defined_symbols[node.sdfg] = def_syms - used_syms
             parents[node.sdfg] = set([parent.sdfg])
 
-    used_syms = sdfg.free_symbols
+    used_syms = sdfg.used_symbols(all_symbols=False)
     def_syms = set()
     for edge, p in sdfg.all_edges_recursive():
         if p.sdfg == sdfg:
@@ -74,16 +74,6 @@ def count_symbols_use_defs(
     used_symbols[sdfg] = used_syms - def_syms
     defined_symbols[sdfg] = def_syms - used_syms
     parents[sdfg] = set()
-
-    # These seem to be fine. sdfg.free_symbols collects too many symbols probably
-    # Remove any symbols containing "index", "idx" or "_if_cond"
-    for nsdfg in list(used_symbols.keys()):
-        used_symbols[nsdfg] = {
-            s for s in used_symbols[nsdfg] if "index" not in s and "idx" not in s and "_if_cond" not in s
-        }
-        defined_symbols[nsdfg] = {
-            s for s in defined_symbols[nsdfg] if "index" not in s and "idx" not in s and "_if_cond" not in s
-        }
 
     # Propagate parent mapping
     changed = True
