@@ -65,8 +65,14 @@ def _insert_reduction(
             f"read_{in_name}", {}, {"out"}, f"out = {in_name}"
         )
         in_sym = parent.sdfg.symbols[in_name]
-        in_access_name, _ = red_state.sdfg.add_scalar(
-            f"reduce_{type}_in", dtype=in_sym.dtype, transient=True, find_new_name=True
+        in_access_name, _ = red_state.sdfg.add_array(
+            f"reduce_{type}_in",
+            shape=[
+                1,
+            ],
+            dtype=in_sym.dtype,
+            transient=True,
+            find_new_name=True,
         )
         in_access = red_state.add_read(in_access_name)
         in_expr = in_access_name if in_expr is in_name else in_expr
@@ -79,8 +85,14 @@ def _insert_reduction(
     size_task = red_state.add_tasklet(
         f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}"
     )
-    size_name, _ = red_state.sdfg.add_scalar(
-        f"reduce_{type}_size", dtype=dace.int32, transient=True, find_new_name=True
+    size_name, _ = red_state.sdfg.add_array(
+        f"reduce_{type}_size",
+        shape=[
+            1,
+        ],
+        dtype=dace.int32,
+        transient=True,
+        find_new_name=True,
     )
     size_access = red_state.add_access(size_name)
 
@@ -90,8 +102,14 @@ def _insert_reduction(
     )
 
     if out_expr is None:
-        arr_name, arr = red_state.sdfg.add_scalar(
-            "out_val", dtype=dace.float64, transient=True, find_new_name=True
+        arr_name, arr = red_state.sdfg.add_array(
+            "out_val",
+            shape=[
+                1,
+            ],
+            dtype=dace.float64,
+            transient=True,
+            find_new_name=True,
         )
         red_state.add_edge(
             red_lib_node,
