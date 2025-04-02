@@ -133,7 +133,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
         f"{end} - {start}",
         "tmp_call_18",
         "maxZ",
-        in_expr=f"{vcfl_name}[0]"
+        in_expr=f"{vcfl_name}[0]",
     )
     pre_state = sdfg.add_state_before(loop_node)
     post_state = sdfg.add_state_after(loop_node)
@@ -263,8 +263,14 @@ def _demote_vcflmax(sdfg: dace.SDFG):
     Demotes the vcflmax symbol to a scalar.
     vcflmax is only used in interstate edges, so we only check interstate edges and replace them.
     """
-    vcfl_name, _ = sdfg.add_scalar(
-        "vcflmax", dtype=sdfg.symbols["vcflmax"], transient=True, find_new_name=True
+    vcfl_name, _ = sdfg.add_array(
+        "vcflmax",
+        shape=[
+            1,
+        ],
+        dtype=sdfg.symbols["vcflmax"],
+        transient=True,
+        find_new_name=True,
     )
     replaced_write = False
     replaced_read = False
@@ -272,7 +278,9 @@ def _demote_vcflmax(sdfg: dace.SDFG):
         if not isinstance(edge.data, dace.sdfg.InterstateEdge):
             continue
         if "vcflmax" in edge.data.assignments.keys():
-            assert not replaced_write, "TODO: vcflmax is assigned in multiple interstate edges"
+            assert (
+                not replaced_write
+            ), "TODO: vcflmax is assigned in multiple interstate edges"
             del edge.data.assignments["vcflmax"]
 
             vstate = parent.add_state_after(edge.src, "vcflmax_state")
@@ -287,10 +295,12 @@ def _demote_vcflmax(sdfg: dace.SDFG):
             )
             replaced_write = True
         if "vcflmax" in edge.data.assignments.values():
-            assert not replaced_read, "TODO: vcflmax is read in multiple interstate edges"
+            assert (
+                not replaced_read
+            ), "TODO: vcflmax is read in multiple interstate edges"
             edge.data.replace("vcflmax", vcfl_name)
             replaced_read = True
-            
+
     sdfg.remove_symbol("vcflmax")
 
 
