@@ -65,11 +65,8 @@ def _insert_reduction(
             f"read_{in_name}", {}, {"out"}, f"out = {in_name}"
         )
         in_sym = parent.sdfg.symbols[in_name]
-        in_access_name, _ = red_state.sdfg.add_array(
+        in_access_name, _ = red_state.sdfg.add_scalar(
             f"reduce_{type}_in",
-            shape=[
-                1,
-            ],
             dtype=in_sym.dtype,
             transient=True,
             find_new_name=True,
@@ -85,11 +82,8 @@ def _insert_reduction(
     size_task = red_state.add_tasklet(
         f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}"
     )
-    size_name, _ = red_state.sdfg.add_array(
+    size_name, _ = red_state.sdfg.add_scalar(
         f"reduce_{type}_size",
-        shape=[
-            1,
-        ],
         dtype=dace.int32,
         transient=True,
         find_new_name=True,
@@ -102,11 +96,8 @@ def _insert_reduction(
     )
 
     if out_expr is None:
-        arr_name, arr = red_state.sdfg.add_array(
+        arr_name, arr = red_state.sdfg.add_scalar(
             "out_val",
-            shape=[
-                1,
-            ],
             dtype=dace.float64,
             transient=True,
             find_new_name=True,
