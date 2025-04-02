@@ -66,6 +66,8 @@ for sdfg_name in sdfg_names:
     else:
         # XXX: Permissive will ignore any read/write conflicts.
         sdfg.apply_transformations_repeated(LoopToMap, permissive=True)
+        # Ensure no symbols are captured by LoopToMap
+        count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
         sdfg.apply_transformations_repeated(MapCollapse)
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"], verbose=verbose)
@@ -73,7 +75,7 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"cpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
     # Shouldn't have any loops left
-    count_loops(sdfg, verbose=verbose, assert_loops=True)
+    count_loops(sdfg, verbose=verbose, use_assert=True)
 
     if Path(f"cpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
@@ -110,6 +112,9 @@ for sdfg_name in sdfg_names:
         # sdfg.apply_transformations_repeated(ConditionNesting)
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
+
+    # Ensure no symbols are captured
+    count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
 
     # Turn all maps to CPU_Multicore
     for node, state in sdfg.all_nodes_recursive():
@@ -194,7 +199,8 @@ for sdfg_name in sdfg_names:
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
         ComputationMapNesting().apply_pass(sdfg, {})
-        sdfg.simplify()
+        # XXX: DDE introduces numerical differences
+        sdfg.simplify(skip=["DeadDataflowElimination"], verbose=verbose)
         merge_maps_in_sdfg(sdfg)
         sdfg.validate()
         if use_cache:
