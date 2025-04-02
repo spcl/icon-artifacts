@@ -15,15 +15,10 @@ class ExpandReductionLibNode(dace.transformation.ExpandTransformation):
     def expansion(node: "ReductionLibNode", state: dace.SDFGState, sdfg: dace.SDFG):
         # regardless of schedule expand the same
         inputs, outputs = _get_inputs_and_outputs(sdfg, state, node)
-        print("AAAAAAAAAa", inputs, outputs)
-        for inp in inputs.items():
-            print(inp[0], inp[1], type(inp[0]), type(inp[1]), inp[1].storage)
-        for inp in outputs.items():
-            print(inp[0], inp[1], type(inp[0]), type(inp[1]), inp[1].storage)
         # Generate the appropriate code
         code = node.generate_code(inputs, outputs)
         # Replace this node with a C++ tasklet
-        node.input_names
+        node.schedule = dace.dtypes.ScheduleType.GPU_Device
         t = dace.nodes.Tasklet('custom_code', node.input_names, node.output_names, code, language=dace.dtypes.Language.CPP)
         for inp in inputs:
             t.add_in_connector(inp)
