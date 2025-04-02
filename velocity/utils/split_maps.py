@@ -420,15 +420,6 @@ def move_in_if(sdfg: dace.SDFG, n: dace.nodes.NestedSDFG):
                                 # DANGEROUS TODO: WHY MISSING SYMBOLS APPEAR AND WHY DOES IT COMPILE AFTER REMOVING THEM?
                                 symbols = set(k for k in n.sdfg.free_symbols if k not in n.in_connectors and k not in n.out_connectors)
                                 missing_symbols = [s for s in symbols if s not in n.symbol_mapping]
-                                #print("Missing", missing_symbols)
-                                #print(nested.guid, "\n", nested.sdfg.guid, "\n", inner_sdfg.guid, "\n", sdfg.guid,
-                                #      s2.sdfg.guid, "\n", n.guid)
-
-                                #for assignment in assignments_to_rm:
-                                #    if assignment in inner_sdfg.free_symbols:
-                                #        inner_sdfg.remove_symbol(assignment)
-                                #        print(assignment)
-                                #        assert assignment not in inner_sdfg.parent_nsdfg_node.symbol_mapping
                                 for sym in missing_symbols:
                                     n.sdfg.remove_symbol(sym)
 
