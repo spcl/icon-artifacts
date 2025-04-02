@@ -2,6 +2,8 @@
 #include "../../include/hash.h"
 #include <dace/dace.h>
 #include <iostream>
+#include <cassert>
+#include <csignal>
 
 struct tomcst {
   // A1.0 Fundamental constants
@@ -283,8 +285,8 @@ struct tecldp {
   double rcl_fzrab = {};
   double rcl_fzrbB = {};
 
-  bool lcldextra = {};
-  bool lcldbudget = {};
+  int32_t lcldextra = {};
+  int32_t lcldbudget = {};
 
   int32_t nssopt = {};
   int32_t ncldtop = {};
@@ -297,12 +299,12 @@ struct tecldp {
 
   // aerosols
   int32_t naercld = {};
-  bool laerliqautolsp = {};
-  bool laerliqautocp = {};
-  bool laerliqautocpb = {};
-  bool laerliqcoll = {};
-  bool laericesed = {};
-  bool laericeauto = {};
+  int32_t laerliqautolsp = {};
+  int32_t laerliqautocp = {};
+  int32_t laerliqautocpb = {};
+  int32_t laerliqcoll = {};
+  int32_t laericesed = {};
+  int32_t laericeauto = {};
 
   // variance arrays
   double nshapep = {};
@@ -456,6 +458,8 @@ void __program_cloudsc_driver_internal(
   v_ydcst_var_47_retv = (double *)(&((*ydcst_var_47_0)->retv));
   int *v_ydecldp_var_49_ncldtop;
   v_ydecldp_var_49_ncldtop = (int *)(&((*ydecldp_var_49_0)->ncldtop));
+std::cerr << "ydecldp . ramid = " << (ydecldp->ramid) << std::endl;
+std::cerr << "ydecldp . ncldtop = " << *v_ydecldp_var_49_ncldtop << " <- " << (ydecldp->ncldtop) << std::endl;
   double *v_ydcst_var_47_rtt;
   v_ydcst_var_47_rtt = (double *)(&((*ydcst_var_47_0)->rtt));
   int *v_ydecldp_var_49_nssopt;
