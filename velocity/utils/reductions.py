@@ -2,7 +2,7 @@ import copy
 from typing import Dict
 import dace
 from dace.data import ListProperty
-from dace.libraries.standard import CodeLibraryNode
+from dace.libraries.standard import CodeLibraryNode, Reduce
 from dace.properties import make_properties, Property
 from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
@@ -15,11 +15,16 @@ class ExpandReductionLibNode(dace.transformation.ExpandTransformation):
     def expansion(node: "ReductionLibNode", state: dace.SDFGState, sdfg: dace.SDFG):
         # regardless of schedule expand the same
         inputs, outputs = _get_inputs_and_outputs(sdfg, state, node)
+        #for inp in inputs.items():
+        #    print(inp[0], inp[1], inp[1].storage)
+        #for outp in outputs.items():
+        #    print(outp[0], outp[1], outp[1].storage)
         # Generate the appropriate code
         code = node.generate_code(inputs, outputs)
         # Replace this node with a C++ tasklet
         node.schedule = dace.dtypes.ScheduleType.GPU_Device
-        t = dace.nodes.Tasklet('custom_code', node.input_names, node.output_names, code, language=dace.dtypes.Language.CPP)
+        t = dace.nodes.Tasklet('custom_code', node.input_names, node.output_names, code, language=dace.dtypes.Language.CPP,
+                               )
         for inp in inputs:
             t.add_in_connector(inp)
         for outp in outputs:
@@ -37,6 +42,7 @@ class ReductionLibNode(dace.sdfg.nodes.LibraryNode):
     implementations = {
         "pure": ExpandReductionLibNode,
         "reduce_maxZ": ExpandReductionLibNode,
+        "reduce_max": ExpandReductionLibNode,
         "reduce_sum": ExpandReductionLibNode,
         "reduce_scan": ExpandReductionLibNode,
         "reduce_maxZ_gpu": ExpandReductionLibNode,
@@ -49,7 +55,7 @@ class ReductionLibNode(dace.sdfg.nodes.LibraryNode):
         "reduce_sum_kernel": ExpandReductionLibNode,
         "reduce_scan_kernel": ExpandReductionLibNode,
     }
-    default_implementation = 'pure'
+    default_implementation = 'reduce_max'
     def __init__(self, name, input_names, output_names, code, schedule=dace.dtypes.ScheduleType.GPU_Device):
         super().__init__(name=name)
         self.code = code
@@ -60,7 +66,6 @@ class ReductionLibNode(dace.sdfg.nodes.LibraryNode):
     def generate_code(self, inputs, outputs):
         if (
             inputs["in_arr"].storage == dace.StorageType.GPU_Global
-            or inputs["in_size"].storage == dace.StorageType.GPU_Shared
         ):
             defgpu = "#define __REDUCE_GPU__" #if self.schedule in dace.dtypes.GPU_SCHEDULES else ""
             undefgpu = "#undef __REDUCE_GPU__" #if self.schedule in dace.dtypes.GPU_SCHEDULES else ""
@@ -71,14 +76,6 @@ class ReductionLibNode(dace.sdfg.nodes.LibraryNode):
             """
         return self.code
 
-#ReductionLibNode.register_implementation('reduce_maxZ', ExpandMa)
-#ReductionLibNode.default_implementation = 'reduce_maxZ'
-
-def _dataview(data: dace.data.Data, memlet: dace.memlet.Memlet) -> dace.data.Data:
-    """ Returns a data descriptor view of a data descriptor and a memlet. """
-    result = copy.deepcopy(data)
-    result.shape = memlet.subset.size()
-    return result
 
 def _get_inputs_and_outputs(sdfg: dace.SDFG, state: dace.SDFGState, node: dace.nodes.Node) -> dace.Tuple[Dict[str, dace.data.Data], Dict[str, dace.data.Data]]:
     """ Returns two dictionaries that map from input/output connectors to data 
@@ -90,13 +87,13 @@ def _get_inputs_and_outputs(sdfg: dace.SDFG, state: dace.SDFGState, node: dace.n
     for edge in state.in_edges(node):
         if edge.data.data is None:
             continue # Skip dependency edges
-        inputs[edge.dst_conn] = _dataview(sdfg.arrays[edge.data.data], edge.data)
+        inputs[edge.dst_conn] = sdfg.arrays[edge.data.data]
 
     outputs: Dict[str, dace.data.Data] = {}
     for edge in state.out_edges(node):
         if edge.data.data is None:
             continue # Skip dependency edges
-        outputs[edge.src_conn] = _dataview(sdfg.arrays[edge.data.data], edge.data)
+        outputs[edge.src_conn] = sdfg.arrays[edge.data.data]
 
     return inputs, outputs
 
@@ -129,6 +126,7 @@ def _insert_reduction(
         #endif
         """,
     )
+    red_lib_node.implementation = f"reduce_{type}"
     red_lib_node.add_in_connector("in_arr")
     red_lib_node.add_in_connector("in_size")
     red_lib_node.add_out_connector("out")
