@@ -195,6 +195,7 @@ for sdfg_name in sdfg_names:
 
         ComputationMapNesting().apply_pass(sdfg, {})
         sdfg.simplify()
+        merge_maps_in_sdfg(sdfg)
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)

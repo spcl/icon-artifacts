@@ -31,4 +31,4 @@ from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
 from utils.computation_map_nesting import ComputationMapNesting
 from utils.pre_gpu_fixes import pre_gpu_fix
 from utils.make_unique_block_var import make_unique_block_var
-from utils.merge_maps import merge_maps
+from utils.merge_maps import merge_maps, merge_maps_in_sdfg
