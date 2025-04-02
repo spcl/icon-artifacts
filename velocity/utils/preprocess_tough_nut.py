@@ -169,5 +169,5 @@ def preprocess_tough_nut(sdfg: dace.SDFG):
     from .split_maps import remove_empty_kernel
     from .propagate_if_cond import propagate_if_cond
     remove_empty_kernel(sdfg)
-    propagate_if_cond(sdfg, sdfg, None, None, True)
+    propagate_if_cond(sdfg, sdfg, None, None, False)
     sdfg.validate()
