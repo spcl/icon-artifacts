@@ -198,9 +198,9 @@ for sdfg_name in sdfg_names:
         #        if isinstance(n, dace.nodes.NestedSDFG):
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
-        # FIXME: This pass causes numerical differences
-        # ComputationMapNesting().apply_pass(sdfg, {})
-        sdfg.simplify()
+        ComputationMapNesting().apply_pass(sdfg, {})
+        # XXX: DDE introduces numerical differences
+        sdfg.simplify(skip=["DeadDataflowElimination"], verbose=verbose)
         merge_maps_in_sdfg(sdfg)
         sdfg.validate()
         if use_cache:
