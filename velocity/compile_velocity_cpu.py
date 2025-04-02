@@ -198,7 +198,8 @@ for sdfg_name in sdfg_names:
         #        if isinstance(n, dace.nodes.NestedSDFG):
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
-        ComputationMapNesting().apply_pass(sdfg, {})
+        # FIXME: This pass causes numerical differences
+        # ComputationMapNesting().apply_pass(sdfg, {})
         sdfg.simplify()
         merge_maps_in_sdfg(sdfg)
         sdfg.validate()
