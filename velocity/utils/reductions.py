@@ -3,7 +3,7 @@ from dace.libraries.standard import CodeLibraryNode
 from dace.properties import make_properties, Property
 from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
-from dace.sdfg.state import ControlFlowRegion
+from dace.sdfg.state import ControlFlowRegion, LoopRegion
 
 
 @make_properties
@@ -120,13 +120,20 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     loop_node, _ = find_node_by_name(sdfg, loop_name)
     start = str(loop_analysis.get_init_assignment(loop_node))
     end = str(loop_analysis.get_loop_end(loop_node))
+    vcfl_name = None
+    for name in sdfg.arrays.keys():
+        if "vcflmax" in name:
+            vcfl_name = name
+            break
+    assert vcfl_name is not None, "vcflmax not found"
     _insert_reduction(
         sdfg,
         loop_node,
-        "vcflmax",
+        vcfl_name,
         f"{end} - {start}",
         "tmp_call_18",
         "maxZ",
+        in_expr=f"{vcfl_name}[0]"
     )
     pre_state = sdfg.add_state_before(loop_node)
     post_state = sdfg.add_state_after(loop_node)
@@ -160,7 +167,6 @@ def cfl_clipping_to_reduction(
         "sum",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,_for_it_35-1]",
     )
-
 
 
 def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name, tmp_name):
@@ -229,7 +235,6 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     parent.remove_node(task)
 
 
-
 def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     """
     Turns the levmask scan into a reduction.
@@ -253,8 +258,47 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     parent.remove_node(task)
 
 
+def _demote_vcflmax(sdfg: dace.SDFG):
+    """
+    Demotes the vcflmax symbol to a scalar.
+    vcflmax is only used in interstate edges, so we only check interstate edges and replace them.
+    """
+    vcfl_name, _ = sdfg.add_scalar(
+        "vcflmax", dtype=sdfg.symbols["vcflmax"], transient=True, find_new_name=True
+    )
+    replaced_write = False
+    replaced_read = False
+    for edge, parent in sdfg.all_edges_recursive():
+        if not isinstance(edge.data, dace.sdfg.InterstateEdge):
+            continue
+        if "vcflmax" in edge.data.assignments.keys():
+            assert not replaced_write, "TODO: vcflmax is assigned in multiple interstate edges"
+            del edge.data.assignments["vcflmax"]
+
+            vstate = parent.add_state_after(edge.src, "vcflmax_state")
+            rnode = vstate.add_read("maxvcfl")
+            wnode = vstate.add_write(vcfl_name)
+            vstate.add_edge(
+                rnode,
+                None,
+                wnode,
+                None,
+                dace.Memlet.from_array("maxvcfl", sdfg.arrays["maxvcfl"]),
+            )
+            replaced_write = True
+        if "vcflmax" in edge.data.assignments.values():
+            assert not replaced_read, "TODO: vcflmax is read in multiple interstate edges"
+            edge.data.replace("vcflmax", vcfl_name)
+            replaced_read = True
+            
+    sdfg.remove_symbol("vcflmax")
+
 
 def add_all_reductions(sdfg: dace.SDFG):
+    # Make sure vcflmax is not a symbol
+    _demote_vcflmax(sdfg)
+    sdfg.save("demoted.sdfg")
+
     # We assume the array names and iteration variable names never change
     if "nproma32" in sdfg.name:
         loop_to_max_reduction(sdfg, f"FOR_l_568_c_568", "T_l568_c568")
