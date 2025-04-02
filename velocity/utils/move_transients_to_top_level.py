@@ -127,7 +127,7 @@ def clean_unused_array(root: dace.SDFG, parent_state, sdfg: dace.SDFG, verbose: 
 
 
 def simplify_recursive(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
-    sdfg.simplify()
+    sdfg.simplify(skip=["StateFusion"])
     for s in sdfg.states():
         for n in s.nodes():
             if isinstance(n, dace.nodes.NestedSDFG):

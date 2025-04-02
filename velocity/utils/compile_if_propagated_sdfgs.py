@@ -106,9 +106,10 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
             try:
                 # Fill in scope entry/exit connectors
                 sdfg.fill_scope_connectors()
+                sdfg.validate()
 
                 # Generate code for the program by traversing the SDFG state by state
-                program_objects = codegen.generate_code(sdfg, validate=False)
+                program_objects = codegen.generate_code(sdfg, validate=True)
             except Exception:
                 fpath = os.path.join("_dacegraphs", "failing.sdfgz")
                 sdfg.save(fpath, compress=True)
@@ -117,7 +118,7 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
 
             # Generate the program folder and write the source files
             compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
-            
+
             modify_files_in_directory(build_loc)
             insert_measure_time_calls(build_loc, sdfg, instrument)
         if gpu:

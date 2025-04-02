@@ -225,17 +225,14 @@ for sdfg_name in sdfg_names:
 
         ToGPU(verbose=verbose).apply_pass(sdfg, {})
         #sdfg.apply_gpu_transformations()
-
         sdfg.validate()
+
         prune_unused_inputs_outputs(sdfg)
         sdfg.validate()
-        sdfg.apply_transformations_repeated(StateFusion)
-        for n, g in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.NestedSDFG):
-                if isinstance(n, dace.nodes.NestedSDFG):
-                    n.sdfg.apply_transformations_repeated(StateFusion, permissive=True)
         propagate_if_cond(sdfg, sdfg, None, None, verbose)
-        sdfg.apply_transformations_repeated(StateFusion)
+        sdfg.validate()
+        #sdfg.compile()
+
         #if not reduction:
         #    for cfg in sdfg.nodes():
         #        if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
@@ -243,11 +240,9 @@ for sdfg_name in sdfg_names:
         #            a0 = s.add_access("gpu_vcflmax")
         #            a1 = s.add_access("vcflmax")
         #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
-        sdfg.save("a.sdfg")
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         sdfg.validate()
-
-        sdfg.validate()
+        #sdfg.compile()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
 
@@ -255,6 +250,7 @@ for sdfg_name in sdfg_names:
     # Validate the SDFG
     sdfg.validate()
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)
+    sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_result.sdfgz")
     resulting_sdfgs.append(sdfg)
 
 ################################################################################
