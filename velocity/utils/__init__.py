@@ -29,3 +29,4 @@ from utils.propagate_block_var import propagate_block_var
 from utils.rename_on_if import rename_on_if
 from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
 from utils.computation_map_nesting import ComputationMapNesting
+from utils.pre_gpu_fixes import pre_gpu_fix

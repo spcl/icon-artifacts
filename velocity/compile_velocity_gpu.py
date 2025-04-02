@@ -157,6 +157,7 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
         #propagate_block_var(sdfg)
+        # pre_gpu_fix(sdfg)
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
