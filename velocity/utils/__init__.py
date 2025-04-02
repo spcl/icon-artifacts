@@ -1,4 +1,4 @@
-from utils.find import find_node_by_name
+from utils.find import find_node_by_name, find_node_by_guid
 from utils.loop_locality import make_array_loop_local, apply_loop_locality_pass
 from utils.reductions import (
     loop_to_max_reduction,
@@ -26,7 +26,9 @@ from utils.propagate_if_cond import propagate_if_cond
 from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
 from utils.unique_names import unique_names
 from utils.propagate_block_var import propagate_block_var
-from utils.rename_on_if import rename_on_if
+from utils.rename_on_if import rename_on_if, rename_on_if2
 from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
 from utils.computation_map_nesting import ComputationMapNesting
 from utils.pre_gpu_fixes import pre_gpu_fix
+from utils.make_unique_block_var import make_unique_block_var
+from utils.merge_maps import merge_maps

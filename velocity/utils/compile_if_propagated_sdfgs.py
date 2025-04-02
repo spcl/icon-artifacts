@@ -42,7 +42,7 @@ def modify_file(file_path, pattern):
     if modified:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.writelines(new_lines)
-        print(f"Modified: {file_path}")
+        # print(f"Modified: {file_path}")
 
 import re
 
@@ -74,7 +74,7 @@ def _process_folder(directory, sdfg: dace.SDFG, instrument: bool = False):
         for file in files:
             if file.endswith(".cpp") or file.endswith(".cu"):
                 filepath = os.path.join(root, file)
-                print(filepath)
+                # print(filepath)
                 if instrument:
                     try:
                         os.mkdir(os.path.join(os.path.abspath(root), "../../../perf"))

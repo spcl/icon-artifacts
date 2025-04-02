@@ -1,6 +1,6 @@
 use_cache = True
-instrument = True
+instrument = False
 cleanup = False
 reduction = True
-release = True
+release = False
 verbose = False

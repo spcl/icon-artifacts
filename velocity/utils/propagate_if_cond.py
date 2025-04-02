@@ -297,15 +297,9 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
 
         # return # here validates
 
-        #SymbolPropagation().apply_pass(sdfg, {})
-        if verbose:
-            sdfg.save(f"test0_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
-
         ConstantPropagation().apply_pass(sdfg, {})
         sdfg.validate()
 
-        if verbose:
-            sdfg.save(f"test1_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
 
     #return # here validates
 
@@ -332,10 +326,10 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                         cond = eval(ss[0])
                         if cond is True:
                             always_true = True
-                            print(ss[0], "->", cond, "is True")
+                            # print(ss[0], "->", cond, "is True")
                         if cond is False:
                             always_false = True
-                            print(ss[0], "->", cond, "is True")
+                            # print(ss[0], "->", cond, "is True")
                     except Exception as ex:
                         print(ex, ss)
                         pass
@@ -393,10 +387,10 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                 try:
                     if eval(cond) is True:
                         always_true = True
-                        print(cond, "is True")
+                        # print(cond, "is True")
                     if eval(cond) is False:
                         always_false = True
-                        print(cond, "is False")
+                        # print(cond, "is False")
                 except Exception as ex:
                     print(ex, cond)
                     pass
@@ -432,8 +426,6 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                     cfg.parent_graph.remove_node(cfg)
 
     sdfg.reset_cfg_list()
-    if verbose:
-        sdfg.save(f"test2_lvn_only_{prop_dict['lvn_only']}_istep_{prop_dict['istep']}.sdfgz", compress=True)
     sdfg.validate()
 
     # Remove all cfg nodes that are 0 == 1

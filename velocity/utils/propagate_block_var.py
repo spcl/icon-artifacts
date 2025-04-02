@@ -46,7 +46,7 @@ def propagate_block_var(sdfg: dace.SDFG):
                 blk_param_types = set()
                 for blk_param in blk_params:
                     blk_param_types.add(current_blk_symbols[blk_param])
-                print(map, blk_params, blk_param_types)
+                # print(map, blk_params, blk_param_types)
 
                 assert len(blk_param_types) <= 1, f"blk_param_types: {blk_param_types}"
 
@@ -82,8 +82,8 @@ def propagate_block_var(sdfg: dace.SDFG):
                                     code_string = code_string.replace(blk_symbol, "1")
                                 if current_blk_symbols[blk_symbol] == "CELL":
                                     code_string = code_string.replace(blk_symbol, "1")
-                    if code_string != ast.unparse(code):
-                        print(code_string, code)
+                    # if code_string != ast.unparse(code):
+                        # print(code_string, code)
                     _code = ast.parse(code_string)
                     n.code.code[i] = _code
         # Replace rest as usual
@@ -103,11 +103,10 @@ def propagate_block_var(sdfg: dace.SDFG):
                     rename_on_if(cfg, blk_symbol, "2", recursive=True)
 
 
-    print(f"Now unneeded blk symbols: {current_blk_symbols}")
+    # print(f"Now unneeded blk symbols: {current_blk_symbols}")
     for sym in current_blk_symbols:
         assert sym in sdfg.free_symbols
         sdfg.remove_symbol(sym)
-    print(sdfg.free_symbols)
+    # print(sdfg.free_symbols)
 
-    sdfg.save("prop_block_var.sdfg", compress=False)
     sdfg.validate()

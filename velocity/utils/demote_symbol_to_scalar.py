@@ -11,7 +11,7 @@ def demote_symbol_to_scalar(sdfg: dace.SDFG, symbol_str: str):
             assert len([(k, v) for k, v in e.data.assignments.items() if k == symbol_str]) <= 1
             if len([(k, v) for k, v in e.data.assignments.items() if k == symbol_str]) == 1:
                 dst, assignment = [(k, v) for k, v in e.data.assignments.items() if k == symbol_str][0]
-                print(dst, assignment, type(assignment))
+                # print(dst, assignment, type(assignment))
                 if dst == symbol_str:
                     for cfg in e.dst.all_control_flow_regions() if not isinstance(e.dst, dace.SDFGState) else [e.dst]:
                         if isinstance(cfg, dace.SDFGState):

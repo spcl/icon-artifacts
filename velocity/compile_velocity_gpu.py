@@ -75,19 +75,6 @@ for sdfg_name in sdfg_names:
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
         if verbose:
             sdfg.save("parallel.sdfgz", compress=True)
-        move_transients_to_top_level(
-            root=sdfg,
-            upper_bounds={
-                "z_w_con_c": 2, # Within cell kernel, 1 block
-                "maxvcfl_arr": 2, # Within cell kernel, 1 block
-                "cfl_clipping": 2, # Within cell kernel, 1 block
-                "z_w_concorr_mc": 2, # Within cell kernel, 1 block
-                "levmask": 2
-            },
-            verbose=verbose,
-        )
-        if verbose:
-            sdfg.save("transients_moved.sdfgz", compress=True)
 
         # Creates segfault with 2GPU applied
         """
@@ -116,7 +103,17 @@ for sdfg_name in sdfg_names:
         # This can only be safely applied to selected cases. Skip for now.
         # sdfg.apply_transformations(YoloMapFission)
         # preprocess_tough_nut(sdfg)
-
+        move_transients_to_top_level(
+            root=sdfg,
+            upper_bounds={
+                "z_w_con_c": 2,
+                "maxvcfl_arr": 2,
+                "cfl_clipping": 2,
+                "z_w_concorr_mc": 2,
+                "levmask": 2,
+            },
+        )
+        preprocess_tough_nut(sdfg)
         sdfg.validate()
 
         # Do not call mapcollapse or mapfusion with permissive=True, because collapsing
@@ -156,8 +153,8 @@ for sdfg_name in sdfg_names:
     if Path(f"gpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
-        #propagate_block_var(sdfg)
         # pre_gpu_fix(sdfg)
+        make_unique_block_var(sdfg)
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
@@ -172,11 +169,7 @@ for sdfg_name in sdfg_names:
                         n.map.schedule = dace.ScheduleType.Sequential
 
         prune_unused_inputs_outputs(sdfg)
-        sdfg.apply_transformations_repeated(StateFusion)
-        for n, g in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.NestedSDFG):
-                if isinstance(n, dace.nodes.NestedSDFG):
-                    n.sdfg.apply_transformations_repeated(StateFusion, permissive=True)
+
         InlineSDFGs().apply_pass(sdfg, {})
         k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
         if verbose:
@@ -204,13 +197,7 @@ for sdfg_name in sdfg_names:
         # I saw trurthy ifs, propagate those conditions and try to fuse states agian
         propagate_if_cond(sdfg, sdfg, None, None, verbose)
         demote_symbol_to_scalar(sdfg, "tmp_call_18")
-        sdfg.apply_transformations_repeated(StateFusion)
-        for n, g in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.NestedSDFG):
-                if isinstance(n, dace.nodes.NestedSDFG):
-                    n.sdfg.apply_transformations_repeated(StateFusion, permissive=True)
-        propagate_if_cond(sdfg, sdfg, None, None, verbose)
-        sdfg.apply_transformations_repeated(StateFusion)
+
         sdfg.validate()
 
         # Breaks the SDFG
@@ -228,9 +215,22 @@ for sdfg_name in sdfg_names:
     if Path(f"gpu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage5.sdfgz")
     else:
+        sdfg.validate()
+        prune_unused_inputs_outputs(sdfg)
+        sdfg.validate()
 
-        ToGPU().apply_pass(sdfg, {"verbose": verbose})
+        ToGPU(verbose=verbose).apply_pass(sdfg, {})
 
+        sdfg.validate()
+        prune_unused_inputs_outputs(sdfg)
+        sdfg.validate()
+        sdfg.apply_transformations_repeated(StateFusion)
+        for n, g in sdfg.all_nodes_recursive():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    n.sdfg.apply_transformations_repeated(StateFusion, permissive=True)
+        propagate_if_cond(sdfg, sdfg, None, None, verbose)
+        sdfg.apply_transformations_repeated(StateFusion)
         #if not reduction:
         #    for cfg in sdfg.nodes():
         #        if cfg.label == "FOR_l_568_c_568{sdfg.function_suffix}":
@@ -240,7 +240,7 @@ for sdfg_name in sdfg_names:
         #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
 
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
-        prune_unused_inputs_outputs(sdfg)
+        sdfg.validate()
 
         sdfg.validate()
         if use_cache:

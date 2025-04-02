@@ -63,3 +63,6 @@ def compare_got_and_want():
         print("No numerical differences found ✅")
     else:
         print("Numerical differences found ❌")
+
+if __name__ == "__main__":
+    compare_got_and_want()

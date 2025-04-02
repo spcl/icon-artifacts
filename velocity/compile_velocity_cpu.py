@@ -7,6 +7,7 @@ from dace.transformation.interstate import (
     ContinueToCondition,
     ConditionFusion,
     StateFusion,
+    ConditionNesting,
 )
 from dace.transformation.passes import InlineSDFGs, SymbolPropagation, StructToContainerGroups
 from dace.transformation.dataflow import MapCollapse, MapFusion, MapUnroll, TrivialMapElimination
@@ -40,6 +41,7 @@ for sdfg_name in sdfg_names:
         clean_bad_views(sdfg)
         sdfg.apply_transformations_repeated(ContinueToCondition)
         sdfg.simplify(verbose=verbose)
+
         SymbolPropagation().apply_pass(sdfg, {})
         sdfg.simplify(verbose=verbose)
         StructToContainerGroups(
@@ -55,15 +57,7 @@ for sdfg_name in sdfg_names:
         if reduction:
             add_all_reductions(sdfg)
         sdfg.simplify(skip=["ArrayElimination"])
-        move_transients_to_top_level(
-            root=sdfg,
-            upper_bounds={
-                "z_w_con_c": 2,
-                "maxvcfl_arr": 2,
-                "cfl_clipping": 2,
-                "z_w_concorr_mc": 2,
-            },
-        )
+
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage1.sdfgz", compress=True)
 
@@ -89,9 +83,31 @@ for sdfg_name in sdfg_names:
         # sdfg.apply_transformations(YoloMapFission)
         #untangle_if_sdfg(sdfg, verbose=verbose)
         #split_map_sdfg(sdfg, False, verbose=verbose)
+        # This needs to be done anser L2Map, and it is necessary to process the though nut
+        move_transients_to_top_level(
+            root=sdfg,
+            upper_bounds={
+                "z_w_con_c": 2,
+                "maxvcfl_arr": 2,
+                "cfl_clipping": 2,
+                "z_w_concorr_mc": 2,
+                "levmask": 2,
+            },
+        )
+        preprocess_tough_nut(sdfg)
+        # This splitting needs z_w_con_c to be moved to the
+        #move_transients_to_top_level(
+        #    root=sdfg,
+        #    upper_bounds={
+        #        "z_w_con_c": 2,
+        #    },
+        #    only=["z_w_con_c"],
+        #)
         sdfg.validate()
-
         sdfg.apply_transformations_repeated(ConditionFusion)
+
+        # This could be worth adding:
+        # sdfg.apply_transformations_repeated(ConditionNesting)
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
@@ -104,7 +120,8 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
         #propagate_block_var(sdfg) # We do not know if the map length is 1 or 2 always
-        """
+        make_unique_block_var(sdfg)
+
         sdfg.validate()
         sdfg.simplify()
         sdfg.validate()
@@ -118,7 +135,7 @@ for sdfg_name in sdfg_names:
                         TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
                         #else:
                         #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")"
-        """
+
         sdfg.validate()
         for s in sdfg.states():
             for n in s.nodes():
@@ -176,8 +193,8 @@ for sdfg_name in sdfg_names:
         #        if isinstance(n, dace.nodes.NestedSDFG):
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
+        ComputationMapNesting().apply_pass(sdfg, {})
         sdfg.simplify()
-
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
