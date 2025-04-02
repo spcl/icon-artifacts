@@ -114,6 +114,8 @@ for sdfg_name in sdfg_names:
             },
         )
         preprocess_tough_nut(sdfg)
+        prune_unused_inputs_outputs(sdfg)
+        prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
 
         # Do not call mapcollapse or mapfusion with permissive=True, because collapsing
@@ -222,6 +224,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
 
         ToGPU(verbose=verbose).apply_pass(sdfg, {})
+        #sdfg.apply_gpu_transformations()
 
         sdfg.validate()
         prune_unused_inputs_outputs(sdfg)
