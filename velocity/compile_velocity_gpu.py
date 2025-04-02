@@ -155,8 +155,10 @@ for sdfg_name in sdfg_names:
     else:
         # pre_gpu_fix(sdfg)
         make_unique_block_var(sdfg)
+        # Skip state fusion until we offload to GPU as having both GPU and CPU usage in the same state
+        # prevents GPU offloading form working
         sdfg.validate()
-        sdfg.simplify()
+        sdfg.simplify(skip=["StateFusion"])
         sdfg.validate()
 
         sdfg.validate()
@@ -186,14 +188,14 @@ for sdfg_name in sdfg_names:
         k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
-        sdfg.simplify()
+        sdfg.simplify(skip=["StateFusion"])
         prune_unused_inputs_outputs(sdfg)
         InlineSDFGs().apply_pass(sdfg, {})
         k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
 
-        sdfg.simplify()
+        sdfg.simplify(skip=["StateFusion"])
         # I saw trurthy ifs, propagate those conditions and try to fuse states agian
         propagate_if_cond(sdfg, sdfg, None, None, verbose)
         demote_symbol_to_scalar(sdfg, "tmp_call_18")
@@ -207,7 +209,7 @@ for sdfg_name in sdfg_names:
         #        if isinstance(n, dace.nodes.NestedSDFG):
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
-        sdfg.simplify()
+        sdfg.simplify(skip=["StateFusion"])
 
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage4.sdfgz", compress=True)
@@ -238,7 +240,7 @@ for sdfg_name in sdfg_names:
         #            a0 = s.add_access("gpu_vcflmax")
         #            a1 = s.add_access("vcflmax")
         #            s.add_edge(a0, None, a1, None, dace.Memlet(expr="gpu_vcflmax"))
-
+        sdfg.save("a.sdfg")
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         sdfg.validate()
 
