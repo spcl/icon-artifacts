@@ -307,7 +307,6 @@ def _demote_vcflmax(sdfg: dace.SDFG):
 def add_all_reductions(sdfg: dace.SDFG):
     # Make sure vcflmax is not a symbol
     _demote_vcflmax(sdfg)
-    sdfg.save("demoted.sdfg")
 
     # We assume the array names and iteration variable names never change
     if "nproma32" in sdfg.name:
