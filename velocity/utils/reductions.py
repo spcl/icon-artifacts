@@ -1,31 +1,109 @@
+import copy
+from typing import Dict
 import dace
+from dace.data import ListProperty
 from dace.libraries.standard import CodeLibraryNode
 from dace.properties import make_properties, Property
 from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
 from dace.sdfg.state import ControlFlowRegion, LoopRegion
 
+@dace.library.expansion
+class ExpandReductionLibNode(dace.transformation.ExpandTransformation):
+    environments = []
+    @staticmethod
+    def expansion(node: "ReductionLibNode", state: dace.SDFGState, sdfg: dace.SDFG):
+        # regardless of schedule expand the same
+        inputs, outputs = _get_inputs_and_outputs(sdfg, state, node)
+        print("AAAAAAAAAa", inputs, outputs)
+        for inp in inputs.items():
+            print(inp[0], inp[1], type(inp[0]), type(inp[1]), inp[1].storage)
+        for inp in outputs.items():
+            print(inp[0], inp[1], type(inp[0]), type(inp[1]), inp[1].storage)
+        # Generate the appropriate code
+        code = node.generate_code(inputs, outputs)
+        # Replace this node with a C++ tasklet
+        node.input_names
+        t = dace.nodes.Tasklet('custom_code', node.input_names, node.output_names, code, language=dace.dtypes.Language.CPP)
+        for inp in inputs:
+            t.add_in_connector(inp)
+        for outp in outputs:
+            t.add_out_connector(outp)
+        return t
 
-@make_properties
-class LibNode(CodeLibraryNode):
+    def __init__(self, **kwargs):
+        super().__init__()
+
+@dace.library.node
+class ReductionLibNode(dace.sdfg.nodes.LibraryNode):
     code = Property(dtype=str, default="", allow_none=False)
-
-    def __init__(self, name, input_names, output_names, code):
-        super().__init__(name=name, input_names=input_names, output_names=output_names)
+    input_names = ListProperty(element_type=str, default=[], allow_none=False)
+    output_names = ListProperty(element_type=str, default=[], allow_none=False)
+    implementations = {
+        "pure": ExpandReductionLibNode,
+        "reduce_maxZ": ExpandReductionLibNode,
+        "reduce_sum": ExpandReductionLibNode,
+        "reduce_scan": ExpandReductionLibNode,
+        "reduce_maxZ_gpu": ExpandReductionLibNode,
+        "reduce_sum_gpu": ExpandReductionLibNode,
+        "reduce_scan_gpu": ExpandReductionLibNode,
+        "reduce_maxZ_device": ExpandReductionLibNode,
+        "reduce_sum_device": ExpandReductionLibNode,
+        "reduce_scan_device": ExpandReductionLibNode,
+        "reduce_maxZ_kernel": ExpandReductionLibNode,
+        "reduce_sum_kernel": ExpandReductionLibNode,
+        "reduce_scan_kernel": ExpandReductionLibNode,
+    }
+    default_implementation = 'pure'
+    def __init__(self, name, input_names, output_names, code, schedule=dace.dtypes.ScheduleType.GPU_Device):
+        super().__init__(name=name)
         self.code = code
+        self.input_names = input_names
+        self.output_names = output_names
+        self.schedule = schedule
 
     def generate_code(self, inputs, outputs):
         if (
             inputs["in_arr"].storage == dace.StorageType.GPU_Global
             or inputs["in_size"].storage == dace.StorageType.GPU_Shared
         ):
+            defgpu = "#define __REDUCE_GPU__" #if self.schedule in dace.dtypes.GPU_SCHEDULES else ""
+            undefgpu = "#undef __REDUCE_GPU__" #if self.schedule in dace.dtypes.GPU_SCHEDULES else ""
             return f"""
-            #define __REDUCE_GPU__
+            {defgpu}
             {self.code}
-            #undef __REDUCE_GPU__
+            {undefgpu}
             """
-
         return self.code
+
+#ReductionLibNode.register_implementation('reduce_maxZ', ExpandMa)
+#ReductionLibNode.default_implementation = 'reduce_maxZ'
+
+def _dataview(data: dace.data.Data, memlet: dace.memlet.Memlet) -> dace.data.Data:
+    """ Returns a data descriptor view of a data descriptor and a memlet. """
+    result = copy.deepcopy(data)
+    result.shape = memlet.subset.size()
+    return result
+
+def _get_inputs_and_outputs(sdfg: dace.SDFG, state: dace.SDFGState, node: dace.nodes.Node) -> dace.Tuple[Dict[str, dace.data.Data], Dict[str, dace.data.Data]]:
+    """ Returns two dictionaries that map from input/output connectors to data 
+        descriptors. 
+        
+        :return: Tuple of (input memlet mapping, output memlet mapping).
+    """
+    inputs: Dict[str, dace.data.Data] = {}
+    for edge in state.in_edges(node):
+        if edge.data.data is None:
+            continue # Skip dependency edges
+        inputs[edge.dst_conn] = _dataview(sdfg.arrays[edge.data.data], edge.data)
+
+    outputs: Dict[str, dace.data.Data] = {}
+    for edge in state.out_edges(node):
+        if edge.data.data is None:
+            continue # Skip dependency edges
+        outputs[edge.src_conn] = _dataview(sdfg.arrays[edge.data.data], edge.data)
+
+    return inputs, outputs
 
 
 def _insert_reduction(
@@ -42,20 +120,23 @@ def _insert_reduction(
     Adds a reduction node to the state after the given state.
     """
     red_state = parent.add_state_after(state)
-    red_lib_node = LibNode(
+    red_lib_node = ReductionLibNode(
         name=f"reduce_{type}",
         input_names=["in_arr", "in_size"],
         output_names=["out"],
         code=f"""
         #ifdef __REDUCE_DEVICE__
-          out = reduce_{type}_device(in_arr, in_size);
+        out = reduce_{type}_device(in_arr, in_size);
         #elif defined(__REDUCE_GPU__)
-          out = reduce_{type}_gpu(in_arr, in_size);
+        out = reduce_{type}_gpu(in_arr, in_size);
         #else
-          out = reduce_{type}_cpu(in_arr, in_size);
+        out = reduce_{type}_cpu(in_arr, in_size);
         #endif
         """,
     )
+    red_lib_node.add_in_connector("in_arr")
+    red_lib_node.add_in_connector("in_size")
+    red_lib_node.add_out_connector("out")
     in_expr = in_expr if in_expr is not None else in_name
     in_access = None
     if in_name in parent.sdfg.arrays:
