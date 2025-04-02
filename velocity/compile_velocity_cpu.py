@@ -113,6 +113,9 @@ for sdfg_name in sdfg_names:
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
+    # Ensure no symbols are captured
+    count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
+
     # Turn all maps to CPU_Multicore
     for node, state in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.MapEntry):
