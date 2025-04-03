@@ -130,6 +130,7 @@ def compile_if_propagated_sdfgs(
     sources.add("src/timer.cpp")
     if gpu:
         sources.add("src/reductions_kernel.cu")
+
     headers = set()
     headers.add("-Iinclude")
     from dace.codegen import codegen, compiler
@@ -178,6 +179,7 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
                     + main_cu_code
                 )
+            sources.add("{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "w") as file:
@@ -185,6 +187,7 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n#include "timer.h"\n'
                     + main_cu_code
                 )
+            sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
         else:
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "r") as file:
                 main_cu_code = file.read()
@@ -222,5 +225,9 @@ def compile_if_propagated_sdfgs(
 
     # check if compilation was successful
     if exit_code != 0:
+        if gpu:
+            print(f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu")
+        else:
+            print(f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu")
         print("Compilation failed")
         exit(1)
