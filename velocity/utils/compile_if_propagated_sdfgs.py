@@ -69,14 +69,14 @@ def _insert_measure_time(filename, path, hash):
     with open(filename, 'w') as f:
         f.writelines(new_lines)
 
-def fix_out_val_0_call(filepath):
+def fix_out_val_0_call(filepath, pattern):
     with open(filepath, 'r') as file:
         lines = file.readlines()
-
+    replacement = pattern.replace("out_val_0", "out_val_0[_for_it_35]")
     with open(filepath, 'w') as file:
         for line in lines:
-            if "out_val_0, &cfl_clipping" in line:
-                line = line.replace("out_val_0, &cfl_clipping", "out_val_0[_for_it_35], &cfl_clipping")
+            if pattern in line:
+                line = line.replace(pattern, replacement)
             file.write(line)
             
 def _process_folder(directory, sdfg: dace.SDFG, instrument: bool = False):
@@ -128,10 +128,15 @@ def compile_if_propagated_sdfgs(sdfgs: typing.List[dace.SDFG], gpu: bool = False
 
             modify_files_in_directory(build_loc)
             insert_measure_time_calls(build_loc, sdfg, instrument)
-            fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp")
+            # fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
+            # fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &maxvcfl_arr")
+            # fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
+            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &cfl_clipping")
+            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &z_w_con_c")
+            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &maxvcfl_arr")
             sources.add(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu")
         else:
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
