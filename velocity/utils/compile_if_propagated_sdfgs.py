@@ -179,7 +179,7 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
                     + main_cu_code
                 )
-            sources.add("{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+            sources.add(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "w") as file:
