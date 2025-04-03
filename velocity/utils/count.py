@@ -14,7 +14,7 @@ def count_loops(sdfg: dace.SDFG, verbose: bool = False, use_assert: bool = False
     if verbose:
         print(f"Loops remaining: {loops_post}")
 
-    if use_assert:
+    if use_assert and loops_post > 0:
         import warnings
         warnings.warn(f"Loops remaining: {loops_post}")
 
@@ -104,7 +104,7 @@ def count_symbols_use_defs(
     if verbose:
         print(f"Symbols defined in nested SDFGs and used outside: {count}")
 
-    if use_assert:
+    if use_assert and count > 0:
         import warnings
         warnings.warn(
             f"Symbols defined in nested SDFGs and used outside: {count}"
