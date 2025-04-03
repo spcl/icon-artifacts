@@ -1,101 +1,8 @@
-import copy
-from typing import Dict
 import dace
-from dace.data import ListProperty
-from dace.libraries.standard import CodeLibraryNode, Reduce
-from dace.properties import make_properties, Property
+from dace.libraries import standard
 from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
-from dace.sdfg.state import ControlFlowRegion, LoopRegion
-
-@dace.library.expansion
-class ExpandReductionLibNode(dace.transformation.ExpandTransformation):
-    environments = []
-    @staticmethod
-    def expansion(node: "ReductionLibNode", state: dace.SDFGState, sdfg: dace.SDFG):
-        # regardless of schedule expand the same
-        inputs, outputs = _get_inputs_and_outputs(sdfg, state, node)
-        #for inp in inputs.items():
-        #    print(inp[0], inp[1], inp[1].storage)
-        #for outp in outputs.items():
-        #    print(outp[0], outp[1], outp[1].storage)
-        # Generate the appropriate code
-        code = node.generate_code(inputs, outputs)
-        # Replace this node with a C++ tasklet
-        node.schedule = dace.dtypes.ScheduleType.GPU_Device
-        t = dace.nodes.Tasklet('custom_code', node.input_names, node.output_names, code, language=dace.dtypes.Language.CPP,
-                               )
-        for inp in inputs:
-            t.add_in_connector(inp)
-        for outp in outputs:
-            t.add_out_connector(outp)
-        return t
-
-    def __init__(self, **kwargs):
-        super().__init__()
-
-@dace.library.node
-class ReductionLibNode(dace.sdfg.nodes.LibraryNode):
-    code = Property(dtype=str, default="", allow_none=False)
-    input_names = ListProperty(element_type=str, default=[], allow_none=False)
-    output_names = ListProperty(element_type=str, default=[], allow_none=False)
-    implementations = {
-        "pure": ExpandReductionLibNode,
-        "reduce_maxZ": ExpandReductionLibNode,
-        "reduce_max": ExpandReductionLibNode,
-        "reduce_sum": ExpandReductionLibNode,
-        "reduce_scan": ExpandReductionLibNode,
-        "reduce_maxZ_gpu": ExpandReductionLibNode,
-        "reduce_sum_gpu": ExpandReductionLibNode,
-        "reduce_scan_gpu": ExpandReductionLibNode,
-        "reduce_maxZ_device": ExpandReductionLibNode,
-        "reduce_sum_device": ExpandReductionLibNode,
-        "reduce_scan_device": ExpandReductionLibNode,
-        "reduce_maxZ_kernel": ExpandReductionLibNode,
-        "reduce_sum_kernel": ExpandReductionLibNode,
-        "reduce_scan_kernel": ExpandReductionLibNode,
-    }
-    default_implementation = 'reduce_max'
-    def __init__(self, name, input_names, output_names, code, schedule=dace.dtypes.ScheduleType.GPU_Device):
-        super().__init__(name=name)
-        self.code = code
-        self.input_names = input_names
-        self.output_names = output_names
-        self.schedule = schedule
-
-    def generate_code(self, inputs, outputs):
-        if (
-            inputs["in_arr"].storage == dace.StorageType.GPU_Global
-        ):
-            defgpu = "#define __REDUCE_GPU__" #if self.schedule in dace.dtypes.GPU_SCHEDULES else ""
-            undefgpu = "#undef __REDUCE_GPU__" #if self.schedule in dace.dtypes.GPU_SCHEDULES else ""
-            return f"""
-            {defgpu}
-            {self.code}
-            {undefgpu}
-            """
-        return self.code
-
-
-def _get_inputs_and_outputs(sdfg: dace.SDFG, state: dace.SDFGState, node: dace.nodes.Node) -> dace.Tuple[Dict[str, dace.data.Data], Dict[str, dace.data.Data]]:
-    """ Returns two dictionaries that map from input/output connectors to data 
-        descriptors. 
-        
-        :return: Tuple of (input memlet mapping, output memlet mapping).
-    """
-    inputs: Dict[str, dace.data.Data] = {}
-    for edge in state.in_edges(node):
-        if edge.data.data is None:
-            continue # Skip dependency edges
-        inputs[edge.dst_conn] = sdfg.arrays[edge.data.data]
-
-    outputs: Dict[str, dace.data.Data] = {}
-    for edge in state.out_edges(node):
-        if edge.data.data is None:
-            continue # Skip dependency edges
-        outputs[edge.src_conn] = sdfg.arrays[edge.data.data]
-
-    return inputs, outputs
+from dace.sdfg.state import ControlFlowRegion
 
 
 def _insert_reduction(
@@ -112,24 +19,19 @@ def _insert_reduction(
     Adds a reduction node to the state after the given state.
     """
     red_state = parent.add_state_after(state)
-    red_lib_node = ReductionLibNode(
-        name=f"reduce_{type}",
-        input_names=["in_arr", "in_size"],
-        output_names=["out"],
-        code=f"""
-        #ifdef __REDUCE_DEVICE__
-        out = reduce_{type}_device(in_arr, in_size);
-        #elif defined(__REDUCE_GPU__)
-        out = reduce_{type}_gpu(in_arr, in_size);
-        #else
-        out = reduce_{type}_cpu(in_arr, in_size);
-        #endif
-        """,
-    )
-    red_lib_node.implementation = f"reduce_{type}"
-    red_lib_node.add_in_connector("in_arr")
-    red_lib_node.add_in_connector("in_size")
-    red_lib_node.add_out_connector("out")
+
+    # Choose the library node
+    name = f"reduce_{type}"
+    if type == "sum":
+        red_node = standard.Reduce(name, wcr="lambda a, b : a + b", identity=0)
+    elif type == "maxZ":
+        red_node = standard.Reduce(name, wcr="lambda a, b : max(a, b)", identity=0)
+    elif type == "scan":
+        red_node = standard.Reduce(name, wcr="lambda a, b : a or b", identity=False)
+    else:
+        raise ValueError(f"Unknown reduction type: {type}")
+
+    # Route array
     in_expr = in_expr if in_expr is not None else in_name
     in_access = None
     if in_name in parent.sdfg.arrays:
@@ -139,7 +41,7 @@ def _insert_reduction(
             f"read_{in_name}", {}, {"out"}, f"out = {in_name}"
         )
         in_sym = parent.sdfg.symbols[in_name]
-        in_access_name, _ = red_state.sdfg.add_scalar(
+        in_access_name, in_arr = red_state.sdfg.add_scalar(
             f"reduce_{type}_in",
             dtype=in_sym.dtype,
             transient=True,
@@ -148,27 +50,32 @@ def _insert_reduction(
         in_access = red_state.add_read(in_access_name)
         in_expr = in_access_name if in_expr is in_name else in_expr
         red_state.add_edge(
-            in_access_task, "out", in_access, None, dace.Memlet(in_access_name)
+            in_access_task,
+            "out",
+            in_access,
+            None,
+            dace.Memlet.from_array(in_access_name, in_arr),
         )
+    red_state.add_nedge(in_access, red_node, dace.Memlet(in_expr))
 
-    red_state.add_edge(in_access, None, red_lib_node, "in_arr", dace.Memlet(in_expr))
+    # # Route size
+    # size_task = red_state.add_tasklet(
+    #     f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}"
+    # )
+    # size_name, _ = red_state.sdfg.add_scalar(
+    #     f"reduce_{type}_size",
+    #     dtype=dace.int32,
+    #     transient=True,
+    #     find_new_name=True,
+    # )
+    # size_access = red_state.add_access(size_name)
 
-    size_task = red_state.add_tasklet(
-        f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}"
-    )
-    size_name, _ = red_state.sdfg.add_scalar(
-        f"reduce_{type}_size",
-        dtype=dace.int32,
-        transient=True,
-        find_new_name=True,
-    )
-    size_access = red_state.add_access(size_name)
+    # red_state.add_edge(size_task, "size", size_access, None, dace.Memlet(size_name))
+    # red_state.add_edge(
+    #     size_access, None, red_lib_node, "in_size", dace.Memlet(size_name)
+    # )
 
-    red_state.add_edge(size_task, "size", size_access, None, dace.Memlet(size_name))
-    red_state.add_edge(
-        size_access, None, red_lib_node, "in_size", dace.Memlet(size_name)
-    )
-
+    # Route output
     if out_expr is None:
         arr_name, arr = red_state.sdfg.add_scalar(
             "out_val",
@@ -176,21 +83,15 @@ def _insert_reduction(
             transient=True,
             find_new_name=True,
         )
-        red_state.add_edge(
-            red_lib_node,
-            "out",
+        red_state.add_nedge(
+            red_node,
             red_state.add_write(arr_name),
-            None,
-            dace.Memlet(arr_name),
+            dace.Memlet.from_array(arr_name, arr),
         )
         parent.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
     else:
-        red_state.add_edge(
-            red_lib_node,
-            "out",
-            red_state.add_write(out_name),
-            None,
-            dace.Memlet(out_expr),
+        red_state.add_nedge(
+            red_node, red_state.add_write(out_name), dace.Memlet(out_expr)
         )
 
     return red_state
