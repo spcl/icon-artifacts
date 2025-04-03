@@ -5,6 +5,7 @@ from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
 from dace.sdfg.state import ControlFlowRegion, LoopRegion
 
+
 @make_properties
 class LibNode(CodeLibraryNode):
     code = Property(dtype=str, default="", allow_none=False)
@@ -83,7 +84,7 @@ def _insert_reduction(
             None,
             dace.Memlet.from_array(in_access_name, in_arr),
         )
-    red_state.add_nedge(in_access, red_node, dace.Memlet(in_expr))
+    red_state.add_edge(in_access, None, red_node, "in_arr", dace.Memlet(in_expr))
 
     # Route size
     size_task = red_state.add_tasklet(
@@ -98,9 +99,7 @@ def _insert_reduction(
     size_access = red_state.add_access(size_name)
 
     red_state.add_edge(size_task, "size", size_access, None, dace.Memlet(size_name))
-    red_state.add_edge(
-        size_access, None, red_node, "in_size", dace.Memlet(size_name)
-    )
+    red_state.add_edge(size_access, None, red_node, "in_size", dace.Memlet(size_name))
 
     # Route output
     if out_expr is None:
@@ -110,15 +109,17 @@ def _insert_reduction(
             transient=True,
             find_new_name=True,
         )
-        red_state.add_nedge(
+        red_state.add_edge(
             red_node,
+            "out",
             red_state.add_write(arr_name),
+            None,
             dace.Memlet.from_array(arr_name, arr),
         )
         parent.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
     else:
-        red_state.add_nedge(
-            red_node, red_state.add_write(out_name), dace.Memlet(out_expr)
+        red_state.add_edge(
+            red_node, "out", red_state.add_write(out_name), None, dace.Memlet(out_expr)
         )
 
     return red_state
