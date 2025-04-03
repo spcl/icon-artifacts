@@ -5,6 +5,7 @@ from pathlib import Path
 import typing
 import re
 
+from dace.sdfg import infer_types
 
 # Replace cpp with cu
 def _replace_cpp_with_cu(directory):
@@ -88,7 +89,6 @@ def fix_out_val_0_call(filepath):
                 )
             file.write(line)
 
-
 def _process_folder(directory, sdfg: dace.SDFG, instrument: bool = False):
     for root, _, files in os.walk(directory):
         for file in files:
@@ -139,7 +139,19 @@ def compile_if_propagated_sdfgs(
             try:
                 # Fill in scope entry/exit connectors
                 sdfg.fill_scope_connectors()
+                infer_types.infer_connector_types(sdfg)
+
+                # Set default storage/schedule types in SDFG
+                infer_types.set_default_schedule_and_storage_types(sdfg, None)
+
+                # Recursively expand library nodes that have not yet been expanded
+                sdfg.expand_library_nodes()
+
+                # After expansion, run another pass of connector/type inference
+                infer_types.infer_connector_types(sdfg)
+                infer_types.set_default_schedule_and_storage_types(sdfg, None)
                 sdfg.validate()
+                sdfg.save(sdfg.name + "_concretized.sdfgz", compress=True)
 
                 # Generate code for the program by traversing the SDFG state by state
                 program_objects = codegen.generate_code(sdfg, validate=True)
