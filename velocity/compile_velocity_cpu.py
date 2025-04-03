@@ -50,6 +50,7 @@ for sdfg_name in sdfg_names:
             simplify=False,
             interface_with_struct_copy=True,
             interface_to_gpu=False,
+            clean_trivial_views=True,
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"], verbose=verbose)
         apply_loop_locality_pass(sdfg)
@@ -125,23 +126,10 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
         #propagate_block_var(sdfg) # We do not know if the map length is 1 or 2 always
-        make_unique_block_var(sdfg)
-
+        # make_unique_block_var(sdfg)
         sdfg.validate()
         sdfg.simplify()
-        sdfg.validate()
-        for s in sdfg.states():
-            for n in s.nodes():
-                if isinstance(n, dace.nodes.MapEntry):
-                    if (n.map.range == dace.subsets.Range([[1, 1, 1]]) or
-                        n.map.range == dace.subsets.Range([[0, 0, 1]])):
-                        #return self._subgraph_user fails checking can be applied??
-                        #if TrivialMapElimination().can_be_applied(s, s.node_id(n), sdfg):
-                        TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
-                        #else:
-                        #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")"
 
-        sdfg.validate()
         for s in sdfg.states():
             for n in s.nodes():
                 if isinstance(n, dace.nodes.MapEntry):
@@ -150,6 +138,7 @@ for sdfg_name in sdfg_names:
                     n.map.unroll_factor = 4
 
         prune_unused_inputs_outputs(sdfg)
+
         sdfg.apply_transformations_repeated(StateFusion)
         for n, g in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.NestedSDFG):

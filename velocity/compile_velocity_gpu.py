@@ -56,6 +56,7 @@ for sdfg_name in sdfg_names:
             simplify=False,
             interface_with_struct_copy=True,
             interface_to_gpu=True,
+            clean_trivial_views=True,
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
         apply_loop_locality_pass(sdfg)
@@ -156,7 +157,7 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
         # pre_gpu_fix(sdfg)
-        make_unique_block_var(sdfg)
+        # make_unique_block_var(sdfg)
         # Skip state fusion until we offload to GPU as having both GPU and CPU usage in the same state
         # prevents GPU offloading form working
         sdfg.validate()
