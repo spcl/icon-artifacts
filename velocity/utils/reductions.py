@@ -85,22 +85,22 @@ def _insert_reduction(
         )
     red_state.add_nedge(in_access, red_node, dace.Memlet(in_expr))
 
-    # # Route size
-    # size_task = red_state.add_tasklet(
-    #     f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}"
-    # )
-    # size_name, _ = red_state.sdfg.add_scalar(
-    #     f"reduce_{type}_size",
-    #     dtype=dace.int32,
-    #     transient=True,
-    #     find_new_name=True,
-    # )
-    # size_access = red_state.add_access(size_name)
+    # Route size
+    size_task = red_state.add_tasklet(
+        f"size_reduce_{type}", {}, {"size"}, f"size = {in_size}"
+    )
+    size_name, _ = red_state.sdfg.add_scalar(
+        f"reduce_{type}_size",
+        dtype=dace.int32,
+        transient=True,
+        find_new_name=True,
+    )
+    size_access = red_state.add_access(size_name)
 
-    # red_state.add_edge(size_task, "size", size_access, None, dace.Memlet(size_name))
-    # red_state.add_edge(
-    #     size_access, None, red_lib_node, "in_size", dace.Memlet(size_name)
-    # )
+    red_state.add_edge(size_task, "size", size_access, None, dace.Memlet(size_name))
+    red_state.add_edge(
+        size_access, None, red_node, "in_size", dace.Memlet(size_name)
+    )
 
     # Route output
     if out_expr is None:
