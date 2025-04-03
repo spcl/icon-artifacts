@@ -4,6 +4,7 @@
 #include <csignal>
 #include <dace/dace.h>
 #include <iostream>
+#include <iomanip>
 
 struct tomcst {
   // A1.0 Fundamental constants
@@ -1051,9 +1052,33 @@ void __program_cloudsc_driver_internal(
   double _if_cond_1_0;
   int _for_it_12_0;
 
+    sym_klev_0 = nlev;
+    sym_klon_0 = nproma;
+
   for (_for_it_129 = 1; (_for_it_129 <= ngptot);
        _for_it_129 = (_for_it_129 + nproma)) {
 
+  {
+    zdqs_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    ztold_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zqold_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zldifdt_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zlcust_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zmf_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zmin_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    llindex1_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
+    llindex3_0 = new int DACE_ALIGN(64)[(25 * sym_klon_0)];
+    iorder_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zqxn_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zqxnm1_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zfluxq_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zmeltmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zfrzmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zqlhs_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
+    zsinksum_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zraincld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsnowcld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+  }
     ibl = (((_for_it_129 - 1) / nproma) + 1);
     tmp_arg_75 = ((ngptot - _for_it_129) + 1);
 
@@ -1126,8 +1151,6 @@ void __program_cloudsc_driver_internal(
         }
       }
     }
-    sym_klev_0 = nlev;
-    sym_klon_0 = nproma;
     {
 
         {double zepsilon_out;
@@ -5138,27 +5161,6 @@ for (_for_it_23_0 = *v_ydecldp_var_49_ncldtop; (_for_it_23_0 <= nlev);
         }
       }
     }
-  }
-  {
-    zdqs_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    ztold_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zqold_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zldifdt_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zlcust_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-    zmf_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zmin_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    llindex1_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
-    llindex3_0 = new int DACE_ALIGN(64)[(25 * sym_klon_0)];
-    iorder_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
-    zqxn_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-    zqxnm1_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-    zfluxq_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-    zmeltmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zfrzmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zqlhs_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
-    zsinksum_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-    zraincld_0 = new double DACE_ALIGN(64)[sym_klon_0];
-    zsnowcld_0 = new double DACE_ALIGN(64)[sym_klon_0];
   }
   _if_cond_19_0 = (_for_it_23_0 > v_ydecldp_var_49_ncldtop[0]);
   if ((_if_cond_19_0 == 1)) {
