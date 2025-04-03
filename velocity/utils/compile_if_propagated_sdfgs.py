@@ -128,6 +128,8 @@ def compile_if_propagated_sdfgs(
     sources = set()
     sources.add("src/reductions.cpp")
     sources.add("src/timer.cpp")
+    if gpu:
+        sources.add("src/reductions_kernel.cu")
     headers = set()
     headers.add("-Iinclude")
     from dace.codegen import codegen, compiler
@@ -183,8 +185,6 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n#include "timer.h"\n'
                     + main_cu_code
                 )
-            sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
-            sources.add(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu")
         else:
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "r") as file:
                 main_cu_code = file.read()
