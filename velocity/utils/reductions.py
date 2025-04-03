@@ -2,7 +2,7 @@ import dace
 from dace.libraries import standard
 from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
-from dace.sdfg.state import ControlFlowRegion
+from dace.sdfg.state import ControlFlowRegion, LoopRegion
 
 
 def _insert_reduction(
@@ -110,12 +110,17 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
             vcfl_name = name
             break
     assert vcfl_name is not None, "vcflmax not found"
+
+    var_name = list(
+        loop_node.nodes()[0].branches[0][0].get_free_symbols() - loop_node.free_symbols
+    )
+    assert len(var_name) == 1
     _insert_reduction(
         sdfg,
         loop_node,
         vcfl_name,
         f"{end} - {start}",
-        "tmp_call_18",
+        f"{var_name[0]}",
         "maxZ",
         in_expr=f"{vcfl_name}[0]",
     )
@@ -124,7 +129,9 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     sdfg.remove_node(loop_node)
     sdfg.add_edge(pre_state, post_state, dace.InterstateEdge())
     task, _ = find_node_by_name(sdfg, task_name)
-    task.code.as_string = "max_vcfl_dyn_var_94_out = tmp_call_18"
+    in_name = list(task.free_symbols)[0]
+    out_name = list(task.out_connectors.keys())[0]
+    task.code.as_string = f"{out_name} = {in_name}"
 
 
 def cfl_clipping_to_reduction(
@@ -142,6 +149,10 @@ def cfl_clipping_to_reduction(
     del parent.in_edges(loop)[0].data.assignments["clip_count"]
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
+
+    outer_loop = parent
+    outer_it_var = outer_loop.loop_variable
+
     _insert_reduction(
         parent,
         loop,
@@ -149,7 +160,7 @@ def cfl_clipping_to_reduction(
         f"{tmp_name}",
         "clip_count",
         "sum",
-        in_expr=f"cfl_clipping[{start}-1:{end}-1,_for_it_35-1]",
+        in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
     )
 
 
@@ -173,17 +184,23 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name, tmp_name):
         transient=True,
     )
     arr_acc = parent.add_write(arr_name)
+    loop, loop_P = find_node_by_name(sdfg, loop_name)
+
+    inner_loop = parent.parent_graph.parent_graph.parent_graph
+    assert isinstance(inner_loop, LoopRegion)
+    il_it_name = inner_loop.loop_variable
+    ol_it_name = loop.loop_variable
+
     parent.add_edge(
         task,
         "maxvcfl_out",
         arr_acc,
         None,
-        dace.Memlet(f"{arr_name}[_for_it_37-1,_for_it_35-1]"),
+        dace.Memlet(f"{arr_name}[{il_it_name}-1,{ol_it_name}-1]"),
     )
 
-    loop, parent = find_node_by_name(sdfg, loop_name)
     _insert_reduction(
-        parent,
+        loop_P,
         loop,
         "maxvcfl_arr",
         f"{tmp_name}*91",
@@ -200,6 +217,10 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     loop, parent = find_node_by_name(sdfg, loop_name)
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
+
+    outer_loop = parent
+    outer_it_var = outer_loop.loop_variable
+
     _insert_reduction(
         parent,
         loop,
@@ -207,8 +228,8 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         f"{end} - {start}",
         "levelmask",
         "scan",
-        in_expr=f"levmask[{start}-1:{end}-1,_for_it_46-1]",
-        out_expr="levelmask[_for_it_46-1]",
+        in_expr=f"levmask[{start}-1:{end}-1,{outer_it_var}-1]",
+        out_expr=f"levelmask[{outer_it_var}-1]",
     )
     pre_state = parent.add_state_before(loop)
     post_state = parent.add_state_after(loop)
@@ -227,6 +248,15 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     prestate = parent.add_state_before(loop)
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
+
+    outer_loop = parent.parent_graph.parent_graph
+    assert isinstance(outer_loop, LoopRegion)
+    outer_it_var = outer_loop.loop_variable
+
+    outer_outer_loop = outer_loop.parent_graph
+    assert isinstance(outer_outer_loop, LoopRegion)
+    outer_outer_it_var = outer_outer_loop.loop_variable
+
     _insert_reduction(
         parent,
         prestate,
@@ -234,8 +264,8 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         f"{end} - {start}",
         "levmask",
         "scan",
-        in_expr=f"cfl_clipping[{start}-1:{end}-1,_for_it_35-1]",
-        out_expr="levmask[_for_it_22-1,_for_it_35-1]",
+        in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
+        out_expr=f"levmask[{outer_outer_it_var}-1,{outer_it_var}-1]",
     )
     task, parent = find_node_by_name(sdfg, task_name)
     parent.remove_node(parent.successors(task)[0])
