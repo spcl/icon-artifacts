@@ -5321,7 +5321,13 @@ void __program_cloudsc_driver_internal(
   int _for_it_11_0;
   double _if_cond_1_0;
   int _for_it_12_0;
+  double *zgdp_0;
+  double *zdqsicedt_0;
+  double *zcorqsmix_0;
+  double *zsnowrime_0;
 
+  sym_klev_0 = nlev;
+  sym_klon_0 = nproma;
   iphase_0 = new int DACE_ALIGN(64)[5];
   imelt_0 = new int DACE_ALIGN(64)[5];
   llfall_0 = new int DACE_ALIGN(64)[5];
@@ -5475,8 +5481,6 @@ void __program_cloudsc_driver_internal(
         }
       }
     }
-    sym_klev_0 = nlev;
-    sym_klon_0 = nproma;
     {
 
       {
@@ -7528,7 +7532,6 @@ void __program_cloudsc_driver_internal(
       for (_for_it_26_0 = 1; (_for_it_26_0 <= icend);
            _for_it_26_0 = (_for_it_26_0 + 1)) {
         {
-          double *zgdp_0;
           double *paph_var_18_0;
           paph_var_18_0 =
               &paph[((__f2dace_A_paph_d_0_s_62 * __f2dace_A_paph_d_1_s_63) *
@@ -7681,7 +7684,6 @@ void __program_cloudsc_driver_internal(
           v_ydthf_var_48_r4ies = (double *)(&((*ydthf_var_48_0)->r4ies));
           double *v_ydthf_var_48_r5ies;
           v_ydthf_var_48_r5ies = (double *)(&((*ydthf_var_48_0)->r5ies));
-          double *zdqsicedt_0;
           double tmp_call_12_0;
           double tmp_arg_4_0;
 
@@ -7901,7 +7903,6 @@ void __program_cloudsc_driver_internal(
           }
         }
         {
-          double *zcorqsmix_0;
           double tmp_call_13_0;
           double tmp_call_14_0;
           double tmp_call_17_0;
@@ -14023,7 +14024,6 @@ void __program_cloudsc_driver_internal(
               double *v_ydecldp_var_49_rcl_const7s;
               v_ydecldp_var_49_rcl_const7s =
                   (double *)(&((*ydecldp_var_49_0)->rcl_const7s));
-              double *zsnowrime_0;
               double tmp_call_68_0;
               double tmp_call_69_0;
               double tmp_arg_41_0;
