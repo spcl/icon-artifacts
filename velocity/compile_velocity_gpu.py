@@ -71,6 +71,8 @@ for sdfg_name in sdfg_names:
     else:
         # XXX: Permissive will ignore any read/write conflicts.
         sdfg.apply_transformations_repeated(LoopToMap, permissive=True)
+        # Ensure no symbols are captured by LoopToMap
+        count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
         sdfg.apply_transformations_repeated(MapCollapse)
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
@@ -96,7 +98,8 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
     # Shouldn't have any loops left
-    #count_loops(sdfg, verbose=verbose, assert_loops=True)
+    count_loops(sdfg, verbose=verbose, use_assert=True)
+
     if Path(f"gpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
     else:
@@ -153,9 +156,13 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"gpu_{sdfg_name}_stage3.sdfgz", compress=True)
     # Currently makes the SDFG invalid, thrust error illegal address
 
+    # Ensure no symbols are captured
+    count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
+
     if Path(f"gpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
+        merge_maps_in_sdfg(sdfg)
         # pre_gpu_fix(sdfg)
         # make_unique_block_var(sdfg)
         # Skip state fusion until we offload to GPU as having both GPU and CPU usage in the same state

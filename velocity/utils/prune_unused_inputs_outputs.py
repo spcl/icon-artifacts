@@ -158,8 +158,8 @@ def prune_unused_inputs_outputs_recursive(sdfg: dace.SDFG):
                                 used_outputs.add(name)
                         unused_inputs = all_inputs - used_inputs
                         unused_outputs = all_outputs - used_outputs
-                        print("4", unused_inputs, unused_outputs)
-                        print("5", used_inputs, used_outputs)
+                        # print("4", unused_inputs, unused_outputs)
+                        # print("5", used_inputs, used_outputs)
 
                         for unused_input in unused_inputs:
                             for ie in node.in_edges(nsdfg):
