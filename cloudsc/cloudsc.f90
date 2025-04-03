@@ -110,7 +110,7 @@ END MODULE yomphyder
 MODULE cloudsc_driver_mod
   IMPLICIT NONE
   CONTAINS
-  SUBROUTINE cloudsc_driver(numomp, nproma, nlev, ngptot, ngptotg, kfldx, ptsphy, pt, pq, tendency_cml, tendency_tmp, tendency_loc, pvfa, pvfl, pvfi, pdyna, pdynl, pdyni, phrsw, phrlw, pvervel, pap, paph, plsm, ldcum, ktype, plu, plude, psnde, pmfu, pmfd, pa, pclv, psupsat, plcrit_aer, picrit_aer, pre_ice, pccn, pnice, pcovptot, prainfrac_toprfz, pfsqlf, pfsqif, pfcqnng, pfcqlng, pfsqrf, pfsqsf, pfcqrng, pfcqsng, pfsqltur, pfsqitur, pfplsl, pfplsn, pfhpsl, pfhpsn, ydomcst, ydoethf, ydecldp)
+  SUBROUTINE cloudsc_driver(numomp, nproma, nlev, ngptot, ngptotg, kfldx, ptsphy, pt, pq, tendency_tmp_t, tendency_tmp_q, tendency_tmp_a, tendency_tmp_cld, tendency_loc_t, tendency_loc_q, tendency_loc_a, tendency_loc_cld, pvfa, pvfl, pvfi, pdyna, pdynl, pdyni, phrsw, phrlw, pvervel, pap, paph, plsm, ldcum, ktype, plu, plude, psnde, pmfu, pmfd, pa, pclv, psupsat, plcrit_aer, picrit_aer, pre_ice, pccn, pnice, pcovptot, prainfrac_toprfz, pfsqlf, pfsqif, pfcqnng, pfcqlng, pfsqrf, pfsqsf, pfcqrng, pfcqsng, pfsqltur, pfsqitur, pfplsl, pfplsn, pfhpsl, pfhpsn, ydomcst, ydoethf, ydecldp)
     USE yomphyder, ONLY: state_type
     USE yomcst, ONLY: tomcst
     USE yoethf, ONLY: toethf
@@ -120,9 +120,11 @@ MODULE cloudsc_driver_mod
     REAL(KIND = 8), INTENT(IN) :: ptsphy
     REAL(KIND = 8), INTENT(IN) :: pt(:, :, :)
     REAL(KIND = 8), INTENT(IN) :: pq(:, :, :)
-    TYPE(state_type), INTENT(IN) :: tendency_cml(:)
-    TYPE(state_type), INTENT(IN) :: tendency_tmp(:)
-    TYPE(state_type), INTENT(OUT) :: tendency_loc(:)
+    ! TYPE(state_type), INTENT(IN) :: tendency_cml(:)
+    REAL(KIND = 8), DIMENSION(:, :, :), INTENT(IN) :: tendency_tmp_t, tendency_tmp_q, tendency_tmp_a
+    REAL(KIND = 8), DIMENSION(:, :, :, :), INTENT(IN) :: tendency_tmp_cld
+    REAL(KIND = 8), DIMENSION(:, :, :), INTENT(OUT) :: tendency_loc_t, tendency_loc_q, tendency_loc_a
+    REAL(KIND = 8), DIMENSION(:, :, :, :), INTENT(OUT) :: tendency_loc_cld
     REAL(KIND = 8), INTENT(IN) :: pvfa(:, :, :)
     REAL(KIND = 8), INTENT(IN) :: pvfl(:, :, :)
     REAL(KIND = 8), INTENT(IN) :: pvfi(:, :, :)
@@ -174,8 +176,8 @@ MODULE cloudsc_driver_mod
       ibl = (jkglo - 1) / nproma + 1
       icend = MIN(nproma, ngptot - jkglo + 1)
       pcovptot(:, :, ibl) = 0.0D0
-      tendency_loc(ibl) % cld(:, :, 5) = 0.0D0
-      CALL cloudsc(1, icend, nproma, nlev, ptsphy, pt(:, :, ibl), pq(:, :, ibl), tendency_tmp(ibl) % t, tendency_tmp(ibl) % q, tendency_tmp(ibl) % a, tendency_tmp(ibl) % cld, tendency_loc(ibl) % t, tendency_loc(ibl) % q, tendency_loc(ibl) % a, tendency_loc(ibl) % cld, pvfa(:, :, ibl), pvfl(:, :, ibl), pvfi(:, :, ibl), pdyna(:, :, ibl), pdynl(:, :, ibl), pdyni(:, :, ibl), phrsw(:, :, ibl), phrlw(:, :, ibl), pvervel(:, :, ibl), pap(:, :, ibl), paph(:, :, ibl), plsm(:, ibl), ldcum(:, ibl), ktype(:, ibl), plu(:, :, ibl), plude(:, :, ibl), psnde(:, :, ibl), pmfu(:, :, ibl), pmfd(:, :, ibl), pa(:, :, ibl), pclv(:, :, :, ibl), psupsat(:, :, ibl), plcrit_aer(:, :, ibl), picrit_aer(:, :, ibl), pre_ice(:, :, ibl), pccn(:, :, ibl), pnice(:, :, ibl), pcovptot(:, :, ibl), prainfrac_toprfz(:, ibl), pfsqlf(:, :, ibl), pfsqif(:, :, ibl), pfcqnng(:, :, ibl), pfcqlng(:, :, ibl), pfsqrf(:, :, ibl), pfsqsf(:, :, ibl), pfcqrng(:, :, ibl), pfcqsng(:, :, ibl), pfsqltur(:, :, ibl), pfsqitur(:, :, ibl), pfplsl(:, :, ibl), pfplsn(:, :, ibl), pfhpsl(:, :, ibl), pfhpsn(:, :, ibl), kfldx, ydomcst, ydoethf, ydecldp)
+      tendency_loc_cld(:, :, 5, ibl) = 0.0D0
+      CALL cloudsc(1, icend, nproma, nlev, ptsphy, pt(:, :, ibl), pq(:, :, ibl), tendency_tmp_t(:, :, ibl), tendency_tmp_q(:, :, ibl), tendency_tmp_a(:, :, ibl), tendency_tmp_cld(:, :, :, ibl), tendency_loc_t(:, :, ibl), tendency_loc_q(:, :, ibl), tendency_loc_a(:, :, ibl), tendency_loc_cld(:, :, :, ibl), pvfa(:, :, ibl), pvfl(:, :, ibl), pvfi(:, :, ibl), pdyna(:, :, ibl), pdynl(:, :, ibl), pdyni(:, :, ibl), phrsw(:, :, ibl), phrlw(:, :, ibl), pvervel(:, :, ibl), pap(:, :, ibl), paph(:, :, ibl), plsm(:, ibl), ldcum(:, ibl), ktype(:, ibl), plu(:, :, ibl), plude(:, :, ibl), psnde(:, :, ibl), pmfu(:, :, ibl), pmfd(:, :, ibl), pa(:, :, ibl), pclv(:, :, :, ibl), psupsat(:, :, ibl), plcrit_aer(:, :, ibl), picrit_aer(:, :, ibl), pre_ice(:, :, ibl), pccn(:, :, ibl), pnice(:, :, ibl), pcovptot(:, :, ibl), prainfrac_toprfz(:, ibl), pfsqlf(:, :, ibl), pfsqif(:, :, ibl), pfcqnng(:, :, ibl), pfcqlng(:, :, ibl), pfsqrf(:, :, ibl), pfsqsf(:, :, ibl), pfcqrng(:, :, ibl), pfcqsng(:, :, ibl), pfsqltur(:, :, ibl), pfsqitur(:, :, ibl), pfplsl(:, :, ibl), pfplsn(:, :, ibl), pfhpsl(:, :, ibl), pfhpsn(:, :, ibl), kfldx, ydomcst, ydoethf, ydecldp)
     END DO
   END SUBROUTINE cloudsc_driver
 END MODULE cloudsc_driver_mod
