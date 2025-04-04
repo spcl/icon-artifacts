@@ -7,7 +7,7 @@
 #include "velocity_tendencies_nproma20480_gpu.h"
 
 int main() {
-  const std::filesystem::path ROOT{"data"};
+  const std::filesystem::path ROOT{"data_nproma20480"};
   const int max_n = 5;
 
   for (int n = 1; n <= max_n; ++n) {
@@ -267,7 +267,7 @@ int main() {
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
         /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
-        dtime, istep, ldeepatmo, lvn_only, ntnd, 0);
+        dtime, istep, ldeepatmo, lvn_only, ntnd);
       __program_velocity_nproma20480_if_prop_lvn_only_0_istep_1(
         h_0_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
         z_kin_hor_e, z_vt_ie, z_w_concorr_me,
@@ -304,7 +304,7 @@ int main() {
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
         /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
-        dtime, istep, ldeepatmo, lvn_only, ntnd, 0);
+        dtime, istep, ldeepatmo, lvn_only, ntnd);
     int err = __dace_exit_velocity_nproma20480_if_prop_lvn_only_0_istep_1(h_0_1);
 
     } else if (lvn_only == 1 && istep == 2){
