@@ -6,11 +6,21 @@
 #include "serde_velocity_nproma20480_gpu.h"
 #include "velocity_tendencies_nproma20480_gpu.h"
 
-int main() {
+int main(int argc, char* argv[]) {
   const std::filesystem::path ROOT{"data_nproma20480"};
-  const int max_n = 5;
+  int max_n1 = 1;
+  int max_n2 = 5;
 
-  for (int n = 1; n <= max_n; ++n) {
+  if (argc >= 2) {
+    max_n1 = std::atoi(argv[1]);
+    max_n2 = max_n1;
+  }
+  if (argc >= 3) {
+    max_n2 = std::atoi(argv[2]);
+  }
+  std::cout << "Running from " << max_n1 << " to " << max_n2 << std::endl;
+
+  for (int n = max_n1; n <= max_n2; ++n) {
     std::cerr << "Reading data for " << n << "..." << std::endl;
 
     global_data_type global_data;
@@ -152,8 +162,8 @@ int main() {
     std::cout << istep << ", lvn_only: " << lvn_only << ", ldeepatmo: " << ldeepatmo << std::endl;
 
     if (lvn_only == 1 && istep == 1){
-      
-    
+
+
       auto *h_1_1 = __dace_init_velocity_nproma20480_if_prop_lvn_only_1_istep_1(
         &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
         z_vt_ie, z_w_concorr_me,
@@ -322,7 +332,7 @@ int main() {
         /*__f2dace_A_z_vt_ie_d_1_s_161=*/
         serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
         serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(2),
-        
+
         /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
         /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
@@ -348,7 +358,7 @@ int main() {
         /*__f2dace_A_z_vt_ie_d_1_s_161=*/
         serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
         serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(2),
-        
+
         /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
         /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
@@ -434,7 +444,7 @@ int main() {
     } else {
       throw std::runtime_error("Law of Logic and Mathematics violated");
     }
-
+    std::cout << "Step " << n << " done." << std::endl;
 
 
     {
