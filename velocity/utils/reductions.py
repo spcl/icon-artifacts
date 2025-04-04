@@ -215,13 +215,8 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     il_start = str(loop_analysis.get_init_assignment(inner_loop))
     il_end = str(loop_analysis.get_loop_end(inner_loop))
 
-    # The size of the required array is dynamic
-    # and even if not, DaCe allocates arrays in the beginning
-    # the size depends on runtime values, thus we get wrong sizes
-    # so we overapproximate here
     arr_name, arr = parent.sdfg.add_array(
         "maxvcfl_arr",
-        # shape=[100, 100], # We cannot overapproximate here afterall
         shape=[f"{il_end} - {il_start}", f"{ol_end} - {ol_start}"],
         dtype=dace.float64,
         transient=True,
@@ -241,7 +236,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         loop_P,
         loop,
         "maxvcfl_arr",
-        f"({arr.shape[0]}) * ({arr.shape[1]})",
+        f"({il_end} - {il_start}) * ({ol_end} - {ol_start})",
         "maxvcfl",
         "maxZ",
         out_expr="maxvcfl[0]",
