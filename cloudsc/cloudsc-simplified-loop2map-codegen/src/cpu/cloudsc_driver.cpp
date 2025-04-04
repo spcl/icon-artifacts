@@ -2651,11 +2651,8 @@ void __program_cloudsc_driver_internal(
     double* zsupsat_0 = nullptr;
     double zrldcp_0;
     int* iphase_0;
-    iphase_0 = new int DACE_ALIGN(64)[5];
     int* imelt_0;
-    imelt_0 = new int DACE_ALIGN(64)[5];
     int* llfall_0;
-    llfall_0 = new int DACE_ALIGN(64)[5];
     int* llindex1_0 = nullptr;
     int* llindex3_0 = nullptr;
     int* iorder_0 = nullptr;
@@ -2686,7 +2683,6 @@ void __program_cloudsc_driver_internal(
     double* zsolqb_0 = nullptr;
     double* zqlhs_0 = nullptr;
     double* zvqx_0;
-    zvqx_0 = new double DACE_ALIGN(64)[5];
     double* zratio_0 = nullptr;
     double* zsinksum_0 = nullptr;
     double* zfallsink_0 = nullptr;
@@ -2913,6 +2909,100 @@ void __program_cloudsc_driver_internal(
     double _if_cond_1_0;
     int _for_it_12_0;
 
+    sym_klev_0 = nlev;
+    sym_klon_0 = nproma;
+
+    iphase_0 = new int DACE_ALIGN(64)[5];
+    imelt_0 = new int DACE_ALIGN(64)[5];
+    llfall_0 = new int DACE_ALIGN(64)[5];
+    zvqx_0 = new double DACE_ALIGN(64)[5];
+    ztp1_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    za_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zaorig_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zqx_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
+    zqx0_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
+    zpfplsx_0 = new double DACE_ALIGN(64)[(((sym_klev_0 * sym_klon_0) + ((4 * sym_klon_0) * (sym_klev_0 + 1))) + sym_klon_0)];
+    zqxn2d_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
+    zlneg_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
+    zfoealfa_0 = new double DACE_ALIGN(64)[((sym_klev_0 * sym_klon_0) + sym_klon_0)];
+    zli_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zliqfrac_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zicefrac_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zqsmix_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zqsliq_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zqsice_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zfoeewmt_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zfoeew_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    zfoeeliqt_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
+    llrainliq_0 = new int DACE_ALIGN(64)[sym_klon_0];
+    zanewm1_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zda_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zcovpclr_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zcovpmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zcovptot_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zcldtopdist_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zqxfg_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zlicld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zrainaut_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zrainacc_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsnowaut_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zldefr_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zacust_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zqpretot_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zlfinalsum_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zlcond1_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zlcond2_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsupsat_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsolab_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsolac_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsolqb_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
+    zsolqa_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
+    zfallsrce_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zfallsink_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zconvsrce_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zconvsink_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zpsupsatsrce_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zratio_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zliqcld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zicecld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zfokoop_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zdtgdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zrdtgdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zrho_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zicetot_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zdqsmixdt_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zcorqsice_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zevaplimmix_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    double* zgdp_0;
+    zgdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    double* zdqsicedt_0;
+    zdqsicedt_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    double* zcorqsmix_0;
+    zcorqsmix_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zdqs_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zldifdt_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zlcust_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zqxnm1_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zmf_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    ztold_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zqold_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zmeltmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zfrzmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zraincld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zsnowcld_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    zicenuclei_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    double* zsnowrime_0;
+    zsnowrime_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    llindex3_0 = new int DACE_ALIGN(64)[(25 * sym_klon_0)];
+    zsinksum_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    iorder_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zmin_0 = new double DACE_ALIGN(64)[sym_klon_0];
+    llindex1_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zqlhs_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
+    zqxn_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+    zfluxq_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
+
     for (_for_it_129 = 1; (_for_it_129 <= ngptot); _for_it_129 = (_for_it_129 + nproma)) {
         ibl = (((_for_it_129 - 1) / nproma) + 1);
         tmp_arg_75 = ((ngptot - _for_it_129) + 1);
@@ -2938,8 +3028,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
         }
-        sym_klev_0 = nlev;
-        sym_klon_0 = nproma;
         {
             {
                 double zepsilon_out;
@@ -3268,12 +3356,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            ztp1_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            za_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zaorig_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zqx_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
-            zqx0_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
-
             {
 #pragma omp parallel for
                 for (auto _for_it_6_0 = 1; _for_it_6_0 < (nlev + 1); _for_it_6_0 += 1) {
@@ -3298,8 +3380,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zpfplsx_0 = new double DACE_ALIGN(64)[(((sym_klev_0 * sym_klon_0) + ((4 * sym_klon_0) * (sym_klev_0 + 1))) + sym_klon_0)];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_3_0 = 1; tmp_parfor_3_0 < 6; tmp_parfor_3_0 += 1) {
@@ -3308,8 +3388,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zqxn2d_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_6_0 = 1; tmp_parfor_6_0 < 6; tmp_parfor_6_0 += 1) {
@@ -3318,8 +3396,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zlneg_0 = new double DACE_ALIGN(64)[((((4 * sym_klev_0) * sym_klon_0) + (sym_klon_0 * (sym_klev_0 - 1))) + sym_klon_0)];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_9_0 = 1; tmp_parfor_9_0 < 6; tmp_parfor_9_0 += 1) {
@@ -3336,18 +3412,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zfoealfa_0 = new double DACE_ALIGN(64)[((sym_klev_0 * sym_klon_0) + sym_klon_0)];
-            zli_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zliqfrac_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zicefrac_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zqsmix_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zqsliq_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zqsice_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zfoeewmt_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zfoeew_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            zfoeeliqt_0 = new double DACE_ALIGN(64)[((sym_klon_0 * (sym_klev_0 - 1)) + sym_klon_0)];
-            llrainliq_0 = new int DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_11_0 = 1; tmp_parfor_11_0 < (sym_klon_0 + 1); tmp_parfor_11_0 += 1) {
@@ -4502,8 +4566,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zanewm1_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_12_0 = 1; tmp_parfor_12_0 < (sym_klon_0 + 1); tmp_parfor_12_0 += 1) {
@@ -4512,8 +4574,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zda_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_13_0 = 1; tmp_parfor_13_0 < (sym_klon_0 + 1); tmp_parfor_13_0 += 1) {
@@ -4522,8 +4582,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zcovpclr_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_14_0 = 1; tmp_parfor_14_0 < (sym_klon_0 + 1); tmp_parfor_14_0 += 1) {
@@ -4532,8 +4590,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zcovpmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_15_0 = 1; tmp_parfor_15_0 < (sym_klon_0 + 1); tmp_parfor_15_0 += 1) {
@@ -4542,8 +4598,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zcovptot_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_16_0 = 1; tmp_parfor_16_0 < (sym_klon_0 + 1); tmp_parfor_16_0 += 1) {
@@ -4552,8 +4606,6 @@ void __program_cloudsc_driver_internal(
             }
         }
         {
-            zcldtopdist_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
             {
 #pragma omp parallel for
                 for (auto tmp_parfor_17_0 = 1; tmp_parfor_17_0 < (sym_klon_0 + 1); tmp_parfor_17_0 += 1) {
@@ -4564,8 +4616,6 @@ void __program_cloudsc_driver_internal(
         {}
         for (_for_it_23_0 = *v_ydecldp_var_49_ncldtop; (_for_it_23_0 <= nlev); _for_it_23_0 = (_for_it_23_0 + 1)) {
             {
-                zqxfg_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_24_0 = 1; _for_it_24_0 < 6; _for_it_24_0 += 1) {
@@ -4574,8 +4624,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zlicld_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_18_0 = 1; tmp_parfor_18_0 < (sym_klon_0 + 1); tmp_parfor_18_0 += 1) {
@@ -4584,8 +4632,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zrainaut_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_19_0 = 1; tmp_parfor_19_0 < (sym_klon_0 + 1); tmp_parfor_19_0 += 1) {
@@ -4594,8 +4640,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zrainacc_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_20_0 = 1; tmp_parfor_20_0 < (sym_klon_0 + 1); tmp_parfor_20_0 += 1) {
@@ -4604,8 +4648,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zsnowaut_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_21_0 = 1; tmp_parfor_21_0 < (sym_klon_0 + 1); tmp_parfor_21_0 += 1) {
@@ -4614,8 +4656,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zldefr_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_22_0 = 1; tmp_parfor_22_0 < (sym_klon_0 + 1); tmp_parfor_22_0 += 1) {
@@ -4624,8 +4664,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zacust_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_23_0 = 1; tmp_parfor_23_0 < (sym_klon_0 + 1); tmp_parfor_23_0 += 1) {
@@ -4634,8 +4672,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zqpretot_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_24_0 = 1; tmp_parfor_24_0 < (sym_klon_0 + 1); tmp_parfor_24_0 += 1) {
@@ -4644,8 +4680,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zlfinalsum_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_25_0 = 1; tmp_parfor_25_0 < (sym_klon_0 + 1); tmp_parfor_25_0 += 1) {
@@ -4654,8 +4688,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zlcond1_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_26_0 = 1; tmp_parfor_26_0 < (sym_klon_0 + 1); tmp_parfor_26_0 += 1) {
@@ -4664,8 +4696,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zlcond2_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_27_0 = 1; tmp_parfor_27_0 < (sym_klon_0 + 1); tmp_parfor_27_0 += 1) {
@@ -4674,8 +4704,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zsupsat_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_28_0 = 1; tmp_parfor_28_0 < (sym_klon_0 + 1); tmp_parfor_28_0 += 1) {
@@ -4684,8 +4712,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zsolab_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_31_0 = 1; tmp_parfor_31_0 < (sym_klon_0 + 1); tmp_parfor_31_0 += 1) {
@@ -4694,8 +4720,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zsolac_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_32_0 = 1; tmp_parfor_32_0 < (sym_klon_0 + 1); tmp_parfor_32_0 += 1) {
@@ -4704,8 +4728,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zsolqb_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_35_0 = 1; tmp_parfor_35_0 < 6; tmp_parfor_35_0 += 1) {
@@ -4714,8 +4736,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zsolqa_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_38_0 = 1; tmp_parfor_38_0 < 6; tmp_parfor_38_0 += 1) {
@@ -4724,8 +4744,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zfallsrce_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_40_0 = 1; tmp_parfor_40_0 < 6; tmp_parfor_40_0 += 1) {
@@ -4734,8 +4752,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zfallsink_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_42_0 = 1; tmp_parfor_42_0 < 6; tmp_parfor_42_0 += 1) {
@@ -4744,8 +4760,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zconvsrce_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_44_0 = 1; tmp_parfor_44_0 < 6; tmp_parfor_44_0 += 1) {
@@ -4754,8 +4768,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zconvsink_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_46_0 = 1; tmp_parfor_46_0 < 6; tmp_parfor_46_0 += 1) {
@@ -4764,8 +4776,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zpsupsatsrce_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_48_0 = 1; tmp_parfor_48_0 < 6; tmp_parfor_48_0 += 1) {
@@ -4774,8 +4784,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zratio_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_50_0 = 1; tmp_parfor_50_0 < 6; tmp_parfor_50_0 += 1) {
@@ -4784,18 +4792,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zliqcld_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zicecld_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zfokoop_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zdtgdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zrdtgdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zrho_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zicetot_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zdqsmixdt_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zcorqsice_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zevaplimmix_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto tmp_parfor_51_0 = 1; tmp_parfor_51_0 < (sym_klon_0 + 1); tmp_parfor_51_0 += 1) {
@@ -4805,8 +4801,6 @@ void __program_cloudsc_driver_internal(
             }
             for (_for_it_26_0 = 1; (_for_it_26_0 <= icend); _for_it_26_0 = (_for_it_26_0 + 1)) {
                 {
-                    double* zgdp_0;
-                    zgdp_0 = new double DACE_ALIGN(64)[sym_klon_0];
                     double* paph_var_18_0;
                     paph_var_18_0 = &paph[((__f2dace_A_paph_d_0_s_62 * __f2dace_A_paph_d_1_s_63) * ((-__f2dace_OA_paph_d_2_s_64) + ibl))];
                     double* pap_var_17_0;
@@ -4861,7 +4855,6 @@ void __program_cloudsc_driver_internal(
 
                         zdtgdp_0[(_for_it_26_0 - 1)] = zdtgdp_out_0;
                     }
-                    delete[] zgdp_0;
                 }
                 {
                     {
@@ -4944,8 +4937,6 @@ void __program_cloudsc_driver_internal(
                     v_ydthf_var_48_r4ies = (double*)(&((*ydthf_var_48_0)->r4ies));
                     double* v_ydthf_var_48_r5ies;
                     v_ydthf_var_48_r5ies = (double*)(&((*ydthf_var_48_0)->r5ies));
-                    double* zdqsicedt_0;
-                    zdqsicedt_0 = new double DACE_ALIGN(64)[sym_klon_0];
                     double tmp_call_12_0;
                     double tmp_arg_4_0;
 
@@ -5021,7 +5012,6 @@ void __program_cloudsc_driver_internal(
 
                         zcorqsice_0[(_for_it_26_0 - 1)] = zcorqsice_out_0;
                     }
-                    delete[] zdqsicedt_0;
                 }
                 zfac_0 = ((zalfaw_0 * zfacw_0) + ((1.0 - zalfaw_0) * zfaci_0));
                 {
@@ -5156,8 +5146,6 @@ void __program_cloudsc_driver_internal(
                     }
                 }
                 {
-                    double* zcorqsmix_0;
-                    zcorqsmix_0 = new double DACE_ALIGN(64)[sym_klon_0];
                     double tmp_call_13_0;
                     double tmp_call_14_0;
                     double tmp_call_17_0;
@@ -5321,7 +5309,6 @@ void __program_cloudsc_driver_internal(
 
                         zevaplimmix_0[(_for_it_26_0 - 1)] = zevaplimmix_out_0;
                     }
-                    delete[] zcorqsmix_0;
                 }
             }
             for (_for_it_27_0 = 1; (_for_it_27_0 <= icend); _for_it_27_0 = (_for_it_27_0 + 1)) {
@@ -5908,7 +5895,6 @@ void __program_cloudsc_driver_internal(
                     }
                 }
             }
-            { delete[] zsupsat_0; }
             _if_cond_16_0 = ((_for_it_23_0 < nlev) && (_for_it_23_0 >= v_ydecldp_var_49_ncldtop[0]));
             if ((_if_cond_16_0 == 1)) {
                 for (_for_it_30_0 = 1; (_for_it_30_0 <= icend); _for_it_30_0 = (_for_it_30_0 + 1)) {
@@ -6053,17 +6039,9 @@ void __program_cloudsc_driver_internal(
                     }
                 }
             }
-            {
-                zdqs_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zldifdt_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zlcust_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-                zqxnm1_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-            }
             _if_cond_19_0 = (_for_it_23_0 > v_ydecldp_var_49_ncldtop[0]);
             if ((_if_cond_19_0 == 1)) {
                 {
-                    zmf_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                     {
 #pragma omp parallel for
                         for (auto _for_it_31_0 = 1; _for_it_31_0 < (icend + 1); _for_it_31_0 += 1) {
@@ -6080,7 +6058,6 @@ void __program_cloudsc_driver_internal(
                             loop_body_62_3_0(__state, &iphase_0[0], &llfall_0[0], &zmf_0[0], &zqxnm1_0[0], &zconvsrce_0[0], &zlcust_0[0], _for_it_32_0, icend, sym_klon_0);
                         }
                     }
-                    delete[] zmf_0;
                 }
                 for (_for_it_34_0 = 1; (_for_it_34_0 <= icend); _for_it_34_0 = (_for_it_34_0 + 1)) {
                     {
@@ -6399,9 +6376,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                ztold_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zqold_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_40_0 = 1; _for_it_40_0 < (icend + 1); _for_it_40_0 += 1) {
@@ -6410,11 +6384,6 @@ void __program_cloudsc_driver_internal(
                             _for_it_23_0, _for_it_40_0, sym_klev_0, sym_klon_0);
                     }
                 }
-                delete[] zlfinalsum_0;
-                delete[] zldifdt_0;
-                delete[] zlcust_0;
-                delete[] zacust_0;
-                delete[] zdqsmixdt_0;
             }
             for (_for_it_41_0 = 1; (_for_it_41_0 <= icend); _for_it_41_0 = (_for_it_41_0 + 1)) {
                 {
@@ -8083,16 +8052,8 @@ void __program_cloudsc_driver_internal(
                         loop_body_26_62_0(__state, &zqold_0[0], &ztold_0[0], &zdqs_0[0], &zqsmix_0[0], &ztp1_0[0], _for_it_23_0, _for_it_43_0, sym_klon_0);
                     }
                 }
-                delete[] ztold_0;
-                delete[] zqold_0;
-                delete[] zldefr_0;
             }
             {
-                zmeltmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zfrzmax_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zraincld_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                zsnowcld_0 = new double DACE_ALIGN(64)[sym_klon_0];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_44_0 = 1; _for_it_44_0 < (icend + 1); _for_it_44_0 += 1) {
@@ -8101,7 +8062,6 @@ void __program_cloudsc_driver_internal(
                             sym_klev_0, sym_klon_0);
                     }
                 }
-                delete[] zevaplimmix_0;
             }
             for (_for_it_45_0 = 1; (_for_it_45_0 <= icend); _for_it_45_0 = (_for_it_45_0 + 1)) {
                 {
@@ -9266,7 +9226,6 @@ void __program_cloudsc_driver_internal(
                         }
                     }
                     {
-                        zicenuclei_0 = new double DACE_ALIGN(64)[sym_klon_0];
                         double tmp_call_48_0;
                         double tmp_arg_27_0;
 
@@ -9603,7 +9562,6 @@ void __program_cloudsc_driver_internal(
 
                             zqxfg_0[(_for_it_47_0 - 1)] = zqxfg_out_0;
                         }
-                        delete[] zicenuclei_0;
                     }
                 }
             }
@@ -10656,8 +10614,6 @@ void __program_cloudsc_driver_internal(
                             v_ydecldp_var_49_rcl_const8s = (double*)(&((*ydecldp_var_49_0)->rcl_const8s));
                             double* v_ydecldp_var_49_rcl_const7s;
                             v_ydecldp_var_49_rcl_const7s = (double*)(&((*ydecldp_var_49_0)->rcl_const7s));
-                            double* zsnowrime_0;
-                            zsnowrime_0 = new double DACE_ALIGN(64)[sym_klon_0];
                             double tmp_call_68_0;
                             double tmp_call_69_0;
                             double tmp_arg_41_0;
@@ -10736,7 +10692,6 @@ void __program_cloudsc_driver_internal(
 
                                 zsolqb_0[((_for_it_53_0 + (3 * sym_klon_0)) - 1)] = zsolqb_out_0;
                             }
-                            delete[] zsnowrime_0;
                         }
                     }
                 }
@@ -12636,37 +12591,12 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                llindex3_0 = new int DACE_ALIGN(64)[(25 * sym_klon_0)];
-                zsinksum_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_65_0 = 1; _for_it_65_0 < 6; _for_it_65_0 += 1) {
                         loop_body_26_64_0(__state, &llindex3_0[0], &zsinksum_0[0], _for_it_65_0, icend, sym_klon_0);
                     }
                 }
-                delete[] zlcond1_0;
-                delete[] zlcond2_0;
-                delete[] zrainaut_0;
-                delete[] zsnowaut_0;
-                delete[] zliqcld_0;
-                delete[] zicecld_0;
-                delete[] zfokoop_0;
-                delete[] zlicld_0;
-                delete[] zdqs_0;
-                delete[] zdtgdp_0;
-                delete[] zrho_0;
-                delete[] zsolab_0;
-                delete[] zsolac_0;
-                delete[] zdp_0;
-                delete[] zqxfg_0;
-                delete[] zmeltmax_0;
-                delete[] zfrzmax_0;
-                delete[] zicetot_0;
-                delete[] zcorqsice_0;
-                delete[] zrainacc_0;
-                delete[] zraincld_0;
-                delete[] zsnowcld_0;
             }
             {
                 {
@@ -12685,8 +12615,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                iorder_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_74_0 = 1; _for_it_74_0 < 6; _for_it_74_0 += 1) {
@@ -12695,9 +12623,6 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zmin_0 = new double DACE_ALIGN(64)[sym_klon_0];
-                llindex1_0 = new int DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_76_0 = 1; _for_it_76_0 < 6; _for_it_76_0 += 1) {
@@ -12740,8 +12665,6 @@ void __program_cloudsc_driver_internal(
                         loop_body_26_69_0(__state, &zsinksum_0[0], _for_it_83_0, icend, sym_klon_0);
                     }
                 }
-                delete[] zmin_0;
-                delete[] llindex1_0;
             }
             for (_for_it_85_0 = 1; (_for_it_85_0 <= 5); _for_it_85_0 = (_for_it_85_0 + 1)) {
                 {
@@ -12770,30 +12693,20 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zqlhs_0 = new double DACE_ALIGN(64)[(25 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_91_0 = 1; _for_it_91_0 < 6; _for_it_91_0 += 1) {
                         loop_body_26_70_0(__state, &zfallsink_0[0], &zsolqb_0[0], &zqlhs_0[0], _for_it_91_0, icend, sym_klon_0);
                     }
                 }
-                delete[] llindex3_0;
-                delete[] iorder_0;
-                delete[] zsolqb_0;
-                delete[] zratio_0;
-                delete[] zsinksum_0;
             }
             {
-                zqxn_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_96_0 = 1; _for_it_96_0 < 6; _for_it_96_0 += 1) {
                         loop_body_26_71_0(__state, &zqx_0[0], &zsolqa_0[0], &zqxn_0[0], _for_it_23_0, _for_it_96_0, icend, sym_klev_0, sym_klon_0);
                     }
                 }
-                delete[] zsolqa_0;
             }
             for (_for_it_99_0 = 1; (_for_it_99_0 <= 4); _for_it_99_0 = (_for_it_99_0 + 1)) {
                 for (_for_it_100_0 = (_for_it_99_0 + 1); (_for_it_100_0 <= 5); _for_it_100_0 = (_for_it_100_0 + 1)) {
@@ -12874,8 +12787,6 @@ void __program_cloudsc_driver_internal(
                         loop_body_26_73_0(__state, &zqxn_0[0], &zqxn2d_0[0], &zqxnm1_0[0], _for_it_109_0, _for_it_23_0, icend, sym_klev_0, sym_klon_0);
                     }
                 }
-                delete[] zqxnm1_0;
-                delete[] zqlhs_0;
             }
             {
                 {
@@ -12884,7 +12795,6 @@ void __program_cloudsc_driver_internal(
                         loop_body_26_74_0(__state, &zfallsink_0[0], &zqxn_0[0], &zrdtgdp_0[0], &zpfplsx_0[0], _for_it_111_0, _for_it_23_0, icend, sym_klev_0, sym_klon_0);
                     }
                 }
-                delete[] zrdtgdp_0;
             }
             {
                 {
@@ -12895,15 +12805,12 @@ void __program_cloudsc_driver_internal(
                 }
             }
             {
-                zfluxq_0 = new double DACE_ALIGN(64)[(5 * sym_klon_0)];
-
                 {
 #pragma omp parallel for
                     for (auto _for_it_114_0 = 1; _for_it_114_0 < (icend + 1); _for_it_114_0 += 1) {
                         loop_body_26_76_0(__state, &zqpretot_0[0], &zcovptot_0[0], _for_it_114_0);
                     }
                 }
-                delete[] zqpretot_0;
             }
             for (_for_it_115_0 = 1; (_for_it_115_0 <= 4); _for_it_115_0 = (_for_it_115_0 + 1)) {
                 {
@@ -13044,14 +12951,6 @@ void __program_cloudsc_driver_internal(
                     }
                 }
             }
-
-            delete[] zqxn_0;
-            delete[] zfluxq_0;
-            delete[] zfallsink_0;
-            delete[] zfallsrce_0;
-            delete[] zconvsrce_0;
-            delete[] zconvsink_0;
-            delete[] zpsupsatsrce_0;
         }
         for (_for_it_122_0 = 1; (_for_it_122_0 <= (nlev + 1)); _for_it_122_0 = (_for_it_122_0 + 1)) {
             for (_for_it_123_0 = 1; (_for_it_123_0 <= icend); _for_it_123_0 = (_for_it_123_0 + 1)) {
@@ -13580,34 +13479,89 @@ void __program_cloudsc_driver_internal(
                 }
             }
         }
-
-        delete[] zfoealfa_0;
-        delete[] zcovpclr_0;
-        delete[] zcovptot_0;
-        delete[] zcovpmax_0;
-        delete[] ztp1_0;
-        delete[] zanewm1_0;
-        delete[] zda_0;
-        delete[] zli_0;
-        delete[] za_0;
-        delete[] zaorig_0;
-        delete[] zliqfrac_0;
-        delete[] zicefrac_0;
-        delete[] zqx_0;
-        delete[] zqx0_0;
-        delete[] zpfplsx_0;
-        delete[] zlneg_0;
-        delete[] zqxn2d_0;
-        delete[] zqsmix_0;
-        delete[] zqsliq_0;
-        delete[] zqsice_0;
-        delete[] zfoeewmt_0;
-        delete[] zfoeew_0;
-        delete[] zfoeeliqt_0;
-        delete[] zcldtopdist_0;
-        delete[] llrainliq_0;
     }
-
+    delete[] zgdp_0;
+    delete[] zdqsicedt_0;
+    delete[] zcorqsmix_0;
+    delete[] zsupsat_0;
+    delete[] zmf_0;
+    delete[] zlfinalsum_0;
+    delete[] zldifdt_0;
+    delete[] zlcust_0;
+    delete[] zacust_0;
+    delete[] zdqsmixdt_0;
+    delete[] ztold_0;
+    delete[] zqold_0;
+    delete[] zldefr_0;
+    delete[] zevaplimmix_0;
+    delete[] zicenuclei_0;
+    delete[] zsnowrime_0;
+    delete[] zlcond1_0;
+    delete[] zlcond2_0;
+    delete[] zrainaut_0;
+    delete[] zsnowaut_0;
+    delete[] zliqcld_0;
+    delete[] zicecld_0;
+    delete[] zfokoop_0;
+    delete[] zlicld_0;
+    delete[] zdqs_0;
+    delete[] zdtgdp_0;
+    delete[] zrho_0;
+    delete[] zsolab_0;
+    delete[] zsolac_0;
+    delete[] zdp_0;
+    delete[] zqxfg_0;
+    delete[] zmeltmax_0;
+    delete[] zfrzmax_0;
+    delete[] zicetot_0;
+    delete[] zcorqsice_0;
+    delete[] zrainacc_0;
+    delete[] zraincld_0;
+    delete[] zsnowcld_0;
+    delete[] zmin_0;
+    delete[] llindex1_0;
+    delete[] llindex3_0;
+    delete[] iorder_0;
+    delete[] zsolqb_0;
+    delete[] zratio_0;
+    delete[] zsinksum_0;
+    delete[] zsolqa_0;
+    delete[] zqxnm1_0;
+    delete[] zqlhs_0;
+    delete[] zrdtgdp_0;
+    delete[] zqpretot_0;
+    delete[] zqxn_0;
+    delete[] zfluxq_0;
+    delete[] zfallsink_0;
+    delete[] zfallsrce_0;
+    delete[] zconvsrce_0;
+    delete[] zconvsink_0;
+    delete[] zpsupsatsrce_0;
+    delete[] zfoealfa_0;
+    delete[] zcovpclr_0;
+    delete[] zcovptot_0;
+    delete[] zcovpmax_0;
+    delete[] ztp1_0;
+    delete[] zanewm1_0;
+    delete[] zda_0;
+    delete[] zli_0;
+    delete[] za_0;
+    delete[] zaorig_0;
+    delete[] zliqfrac_0;
+    delete[] zicefrac_0;
+    delete[] zqx_0;
+    delete[] zqx0_0;
+    delete[] zpfplsx_0;
+    delete[] zlneg_0;
+    delete[] zqxn2d_0;
+    delete[] zqsmix_0;
+    delete[] zqsliq_0;
+    delete[] zqsice_0;
+    delete[] zfoeewmt_0;
+    delete[] zfoeew_0;
+    delete[] zfoeeliqt_0;
+    delete[] zcldtopdist_0;
+    delete[] llrainliq_0;
     delete[] iphase_0;
     delete[] imelt_0;
     delete[] llfall_0;
