@@ -122,6 +122,10 @@ extern "C" void cloudsc_driver_wrapper_(
     int *__f2dace_OA_tendency_tmp_q_d_2_s_11,
     int *__f2dace_OA_tendency_tmp_t_d_2_s_8, int *kfldx, int *ngptot,
     int *ngptotg, int *nlev, int *nproma, int *numomp, double *ptsphy) {
+  std::cout << "C++: nproma = " << *nproma << std::endl;
+  std::cout << "C++: ydomcst . rgamd = " << ydomcst -> rgamd << std::endl;
+  std::cout << "C++: ydoethf . rkoop2 = " << ydoethf -> rkoop2 << std::endl;
+  std::cout << "C++: ydecldp . nbeta = " << ydecldp -> nbeta << std::endl;
   std::cout << "init" << std::endl;
   auto *h = __dace_init_cloudsc_driver(
       ktype, ldcum, pa, pap, paph, pccn, pclv, pcovptot, pdyna, pdyni, pdynl,

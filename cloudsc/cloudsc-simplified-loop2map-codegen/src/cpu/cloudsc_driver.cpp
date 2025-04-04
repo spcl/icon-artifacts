@@ -2804,7 +2804,7 @@ inline void loop_body_363_0_0(
     pfsqif_var_34_0 = &pfsqif[((__f2dace_A_pfsqif_d_0_s_119 * __f2dace_A_pfsqif_d_1_s_120) * ((-__f2dace_OA_pfsqif_d_2_s_121) + ibl))];
     double zalfaw_0;
 
-    zalfaw_0 = float(zfoealfa_0[((_for_it_126_0 + (sym_klon_0 * (_for_it_125_0 - 1))) - 1)]);
+    zalfaw_0 = double(zfoealfa_0[((_for_it_126_0 + (sym_klon_0 * (_for_it_125_0 - 1))) - 1)]);
 
     {
         double *paph_var_18_0;
