@@ -243,7 +243,6 @@ for sdfg_name in sdfg_names:
     else:
         # Add ThreadBlock map and coarsen a bit
         dace.Config.set('compiler', 'cuda', 'default_block_size', value="128,1,1")
-
         for n, graph in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.MapEntry):
                 if n.schedule == dace.ScheduleType.GPU_Device:
@@ -258,6 +257,7 @@ for sdfg_name in sdfg_names:
                         },
                     )
         # Only if we can have a dimension we can divide nicely
+        """
         for n, graph in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.MapEntry):
                 if n.schedule == dace.ScheduleType.GPU_Device:
@@ -266,7 +266,7 @@ for sdfg_name in sdfg_names:
                             isinstance(n2, dace.nodes.MapEntry)
                             and n2.map.schedule == dace.dtypes.ScheduleType.GPU_ThreadBlock
                         ):
-                            #print(n.map.range) # 1:91(0:90) or 1:92(0:910) -> meaning 90 and 91 elements
+                            #print(n.map.range) # 1:91(0:90) or 1:92(0:91) -> meaning 90 and 91 elements
                             coarsening_factors = []
                             for (b, e, s), (tb, te, ts) in zip(n.map.range, n2.map.range):
                                 range1 = (e+1-b)//s
@@ -301,6 +301,7 @@ for sdfg_name in sdfg_names:
                                     },
                                 )
         sdfg.validate()
+        """
         # Fix remainder loop for tiling
         """
         for n, graph in sdfg.all_nodes_recursive():
