@@ -225,6 +225,8 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         ToGPU(verbose=verbose).apply_pass(sdfg, {})
         sdfg.validate()
+        if use_cache:
+            sdfg.save(f"gpu_{sdfg_name}_stage4_5.sdfgz", compress=True)
         #
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         sdfg.validate()
