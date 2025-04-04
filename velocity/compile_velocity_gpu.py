@@ -258,7 +258,6 @@ for sdfg_name in sdfg_names:
                         },
                     )
         # Only if we can have a dimension we can divide nicely
-        """
         for n, graph in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.MapEntry):
                 if n.schedule == dace.ScheduleType.GPU_Device:
@@ -301,7 +300,6 @@ for sdfg_name in sdfg_names:
                                         "tile_sizes": list(reversed(coarsening_factors)),
                                     },
                                 )
-        """
         sdfg.validate()
         # Fix remainder loop for tiling
         """
