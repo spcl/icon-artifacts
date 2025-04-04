@@ -257,9 +257,20 @@ for sdfg_name in sdfg_names:
                         },
                     )
         # Only if we can have a dimension we can divide nicely
+        sdfg.save(f"gpu_{sdfg_name}_stage5_5.sdfgz", compress=True)
         for n, graph in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.MapEntry):
                 if n.schedule == dace.ScheduleType.GPU_Device:
+                    # Assert no reductions in the map
+                    ns = graph.all_nodes_between(n, graph.exit_node(n))
+                    cont = False
+                    for _n in ns:
+                        if isinstance(_n, dace.nodes.LibraryNode):
+                            cont = True
+                            break
+                    if cont:
+                        continue
+
                     for n2 in sdutil.dfs_topological_sort(graph, n):
                         if (
                             isinstance(n2, dace.nodes.MapEntry)
@@ -270,12 +281,15 @@ for sdfg_name in sdfg_names:
                             for (b, e, s), (tb, te, ts) in zip(n.map.range, n2.map.range):
                                 range1 = (e+1-b)//s
                                 range2 = (te+1-tb)//ts
-                                print(f"Range1: {range1}, Range2: {range2}")
+                                print(f"Range1: {range1}, Range2: {range2} for map {n}")
                                 dim = 1
                                 try:
                                     dim = int(range1 // range2)
                                 except:
                                     dim = 1
+                                if dim == 92:
+                                    coarsening_factor = 8
+                                    print("Coarsening factor: 8 for range 92")
                                 if dim == 91:
                                     coarsening_factor = 7
                                     print("Coarsening factor: 7 for range 91")
@@ -288,7 +302,8 @@ for sdfg_name in sdfg_names:
                                 else:
                                     coarsening_factor = 1
                                 coarsening_factors.append(coarsening_factor)
-
+                            print(f"Coarsening factors: {coarsening_factors} apply value: {not all([v == 1 for v in coarsening_factors])}")
+                            print("\n")
                             if not all([v == 1 for v in coarsening_factors]):
                                 ThreadCoarsening.apply_to(
                                     sdfg=graph.sdfg,
@@ -324,6 +339,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
+        #exit()
 
     # Validate the SDFG
     sdfg.validate()
