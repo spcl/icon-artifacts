@@ -215,9 +215,24 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     il_start = str(loop_analysis.get_init_assignment(inner_loop))
     il_end = str(loop_analysis.get_loop_end(inner_loop))
 
+    # The sizes need to be symbolic for dace to allocate the array correctly
+    ol_size_sym = parent.sdfg.add_symbol(
+        "ol_size", stype=dace.dtypes.int32, find_new_name=True
+    )
+    il_size_sym = parent.sdfg.add_symbol(
+        "il_size", stype=dace.dtypes.int32, find_new_name=True
+    )
+    sdfg.add_state_after(
+        sdfg.start_state,
+        assignments={
+            f"{ol_size_sym}": f"{ol_end}",
+            f"{il_size_sym}": f"__CG_global_data__m_nproma",
+        },
+    )
+
     arr_name, arr = parent.sdfg.add_array(
         "maxvcfl_arr",
-        shape=[f"{il_end} - {il_start}", f"{ol_end} - {ol_start}"],
+        shape=[f"{il_size_sym}", f"{ol_size_sym}"],
         dtype=dace.float64,
         transient=True,
         find_new_name=True,
@@ -239,6 +254,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         f"({il_end} - {il_start}) * ({ol_end} - {ol_start})",
         "maxvcfl",
         "maxZ",
+        in_expr=f"maxvcfl_arr[0:{il_end} - {il_start},0:{ol_end} - {ol_start}]",
         out_expr="maxvcfl[0]",
     )
 
