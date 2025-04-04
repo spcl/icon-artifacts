@@ -228,7 +228,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         ToGPU(verbose=verbose).apply_pass(sdfg, {})
         sdfg.validate()
-        if use_cache:
+        if use_cache and verbose:
             sdfg.save(f"gpu_{sdfg_name}_stage4_5.sdfgz", compress=True)
         #
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
@@ -257,7 +257,8 @@ for sdfg_name in sdfg_names:
                         },
                     )
         # Only if we can have a dimension we can divide nicely
-        sdfg.save(f"gpu_{sdfg_name}_stage5_5.sdfgz", compress=True)
+        if verbose and use_cache:
+            sdfg.save(f"gpu_{sdfg_name}_stage5_5.sdfgz", compress=True)
         for n, graph in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.MapEntry):
                 if n.schedule == dace.ScheduleType.GPU_Device:
@@ -335,11 +336,10 @@ for sdfg_name in sdfg_names:
                                 }
                             )
                             break
-        """
         sdfg.validate()
+        """
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
-        #exit()
 
     # Validate the SDFG
     sdfg.validate()
