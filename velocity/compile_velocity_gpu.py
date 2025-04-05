@@ -237,10 +237,10 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
 
 
-
     if Path(f"gpu_{sdfg_name}_stage6.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage6.sdfgz")
     else:
+        """
         # Add ThreadBlock map and coarsen a bit
         dace.Config.set('compiler', 'cuda', 'default_block_size', value="128,1,1")
         for n, graph in sdfg.all_nodes_recursive():
@@ -316,7 +316,8 @@ for sdfg_name in sdfg_names:
                                     },
                                 )
         sdfg.validate()
-        # Fix remainder loop for tiling
+        """
+        sdfg.validate()
         """
         for n, graph in sdfg.all_nodes_recursive():
             if isinstance(n, dace.nodes.MapEntry):
