@@ -2407,14 +2407,6 @@ inline void mycloudsc0_1_3_123(
 
     {}
 
-    double* zsnowrime;
-    zsnowrime = new double DACE_ALIGN(64)[sym_klon];
-    double* zgdp;
-    zgdp = new double DACE_ALIGN(64)[sym_klon];
-    double* zcorqsmix;
-    zcorqsmix = new double DACE_ALIGN(64)[sym_klon];
-    double* zdqsicedt;
-    zdqsicedt = new double DACE_ALIGN(64)[sym_klon];
     for (_for_it_23 = *v_ydecldp_var_49_ncldtop; (_for_it_23 <= sym_klev); _for_it_23 = (_for_it_23 + 1)) {
         for (_for_it_24 = 1; (_for_it_24 <= 5); _for_it_24 = (_for_it_24 + 1)) {
             for (_for_it_25 = 1; (_for_it_25 <= icend); _for_it_25 = (_for_it_25 + 1)) {
@@ -2763,6 +2755,8 @@ inline void mycloudsc0_1_3_123(
         }
         for (_for_it_26 = 1; (_for_it_26 <= icend); _for_it_26 = (_for_it_26 + 1)) {
             {
+                double zgdp;
+
                 {
                     double pap_var_17_0_in_0 = pap_var_17[((_for_it_26 + (sym_klon * (_for_it_23 - 1))) - 1)];
                     double ydcst_var_47_0_in_rd = v_ydcst_var_47_rd[0];
@@ -2798,11 +2792,11 @@ inline void mycloudsc0_1_3_123(
                     zgdp_out_0 = (ydcst_var_47_0_in_rg / zdp_0_in_0);
                     ///////////////////
 
-                    zgdp[(_for_it_26 - 1)] = zgdp_out_0;
+                    zgdp = zgdp_out_0;
                 }
                 {
                     double ptsphy_var_5_0_in = ptsphy_var_5[0];
-                    double zgdp_0_in_0 = zgdp[(_for_it_26 - 1)];
+                    double zgdp_0_in_0 = zgdp;
                     double zdtgdp_out_0;
 
                     ///////////////////
@@ -2890,6 +2884,7 @@ inline void mycloudsc0_1_3_123(
             }
             zalfaw = zfoealfa[((_for_it_26 + (sym_klon * (_for_it_23 - 1))) - 1)];
             {
+                double zdqsicedt;
                 double tmp_call_12;
                 double tmp_arg_4;
                 double* v_ydthf_var_48_r4ies;
@@ -2955,11 +2950,11 @@ inline void mycloudsc0_1_3_123(
                     zdqsicedt_out_0 = ((zfaci_0_in * zcor_0_in) * zqsice_0_in_0);
                     ///////////////////
 
-                    zdqsicedt[(_for_it_26 - 1)] = zdqsicedt_out_0;
+                    zdqsicedt = zdqsicedt_out_0;
                 }
                 {
                     double ydthf_var_48_0_in_ralsdcp = v_ydthf_var_48_ralsdcp[0];
-                    double zdqsicedt_0_in_0 = zdqsicedt[(_for_it_26 - 1)];
+                    double zdqsicedt_0_in_0 = zdqsicedt;
                     double zcorqsice_out_0;
 
                     ///////////////////
@@ -3103,6 +3098,7 @@ inline void mycloudsc0_1_3_123(
                 }
             }
             {
+                double zcorqsmix;
                 double tmp_call_13;
                 double tmp_call_14;
                 double tmp_call_17;
@@ -3170,10 +3166,10 @@ inline void mycloudsc0_1_3_123(
                     zcorqsmix_out_0 = (1.0 + (tmp_call_13_0_in * zdqsmixdt_0_in_0));
                     ///////////////////
 
-                    zcorqsmix[(_for_it_26 - 1)] = zcorqsmix_out_0;
+                    zcorqsmix = zcorqsmix_out_0;
                 }
                 {
-                    double zcorqsmix_0_in_0 = zcorqsmix[(_for_it_26 - 1)];
+                    double zcorqsmix_0_in_0 = zcorqsmix;
                     double zqsmix_0_in_0 = zqsmix[((_for_it_26 + (sym_klon * (_for_it_23 - 1))) - 1)];
                     double zqx_0_in_0 = zqx[(((_for_it_26 + ((4 * sym_klev) * sym_klon)) + (sym_klon * (_for_it_23 - 1))) - 1)];
                     double tmp_arg_5_out;
@@ -9185,6 +9181,7 @@ inline void mycloudsc0_1_3_123(
                 }
                 if ((_if_cond_60 == 1)) {
                     {
+                        double zsnowrime;
                         double tmp_call_68;
                         double tmp_call_69;
                         double tmp_arg_41;
@@ -9233,10 +9230,10 @@ inline void mycloudsc0_1_3_123(
                             zsnowrime_out_0 = (((((0.3 * zcovptot_0_in_0) * ptsphy_var_5_0_in) * ydecldp_var_49_0_in_rcl_const7s) * zfallcorr_0_in) * tmp_call_68_0_in);
                             ///////////////////
 
-                            zsnowrime[(_for_it_53 - 1)] = zsnowrime_out_0;
+                            zsnowrime = zsnowrime_out_0;
                         }
                         {
-                            double zsnowrime_0_in_0 = zsnowrime[(_for_it_53 - 1)];
+                            double zsnowrime_0_in_0 = zsnowrime;
                             double tmp_call_69_out;
 
                             ///////////////////
@@ -9255,10 +9252,10 @@ inline void mycloudsc0_1_3_123(
                             zsnowrime_out_0 = tmp_call_69_0_in;
                             ///////////////////
 
-                            zsnowrime[(_for_it_53 - 1)] = zsnowrime_out_0;
+                            zsnowrime = zsnowrime_out_0;
                         }
                         {
-                            double zsnowrime_0_in_0 = zsnowrime[(_for_it_53 - 1)];
+                            double zsnowrime_0_in_0 = zsnowrime;
                             double zsolqb_0_in_0 = zsolqb[((_for_it_53 + (3 * sym_klon)) - 1)];
                             double zsolqb_out_0;
 
@@ -12009,10 +12006,6 @@ inline void mycloudsc0_1_3_123(
             }
         }
     }
-    delete[] zsnowrime;
-    delete[] zgdp;
-    delete[] zcorqsmix;
-    delete[] zdqsicedt;
 
     for (_for_it_122 = 1; (_for_it_122 <= (sym_klev + 1)); _for_it_122 = (_for_it_122 + 1)) {
         for (_for_it_123 = 1; (_for_it_123 <= icend); _for_it_123 = (_for_it_123 + 1)) {
