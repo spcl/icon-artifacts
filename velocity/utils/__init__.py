@@ -37,3 +37,4 @@ from utils.make_unique_block_var import make_unique_block_var
 from utils.merge_maps import merge_maps, merge_maps_in_sdfg
 from utils.permute_index import permute_index
 from utils.permute_index import permute_maps
+from utils.tile import tile_kernels
