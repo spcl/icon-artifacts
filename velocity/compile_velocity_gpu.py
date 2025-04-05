@@ -227,6 +227,8 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
+        # pre_gpu_fix(sdfg)
+        # move_ifs_inside_maps(sdfg)
         flatten_lib, _ = find_node_by_name(sdfg, "flatten")
         deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
         ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib]).apply_pass(sdfg, {})

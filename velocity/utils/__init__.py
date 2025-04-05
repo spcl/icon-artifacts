@@ -38,3 +38,4 @@ from utils.merge_maps import merge_maps, merge_maps_in_sdfg
 from utils.permute_index import permute_index
 from utils.permute_index import permute_maps
 from utils.tile import tile_kernels
+from utils.move_ifs_inside_maps import move_ifs_inside_maps
