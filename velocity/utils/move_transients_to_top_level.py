@@ -136,7 +136,9 @@ def simplify_recursive(root: dace.SDFG, sdfg: dace.SDFG, verbose: bool):
 def move_transients_to_top_level(root: dace.SDFG,
                                  upper_bounds = dict[str, int],
                                  verbose=False,
-                                 only=None):
+                                 only=None,
+                                 ilifetime=None,
+                                 no_dim_change=False):
     # If we have a transient array, make it live on the top level SDFG
     # For this, collect all transients that do not exist on top level SDFG
     # Add them to top level SDFG, if they are arrays and have storage location Default
@@ -248,24 +250,44 @@ def move_transients_to_top_level(root: dace.SDFG,
             b, e, s = map_entry.map.range[0]
             bound = (e+1-b)//s
             lifetime = dace.AllocationLifetime.Scope
+            if ilifetime is not None:
+                lifetime = ilifetime # can break but if user passed something they should now it
 
         assert arr_desc.start_offset == 0, f"{arr_desc}, {arr_desc.start_offset}"
-        new_desc = dace.data.Array(
-            dtype=arr_desc.dtype,
-            shape=list(arr_desc.shape) + [bound],
-            strides=list(arr_desc.strides) + [arr_desc.total_size],
-            transient=True,
-            storage=arr_desc.storage,
-            location=arr_desc.location,
-            allow_conflicts=arr_desc.allow_conflicts,
-            offset=list(arr_desc.offset) + [0],
-            may_alias=arr_desc.may_alias,
-            lifetime=lifetime,
-            alignment=arr_desc.alignment,
-            debuginfo=arr_desc.debuginfo,
-            total_size=bound * arr_desc.total_size,
-            start_offset=0,
-        )
+        if not no_dim_change:
+            new_desc = dace.data.Array(
+                dtype=arr_desc.dtype,
+                shape=list(arr_desc.shape) + [bound],
+                strides=list(arr_desc.strides) + [arr_desc.total_size],
+                transient=True,
+                storage=arr_desc.storage,
+                location=arr_desc.location,
+                allow_conflicts=arr_desc.allow_conflicts,
+                offset=list(arr_desc.offset) + [0],
+                may_alias=arr_desc.may_alias,
+                lifetime=lifetime,
+                alignment=arr_desc.alignment,
+                debuginfo=arr_desc.debuginfo,
+                total_size=bound * arr_desc.total_size,
+                start_offset=0,
+            )
+        else:
+            new_desc = dace.data.Array(
+                dtype=arr_desc.dtype,
+                shape=list(arr_desc.shape),
+                strides=list(arr_desc.strides),
+                transient=True,
+                storage=arr_desc.storage,
+                location=arr_desc.location,
+                allow_conflicts=arr_desc.allow_conflicts,
+                offset=list(arr_desc.offset),
+                may_alias=arr_desc.may_alias,
+                lifetime=lifetime,
+                alignment=arr_desc.alignment,
+                debuginfo=arr_desc.debuginfo,
+                total_size=arr_desc.total_size,
+                start_offset=0,
+            )
         copy_new_desc = copy.deepcopy(new_desc)
         copy_new_desc.transient = False
         child_sdfg.remove_data(arr_name, False)
@@ -288,7 +310,8 @@ def move_transients_to_top_level(root: dace.SDFG,
                     mem_range_list = []
                     for b,e,s in mem_range.ranges:
                         mem_range_list += [(b, e, s)]
-                    mem_range_list += [(param_sym, param_sym, 1)]
+                    if not no_dim_change:
+                        mem_range_list += [(param_sym, param_sym, 1)]
                     state.remove_edge(edge)
                     state.add_edge(
                         edge.src,
@@ -315,9 +338,9 @@ def move_transients_to_top_level(root: dace.SDFG,
         assert len(parent_state) == 1
         parent_state = parent_state[0]
 
+        map_exit = parent_state.exit_node(map_entry)
         if "IN_" + arr_name not in map_entry.in_connectors:
             a0 = parent_state.add_access(arr_name)
-            a1 = parent_state.add_access(arr_name)
             map_entry.add_in_connector("IN_" + arr_name)
             map_entry.add_out_connector("OUT_" + arr_name)
             map_exit = parent_state.exit_node(map_entry)
@@ -345,8 +368,10 @@ def move_transients_to_top_level(root: dace.SDFG,
         #                if oe.dst.data == arr_name:
         #                    print(f"z_w_con_c: {oe}")
         #                    raise Exception("uwu")
-        if ("IN_" + arr_name not in map_exit.in_connectors) and has_write:
+        if ("OUT_" + arr_name not in map_exit.out_connectors) and has_write:
+            print(has_write, map_exit.out_connectors)
             #raise Exception(f"{map_exit} not in {parent_state.nodes()}")
+            a1 = parent_state.add_access(arr_name)
             map_exit.add_in_connector("IN_" + arr_name)
             map_exit.add_out_connector("OUT_" + arr_name)
             nsdfg.add_out_connector(arr_name, force=True)

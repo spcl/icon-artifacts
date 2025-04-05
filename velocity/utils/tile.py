@@ -24,6 +24,7 @@ from dace.transformation.dataflow import MapCollapse, MapFusion, TrivialMapElimi
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 from dace.sdfg import utils as sdutil
+from utils.config import tile
 
 def _can_apply(graph, n, seq_map_ok=False):
     if not (isinstance(n, dace.nodes.MapEntry) and n.schedule == dace.ScheduleType.GPU_Device):
@@ -43,6 +44,9 @@ def _can_apply(graph, n, seq_map_ok=False):
         return not cont
 
 def tile_kernels(sdfg: dace.SDFG):
+    if not tile:
+        return
+
     for graph in [v for v, _ in list(sdfg.all_nodes_recursive()) if isinstance(v, dace.SDFGState)]:
         for n in graph.nodes():
             if isinstance(n, dace.nodes.MapEntry):

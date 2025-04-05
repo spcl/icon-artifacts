@@ -6,6 +6,7 @@ import typing
 import re
 
 from dace.sdfg import infer_types
+from utils.config import fix_out_val_0
 
 # Replace cpp with cu
 def _replace_cpp_with_cu(directory):
@@ -167,9 +168,10 @@ def compile_if_propagated_sdfgs(
 
             modify_files_in_directory(build_loc)
             insert_measure_time_calls(build_loc, sdfg, instrument)
-            # fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
-            # fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &maxvcfl_arr")
-            # fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
+            if fix_out_val_0:
+                  fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
+                  fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &maxvcfl_arr")
+                  fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
@@ -179,12 +181,13 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
                     + main_cu_code
                 )
-            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &cfl_clipping")
-            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &z_w_con_c")
-            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &maxvcfl_arr")
-            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &gpu_levmask")
-            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &gpu_maxvcfl_arr")
-            # fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &gpu_cfl_clipping")
+            if fix_out_val_0:
+                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
+                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")
+                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
+                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_levmask")
+                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
+                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
             sources.add(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()

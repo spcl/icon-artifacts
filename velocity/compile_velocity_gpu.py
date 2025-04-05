@@ -114,11 +114,11 @@ for sdfg_name in sdfg_names:
         move_transients_to_top_level(
             root=sdfg,
             upper_bounds={
-                "z_w_con_c": 2,
-                "maxvcfl_arr": 2,
-                "cfl_clipping": 2,
-                "z_w_concorr_mc": 2,
-                "levmask": 2,
+                "z_w_con_c": 2, # TODO: ensure it works with nblocks, and not 2
+                "maxvcfl_arr": 2, # TODO: ensure it works with nblocks, and not 2
+                "cfl_clipping": 2, # TODO: ensure it works with nblocks, and not 2
+                "z_w_concorr_mc": 2, # TODO: ensure it works with nblocks, and not 2
+                "levmask": 2, # TODO: ensure it works with nblocks, and not 2
             },
         )
         preprocess_tough_nut(sdfg)
@@ -167,7 +167,7 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage4.sdfgz")
     else:
         merge_maps_in_sdfg(sdfg)
-        # pre_gpu_fix(sdfg)
+
         # make_unique_block_var(sdfg)
         # Skip state fusion until we offload to GPU as having both GPU and CPU usage in the same state
         # prevents GPU offloading form working
@@ -231,12 +231,24 @@ for sdfg_name in sdfg_names:
         # move_ifs_inside_maps(sdfg)
         flatten_lib, _ = find_node_by_name(sdfg, "flatten")
         deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
+        pre_gpu_fix(sdfg)
+        move_ifs_inside_maps(sdfg)
+        move_transients_to_top_level(
+            root=sdfg,
+            upper_bounds={
+                "out_val_0": 1, # TODO: ensure it works with nblocks, and not 1
+            },
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            no_dim_change=False,
+        )
         ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib]).apply_pass(sdfg, {})
         sdfg.validate()
         if use_cache and verbose:
             sdfg.save(f"gpu_{sdfg_name}_stage4_5.sdfgz", compress=True)
         #
+        prune_unused_inputs_outputs(sdfg)
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
+        prune_unused_inputs_outputs(sdfg)
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
@@ -247,11 +259,8 @@ for sdfg_name in sdfg_names:
     else:
         # Add ThreadBlock map and coarsen a bit
         if tile:
-
             dace.Config.set('compiler', 'cuda', 'default_block_size', value="128,1,1")
-
-            if tile:
-                tile_kernels(sdfg)
+            tile_kernels(sdfg)
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
 
