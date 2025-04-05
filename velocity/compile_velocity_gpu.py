@@ -226,7 +226,9 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
-        ToGPU(verbose=verbose).apply_pass(sdfg, {})
+        flatten_lib, _ = find_node_by_name(sdfg, "flatten")
+        deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
+        ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib]).apply_pass(sdfg, {})
         sdfg.validate()
         if use_cache and verbose:
             sdfg.save(f"gpu_{sdfg_name}_stage4_5.sdfgz", compress=True)
