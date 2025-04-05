@@ -4,6 +4,7 @@ import dace
 import os
 from dace.transformation.auto_tile.add_compute_element_map import AddComputeElementBlockMap
 from dace.transformation.auto_tile.remainder_loop import RemainderLoop
+from dace.transformation.auto_tile.remainder_loop_stencil_map import RemainderLoopStencilMap
 from dace.transformation.auto_tile.thread_coarsening import ThreadCoarsening
 from dace.transformation.interstate import (
     LoopToMap,
@@ -242,105 +243,106 @@ for sdfg_name in sdfg_names:
     if Path(f"gpu_{sdfg_name}_stage6.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage6.sdfgz")
     else:
-        """
         # Add ThreadBlock map and coarsen a bit
-        dace.Config.set('compiler', 'cuda', 'default_block_size', value="128,1,1")
-        for n, graph in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.MapEntry):
-                if n.schedule == dace.ScheduleType.GPU_Device:
-                    AddComputeElementBlockMap.apply_to(
-                        sdfg=graph.sdfg,
-                        verify=False,
-                        map_entry=n,
-                        options={
-                            "compute_element_group_dims": [128, 1, 1],
-                            "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
-                            "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
-                        },
-                    )
-        # Only if we can have a dimension we can divide nicely
-        if verbose and use_cache:
-            sdfg.save(f"gpu_{sdfg_name}_stage5_5.sdfgz", compress=True)
-        for n, graph in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.MapEntry):
-                if n.schedule == dace.ScheduleType.GPU_Device:
-                    # Assert no reductions in the map
-                    ns = graph.all_nodes_between(n, graph.exit_node(n))
-                    cont = False
-                    for _n in ns:
-                        if isinstance(_n, dace.nodes.LibraryNode):
-                            cont = True
-                            break
-                    if cont:
-                        continue
+        if tile:
 
-                    for n2 in sdutil.dfs_topological_sort(graph, n):
-                        if (
-                            isinstance(n2, dace.nodes.MapEntry)
-                            and n2.map.schedule == dace.dtypes.ScheduleType.GPU_ThreadBlock
-                        ):
-                            #print(n.map.range) # 1:91(0:90) or 1:92(0:91) -> meaning 90 and 91 elements
-                            coarsening_factors = []
-                            for (b, e, s), (tb, te, ts) in zip(n.map.range, n2.map.range):
-                                range1 = (e+1-b)//s
-                                range2 = (te+1-tb)//ts
-                                print(f"Range1: {range1}, Range2: {range2} for map {n}")
-                                dim = 1
-                                try:
-                                    dim = int(range1 // range2)
-                                except:
-                                    dim = 1
-                                if dim == 92:
-                                    coarsening_factor = 8
-                                    print("Coarsening factor: 8 for range 92")
-                                if dim == 91:
-                                    coarsening_factor = 7
-                                    print("Coarsening factor: 7 for range 91")
-                                elif dim == 90:
-                                    coarsening_factor = 9
-                                    print("Coarsening factor: 9 for range 90")
-                                elif dim == 89:
-                                    coarsening_factor = 1
-                                    print("Coarsening factor: 1 for range 89")
+            dace.Config.set('compiler', 'cuda', 'default_block_size', value="128,1,1")
+            for n, graph in sdfg.all_nodes_recursive():
+                if isinstance(n, dace.nodes.MapEntry):
+                    if n.schedule == dace.ScheduleType.GPU_Device:
+                        AddComputeElementBlockMap.apply_to(
+                            sdfg=graph.sdfg,
+                            verify=False,
+                            map_entry=n,
+                            options={
+                                "compute_element_group_dims": [128, 1, 1],
+                                "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
+                                "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                            },
+                        )
+            # Only if we can have a dimension we can divide nicely
+            if verbose and use_cache:
+                sdfg.save(f"gpu_{sdfg_name}_stage5_5.sdfgz", compress=True)
+            for n, graph in sdfg.all_nodes_recursive():
+                if isinstance(n, dace.nodes.MapEntry):
+                    if n.schedule == dace.ScheduleType.GPU_Device:
+                        # Assert no reductions in the map
+                        ns = graph.all_nodes_between(n, graph.exit_node(n))
+                        cont = False
+                        for _n in ns:
+                            if isinstance(_n, dace.nodes.LibraryNode):
+                                cont = True
+                                break
+                        if cont:
+                            continue
+
+                        for n2 in sdutil.dfs_topological_sort(graph, n):
+                            if (
+                                isinstance(n2, dace.nodes.MapEntry)
+                                and n2.map.schedule == dace.dtypes.ScheduleType.GPU_ThreadBlock
+                            ):
+                                #print(n.map.range) # 1:91(0:90) or 1:92(0:91) -> meaning 90 and 91 elements
+                                coarsening_factors = []
+                                if not remainder_loop:
+                                    for (b, e, s), (tb, te, ts) in zip(n.map.range, n2.map.range):
+                                        range1 = (e+1-b)//s
+                                        range2 = (te+1-tb)//ts
+                                        print(f"Range1: {range1}, Range2: {range2} for map {n}")
+                                        dim = 1
+                                        try:
+                                            dim = int(range1 // range2)
+                                        except:
+                                            dim = 1
+                                        if dim == 92:
+                                            coarsening_factor = 8
+                                            print("Coarsening factor: 8 for range 92")
+                                        if dim == 91:
+                                            coarsening_factor = 7
+                                            print("Coarsening factor: 7 for range 91")
+                                        elif dim == 90:
+                                            coarsening_factor = 9
+                                            print("Coarsening factor: 9 for range 90")
+                                        elif dim == 89:
+                                            coarsening_factor = 1
+                                            print("Coarsening factor: 1 for range 89")
+                                        else:
+                                            coarsening_factor = 1
+                                        coarsening_factors.append(coarsening_factor)
                                 else:
-                                    coarsening_factor = 1
-                                coarsening_factors.append(coarsening_factor)
-                            print(f"Coarsening factors: {coarsening_factors} apply value: {not all([v == 1 for v in coarsening_factors])}")
-                            print("\n")
-                            if not all([v == 1 for v in coarsening_factors]):
-                                ThreadCoarsening.apply_to(
-                                    sdfg=graph.sdfg,
-                                    verify=False,
-                                    thread_group_map_entry=n2,
-                                    device_map_entry=n,
-                                    options={
-                                        "tile_sizes": list(reversed(coarsening_factors)),
-                                    },
-                                )
-        sdfg.validate()
-        """
-        sdfg.validate()
-        """
-        for n, graph in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.MapEntry):
-                if n.schedule == dace.ScheduleType.GPU_Device:
-                    for n2 in sdutil.dfs_topological_sort(graph, n):
-                        if (
-                            isinstance(n2, dace.nodes.MapEntry)
-                            and n2.map.label.startswith("ThreadCoarsenedMap")
-                        ):
-                            RemainderLoop.apply_to(
-                                sdfg=graph.sdfg,
-                                verify=True,
-                                inner_work_map_entry=n2,
-                                tblock_type=dace.dtypes.ScheduleType.GPU_ThreadBlock,
-                                options={
-                                    "tblock_type": dace.dtypes.ScheduleType.GPU_ThreadBlock,
-                                }
-                            )
-                            break
-        sdfg.validate()
-        """
+                                    coarsening_factors = [4, 2]
+                                print(f"Coarsening factors: {coarsening_factors} apply value: {not all([v == 1 for v in coarsening_factors])}")
+                                print("\n")
+                                if not all([v == 1 for v in coarsening_factors]):
+                                    ThreadCoarsening.apply_to(
+                                        sdfg=graph.sdfg,
+                                        verify=False,
+                                        thread_group_map_entry=n2,
+                                        device_map_entry=n,
+                                        options={
+                                            "tile_sizes": list(reversed(coarsening_factors)),
+                                        },
+                                    )
+            sdfg.validate()
+            if remainder_loop:
+                for n, graph in sdfg.all_nodes_recursive():
+                    if isinstance(n, dace.nodes.MapEntry):
+                        if n.schedule == dace.ScheduleType.GPU_Device:
+                            for n2 in sdutil.dfs_topological_sort(graph, n):
+                                if (
+                                    isinstance(n2, dace.nodes.MapEntry)
+                                    and n2.map.label.startswith("ThreadCoarsenedMap")
+                                ):
+                                    RemainderLoopStencilMap.apply_to(
+                                        sdfg=graph.sdfg,
+                                        verify=True,
+                                        inner_work_map_entry=n2,
+                                        tblock_type=dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                                        options={
+                                            "tblock_type": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                                        }
+                                    )
+                                    break
+                sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
 
