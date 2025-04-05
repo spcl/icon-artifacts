@@ -249,6 +249,7 @@ for sdfg_name in sdfg_names:
         prune_unused_inputs_outputs(sdfg)
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         prune_unused_inputs_outputs(sdfg)
+        #to_segmented_reduction(sdfg)
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
