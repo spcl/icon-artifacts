@@ -38,12 +38,6 @@ double reduce_maxZ_to_scalar_gpu(const double *d_in, int size)
   return maxval;
 }
 
-int reduce_sum_to_scalar_gpu(const int *d_in, int size)
-{
-  int maxval = thrust::reduce(d_in, d_in + size, 0, thrust::plus<int>());
-  return maxval;
-}
-
 // sum reduction interface
 void reduce_sum_to_address_gpu(const int *d_in, int* d_out, int size)
 {
@@ -65,6 +59,12 @@ void reduce_sum_to_address_gpu(const int *d_in, int* d_out, int size)
   if (temp_storage_bytes != 0) {
     cudaFree(d_temp_storage);
   }
+}
+
+int reduce_sum_to_scalar_gpu(const int *d_in, int size)
+{
+  int maxval = thrust::reduce(d_in, d_in + size, 0, thrust::plus<int>());
+  return maxval;
 }
 
 // scan reduction interface

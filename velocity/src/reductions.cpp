@@ -26,13 +26,9 @@ void reduce_maxZ_to_address_cpu(const double *d_in, double* d_out, int size)
   d_out[0] = max_val;
 }
 
-double reduce_maxZ_cpu(const double d_in, int size)
-{
-  return (d_in > 0) ? d_in : 0;
-}
 
 // sum reduction interface
-int reduce_sum_cpu(const int *d_in, int size)
+int reduce_sum_to_scalar_cpu(const int *d_in, int size)
 {
   int sum = 0.0;
 #pragma omp parallel for reduction(+ : sum)
@@ -42,18 +38,19 @@ int reduce_sum_cpu(const int *d_in, int size)
   return sum;
 }
 
-int reduce_sum_cpu(const int d_in, int size)
+void reduce_sum_to_address_cpu(const int *d_in, int* d_out, int size)
 {
-  return d_in;
+  int sum = 0.0;
+#pragma omp parallel for reduction(+ : sum)
+  for (int i = 0; i < size; i++){
+    sum += d_in[i];
+  }
+  d_out[0] = sum;
 }
+
 
 // scan reduction interface
 int reduce_scan_cpu(const int *d_in, int size)
 {
-  return reduce_sum_cpu(d_in, size) > 0? 1 : 0;
-}
-
-int reduce_scan_cpu(const int d_in, int size)
-{
-  return d_in > 0? 1 : 0;
+  return reduce_sum_to_scalar_cpu(d_in, size) > 0? 1 : 0;
 }

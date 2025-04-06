@@ -56,6 +56,14 @@ def _insert_reduction(
         #else
           out = reduce_{type}_cpu(in_arr, in_size);
         #endif
+        """ if "address" not in type else f"""
+        #ifdef __REDUCE_DEVICE__
+          reduce_{type}_device(in_arr, &out, in_size);
+        #elif defined(__REDUCE_GPU__)
+          reduce_{type}_gpu(in_arr, &out, in_size);
+        #else
+          reduce_{type}_cpu(in_arr, &out, in_size);
+        #endif
         """,
     )
 
@@ -122,7 +130,7 @@ def _insert_reduction(
             red_node, "out", red_state.add_write(out_name), None, dace.Memlet(out_expr)
         )
 
-    return red_state
+    return red_state, red_node
 
 
 def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
@@ -151,7 +159,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
             assert len(tmp_call_names) == 1, f"{tmp_call_names} is not a single variable"
             var_name = tmp_call_names[0]
     assert var_name is not None, f"Could not deduce output variable name"
-    _insert_reduction(
+    red_state, red_node = _insert_reduction(
         sdfg,
         loop_node,
         vcfl_name,
@@ -160,6 +168,8 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
         "maxZ_to_scalar",
         in_expr=f"{vcfl_name}[{start}-1:{end}-1]",
     )
+    red_node._offloadable = False
+    red_node._output = "scalar"
     pre_state = sdfg.add_state_before(loop_node)
     post_state = sdfg.add_state_after(loop_node)
     sdfg.remove_node(loop_node)
@@ -168,6 +178,8 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     in_name = list(task.free_symbols)[0]
     out_name = list(task.out_connectors.keys())[0]
     task.code.as_string = f"{out_name} = {in_name}"
+    task._offloadable = False
+    task._output = "scalar"
 
 
 def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
@@ -187,7 +199,7 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
     outer_loop = parent
     outer_it_var = outer_loop.loop_variable
 
-    _insert_reduction(
+    red_state, red_node = _insert_reduction(
         parent,
         loop,
         "cfl_clipping",
@@ -196,11 +208,23 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
         "sum_to_address",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
     )
+    red_node._offloadable = True
+    red_node._output = "array"
     from utils.move_scalar_to_array import move_scalar_to_array
 
     dst_arr_name = "out_val_0"
     move_scalar_to_array(sdfg, dst_arr_name)
+    # Change interstate edge
+    for oe in red_state.parent_graph.out_edges(red_state):
+        if oe.data is not None:
+            if oe.data.assignments is not None:
+                for k, v in oe.data.assignments.items():
+                    if v == "out_val_0":
+                        oe.data.assignments[k] = "out_val_0[0]"
 
+
+    task._offloadable = True
+    task._output = "array"
 
 def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     """
@@ -259,17 +283,18 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         dace.Memlet(f"{arr_name}[{il_it_name}-1,{ol_it_name}-1]"),
     )
 
-    _insert_reduction(
+    red_state, red_node = _insert_reduction(
         loop_P,
         loop,
         "maxvcfl_arr",
         f"({il_end} - {il_start}) * ({ol_end} - {ol_start})",
         "maxvcfl",
-        "maxZ",
+        "maxZ_to_scalar",
         in_expr=f"maxvcfl_arr[0:{il_end} - {il_start},0:{ol_end} - {ol_start}]",
         out_expr="maxvcfl[0]",
     )
-
+    red_node._offloadable = False
+    red_node._output = "scalar"
 
 def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     """
@@ -282,7 +307,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     outer_loop = parent
     outer_it_var = outer_loop.loop_variable
 
-    _insert_reduction(
+    red_state, red_node = _insert_reduction(
         parent,
         loop,
         "levmask",
@@ -299,7 +324,8 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     task, parent = find_node_by_name(sdfg, task_name)
     parent.remove_node(parent.successors(task)[0])
     parent.remove_node(task)
-
+    red_node._offloadable = True
+    red_node._output = "array"
 
 def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     """
@@ -414,6 +440,7 @@ def add_all_reductions(sdfg: dace.SDFG):
             sdfg, "T_l551_c551", "Conditional_l_551_c_551", "FOR_l_549_c_549"
         )
 
+        # vcflmax will be kept on the CPU so this should write to a scalar
         maxvcfl_to_reduction(sdfg, "T_l558_c558", f"FOR_l_547_c_547")
 
         tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
