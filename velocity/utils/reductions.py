@@ -229,7 +229,6 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
     red_node._offloadable = True
     red_node._output = "array"
 
-
     # Change interstate edge
     for oe in red_state.parent_graph.out_edges(red_state):
         if oe.data is not None:

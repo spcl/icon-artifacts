@@ -257,7 +257,7 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
 
-        ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib]).apply_pass(sdfg, {})
+        ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib], exclude=["vcflmax"]).apply_pass(sdfg, {})
         sdfg.validate()
         if use_cache and verbose:
             sdfg.save(f"gpu_{sdfg_name}_stage4_5.sdfgz", compress=True)
