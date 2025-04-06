@@ -272,22 +272,8 @@ def move_transients_to_top_level(root: dace.SDFG,
                 start_offset=0,
             )
         else:
-            new_desc = dace.data.Array(
-                dtype=arr_desc.dtype,
-                shape=list(arr_desc.shape),
-                strides=list(arr_desc.strides),
-                transient=True,
-                storage=arr_desc.storage,
-                location=arr_desc.location,
-                allow_conflicts=arr_desc.allow_conflicts,
-                offset=list(arr_desc.offset),
-                may_alias=arr_desc.may_alias,
-                lifetime=lifetime,
-                alignment=arr_desc.alignment,
-                debuginfo=arr_desc.debuginfo,
-                total_size=arr_desc.total_size,
-                start_offset=0,
-            )
+            new_desc = copy.deepcopy(arr_desc)
+            new_desc.transient = True
         copy_new_desc = copy.deepcopy(new_desc)
         copy_new_desc.transient = False
         child_sdfg.remove_data(arr_name, False)

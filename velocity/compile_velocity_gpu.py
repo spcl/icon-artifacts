@@ -209,7 +209,7 @@ for sdfg_name in sdfg_names:
         #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
 
         sdfg.simplify(skip=["StateFusion"])
-
+        sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage4.sdfgz", compress=True)
 
@@ -225,16 +225,38 @@ for sdfg_name in sdfg_names:
         # move_ifs_inside_maps(sdfg)
         flatten_lib, _ = find_node_by_name(sdfg, "flatten")
         deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
-        pre_gpu_fix(sdfg)
-        move_ifs_inside_maps(sdfg)
+        #pre_gpu_fix(sdfg)
+        #move_ifs_inside_maps(sdfg)
+        # z_v_grad_w [ tmp_struct_symbol_4, 90, tmp_struct_symbol_5 ] (nproma,p_patch%nlev,p_patch%nblks_e)
+        # tmp_struct_symbol_5 == nblks_e
+        # zeta [ tmp_struct_symbol_8, 90, tmp_struct_symbol_9 ] (nproma,p_patch%nlev,p_patch%nblks_v)
+        # tmp_struct_symbol_9 == nblks_v
+        # z_ekinh [ tmp_struct_symbol_10, 90, tmp_struct_symbol_11 ] (nproma,p_patch%nlev,p_patch%nblks_c)
+        # tmp_struct_symbol_11 == nblks_c
+        move_transients_to_top_level(
+            root=sdfg,
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            only=["z_w_concorr_mc", "z_w_con_c", "z_v_grad_w",
+                  "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full",
+                  "levmask", "cfl_clipping", "maxvcfl_arr"],
+            no_dim_change=True,
+        )
         move_transients_to_top_level(
             root=sdfg,
             upper_bounds={
-                "out_val_0": 1, # TODO: ensure it works with nblocks, and not 1
+                "out_val_0": 91, # We need to duplicate this with nlevp1 should be good to go
             },
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
-            no_dim_change=False,
+            only=["out_val_0"],
         )
+        move_scalar_to_array(
+            root=sdfg,
+            name="difcoef"
+        )
+
+        sdfg.validate()
+        sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
+
         ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib]).apply_pass(sdfg, {})
         sdfg.validate()
         if use_cache and verbose:
@@ -243,6 +265,7 @@ for sdfg_name in sdfg_names:
         prune_unused_inputs_outputs(sdfg)
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         prune_unused_inputs_outputs(sdfg)
+        move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
         #gitto_segmented_reduction(sdfg)
         sdfg.validate()
         if use_cache:

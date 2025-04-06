@@ -382,7 +382,7 @@ def add_all_reductions(sdfg: dace.SDFG):
     #
     #    warnings.warn("vcflmax is a symbol, demoting to a scalar")
     #    _demote_vcflmax(sdfg)
-    assert "vcflmax" not in sdfg.symbols and "vcflmax" in sdfg.arrays, f"vcflmax needs to be an array"
+    assert "vcflmax" not in sdfg.symbols, "vcflmax is a symbol, demoting to a scalar"
 
     # We assume the array names and iteration variable names never change
     if "nproma32" in sdfg.name:
