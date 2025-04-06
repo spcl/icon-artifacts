@@ -60,7 +60,7 @@ for sdfg_name in sdfg_names:
             verbose=verbose,
             simplify=False,
             interface_with_struct_copy=True,
-            interface_to_gpu=False,
+            interface_to_gpu=True,
             clean_trivial_views=True,
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
