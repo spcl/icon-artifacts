@@ -221,12 +221,11 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
-        # pre_gpu_fix(sdfg)
-        # move_ifs_inside_maps(sdfg)
-        flatten_lib, _ = find_node_by_name(sdfg, "flatten")
-        deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
         #pre_gpu_fix(sdfg)
         #move_ifs_inside_maps(sdfg)
+        flatten_lib, _ = find_node_by_name(sdfg, "flatten")
+        deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
+
         # z_v_grad_w [ tmp_struct_symbol_4, 90, tmp_struct_symbol_5 ] (nproma,p_patch%nlev,p_patch%nblks_e)
         # tmp_struct_symbol_5 == nblks_e
         # zeta [ tmp_struct_symbol_8, 90, tmp_struct_symbol_9 ] (nproma,p_patch%nlev,p_patch%nblks_v)
@@ -258,7 +257,6 @@ for sdfg_name in sdfg_names:
 
         sdfg.validate()
         sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
-
         ToGPU(verbose=verbose, cpu_library_nodes=[flatten_lib, deflatten_lib], exclude=["vcflmax"]).apply_pass(sdfg, {})
         sdfg.validate()
         if use_cache and verbose:
@@ -268,7 +266,7 @@ for sdfg_name in sdfg_names:
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         prune_unused_inputs_outputs(sdfg)
         move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
-        #gitto_segmented_reduction(sdfg)
+        #TODO: to_segmented_reduction(sdfg)
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
