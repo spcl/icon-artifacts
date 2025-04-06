@@ -37,6 +37,7 @@ def _insert_reduction(
     type: str,
     in_expr: str = None,
     out_expr: str = None,
+    symtype: dace.typeclass = None,
 ):
     """
     Adds a reduction node to the state after the given state.
@@ -58,11 +59,11 @@ def _insert_reduction(
         #endif
         """ if "address" not in type else f"""
         #ifdef __REDUCE_DEVICE__
-          reduce_{type}_device(in_arr, &out, in_size);
+          reduce_{type}_device(in_arr, out, in_size);
         #elif defined(__REDUCE_GPU__)
-          reduce_{type}_gpu(in_arr, &out, in_size);
+          reduce_{type}_gpu(in_arr, out, in_size);
         #else
-          reduce_{type}_cpu(in_arr, &out, in_size);
+          reduce_{type}_cpu(in_arr, out, in_size);
         #endif
         """,
     )
@@ -111,20 +112,23 @@ def _insert_reduction(
 
     # Route output
     if out_expr is None:
-        arr_name, arr = red_state.sdfg.add_scalar(
-            "out_val",
-            dtype=dace.float64,
-            transient=True,
-            find_new_name=True,
-        )
-        red_state.add_edge(
-            red_node,
-            "out",
-            red_state.add_write(arr_name),
-            None,
-            dace.Memlet.from_array(arr_name, arr),
-        )
-        parent.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+        #if "address" not in type:
+            arr_name, arr = red_state.sdfg.add_scalar(
+                "out_val",
+                dtype=symtype,
+                transient=True,
+                find_new_name=True,
+            )
+            red_state.add_edge(
+                red_node,
+                "out",
+                red_state.add_write(arr_name),
+                None,
+                dace.Memlet.from_array(arr_name, arr),
+            )
+            parent.add_state_after(red_state, assignments={out_name: f"{arr_name}"})
+        #else:
+        #
     else:
         red_state.add_edge(
             red_node, "out", red_state.add_write(out_name), None, dace.Memlet(out_expr)
@@ -167,6 +171,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
         f"{var_name}",
         "maxZ_to_scalar",
         in_expr=f"{vcfl_name}[{start}-1:{end}-1]",
+        symtype=dace.float64,
     )
     red_node._offloadable = False
     red_node._output = "scalar"
@@ -199,29 +204,40 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
     outer_loop = parent
     outer_it_var = outer_loop.loop_variable
 
+    from utils.move_scalar_to_array import move_scalar_to_array
+    dst_arr_name = "out_val_0"
+    if "out_val_0" not in sdfg.arrays:
+        sdfg.add_array(
+            "out_val_0",
+            shape=[1],
+            dtype=dace.int32,
+            transient=True,
+            find_new_name=False,
+        )
+    #move_scalar_to_array(sdfg, dst_arr_name)
     red_state, red_node = _insert_reduction(
         parent,
         loop,
         "cfl_clipping",
         f"{end} - {start}",
-        "clip_count",
+        "out_val_0",
         "sum_to_address",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
+        out_expr=f"out_val_0[0:0]",
+        symtype=dace.int32,
     )
     red_node._offloadable = True
     red_node._output = "array"
-    from utils.move_scalar_to_array import move_scalar_to_array
 
-    dst_arr_name = "out_val_0"
-    move_scalar_to_array(sdfg, dst_arr_name)
+
     # Change interstate edge
     for oe in red_state.parent_graph.out_edges(red_state):
         if oe.data is not None:
             if oe.data.assignments is not None:
                 for k, v in oe.data.assignments.items():
-                    if v == "out_val_0":
-                        oe.data.assignments[k] = "out_val_0[0]"
-
+                    if v == "out_val":
+                        oe.data.assignments[k] = "out_val[0]"
+    sdfg.validate()
 
     task._offloadable = True
     task._output = "array"
@@ -292,6 +308,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         "maxZ_to_scalar",
         in_expr=f"maxvcfl_arr[0:{il_end} - {il_start},0:{ol_end} - {ol_start}]",
         out_expr="maxvcfl[0]",
+        symtype=dace.float64,
     )
     red_node._offloadable = False
     red_node._output = "scalar"
@@ -316,6 +333,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         "scan",
         in_expr=f"levmask[{start}-1:{end}-1,{outer_it_var}-1]",
         out_expr=f"levelmask[{outer_it_var}-1]",
+        symtype=dace.int32,
     )
     pre_state = parent.add_state_before(loop)
     post_state = parent.add_state_after(loop)
@@ -353,6 +371,7 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         "scan",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
         out_expr=f"levmask[{outer_outer_it_var}-1,{outer_it_var}-1]",
+        symtype=dace.int32,
     )
     task, parent = find_node_by_name(sdfg, task_name)
     parent.remove_node(parent.successors(task)[0])
