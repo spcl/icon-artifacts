@@ -26,10 +26,10 @@ from dace.sdfg import utils as sdutil
 
 # Load SDFG
 sdfg_names = [
-    "velocity_nproma20480_if_prop_lvn_only_0_istep_1.sdfgz",
-    "velocity_nproma20480_if_prop_lvn_only_1_istep_1.sdfgz",
-    "velocity_nproma20480_if_prop_lvn_only_1_istep_2.sdfgz",
-    "velocity_nproma20480_if_prop_lvn_only_0_istep_2.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_1.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_1.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_2.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_2.sdfgz",
 ]
 resulting_sdfgs = []
 for sdfg_name in sdfg_names:
@@ -48,6 +48,7 @@ for sdfg_name in sdfg_names:
     if Path(f"gpu_{sdfg_name}_stage1.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage1.sdfgz")
     else:
+        # Needed to remove partial view towards (it is illegal and should not happen)
         clean_bad_views(sdfg)
         sdfg.apply_transformations_repeated(ContinueToCondition)
         sdfg.simplify()
@@ -63,7 +64,11 @@ for sdfg_name in sdfg_names:
             clean_trivial_views=True,
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
-        apply_loop_locality_pass(sdfg)
+
+        # Nproma is not known at compile time anymore
+        # TODO: Circumvent this
+        # apply_loop_locality_pass(sdfg)
+
         if reduction:
             add_all_reductions(sdfg)
         sdfg.simplify(skip=["ArrayElimination"])
@@ -83,21 +88,6 @@ for sdfg_name in sdfg_names:
         if verbose:
             sdfg.save("parallel.sdfgz", compress=True)
 
-        # Creates segfault with 2GPU applied
-        """
-        for s in sdfg.states():
-            for n in s.nodes():
-                if isinstance(n, dace.nodes.MapEntry):
-                    if (n.map.range == dace.subsets.Range([[1, 1, 1]]) or
-                        n.map.range == dace.subsets.Range([[0, 0, 1]])):
-                        #return self._subgraph_user fails checking can be applied??
-                        #if TrivialMapElimination().can_be_applied(s, s.node_id(n), sdfg):
-                        TrivialMapElimination().apply_to(sdfg=sdfg, map_entry=n)
-                        #else:
-                        #    print(f"Cannot eliminate map {n.map} in state {s} in SDFG {sdfg.label}")
-        """
-
-
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
@@ -108,19 +98,23 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage3.sdfgz")
     else:
         sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
-        # This can only be safely applied to selected cases. Skip for now.
+
+        # With kernel launch restructuring we do not collapse and do not need this
         # sdfg.apply_transformations(YoloMapFission)
-        # preprocess_tough_nut(sdfg)
-        move_transients_to_top_level(
-            root=sdfg,
-            upper_bounds={
-                "z_w_con_c": 2, # TODO: ensure it works with nblocks, and not 2
-                "maxvcfl_arr": 2, # TODO: ensure it works with nblocks, and not 2
-                "cfl_clipping": 2, # TODO: ensure it works with nblocks, and not 2
-                "z_w_concorr_mc": 2, # TODO: ensure it works with nblocks, and not 2
-                "levmask": 2, # TODO: ensure it works with nblocks, and not 2
-            },
-        )
+
+        # These simplified by DaCe when nblks_c and nblks_v were known to be 2 and nblocks_e was 2
+        # Now should not be needed
+        #move_transients_to_top_level(
+        #    root=sdfg,
+        #    upper_bounds={
+        #        "z_w_con_c": 2, # TODO: ensure it works with nblocks, and not 2
+        #        "maxvcfl_arr": 2, # TODO: ensure it works with nblocks, and not 2
+        #        "cfl_clipping": 2, # TODO: ensure it works with nblocks, and not 2
+        #        "z_w_concorr_mc": 2, # TODO: ensure it works with nblocks, and not 2
+        #        "levmask": 2, # TODO: ensure it works with nblocks, and not 2
+        #    },
+        #)
+
         preprocess_tough_nut(sdfg)
         prune_unused_inputs_outputs(sdfg)
         prune_unused_inputs_outputs_recursive(sdfg)
@@ -249,7 +243,7 @@ for sdfg_name in sdfg_names:
         prune_unused_inputs_outputs(sdfg)
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         prune_unused_inputs_outputs(sdfg)
-        #to_segmented_reduction(sdfg)
+        #gitto_segmented_reduction(sdfg)
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)

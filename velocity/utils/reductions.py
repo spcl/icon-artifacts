@@ -139,16 +139,24 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
             break
     assert vcfl_name is not None, "vcflmax not found"
 
-    var_name = list(
+    var_names = list(
         loop_node.nodes()[0].branches[0][0].get_free_symbols() - loop_node.free_symbols
     )
-    assert len(var_name) == 1
+    var_name = None
+    if len(var_names) == 1:
+        var_name = list(var_names)[0]
+    else:
+        for name in var_names:
+            tmp_call_names = [v for v in var_names if "tmp_call" in v]
+            assert len(tmp_call_names) == 1, f"{tmp_call_names} is not a single variable"
+            var_name = tmp_call_names[0]
+    assert var_name is not None, f"Could not deduce output variable name"
     _insert_reduction(
         sdfg,
         loop_node,
         vcfl_name,
         f"{end} - {start}",
-        f"{var_name[0]}",
+        f"{var_name}",
         "maxZ",
         in_expr=f"{vcfl_name}[{start}-1:{end}-1]",
     )
@@ -386,6 +394,14 @@ def add_all_reductions(sdfg: dace.SDFG):
         levmask_to_reduction(sdfg, f"FOR_l_470_c_470", "T_l472_c472")
 
     elif "nproma20480" in sdfg.name:
+        loop_to_max_reduction(sdfg, f"FOR_l_652_c_652", "T_l652_c652")
+        cfl_clipping_to_reduction(
+            sdfg, "T_l551_c551", "Conditional_l_551_c_551", "FOR_l_549_c_549"
+        )
+        maxvcfl_to_reduction(sdfg, "T_l558_c558", f"FOR_l_547_c_547")
+        tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
+        levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
+    elif "no_nproma" in sdfg.name:
         loop_to_max_reduction(sdfg, f"FOR_l_652_c_652", "T_l652_c652")
         cfl_clipping_to_reduction(
             sdfg, "T_l551_c551", "Conditional_l_551_c_551", "FOR_l_549_c_549"

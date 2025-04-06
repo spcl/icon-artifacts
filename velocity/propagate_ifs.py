@@ -3,7 +3,7 @@ import dace
 from utils import *
 
 # Load SDFG
-sdfg_name = "velocity_nproma20480.sdfgz"
+sdfg_name = "velocity_no_nproma.sdfgz"
 sdfg = dace.SDFG.from_file(sdfg_name)
 sdfg.name = sdfg_name.split(".")[0]
 sdfg.validate()
