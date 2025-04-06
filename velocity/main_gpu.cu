@@ -3,11 +3,11 @@
 #include <iostream>
 #include <string>
 
-#include "serde_velocity_nproma20480_gpu.h"
-#include "velocity_tendencies_nproma20480_gpu.h"
+#include "serde_velocity_no_nproma_gpu.h"
+#include "velocity_tendencies_no_nproma_gpu.h"
 
 int main(int argc, char* argv[]) {
-  const std::filesystem::path ROOT{"data_nproma20480"};
+  const std::filesystem::path ROOT{"data_no_nproma"};
   int max_n1 = 1;
   int max_n2 = 5;
 
