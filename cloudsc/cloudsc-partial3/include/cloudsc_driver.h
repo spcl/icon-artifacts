@@ -6,6 +6,8 @@
 
 #include "../../struct_defs.h"
 
+struct cloudsc_driver_state_t;  // Forward declaration.
+
 DACE_EXPORTED cloudsc_driver_state_t* __dace_init_cloudsc_driver(
     int* __restrict__ ktype, int* __restrict__ ldcum, double* __restrict__ pa, double* __restrict__ pap, double* __restrict__ paph, double* __restrict__ pccn, double* __restrict__ pclv,
     double* __restrict__ pcovptot, double* __restrict__ pdyna, double* __restrict__ pdyni, double* __restrict__ pdynl, double* __restrict__ pfcqlng, double* __restrict__ pfcqnng,

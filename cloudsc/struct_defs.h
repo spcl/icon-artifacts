@@ -307,4 +307,4 @@ struct tecldp {
     double rbetap1[101];
 };
 
-struct cloudsc_driver_state_t {};
+//struct cloudsc_driver_state_t {};
