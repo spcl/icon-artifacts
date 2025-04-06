@@ -43,6 +43,12 @@ def modify_file(file_path, pattern):
         if pattern.match(line):
             line = pattern.sub(r"\1static int tmp_struct_symbol", line)
             modified = True
+        line = re.sub(
+            r'\bint\s+(__(f2dace_[a-zA-Z0-9_]+));',
+            r'static int \1;',
+            line
+        )
+            
         new_lines.append(line)
 
     if modified:

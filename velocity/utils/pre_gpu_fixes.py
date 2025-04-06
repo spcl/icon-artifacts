@@ -360,7 +360,7 @@ def step_1(sdfg: dace.SDFG):
     # parent.remove_node(node)
     sdfg.validate()
     sdfg.apply_transformations_repeated(MapCollapse)
-    sdfg.save("debug.sdfg")
+    # sdfg.save("debug.sdfg")
     # assert False
     
 def step_2(sdfg: dace.SDFG):
@@ -424,7 +424,7 @@ def step_2(sdfg: dace.SDFG):
             node.symbol_mapping["clip_count"] = "out_val_0"
     parent_sdfg.remove_node(cond_block_copy)
     set_nested_sdfg_parent_references(sdfg)
-    sdfg.save("debug_step_2.sdfg")
+    # sdfg.save("debug_step_2.sdfg")
     sdfg.validate()
     return parent_sdfg.parent      
     
@@ -433,7 +433,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
     """
     assert isinstance(target_state, dace.SDFGState)
     edge_map = {}
-    sdfg.save("debug_step_3_1.sdfg")
+    # sdfg.save("debug_step_3_1.sdfg")
     for node in target_state.nodes():
         if node.label == "T_l546_c546":
             target_state.remove_node(node)
@@ -533,13 +533,13 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             map_nsdfg.add_in_connector("out_val_0")
             map_state.add_edge(node, "OUT_5", map_nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
     
-    sdfg.save("debug_step_3_2.sdfg")
+    # sdfg.save("debug_step_3_2.sdfg")
     sdfg.simplify(validate=False)    
     # sdfg.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     target_state.parent.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     node, parent = find_node_by_name(sdfg, "T_l562_c562")
     parent.parent.add_scalar("out_val_0", dtype=dace.float64)
-    sdfg.save("debug_step_3.sdfg")
+    # sdfg.save("debug_step_3.sdfg")
     sdfg.validate()
     # assert False
 
