@@ -47,12 +47,13 @@ def map_for_44(sdfg: dace.SDFG):
     inner_map_entry = [node for node in state_to_duplicate.nodes() if isinstance(node, dace.nodes.MapEntry)][0]
     
     an = state_to_duplicate.add_access("levmask")
-    inner_map_entry.add_in_connector("IN_13")
-    inner_map_entry.add_out_connector("OUT_13")
-    state_to_duplicate.add_edge(an, None, inner_map_entry, "IN_13", dc(in_edge.data))
+    conn_number = state_to_duplicate.in_degree(inner_map_entry) + 1
+    inner_map_entry.add_in_connector(f"IN_{conn_number}")
+    inner_map_entry.add_out_connector(f"OUT_{conn_number}")
+    state_to_duplicate.add_edge(an, None, inner_map_entry, f"IN_{conn_number}", dc(in_edge.data))
     nsddfg = state_to_duplicate.out_edges(inner_map_entry)[0].dst
     nsddfg.add_in_connector("levmask")
-    state_to_duplicate.add_edge(inner_map_entry, "OUT_13", nsddfg, "levmask", dc(out_edge.data))
+    state_to_duplicate.add_edge(inner_map_entry, f"OUT_{conn_number}", nsddfg, "levmask", dc(out_edge.data))
     # Add memlet symbol
     
     outer_nsdfg.symbol_mapping["nrdmax_jg"] = "nrdmax_jg"
@@ -108,12 +109,13 @@ def map_for_52(sdfg: dace.SDFG):
     inner_map_entry = [node for node in state_to_duplicate.nodes() if isinstance(node, dace.nodes.MapEntry)][0]
     
     an = state_to_duplicate.add_access("levelmask")
-    inner_map_entry.add_in_connector("IN_18")
-    inner_map_entry.add_out_connector("OUT_18")
-    state_to_duplicate.add_edge(an, None, inner_map_entry, "IN_18", dc(in_edge.data))
+    conn_number = state_to_duplicate.in_degree(inner_map_entry) + 1
+    inner_map_entry.add_in_connector(f"IN_{conn_number}")
+    inner_map_entry.add_out_connector(f"OUT_{conn_number}")
+    state_to_duplicate.add_edge(an, None, inner_map_entry, f"IN_{conn_number}", dc(in_edge.data))
     nsddfg = state_to_duplicate.out_edges(inner_map_entry)[0].dst
     nsddfg.add_in_connector("levelmask")
-    state_to_duplicate.add_edge(inner_map_entry, "OUT_18", nsddfg, "levelmask", dc(out_edge.data))
+    state_to_duplicate.add_edge(inner_map_entry, f"OUT_{conn_number}", nsddfg, "levelmask", dc(out_edge.data))
     # Add memlet symbol
     
     outer_nsdfg.symbol_mapping["nrdmax_jg"] = "nrdmax_jg"
