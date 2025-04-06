@@ -1,6 +1,6 @@
 import dace
 
-def move_scalar_to_array(root:dace.SDFG, name:str):
+def move_scalar_to_array(root:dace.SDFG, name:str, double_size:bool=False):
     assert name in root.arrays, f"Array {name} not found in SDFG"
     assert isinstance(root.arrays[name], dace.data.Scalar), f"Array {name} is not a scalar"
 
@@ -10,7 +10,7 @@ def move_scalar_to_array(root:dace.SDFG, name:str):
 
     array_desc = dace.data.Array(
         dtype=scalar_desc.dtype,
-        shape=(1,),
+        shape=(1,) if not double_size else (2, ),
         transient=scalar_desc.transient,
         location=scalar_desc.location,
         strides=(1,),

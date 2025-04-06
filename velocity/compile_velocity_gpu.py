@@ -249,10 +249,12 @@ for sdfg_name in sdfg_names:
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
             only=["out_val_0"],
         )
-        move_scalar_to_array(
-            root=sdfg,
-            name="difcoef"
-        )
+        if "difcoef" in sdfg.arrays:
+            move_scalar_to_array(
+                root=sdfg,
+                name="difcoef",
+                double_size=True,
+            )
 
         sdfg.validate()
         sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
