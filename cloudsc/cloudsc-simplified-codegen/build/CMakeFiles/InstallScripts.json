@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/scratch/pmazumde/gitspace/icon-artifacts/cloudsc/cloudsc-simplified-codegen/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

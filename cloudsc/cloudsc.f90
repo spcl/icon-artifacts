@@ -500,19 +500,18 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
   DO jk = 1, klev
     DO jl = 1, kfdia
       oka = ztp1(jl, jk)
-      zfoealfa(jl, jk) = foealfa(oka, ydthf)
-      oka = ztp1(jl, jk)
-      zfoeewmt(jl, jk) = MIN(foeewm(oka, ydthf, ydcst) / pap(jl, jk), 0.5D0)
+      zfoealfa(jl, jk) = MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)
+      zfoeewmt(jl, jk) = MIN(ydthf % r2es * (MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les)) + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * EXP(ydthf % r3ies * (oka - ydcst % rtt) / (oka - ydthf % r4ies))) / pap(jl, jk), 0.5D0)
       zqsmix(jl, jk) = zfoeewmt(jl, jk)
       zqsmix(jl, jk) = zqsmix(jl, jk) / (1.0D0 - ydcst % retv * zqsmix(jl, jk))
       oka = ztp1(jl, jk)
-      zalfa = foedelta(oka, ydcst)
+      zalfa = MAX(0.0D0, SIGN(1.0D0, oka - ydcst % rtt))
       oka = ztp1(jl, jk)
-      zfoeew(jl, jk) = MIN((zalfa * foeeliq(oka, ydthf, ydcst) + (1.0D0 - zalfa) * foeeice(oka, ydthf, ydcst)) / pap(jl, jk), 0.5D0)
+      zfoeew(jl, jk) = MIN((zalfa * ydthf % r2es * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les)) + (1.0D0 - zalfa) * ydthf % r2es * EXP(ydthf % r3ies * (oka - ydcst % rtt) / (oka - ydthf % r4ies))) / pap(jl, jk), 0.5D0)
       zfoeew(jl, jk) = MIN(0.5D0, zfoeew(jl, jk))
       zqsice(jl, jk) = zfoeew(jl, jk) / (1.0D0 - ydcst % retv * zfoeew(jl, jk))
       oka = ztp1(jl, jk)
-      zfoeeliqt(jl, jk) = MIN(foeeliq(oka, ydthf, ydcst) / pap(jl, jk), 0.5D0)
+      zfoeeliqt(jl, jk) = MIN(ydthf % r2es * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les)) / pap(jl, jk), 0.5D0)
       zqsliq(jl, jk) = zfoeeliqt(jl, jk)
       zqsliq(jl, jk) = zqsliq(jl, jk) / (1.0D0 - ydcst % retv * zqsliq(jl, jk))
     END DO
@@ -599,7 +598,7 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
       zcor = 1.0D0 / (1.0D0 - ydcst % retv * zfoeewmt(jl, jk))
       zdqsmixdt(jl) = zfac * zcor * zqsmix(jl, jk)
       oka = ztp1(jl, jk)
-      zcorqsmix(jl) = 1.0D0 + foeldcpm(oka, ydthf) * zdqsmixdt(jl)
+      zcorqsmix(jl) = 1.0D0 + MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * ydthf % ralvdcp + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * ydthf % ralsdcp * zdqsmixdt(jl)
       zevaplimmix(jl) = MAX((zqsmix(jl, jk) - zqx(jl, jk, 5)) / zcorqsmix(jl), 0.0D0)
       zevaplimliq(jl) = MAX((zqsliq(jl, jk) - zqx(jl, jk, 5)) / zcorqsliq(jl), 0.0D0)
       zevaplimice(jl) = MAX((zqsice(jl, jk) - zqx(jl, jk, 5)) / zcorqsice(jl), 0.0D0)
@@ -620,7 +619,7 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
     END DO
     DO jl = 1, kfdia
       oka = ztp1(jl, jk)
-      zfokoop(jl) = fokoop(oka, ydthf, ydcst)
+      zfokoop(jl) =  MIN(ydthf % rkoop1 - ydthf % rkoop2 * oka, ydthf % r2es * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les)) / ydthf % r2es * EXP(ydthf % r3ies * (oka - ydcst % rtt) / (oka - ydthf % r4ies)))
     END DO
     DO jl = 1, kfdia
       IF (ztp1(jl, jk) >= ydcst % rtt .OR. ydecldp % nssopt == 0) THEN
@@ -760,24 +759,24 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
     DO jl = 1, kfdia
       zqp = 1.0D0 / pap(jl, jk)
       oka = ztp1(jl, jk)
-      zqsat = foeewm(oka, ydthf, ydcst) * zqp
+      zqsat = ydthf % r2es * (MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les)) + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * EXP(ydthf % r3ies * (oka - ydcst % rtt) / (oka - ydthf % r4ies))) * zqp
       zqsat = MIN(0.5D0, zqsat)
       zcor = 1.0D0 / (1.0D0 - ydcst % retv * zqsat)
       zqsat = zqsat * zcor
       oka = ztp1(jl, jk)
-      zcond = (zqsmix(jl, jk) - zqsat) / (1.0D0 + zqsat * zcor * foedem(oka, ydthf))
+      zcond = (zqsmix(jl, jk) - zqsat) / (1.0D0 + zqsat * zcor * MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * ydthf % r5alvcp * (1.0D0 / (oka - ydthf % r4les) ** 2) + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * ydthf % r5alscp * (1.0D0 / (oka - ydthf % r4ies) ** 2))
       oka = ztp1(jl, jk)
-      ztp1(jl, jk) = ztp1(jl, jk) + foeldcpm(oka, ydthf) * zcond
+      ztp1(jl, jk) = ztp1(jl, jk) + MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * ydthf % ralvdcp + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * ydthf % ralsdcp * zcond
       zqsmix(jl, jk) = zqsmix(jl, jk) - zcond
       oka = ztp1(jl, jk)
-      zqsat = foeewm(oka, ydthf, ydcst) * zqp
+      zqsat = ydthf % r2es * (MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les)) + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * EXP(ydthf % r3ies * (oka - ydcst % rtt) / (oka - ydthf % r4ies))) * zqp
       zqsat = MIN(0.5D0, zqsat)
       zcor = 1.0D0 / (1.0D0 - ydcst % retv * zqsat)
       zqsat = zqsat * zcor
       oka = ztp1(jl, jk)
-      zcond1 = (zqsmix(jl, jk) - zqsat) / (1.0D0 + zqsat * zcor * foedem(oka, ydthf))
+      zcond1 = (zqsmix(jl, jk) - zqsat) / (1.0D0 + zqsat * zcor * MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * ydthf % r5alvcp * (1.0D0 / (oka - ydthf % r4les) ** 2) + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * ydthf % r5alscp * (1.0D0 / (oka - ydthf % r4ies) ** 2))
       oka = ztp1(jl, jk)
-      ztp1(jl, jk) = ztp1(jl, jk) + foeldcpm(oka, ydthf) * zcond1
+      ztp1(jl, jk) = ztp1(jl, jk) + MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * ydthf % ralvdcp + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * ydthf % ralsdcp * zcond1
       zqsmix(jl, jk) = zqsmix(jl, jk) - zcond1
     END DO
     DO jl = 1, kfdia
@@ -804,7 +803,7 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
         IF (za(jl, jk) > 0.99D0) THEN
           zcor = 1.0D0 / (1.0D0 - ydcst % retv * zqsmix(jl, jk))
           oka = ztp1(jl, jk)
-          zcdmax = (zqx(jl, jk, 5) - zqsmix(jl, jk)) / (1.0D0 + zcor * zqsmix(jl, jk) * foedem(oka, ydthf))
+          zcdmax = (zqx(jl, jk, 5) - zqsmix(jl, jk)) / (1.0D0 + zcor * zqsmix(jl, jk) * MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2) * ydthf % r5alvcp * (1.0D0 / (oka - ydthf % r4les) ** 2) + (1.0D0 - MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, oka)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)) * ydthf % r5alscp * (1.0D0 / (oka - ydthf % r4ies) ** 2))
         ELSE
           zcdmax = (zqx(jl, jk, 5) - za(jl, jk) * zqsmix(jl, jk)) / za(jl, jk)
         END IF
@@ -881,7 +880,7 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
       END IF
       IF (ztp1(jl, jk) < ydcst % rtt .AND. zqxfg(jl, 1) > ydecldp % rlmin) THEN
         oka = ztp1(jl, jk)
-        zvpice = foeeice(oka, ydthf, ydcst) * ydcst % rv / ydcst % rd
+        zvpice = ydthf % r2es * EXP(ydthf % r3ies * (oka - ydcst % rtt) / (oka - ydthf % r4ies)) * ydcst % rv / ydcst % rd
         zvpliq = zvpice * zfokoop(jl)
         zicenuclei(jl) = 1000.0D0 * EXP(12.96D0 * (zvpliq - zvpice) / zvpliq - 0.639D0)
         zadd = ydcst % rlstt * (ydcst % rlstt / (ydcst % rv * ztp1(jl, jk)) - 1.0D0) / (0.024D0 * ztp1(jl, jk))
@@ -1071,7 +1070,7 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
         zpreclr = zqxfg(jl, 3) / zcovptot(jl)
         zfallcorr = (ydecldp % rdensref / zrho(jl)) ** 0.4D0
         oka = ztp1(jl, jk)
-        zesatliq = ydcst % rv / ydcst % rd * foeeliq(oka, ydthf, ydcst)
+        zesatliq = ydcst % rv / ydcst % rd * ydthf % r2es * EXP(ydthf % r3les * (oka - ydcst % rtt) / (oka - ydthf % r4les))
         zlambda = (ydecldp % rcl_fac1 / (zrho(jl) * zpreclr)) ** ydecldp % rcl_fac2
         zevap_denom = ydecldp % rcl_cdenom1 * zesatliq - ydecldp % rcl_cdenom2 * ztp1(jl, jk) * zesatliq + ydecldp % rcl_cdenom3 * ztp1(jl, jk) ** 3.0D0 * pap(jl, jk)
         zcorr2 = (ztp1(jl, jk) / 273.0D0) ** 1.5D0 * 393.0D0 / (ztp1(jl, jk) + 120.0D0)
@@ -1354,69 +1353,4 @@ SUBROUTINE cloudsc(kidia, kfdia, klon, klev, ptsphy, pt, pq, ptendency_tmp_t, pt
       pfhpsn(jl, jk) = - ydcst % rlstt * pfplsn(jl, jk)
     END DO
   END DO
-  CONTAINS
-  REAL(KIND = 8) FUNCTION foedelta(ptare, ydcst)
-    USE yomcst, ONLY: tomcst
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(tomcst), INTENT(IN) :: ydcst
-    foedelta = MAX(0.0D0, SIGN(1.0D0, ptare - ydcst % rtt))
-  END FUNCTION foedelta
-  REAL(KIND = 8) FUNCTION foealfa(ptare, ydthf)
-    USE yoethf, ONLY: toethf
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    foealfa = MIN(1.0D0, ((MAX(ydthf % rtice, MIN(ydthf % rtwat, ptare)) - ydthf % rtice) * ydthf % rtwat_rtice_r) ** 2)
-  END FUNCTION foealfa
-  REAL(KIND = 8) FUNCTION foeewm(ptare, ydthf, ydcst)
-    USE yoethf, ONLY: toethf
-    USE yomcst, ONLY: tomcst
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    TYPE(tomcst), INTENT(IN) :: ydcst
-    foeewm = ydthf % r2es * (foealfa(ptare, ydthf) * EXP(ydthf % r3les * (ptare - ydcst % rtt) / (ptare - ydthf % r4les)) + (1.0D0 - foealfa(ptare, ydthf)) * EXP(ydthf % r3ies * (ptare - ydcst % rtt) / (ptare - ydthf % r4ies)))
-  END FUNCTION foeewm
-  REAL(KIND = 8) FUNCTION foedem(ptare, ydthf)
-    USE yoethf, ONLY: toethf
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    foedem = foealfa(ptare, ydthf) * ydthf % r5alvcp * (1.0D0 / (ptare - ydthf % r4les) ** 2) + (1.0D0 - foealfa(ptare, ydthf)) * ydthf % r5alscp * (1.0D0 / (ptare - ydthf % r4ies) ** 2)
-  END FUNCTION foedem
-  REAL(KIND = 8) FUNCTION foeldcpm(ptare, ydthf)
-    USE yoethf, ONLY: toethf
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    foeldcpm = foealfa(ptare, ydthf) * ydthf % ralvdcp + (1.0D0 - foealfa(ptare, ydthf)) * ydthf % ralsdcp
-  END FUNCTION foeldcpm
-  REAL(KIND = 8) FUNCTION foeeliq(ptare, ydthf, ydcst)
-    USE yoethf, ONLY: toethf
-    USE yomcst, ONLY: tomcst
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    TYPE(tomcst), INTENT(IN) :: ydcst
-    foeeliq = ydthf % r2es * EXP(ydthf % r3les * (ptare - ydcst % rtt) / (ptare - ydthf % r4les))
-  END FUNCTION foeeliq
-  REAL(KIND = 8) FUNCTION foeeice(ptare, ydthf, ydcst)
-    USE yoethf, ONLY: toethf
-    USE yomcst, ONLY: tomcst
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    TYPE(tomcst), INTENT(IN) :: ydcst
-    foeeice = ydthf % r2es * EXP(ydthf % r3ies * (ptare - ydcst % rtt) / (ptare - ydthf % r4ies))
-  END FUNCTION foeeice
-  REAL(KIND = 8) FUNCTION fokoop(ptare, ydthf, ydcst)
-    USE yoethf, ONLY: toethf
-    USE yomcst, ONLY: tomcst
-    IMPLICIT NONE
-    REAL(KIND = 8), INTENT(IN) :: ptare
-    TYPE(toethf), INTENT(IN) :: ydthf
-    TYPE(tomcst), INTENT(IN) :: ydcst
-    fokoop = MIN(ydthf % rkoop1 - ydthf % rkoop2 * ptare, foeeliq(ptare, ydthf, ydcst) / foeeice(ptare, ydthf, ydcst))
-  END FUNCTION fokoop
 END SUBROUTINE cloudsc

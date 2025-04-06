@@ -1,4 +1,0 @@
-/scratch/pmazumde/gitspace/icon-artifacts/cloudsc/cloudsc-simplified-codegen/build/CMakeFiles/cloudsc_driver.dir
-/scratch/pmazumde/gitspace/icon-artifacts/cloudsc/cloudsc-simplified-codegen/build/CMakeFiles/dacestub_cloudsc_driver.dir
-/scratch/pmazumde/gitspace/icon-artifacts/cloudsc/cloudsc-simplified-codegen/build/CMakeFiles/edit_cache.dir
-/scratch/pmazumde/gitspace/icon-artifacts/cloudsc/cloudsc-simplified-codegen/build/CMakeFiles/rebuild_cache.dir

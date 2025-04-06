@@ -1,1 +1,0 @@
-#define __HASH_cloudsc_driver "2f7473cd17ab969b65419ed4baf949c5d867a4af48e33e568571ec02a0af9b79"
