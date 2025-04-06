@@ -60,7 +60,7 @@ for sdfg_name in sdfg_names:
             verbose=verbose,
             simplify=False,
             interface_with_struct_copy=True,
-            interface_to_gpu=True,
+            interface_to_gpu=False,
             clean_trivial_views=True,
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
@@ -235,7 +235,7 @@ if instrument:
     # instrument the SDFG
     instrument_sdfg(resulting_sdfgs)
 
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument, generate_code=True)
+compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release, instrument=instrument, generate_code=True)
 
 # check if execution was successful
 if os.system(f"./velocity_gpu") != 0:
