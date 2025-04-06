@@ -2,7 +2,7 @@
 
 #define __REDUCE_DEVICE__
 
-__device__ __inline__ double reduce_maxZ_device(const double *d_in, int size)
+__device__ __inline__ double reduce_maxZ_to_scalar_device(const double *d_in, int size)
 {
     double max_val = 0.0;
     for (int i = 0; i < size; i++){
@@ -11,8 +11,13 @@ __device__ __inline__ double reduce_maxZ_device(const double *d_in, int size)
     return max_val;
 }
 
+__device__ __inline__ void reduce_maxZ_to_scalar_device(const double *d_in, double* d_out, int size)
+{
+    d_out[0] = reduce_maxZ_to_scalar_device(d_in, size);
+}
+
 // sum reduction interface
-__device__ __inline__ int reduce_sum_device(const int *d_in, int size)
+__device__ __inline__ int reduce_sum_to_scalar_device(const int *d_in, int size)
 {
     int sum = 0;
     for (int i = 0; i < size; i++){
@@ -21,10 +26,15 @@ __device__ __inline__ int reduce_sum_device(const int *d_in, int size)
     return sum;
 }
 
+__device__ __inline__ void reduce_maxZ_to_address_device(const int *d_in, int* d_out, int size)
+{
+    d_out[0] = reduce_sum_to_scalar_device(d_in, size);
+}
+
 // scan reduction interface
 __device__ __inline__ int reduce_scan_device(const int *d_in, int size)
 {
-    return (reduce_sum_device(d_in, size) > 0) ? 1 : 0;
+    return (reduce_sum_to_scalar_device(d_in, size) > 0) ? 1 : 0;
 }
 
 __device__ __inline__ double reduce_maxZ_device(const double d_in, int size)
