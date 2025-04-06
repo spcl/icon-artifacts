@@ -157,7 +157,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
         vcfl_name,
         f"{end} - {start}",
         f"{var_name}",
-        "maxZ",
+        "maxZ_to_scalar",
         in_expr=f"{vcfl_name}[{start}-1:{end}-1]",
     )
     pre_state = sdfg.add_state_before(loop_node)
@@ -193,9 +193,13 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
         "cfl_clipping",
         f"{end} - {start}",
         "clip_count",
-        "sum",
+        "sum_to_address",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
     )
+    from utils.move_scalar_to_array import move_scalar_to_array
+
+    dst_arr_name = "out_val_0"
+    move_scalar_to_array(sdfg, dst_arr_name)
 
 
 def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
@@ -403,13 +407,17 @@ def add_all_reductions(sdfg: dace.SDFG):
         tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
         levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
     elif "no_nproma" in sdfg.name:
+        # Final reduction over nblocks, this will be on CPU -> write to scalar
         loop_to_max_reduction(sdfg, f"FOR_l_652_c_652", "T_l652_c652")
+        # Will be used on GPU next kernel, write to array
         cfl_clipping_to_reduction(
             sdfg, "T_l551_c551", "Conditional_l_551_c_551", "FOR_l_549_c_549"
         )
+
         maxvcfl_to_reduction(sdfg, "T_l558_c558", f"FOR_l_547_c_547")
+
         tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
-        levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
+        #levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
 
     else:
         raise ValueError("Unknown NPROMA size")
