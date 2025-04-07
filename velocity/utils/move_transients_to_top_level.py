@@ -139,7 +139,8 @@ def move_transients_to_top_level(root: dace.SDFG,
                                  only=None,
                                  ilifetime=None,
                                  no_dim_change=False,
-                                 offset:int=0):
+                                 offset:int=0,
+                                 set_zero:bool=False):
     # If we have a transient array, make it live on the top level SDFG
     # For this, collect all transients that do not exist on top level SDFG
     # Add them to top level SDFG, if they are arrays and have storage location Default
@@ -327,6 +328,8 @@ def move_transients_to_top_level(root: dace.SDFG,
         map_exit = parent_state.exit_node(map_entry)
         if "IN_" + arr_name not in map_entry.in_connectors:
             a0 = parent_state.add_access(arr_name)
+            if set_zero:
+                a0.setzero = True
             map_entry.add_in_connector("IN_" + arr_name)
             map_entry.add_out_connector("OUT_" + arr_name)
             map_exit = parent_state.exit_node(map_entry)

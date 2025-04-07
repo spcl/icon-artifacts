@@ -263,6 +263,7 @@ for sdfg_name in sdfg_names:
                 root=sdfg,
                 name="difcoef",
                 double_size=True,
+                set_zero=True,
             )
 
         sdfg.validate()
