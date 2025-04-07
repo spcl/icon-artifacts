@@ -4,6 +4,6 @@ cleanup = False
 reduction = True
 release = False
 verbose = False
-tile = False
+tile = True
 remainder_loop = False
 fix_out_val_0 = True

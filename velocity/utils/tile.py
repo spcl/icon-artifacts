@@ -1,3 +1,4 @@
+from typing import List
 import dace
 
 from pathlib import Path
@@ -43,6 +44,81 @@ def _can_apply(graph, n, seq_map_ok=False):
         cont = cont or has_seq_map
         return not cont
 
+def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_it_24"],
+                         tblock_sizes:List[int]=[256,1,1],
+                         coarsening_factors:List[int]=[4,2],
+                         remainder_loop:bool=True):
+    map_entry, parent_state, parent_sdfg = None, None, None
+    for graph in [v for v, _ in list(sdfg.all_nodes_recursive()) if isinstance(v, dace.SDFGState)]:
+        for n in graph.nodes():
+            if isinstance(n, dace.nodes.MapEntry) and n.map.params == params:
+                map_entry = n
+                parent_state = graph
+                parent_sdfg = graph.sdfg
+                break
+
+    if map_entry is not None:
+        mguid = map_entry.guid
+        AddComputeElementBlockMap.apply_to(
+            sdfg=parent_sdfg,
+            verify=False,
+            map_entry=map_entry,
+            options={
+                "compute_element_group_dims": tblock_sizes,
+                "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
+                "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+            },
+        )
+        map_entry = parent_state.entry_node(map_entry) # Due to how maptiling works
+        tblock_entry = set([e.dst for e in parent_state.out_edges(map_entry) if isinstance(e.dst, dace.nodes.MapEntry)]).pop()
+        #print(map_entry, tblock_entry)
+
+        if not remainder_loop:
+            for i, ((b, e, s), (tb, te, ts)) in enumerate(zip(map_entry.map.range, tblock_entry.map.range)):
+                range1 = (e+1-b)//s
+                range2 = (te+1-tb)//ts
+                dim = int(range1 // range2)
+                if coarsening_factors[-(i+1)] != 1:
+                    assert dim % coarsening_factors[-(i+1)] == 0, f"Coarsening factor {coarsening_factors[i]} is not a divisor of {dim}"
+
+            ThreadCoarsening.apply_to(
+                sdfg=parent_sdfg,
+                verify=False,
+                thread_group_map_entry=tblock_entry,
+                device_map_entry=map_entry,
+                options={
+                    "tile_sizes": coarsening_factors,
+                },
+            )
+        else:
+            ThreadCoarsening.apply_to(
+                sdfg=parent_sdfg,
+                verify=False,
+                thread_group_map_entry=tblock_entry,
+                device_map_entry=map_entry,
+                options={
+                    "tile_sizes": coarsening_factors,
+                },
+            )
+
+        #map_entry = parent_state.entry_node(map_entry) # Due to how maptiling works
+        tblock_entry = set([e.dst for e in parent_state.out_edges(map_entry) if isinstance(e.dst, dace.nodes.MapEntry)]).pop()
+        inner_work_map_entry = set([e.dst for e in parent_state.out_edges(tblock_entry) if isinstance(e.dst, dace.nodes.MapEntry)]).pop()
+        #print(map_entry, tblock_entry, inner_work_map_entry)
+
+        if remainder_loop:
+            RemainderLoopStencilMap.apply_to(
+                sdfg=parent_sdfg,
+                verify=True,
+                inner_work_map_entry=inner_work_map_entry,
+                tblock_type=dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                options={
+                    "tblock_type": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                }
+            )
+
+    pass
+
 def tile_kernels(sdfg: dace.SDFG):
     if not tile:
         return
@@ -56,11 +132,12 @@ def tile_kernels(sdfg: dace.SDFG):
                         verify=False,
                         map_entry=n,
                         options={
-                            "compute_element_group_dims": [128, 1, 1],
+                            "compute_element_group_dims": [256, 1, 1],
                             "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
                             "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
                         },
                     )
+
 
     for graph in [v for v, _ in list(sdfg.all_nodes_recursive()) if isinstance(v, dace.SDFGState)]:
         for n in graph.nodes():
