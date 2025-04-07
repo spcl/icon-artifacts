@@ -100,7 +100,7 @@ def to_segmented_reduction(sdfg: dace.SDFG):
                         input_names=["in_arr", "in_segment_size", "in_batch_size"],
                         output_names=["out_arr"],
                         code = f"""
-reduce_segmented_to_address_gpu<1024>(in_arr, out_arr, in_segment_size, in_batch_size);
+reduce_segmented_to_address_gpu(in_arr, out_arr, in_segment_size, in_batch_size, __dace_current_stream);
 """
                     )
                     srln.schedule=dace.dtypes.ScheduleType.GPU_Device
@@ -111,8 +111,8 @@ reduce_segmented_to_address_gpu<1024>(in_arr, out_arr, in_segment_size, in_batch
                     graph.add_edge(in_an, input_edge.src_conn, srln, "in_arr", dace.memlet.Memlet(data=input_edge.data.data, subset=dace.subsets.Range(in_memlet_ranges)))
                     graph.add_edge(srln, "out_arr", out_an, output_edge.dst_conn, dace.memlet.Memlet(data=output_edge.data.data, subset=dace.subsets.Range(out_memlet_ranges)))
 
-                    t1 = graph.add_tasklet(name="t_segment_size", inputs=set(), outputs={"_out"}, code=f"__out = {segment_size}")
-                    t2 = graph.add_tasklet(name="t_batch_size", inputs=set(), outputs={"_out"}, code=f"__out = {batch_size}")
+                    t1 = graph.add_tasklet(name="t_segment_size", inputs=set(), outputs={"_out"}, code=f"_out = {segment_size}")
+                    t2 = graph.add_tasklet(name="t_batch_size", inputs=set(), outputs={"_out"}, code=f"_out = {batch_size}")
                     s1name, s1 = graph.sdfg.add_scalar(name="segment_size", dtype=dace.int32, storage=dace.StorageType.Register, find_new_name=True, transient=True)
                     s2name, s2 = graph.sdfg.add_scalar(name="batch_size", dtype=dace.int32, storage=dace.StorageType.Register, find_new_name=True, transient=True)
                     s1an = graph.add_access(s1name)

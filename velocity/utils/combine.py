@@ -4,7 +4,30 @@ from typing import List, Dict
 
 from dace.codegen.control_flow import ConditionalBlock, ControlFlowRegion
 from dace.properties import CodeBlock
+import typing
 
+def _unique_names(sdfgs: typing.List[dace.SDFG]):
+    for i, sdfg in enumerate(sdfgs):
+        sdfg.function_suffix = "_" + str(i)
+        visited = set()
+        for n, parent in sdfg.all_nodes_recursive():
+            if n in visited:
+                continue
+            # Add unique names for anything that can become CUDA functions to avoid name conflicts
+            if isinstance(n, dace.nodes.MapEntry):
+                n.map.label = f"{n.map.label}{sdfg.function_suffix}"
+                n.label = f"{n.label}{sdfg.function_suffix}"
+                visited.add(n.map)
+                visited.add(n)
+            #if isinstance(n, dace.nodes.MapExit):
+            #    n.label = f"{n.label}{sdfg.function_suffix}"
+            #    visited.add(n)
+            elif isinstance(n, dace.nodes.NestedSDFG):
+                n.sdfg.function_suffix = "_" + str(i)
+                visited.add(n)
+            elif not isinstance(n, dace.nodes.AccessNode) and not isinstance(n, dace.nodes.EntryNode) and not isinstance(n, dace.nodes.ExitNode):
+                n.label = f"{n.label}{sdfg.function_suffix}"
+                visited.add(n)
 
 def combine(sdfgs: List[dace.SDFG], cond_list: List[Dict[str, str]]):
     merged_sdfg = dace.SDFG("merged_sdfg")
@@ -14,6 +37,7 @@ def combine(sdfgs: List[dace.SDFG], cond_list: List[Dict[str, str]]):
         sdfg=merged_sdfg,
         parent=None,
     )
+    merged_sdfg.add_node(cb, is_start_block=True)
 
     for sdfg, cond_dict in zip(sdfgs, cond_list):
         cfg = ControlFlowRegion(
@@ -52,6 +76,7 @@ if __name__ == "__main__":
         "gpu_velocity_no_nproma_if_prop_lvn_only_1_istep_2_result.sdfgz",
     ]
     sdfgs = [dace.SDFG.from_file(sdfg_name) for sdfg_name in sdfg_names]
+    _unique_names(sdfgs)
     cond_dict = [
         {"i_step": 1, "lvn_only": 0},
         {"i_step": 2, "lvn_only": 0},
@@ -60,3 +85,21 @@ if __name__ == "__main__":
     ]
     ms = combine(sdfgs, cond_dict)
     ms.save("merged_sdfg.sdfgz", compress=True)
+    ms.validate()
+    sdfg_names = [
+        "cpu_velocity_no_nproma_if_prop_lvn_only_0_istep_1_result.sdfgz",
+        "cpu_velocity_no_nproma_if_prop_lvn_only_0_istep_2_result.sdfgz",
+        "cpu_velocity_no_nproma_if_prop_lvn_only_1_istep_1_result.sdfgz",
+        "cpu_velocity_no_nproma_if_prop_lvn_only_1_istep_2_result.sdfgz",
+    ]
+    sdfgs = [dace.SDFG.from_file(sdfg_name) for sdfg_name in sdfg_names]
+    _unique_names(sdfgs)
+    cond_dict = [
+        {"i_step": 1, "lvn_only": 0},
+        {"i_step": 2, "lvn_only": 0},
+        {"i_step": 1, "lvn_only": 1},
+        {"i_step": 2, "lvn_only": 1},
+    ]
+    ms = combine(sdfgs, cond_dict)
+    ms.save("merged_sdfg_cpu.sdfgz", compress=True)
+    ms.validate()

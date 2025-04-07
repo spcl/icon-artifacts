@@ -53,7 +53,7 @@ def _insert_reduction(
         #ifdef __REDUCE_DEVICE__
           out = reduce_{type}_device(in_arr, in_size);
         #elif defined(__REDUCE_GPU__)
-          out = reduce_{type}_gpu(in_arr, in_size);
+          out = reduce_{type}_gpu(in_arr, in_size, __dace_current_stream);
         #else
           out = reduce_{type}_cpu(in_arr, in_size);
         #endif
@@ -61,7 +61,7 @@ def _insert_reduction(
         #ifdef __REDUCE_DEVICE__
           reduce_{type}_device(in_arr, out, in_size);
         #elif defined(__REDUCE_GPU__)
-          reduce_{type}_gpu(in_arr, out, in_size);
+          reduce_{type}_gpu(in_arr, out, in_size, __dace_current_stream);
         #else
           reduce_{type}_cpu(in_arr, out, in_size);
         #endif
