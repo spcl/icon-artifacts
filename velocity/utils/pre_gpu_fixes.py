@@ -280,7 +280,7 @@ def step_1(sdfg: dace.SDFG):
     new_shape = ["89"]
     new_an = state_copy_1.add_array("out_val_0", dtype=nsdfg.sdfg.arrays["out_val_0"].dtype, shape=new_shape, transient=True)
     # state_copy_1.add_node(new_an)
-    state_copy_1.add_edge(map_exit, "OUT_1", new_an, None, dace.Memlet(expr="out_val_0[_for_it_35]"))
+    state_copy_1.add_edge(map_exit, "OUT_1", new_an, None, dace.Memlet(expr="out_val_0[0:89]"))
 
     # prune inputs
     in_edges = state_copy_1.in_edges(map_entry_it_35)
@@ -338,7 +338,7 @@ def step_1(sdfg: dace.SDFG):
             nsdfg.sdfg.arrays["out_val_0"].transient = False
             map_entry.add_in_connector("IN_6")
             map_entry.add_out_connector("OUT_6")
-            state_copy_2.add_edge(an, None, map_entry, "IN_6", dace.Memlet(expr="out_val_0[_for_it_35]"))
+            state_copy_2.add_edge(an, None, map_entry, "IN_6", dace.Memlet(expr="out_val_0[0:89]"))
             nsdfg.add_in_connector("out_val_0")
             state_copy_2.add_edge(map_entry, "OUT_6", nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
     
