@@ -248,6 +248,7 @@ for sdfg_name in sdfg_names:
             },
             only=["maxvcfl_arr"],
             no_dim_change=False,
+            offset=-1
         )
         move_transients_to_top_level(
             root=sdfg,
