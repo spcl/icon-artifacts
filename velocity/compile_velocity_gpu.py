@@ -248,7 +248,8 @@ for sdfg_name in sdfg_names:
             },
             only=["maxvcfl_arr"],
             no_dim_change=False,
-            offset=-1
+            offset=-1,
+            set_zero=True,
         )
         move_transients_to_top_level(
             root=sdfg,
@@ -263,7 +264,6 @@ for sdfg_name in sdfg_names:
                 root=sdfg,
                 name="difcoef",
                 double_size=True,
-                set_zero=True,
             )
 
         sdfg.validate()
