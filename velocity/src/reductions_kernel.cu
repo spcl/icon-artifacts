@@ -72,3 +72,9 @@ int reduce_scan_gpu(const int *d_in, int size)
 {
   return (reduce_sum_to_scalar_gpu(d_in, size) > 0)? 1 : 0;
 }
+
+// scan reduction interface
+int reduce_scan_gpu(int d_in, int size)
+{
+  return (d_in > 0)? 1 : 0;
+}
