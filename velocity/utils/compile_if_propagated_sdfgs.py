@@ -123,6 +123,24 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
     _process_folder(script_dir, sdfg, instrument)
 
 
+def comment_out_syncs(filepath):
+    # comment out (prepend //) any line containing cudaStreamSynchronize
+    vcflmax_count = 0
+    with open(filepath, "r") as file:
+        lines = file.readlines()
+    with open(filepath, "w") as file:
+        for line in lines:
+            if "vcflmax" in line:
+                vcflmax_count = 1
+            if "cudaStreamSynchronize" in line:
+                if vcflmax_count > 0:
+                    vcflmax_count -= 1
+                    line = "//" + line
+                    line += "\ncudaStreamSynchronize(__state->gpu_context->streams[0]);\n"
+                else:
+                  line = "//" + line
+            file.write(line)
+
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
     gpu: bool = False,
@@ -180,6 +198,7 @@ def compile_if_propagated_sdfgs(
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
+            comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
