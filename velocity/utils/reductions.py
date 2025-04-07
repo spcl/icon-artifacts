@@ -365,10 +365,10 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         parent,
         prestate,
         "cfl_clipping",
-        f"{end} - {start}",
+        f"1",
         "levmask",
         "scan",
-        in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
+        in_expr=f"cfl_clipping[{outer_outer_it_var}-1,{outer_it_var}-1]",
         out_expr=f"levmask[{outer_outer_it_var}-1,{outer_it_var}-1]",
         symtype=dace.int32,
     )
@@ -462,7 +462,9 @@ def add_all_reductions(sdfg: dace.SDFG):
         maxvcfl_to_reduction(sdfg, "T_l558_c558", f"FOR_l_547_c_547")
 
         tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
-        #levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
+
+        # This is a scan of size 1 for compatibility with future transformations
+        levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
 
     else:
         raise ValueError("Unknown NPROMA size")
