@@ -16,7 +16,8 @@ def step_1(sdfg: dace.SDFG):
     
     """
     # sdfg.simplify()
-    library_node_reduction, library_node_reduction_parnet = find_node_by_name(sdfg, "reduce_sum")
+    # sdfg.save("debug_pre.sdfg")
+    library_node_reduction, library_node_reduction_parnet = find_node_by_name(sdfg, "reduce_sum_to_address")
     assert isinstance(library_node_reduction, dace.nodes.LibraryNode)
     
     # Get the library node's in edges
@@ -25,13 +26,13 @@ def step_1(sdfg: dace.SDFG):
     cfl_edge = in_edges[0] if in_edges[0].src.data == "cfl_clipping" else in_edges[1]
     cfl = cfl_edge.src
     assert cfl.data == "cfl_clipping"
-    reduction_sum_size_edge = in_edges[0] if in_edges[0].src.data == "reduce_sum_size" else in_edges[1]
+    reduction_sum_size_edge = in_edges[0] if in_edges[0].src.data == "reduce_sum_to_address_size" else in_edges[1]
     reduction_sum_size = reduction_sum_size_edge.src
-    assert reduction_sum_size.data == "reduce_sum_size"
+    assert reduction_sum_size.data == "reduce_sum_to_address_size"
     
     tasklet_before_reduction_edges = library_node_reduction_parnet.in_edges(reduction_sum_size)[0]
     tasklet_before_reduction = tasklet_before_reduction_edges.src
-    assert tasklet_before_reduction.label == "size_reduce_sum"
+    assert tasklet_before_reduction.label == "size_reduce_sum_to_address"
     
     # Get the library node's out edges
     out_edges = library_node_reduction_parnet.out_edges(library_node_reduction)
@@ -132,7 +133,7 @@ def step_1(sdfg: dace.SDFG):
             assert isinstance(in_edges[0].src, dace.nodes.AccessNode)
             assert isinstance(in_edges[1].src, dace.nodes.AccessNode)
             assert isinstance(out_edges[0].dst, dace.nodes.AccessNode)
-            reduce_node = in_edges[0].src if in_edges[0].src.data == "reduce_maxZ_size_0" else in_edges[1].src
+            reduce_node = in_edges[0].src if in_edges[0].src.data == "reduce_maxZ_to_scalar_size" else in_edges[1].src
             reduce_tasklet = outer_state.in_edges(reduce_node)[0].src
             assert isinstance(reduce_tasklet, dace.nodes.Tasklet)
             outer_state.remove_node(out_edges[0].dst)
@@ -234,7 +235,7 @@ def step_1(sdfg: dace.SDFG):
             assert isinstance(in_edges[0].src, dace.nodes.AccessNode)
             assert isinstance(in_edges[1].src, dace.nodes.AccessNode)
             assert isinstance(out_edges[0].dst, dace.nodes.AccessNode)
-            reduce_node = in_edges[0].src if in_edges[0].src.data == "reduce_maxZ_size_0" else in_edges[1].src
+            reduce_node = in_edges[0].src if in_edges[0].src.data == "reduce_maxZ_to_scalar_size" else in_edges[1].src
             reduce_tasklet = state_copy_1.in_edges(reduce_node)[0].src
             assert isinstance(reduce_tasklet, dace.nodes.Tasklet)
             state_copy_1.remove_node(out_edges[0].dst)
@@ -433,7 +434,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
     """
     assert isinstance(target_state, dace.SDFGState)
     edge_map = {}
-    # sdfg.save("debug_step_3_1.sdfg")
+    sdfg.save("debug_step_3_1.sdfg")
     for node in target_state.nodes():
         if node.label == "T_l546_c546":
             target_state.remove_node(node)
@@ -467,7 +468,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
     
     # put the clip count assignement inside the innermost map
     for edge, parent in nsdfg_map.sdfg.all_edges_recursive():
-        if isinstance(edge.data, dace.sdfg.InterstateEdge) and "clip_count" in edge.data.assignments.keys():
+        if isinstance(edge.data, dace.sdfg.InterstateEdge) and len(edge.data.assignments) == 0 and isinstance(edge.dst, dace.SDFGState):
             parent.remove_node(edge.src)
             
         if isinstance(edge.data, dace.sdfg.InterstateEdge) and "_if_cond_18" in edge.data.assignments.keys():
@@ -504,6 +505,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
                                 edge.src.sdfg.remove_data(edge.src_conn)
                             target_state.remove_edge(edge)
             elif len(nnode.sdfg.nodes()) == 2:
+                sdfg.save("debug_step_3_4.sdfg")
                 for edge in in_edges:
                     out_edge = list(target_state.out_edges_by_connector(node, edge.dst_conn.replace("IN_", "OUT_")))[0]
                     if out_edge.dst.data != "levmask":
@@ -533,7 +535,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             map_nsdfg.add_in_connector("out_val_0")
             map_state.add_edge(node, "OUT_5", map_nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
     
-    # sdfg.save("debug_step_3_2.sdfg")
+    sdfg.save("debug_step_3_6.sdfg")
     sdfg.simplify(validate=False)    
     # sdfg.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     target_state.parent.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
