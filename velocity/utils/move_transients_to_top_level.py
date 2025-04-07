@@ -296,7 +296,10 @@ def move_transients_to_top_level(root: dace.SDFG,
                     mem_range = copy.deepcopy(edge.data.subset)
                     mem_range_list = []
                     if not no_dim_change:
-                        mem_range_list += [(param_sym, param_sym, 1)] if offset == 0 else [(param_sym+offset, param_sym+offset, 1)]
+                        if offset == 0:
+                            mem_range_list += [(param_sym, param_sym, 1)]
+                        else:
+                            mem_range_list += [(param_sym+offset, param_sym+offset, 1)]
                     for b,e,s in mem_range.ranges:
                         mem_range_list += [(b, e, s)]
                     state.remove_edge(edge)

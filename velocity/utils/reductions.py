@@ -270,20 +270,20 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     ol_size_sym = parent.sdfg.add_symbol(
         "ol_size", stype=dace.dtypes.int32, find_new_name=True
     )
-    il_size_sym = parent.sdfg.add_symbol(
-        "il_size", stype=dace.dtypes.int32, find_new_name=True
-    )
+    #il_size_sym = parent.sdfg.add_symbol(
+    #    "il_size", stype=dace.dtypes.int32, find_new_name=True
+    #)
     sdfg.add_state_after(
         sdfg.start_state,
         assignments={
             f"{ol_size_sym}": f"{ol_end}",
-            f"{il_size_sym}": f"__CG_global_data__m_nproma",
+            #f"{il_size_sym}": f"tmp_struct_symbol_4",
         },
     )
 
     arr_name, arr = parent.sdfg.add_array(
         "maxvcfl_arr",
-        shape=[f"{il_size_sym}", f"{ol_size_sym}"],
+        shape=[f"tmp_struct_symbol_4", f"{ol_size_sym}"],
         dtype=dace.float64,
         transient=True,
         find_new_name=True,

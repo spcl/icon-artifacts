@@ -28,12 +28,23 @@ from dace.transformation import transformation as pm
 from dace.symbolic import symstr, issymbolic
 from dace.libraries.standard.environments.cuda import CUDA
 
-from dace.libraries.standard import reduction_planner as red_planner
+from dace.libraries.standard import CodeLibraryNode, reduction_planner as red_planner
 import copy
 
 seg_reduction = f"""
 
 """
+
+@make_properties
+class SegmentedReduceLibNode(CodeLibraryNode):
+    code = Property(dtype=str, default="", allow_none=False)
+
+    def __init__(self, name, input_names, output_names, code):
+        super().__init__(name=name, input_names=input_names, output_names=output_names)
+        self.code = code
+
+    def generate_code(self, inputs, outputs):
+        return self.code
 
 def to_segmented_reduction(sdfg: dace.SDFG):
     all_maps = [(v, g) for v, g in sdfg.all_nodes_recursive() if isinstance(v, dace.sdfg.nodes.MapEntry)]
@@ -53,17 +64,71 @@ def to_segmented_reduction(sdfg: dace.SDFG):
                 tasklet = tasklets[0]
                 access_node = access_nodes[0]
                 # check if the library node is a reduce
-                if 'reduce_' in lib_node.label:
+                if 'reduce_sum_to_address' in lib_node.label:
                     # Replace map with segmented reduce
                     print(f"Found reduce node {lib_node.label} in map {map_entry.label}")
-                    assert "scan" in lib_node.label or "address" in lib_node.label
                     inputs = [v for v in graph.in_edges(map_entry)]
                     outputs = [v for v in graph.out_edges(graph.exit_node(map_entry))]
                     assert len(inputs) == 1
                     assert len(outputs) == 1
                     input_edge = inputs[0]
                     output_edge = outputs[0]
+                    print(input_edge, output_edge)
+                    assert len(map_entry.range) == 1
+                    b,e,s = map_entry.range[0]
+                    in_arr = sdfg.arrays[input_edge.data.data]
+                    out_arr = sdfg.arrays[output_edge.data.data]
+                    if input_edge.data.data != "gpu_cfl_clipping":
+                        continue
+                    segment_size = in_arr.shape[0]
+                    batch_size = (e+1-b)
+                    #raise Exception(segment_size, batch_size)
+                    batch_offset = b
 
+                    for r in  input_edge.data.subset.ranges:
+                        print(r, type(r))
+
+                    in_memlet_ranges = [r for r in input_edge.data.subset.ranges]
+                    in_memlet_ranges[-1] = [b-1, e, 1]
+
+                    out_memlet_ranges = [r for r in output_edge.data.subset.ranges]
+                    out_memlet_ranges[-1] = [b-1, e, 1]
+
+                    srln = SegmentedReduceLibNode(
+                        name="segmented_reduce_sum_to_address",
+                        #schedule=dace.dtypes.ScheduleType.GPU_Device,
+                        input_names=["in_arr", "in_segment_size", "in_batch_size"],
+                        output_names=["out_arr"],
+                        code = f"""
+reduce_segmented_to_address_gpu<1024>(in_arr, out_arr, in_segment_size, in_batch_size);
+"""
+                    )
+                    srln.schedule=dace.dtypes.ScheduleType.GPU_Device
+
+                    graph.add_node(srln)
+                    in_an = input_edge.src
+                    out_an = output_edge.dst
+                    graph.add_edge(in_an, input_edge.src_conn, srln, "in_arr", dace.memlet.Memlet(data=input_edge.data.data, subset=dace.subsets.Range(in_memlet_ranges)))
+                    graph.add_edge(srln, "out_arr", out_an, output_edge.dst_conn, dace.memlet.Memlet(data=output_edge.data.data, subset=dace.subsets.Range(out_memlet_ranges)))
+
+                    t1 = graph.add_tasklet(name="t_segment_size", inputs=set(), outputs={"_out"}, code=f"__out = {segment_size}")
+                    t2 = graph.add_tasklet(name="t_batch_size", inputs=set(), outputs={"_out"}, code=f"__out = {batch_size}")
+                    s1name, s1 = graph.sdfg.add_scalar(name="segment_size", dtype=dace.int32, storage=dace.StorageType.Register, find_new_name=True, transient=True)
+                    s2name, s2 = graph.sdfg.add_scalar(name="batch_size", dtype=dace.int32, storage=dace.StorageType.Register, find_new_name=True, transient=True)
+                    s1an = graph.add_access(s1name)
+                    s2an = graph.add_access(s2name)
+                    graph.add_edge(t1, "_out", s1an, None, dace.memlet.Memlet(data=s1name, subset="0"))
+                    graph.add_edge(t2, "_out", s2an, None, dace.memlet.Memlet(data=s2name, subset="0"))
+
+                    graph.add_edge(s1an, None, srln, "in_segment_size", dace.memlet.Memlet(data=s1name, subset="0"))
+                    graph.add_edge(s2an, None, srln, "in_batch_size", dace.memlet.Memlet(data=s2name, subset="0"))
+                    #graph.add_edge(srln, "out_arr", output_edge.dst, None, d)
+
+                    for n in all_nodes + [map_entry, graph.exit_node(map_entry)]:
+                        graph.remove_node(n)
+                    #sdfg.save("uwu.sdfg")
+                    #raise Exception(segment_size, batch_size)
+                    return
                     #assert len(input_edge.data.subset) == 2
                     #assert len(output_edge.data.subset) == 1
 

@@ -78,7 +78,7 @@ __global__ void batched_reduce_sum_v2(int* __restrict__ output_data,
 }
 
 template <size_t NUM_THREADS>
-void reduce_segmented_to_address_gpu(const int *d_in, int* d_out, int size, int size2, cudaStream_t stream)
+void reduce_segmented_to_address_gpu(const int *d_in, int* d_out, int size, int batch_size)
 {
-    batched_reduce_sum_v2<NUM_THREADS><<<size2, NUM_THREADS, 0, stream>>>(d_out, d_in, size);
+    batched_reduce_sum_v2<NUM_THREADS><<<batch_size, NUM_THREADS>>>(d_out, d_in, size);
 }

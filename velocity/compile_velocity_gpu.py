@@ -221,8 +221,8 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
-        #pre_gpu_fix(sdfg)
-        #move_ifs_inside_maps(sdfg)
+        pre_gpu_fix(sdfg)
+        move_ifs_inside_maps(sdfg)
         flatten_lib, _ = find_node_by_name(sdfg, "flatten")
         deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
@@ -253,11 +253,9 @@ for sdfg_name in sdfg_names:
         )
         move_transients_to_top_level(
             root=sdfg,
-            upper_bounds={
-                "out_val_0": 91, # We need to duplicate this with nlevp1 should be good to go
-            },
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
             only=["out_val_0"],
+            no_dim_change=True,
         )
         if "difcoef" in sdfg.arrays:
             move_scalar_to_array(
@@ -265,6 +263,7 @@ for sdfg_name in sdfg_names:
                 name="difcoef",
                 double_size=True,
             )
+
 
         sdfg.validate()
         sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
@@ -278,10 +277,26 @@ for sdfg_name in sdfg_names:
         prune_unused_inputs_outputs(sdfg)
         #move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
         #TODO: to_segmented_reduction(sdfg)
+        print("SEGMENTED REDUCTION BEG")
+        to_segmented_reduction(sdfg)
+        for arrname, arr in sdfg.arrays.items():
+            if arr.transient:
+                if arr.storage == dace.dtypes.StorageType.GPU_Global:
+                    arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
+            #if arrname == "gpu_maxvcfl_arr":
+            #    raise Exception(arr, arr.transient, arr.lifetime, arr.storage)
+        for e, graph in sdfg.all_edges_recursive():
+            if e.data is not None and hasattr(e.data, "data") and e.data.data == "gpu_out_val_0":
+                sb = dace.subsets.Range.from_string("2*_for_it_35")
+                print(sb, e.data.subset)
+                if sb == e.data.subset:
+                    #raise Exception(f"{sb}| {e.data.subset} uwu")
+                    e.data.subset = dace.subsets.Range.from_string("_for_it_35")
+                #if e.data.subset =
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
-
+        #exit()
 
     if Path(f"gpu_{sdfg_name}_stage6.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage6.sdfgz")
