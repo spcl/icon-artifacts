@@ -55,6 +55,21 @@ def to_segmented_reduction(sdfg: dace.SDFG):
                 # check if the library node is a reduce
                 if 'reduce_' in lib_node.label:
                     # Replace map with segmented reduce
+                    print(f"Found reduce node {lib_node.label} in map {map_entry.label}")
+                    assert "scan" in lib_node.label or "address" in lib_node.label
+                    inputs = [v for v in graph.in_edges(map_entry)]
+                    outputs = [v for v in graph.out_edges(graph.exit_node(map_entry))]
+                    assert len(inputs) == 1
+                    assert len(outputs) == 1
+                    input_edge = inputs[0]
+                    output_edge = outputs[0]
+
+                    #assert len(input_edge.data.subset) == 2
+                    #assert len(output_edge.data.subset) == 1
+
+                    # Pass
+
+                    """
                     sr = SegmentedReduce(name=map_entry.label,
                                     wcr='lambda a, b: a + b')
                     ies = graph.in_edges(map_entry)
@@ -70,7 +85,7 @@ def to_segmented_reduction(sdfg: dace.SDFG):
                     graph.add_node(sr)
                     graph.add_edge(in_edge.src, in_edge.src_conn, sr, "_in", copy.deepcopy(in_edge.data))
                     graph.add_edge(sr, '_out', out_edge.dst, out_edge.dst_conn, copy.deepcopy(out_edge.data))
-
+                    """
 
 @dace.library.expansion
 class ExpandGPU(pm.ExpandTransformation):
@@ -228,7 +243,7 @@ class SegmentedReduce(dace.sdfg.nodes.LibraryNode):
 
     @staticmethod
     def from_json(json_obj, context=None):
-        ret = Reduce('reduce', 'lambda a, b: a', None)
+        ret = SegmentedReduce('reduce', 'lambda a, b: a', None)
         dace.serialize.set_properties_from_json(ret, json_obj, context=context)
         return ret
 

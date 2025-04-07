@@ -302,10 +302,10 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         loop_P,
         loop,
         "maxvcfl_arr",
-        f"({il_end} - {il_start}) * ({ol_end} - {ol_start})",
+        f"({il_end} - {il_start}) * (87)",
         "maxvcfl",
         "maxZ_to_scalar",
-        in_expr=f"maxvcfl_arr[0:{il_end} - {il_start},0:{ol_end} - {ol_start}]",
+        in_expr=f"maxvcfl_arr[{il_start}-1:{il_end}-1,0:87]",
         out_expr="maxvcfl[0]",
         symtype=dace.float64,
     )

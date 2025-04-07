@@ -11,7 +11,7 @@ int reduce_scan_gpu(const int *d_in, int size);
 
 
 template <size_t NUM_WARPS>
-__device__ int shared_data_reduce_sum_v2(int shared_data[NUM_WARPS])
+__device__ __forceinline__ int shared_data_reduce_sum_v2(int shared_data[NUM_WARPS])
 {
     int sum{0};
 #pragma unroll
@@ -22,7 +22,7 @@ __device__ int shared_data_reduce_sum_v2(int shared_data[NUM_WARPS])
     return sum;
 }
 
-__device__ int warp_reduce_sum(int val)
+__device__ __forceinline__ int warp_reduce_sum(int val)
 {
     constexpr unsigned int FULL_MASK{0xffffffff};
 #pragma unroll
@@ -34,7 +34,7 @@ __device__ int warp_reduce_sum(int val)
 }
 
 template <size_t NUM_THREADS, size_t NUM_WARPS = NUM_THREADS / 32>
-__device__ int block_reduce_sum_v2(int const* __restrict__ input_data,
+__device__ __forceinline__ int block_reduce_sum_v2(int const* __restrict__ input_data,
                                     int shared_data[NUM_WARPS],
                                     size_t num_elements)
 {
