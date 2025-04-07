@@ -37,3 +37,7 @@ __device__ __inline__ int reduce_scan_device(const int *d_in, int size)
     return (reduce_sum_to_scalar_device(d_in, size) > 0) ? 1 : 0;
 }
 
+__device__ __inline__ int reduce_scan_device(int d_in, int size)
+{
+    return (d_in > 0) ? 1 : 0;
+}
