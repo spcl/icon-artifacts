@@ -257,13 +257,13 @@ def move_transients_to_top_level(root: dace.SDFG,
         if not no_dim_change:
             new_desc = dace.data.Array(
                 dtype=arr_desc.dtype,
-                shape=list(arr_desc.shape) + [bound],
-                strides=list(arr_desc.strides) + [arr_desc.total_size],
+                shape=[bound] + list(arr_desc.shape),
+                strides=[arr_desc.total_size] + list(arr_desc.strides),
                 transient=True,
                 storage=arr_desc.storage,
                 location=arr_desc.location,
                 allow_conflicts=arr_desc.allow_conflicts,
-                offset=list(arr_desc.offset) + [0],
+                offset=[0] + list(arr_desc.offset),
                 may_alias=arr_desc.may_alias,
                 lifetime=lifetime,
                 alignment=arr_desc.alignment,
@@ -293,10 +293,10 @@ def move_transients_to_top_level(root: dace.SDFG,
                 if edge.data.data == arr_name:
                     mem_range = copy.deepcopy(edge.data.subset)
                     mem_range_list = []
-                    for b,e,s in mem_range.ranges:
-                        mem_range_list += [(b, e, s)]
                     if not no_dim_change:
                         mem_range_list += [(param_sym, param_sym, 1)]
+                    for b,e,s in mem_range.ranges:
+                        mem_range_list += [(b, e, s)]
                     state.remove_edge(edge)
                     state.add_edge(
                         edge.src,
