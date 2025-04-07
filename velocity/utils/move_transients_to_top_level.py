@@ -244,7 +244,7 @@ def move_transients_to_top_level(root: dace.SDFG,
         arr_desc: dace.data.Data = child_sdfg.arrays[arr_name]
         assert len(map_entry.map.range) == 1
         if arr_name in upper_bounds:
-            bound = upper_bounds[arr_name]
+            bound = upper_bounds[arr_name] if isinstance(upper_bounds[arr_name], int) else dace.symbolic.symbol(upper_bounds[arr_name])
             lifetime = dace.AllocationLifetime.SDFG
         else:
             b, e, s = map_entry.map.range[0]
@@ -268,7 +268,6 @@ def move_transients_to_top_level(root: dace.SDFG,
                 lifetime=lifetime,
                 alignment=arr_desc.alignment,
                 debuginfo=arr_desc.debuginfo,
-                total_size=bound * arr_desc.total_size,
                 start_offset=0,
             )
         else:

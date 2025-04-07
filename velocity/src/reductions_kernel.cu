@@ -34,7 +34,7 @@ void reduce_maxZ_to_address_gpu(const double *d_in, double* d_out, int size)
 
 double reduce_maxZ_to_scalar_gpu(const double *d_in, int size)
 {
-  double maxval = thrust::reduce(d_in, d_in + size, 0.0, thrust::maximum<double>());
+  double maxval = thrust::reduce(thrust::device, d_in, d_in + size, 0.0, thrust::maximum<double>());
   return maxval;
 }
 
@@ -63,7 +63,7 @@ void reduce_sum_to_address_gpu(const int *d_in, int* d_out, int size)
 
 int reduce_sum_to_scalar_gpu(const int *d_in, int size)
 {
-  int maxval = thrust::reduce(d_in, d_in + size, 0, thrust::plus<int>());
+  int maxval = thrust::reduce(thrust::device, d_in, d_in + size, 0, thrust::plus<int>());
   return maxval;
 }
 

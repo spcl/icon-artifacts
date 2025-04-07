@@ -237,8 +237,17 @@ for sdfg_name in sdfg_names:
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
             only=["z_w_concorr_mc", "z_w_con_c", "z_v_grad_w",
                   "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full",
-                  "levmask", "cfl_clipping", "maxvcfl_arr"],
+                  "levmask", "cfl_clipping"],
             no_dim_change=True,
+        )
+        move_transients_to_top_level(
+            root=sdfg,
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            upper_bounds={
+                "maxvcfl_arr": "tmp_struct_symbol_11"
+            },
+            only=["maxvcfl_arr"],
+            no_dim_change=False,
         )
         move_transients_to_top_level(
             root=sdfg,
@@ -265,7 +274,7 @@ for sdfg_name in sdfg_names:
         prune_unused_inputs_outputs(sdfg)
         GPUKernelLaunchRestructure().apply_pass(sdfg, {})
         prune_unused_inputs_outputs(sdfg)
-        move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
+        #move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
         #TODO: to_segmented_reduction(sdfg)
         sdfg.validate()
         if use_cache:

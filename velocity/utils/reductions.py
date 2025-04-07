@@ -276,8 +276,8 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     sdfg.add_state_after(
         sdfg.start_state,
         assignments={
-            f"{ol_size_sym}": f"{ol_end} - 3",
-            f"{il_size_sym}": f"__CG_global_data__m_nproma - 1",
+            f"{ol_size_sym}": f"{ol_end}",
+            f"{il_size_sym}": f"__CG_global_data__m_nproma",
         },
     )
 
