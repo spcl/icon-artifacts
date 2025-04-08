@@ -138,6 +138,7 @@ def tile_kernels(sdfg: dace.SDFG):
                             "compute_element_group_dims": [256, 1, 1],
                             "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
                             "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                            "tiles_evenly": False,
                         },
                     )
 
