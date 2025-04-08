@@ -57,6 +57,9 @@ def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_
                 parent_sdfg = graph.sdfg
                 break
 
+    if map_entry is None:
+        return
+
     if map_entry is not None:
         mguid = map_entry.guid
         AddComputeElementBlockMap.apply_to(

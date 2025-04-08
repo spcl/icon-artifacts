@@ -302,12 +302,33 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage6.sdfgz")
     else:
         # Add ThreadBlock map and coarsen a bit
+        dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
         if tile:
             dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
             tile_specific_kernel(sdfg,
+                    params=["_for_it_1_0_0", "_for_it_2_0_0"],
+                    tblock_sizes=[256,1,1],
+                    coarsening_factors=[1,4],
+                    remainder_loop=True)
+            tile_specific_kernel(sdfg,
+                    params=["_for_it_4_0", "_for_it_5_0"],
+                    tblock_sizes=[256,1,1],
+                    coarsening_factors=[1,4],
+                    remainder_loop=True)
+            tile_specific_kernel(sdfg,
                     params=["_for_it_23", "_for_it_24"],
                     tblock_sizes=[256,1,1],
-                    coarsening_factors=[4,2],
+                    coarsening_factors=[2,4],
+                    remainder_loop=True)
+            tile_specific_kernel(sdfg,
+                    params=["_for_it_25", "_for_it_26"],
+                    tblock_sizes=[256,1,1],
+                    coarsening_factors=[2,4],
+                    remainder_loop=True)
+            tile_specific_kernel(sdfg,
+                    params=["_for_it_32", "_for_it_33"],
+                    tblock_sizes=[256,1,1],
+                    coarsening_factors=[2,1],
                     remainder_loop=True)
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
