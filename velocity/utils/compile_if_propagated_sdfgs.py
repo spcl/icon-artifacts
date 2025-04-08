@@ -122,7 +122,29 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
         script_dir = path
     _process_folder(script_dir, sdfg, instrument)
 
+def add_timers(file_path: str):
+    """
+    """
+    import re
 
+    with open(file_path, "r") as f:
+        code = f.read()
+
+    # Pattern 1: cudaMemcpyAsync line
+    pattern1 = r'^\s*DACE_GPU_CHECK\(cudaMemcpyAsync\(__CG_p_int__m_geofac_grdiv.*?\);\s*$'
+    replacement1 = '    measure_time("Run");\n\\g<0>'
+
+    # Pattern 2: nrdmax_jg assignment
+    pattern2 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
+    replacement2 = '    measure_time("Run");\n\\g<0>'
+
+    # Apply both replacements
+    code = re.sub(pattern1, replacement1, code, flags=re.MULTILINE)
+    code = re.sub(pattern2, replacement2, code, flags=re.MULTILINE)
+
+    with open(file_path, "w") as f:
+        f.write(code)
+        
 def comment_out_syncs(filepath):
     # comment out (prepend //) any line containing cudaStreamSynchronize
     vcflmax_count = 0
@@ -191,7 +213,8 @@ def compile_if_propagated_sdfgs(
             compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
 
             modify_files_in_directory(build_loc)
-            insert_measure_time_calls(build_loc, sdfg, instrument)
+            add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp")
+            # insert_measure_time_calls(build_loc, sdfg, instrument)
             if fix_out_val_0:
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &maxvcfl_arr")
@@ -239,7 +262,7 @@ def compile_if_propagated_sdfgs(
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
     if gpu:
         if release:
-            flags = f" {supress_flags} -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new -Xcompiler=-fopenmp --expt-relaxed-constexpr -arch=native --use_fast_math -O3 --extra-device-vectorization -dlto --gen-opt-lto"
+            flags = f" {supress_flags} -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 --extra-device-vectorization -dlto --gen-opt-lto"
         else:
             flags = f" {supress_flags}  -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false"
     else:
