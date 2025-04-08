@@ -54,3 +54,10 @@ int reduce_scan_cpu(const int *d_in, int size)
 {
   return reduce_sum_to_scalar_cpu(d_in, size) > 0? 1 : 0;
 }
+
+// scan reduction interface
+int reduce_scan_cpu(const int d_in, int size)
+{
+  return d_in > 0? 1 : 0;
+}
+
