@@ -309,6 +309,29 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         out_expr="maxvcfl[0]",
         symtype=dace.float64,
     )
+
+    # Cache aligned version:
+    # parent.add_edge(
+    #     task,
+    #     "maxvcfl_out",
+    #     arr_acc,
+    #     None,
+    #     dace.Memlet(f"{arr_name}[{il_it_name}-{il_start},{ol_it_name}-{il_start}]"),
+    # )
+
+    # red_state, red_node = _insert_reduction(
+    #     loop_P,
+    #     loop,
+    #     "maxvcfl_arr",
+    #     f"({il_end} - {il_start}) * (87)",
+    #     "maxvcfl",
+    #     "maxZ_to_scalar",
+    #     in_expr=f"maxvcfl_arr[0:{il_end}-{il_start},0:87]",
+    #     out_expr="maxvcfl[0]",
+    #     symtype=dace.float64,
+    # )
+
+
     red_node._offloadable = False
     red_node._output = "scalar"
 

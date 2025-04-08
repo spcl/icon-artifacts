@@ -1,7 +1,3 @@
-
-
-
-
 #include <iostream>
 #include <chrono>
 
@@ -13,9 +9,9 @@ void measure_time(const char *tag = nullptr)
   if (timer_call_count % 2 == 1)
   {
     auto now = std::chrono::high_resolution_clock::now();
-    unsigned long int start = std::chrono::duration_cast<std::chrono::milliseconds>(timer_last_time.time_since_epoch()).count();
-    unsigned long int end = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    std::cout << "Timer " << tag << " took " << (end - start) << " ms" << std::endl;
+    unsigned long int start = std::chrono::duration_cast<std::chrono::microseconds>(timer_last_time.time_since_epoch()).count();
+    unsigned long int end = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    std::cout << "Timer " << tag << " took " << (end - start) << " us" << std::endl;
   } else {
     timer_last_time = std::chrono::high_resolution_clock::now();
   }
