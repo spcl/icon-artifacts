@@ -70,6 +70,7 @@ def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_
                 "compute_element_group_dims": tblock_sizes,
                 "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
                 "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                "tiles_evenly": remainder_loop,
             },
         )
         map_entry = parent_state.entry_node(map_entry) # Due to how maptiling works
@@ -125,9 +126,6 @@ def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_
     pass
 
 def tile_kernels(sdfg: dace.SDFG):
-    if not tile:
-        return
-
     for graph in [v for v, _ in list(sdfg.all_nodes_recursive()) if isinstance(v, dace.SDFGState)]:
         for n in graph.nodes():
             if isinstance(n, dace.nodes.MapEntry):
@@ -156,28 +154,27 @@ def tile_kernels(sdfg: dace.SDFG):
                     and "nrdmax_jg" not in str(n.map.range[0])
                 ):
                     coarsening_factors = []
-                    if not remainder_loop:
-                        for (b, e, s), (tb, te, ts) in zip(n.map.range, n2.map.range):
-                            range1 = (e+1-b)//s
-                            range2 = (te+1-tb)//ts
+
+                    for (b, e, s), (tb, te, ts) in zip(n.map.range, n2.map.range):
+                        range1 = (e+1-b)//s
+                        range2 = (te+1-tb)//ts
+                        dim = 1
+                        try:
+                            dim = int(range1 // range2)
+                        except:
                             dim = 1
-                            try:
-                                dim = int(range1 // range2)
-                            except:
-                                dim = 1
-                            if dim == 92:
-                                coarsening_factor = 8
-                            if dim == 91:
-                                coarsening_factor = 7
-                            elif dim == 90:
-                                coarsening_factor = 9
-                            elif dim == 89:
-                                coarsening_factor = 1
-                            else:
-                                coarsening_factor = 1
-                            coarsening_factors.append(coarsening_factor)
-                    else:
-                        coarsening_factors = [4, 2]
+                        if dim == 92:
+                            coarsening_factor = 8
+                        if dim == 91:
+                            coarsening_factor = 7
+                        elif dim == 90:
+                            coarsening_factor = 9
+                        elif dim == 89:
+                            coarsening_factor = 1
+                        else:
+                            coarsening_factor = 1
+                        coarsening_factors.append(coarsening_factor)
+
                     if not all([v == 1 for v in coarsening_factors]):
                         ThreadCoarsening.apply_to(
                             sdfg=graph.sdfg,
@@ -191,31 +188,4 @@ def tile_kernels(sdfg: dace.SDFG):
                         # We added 1 map, the n is parent of
                         n = graph.entry_node(n)
 
-    if not remainder_loop:
-        sdfg.validate()
-        return
-
-    for graph in [v for v, _ in list(sdfg.all_nodes_recursive()) if isinstance(v, dace.SDFGState)]:
-        for n in graph.nodes():
-            if not _can_apply(graph, n, seq_map_ok=True):
-                continue
-
-            for n2 in sdutil.dfs_topological_sort(graph, n):
-                if (
-                    isinstance(n2, dace.nodes.MapEntry)
-                    and n2.map.label.startswith("ThreadCoarsenedMap")
-                    and graph.entry_node(n2).map.schedule == dace.dtypes.ScheduleType.GPU_ThreadBlock
-                    and graph.entry_node(graph.entry_node(n2)) == n
-                    and "nrdmax_jg" not in str(n.map.range[0])
-                ):
-                    RemainderLoopStencilMap.apply_to(
-                        sdfg=graph.sdfg,
-                        verify=True,
-                        inner_work_map_entry=n2,
-                        tblock_type=dace.dtypes.ScheduleType.GPU_ThreadBlock,
-                        options={
-                            "tblock_type": dace.dtypes.ScheduleType.GPU_ThreadBlock,
-                        }
-                    )
-                    break
     sdfg.validate()

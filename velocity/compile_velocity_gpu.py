@@ -305,6 +305,7 @@ for sdfg_name in sdfg_names:
         dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
         if tile:
             dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
+            """
             tile_specific_kernel(sdfg,
                     params=["_for_it_1_0_0", "_for_it_2_0_0"],
                     tblock_sizes=[256,1,1],
@@ -340,6 +341,8 @@ for sdfg_name in sdfg_names:
                     tblock_sizes=[256,1,1],
                     coarsening_factors=[4, 1],
                     remainder_loop=True)
+            """
+            tile_kernels(sdfg)
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
 
