@@ -268,18 +268,18 @@ def compile_if_propagated_sdfgs(
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
     if gpu:
         if release:
-            flags = f" {supress_flags} -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 --extra-device-vectorization -dlto --gen-opt-lto"
+            flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 "
         else:
-            flags = f" {supress_flags}  -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false"
+            flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
-            flags += " -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared"
+            flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
+        else:
+            flags += " -std=c++20 "
     else:
         if release:
             flags = " -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 -g "
         else:
             flags = " -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -g -ggdb "
-        if lib:
-            flags += " -fPIC -shared"
 
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
