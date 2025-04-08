@@ -144,7 +144,7 @@ def add_timers(file_path: str):
 
     with open(file_path, "w") as f:
         f.write(code)
-        
+
 def comment_out_syncs(filepath):
     # comment out (prepend //) any line containing cudaStreamSynchronize
     vcflmax_count = 0
@@ -172,6 +172,7 @@ def compile_if_propagated_sdfgs(
     release: bool = False,
     instrument: bool = False,
     generate_code: bool = True,
+    lib = False,
 ):
     sources = set()
     sources.add("src/reductions.cpp")
@@ -258,9 +259,11 @@ def compile_if_propagated_sdfgs(
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
 
     if not gpu:
-        sources.add("main.cc")
+        if not lib:
+            sources.add("main.cc")
     else:
-        sources.add("main_gpu.cu")
+        if not lib:
+            sources.add("main_gpu.cu")
 
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
     if gpu:
@@ -268,21 +271,35 @@ def compile_if_propagated_sdfgs(
             flags = f" {supress_flags} -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 --extra-device-vectorization -dlto --gen-opt-lto"
         else:
             flags = f" {supress_flags}  -std=c++20 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false"
+        if lib:
+            flags += " -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared"
     else:
         if release:
             flags = " -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 -g "
         else:
             flags = " -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -g -ggdb "
+        if lib:
+            flags += " -fPIC -shared"
 
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
-        exit_code = os.system(
-            f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
-        )
+        if not lib:
+            exit_code = os.system(
+                f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
+            )
+        else:
+            exit_code = os.system(
+                f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
+            )
     else:
-        exit_code = os.system(
-            f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
-        )
+        if not lib:
+            exit_code = os.system(
+                f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
+            )
+        else:
+            exit_code = os.system(
+                f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_cpu.so"
+            )
 
     # check if compilation was successful
     if exit_code != 0:
