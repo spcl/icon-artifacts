@@ -240,16 +240,6 @@ fnames = [
     "velocity_no_nproma_if_prop_lvn_only_1_istep_2",
 ]
 
-# Example usage
-process_file(
-    input_path='.dacecache2/velocity_no_nproma_if_prop_lvn_only_0_istep_1/src/cpu/velocity_no_nproma_if_prop_lvn_only_0_istep_1.cu',
-    flattener_replacement_path='velocity_no_nproma_if_prop_lvn_only_0_istep_1_flattener_code.cpp',
-    deflattener_replacement_path='velocity_no_nproma_if_prop_lvn_only_0_istep_1_deflattener_code.cpp',
-    output_path_removed='removed_lines.txt',
-    output_path_cleaned='cleaned_output.cpp'
-)
-
-
 def process_files(
     sdfg_names=[fname for fname in fnames],
 ):
