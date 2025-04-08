@@ -137,6 +137,7 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
     inside_deflatten_block = False
     deflatten_inserted = False
 
+    first_rm_free = True
     for line in lines:
         # Detect and remove flatten block
         if '// Start flatten' in line:
@@ -203,6 +204,7 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
                     cleaned_lines.append(f"gpu_{gpuin} = {gpuin};\n")
 
         # Match any of the removal patterns
+
         if (
             pattern_cg_alloc.search(line) or
             pattern_lower_assign.search(line) or
@@ -225,6 +227,9 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
                     removed_lines.append(line)
                     donot = True
                     break
+            if first_rm_free:
+                first_rm_free = False
+                cleaned_lines.append("cudaDeviceSynchronize();\n")
 
             if not donot:
                 cleaned_lines.append(line)
