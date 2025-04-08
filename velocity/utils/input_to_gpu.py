@@ -1,4 +1,5 @@
 import dace
+from dace.sdfg import SDFGState
 import re
 
 
@@ -7,8 +8,17 @@ def input_to_gpu(sdfg: dace.SDFG, input_name: str):
     Transforms an input to be present on the GPU.
     """
 
-    first_state = sdfg.start_state
+    first_state: SDFGState = sdfg.start_state
     last_state = sdfg.sink_nodes()[0]
+
+    # Ensure the symbols are not eliminated
+    first_state.add_tasklet(
+        "sym_hack",
+        {},
+        {},
+        f"i_am_not_used = {sdfg.arrays[input_name].total_size}",
+        side_effects=True,
+    )
 
     # Rename access nodes
     for node, p in sdfg.all_nodes_recursive():
