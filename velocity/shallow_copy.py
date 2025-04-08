@@ -226,10 +226,10 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
                     print(f"DACE_GPU_CHECK(cudaMemcpyAsync({gpuin}, gpu_{gpuin}... Warning: {gpuin} is used in a memcpy operation.")
                     removed_lines.append(line)
                     donot = True
+                    if first_rm_free:
+                        first_rm_free = False
+                        cleaned_lines.append("cudaDeviceSynchronize();\n")
                     break
-            if first_rm_free:
-                first_rm_free = False
-                cleaned_lines.append("cudaDeviceSynchronize();\n")
 
             if not donot:
                 cleaned_lines.append(line)
