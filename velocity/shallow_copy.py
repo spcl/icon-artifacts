@@ -17,6 +17,99 @@ def _check_deflattener_assignment(line):
             tokens[-3].startswith("__cg_")):
             return True
 
+setzero_str0_1="""
+{
+for (int i = 0; i < tmp_struct_symbol_12; i++){
+    __state->__0_vcflmax[i] = 0.0;
+}
+
+{
+cudaStream_t stream = __state->gpu_context->streams[0];
+cudaMemsetAsync(__state->__0_gpu_levelmask, 0, 90 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_maxvcfl_arr, 0, (((87 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (87 * tmp_struct_symbol_4)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_v, 0, (((91 * tmp_struct_symbol_6) * (tmp_struct_symbol_7 - 1)) + (91 * tmp_struct_symbol_6)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_cfl_clipping, 0, (91 * tmp_struct_symbol_14) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c, 0, (91 * tmp_struct_symbol_1) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_levmask, 0, (90 * tmp_struct_symbol_13) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_concorr_mc, 0, (90 * tmp_struct_symbol_0) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_zeta, 0, (((90 * tmp_struct_symbol_8) * (tmp_struct_symbol_9 - 1)) + (90 * tmp_struct_symbol_8)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c_full, 0, (((90 * tmp_struct_symbol_2) * (tmp_struct_symbol_3 - 1)) + (90 * tmp_struct_symbol_2)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_out_val_0, 0, 89 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_v_grad_w, 0, (((90 * tmp_struct_symbol_4) * (tmp_struct_symbol_5 - 1)) + (90 * tmp_struct_symbol_4)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_ekinh, 0, (((90 * tmp_struct_symbol_10) * (tmp_struct_symbol_11 - 1)) + (90 * tmp_struct_symbol_10)) * sizeof(double), stream);
+}
+}
+"""
+setzero_str0_2="""
+{
+for (int i = 0; i < tmp_struct_symbol_12; i++){
+    __state->__0_vcflmax[i] = 0.0;
+}
+
+{
+cudaStream_t stream = __state->gpu_context->streams[0];
+cudaMemsetAsync(__state->__0_gpu_levelmask, 0, 90 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_maxvcfl_arr, 0, (((87 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (87 * tmp_struct_symbol_4)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_v, 0, (((91 * tmp_struct_symbol_6) * (tmp_struct_symbol_7 - 1)) + (91 * tmp_struct_symbol_6)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_cfl_clipping, 0, (91 * tmp_struct_symbol_14) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c, 0, (91 * tmp_struct_symbol_1) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_levmask, 0, (90 * tmp_struct_symbol_13) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_zeta, 0, (((90 * tmp_struct_symbol_8) * (tmp_struct_symbol_9 - 1)) + (90 * tmp_struct_symbol_8)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c_full, 0, (((90 * tmp_struct_symbol_2) * (tmp_struct_symbol_3 - 1)) + (90 * tmp_struct_symbol_2)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_out_val_0, 0, 89 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_v_grad_w, 0, (((90 * tmp_struct_symbol_4) * (tmp_struct_symbol_5 - 1)) + (90 * tmp_struct_symbol_4)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_ekinh, 0, (((90 * tmp_struct_symbol_10) * (tmp_struct_symbol_11 - 1)) + (90 * tmp_struct_symbol_10)) * sizeof(double), stream);
+}
+}
+"""
+setzero_str1_1="""
+{
+for (int i = 0; i < tmp_struct_symbol_12; i++){
+    __state->__0_vcflmax[i] = 0.0;
+}
+
+{
+cudaStream_t stream = __state->gpu_context->streams[0];
+cudaMemsetAsync(__state->__0_gpu_levelmask, 0, 90 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_maxvcfl_arr, 0, (((87 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (87 * tmp_struct_symbol_4)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_cfl_clipping, 0, (91 * tmp_struct_symbol_14) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c, 0, (91 * tmp_struct_symbol_1) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_levmask, 0, (90 * tmp_struct_symbol_13) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_concorr_mc, 0, (90 * tmp_struct_symbol_0) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_zeta, 0, (((90 * tmp_struct_symbol_8) * (tmp_struct_symbol_9 - 1)) + (90 * tmp_struct_symbol_8)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c_full, 0, (((90 * tmp_struct_symbol_2) * (tmp_struct_symbol_3 - 1)) + (90 * tmp_struct_symbol_2)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_out_val_0, 0, 89 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_ekinh, 0, (((90 * tmp_struct_symbol_10) * (tmp_struct_symbol_11 - 1)) + (90 * tmp_struct_symbol_10)) * sizeof(double), stream);
+}
+}
+"""
+setzero_str1_2="""
+{
+for (int i = 0; i < tmp_struct_symbol_12; i++){
+    __state->__0_vcflmax[i] = 0.0;
+}
+
+{
+cudaStream_t stream = __state->gpu_context->streams[0];
+cudaMemsetAsync(__state->__0_gpu_levelmask, 0, 90 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_maxvcfl_arr, 0, (((87 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (87 * tmp_struct_symbol_4)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_cfl_clipping, 0, (91 * tmp_struct_symbol_14) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c, 0, (91 * tmp_struct_symbol_1) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_levmask, 0, (90 * tmp_struct_symbol_13) * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_zeta, 0, (((90 * tmp_struct_symbol_8) * (tmp_struct_symbol_9 - 1)) + (90 * tmp_struct_symbol_8)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_z_w_con_c_full, 0, (((90 * tmp_struct_symbol_2) * (tmp_struct_symbol_3 - 1)) + (90 * tmp_struct_symbol_2)) * sizeof(double), stream);
+cudaMemsetAsync(__state->__0_gpu_out_val_0, 0, 89 * sizeof(int), stream);
+cudaMemsetAsync(__state->__0_gpu_z_ekinh, 0, (((90 * tmp_struct_symbol_10) * (tmp_struct_symbol_11 - 1)) + (90 * tmp_struct_symbol_10)) * sizeof(double), stream);
+}
+}
+"""
+setzerodict = {
+    "lvn_only_0_istep_1": setzero_str0_1,
+    "lvn_only_0_istep_2": setzero_str0_2,
+    "lvn_only_1_istep_1": setzero_str1_1,
+    "lvn_only_1_istep_2": setzero_str1_2,
+}
+
 def process_file(input_path, flattener_replacement_path, deflattener_replacement_path, output_path_removed, output_path_cleaned):
     with open(input_path, 'r') as infile:
         lines = infile.readlines()
@@ -52,6 +145,15 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
             inside_flatten_block = False
             removed_lines.append(line)
             cleaned_lines.extend(flattener_replacement_lines)
+            if "lvn_only_0_istep_1" in input_path:
+                setzero_str = setzerodict["lvn_only_0_istep_1"]
+            elif "lvn_only_0_istep_2" in input_path:
+                setzero_str = setzerodict["lvn_only_0_istep_2"]
+            elif "lvn_only_1_istep_1" in input_path:
+                setzero_str = setzerodict["lvn_only_1_istep_1"]
+            elif "lvn_only_1_istep_2" in input_path:
+                setzero_str = setzerodict["lvn_only_1_istep_2"]
+            cleaned_lines.extend(setzero_str)
             flatten_inserted = True
             continue
 
