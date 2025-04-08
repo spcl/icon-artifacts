@@ -62,6 +62,8 @@ for sdfg_name in sdfg_names:
             interface_with_struct_copy=True,
             interface_to_gpu=True,
             clean_trivial_views=True,
+            shallow_copy=False,
+            shallow_copy_to_gpu=False
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
 
@@ -115,7 +117,7 @@ for sdfg_name in sdfg_names:
         #    },
         #)
 
-        preprocess_tough_nut(sdfg)
+        #preprocess_tough_nut(sdfg)
         prune_unused_inputs_outputs(sdfg)
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
@@ -232,6 +234,7 @@ for sdfg_name in sdfg_names:
         # tmp_struct_symbol_9 == nblks_v
         # z_ekinh [ tmp_struct_symbol_10, 90, tmp_struct_symbol_11 ] (nproma,p_patch%nlev,p_patch%nblks_c)
         # tmp_struct_symbol_11 == nblks_c
+        sdfg.save("before_move.sdfgz", compress=True)
         move_transients_to_top_level(
             root=sdfg,
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
@@ -240,6 +243,9 @@ for sdfg_name in sdfg_names:
                   "levmask", "cfl_clipping"],
             no_dim_change=True,
         )
+        #cfl clipping 2
+        #levelmask 2
+        #vcflmax 1
         move_transients_to_top_level(
             root=sdfg,
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
@@ -263,7 +269,7 @@ for sdfg_name in sdfg_names:
                 name="difcoef",
                 double_size=True,
             )
-
+        sdfg.save("after_move.sdfgz", compress=True)
 
         sdfg.validate()
         sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
