@@ -195,7 +195,7 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
         pattern_malloc_gpu_ins = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMalloc\s*\(\s*\(void\*\*\)\s*&gpu_(' + '|'.join(gpu_inputs) + r')\s*.*\);')
         pattern_cuda_free_ins = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaFree\s*\(\s*gpu_(' + '|'.join(gpu_inputs) + r')\)\s*\)\s*;')
         pattern_memcpy_gpu_ins = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMemcpyAsync\s*\(\s*(gpu_(' + '|'.join(gpu_inputs) + r'))|(' + '|'.join(gpu_inputs) + r')\s*,\s*gpu_(' + '|'.join(gpu_inputs) + r')\s*\)\s*;')
-
+        pattern_cuda_free_ins2 = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaFree\s*\(\s*(' + '|'.join(gpu_inputs) + r')\)\s*\)\s*;')
 
         if pattern_malloc_gpu_ins.search(line):
             for gpuin in gpu_inputs:
@@ -213,11 +213,21 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
             pattern_cuda_memcpy2.search(line) or
             pattern_malloc_gpu_ins.search(line) or
             pattern_cuda_free_ins.search(line) or
-            pattern_memcpy_gpu_ins.search(line)
+            pattern_memcpy_gpu_ins.search(line) or
+            pattern_cuda_free_ins2.search(line)
         ):
             removed_lines.append(line)
         else:
-            cleaned_lines.append(line)
+            donot = False
+            for gpuin in gpu_inputs:
+                if f"DACE_GPU_CHECK(cudaMemcpyAsync({gpuin}, gpu_{gpuin}" in line:
+                    print(f"DACE_GPU_CHECK(cudaMemcpyAsync({gpuin}, gpu_{gpuin}... Warning: {gpuin} is used in a memcpy operation.")
+                    removed_lines.append(line)
+                    donot = True
+                    break
+
+            if not donot:
+                cleaned_lines.append(line)
 
 
 
