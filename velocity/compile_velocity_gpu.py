@@ -373,6 +373,11 @@ for sdfg_name in sdfg_names:
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
         """
+
+    input_to_gpu(sdfg, "z_w_concorr_me")
+    input_to_gpu(sdfg, "z_kin_hor_e")
+    input_to_gpu(sdfg, "z_vt_ie")
+
     # Validate the SDFG
     sdfg.validate()
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)
