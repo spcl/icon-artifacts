@@ -1,0 +1,160 @@
+import re
+
+def _check_flattener_assignment(line):
+    tokens = line.split()
+    if len(tokens) == 4:
+        if (tokens[-1].startswith("__CG_") and
+            "=" == tokens[-2] and
+            tokens[-3].startswith("__cg_")):
+            return True
+
+def _check_deflattener_assignment(line):
+    "double *__cg_p_prog__m_w                                 = &__CG_p_prog__m_w[0];"
+    tokens = line.split()
+    if len(tokens) == 4:
+        if (tokens[-1].startswith("&__CG_") and
+            "=" == tokens[-2] and
+            tokens[-3].startswith("__cg_")):
+            return True
+
+def process_file(input_path, flattener_replacement_path, deflattener_replacement_path, output_path_removed, output_path_cleaned):
+    with open(input_path, 'r') as infile:
+        lines = infile.readlines()
+
+    with open(flattener_replacement_path, 'r') as repfile1:
+        flattener_replacement_lines = repfile1.readlines()
+    with open(deflattener_replacement_path, 'r') as repfile2:
+        deflattener_replacement_lines = repfile2.readlines()
+
+    cleaned_lines = []
+    removed_lines = []
+
+    # Compile all regex patterns
+    pattern_cg_alloc = re.compile(r'^\s*__CG\w*\s*=\s*new\b.*;')
+    pattern_lower_assign = re.compile(r'^\s*\w+\.lower\(\)\s*=\s*.*;')
+    pattern_memcpy_gpu = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMemcpyAsync\s*\(\s*gpu___CG_.*')
+    pattern_malloc_gpu = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMalloc\s*\(\s*\(void\*\*\)\s*&gpu___CG_.*')
+    pattern_delete_cg = re.compile(r'^\s*delete\[\]\s+__CG_.*;')
+    pattern_cuda_free = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaFree\s*\(\s*gpu___CG_.*\)\s*\)\s*;')
+    pattern_cuda_memcpy2 = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMemcpyAsync\s*\(\s*__CG_.*\)\s*\)\s*;')
+    inside_flatten_block = False
+    flatten_inserted = False
+    inside_deflatten_block = False
+    deflatten_inserted = False
+
+    for line in lines:
+        # Detect and remove flatten block
+        if '// Start flatten' in line:
+            inside_flatten_block = True
+            removed_lines.append(line)
+            continue
+        elif '// End flatten' in line:
+            inside_flatten_block = False
+            removed_lines.append(line)
+            cleaned_lines.extend(flattener_replacement_lines)
+            flatten_inserted = True
+            continue
+
+        if '// Start deflatten' in line:
+            inside_deflatten_block = True
+            removed_lines.append(line)
+            continue
+        elif '// End deflatten' in line:
+            inside_deflatten_block = False
+            removed_lines.append(line)
+            cleaned_lines.extend(deflattener_replacement_lines)
+            deflatten_inserted = True
+            continue
+
+
+        if inside_flatten_block or inside_deflatten_block:
+            removed_lines.append(line)
+            continue
+
+        specific_remvoes = ["__CG_global_data__m_nproma = __cg_global_data__m_nproma;",
+                            "__CG_p_diag__m_max_vcfl_dyn = __cg_p_diag__m_max_vcfl_dyn;"]
+        cont = False
+        for sr in specific_remvoes:
+            if sr in line:
+                removed_lines.append(line)
+                cont = True
+        if cont:
+            continue
+
+        if _check_flattener_assignment(line) or _check_deflattener_assignment(line):
+            removed_lines.append(line)
+            continue
+
+        # Match any of the removal patterns
+        if (
+            pattern_cg_alloc.search(line) or
+            pattern_lower_assign.search(line) or
+            pattern_memcpy_gpu.search(line) or
+            pattern_malloc_gpu.search(line) or
+            pattern_delete_cg.search(line) or
+            pattern_cuda_free.search(line) or
+            pattern_cuda_memcpy2.search(line)
+        ):
+            removed_lines.append(line)
+        else:
+            cleaned_lines.append(line)
+
+    # Write to output files
+    with open(output_path_removed, 'w') as removed_file:
+        removed_file.writelines(removed_lines)
+
+    with open(output_path_cleaned, 'w') as cleaned_file:
+        cleaned_file.writelines(cleaned_lines)
+
+    if not flatten_inserted:
+        print("Warning: No '// Start flatten' block was found.")
+    if not deflatten_inserted:
+        print("Warning: No '// Start deflatten' block was found.")
+
+fnames = [
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_1",
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_2",
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_1",
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_2",
+]
+
+# Example usage
+process_file(
+    input_path='.dacecache2/velocity_no_nproma_if_prop_lvn_only_0_istep_1/src/cpu/velocity_no_nproma_if_prop_lvn_only_0_istep_1.cu',
+    flattener_replacement_path='velocity_no_nproma_if_prop_lvn_only_0_istep_1_flattener_code.cpp',
+    deflattener_replacement_path='velocity_no_nproma_if_prop_lvn_only_0_istep_1_deflattener_code.cpp',
+    output_path_removed='removed_lines.txt',
+    output_path_cleaned='cleaned_output.cpp'
+)
+
+
+def process_files(
+    sdfg_names=[fname for fname in fnames],
+):
+    for sname in sdfg_names:
+        process_file(
+            input_path=f'.dacecache/{sname}/src/cpu/{sname}.cu',
+            flattener_replacement_path=f'./{sname}_flattener_code.cpp',
+            deflattener_replacement_path=f'./{sname}_deflattener_code.cpp',
+            output_path_removed=f'{sname}_removed_lines.txt',
+            output_path_cleaned=f'.dacecache/{sname}/src/cpu/{sname}.cu'
+        )
+
+def combine_files(file_paths, output_path):
+    combined_lines = set()
+
+    # Read lines from each file and add them to the set
+    for file_path in file_paths:
+        with open(file_path, 'r') as file:
+            combined_lines.update(file.readlines())
+
+    # Write the combined unique lines to a new file
+    with open(output_path, 'w') as output_file:
+        output_file.writelines(sorted(combined_lines))
+
+# Example usage: combining 4 files
+combine_files(
+    file_paths=[fname + "_flattener_code.cpp" for fname in fnames],
+    output_path='combined.cpp'
+)
+process_files(fnames)
