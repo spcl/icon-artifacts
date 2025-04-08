@@ -130,15 +130,15 @@ def add_timers(file_path: str):
     with open(file_path, "r") as f:
         code = f.read()
 
-    # Pattern 1: cudaMemcpyAsync line
-    pattern1 = r'^\s*DACE_GPU_CHECK\(cudaMemcpyAsync\(__CG_p_int__m_geofac_grdiv.*?\);\s*$'
+    # Pattern 1: Insert BEFORE `nrdmax_jg = __CG_global_data__m_nrdmax[0];`
+    pattern1 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
     replacement1 = '    measure_time("Run");\n\\g<0>'
 
-    # Pattern 2: nrdmax_jg assignment
-    pattern2 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
-    replacement2 = '    measure_time("Run");\n\\g<0>'
+    # Pattern 2: Insert AFTER `__CG_p_diag__m_max_vcfl_dyn = p_diag_out_max_vcfl_dyn;`
+    pattern2 = r'^(\s*__CG_p_diag__m_max_vcfl_dyn\s*=\s*p_diag_out_max_vcfl_dyn;\s*)$'
+    replacement2 = '\\1\n    measure_time("Run");'
 
-    # Apply both replacements
+    # Apply replacements
     code = re.sub(pattern1, replacement1, code, flags=re.MULTILINE)
     code = re.sub(pattern2, replacement2, code, flags=re.MULTILINE)
 
