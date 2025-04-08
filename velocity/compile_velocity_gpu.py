@@ -376,10 +376,10 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
         """
 
-    input_to_gpu(sdfg, "z_w_concorr_me")
-    input_to_gpu(sdfg, "z_kin_hor_e")
-    input_to_gpu(sdfg, "z_vt_ie")
-    # make_arrays_persistent(sdfg)
+    #input_to_gpu(sdfg, "z_w_concorr_me")
+    #input_to_gpu(sdfg, "z_kin_hor_e")
+    #input_to_gpu(sdfg, "z_vt_ie")
+    make_arrays_persistent(sdfg)
     # Validate the SDFG
     sdfg.validate()
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)

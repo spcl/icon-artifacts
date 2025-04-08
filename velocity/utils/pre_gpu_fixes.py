@@ -19,7 +19,7 @@ def step_1(sdfg: dace.SDFG):
     # sdfg.save("debug_pre.sdfg")
     library_node_reduction, library_node_reduction_parnet = find_node_by_name(sdfg, "reduce_sum_to_address")
     assert isinstance(library_node_reduction, dace.nodes.LibraryNode)
-    
+
     # Get the library node's in edges
     in_edges = library_node_reduction_parnet.in_edges(library_node_reduction)
     assert len(in_edges) == 2
@@ -29,11 +29,11 @@ def step_1(sdfg: dace.SDFG):
     reduction_sum_size_edge = in_edges[0] if in_edges[0].src.data == "reduce_sum_to_address_size" else in_edges[1]
     reduction_sum_size = reduction_sum_size_edge.src
     assert reduction_sum_size.data == "reduce_sum_to_address_size"
-    
+
     tasklet_before_reduction_edges = library_node_reduction_parnet.in_edges(reduction_sum_size)[0]
     tasklet_before_reduction = tasklet_before_reduction_edges.src
     assert tasklet_before_reduction.label == "size_reduce_sum_to_address"
-    
+
     # Get the library node's out edges
     out_edges = library_node_reduction_parnet.out_edges(library_node_reduction)
     assert len(out_edges) == 1
@@ -48,9 +48,9 @@ def step_1(sdfg: dace.SDFG):
     new_state.add_edge(reduction_sum_size_edge.src, reduction_sum_size_edge.src_conn, reduction_sum_size_edge.dst, reduction_sum_size_edge.dst_conn, reduction_sum_size_edge.data)
     new_state.add_edge(tasklet_before_reduction_edges.src, tasklet_before_reduction_edges.src_conn, tasklet_before_reduction_edges.dst, tasklet_before_reduction_edges.dst_conn, tasklet_before_reduction_edges.data)
     new_state.add_edge(reduction_sum_edge.src, reduction_sum_edge.src_conn, reduction_sum_edge.dst, reduction_sum_edge.dst_conn, reduction_sum_edge.data)
-    
-    
-    
+
+
+
     # remove things from the first state
     library_node_reduction_parnet.remove_edge(cfl_edge)
     library_node_reduction_parnet.remove_edge(reduction_sum_size_edge)
@@ -58,8 +58,8 @@ def step_1(sdfg: dace.SDFG):
     library_node_reduction_parnet.remove_edge(reduction_sum_edge)
     library_node_reduction_parnet.remove_nodes_from([reduction_sum_size, tasklet_before_reduction, library_node_reduction, reduction_sum])
 
-    
-    
+
+
     # Distribute the outer map and duplicate the inside
     outer_state = library_node_reduction_parnet.sdfg.parent
     state_copy_1 = outer_state.parent.add_state_after(outer_state)
@@ -69,14 +69,14 @@ def step_1(sdfg: dace.SDFG):
         node_copy = dc(node)
         map_of_copies[node] = node_copy
         state_copy_1.add_node(node_copy)
-    
+
     for edge in outer_state.edges():
         src = edge.src
         dst = edge.dst
         src_copy = map_of_copies[src]
         dst_copy = map_of_copies[dst]
         state_copy_1.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, dc(edge.data))
-        
+
     state_copy_2 = outer_state.parent.add_state_after(state_copy_1)
     map_of_copies = {}
     # Copy all the elements of the state to the copy
@@ -84,14 +84,14 @@ def step_1(sdfg: dace.SDFG):
         node_copy = dc(node)
         map_of_copies[node] = node_copy
         state_copy_2.add_node(node_copy)
-    
+
     for edge in outer_state.edges():
         src = edge.src
         dst = edge.dst
         src_copy = map_of_copies[src]
         dst_copy = map_of_copies[dst]
         state_copy_2.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, dc(edge.data))
-    
+
     # ****** First state ******
     for node in outer_state.nodes():
         if isinstance(node, dace.nodes.NestedSDFG):
@@ -114,7 +114,7 @@ def step_1(sdfg: dace.SDFG):
             # Delete the map entry and exit nodes
             map_entry = node
             out_edges = outer_state.out_edges(map_entry)
-            
+
             assert len(out_edges) == 2
             assert isinstance(out_edges[0].dst, dace.nodes.Tasklet)
             map_exit = outer_state.exit_node(map_entry)
@@ -143,7 +143,7 @@ def step_1(sdfg: dace.SDFG):
         elif isinstance(node, dace.nodes.MapEntry) and "_for_it_35" in node.params:
             # we need to change the output to only be out_val_0
             map_entry_it_35 = node
-    
+
     # prune outputs
     map_exit = outer_state.exit_node(map_entry_it_35)
     out_edges = outer_state.out_edges(map_exit)
@@ -153,7 +153,7 @@ def step_1(sdfg: dace.SDFG):
         if out_edge.dst.data == "cfl_clipping":
             continue
         outer_state.remove_node(out_edge.dst)
-    
+
     # remove all the in connectors
     in_edges = outer_state.in_edges(map_exit)
     nsdfg = in_edges[0].src
@@ -169,7 +169,7 @@ def step_1(sdfg: dace.SDFG):
         map_exit.remove_out_connector(in_edge.dst_conn.replace("IN_", "OUT_"))
         # remove the edges
         outer_state.remove_edge(in_edge)
-    
+
     # prune inputs
     in_edges = outer_state.in_edges(map_entry_it_35)
     assert len(in_edges) == 5
@@ -179,7 +179,7 @@ def step_1(sdfg: dace.SDFG):
         if in_edge.src.data in no_remove:
             continue
         outer_state.remove_node(in_edge.src)
-    
+
     out_edges = outer_state.out_edges(map_entry_it_35)
     assert len(out_edges) == 5
     for out_edge in out_edges:
@@ -193,7 +193,7 @@ def step_1(sdfg: dace.SDFG):
         map_entry_it_35.remove_in_connector(out_edge.src_conn.replace( "OUT_", "IN_"))
         # remove the edges
         outer_state.remove_edge(out_edge)
-    
+
     # ****** Second state ******
     for node in state_copy_1.nodes():
         if isinstance(node, dace.nodes.NestedSDFG):
@@ -216,7 +216,7 @@ def step_1(sdfg: dace.SDFG):
             # Delete the map entry and exit nodes
             map_entry = node
             out_edges = state_copy_1.out_edges(map_entry)
-            
+
             assert len(out_edges) == 2
             assert isinstance(out_edges[0].dst, dace.nodes.Tasklet)
             map_exit = state_copy_1.exit_node(map_entry)
@@ -245,7 +245,7 @@ def step_1(sdfg: dace.SDFG):
         elif isinstance(node, dace.nodes.MapEntry) and "_for_it_35" in node.params:
             # we need to change the output to only be out_val_0
             map_entry_it_35 = node
-    
+
     # prune outputs
     map_exit = state_copy_1.exit_node(map_entry_it_35)
     out_edges = state_copy_1.out_edges(map_exit)
@@ -253,7 +253,7 @@ def step_1(sdfg: dace.SDFG):
     # remove all the target nodes
     for out_edge in out_edges:
         state_copy_1.remove_node(out_edge.dst)
-    
+
     # remove all the in connectors
     in_edges = state_copy_1.in_edges(map_exit)
     nsdfg = in_edges[0].src
@@ -267,7 +267,7 @@ def step_1(sdfg: dace.SDFG):
         map_exit.remove_out_connector(in_edge.dst_conn.replace("IN_", "OUT_"))
         # remove the edges
         state_copy_1.remove_edge(in_edge)
-    
+
     # create an array of size 1
     existing_array = nsdfg.sdfg.arrays["out_val_0"]
     new_array = dace.data.Array(dtype=existing_array.dtype, shape=[1], transient=False)
@@ -290,7 +290,7 @@ def step_1(sdfg: dace.SDFG):
         if in_edge.src.data == "cfl_clipping":
             continue
         state_copy_1.remove_node(in_edge.src)
-    
+
     out_edges = state_copy_1.out_edges(map_entry_it_35)
     assert len(out_edges) == 5
     for out_edge in out_edges:
@@ -304,7 +304,7 @@ def step_1(sdfg: dace.SDFG):
         map_entry_it_35.remove_in_connector(out_edge.src_conn.replace( "OUT_", "IN_"))
         # remove the edges
         state_copy_1.remove_edge(out_edge)
-        
+
     # ****** Third state ******
     for node in state_copy_2.nodes():
         if isinstance(node, dace.nodes.NestedSDFG):
@@ -322,7 +322,7 @@ def step_1(sdfg: dace.SDFG):
                         # out_edge.data.assignments = {'clip_count': 'out_val_0[0]'}
                     else:
                         node.sdfg.remove_node(s)
-                    
+
                 elif isinstance(s, ConditionalBlock):
                     pass
                 else:
@@ -341,19 +341,19 @@ def step_1(sdfg: dace.SDFG):
             state_copy_2.add_edge(an, None, map_entry, "IN_6", dace.Memlet(expr="out_val_0[0:89]"))
             nsdfg.add_in_connector("out_val_0")
             state_copy_2.add_edge(map_entry, "OUT_6", nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
-    
+
     set_nested_sdfg_parent_references(sdfg)
     # sdfg.save("debug_preval.sdfg")
     sdfg.validate()
     sdfg.reset_cfg_list()
     # sdfg.simplify(validate=False)
-    
+
     # Quick hack fix after simplify
     # node, parent = find_node_by_name(sdfg, "out_val_0_0")
     # out_edges = parent.out_edges(node)
     # assert len(out_edges) == 1
     # out_edge = out_edges[0]
-    
+
     # in_edges = parent.in_edges(node)
     # assert len(in_edges) == 1
     # in_edge = in_edges[0]
@@ -363,7 +363,7 @@ def step_1(sdfg: dace.SDFG):
     sdfg.apply_transformations_repeated(MapCollapse)
     # sdfg.save("debug.sdfg")
     # assert False
-    
+
 def step_2(sdfg: dace.SDFG):
     reduction, reduction_parent = find_node_by_name(sdfg, "reduce_scan")
     # Get the input
@@ -382,26 +382,26 @@ def step_2(sdfg: dace.SDFG):
     tasklet_before_reduction_edges = reduction_parent.in_edges(reduction_sum_size)[0]
     tasklet_before_reduction = tasklet_before_reduction_edges.src
     assert tasklet_before_reduction.label == "size_reduce_scan"
-    
+
     # get the conditional block parent
     cond_block = reduction_parent.parent_graph.parent_graph
     parent_sdfg = reduction_parent.parent
     assert isinstance(parent_sdfg, dace.SDFG)
-    
+
     # Duplicate the conditional block
     cond_block_copy = dc(cond_block)
     parent_sdfg.add_node(cond_block_copy)
-    
+
     # Get the condition state
     cond_state_edge = parent_sdfg.in_edges(cond_block)[0]
     cond_state = cond_state_edge.src
     assert isinstance(cond_state, dace.SDFGState)
     parent_sdfg.add_edge(cond_state, cond_block_copy, dc(cond_state_edge.data))
-    
+
     for node in reduction_parent.nodes():
         if node not in [reduction, out_edge.dst, in_edge.src, reduction_sum_size, tasklet_before_reduction]:
              reduction_parent.remove_node(node)
-    
+
     for node, parent in cond_block_copy.all_nodes_recursive():
         if isinstance(node, dace.nodes.LibraryNode):
             parent.remove_node(node)
@@ -409,13 +409,13 @@ def step_2(sdfg: dace.SDFG):
             parent.remove_node(node)
         elif isinstance(node, dace.nodes.Tasklet) and node.label == "size_reduce_scan":
             parent.remove_node(node)
-    
+
     inside_state = list(cond_block_copy.all_states())
     assert len(inside_state) == 1
     inside_state = inside_state[0]
     inside_state_copy = dc(inside_state)
     parent_sdfg.add_edge(cond_state, inside_state_copy, dc(cond_state_edge.data))
-    
+
     # Get the nested SDFG condition inside to change it
     for node, parent in inside_state_copy.all_nodes_recursive():
         if isinstance(node, ConditionalBlock):
@@ -427,8 +427,8 @@ def step_2(sdfg: dace.SDFG):
     set_nested_sdfg_parent_references(sdfg)
     # sdfg.save("debug_step_2.sdfg")
     sdfg.validate()
-    return parent_sdfg.parent      
-    
+    return parent_sdfg.parent
+
 def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
     """
     """
@@ -444,14 +444,14 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             copy_node = dc(node)
             target_state.add_node(copy_node)
             edge_map[node] = copy_node
-    
+
     for edge in target_state.edges():
         src = edge.src
         dst = edge.dst
         src_copy = edge_map[src]
         dst_copy = edge_map[dst]
         target_state.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, dc(edge.data))
-    
+
     i = 0
     for node in target_state.nodes():
         if isinstance(node, dace.nodes.NestedSDFG):
@@ -465,15 +465,15 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
                 outside_block = [n for n in node.sdfg.nodes() if isinstance(n, ConditionalBlock)][0]
                 node.sdfg.remove_node(outside_block)
                 i += 1
-    
+
     # put the clip count assignement inside the innermost map
     for edge, parent in nsdfg_map.sdfg.all_edges_recursive():
         if isinstance(edge.data, dace.sdfg.InterstateEdge) and len(edge.data.assignments) == 0 and isinstance(edge.dst, dace.SDFGState):
             parent.remove_node(edge.src)
-            
+
         if isinstance(edge.data, dace.sdfg.InterstateEdge) and "_if_cond_18" in edge.data.assignments.keys():
             edge.data.assignments["clip_count"] = "out_val_0"
-    
+
     set_nested_sdfg_parent_references(sdfg)
     for node in target_state.nodes():
         if isinstance(node, dace.nodes.MapEntry) and "_for_it_35" in node.map.params:
@@ -493,7 +493,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             nnode = in_edges[0].src
             assert isinstance(nnode, dace.nodes.NestedSDFG)
             if len(nnode.sdfg.nodes()) == 1:
-                # State only 
+                # State only
                 for edge in in_edges:
                     out_edge = list(target_state.out_edges_by_connector(node, edge.dst_conn.replace("IN_", "OUT_")))[0]
                     if out_edge.dst.data == "levmask":
@@ -522,10 +522,10 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
                         target_state.remove_edge(edge)
             else:
                 raise ValueError("Unexpected number of nodes in nested SDFG")
-    
+
     map_state = nsdfg_map.sdfg.states()[0]
     for node in map_state.nodes():
-        if isinstance(node, dace.nodes.MapEntry):       
+        if isinstance(node, dace.nodes.MapEntry):
             an = map_state.add_access("out_val_0")
             node.add_in_connector("IN_5")
             node.add_out_connector("OUT_5")
@@ -534,9 +534,9 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             assert isinstance(map_nsdfg, dace.nodes.NestedSDFG)
             map_nsdfg.add_in_connector("out_val_0")
             map_state.add_edge(node, "OUT_5", map_nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
-    
+
     sdfg.save("debug_step_3_6.sdfg")
-    sdfg.simplify(validate=False)    
+    sdfg.simplify(validate=False)
     # sdfg.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     target_state.parent.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     node, parent = find_node_by_name(sdfg, "T_l562_c562")
@@ -548,70 +548,11 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
 
 def make_arrays_persistent(sdfg: dace.SDFG):
     # Make stuff persistent
-    move_persistent = ["vcflmax",
-                       "__CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask",
-                       "__CG_p_patch__CG_cells__m_neighbor_idx",
-                       "__CG_p_patch__CG_cells__m_neighbor_blk",
-                       "__CG_p_patch__CG_cells__m_edge_idx",
-                       "__CG_p_patch__CG_cells__m_edge_blk", 
-                       "__CG_p_patch__CG_cells__m_area",
-                       "__CG_p_patch__CG_cells__m_start_index",
-                       "__CG_p_patch__CG_cells__m_end_index",
-                       "__CG_p_patch__CG_cells__m_start_block",
-                       "__CG_p_patch__CG_cells__m_end_block",
-                       "__CG_p_patch__CG_edges__m_cell_idx",
-                       "__CG_p_patch__CG_edges__m_cell_blk",
-                       "__CG_p_patch__CG_edges__m_vertex_idx",
-                       "__CG_p_patch__CG_edges__m_vertex_blk",
-                       "__CG_p_patch__CG_edges__m_tangent_orientation",
-                       "__CG_p_patch__CG_edges__m_quad_idx",
-                       "__CG_p_patch__CG_edges__m_quad_blk",
-                       "__CG_p_patch__CG_edges__m_inv_primal_edge_length",
-                       "__CG_p_patch__CG_edges__m_inv_dual_edge_length",
-                       "__CG_p_patch__CG_edges__m_area_edge",
-                       "__CG_p_patch__CG_edges__m_f_e",
-                       "__CG_p_patch__CG_edges__m_start_index",
-                       "__CG_p_patch__CG_verts__m_cell_idx",
-                       "__CG_p_patch__CG_edges__m_start_block",
-                       "__CG_p_patch__CG_verts__m_cell_blk",
-                       "__CG_p_patch__CG_verts__m_edge_idx",
-                       "__CG_p_patch__CG_edges__m_end_block",
-                       "__CG_p_patch__CG_verts__m_cell_idx",
-                       "__CG_p_patch__CG_verts__m_cell_blk",
-                       "__CG_p_patch__CG_verts__m_edge_blk",
-                       "__CG_p_patch__CG_verts__m_start_index",
-                       "__CG_p_patch__CG_verts__m_end_index",
-                       "__CG_p_patch__CG_verts__m_start_block",
-                       "__CG_p_patch__CG_verts__m_end_block",
-                       "__CG_p_int__m_c_lin_e",
-                       "__CG_p_int__m_e_bln_c_s",
-                        "__CG_p_int__m_cells_aw_verts",
-                        "__CG_p_int__m_rbf_vec_coeff_e",
-                        "__CG_p_int__m_geofac_grdiv",
-                        "__CG_p_int__m_geofac_rot",
-                        "__CG_p_int__m_geofac_n2s",
-                        "__CG_p_prog__m_w",
-                        "__CG_p_prog__m_vn",
-                        "__CG_p_metrics__m_ddxn_z_full",
-                        "__CG_p_metrics__m_ddxt_z_full",
-                        "__CG_p_metrics__m_ddqz_z_full_e",
-                        "__CG_p_metrics__m_ddqz_z_half",
-                        "__CG_p_metrics__m_wgtfac_c",
-                        "__CG_p_metrics__m_wgtfac_e",
-                        "__CG_p_metrics__m_wgtfacq_e",
-                        "__CG_p_metrics__m_coeff_gradekin",
-                        "__CG_p_metrics__m_coeff1_dwdz",
-                        "__CG_p_metrics__m_coeff2_dwdz",
-                        "__CG_p_diag__m_vt",
-                        "__CG_p_diag__m_vn_ie",
-                        "__CG_p_diag__m_w_concorr_c",
-                        "__CG_p_diag__m_ddt_vn_apc_pc",
-                        "__CG_p_patch__CG_edges__m_end_index",
-                        "__CG_p_diag__m_ddt_w_adv_pc",
-                        "__CG_p_patch__CG_edges__m_end_index",
-                        "__CG_p_diag__m_ddt_w_adv_pc",
-                        "__CG_global_data__m_nflatlev",
-                        "__CG_global_data__m_nrdmax"
+    move_persistent = ["gpu_levelmask", "gpu_maxvcfl_arr", "gpu_z_w_v",
+                        "gpu_cfl_clipping", "gpu_z_w_con_c", "gpu_levmask",
+                        "gpu_zeta", "gpu_z_w_con_c_full", "gpu_out_val_0",
+                        "gpu_z_v_grad_w", "gpu_z_ekinh", "gpu_z_w_concorr_mc",
+                        "vcflmax"
                        ]
     for node, parent in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.AccessNode) and node.data in move_persistent :
