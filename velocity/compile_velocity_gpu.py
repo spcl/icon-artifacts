@@ -308,27 +308,37 @@ for sdfg_name in sdfg_names:
             tile_specific_kernel(sdfg,
                     params=["_for_it_1_0_0", "_for_it_2_0_0"],
                     tblock_sizes=[256,1,1],
-                    coarsening_factors=[1,4],
+                    coarsening_factors=[1, 4],
                     remainder_loop=True)
             tile_specific_kernel(sdfg,
                     params=["_for_it_4_0", "_for_it_5_0"],
                     tblock_sizes=[256,1,1],
-                    coarsening_factors=[1,4],
+                    coarsening_factors=[1, 4],
                     remainder_loop=True)
             tile_specific_kernel(sdfg,
                     params=["_for_it_23", "_for_it_24"],
                     tblock_sizes=[256,1,1],
-                    coarsening_factors=[2,4],
+                    coarsening_factors=[9, 1],
+                    remainder_loop=False)
+            tile_specific_kernel(sdfg,
+                    params=["_for_it_38", "_for_it_39"],
+                    tblock_sizes=[256,1,1],
+                    coarsening_factors=[9, 1],
+                    remainder_loop=False)
+            tile_specific_kernel(sdfg,
+                    params=["_for_it_40", "_for_it_41"],
+                    tblock_sizes=[256,1,1],
+                    coarsening_factors=[8, 1],
                     remainder_loop=True)
             tile_specific_kernel(sdfg,
                     params=["_for_it_25", "_for_it_26"],
                     tblock_sizes=[256,1,1],
-                    coarsening_factors=[2,4],
+                    coarsening_factors=[4, 2],
                     remainder_loop=True)
             tile_specific_kernel(sdfg,
                     params=["_for_it_32", "_for_it_33"],
                     tblock_sizes=[256,1,1],
-                    coarsening_factors=[2,1],
+                    coarsening_factors=[4, 1],
                     remainder_loop=True)
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)

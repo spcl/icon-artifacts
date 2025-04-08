@@ -78,10 +78,12 @@ def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_
 
         if not remainder_loop:
             for i, ((b, e, s), (tb, te, ts)) in enumerate(zip(map_entry.map.range, tblock_entry.map.range)):
+                if coarsening_factors[i] == 1:
+                    continue
                 range1 = (e+1-b)//s
                 range2 = (te+1-tb)//ts
                 dim = int(range1 // range2)
-                if coarsening_factors[-(i+1)] != 1:
+                if coarsening_factors[i] != 1:
                     assert dim % coarsening_factors[-(i+1)] == 0, f"Coarsening factor {coarsening_factors[i]} is not a divisor of {dim}"
 
             ThreadCoarsening.apply_to(
@@ -90,7 +92,7 @@ def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_
                 thread_group_map_entry=tblock_entry,
                 device_map_entry=map_entry,
                 options={
-                    "tile_sizes": coarsening_factors,
+                    "tile_sizes": list(reversed(coarsening_factors)),
                 },
             )
         else:
@@ -100,7 +102,7 @@ def tile_specific_kernel(sdfg: dace.SDFG, params:List[str]=["_for_it_23", "_for_
                 thread_group_map_entry=tblock_entry,
                 device_map_entry=map_entry,
                 options={
-                    "tile_sizes": coarsening_factors,
+                    "tile_sizes": list(reversed(coarsening_factors)),
                 },
             )
 
