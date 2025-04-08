@@ -110,6 +110,8 @@ setzerodict = {
     "lvn_only_1_istep_2": setzero_str1_2,
 }
 
+gpu_inputs = ["z_w_concorr_me", "z_vt_ie", "z_kin_hor_e"]
+
 def process_file(input_path, flattener_replacement_path, deflattener_replacement_path, output_path_removed, output_path_cleaned):
     with open(input_path, 'r') as infile:
         lines = infile.readlines()
@@ -187,6 +189,19 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
             removed_lines.append(line)
             continue
 
+        gpu_inputs = ["z_w_concorr_me", "z_vt_ie", "z_kin_hor_e"]
+
+        # Modify the pattern matching to specifically check for these variables
+        pattern_malloc_gpu_ins = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMalloc\s*\(\s*\(void\*\*\)\s*&gpu_(' + '|'.join(gpu_inputs) + r')\s*.*\);')
+        pattern_cuda_free_ins = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaFree\s*\(\s*gpu_(' + '|'.join(gpu_inputs) + r')\)\s*\)\s*;')
+        pattern_memcpy_gpu_ins = re.compile(r'^\s*DACE_GPU_CHECK\(\s*cudaMemcpyAsync\s*\(\s*(gpu_(' + '|'.join(gpu_inputs) + r'))|(' + '|'.join(gpu_inputs) + r')\s*,\s*gpu_(' + '|'.join(gpu_inputs) + r')\s*\)\s*;')
+
+
+        if pattern_malloc_gpu_ins.search(line):
+            for gpuin in gpu_inputs:
+                if gpuin in line:
+                    cleaned_lines.append(f"gpu_{gpuin} = {gpuin};\n")
+
         # Match any of the removal patterns
         if (
             pattern_cg_alloc.search(line) or
@@ -195,11 +210,16 @@ def process_file(input_path, flattener_replacement_path, deflattener_replacement
             pattern_malloc_gpu.search(line) or
             pattern_delete_cg.search(line) or
             pattern_cuda_free.search(line) or
-            pattern_cuda_memcpy2.search(line)
+            pattern_cuda_memcpy2.search(line) or
+            pattern_malloc_gpu_ins.search(line) or
+            pattern_cuda_free_ins.search(line) or
+            pattern_memcpy_gpu_ins.search(line)
         ):
             removed_lines.append(line)
         else:
             cleaned_lines.append(line)
+
+
 
     # Write to output files
     with open(output_path_removed, 'w') as removed_file:
