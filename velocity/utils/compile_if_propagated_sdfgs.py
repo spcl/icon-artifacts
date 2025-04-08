@@ -148,20 +148,23 @@ def add_timers(file_path: str):
 def comment_out_syncs(filepath):
     # comment out (prepend //) any line containing cudaStreamSynchronize
     vcflmax_count = 0
+    added_one = False
     with open(filepath, "r") as file:
         lines = file.readlines()
     with open(filepath, "w") as file:
         for line in lines:
-            if "vcflmax" in line:
+            if "vcflmax_out_0 = maxvcfl_0_in;" in line:
                 vcflmax_count = 1
             if "cudaStreamSynchronize" in line:
                 if vcflmax_count > 0:
                     vcflmax_count -= 1
                     line = "//" + line
                     line += "\ncudaStreamSynchronize(__state->gpu_context->streams[0]);\n"
+                    added_one = True
                 else:
                   line = "//" + line
             file.write(line)
+    assert added_one, f"Couldn't add one necessary sync."
 
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
