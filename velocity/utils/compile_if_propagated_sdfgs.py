@@ -258,9 +258,11 @@ def compile_if_propagated_sdfgs(
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
 
     if not gpu:
-        sources.add("main.cc")
+        #sources.add("main.cc")
+        ...
     else:
-        sources.add("main_gpu.cu")
+        #sources.add("main_gpu.cu")
+        ...
 
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
     if gpu:
@@ -274,21 +276,28 @@ def compile_if_propagated_sdfgs(
         else:
             flags = " -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -g -ggdb "
 
+    if gpu:
+        flags += " --compiler-options '-fPIC' --shared "
+    else:
+        flags += " -fPIC --shared "
+
+    flags += " -g "
+
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
         exit_code = os.system(
-            f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
+            f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
         )
     else:
         exit_code = os.system(
-            f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
+            f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_cpu.so"
         )
 
     # check if compilation was successful
     if exit_code != 0:
         if gpu:
-            print(f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu")
+            print(f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so")
         else:
-            print(f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu")
+            print(f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_cpu.so")
         print("Compilation failed")
         exit(1)
