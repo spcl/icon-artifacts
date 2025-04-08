@@ -14,7 +14,7 @@ def move_ifs_inside_maps(sdfg: dace.SDFG):
 def map_for_44(sdfg: dace.SDFG):
     # Get the necessary nodes
     try:
-        dif_local, dif_parent = find_node_by_name(sdfg, "difcoef_local")
+        dif_local, dif_parent = find_node_by_name(sdfg, "tmp_call_10")
     except AssertionError:
         return
     conditional_block = dif_parent.parent_graph.parent_graph
@@ -36,8 +36,9 @@ def map_for_44(sdfg: dace.SDFG):
         
     inner_nsdfg = [node for node in state_to_duplicate.nodes() if isinstance(node, dace.nodes.NestedSDFG)][0]
     inner_nsdfg.sdfg.add_symbol("_if_cond_24", dace.int32)
-    state_to_duplicate.parent.remove_symbol("_if_cond_24")
-    inner_nsdfg.sdfg.add_symbol("_if_cond_24", dace.int32)
+    inner_nsdfg.symbol_mapping["tmp_struct_symbol_13"] = "tmp_struct_symbol_13"
+    # state_to_duplicate.parent.remove_symbol("_if_cond_24")
+    # inner_nsdfg.sdfg.add_symbol("_if_cond_24", dace.int32)
     
     outermost_state = outerstate_edge.src.parent.parent
     outer_map_entry = [node for node in outermost_state.nodes() if isinstance(node, dace.nodes.MapEntry) and "_for_it_44" in node.map.params][0]
