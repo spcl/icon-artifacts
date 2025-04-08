@@ -23,6 +23,7 @@ from dace.transformation.dataflow import MapCollapse, MapFusion, TrivialMapElimi
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 from dace.sdfg import utils as sdutil
+from utils.move_scalar_to_array import move_scalar_to_array, _tmp_difcoef
 
 # Load SDFG
 sdfg_names = [
@@ -264,11 +265,12 @@ for sdfg_name in sdfg_names:
             no_dim_change=True,
         )
         if "difcoef" in sdfg.arrays:
-            move_scalar_to_array(
-                root=sdfg,
-                name="difcoef",
-                double_size=True,
-            )
+            #move_scalar_to_array(
+            #    root=sdfg,
+            #    name="difcoef",
+            #    double_size=True,
+            #)
+            _tmp_difcoef(sdfg)
         sdfg.save("after_move.sdfgz", compress=True)
 
         sdfg.validate()

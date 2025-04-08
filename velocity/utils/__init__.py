@@ -40,7 +40,7 @@ from utils.permute_index import permute_maps
 from utils.tile import tile_kernels, tile_specific_kernel
 from utils.move_ifs_inside_maps import move_ifs_inside_maps
 from utils.segmented_reduction import to_segmented_reduction
-from utils.move_scalar_to_array import move_scalar_to_array
+from utils.move_scalar_to_array import move_scalar_to_array, _tmp_difcoef
 from utils.move_lib_schedules import move_lib_schedules
 
 from utils.combine import combine
