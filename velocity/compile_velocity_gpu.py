@@ -24,6 +24,34 @@ from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 from dace.sdfg import utils as sdutil
 from utils.move_scalar_to_array import move_scalar_to_array, _tmp_difcoef
+import dace
+import sympy
+from dace.sdfg import infer_types
+from dace.sdfg.state import SDFGState, ControlFlowRegion
+from dace.sdfg.graph import SubgraphView
+from dace.sdfg.propagation import propagate_states
+from dace.sdfg.scope import is_devicelevel_gpu_kernel
+from dace import config, data as dt, dtypes, Memlet, symbolic
+from dace.sdfg import SDFG, nodes, graph as gr
+from typing import Set, Tuple, Union, List, Iterable, Dict
+import warnings
+
+# Transformations
+from dace.transformation.dataflow import MapCollapse, TrivialMapElimination, MapFusion, ReduceExpansion
+from dace.transformation.interstate import LoopToMap, RefineNestedAccess
+from dace.transformation.subgraph.composite import CompositeFusion
+from dace.transformation.subgraph import helpers as xfsh
+from dace.transformation import helpers as xfh
+
+# Environments
+from dace.libraries.blas.environments import intel_mkl as mkl, openblas
+
+# Enumerator
+from dace.transformation.estimator.enumeration import GreedyEnumerator
+
+# FPGA AutoOpt
+from dace.transformation.auto import fpga as fpga_auto_opt
+
 
 # Load SDFG
 sdfg_names = [
@@ -315,17 +343,26 @@ for sdfg_name in sdfg_names:
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
 
-    """
     if Path(f"gpu_{sdfg_name}_stage7.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage7.sdfgz")
     else:
         # Add ThreadBlock map and coarsen a bit
+        # Used in interstate edges:
+        # z_w_con_c
+        # ddqz_half
+        # levmask
+        # levelmask
+        # cfl_clipping
+        # gpu___CG_p_metrics__m_ddqz_z_half
+        # z_kin_hor_e
+        # Used in Reductions:
+        # gpu_levmask [nblock, 90] (stored as l -> r) -> map[88] reduction over nblock -> gpu_levelmask [90]
+        # gpu_cfl_clipping  [nproma, 90] (stored l -> r)-> segmented reduction -> gpu_out_val_0 [90]
+        # gpu_maxvcfl_arr [for_it_22 -1, nproma, 90] (stored r -> l)-> reduction -> scalar -> vcflmax [nblks]
+        """
         permute_index(sdfg, sdfg,
         {
-"gpu___CG_p_patch__CG_edges__m_quad_idx": [1, 0, 2],
 "gpu___CG_p_int__m_geofac_n2s": [1, 0, 2],
-"gpu___CG_p_patch__CG_verts__m_cell_blk": [1, 0, 2],
-"gpu___CG_p_patch__CG_verts__m_edge_blk": [1, 0, 2],
 "gpu___CG_p_int__m_rbf_vec_coeff_e": [1, 0, 2],
 "gpu___CG_p_int__m_cells_aw_verts": [1, 0, 2],
 "gpu___CG_p_metrics__m_coeff2_dwdz": [1, 0, 2],
@@ -333,35 +370,21 @@ for sdfg_name in sdfg_names:
 "gpu___CG_p_diag__m_w_concorr_c": [1, 0, 2],
 "gpu___CG_p_metrics__m_coeff1_dwdz": [1, 0, 2],
 "gpu___CG_p_metrics__m_wgtfac_e": [1, 0, 2],
-"gpu___CG_p_patch__CG_edges__m_vertex_idx": [1, 0, 2],
 "gpu___CG_p_metrics__m_ddqz_z_full_e": [1, 0, 2],
-"gpu___CG_p_patch__CG_edges__m_quad_blk": [1, 0, 2],
 "gpu___CG_p_int__m_geofac_rot": [1, 0, 2],
 "gpu___CG_p_metrics__m_ddxt_z_full": [1, 0, 2],
-"gpu___CG_p_patch__CG_edges__m_vertex_blk": [1, 0, 2],
 "gpu___CG_p_diag__m_vn_ie": [1, 0, 2],
-"gpu___CG_p_patch__CG_cells__m_neighbor_idx": [1, 0, 2],
 "gpu___CG_p_diag__m_vt": [1, 0, 2],
-"gpu___CG_p_patch__CG_edges__m_cell_idx": [1, 0, 2],
 "gpu___CG_p_metrics__m_coeff_gradekin": [1, 0, 2],
-"gpu___CG_p_patch__CG_verts__m_edge_idx": [1, 0, 2],
 "gpu___CG_p_metrics__m_wgtfacq_e": [1, 0, 2],
-"gpu___CG_p_metrics__m_ddqz_z_half": [1, 0, 2],
 "gpu___CG_p_metrics__m_wgtfac_c": [1, 0, 2],
 "gpu___CG_p_diag__m_ddt_w_adv_pc": [1, 0, 2, 3],
 "gpu___CG_p_prog__m_vn": [1, 0, 2],
 "gpu___CG_p_int__m_c_lin_e": [1, 0, 2],
 "gpu___CG_p_metrics__m_ddxn_z_full": [1, 0, 2],
-"gpu___CG_p_patch__CG_edges__m_cell_blk": [1, 0, 2],
 "gpu___CG_p_int__m_geofac_grdiv": [1, 0, 2],
-"gpu___CG_p_patch__CG_cells__m_edge_idx": [1, 0, 2],
-"gpu___CG_p_patch__CG_cells__m_edge_blk": [1, 0, 2],
-"gpu___CG_p_patch__CG_cells__m_neighbor_blk": [1, 0, 2],
-"gpu___CG_p_patch__CG_verts__m_cell_idx": [1, 0, 2],
 "gpu___CG_p_diag__m_ddt_vn_apc_pc": [1, 0, 2, 3],
 "gpu___CG_p_int__m_e_bln_c_s": [1, 0, 2],
-"gpu_maxvcfl_arr": [1, 0, 2],
-"gpu_z_kin_hor_e": [1, 0, 2],
 "gpu_z_w_con_c_full": [1, 0, 2],
 "gpu_z_w_v": [1, 0, 2],
 "gpu_z_vt_ie": [1, 0, 2],
@@ -370,18 +393,25 @@ for sdfg_name in sdfg_names:
 "gpu_z_v_grad_w": [1, 0, 2],
 "gpu_z_ekinh": [1, 0, 2],
         })
+    """
+        permute_index(sdfg, sdfg,
+        {
+"gpu_zeta": [1, 0, 2],
+"gpu_z_v_grad_w": [1, 0, 2],
+"gpu_z_ekinh": [1, 0, 2],
+        })
         #permute_all_maps(sdfg, [1, 0, 2])
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
-        """
 
     #input_to_gpu(sdfg, "z_w_concorr_me")
     #input_to_gpu(sdfg, "z_kin_hor_e")
     #input_to_gpu(sdfg, "z_vt_ie")
-    make_arrays_persistent(sdfg)
+    #make_arrays_persistent(sdfg)
     # Validate the SDFG
     sdfg.validate()
+    #tile_kernels(sdfg)
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)
     sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_result.sdfgz")
     resulting_sdfgs.append(sdfg)

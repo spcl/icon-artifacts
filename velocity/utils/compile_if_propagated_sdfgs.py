@@ -135,12 +135,15 @@ def add_timers(file_path: str):
     replacement1 = '    measure_time("Run");\n\\g<0>'
 
     # Pattern 2: Insert AFTER `__CG_p_diag__m_max_vcfl_dyn = p_diag_out_max_vcfl_dyn;`
-    pattern2 = r'^(\s*__CG_p_diag__m_max_vcfl_dyn\s*=\s*p_diag_out_max_vcfl_dyn;\s*)$'
+    pattern2 = r'^(.*i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block\[\(\(- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2\) - 4\)\];.*)$'
+    p2 = "i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];"
+    escaped_p2 = re.escape(p2)
     replacement2 = '\\1\n    measure_time("Run");'
 
     # Apply replacements
     code = re.sub(pattern1, replacement1, code, flags=re.MULTILINE)
     code = re.sub(pattern2, replacement2, code, flags=re.MULTILINE)
+
 
     with open(file_path, "w") as f:
         f.write(code)
