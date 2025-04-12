@@ -44,6 +44,6 @@ from utils.move_scalar_to_array import move_scalar_to_array, _tmp_difcoef
 from utils.move_lib_schedules import move_lib_schedules
 
 from utils.combine import combine
-from utils.permute import permute_index, permute_maps, permute_all_maps
+from utils.permute import permute_index, permute_maps, permute_all_maps, permute_all_maps_depending_on_input
 from utils.input_to_gpu import input_to_gpu
 from utils.pre_gpu_fixes import make_arrays_persistent

@@ -394,15 +394,14 @@ for sdfg_name in sdfg_names:
 "gpu_z_ekinh": [1, 0, 2],
         })
     """
-        """
-        permute_index(sdfg, sdfg,
-        {
+        permute_dict =         {
 "gpu_zeta": [1, 0, 2],
 "gpu_z_v_grad_w": [1, 0, 2],
 "gpu_z_ekinh": [1, 0, 2],
-        })
-        #permute_all_maps(sdfg, [1, 0, 2])
-        """
+"gpu_z_w_con_c": [1, 0]
+        }
+        permute_index(sdfg, sdfg,permute_dict)
+        permute_all_maps_depending_on_input(sdfg, [1, 0], set(["per_" + v for v in permute_dict.keys()]))
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
@@ -437,10 +436,21 @@ if instrument:
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument, generate_code=True, lib=False)
 
 # check if execution was successful
+if os.system(f"./velocity_gpu 1 1") != 0:
+    print("Execution failed")
+    exit(1)
+if os.system(f"./velocity_gpu 2 2") != 0:
+    print("Execution failed")
+    exit(1)
 if os.system(f"./velocity_gpu 3 3") != 0:
     print("Execution failed")
     exit(1)
-
+if os.system(f"./velocity_gpu 4 4") != 0:
+    print("Execution failed")
+    exit(1)
+if os.system(f"./velocity_gpu 5 5") != 0:
+    print("Execution failed")
+    exit(1)
 # Compare .got and .want files
 compare_got_and_want()
 

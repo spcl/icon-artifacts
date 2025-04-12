@@ -40,6 +40,46 @@ from dace.transformation.auto import fpga as fpga_auto_opt
 from utils.reductions import LibNode
 import copy
 
+import re
+import itertools
+
+processed_edges = set()
+def _replace_on_lines(sdfg: SDFG, old_name:str, new_name:str, permute_list:List[int]):
+    for no in sdfg.all_control_flow_blocks():
+        for e in no.parent_graph.in_edges(no) + no.parent_graph.out_edges(no):
+            if e in processed_edges:
+                continue
+            processed_edges.add(e)
+            if e.data is not None:
+                new_assignments = dict()
+                matchlen = len(permute_list)
+                for k, v in e.data.assignments.items():
+                    _v = copy.deepcopy(v)
+                    pattern = r'(' + re.escape(old_name) + r')\[(.*?)\]'
+                    #print(pattern, v)
+                    assert k != old_name
+                    for match in re.finditer(pattern, v):
+                        assert match.group(1) == old_name, f"Expected {old_name}, got {match.group(1)}"
+                        args_str = match.group(2)  # Get the arguments part as a string
+                        old_pattern = re.escape(old_name) + r"\[" + re.escape(args_str) + r"\]"
+
+                        # Split the arguments by commas, ignoring whitespace
+                        args = [arg.strip() for arg in args_str.split(',')]
+
+                        # Get permutations of the arguments (only if more than one argument exists)
+                        assert len(args) == matchlen, f"Expected {matchlen} arguments, got {len(args), args, args_str, old_pattern, pattern, match}"
+                        newargs = []
+                        for i in range(len(args)):
+                            newargs.append(args[permute_list[i]])
+
+                        # For each permutation, rewrite the function
+                        new_expr = f'{new_name}[{", ".join(newargs)}]'
+                        _v = re.sub(old_pattern, new_expr, _v, count=1)
+                        print(f"Replaced {old_pattern} with {new_expr} in {k} -> {_v}")
+                        #raise Exception("UWU")
+                    new_assignments[k] = _v
+                e.data.assignments = new_assignments
+
 def _transpose_reduction(sdfg: SDFG, map_param:str = "_for_it_46"):
     for n, g in sdfg.all_nodes_recursive():
         if isinstance(n, dace.nodes.MapEntry) and n.map.params == [map_param]:
@@ -255,16 +295,22 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                             ie.dst_conn = name_map[ie.dst_conn]
 
                     for oe in s.out_edges(n):
-                        src_name = oe.src_conn
-                        dst_name = oe.data.data
+                        dst_name = oe.src_conn
+                        src_name = oe.data.data
                         if dst_name in permute_map:
                             new_permute_map[dst_name] = permute_map[dst_name]
                         if oe.src_conn in name_map:
                             oe.src.remove_out_connector(oe.src_conn)
                             oe.src.add_out_connector(name_map[oe.src_conn])
                             oe.src_conn = name_map[oe.src_conn]
+                            assert oe.src == n
+                            if oe.src_conn not in n.out_connectors:
+                                n.add_out_connector(oe.src_conn, force=True)
 
                     permute_index(root, n.sdfg, new_permute_map, name_map)
+
+    for old_name, new_name in name_map.items():
+        _replace_on_lines(sdfg, old_name, new_name, permute_map[old_name])
     #sdfg.save("t2.sdfgz", compress=True)
 
     final_block = [v for v in sdfg.nodes() if sdfg.out_degree(v) == 0][0]
@@ -323,3 +369,23 @@ def permute_all_maps(sdfg: dace.SDFG, permute_list):
                         for j in range(len(permute_list)):
                             new_params.append(old_params[permute_list[j]])
                         MapDimShuffle.apply_to(sdfg, map_entry=n, options={"parameters": new_params})
+
+def permute_all_maps_depending_on_input(sdfg: dace.SDFG, permute_list, inout_set):
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.MapEntry):
+            inputs_and_outputs = set([e.src.data for e in g.in_edges(n) if isinstance(e.src, dace.nodes.AccessNode)]) | set([e.dst.data for e in g.out_edges(g.exit_node(n)) if isinstance(e.dst, dace.nodes.AccessNode)])
+            inout_match = inputs_and_outputs.intersection(inout_set)
+
+            if len(inout_match) == 0:
+                continue
+
+            old_params = n.map.params
+            new_params = []
+            local_permute_list = copy.deepcopy(permute_list)
+            if len(n.map.range) == 1:
+                continue
+            if len(n.map.range) == len(local_permute_list):
+                for j in range(len(local_permute_list)):
+                    new_params.append(old_params[local_permute_list[j]])
+                print("Permuting map", n.map.label, "with", local_permute_list, "from", old_params, "to", new_params)
+                MapDimShuffle.apply_to(g.sdfg, map_entry=n, options={"parameters": new_params})
