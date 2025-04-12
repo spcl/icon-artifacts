@@ -394,6 +394,7 @@ for sdfg_name in sdfg_names:
 "gpu_z_ekinh": [1, 0, 2],
         })
     """
+        """
         permute_index(sdfg, sdfg,
         {
 "gpu_zeta": [1, 0, 2],
@@ -401,6 +402,7 @@ for sdfg_name in sdfg_names:
 "gpu_z_ekinh": [1, 0, 2],
         })
         #permute_all_maps(sdfg, [1, 0, 2])
+        """
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
@@ -435,7 +437,7 @@ if instrument:
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=True, release=release, instrument=instrument, generate_code=True, lib=False)
 
 # check if execution was successful
-if os.system(f"./velocity_gpu") != 0:
+if os.system(f"./velocity_gpu 3 3") != 0:
     print("Execution failed")
     exit(1)
 

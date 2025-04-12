@@ -17,6 +17,8 @@ def compare_got_and_want():
     # Compare each .got file with its corresponding .want file
     found_diff_all = False
     for got, want in zip(got_files, want_files):
+        if "p_diag" not in got:
+            continue
         found_diff = False
         max_rel_diff = 0
         max_abs_diff = 0

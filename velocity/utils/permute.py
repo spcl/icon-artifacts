@@ -73,7 +73,7 @@ def _transpose_reduction(sdfg: SDFG, map_param:str = "_for_it_46"):
 
 
 
-def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List[int]]):
+def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List[int]], parent_name_map = None):
     if root == sdfg:
         s1 = sdfg.add_state_after(sdfg.start_state, "transpose")
         permuted_arrays = dict()
@@ -92,6 +92,8 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                 strides = [1]
                 for dim in per_shape[:-1]:
                     strides.append(strides[-1] * dim)
+                if per_shape[0] == 90:
+                    print(strides, per_shape, arr_shape)
                 per_arr = dace.data.Array(
                     dtype=arr.dtype,
                     shape=per_shape,
@@ -205,6 +207,7 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
         arr_add = dict()
         for arr_name, _arr in list(sdfg.arrays.items()):
             if arr_name in permute_map:
+                new_arr_name = parent_name_map[arr_name]
                 permute_indices = permute_map[arr_name]
                 arr: dace.data.Data = _arr
                 arr_shape = arr.shape
@@ -216,25 +219,25 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                     #print(arr_shape, permute_indices, arr_name, permute_map)
                     per_shape.append(arr_shape[i])
                 strides = [1]
-                for dim in arr.shape[:-1]:
+                for dim in per_shape[:-1]:
                     strides.append(strides[-1] * dim)
                 per_arr = dace.data.Array(
                     dtype=arr.dtype,
                     shape=per_shape,
-                    transient=arr.transient,
                     strides=strides,
+                    transient=arr.transient,
                     allow_conflicts=arr.allow_conflicts,
                     storage=arr.storage,
                     alignment=arr.alignment,
                     lifetime=arr.lifetime,
                 )
                 sdfg.remove_data(arr_name, validate=False)
-                sdfg.add_datadesc(arr_name, per_arr)
+                sdfg.add_datadesc(new_arr_name, per_arr)
                 assert arr.offset == tuple([0] * len(arr_shape)), f"{arr.offset}"
 
-                name_map[arr_name] = arr_name
+                name_map[arr_name] = new_arr_name
 
-    sdfg.save("t1.sdfgz", compress=True)
+    #sdfg.save("t1.sdfgz", compress=True)
 
     for g in sdfg.all_nodes_between(s1, s2) if sdfg == root else sdfg.all_control_flow_regions():
         for s in g.all_states() if not isinstance(g, SDFGState) else [g]:
@@ -245,14 +248,24 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                         src_name = ie.data.data
                         dst_name = ie.dst_conn
                         if src_name in permute_map:
-                            new_permute_map[dst_name] = permute_map[src_name]
+                            new_permute_map[src_name] = permute_map[src_name]
+                        if ie.dst_conn in name_map:
+                            ie.dst.remove_in_connector(ie.dst_conn)
+                            ie.dst.add_in_connector(name_map[ie.dst_conn])
+                            ie.dst_conn = name_map[ie.dst_conn]
+
                     for oe in s.out_edges(n):
                         src_name = oe.src_conn
                         dst_name = oe.data.data
                         if dst_name in permute_map:
-                            new_permute_map[src_name] = permute_map[dst_name]
-                    permute_index(root, n.sdfg, new_permute_map)
-    sdfg.save("t2.sdfgz", compress=True)
+                            new_permute_map[dst_name] = permute_map[dst_name]
+                        if oe.src_conn in name_map:
+                            oe.src.remove_out_connector(oe.src_conn)
+                            oe.src.add_out_connector(name_map[oe.src_conn])
+                            oe.src_conn = name_map[oe.src_conn]
+
+                    permute_index(root, n.sdfg, new_permute_map, name_map)
+    #sdfg.save("t2.sdfgz", compress=True)
 
     final_block = [v for v in sdfg.nodes() if sdfg.out_degree(v) == 0][0]
     for g in sdfg.all_nodes_between(s1, s2) if sdfg == root else sdfg.all_control_flow_regions():
@@ -285,7 +298,7 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                     except Exception as e:
                         sdfg.save("uwu.sdfg")
                         raise e
-    sdfg.save("t3.sdfgz", compress=True)
+    #sdfg.save("t3.sdfgz", compress=True)
 
 def permute_maps(sdfg: dace.SDFG, permute_map : Dict[str, List[int]]):
     for s, g in sdfg.all_nodes_recursive():

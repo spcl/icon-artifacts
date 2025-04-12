@@ -167,7 +167,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
         sdfg,
         loop_node,
         vcfl_name,
-        f"{end} + 1 - {start}",
+        f"{end} - {start}",
         f"{var_name}",
         "maxZ_to_scalar",
         in_expr=f"{vcfl_name}[{start}-1:{end}-1]",
@@ -219,7 +219,7 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
         parent,
         loop,
         "cfl_clipping",
-        f"{end} + 1 - {start}",
+        f"{end} - {start}",
         "out_val_0",
         "sum_to_address",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
@@ -270,20 +270,20 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     ol_size_sym = parent.sdfg.add_symbol(
         "ol_size", stype=dace.dtypes.int32, find_new_name=True
     )
-    #il_size_sym = parent.sdfg.add_symbol(
-    #    "il_size", stype=dace.dtypes.int32, find_new_name=True
-    #)
+    il_size_sym = parent.sdfg.add_symbol(
+        "il_size", stype=dace.dtypes.int32, find_new_name=True
+    )
     sdfg.add_state_after(
         sdfg.start_state,
         assignments={
             f"{ol_size_sym}": f"{ol_end}",
-            #f"{il_size_sym}": f"tmp_struct_symbol_4",
+            f"{il_size_sym}": f"__CG_global_data__m_nproma",
         },
     )
 
     arr_name, arr = parent.sdfg.add_array(
         "maxvcfl_arr",
-        shape=[f"tmp_struct_symbol_4", f"{ol_size_sym}"],
+        shape=[f"{il_size_sym}", f"{ol_size_sym}"],
         dtype=dace.float64,
         transient=True,
         find_new_name=True,
@@ -302,36 +302,13 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         loop_P,
         loop,
         "maxvcfl_arr",
-        f"({il_end} + 1 - {il_start}) * (87)",
+        f"({il_end} - {il_start}) * (87)",
         "maxvcfl",
         "maxZ_to_scalar",
         in_expr=f"maxvcfl_arr[{il_start}-1:{il_end}-1,0:87]",
         out_expr="maxvcfl[0]",
         symtype=dace.float64,
     )
-
-    # Cache aligned version:
-    # parent.add_edge(
-    #     task,
-    #     "maxvcfl_out",
-    #     arr_acc,
-    #     None,
-    #     dace.Memlet(f"{arr_name}[{il_it_name}-{il_start},{ol_it_name}-{il_start}]"),
-    # )
-
-    # red_state, red_node = _insert_reduction(
-    #     loop_P,
-    #     loop,
-    #     "maxvcfl_arr",
-    #     f"({il_end} - {il_start}) * (87)",
-    #     "maxvcfl",
-    #     "maxZ_to_scalar",
-    #     in_expr=f"maxvcfl_arr[0:{il_end}-{il_start},0:87]",
-    #     out_expr="maxvcfl[0]",
-    #     symtype=dace.float64,
-    # )
-
-
     red_node._offloadable = False
     red_node._output = "scalar"
 
@@ -350,7 +327,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         parent,
         loop,
         "levmask",
-        f"{end} + 1 - {start}",
+        f"{end} - {start}",
         "levelmask",
         "scan",
         in_expr=f"levmask[{start}-1:{end}-1,{outer_it_var}-1]",
