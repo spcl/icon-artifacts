@@ -20,7 +20,7 @@ from dace.transformation.passes import (
 )
 
 from dace.transformation.passes import GPUKernelLaunchRestructure
-from dace.transformation.dataflow import MapCollapse, MapFusion, TrivialMapElimination
+from dace.transformation.dataflow import MapCollapse, MapFusion, MapTiling, TrivialMapElimination
 from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 from dace.sdfg import utils as sdutil
@@ -477,11 +477,38 @@ for sdfg_name in sdfg_names:
     # Validate the SDFG
     sdfg.validate()
     #tile_kernels(sdfg)
+
+    all_maps = [(v, g) for v, g in sdfg.all_nodes_recursive() if isinstance(v, dace.sdfg.nodes.MapEntry)]
+    for v,g in all_maps:
+        if "transpose" in v.label:
+            continue
+        if len(v.params) == 2:
+            tile_sizes = [1, 3]
+        elif len(v.params)  == 3:
+            tile_sizes = [1, 1, 3]
+        elif len(v.params) == 1:
+            tile_sizes = [3]
+        else:
+            raise Exception(f"? {v.params}")
+        MapTiling.apply_to(
+            sdfg=g.sdfg,
+            options=dict(
+                prefix="b",
+                tile_sizes=tile_sizes,
+                divides_evenly=False,
+                tile_trivial=True,
+                skew=False,
+            ),
+            map_entry=v,
+        )
+        v.map.schedule = dace.dtypes.ScheduleType.Sequential
+    sdfg.validate()
+    sdfg.save(sdfg.name + "_tiled.sdfgz", compress=True)
     sdfg.save(f"gpu_{sdfg_name}_result.sdfgz", compress=True)
     sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_result.sdfgz")
     resulting_sdfgs.append(sdfg)
 
-dace.Config.set('compiler', 'cuda', 'default_block_size', value="96,1,1")
+dace.Config.set('compiler', 'cuda', 'default_block_size', value="32,8,1")
 
 ################################################################################
 ### Numerically validate the SDFG

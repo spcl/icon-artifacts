@@ -381,9 +381,6 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                 print(old_name, " -> ", new_name)
                 _replace_on_lines(n.sdfg, old_name, new_name, perm)
 
-    if root.label == sdfg.label:
-        root.save(root.name + "_name_repl.sdfgz", compress=True)
-        root.validate()
     #raise Exception("UWU")
     # Need to fix node validation errors:
     # e.g.:
