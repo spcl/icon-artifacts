@@ -373,11 +373,12 @@ def permute_all_maps(sdfg: dace.SDFG, permute_list):
 def permute_all_maps_depending_on_input(sdfg: dace.SDFG, permute_list, inout_set):
     for n, g in sdfg.all_nodes_recursive():
         if isinstance(n, dace.nodes.MapEntry):
-            inputs_and_outputs = set([e.src.data for e in g.in_edges(n) if isinstance(e.src, dace.nodes.AccessNode)]) | set([e.dst.data for e in g.out_edges(g.exit_node(n)) if isinstance(e.dst, dace.nodes.AccessNode)])
-            inout_match = inputs_and_outputs.intersection(inout_set)
+            if inout_set is not None:
+                inputs_and_outputs = set([e.src.data for e in g.in_edges(n) if isinstance(e.src, dace.nodes.AccessNode)]) | set([e.dst.data for e in g.out_edges(g.exit_node(n)) if isinstance(e.dst, dace.nodes.AccessNode)])
+                inout_match = inputs_and_outputs.intersection(inout_set)
 
-            if len(inout_match) == 0:
-                continue
+                if len(inout_match) == 0:
+                    continue
 
             old_params = n.map.params
             new_params = []
@@ -388,4 +389,4 @@ def permute_all_maps_depending_on_input(sdfg: dace.SDFG, permute_list, inout_set
                 for j in range(len(local_permute_list)):
                     new_params.append(old_params[local_permute_list[j]])
                 print("Permuting map", n.map.label, "with", local_permute_list, "from", old_params, "to", new_params)
-                MapDimShuffle.apply_to(g.sdfg, map_entry=n, options={"parameters": new_params})
+                MapDimShuffle.apply_to(g.sdfg, verify=True, map_entry=n, options={"parameters": new_params})

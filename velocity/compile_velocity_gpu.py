@@ -395,13 +395,40 @@ for sdfg_name in sdfg_names:
         })
     """
         permute_dict =         {
+"gpu___CG_p_int__m_geofac_n2s": [1, 0, 2],
+"gpu___CG_p_int__m_rbf_vec_coeff_e": [1, 0, 2],
+"gpu___CG_p_int__m_cells_aw_verts": [1, 0, 2],
+"gpu___CG_p_metrics__m_coeff2_dwdz": [1, 0, 2],
+"gpu___CG_p_prog__m_w": [1, 0, 2],
+"gpu___CG_p_diag__m_w_concorr_c": [1, 0, 2],
+"gpu___CG_p_metrics__m_coeff1_dwdz": [1, 0, 2],
+"gpu___CG_p_metrics__m_wgtfac_e": [1, 0, 2],
+"gpu___CG_p_metrics__m_ddqz_z_full_e": [1, 0, 2],
+"gpu___CG_p_int__m_geofac_rot": [1, 0, 2],
+"gpu___CG_p_metrics__m_ddxt_z_full": [1, 0, 2],
+"gpu___CG_p_diag__m_vn_ie": [1, 0, 2],
+"gpu___CG_p_diag__m_vt": [1, 0, 2],
+"gpu___CG_p_metrics__m_coeff_gradekin": [1, 0, 2],
+"gpu___CG_p_metrics__m_wgtfacq_e": [1, 0, 2],
+"gpu___CG_p_metrics__m_wgtfac_c": [1, 0, 2],
+"gpu___CG_p_diag__m_ddt_w_adv_pc": [1, 0, 2, 3],
+"gpu___CG_p_prog__m_vn": [1, 0, 2],
+"gpu___CG_p_int__m_c_lin_e": [1, 0, 2],
+"gpu___CG_p_metrics__m_ddxn_z_full": [1, 0, 2],
+"gpu___CG_p_int__m_geofac_grdiv": [1, 0, 2],
+"gpu___CG_p_diag__m_ddt_vn_apc_pc": [1, 0, 2, 3],
+"gpu___CG_p_int__m_e_bln_c_s": [1, 0, 2],
+"gpu_z_w_con_c_full": [1, 0, 2],
+"gpu_z_w_v": [1, 0, 2],
+"gpu_z_vt_ie": [1, 0, 2],
+"gpu_z_w_concorr_me": [1, 0, 2],
 "gpu_zeta": [1, 0, 2],
 "gpu_z_v_grad_w": [1, 0, 2],
 "gpu_z_ekinh": [1, 0, 2],
-"gpu_z_w_con_c": [1, 0]
         }
         permute_index(sdfg, sdfg,permute_dict)
-        permute_all_maps_depending_on_input(sdfg, [1, 0], set(["per_" + v for v in permute_dict.keys()]))
+        #permute_all_maps_depending_on_input(sdfg, [1, 0], set(["per_" + v for v in permute_dict.keys()]))
+        permute_all_maps_depending_on_input(sdfg, [1, 0], None))
         sdfg.validate()
         if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
