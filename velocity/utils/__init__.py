@@ -12,7 +12,7 @@ from utils.compare_got_and_want import compare_got_and_want
 from utils.compile_sdfg import compile_sdfg
 from utils.count import count_loops, count_max_maps_per_state, count_symbols_use_defs
 from utils.move_transients_to_top_level import move_transients_to_top_level
-from utils.config import use_cache, cleanup, reduction, release, verbose, instrument, tile, remainder_loop
+from utils.config import use_cache, cleanup, reduction, release, verbose, instrument, tile, remainder_loop, layout_transform
 from utils.map_fissions import YoloMapFission
 from utils.split_maps import split_map_sdfg, untangle_if_sdfg
 from utils.raise_loop_invariant_if import raise_loop_invariant_if
