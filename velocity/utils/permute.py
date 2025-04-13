@@ -113,7 +113,7 @@ def _transpose_reduction(sdfg: SDFG, map_param:str = "_for_it_46"):
 
 
 
-def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List[int]], parent_name_map = None):
+def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List[int]], parent_name_map, orig_map):
     if root == sdfg:
         s1 = sdfg.add_state_after(sdfg.start_state, "transpose")
         permuted_arrays = dict()
@@ -279,6 +279,8 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
 
     #sdfg.save("t1.sdfgz", compress=True)
 
+
+
     for g in sdfg.all_nodes_between(s1, s2) if sdfg == root else sdfg.all_control_flow_regions():
         for s in g.all_states() if not isinstance(g, SDFGState) else [g]:
             for n in s.nodes():
@@ -291,8 +293,11 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                             new_permute_map[src_name] = permute_map[src_name]
                         if ie.dst_conn in name_map:
                             ie.dst.remove_in_connector(ie.dst_conn)
-                            ie.dst.add_in_connector(name_map[ie.dst_conn])
+                            ie.dst.add_in_connector(name_map[ie.dst_conn], force=True)
                             ie.dst_conn = name_map[ie.dst_conn]
+                            assert ie.dst == n
+                            if ie.dst_conn not in n.in_connectors:
+                                n.add_out_connector(ie.dst_conn, force=True)
 
                     for oe in s.out_edges(n):
                         dst_name = oe.src_conn
@@ -301,17 +306,15 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                             new_permute_map[dst_name] = permute_map[dst_name]
                         if oe.src_conn in name_map:
                             oe.src.remove_out_connector(oe.src_conn)
-                            oe.src.add_out_connector(name_map[oe.src_conn])
+                            oe.src.add_out_connector(name_map[oe.src_conn], force=True)
                             oe.src_conn = name_map[oe.src_conn]
                             assert oe.src == n
                             if oe.src_conn not in n.out_connectors:
                                 n.add_out_connector(oe.src_conn, force=True)
 
-                    permute_index(root, n.sdfg, new_permute_map, name_map)
+                    permute_index(root, n.sdfg, new_permute_map, name_map, orig_map)
 
-    for old_name, new_name in name_map.items():
-        _replace_on_lines(sdfg, old_name, new_name, permute_map[old_name])
-    #sdfg.save("t2.sdfgz", compress=True)
+
 
     final_block = [v for v in sdfg.nodes() if sdfg.out_degree(v) == 0][0]
     for g in sdfg.all_nodes_between(s1, s2) if sdfg == root else sdfg.all_control_flow_regions():
@@ -327,11 +330,11 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                     if e.dst_conn == "IN_" + e.data.data:
                         e.dst_conn = "IN_" + name_map[e.data.data]
                         e.dst.remove_in_connector("IN_" + e.data.data)
-                        e.dst.add_in_connector("IN_" + name_map[e.data.data])
+                        e.dst.add_in_connector("IN_" + name_map[e.data.data], force=True)
                     if e.src_conn == "OUT_" + e.data.data:
                         e.src_conn = "OUT_" + name_map[e.data.data]
                         e.src.remove_out_connector("OUT_" + e.data.data)
-                        e.src.add_out_connector("OUT_" + name_map[e.data.data])
+                        e.src.add_out_connector("OUT_" + name_map[e.data.data], force=True)
                     oldn = e.data.data
                     e.data.data = name_map[e.data.data]
                     new_subset = []
@@ -345,6 +348,23 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                         sdfg.save("uwu.sdfg")
                         raise e
     #sdfg.save("t3.sdfgz", compress=True)
+    for old_name, new_name in orig_map.items():
+        assert old_name in permute_map or new_name in permute_map, f"Array {old_name} or {new_name} not in permute map"
+        perm = permute_map[old_name] if old_name in permute_map else permute_map[new_name]
+        _replace_on_lines(sdfg, old_name, new_name, perm)
+
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.NestedSDFG):
+            assert old_name in permute_map or new_name in permute_map, f"Array {old_name} or {new_name} not in permute map"
+            perm = permute_map[old_name] if old_name in permute_map else permute_map[new_name]
+            for old_name, new_name in orig_map.items():
+                _replace_on_lines(n.sdfg, old_name, new_name, perm)
+    sdfg.save(sdfg.name + "name_repl.sdfgz", compress=True)
+    # Need to fix node validation errors:
+    # e.g.:
+    # dace.sdfg.validation.InvalidSDFGNodeError: Node validation failed: Missing symbols on nested SDFG:
+    # ['gpu___CG_p_patch__CG_verts__m_cell_blk', 'gpu___CG_p_patch__CG_verts__m_cell_idx'] (at state single_state_body, node loop_body)
+    # This happens because connector missing or smth uwu :(
 
 def permute_maps(sdfg: dace.SDFG, permute_map : Dict[str, List[int]]):
     for s, g in sdfg.all_nodes_recursive():
