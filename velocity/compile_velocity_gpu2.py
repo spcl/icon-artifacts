@@ -463,7 +463,7 @@ for sdfg_name in sdfg_names:
             raise Exception("UWU")
             """
 
-            permute_index(sdfg, sdfg, permute_dict, None, d)
+            permute_index(sdfg, sdfg, permute_dict, None, d, permute_dict)
             #permute_all_maps_depending_on_input(sdfg, [1, 0], set(["per_" + v for v in permute_dict.keys()]))
             permute_all_maps_depending_on_input(sdfg, [1, 0], None)
             sdfg.validate()
