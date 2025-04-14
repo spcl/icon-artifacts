@@ -11,6 +11,7 @@ int main(int argc, char* argv[]) {
   const std::filesystem::path ROOT{"data_no_nproma"};
   int max_n1 = 1;
   int max_n2 = 5;
+  int rep = 1;
 
   if (argc >= 2) {
     max_n1 = std::atoi(argv[1]);
@@ -18,6 +19,9 @@ int main(int argc, char* argv[]) {
   }
   if (argc >= 3) {
     max_n2 = std::atoi(argv[2]);
+  }
+  if (argc >= 4) {
+    rep = std::atoi(argv[3]);
   }
   std::cout << "Running from " << max_n1 << " to " << max_n2 << std::endl;
 
@@ -146,7 +150,7 @@ int main(int argc, char* argv[]) {
       auto [m, arr] = serde::read_array<double>(data);
       z_w_concorr_me = arr;
       gpu_z_w_concorr_me = z_w_concorr_me;
-    
+
       // int z_w_concorr_me_vol = m.volume();
       // cudaError_t err = cudaMalloc((void**)&gpu_z_w_concorr_me, z_w_concorr_me_vol * sizeof(double));
       // if (err != cudaSuccess) {
@@ -327,7 +331,8 @@ int main(int argc, char* argv[]) {
         /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), 0, dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
-      __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
+      for (int j = 0; j < rep; j++){
+        __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
         h_0_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
         gpu_z_kin_hor_e, gpu_z_vt_ie, gpu_z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
@@ -364,6 +369,7 @@ int main(int argc, char* argv[]) {
         /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), 0, dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
+      }
     int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_1(h_0_1);
 
     } else if (lvn_only == 1 && istep == 2){
@@ -456,6 +462,7 @@ int main(int argc, char* argv[]) {
         serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
         /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/0, dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
+      for (int j = 0; j < rep; j++){
       __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
         h_0_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
         gpu_z_vt_ie,  gpu_z_w_concorr_me,
@@ -488,6 +495,7 @@ int main(int argc, char* argv[]) {
         serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
         /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/0, dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
+      }
         int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_2(h_0_2);
 
     } else {
