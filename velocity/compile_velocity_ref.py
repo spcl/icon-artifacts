@@ -13,10 +13,10 @@ from utils import *
 
 # Load SDFG
 sdfg_names = [
-    "velocity_nproma20480_if_prop_lvn_only_0_istep_1.sdfgz",
-    "velocity_nproma20480_if_prop_lvn_only_1_istep_1.sdfgz",
-    "velocity_nproma20480_if_prop_lvn_only_1_istep_2.sdfgz",
-    "velocity_nproma20480_if_prop_lvn_only_0_istep_2.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_1.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_1.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_2.sdfgz",
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_2.sdfgz",
 ]
 resulting_sdfgs = []
 for sdfg_name in sdfg_names:

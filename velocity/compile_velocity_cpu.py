@@ -50,6 +50,7 @@ for sdfg_name in sdfg_names:
     else:
         # Needed to remove partial view towards (it is illegal and should not happen)
         clean_bad_views(sdfg)
+        sdfg.save("cpu_" + sdfg_name + "_views_cleaned.sdfgz", compress=True)
         sdfg.apply_transformations_repeated(ContinueToCondition)
         sdfg.simplify()
         SymbolPropagation().apply_pass(sdfg, {})
@@ -62,6 +63,8 @@ for sdfg_name in sdfg_names:
             interface_with_struct_copy=True,
             interface_to_gpu=False,
             clean_trivial_views=True,
+            shallow_copy=False,
+            shallow_copy_to_gpu=False,
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
 
