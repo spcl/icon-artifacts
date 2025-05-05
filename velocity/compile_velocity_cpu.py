@@ -53,13 +53,12 @@ for sdfg_name in sdfg_names:
         sdfg.save("cpu_" + sdfg_name + "_views_cleaned.sdfgz", compress=True)
         sdfg.apply_transformations_repeated(ContinueToCondition)
         sdfg.simplify()
-        SymbolPropagation().apply_pass(sdfg, {})
-        sdfg.simplify()
+
         StructToContainerGroups(
             validate=False,
             save_steps=False,
             verbose=verbose,
-            simplify=False,
+            simplify=True,
             interface_with_struct_copy=True,
             interface_to_gpu=False,
             clean_trivial_views=True,
@@ -68,6 +67,8 @@ for sdfg_name in sdfg_names:
         ).apply_pass(sdfg, {})
         sdfg.simplify(skip=["ArrayElimination"])
 
+        SymbolPropagation().apply_pass(sdfg, {})
+        sdfg.simplify()
         # Nproma is not known at compile time anymore
         # TODO: Circumvent this
         # apply_loop_locality_pass(sdfg)
