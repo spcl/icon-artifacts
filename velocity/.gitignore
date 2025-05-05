@@ -6,3 +6,5 @@ _dacegraphs
 utils/config.py
 data_*/
 data/
+**.got
+**.want
