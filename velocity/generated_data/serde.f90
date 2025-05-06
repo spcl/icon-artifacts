@@ -910,15 +910,6 @@ MODULE serde
       CALL serialize(io, (kmeta == 0), cleanup = .FALSE.)
       CALL serialize(io, x % ddt_vn_apc_pc, cleanup = .FALSE.)
     END IF
-    CALL serialize(io, '# ddt_vn_cor_pc', cleanup = .FALSE.)
-    CALL serialize(io, '# assoc', cleanup = .FALSE.)
-    CALL serialize(io, ASSOCIATED(x % ddt_vn_cor_pc), cleanup = .FALSE.)
-    IF (ASSOCIATED(x % ddt_vn_cor_pc)) THEN
-      kmeta = 0
-      CALL serialize(io, "# missing", cleanup = .FALSE.)
-      CALL serialize(io, (kmeta == 0), cleanup = .FALSE.)
-      CALL serialize(io, x % ddt_vn_cor_pc, cleanup = .FALSE.)
-    END IF
     CALL serialize(io, '# ddt_w_adv_pc', cleanup = .FALSE.)
     CALL serialize(io, '# assoc', cleanup = .FALSE.)
     CALL serialize(io, ASSOCIATED(x % ddt_w_adv_pc), cleanup = .FALSE.)
@@ -928,10 +919,6 @@ MODULE serde
       CALL serialize(io, (kmeta == 0), cleanup = .FALSE.)
       CALL serialize(io, x % ddt_w_adv_pc, cleanup = .FALSE.)
     END IF
-    CALL serialize(io, '# ddt_vn_adv_is_associated', cleanup = .FALSE.)
-    CALL serialize(io, x % ddt_vn_adv_is_associated, cleanup = .FALSE.)
-    CALL serialize(io, '# ddt_vn_cor_is_associated', cleanup = .FALSE.)
-    CALL serialize(io, x % ddt_vn_cor_is_associated, cleanup = .FALSE.)
     CALL serialize(io, '# max_vcfl_dyn', cleanup = .FALSE.)
     CALL serialize(io, x % max_vcfl_dyn, cleanup = .FALSE.)
     IF (nline_local) WRITE(io, '(g0)', ADVANCE = 'no') NEW_LINE('A')

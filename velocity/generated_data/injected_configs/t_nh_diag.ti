@@ -1,0 +1,4 @@
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "ddt_vn_adv_is_associated", "value": "0" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "ddt_vn_cor_is_associated", "value": "0" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "max_vcfl_dyn", "value": "0.0000000000000000" }
+

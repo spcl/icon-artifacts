@@ -298,8 +298,7 @@ MODULE mo_nonhydro_types
   END TYPE t_nh_prog
   TYPE :: t_nh_diag
     REAL(KIND = 8), POINTER, CONTIGUOUS :: vn_ie_ubc(:, :, :)
-    REAL(KIND = 8), POINTER, CONTIGUOUS :: vt(:, :, :), vn_ie(:, :, :), w_concorr_c(:, :, :), ddt_vn_apc_pc(:, :, :, :), ddt_vn_cor_pc(:, :, :, :), ddt_w_adv_pc(:, :, :, :)
-    LOGICAL :: ddt_vn_adv_is_associated = .FALSE., ddt_vn_cor_is_associated = .FALSE.
+    REAL(KIND = 8), POINTER, CONTIGUOUS :: vt(:, :, :), vn_ie(:, :, :), w_concorr_c(:, :, :), ddt_vn_apc_pc(:, :, :, :), ddt_w_adv_pc(:, :, :, :)
     REAL(KIND = 8) :: max_vcfl_dyn = 0.0D0
   END TYPE t_nh_diag
   TYPE :: t_nh_metrics
@@ -600,26 +599,12 @@ MODULE mo_velocity_advection
             p_diag % ddt_vn_apc_pc(je, jk, jb, ntnd) = - (z_kin_hor_e(je, jk, jb) * (p_metrics % coeff_gradekin(je, 1, jb) - p_metrics % coeff_gradekin(je, 2, jb)) + p_metrics % coeff_gradekin(je, 2, jb) * z_ekinh(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_metrics % coeff_gradekin(je, 1, jb) * z_ekinh(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_diag % vt(je, jk, jb) * (p_patch % edges % f_e(je, jb) + 0.5D0 * (zeta(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1)) + zeta(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)))) + (p_int % c_lin_e(je, 1, jb) * z_w_con_c_full(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * z_w_con_c_full(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2))) * (p_diag % vn_ie(je, jk, jb) - p_diag % vn_ie(je, jk + 1, jb)) / p_metrics % ddqz_z_full_e(je, jk, jb))
           END DO
         END DO
-        IF (p_diag % ddt_vn_adv_is_associated .OR. p_diag % ddt_vn_cor_is_associated) THEN
-          DO jk = 1, nlev
-            DO je = i_startidx, i_endidx
-              p_diag % ddt_vn_cor_pc(je, jk, jb, ntnd) = - p_diag % vt(je, jk, jb) * p_patch % edges % f_e(je, jb)
-            END DO
-          END DO
-        END IF
       ELSE
         DO jk = 1, nlev
           DO je = i_startidx, i_endidx
             p_diag % ddt_vn_apc_pc(je, jk, jb, ntnd) = - ((z_kin_hor_e(je, jk, jb) * (p_metrics % coeff_gradekin(je, 1, jb) - p_metrics % coeff_gradekin(je, 2, jb)) + p_metrics % coeff_gradekin(je, 2, jb) * z_ekinh(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_metrics % coeff_gradekin(je, 1, jb) * z_ekinh(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) * p_metrics % deepatmo_gradh_mc(jk) + p_diag % vt(je, jk, jb) * (p_patch % edges % f_e(je, jb) + 0.5D0 * (zeta(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1)) + zeta(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2))) * p_metrics % deepatmo_gradh_mc(jk)) + (p_int % c_lin_e(je, 1, jb) * z_w_con_c_full(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * z_w_con_c_full(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2))) * ((p_diag % vn_ie(je, jk, jb) - p_diag % vn_ie(je, jk + 1, jb)) / p_metrics % ddqz_z_full_e(je, jk, jb) + p_prog % vn(je, jk, jb) * p_metrics % deepatmo_invr_mc(jk) - p_patch % edges % ft_e(je, jb)))
           END DO
         END DO
-        IF (p_diag % ddt_vn_adv_is_associated .OR. p_diag % ddt_vn_cor_is_associated) THEN
-          DO jk = 1, nlev
-            DO je = i_startidx, i_endidx
-              p_diag % ddt_vn_cor_pc(je, jk, jb, ntnd) = - (+ p_diag % vt(je, jk, jb) * (p_patch % edges % f_e(je, jb)) + (p_int % c_lin_e(je, 1, jb) * z_w_con_c_full(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * z_w_con_c_full(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2))) * (- p_patch % edges % ft_e(je, jb)))
-            END DO
-          END DO
-        END IF
       END IF
       IF (global_data % lextra_diffu) THEN
         ie = 0
@@ -638,7 +623,7 @@ MODULE mo_velocity_advection
     END DO
     i_startblk = p_patch % cells % start_block(4)
     i_endblk = p_patch % cells % end_block(- 4)
-    max_vcfl_dyn = MAX(p_diag % max_vcfl_dyn, MAXVAL(vcflmax(i_startblk : i_endblk)))
+    max_vcfl_dyn = MAX(0.0D0, MAXVAL(vcflmax(i_startblk : i_endblk)))
     p_diag % max_vcfl_dyn = max_vcfl_dyn
     IF (global_data % timers_level > 5) CALL timer_stop(global_data, global_data % timer_solve_nh_veltend)
   END SUBROUTINE velocity_tendencies

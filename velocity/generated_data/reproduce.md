@@ -46,16 +46,18 @@ python -m dace.frontend.fortran.tools.create_singular_sdfg_from_ast \
 -i ${ARTIFACTS}/velocity_modified.f90 \
 -k mo_velocity_advection.velocity_tendencies \
 -o ${ARTIFACTS}/velocity.sdfg \
--d ${ARTIFACTS}/velocity_checkpoints
+-d ${ARTIFACTS}/velocity_checkpoints \
+-c ${ARTIFACTS}/injected_configs
 ```
 
 Generate Headers:
 ```bash
 python -m dace.frontend.fortran.tools.generate_serde_f90_and_cpp \
-    -i ${ARTIFACTS}/velocity_modified.f90 \
-    -g ${ARTIFACTS}/velocity.sdfg \
-    -f ${ARTIFACTS}/serde.f90 \
-    -c ${ARTIFACTS}/serde.h
+-i ${ARTIFACTS}/velocity_modified.f90 \
+-g ${ARTIFACTS}/velocity.sdfg \
+-f ${ARTIFACTS}/serde.f90 \
+-c ${ARTIFACTS}/serde.h \
+--config_inject ${ARTIFACTS}/injected_configs
 ```
 
 # ICON (Running and Getting Data)
