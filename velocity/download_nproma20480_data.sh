@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Set the URL and output directory
+# NOTE: Use `patch_out_is_associated.sh` to patch the data out of the two `..._is_associated` struct members.
 URL="https://polybox.ethz.ch/index.php/s/Hz7GncTrqHqMem7/download/nproma20480_data_files.tar.xz"
 OUTPUT_DIR="data_nproma20480"
 TAR_FILE="nproma20480_data_files.tar.xz"
