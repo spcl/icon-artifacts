@@ -3,6 +3,7 @@ import dace
 
 BAD_VIEW_NAMES = [
     ("ptr_patch_var_128_0", "v_ptr_patch_var_128_verts"),
+    ("ptr_patch_var_130_0", "v_ptr_patch_var_130_verts"),
     ("p_patch", "v_p_patch_edges"),
     ("p_patch", "v_p_patch_cells"),
 ]
