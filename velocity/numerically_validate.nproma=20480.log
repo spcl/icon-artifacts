@@ -39,31 +39,31 @@ All data read...
 Step 6519 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
 
 =================================================================
-==2171362==ERROR: LeakSanitizer: detected memory leaks
+==3383836==ERROR: LeakSanitizer: detected memory leaks
 
-Direct leak of 424 byte(s) in 1 object(s) allocated from:
+Direct leak of 5512 byte(s) in 13 object(s) allocated from:
     #0 0x7ffff72b3407 in operator new(unsigned long) /tmp/kleinm/spack-stage/spack-stage-gcc-10.2.0-fqf4ze2mfclmx6e7ehrjckznpoqnevmi/spack-src/libsanitizer/asan/asan_new_delete.cpp:99
-    #1 0x470721 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:950
-    #2 0x4c2529 in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:59
+    #1 0x46dd20 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:1013
+    #2 0x4bdcbc in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:58
     #3 0x7ffff598c492 in __libc_start_main (/lib64/libc.so.6+0x23492)
 
-Direct leak of 224 byte(s) in 1 object(s) allocated from:
+Direct leak of 2912 byte(s) in 13 object(s) allocated from:
     #0 0x7ffff72b3407 in operator new(unsigned long) /tmp/kleinm/spack-stage/spack-stage-gcc-10.2.0-fqf4ze2mfclmx6e7ehrjckznpoqnevmi/spack-src/libsanitizer/asan/asan_new_delete.cpp:99
-    #1 0x470506 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:945
-    #2 0x4c2529 in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:59
+    #1 0x46db05 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:1008
+    #2 0x4bdcbc in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:58
     #3 0x7ffff598c492 in __libc_start_main (/lib64/libc.so.6+0x23492)
 
-Direct leak of 192 byte(s) in 1 object(s) allocated from:
+Direct leak of 2496 byte(s) in 13 object(s) allocated from:
     #0 0x7ffff72b3407 in operator new(unsigned long) /tmp/kleinm/spack-stage/spack-stage-gcc-10.2.0-fqf4ze2mfclmx6e7ehrjckznpoqnevmi/spack-src/libsanitizer/asan/asan_new_delete.cpp:99
-    #1 0x470990 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:955
-    #2 0x4c2529 in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:59
+    #1 0x46df8f in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:1018
+    #2 0x4bdcbc in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:58
     #3 0x7ffff598c492 in __libc_start_main (/lib64/libc.so.6+0x23492)
 
-Indirect leak of 24 byte(s) in 1 object(s) allocated from:
+Indirect leak of 312 byte(s) in 13 object(s) allocated from:
     #0 0x7ffff72b3407 in operator new(unsigned long) /tmp/kleinm/spack-stage/spack-stage-gcc-10.2.0-fqf4ze2mfclmx6e7ehrjckznpoqnevmi/spack-src/libsanitizer/asan/asan_new_delete.cpp:99
-    #1 0x45f365 in serde::deserialize(t_grid_cells*, std::istream&) generated_data/serde.h:480
-    #2 0x4705d3 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:946
-    #3 0x4c2529 in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:59
+    #1 0x45c964 in serde::deserialize(t_grid_cells*, std::istream&) generated_data/serde.h:522
+    #2 0x46dbd2 in serde::deserialize(t_patch*, std::istream&) generated_data/serde.h:1009
+    #3 0x4bdcbc in main /scratch/pmazumde/dycon/icon-artifacts/velocity/main.cc:58
     #4 0x7ffff598c492 in __libc_start_main (/lib64/libc.so.6+0x23492)
 
-SUMMARY: AddressSanitizer: 864 byte(s) leaked in 4 allocation(s).
+SUMMARY: AddressSanitizer: 11232 byte(s) leaked in 52 allocation(s).
