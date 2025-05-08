@@ -284,7 +284,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
 
     arr_name, arr = parent.sdfg.add_array(
         "maxvcfl_arr",
-        shape=[f"tmp_struct_symbol_19", f"{ol_size_sym}"],
+        shape=[f"tmp_struct_symbol_4", f"{ol_size_sym}"],
         dtype=dace.float64,
         transient=True,
         find_new_name=True,

@@ -122,7 +122,7 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
         script_dir = path
     _process_folder(script_dir, sdfg, instrument)
 
-def add_timers(file_path: str):
+def add_timers(file_path: str, gpu: bool):
     """
     """
     import re
@@ -134,14 +134,19 @@ def add_timers(file_path: str):
     # Pattern 1: Insert BEFORE `nrdmax_jg = __CG_global_data__m_nrdmax[0];`
     pattern1 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
     #replacement1 = '    cudaDeviceSynchronize();\n    measure_time("Run");\n\\g<0>'
-    replacement1 = '   measure_time("Run"); \n cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
+    replacement1 = '   measure_time("Run"); \n'
+    if gpu:
+        replacement1 += '   cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
     # Pattern 2: Insert AFTER `__CG_p_diag__m_max_vcfl_dyn = p_diag_out_max_vcfl_dyn;`
     pattern2 = r'^(.*i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block\[\(\(- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2\) - 4\)\];.*)$'
     p2 = "i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];"
     escaped_p2 = re.escape(p2)
     #replacement2 = '\\1\n    cudaDeviceSynchronize();\n    measure_time("Run");'
-    replacement2 = '\\g<0>    cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n measure_time("Run");\n'
-
+    if gpu:
+        replacement2 = '\\g<0>    cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n'
+        replacement2 += '  measure_time("Run");\n'
+    else:
+        replacement2 = '  measure_time("Run");\n'
     # Apply replacements
     code = re.sub(pattern1, replacement1, code, flags=re.MULTILINE)
     code = re.sub(pattern2, replacement2, code, flags=re.MULTILINE)
@@ -222,7 +227,7 @@ def compile_if_propagated_sdfgs(
             compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
 
             modify_files_in_directory(build_loc)
-            add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp")
+            add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp", gpu)
             # insert_measure_time_calls(build_loc, sdfg, instrument)
             if fix_out_val_0:
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")

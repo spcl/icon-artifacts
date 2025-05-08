@@ -247,7 +247,7 @@ for sdfg_name in sdfg_names:
             root=sdfg,
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
             upper_bounds={
-                "maxvcfl_arr": "tmp_struct_symbol_18"
+                "maxvcfl_arr": "tmp_struct_symbol_11"
             },
             only=["maxvcfl_arr"],
             no_dim_change=False,
@@ -271,7 +271,7 @@ for sdfg_name in sdfg_names:
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage5.sdfgz", compress=True)
 
-    make_arrays_persistent(sdfg)
+    #make_arrays_persistent(sdfg)
     sdfg.validate()
     sdfg.save(f"cpu_{sdfg_name}_result.sdfgz", compress=True)
     sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_result.sdfgz")
