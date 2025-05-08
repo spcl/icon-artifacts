@@ -252,10 +252,6 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
-        pre_gpu_fix(sdfg)
-        move_ifs_inside_maps(sdfg)
-        flatten_lib, _ = find_node_by_name(sdfg, "flatten")
-        deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
         # z_v_grad_w [ tmp_struct_symbol_4, 90, tmp_struct_symbol_5 ] (nproma,p_patch%nlev,p_patch%nblks_e)
         # tmp_struct_symbol_5 == nblks_e
@@ -299,7 +295,16 @@ for sdfg_name in sdfg_names:
             #    double_size=True,
             #)
             _tmp_difcoef(sdfg)
-        sdfg.save("after_move.sdfgz", compress=True)
+        if use_cache:
+            sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
+
+    if Path(f"gpu_{sdfg_name}_stage6.sdfgz").exists() and use_cache:
+        sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage6.sdfgz")
+    else:
+        pre_gpu_fix(sdfg)
+        move_ifs_inside_maps(sdfg)
+        flatten_lib, _ = find_node_by_name(sdfg, "flatten")
+        deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
         sdfg.validate()
         sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
@@ -331,10 +336,10 @@ for sdfg_name in sdfg_names:
                 #if e.data.subset =
         sdfg.validate()
         if use_cache:
-            sdfg.save(f"gpu_{sdfg_name}_stage5.sdfgz", compress=True)
+            sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
 
-    if Path(f"gpu_{sdfg_name}_stage6.sdfgz").exists() and use_cache:
-        sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage6.sdfgz")
+    if Path(f"gpu_{sdfg_name}_stage7.sdfgz").exists() and use_cache:
+        sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage7.sdfgz")
     else:
         # Add ThreadBlock map and coarsen a bit
         #dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
@@ -349,19 +354,20 @@ for sdfg_name in sdfg_names:
         #tile_kernels(sdfg)
 
         if use_cache:
-            sdfg.save(f"gpu_{sdfg_name}_stage6.sdfgz", compress=True)
-
-    if Path(f"gpu_{sdfg_name}_stage7.sdfgz").exists() and use_cache:
-        sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage7.sdfgz")
-    else:
-        sdfg.validate()
-        if use_cache:
             sdfg.save(f"gpu_{sdfg_name}_stage7.sdfgz", compress=True)
 
-    #input_to_gpu(sdfg, "z_w_concorr_me")
-    #input_to_gpu(sdfg, "z_kin_hor_e")
-    #input_to_gpu(sdfg, "z_vt_ie")
-    make_arrays_persistent(sdfg)
+    if Path(f"gpu_{sdfg_name}_stage8.sdfgz").exists() and use_cache:
+        sdfg = dace.SDFG.from_file(f"gpu_{sdfg_name}_stage8.sdfgz")
+    else:
+        sdfg.validate()
+        #input_to_gpu(sdfg, "z_w_concorr_me")
+        #input_to_gpu(sdfg, "z_kin_hor_e")
+        #input_to_gpu(sdfg, "z_vt_ie")
+        make_arrays_persistent(sdfg)
+        if use_cache:
+            sdfg.save(f"gpu_{sdfg_name}_stage8.sdfgz", compress=True)
+
+
     # Validate the SDFG
     sdfg.validate()
     #tile_kernels(sdfg)
