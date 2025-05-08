@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 
-#include "serde.h"
-#include "velocity_tendencies.h"
+#include "serde_ref.h"
+#include "velocity_tendencies_ref.h"
 
 int main (int argc, char* argv[]) {
     const std::filesystem::path ROOT{ "data_nproma32" };
@@ -163,10 +163,8 @@ int main (int argc, char* argv[]) {
         std::cout << "Step " << n << " variables, extra_diffu: " << global_data.lextra_diffu << ", istep: ";
         std::cout << istep << ", lvn_only: " << lvn_only << ", ldeepatmo: " << ldeepatmo << std::endl;
 
-        if (lvn_only == 1 && istep == 1){
 
-
-          auto *h_1_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
+          auto *h_1_1 = __dace_init_velocity_tendencies(
             &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
             z_vt_ie, z_w_concorr_me,
             /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
@@ -200,47 +198,8 @@ int main (int argc, char* argv[]) {
             /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
             serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
             dtime, istep, ldeepatmo, lvn_only, ntnd);
-          __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
+          __program_velocity_tendencies(
             h_1_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
-            z_vt_ie, z_w_concorr_me,
-            /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
-            /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
-            /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
-            /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
-            /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
-            /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
-            /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-            /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
-            /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
-            /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
-            /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0),
-            /*__f2dace_OA_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
-            /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
-            dtime, istep, ldeepatmo, lvn_only, ntnd);
-            int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(h_1_1);
-
-        } else if (lvn_only == 0 && istep == 1){
-
-
-            auto *h_0_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-            &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
             z_vt_ie, z_w_concorr_me,
             /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
             serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
@@ -273,156 +232,7 @@ int main (int argc, char* argv[]) {
             /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
             serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2),  dt_linintp_ubc,
             dtime, istep, ldeepatmo, lvn_only, ntnd);
-          for (int j = 0; j < rep; j++){
-            __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-            h_0_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
-            z_kin_hor_e, z_vt_ie, z_w_concorr_me,
-            /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
-            /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
-            /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
-            /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
-            /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
-            /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
-            /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-            /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
-            /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
-            /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
-            /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0),
-            /*__f2dace_OA_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
-            /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
-            dtime, istep, ldeepatmo, lvn_only, ntnd);
-          }
-        int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_1(h_0_1);
-
-        } else if (lvn_only == 1 && istep == 2){
-
-          auto *h_1_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-            &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
-            z_vt_ie,  z_w_concorr_me,
-            /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
-            /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
-            /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
-            /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
-            /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
-            /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(2),
-            /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
-            /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-             dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
-          __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-            h_1_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
-            z_vt_ie,  z_w_concorr_me,
-            /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
-            /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
-            /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
-            /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
-
-            /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
-            /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(2),
-            /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
-            /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-            dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
-        int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_2(h_1_2);
-
-        } else if (lvn_only == 0 && istep == 2){
-
-          auto *h_0_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-            &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
-            z_vt_ie,  z_w_concorr_me,
-            /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
-            /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
-            /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
-            /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
-            /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
-            /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-            /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
-            /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
-            /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
-            dt_linintp_ubc,
-            dtime, istep, ldeepatmo, lvn_only, ntnd);
-          for (int j = 0; j < rep; j++){
-          __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-            h_0_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
-            z_vt_ie,  z_w_concorr_me,
-            /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
-            /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
-            /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
-            /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
-            /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
-            /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
-            /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-            /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
-            /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
-            /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
-            dt_linintp_ubc,
-            dtime, istep, ldeepatmo, lvn_only, ntnd);
-          }
-            int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_2(h_0_2);
-
-        } else {
-          throw std::runtime_error("Law of Logic and Mathematics violated");
-        }
+            int err = __dace_exit_velocity_tendencies(h_1_1);
         std::cout << "Step " << n << " done." << std::endl;
 
 

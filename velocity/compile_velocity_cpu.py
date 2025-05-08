@@ -77,7 +77,7 @@ for sdfg_name in sdfg_names:
         # Needed to remove partial view towers (it is illegal and should not happen, but it happens)
         clean_bad_views(sdfg)
         sdfg.apply_transformations_repeated(ContinueToCondition) # To RM continue blocks - this could made into a nice transformation (living in Main)
-        sdfg.save("cpu_continue_to_cond.sdfgz", compress=True)
+        #sdfg.save("cpu_continue_to_cond.sdfgz", compress=True)
         StructToContainerGroups(
             validate=False,
             save_steps=False,
@@ -89,15 +89,16 @@ for sdfg_name in sdfg_names:
             shallow_copy=False,
             shallow_copy_to_gpu=False
         ).apply_pass(sdfg, {}) # Flattening pass
-        sdfg.simplify()
-        SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp can be made into a transformation
-        sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
-        if reduction:
-            add_all_reductions(sdfg) # Name matched reductions - major work necessary to make a "detect reduction" pass
-        sdfg.simplify(skip=["ArrayElimination"])
+        #sdfg.simplify(skip=["ArrayElimination"])
+        #SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp can be made into a transformation
+        #sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
+        #if reduction:
+        #    add_all_reductions(sdfg) # Name matched reductions - major work necessary to make a "detect reduction" pass
+        #sdfg.simplify(skip=["ArrayElimination"])
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage1.sdfgz", compress=True)
 
+    """
     if Path(f"cpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage2.sdfgz")
     else:
@@ -114,7 +115,8 @@ for sdfg_name in sdfg_names:
 
     # Shouldn't have any loops left
     count_loops(sdfg, verbose=verbose, use_assert=True)
-
+    """
+    """
     if Path(f"cpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
     else:
@@ -156,7 +158,8 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
     count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
-
+    """
+    """
     if Path(f"cpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
@@ -204,7 +207,8 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
-
+    """
+    """
     if Path(f"cu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage5.sdfgz")
     else:
@@ -270,6 +274,7 @@ for sdfg_name in sdfg_names:
         # After this we are in GPU mode
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage5.sdfgz", compress=True)
+        """
 
     #make_arrays_persistent(sdfg)
     sdfg.validate()
