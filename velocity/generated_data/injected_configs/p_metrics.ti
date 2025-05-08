@@ -1,0 +1,13 @@
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_ddxn_z_full_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_ddxt_z_full_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_ddqz_z_full_e_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_ddqz_z_half_d_1_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_wgtfac_c_d_1_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_wgtfac_e_d_1_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_coeff1_dwdz_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_coeff2_dwdz_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_deepatmo_gradh_mc_d_0_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_deepatmo_invr_mc_d_0_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_deepatmo_gradh_ifc_d_0_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_metrics", "component": "__f2dace_SA_deepatmo_invr_ifc_d_0_s", "value": "91" }
+
