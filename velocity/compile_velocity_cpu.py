@@ -18,11 +18,37 @@ from dace.transformation.passes import (
     StructToContainerGroups,
 )
 
-from dace.transformation.passes import GPUKernelLaunchRestructure
 from dace.transformation.dataflow import MapCollapse, MapFusion, TrivialMapElimination
-from dace.transformation.passes.to_gpu import ToGPU
 from utils import *
 from dace.sdfg import utils as sdutil
+from utils.move_scalar_to_array import move_scalar_to_array, _tmp_difcoef
+import dace
+import sympy
+from dace.sdfg import infer_types
+from dace.sdfg.state import SDFGState, ControlFlowRegion
+from dace.sdfg.graph import SubgraphView
+from dace.sdfg.propagation import propagate_states
+from dace import config, data as dt, dtypes, Memlet, symbolic
+from dace.sdfg import SDFG, nodes, graph as gr
+from typing import Set, Tuple, Union, List, Iterable, Dict
+import warnings
+
+# Transformations
+from dace.transformation.dataflow import MapCollapse, TrivialMapElimination, MapFusion, ReduceExpansion
+from dace.transformation.interstate import LoopToMap, RefineNestedAccess
+from dace.transformation.subgraph.composite import CompositeFusion
+from dace.transformation.subgraph import helpers as xfsh
+from dace.transformation import helpers as xfh
+
+# Environments
+from dace.libraries.blas.environments import intel_mkl as mkl, openblas
+
+# Enumerator
+from dace.transformation.estimator.enumeration import GreedyEnumerator
+
+# FPGA AutoOpt
+from dace.transformation.auto import fpga as fpga_auto_opt
+from utils.reductions import LibNode
 
 # Load SDFG
 sdfg_names = [
@@ -48,33 +74,26 @@ for sdfg_name in sdfg_names:
     if Path(f"cpu_{sdfg_name}_stage1.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage1.sdfgz")
     else:
-        # Needed to remove partial view towards (it is illegal and should not happen)
+        # Needed to remove partial view towers (it is illegal and should not happen, but it happens)
         clean_bad_views(sdfg)
-        sdfg.save("cpu_" + sdfg_name + "_views_cleaned.sdfgz", compress=True)
-        sdfg.apply_transformations_repeated(ContinueToCondition)
-        sdfg.simplify()
-
+        sdfg.apply_transformations_repeated(ContinueToCondition) # To RM continue blocks - this could made into a nice transformation (living in Main)
+        sdfg.save("cpu_continue_to_cond.sdfgz", compress=True)
         StructToContainerGroups(
             validate=False,
             save_steps=False,
             verbose=verbose,
-            simplify=True,
+            simplify=False,
             interface_with_struct_copy=True,
             interface_to_gpu=False,
             clean_trivial_views=True,
             shallow_copy=False,
-            shallow_copy_to_gpu=False,
-        ).apply_pass(sdfg, {})
-        sdfg.simplify(skip=["ArrayElimination"])
-
-        SymbolPropagation().apply_pass(sdfg, {})
+            shallow_copy_to_gpu=False
+        ).apply_pass(sdfg, {}) # Flattening pass
         sdfg.simplify()
-        # Nproma is not known at compile time anymore
-        # TODO: Circumvent this
-        # apply_loop_locality_pass(sdfg)
-
+        SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp can be made into a transformation
+        sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
         if reduction:
-            add_all_reductions(sdfg)
+            add_all_reductions(sdfg) # Name matched reductions - major work necessary to make a "detect reduction" pass
         sdfg.simplify(skip=["ArrayElimination"])
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage1.sdfgz", compress=True)
@@ -82,9 +101,7 @@ for sdfg_name in sdfg_names:
     if Path(f"cpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage2.sdfgz")
     else:
-        # XXX: Permissive will ignore any read/write conflicts.
         sdfg.apply_transformations_repeated(LoopToMap, permissive=True)
-        # Ensure no symbols are captured by LoopToMap
         count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
         sdfg.apply_transformations_repeated(MapCollapse)
@@ -102,36 +119,16 @@ for sdfg_name in sdfg_names:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
     else:
         sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
+        # Changing the order of the transformations here messes things up.
 
-        # With kernel launch restructuring we do not collapse and do not need this
-        # sdfg.apply_transformations(YoloMapFission)
-
-        # These simplified by DaCe when nblks_c and nblks_v were known to be 2 and nblocks_e was 2
-        # Now should not be needed
-        #move_transients_to_top_level(
-        #    root=sdfg,
-        #    upper_bounds={
-        #        "z_w_con_c": 2, # TODO: ensure it works with nblocks, and not 2
-        #        "maxvcfl_arr": 2, # TODO: ensure it works with nblocks, and not 2
-        #        "cfl_clipping": 2, # TODO: ensure it works with nblocks, and not 2
-        #        "z_w_concorr_mc": 2, # TODO: ensure it works with nblocks, and not 2
-        #        "levmask": 2, # TODO: ensure it works with nblocks, and not 2
-        #    },
-        #)
-
-        preprocess_tough_nut(sdfg)
-        prune_unused_inputs_outputs(sdfg)
+        prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
         prune_unused_inputs_outputs_recursive(sdfg)
         sdfg.validate()
 
-        # Do not call mapcollapse or mapfusion with permissive=True, because collapsing
-        # Sequential -> GPU _ Device map into one will not result well
-        #sdfg.apply_transformations_repeated(ConditionFusion)
         sdfg.apply_transformations_repeated(ConditionFusion)
-        # Some NestedSDFGs with if conditions can be split only after moving up invariant ifs
-        # split_map_sdfg(sdfg, True, verbose)
         prune_unused_inputs_outputs(sdfg)
         InlineSDFGs().apply_pass(sdfg, {})
+
         k = sdfg.apply_transformations_repeated(MapCollapse)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
@@ -147,6 +144,7 @@ for sdfg_name in sdfg_names:
         k = sdfg.apply_transformations_repeated(MapCollapse)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
+
         sdfg.simplify(skip=["StateFusion"])
         prune_unused_inputs_outputs(sdfg)
         InlineSDFGs().apply_pass(sdfg, {})
@@ -156,9 +154,7 @@ for sdfg_name in sdfg_names:
 
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
-    # Currently makes the SDFG invalid, thrust error illegal address
 
-    # Ensure no symbols are captured
     count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
 
     if Path(f"cpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
@@ -166,9 +162,6 @@ for sdfg_name in sdfg_names:
     else:
         merge_maps_in_sdfg(sdfg)
 
-        # make_unique_block_var(sdfg)
-        # Skip state fusion until we offload to GPU as having both GPU and CPU usage in the same state
-        # prevents GPU offloading form working
         sdfg.validate()
         sdfg.simplify(skip=["StateFusion"])
         sdfg.validate()
@@ -186,11 +179,13 @@ for sdfg_name in sdfg_names:
                     k = n.sdfg.apply_transformations_repeated(MapFusion, permissive=True)
                     if verbose:
                         print(f"Applied MapFusion {k} time(s) to NestedSDFG {n.sdfg.name}")
+
         if verbose:
             print(f"Applied MapFusion {k} time(s)")
         k = sdfg.apply_transformations_repeated(MapCollapse, permissive=True)
         if verbose:
             print(f"Applied MapCollapse {k} time(s)")
+
         sdfg.simplify(skip=["StateFusion"])
         prune_unused_inputs_outputs(sdfg)
         InlineSDFGs().apply_pass(sdfg, {})
@@ -201,95 +196,95 @@ for sdfg_name in sdfg_names:
         sdfg.simplify(skip=["StateFusion"])
         # I saw trurthy ifs, propagate those conditions and try to fuse states agian
         propagate_if_cond(sdfg, sdfg, None, None, verbose)
-        demote_symbol_to_scalar(sdfg, "tmp_call_18")
-
+        # Prevents some transformations from being applied
+        # This is not a symbol anymore (?)
+        # demote_symbol_to_scalar(sdfg, "tmp_call_18")
         sdfg.validate()
-
-        # Breaks the SDFG
-        #sdfg.apply_transformations_once_everywhere(MapFusion)
-        #for n, g in sdfg.all_nodes_recursive():
-        #    if isinstance(n, dace.nodes.NestedSDFG):
-        #        if isinstance(n, dace.nodes.NestedSDFG):
-        #            n.sdfg.apply_transformations_once_everywhere(MapFusion, permissive=True)
-
         sdfg.simplify(skip=["StateFusion"])
-
+        sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
 
-
-    if Path(f"cpu_{sdfg_name}_stage7.sdfgz").exists() and use_cache:
-        sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage7.sdfgz")
+    if Path(f"cu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
+        sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage5.sdfgz")
     else:
-        # Add ThreadBlock map and coarsen a bit
-        permute_index(sdfg, sdfg,
-        {
-"__CG_p_patch__CG_edges__m_quad_idx": [1, 0, 2],
-"__CG_p_int__m_geofac_n2s": [1, 0, 2],
-"__CG_p_patch__CG_verts__m_cell_blk": [1, 0, 2],
-"__CG_p_patch__CG_verts__m_edge_blk": [1, 0, 2],
-"__CG_p_int__m_rbf_vec_coeff_e": [1, 0, 2],
-"__CG_p_int__m_cells_aw_verts": [1, 0, 2],
-"__CG_p_metrics__m_coeff2_dwdz": [1, 0, 2],
-"__CG_p_prog__m_w": [1, 0, 2],
-"__CG_p_diag__m_w_concorr_c": [1, 0, 2],
-"__CG_p_metrics__m_coeff1_dwdz": [1, 0, 2],
-"__CG_p_metrics__m_wgtfac_e": [1, 0, 2],
-"__CG_p_patch__CG_edges__m_vertex_idx": [1, 0, 2],
-"__CG_p_metrics__m_ddqz_z_full_e": [1, 0, 2],
-"__CG_p_patch__CG_edges__m_quad_blk": [1, 0, 2],
-"__CG_p_int__m_geofac_rot": [1, 0, 2],
-"__CG_p_metrics__m_ddxt_z_full": [1, 0, 2],
-"__CG_p_patch__CG_edges__m_vertex_blk": [1, 0, 2],
-"__CG_p_diag__m_vn_ie": [1, 0, 2],
-"__CG_p_patch__CG_cells__m_neighbor_idx": [1, 0, 2],
-"__CG_p_diag__m_vt": [1, 0, 2],
-"__CG_p_patch__CG_edges__m_cell_idx": [1, 0, 2],
-"__CG_p_metrics__m_coeff_gradekin": [1, 0, 2],
-"__CG_p_patch__CG_verts__m_edge_idx": [1, 0, 2],
-"__CG_p_metrics__m_wgtfacq_e": [1, 0, 2],
-"__CG_p_metrics__m_ddqz_z_half": [1, 0, 2],
-"__CG_p_metrics__m_wgtfac_c": [1, 0, 2],
-"__CG_p_diag__m_ddt_w_adv_pc": [1, 0, 2, 3],
-"__CG_p_prog__m_vn": [1, 0, 2],
-"__CG_p_int__m_c_lin_e": [1, 0, 2],
-"__CG_p_metrics__m_ddxn_z_full": [1, 0, 2],
-"__CG_p_patch__CG_edges__m_cell_blk": [1, 0, 2],
-"__CG_p_int__m_geofac_grdiv": [1, 0, 2],
-"__CG_p_patch__CG_cells__m_edge_idx": [1, 0, 2],
-"__CG_p_patch__CG_cells__m_edge_blk": [1, 0, 2],
-"__CG_p_patch__CG_cells__m_neighbor_blk": [1, 0, 2],
-"__CG_p_patch__CG_verts__m_cell_idx": [1, 0, 2],
-"__CG_p_diag__m_ddt_vn_apc_pc": [1, 0, 2, 3],
-"__CG_p_int__m_e_bln_c_s": [1, 0, 2],
-"maxvcfl_arr": [1, 0, 2],
-"z_kin_hor_e": [1, 0, 2],
-"z_w_con_c_full": [1, 0, 2],
-"z_w_v": [1, 0, 2],
-"z_vt_ie": [1, 0, 2],
-"z_w_concorr_me": [1, 0, 2],
-"zeta": [1, 0, 2],
-"z_v_grad_w": [1, 0, 2],
-"z_ekinh": [1, 0, 2],
-        })
-        #permute_all_maps(sdfg, [1, 0, 2])
         sdfg.validate()
-        if use_cache:
-            sdfg.save(f"cpu_{sdfg_name}_stage7.sdfgz", compress=True)
+        prune_unused_inputs_outputs(sdfg)
+        sdfg.validate()
+        prune_unused_inputs_outputs_recursive(sdfg)
+        sdfg.validate()
+        # Hardcoded fixes for the GPU version
+        # pre_gpu_fix(sdfg)
+        # move_ifs_inside_maps(sdfg)
+        flatten_lib, _ = find_node_by_name(sdfg, "flatten")
+        deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
-    # Validate the SDFG
+        # if nlev and nlevp1 are propagated
+        # z_v_grad_w [ tmp_struct_symbol_4, 90, tmp_struct_symbol_5 ] (nproma,p_patch%nlev,p_patch%nblks_e)
+        # tmp_struct_symbol_5 == nblks_e
+        # zeta [ tmp_struct_symbol_8, 90, tmp_struct_symbol_9 ] (nproma,p_patch%nlev,p_patch%nblks_v)
+        # tmp_struct_symbol_9 == nblks_v
+        # z_ekinh [ tmp_struct_symbol_10, 90, tmp_struct_symbol_11 ] (nproma,p_patch%nlev,p_patch%nblks_c)
+        # tmp_struct_symbol_11 == nblks_c
+
+        # if nlev and nlevp1 are not propagated
+        # z_v_grad_w [ tmp_struct_symbol_7, tmp_struct_symbol_8, tmp_struct_symbol_9 ] (nproma,p_patch%nlev,p_patch%nblks_e)
+        # tmp_struct_symbol_9 == nblks_e
+        # zeta [ tmp_struct_symbol_13, tmp_struct_symbol_14, tmp_struct_symbol_15 ] (nproma,p_patch%nlev,p_patch%nblks_v)
+        # tmp_struct_symbol_15 == nblks_v
+        # z_ekinh [ tmp_struct_symbol_16, tmp_struct_symbol_17, tmp_struct_symbol_18 ] (nproma,p_patch%nlev,p_patch%nblks_c)
+        # tmp_struct_symbol_18 == nblks_c
+        sdfg.save("before_move.sdfgz", compress=True)
+        move_transients_to_top_level(
+            root=sdfg,
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            only=["z_w_concorr_mc", "z_w_con_c", "z_v_grad_w",
+                  "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full",
+                  "levmask", "cfl_clipping"],
+            no_dim_change=True,
+        )
+        move_transients_to_top_level(
+            root=sdfg,
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            upper_bounds={
+                "maxvcfl_arr": "tmp_struct_symbol_18"
+            },
+            only=["maxvcfl_arr"],
+            no_dim_change=False,
+            offset=-1,
+            set_zero=True,
+        )
+        move_transients_to_top_level(
+            root=sdfg,
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            only=["out_val_0"],
+            no_dim_change=True,
+        )
+        if "difcoef" in sdfg.arrays:
+            _tmp_difcoef(sdfg)
+
+        sdfg.validate()
+        sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
+        sdfg.validate()
+
+        # After this we are in GPU mode
+        if use_cache:
+            sdfg.save(f"cpu_{sdfg_name}_stage5.sdfgz", compress=True)
+
+    make_arrays_persistent(sdfg)
     sdfg.validate()
     sdfg.save(f"cpu_{sdfg_name}_result.sdfgz", compress=True)
     sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_result.sdfgz")
     resulting_sdfgs.append(sdfg)
 
 
+dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
 
 ################################################################################
 ### Numerically validate the SDFG
 ################################################################################
 
-# for i in {1..5}; do ./velocity_gpu ${i} ${i}; done
+# for i in {1..5}; do ./velocity_cpu ${i} ${i}; done
 
 # Compile the SDFG
 unique_names(resulting_sdfgs)
@@ -299,13 +294,24 @@ if instrument:
     # instrument the SDFG
     instrument_sdfg(resulting_sdfgs)
 
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release, instrument=instrument, generate_code=True)
+compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release, instrument=instrument, generate_code=True, lib=False)
 
 # check if execution was successful
-if os.system(f"./velocity_gpu") != 0:
+if os.system(f"./velocity_cpu 1 1") != 0:
     print("Execution failed")
     exit(1)
-
+if os.system(f"./velocity_cpu 2 2") != 0:
+    print("Execution failed")
+    exit(1)
+if os.system(f"./velocity_cpu 3 3") != 0:
+    print("Execution failed")
+    exit(1)
+if os.system(f"./velocity_cpu 4 4") != 0:
+    print("Execution failed")
+    exit(1)
+if os.system(f"./velocity_cpu 5 5") != 0:
+    print("Execution failed")
+    exit(1)
 # Compare .got and .want files
 compare_got_and_want()
 
