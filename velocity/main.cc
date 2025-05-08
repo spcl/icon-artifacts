@@ -8,7 +8,7 @@
 
 int main (int argc, char* argv[]) {
     const std::filesystem::path ROOT{ "data_nproma32" };
-    std::vector<int> ns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 43, 139, 194, 967, 1140, 1814 };
+    std::vector<int> ns = { 1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701 };
     int n1 = -1;
     int rep = 1;
 
