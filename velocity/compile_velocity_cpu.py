@@ -294,7 +294,7 @@ if instrument:
     # instrument the SDFG
     instrument_sdfg(resulting_sdfgs)
 
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=release, instrument=instrument, generate_code=True, lib=False)
+compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=True, instrument=instrument, generate_code=True, lib=False)
 
 # check if execution was successful
 if os.system(f"./velocity_cpu 1 1") != 0:
