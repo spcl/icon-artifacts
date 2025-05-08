@@ -1,0 +1,4 @@
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_model_domain.t_patch", "component": "id", "value": "1" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_model_domain.t_patch", "component": "nlev", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_model_domain.t_patch", "component": "nlevp1", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_model_domain.t_patch", "component": "nshift", "value": "0" }

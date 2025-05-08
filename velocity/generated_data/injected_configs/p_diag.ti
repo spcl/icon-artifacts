@@ -1,0 +1,8 @@
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "__f2dace_SA_vt_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "__f2dace_SA_vn_ie_d_1_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "__f2dace_SA_w_concorr_c_d_1_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "__f2dace_SA_ddt_vn_apc_pc_d_1_s", "value": "90" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "__f2dace_SA_ddt_w_adv_pc_d_1_s", "value": "91" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "ddt_vn_adv_is_associated", "value": "0" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "ddt_vn_cor_is_associated", "value": "0" }
+{ "type": "ConstTypeInjection", "scope": null, "root": "mo_nonhydro_types.t_nh_diag", "component": "max_vcfl_dyn", "value": "0.00000000000000000000E+00" }
