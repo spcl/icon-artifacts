@@ -246,8 +246,8 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     Turns the maxvcfl max into a reduction.
     """
     task, parent = find_node_by_name(sdfg, task_name, skip=1)
-    tmp_call = "tmp_call_10_0_in"
-    assert task.code.as_string == f"maxvcfl_out = max(maxvcfl_0_in, {tmp_call})"
+    tmp_call = "tmp_call_8_0_in"
+    assert task.code.as_string == f"maxvcfl_out = max(maxvcfl_0_in, {tmp_call})", task.code.as_string
     task.code.as_string = f"maxvcfl_out = {tmp_call}"
     task.remove_in_connector("maxvcfl_0_in")
     for pred in parent.predecessors(task):
