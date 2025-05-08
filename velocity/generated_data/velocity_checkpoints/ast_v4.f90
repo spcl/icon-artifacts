@@ -4,7 +4,6 @@ MODULE global_mod
     LOGICAL, PUBLIC :: i_am_accel_node = .FALSE.
     LOGICAL :: lextra_diffu
     INTEGER :: nproma = 0
-    LOGICAL :: lvert_nest
     INTEGER :: timers_level
     INTEGER :: timer_solve_nh_veltend
     INTEGER :: timer_intp
@@ -183,13 +182,9 @@ MODULE mo_model_domain
     INTEGER, ALLOCATABLE :: end_block(:)
   END TYPE t_grid_vertices
   TYPE :: t_patch
-    INTEGER :: id
     INTEGER :: nblks_c
     INTEGER :: nblks_e
     INTEGER :: nblks_v
-    INTEGER :: nlev
-    INTEGER :: nlevp1
-    INTEGER :: nshift
     TYPE(t_grid_cells) :: cells
     TYPE(t_grid_edges) :: edges
     TYPE(t_grid_vertices) :: verts
@@ -297,7 +292,6 @@ MODULE mo_nonhydro_types
     REAL(KIND = 8), POINTER, CONTIGUOUS :: w(:, :, :), vn(:, :, :)
   END TYPE t_nh_prog
   TYPE :: t_nh_diag
-    REAL(KIND = 8), POINTER, CONTIGUOUS :: vn_ie_ubc(:, :, :)
     REAL(KIND = 8), POINTER, CONTIGUOUS :: vt(:, :, :), vn_ie(:, :, :), w_concorr_c(:, :, :), ddt_vn_apc_pc(:, :, :, :), ddt_w_adv_pc(:, :, :, :)
     REAL(KIND = 8) :: max_vcfl_dyn = 0.0D0
   END TYPE t_nh_diag
@@ -382,32 +376,28 @@ MODULE mo_velocity_advection
     INTEGER :: i_startblk, i_endblk, i_startidx, i_endidx
     INTEGER :: i_startblk_2, i_endblk_2, i_startidx_2, i_endidx_2
     INTEGER :: rl_start, rl_end, rl_start_2, rl_end_2
-    REAL(KIND = 8) :: z_w_concorr_mc(global_data % nproma, p_patch % nlev)
-    REAL(KIND = 8) :: z_w_con_c(global_data % nproma, p_patch % nlevp1)
-    REAL(KIND = 8) :: z_w_con_c_full(global_data % nproma, p_patch % nlev, p_patch % nblks_c)
-    REAL(KIND = 8) :: z_v_grad_w(global_data % nproma, p_patch % nlev, p_patch % nblks_e)
-    REAL(KIND = 8) :: z_w_v(global_data % nproma, p_patch % nlevp1, p_patch % nblks_v)
-    REAL(KIND = 8) :: zeta(global_data % nproma, p_patch % nlev, p_patch % nblks_v)
-    REAL(KIND = 8) :: z_ekinh(global_data % nproma, p_patch % nlev, p_patch % nblks_c)
+    REAL(KIND = 8) :: z_w_concorr_mc(global_data % nproma, 90)
+    REAL(KIND = 8) :: z_w_con_c(global_data % nproma, 91)
+    REAL(KIND = 8) :: z_w_con_c_full(global_data % nproma, 90, p_patch % nblks_c)
+    REAL(KIND = 8) :: z_v_grad_w(global_data % nproma, 90, p_patch % nblks_e)
+    REAL(KIND = 8) :: z_w_v(global_data % nproma, 91, p_patch % nblks_v)
+    REAL(KIND = 8) :: zeta(global_data % nproma, 90, p_patch % nblks_v)
+    REAL(KIND = 8) :: z_ekinh(global_data % nproma, 90, p_patch % nblks_c)
     INTEGER :: nlev, nlevp1
     LOGICAL :: l_vert_nested
     INTEGER :: jg
     REAL(KIND = 8) :: cfl_w_limit, vcfl, maxvcfl, vcflmax(p_patch % nblks_c)
     REAL(KIND = 8) :: w_con_e, scalfac_exdiff, difcoef, max_vcfl_dyn
     INTEGER :: ie, nrdmax_jg, nflatlev_jg, clip_count
-    LOGICAL :: levmask(p_patch % nblks_c, p_patch % nlev), levelmask(p_patch % nlev)
-    LOGICAL :: cfl_clipping(global_data % nproma, p_patch % nlevp1)
+    LOGICAL :: levmask(p_patch % nblks_c, 90), levelmask(90)
+    LOGICAL :: cfl_clipping(global_data % nproma, 91)
     IF (global_data % timers_level > 5) CALL timer_start(global_data, global_data % timer_solve_nh_veltend)
-    IF ((global_data % lvert_nest) .AND. (p_patch % nshift > 0)) THEN
-      l_vert_nested = .TRUE.
-    ELSE
-      l_vert_nested = .FALSE.
-    END IF
-    jg = p_patch % id
-    nrdmax_jg = global_data % nrdmax(jg)
-    nflatlev_jg = global_data % nflatlev(jg)
-    nlev = p_patch % nlev
-    nlevp1 = p_patch % nlevp1
+    l_vert_nested = .FALSE.
+    jg = 1
+    nrdmax_jg = global_data % nrdmax(1)
+    nflatlev_jg = global_data % nflatlev(1)
+    nlev = 90
+    nlevp1 = 91
     IF (global_data % lextra_diffu) THEN
       cfl_w_limit = 0.65D0 / dtime
       scalfac_exdiff = 0.05D0 / (dtime * (0.85D0 - cfl_w_limit * dtime))
@@ -447,21 +437,12 @@ MODULE mo_velocity_advection
             z_w_concorr_me(je, jk, jb) = p_prog % vn(je, jk, jb) * p_metrics % ddxn_z_full(je, jk, jb) + p_diag % vt(je, jk, jb) * p_metrics % ddxt_z_full(je, jk, jb)
           END DO
         END DO
-        IF (.NOT. l_vert_nested) THEN
-          DO je = i_startidx, i_endidx
-            p_diag % vn_ie(je, 1, jb) = p_prog % vn(je, 1, jb)
-            z_vt_ie(je, 1, jb) = p_diag % vt(je, 1, jb)
-            z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_prog % vn(je, 1, jb) ** 2 + p_diag % vt(je, 1, jb) ** 2)
-            p_diag % vn_ie(je, nlevp1, jb) = p_metrics % wgtfacq_e(je, 1, jb) * p_prog % vn(je, nlev, jb) + p_metrics % wgtfacq_e(je, 2, jb) * p_prog % vn(je, nlev - 1, jb) + p_metrics % wgtfacq_e(je, 3, jb) * p_prog % vn(je, nlev - 2, jb)
-          END DO
-        ELSE
-          DO je = i_startidx, i_endidx
-            p_diag % vn_ie(je, 1, jb) = p_diag % vn_ie_ubc(je, 1, jb) + dt_linintp_ubc * p_diag % vn_ie_ubc(je, 2, jb)
-            z_vt_ie(je, 1, jb) = p_diag % vt(je, 1, jb)
-            z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_prog % vn(je, 1, jb) ** 2 + p_diag % vt(je, 1, jb) ** 2)
-            p_diag % vn_ie(je, nlevp1, jb) = p_metrics % wgtfacq_e(je, 1, jb) * p_prog % vn(je, nlev, jb) + p_metrics % wgtfacq_e(je, 2, jb) * p_prog % vn(je, nlev - 1, jb) + p_metrics % wgtfacq_e(je, 3, jb) * p_prog % vn(je, nlev - 2, jb)
-          END DO
-        END IF
+        DO je = i_startidx, i_endidx
+          p_diag % vn_ie(je, 1, jb) = p_prog % vn(je, 1, jb)
+          z_vt_ie(je, 1, jb) = p_diag % vt(je, 1, jb)
+          z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_prog % vn(je, 1, jb) ** 2 + p_diag % vt(je, 1, jb) ** 2)
+          p_diag % vn_ie(je, nlevp1, jb) = p_metrics % wgtfacq_e(je, 1, jb) * p_prog % vn(je, 90, jb) + p_metrics % wgtfacq_e(je, 2, jb) * p_prog % vn(je, 89, jb) + p_metrics % wgtfacq_e(je, 3, jb) * p_prog % vn(je, 88, jb)
+        END DO
       END DO
     END IF
     rl_start = 7
@@ -521,7 +502,7 @@ MODULE mo_velocity_advection
         END DO
       END DO
       DO jc = i_startidx, i_endidx
-        z_w_con_c(jc, nlevp1) = 0.0D0
+        z_w_con_c(jc, 91) = 0.0D0
       END DO
       DO jk = nlev, nflatlev_jg + 1, - 1
         DO jc = i_startidx, i_endidx
