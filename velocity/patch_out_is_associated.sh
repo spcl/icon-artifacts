@@ -13,3 +13,7 @@ sed -i \
 -e '/# nlevp1/{N;d;}' \
 -e '/# nshift/{N;d;}' \
 p_patch.*.data
+
+sed -i \
+-e '/# lvert_nest/{N;d;}' \
+global_data.*.data
