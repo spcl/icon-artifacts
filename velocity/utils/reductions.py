@@ -197,7 +197,6 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
     cond_block, parent = find_node_by_name(sdfg, cond_name)
     parent.remove_node(cond_block)
     loop, parent = find_node_by_name(sdfg, loop_name)
-    del parent.in_edges(loop)[0].data.assignments["clip_count"]
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
 
