@@ -40,3 +40,25 @@ def stage_inputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
 
 def stage_outputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
   return {name: stage_output(name, stage, codegen_dir) for name in sdfg_names()}
+
+def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
+  for name, g in sdfgs.items():
+      g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
+  sdfgs = list(sdfgs.values())
+  # Avoid name conflicts.
+  unique_names(sdfgs)
+  # Add instrumentation if necessary.
+  if config.instrument:
+      instrument_sdfg(sdfgs)
+
+  dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
+  compile_if_propagated_sdfgs(
+      sdfgs, gpu=False, release=True,
+      instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
+      generate_code=True, lib=False,
+      stage_suffix=None, # stage3 if you need clip_count, else None, TODO: improve this
+      )
+  binpath = Path('velocity_cpu')
+  assert binpath.exists()
+  binpath = binpath.rename(f"{binpath.name}.stage{stage}")
+  print(f"Binary available: {binpath}")

@@ -71,24 +71,7 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-
-        # TODO: THE REST OF THE COMMON COMPILE ACTION SHOULD BE ABSTRACTED AWAY.
-        for name, g in sdfgs.items():
-            g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{STAGE_ID}/{name}"
-        sdfgs = list(sdfgs.values())
-        # Avoid name conflicts.
-        unique_names(sdfgs)
-        # Add instrumentation if necessary.
-        if config.instrument:
-            instrument_sdfg(sdfgs)
-
-        dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
-        compile_if_propagated_sdfgs(
-            sdfgs, gpu=False, release=True,
-            instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
-            generate_code=True, lib=False,
-            stage_suffix=None, # stage3 if you need clip_count, else None, TODO: improve this
-            )
+        common.compile_action(STAGE_ID, sdfgs)
 
 if __name__ == "__main__":
     main()
