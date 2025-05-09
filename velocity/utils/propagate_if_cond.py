@@ -509,6 +509,7 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
 
     # If continue block remove all following nodes
     # Clean all nodes reachable from a continue block
+    """
     fixpoint = True
     while fixpoint:
         fixpoint = False
@@ -528,7 +529,7 @@ def propagate_if_cond(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dic
                     for _n in nodes_to_rm:
                         parent.remove_node(_n)
                     break
-
+    """
     #for cfg in sdfg.all_control_flow_blocks():
     #    if isinstance(cfg, ConditionalBlock):
     #        print(cfg.label, len(cfg.branches))

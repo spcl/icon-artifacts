@@ -74,10 +74,15 @@ for sdfg_name in sdfg_names:
     if Path(f"cpu_{sdfg_name}_stage1.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage1.sdfgz")
     else:
-        # Needed to remove partial view towers (it is illegal and should not happen, but it happens)
+        # Tests: (Clean Bad Views is mandatory)
+        # StructToContainerGroups => OK
+        # ContinueToCondition + StructToContainerGroups => OK
+        # ContinueToCondition + StructToContainerGroups + Simplify + SymbolProp + Simplify => ? (probably OK, untested)
+        # ContinueToCondition + StructToContainerGroups + Simplify + SymbolProp + Simplify + Reduction => OK
+        # Need to remove partial view towers (it is illegal and should not happen, but it happens)
         clean_bad_views(sdfg)
         sdfg.apply_transformations_repeated(ContinueToCondition) # To RM continue blocks - this could made into a nice transformation (living in Main)
-        #sdfg.save("cpu_continue_to_cond.sdfgz", compress=True)
+        # Flattening needs to run before everything
         StructToContainerGroups(
             validate=False,
             save_steps=False,
@@ -89,16 +94,14 @@ for sdfg_name in sdfg_names:
             shallow_copy=False,
             shallow_copy_to_gpu=False
         ).apply_pass(sdfg, {}) # Flattening pass
-        #sdfg.simplify(skip=["ArrayElimination"])
-        #SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp can be made into a transformation
-        #sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
-        #if reduction:
-        #    add_all_reductions(sdfg) # Name matched reductions - major work necessary to make a "detect reduction" pass
-        #sdfg.simplify(skip=["ArrayElimination"])
+        sdfg.simplify(skip=["ArrayElimination"])
+        SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp TODO: can be made into a proper transformation
+        sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
+        if reduction:
+            add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage1.sdfgz", compress=True)
 
-    """
     if Path(f"cpu_{sdfg_name}_stage2.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage2.sdfgz")
     else:
@@ -107,24 +110,20 @@ for sdfg_name in sdfg_names:
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
         sdfg.apply_transformations_repeated(MapCollapse)
         sdfg.simplify(skip=["ArrayElimination", "InlineSDFG"])
-        if verbose:
-            sdfg.save("parallel.sdfgz", compress=True)
 
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage2.sdfgz", compress=True)
 
     # Shouldn't have any loops left
     count_loops(sdfg, verbose=verbose, use_assert=True)
-    """
-    """
+
     if Path(f"cpu_{sdfg_name}_stage3.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage3.sdfgz")
     else:
         sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
-        # Changing the order of the transformations here messes things up.
 
         prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
-        prune_unused_inputs_outputs_recursive(sdfg)
+        # prune_unused_inputs_outputs_recursive(sdfg) # An error related to ntnd if this is called, removed
         sdfg.validate()
 
         sdfg.apply_transformations_repeated(ConditionFusion)
@@ -158,12 +157,13 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
     count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
-    """
+
     """
     if Path(f"cpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
-        merge_maps_in_sdfg(sdfg)
+        #TODO: Reenable once we know exact issue
+        # merge_maps_in_sdfg(sdfg)
 
         sdfg.validate()
         sdfg.simplify(skip=["StateFusion"])
@@ -198,9 +198,11 @@ for sdfg_name in sdfg_names:
 
         sdfg.simplify(skip=["StateFusion"])
         # I saw trurthy ifs, propagate those conditions and try to fuse states agian
-        propagate_if_cond(sdfg, sdfg, None, None, verbose)
+        # Currently crashes, TODO: fix
+        # propagate_if_cond(sdfg, sdfg, None, None, verbose)
         # Prevents some transformations from being applied
         # This is not a symbol anymore (?)
+        # TODO: check if this is necessary, if so fix
         # demote_symbol_to_scalar(sdfg, "tmp_call_18")
         sdfg.validate()
         sdfg.simplify(skip=["StateFusion"])
@@ -209,13 +211,13 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
     """
     """
-    if Path(f"cu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
+    if Path(f"cpu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage5.sdfgz")
     else:
         sdfg.validate()
         prune_unused_inputs_outputs(sdfg)
         sdfg.validate()
-        prune_unused_inputs_outputs_recursive(sdfg)
+        # prune_unused_inputs_outputs_recursive(sdfg) # Missing symbol ntnd error
         sdfg.validate()
         # Hardcoded fixes for the GPU version
         # pre_gpu_fix(sdfg)
@@ -238,7 +240,6 @@ for sdfg_name in sdfg_names:
         # tmp_struct_symbol_15 == nblks_v
         # z_ekinh [ tmp_struct_symbol_16, tmp_struct_symbol_17, tmp_struct_symbol_18 ] (nproma,p_patch%nlev,p_patch%nblks_c)
         # tmp_struct_symbol_18 == nblks_c
-        sdfg.save("before_move.sdfgz", compress=True)
         move_transients_to_top_level(
             root=sdfg,
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
@@ -267,16 +268,12 @@ for sdfg_name in sdfg_names:
         if "difcoef" in sdfg.arrays:
             _tmp_difcoef(sdfg)
 
-        sdfg.validate()
-        sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
-        sdfg.validate()
-
+        make_arrays_persistent(sdfg)
         # After this we are in GPU mode
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage5.sdfgz", compress=True)
-        """
+    """
 
-    #make_arrays_persistent(sdfg)
     sdfg.validate()
     sdfg.save(f"cpu_{sdfg_name}_result.sdfgz", compress=True)
     sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_result.sdfgz")
@@ -299,7 +296,9 @@ if instrument:
     # instrument the SDFG
     instrument_sdfg(resulting_sdfgs)
 
-compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=True, instrument=instrument, generate_code=True, lib=False)
+compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=True,
+                            instrument=instrument, generate_code=True, lib=False,
+                            stage_suffix="stage3") # stage3 if you need clip_count, else None, TODO: improve this
 
 exit()
 # check if execution was successful

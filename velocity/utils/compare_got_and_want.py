@@ -1,8 +1,9 @@
+import argparse
 import os
 import numpy as np
 
 
-def compare_got_and_want():
+def compare_got_and_want(timestep = None):
     # Precision for double precision floating point numbers
     abs_tol = np.finfo(np.float64).eps
     rel_tol = np.finfo(np.float64).eps
@@ -17,6 +18,9 @@ def compare_got_and_want():
     # Compare each .got file with its corresponding .want file
     found_diff_all = False
     for got, want in zip(got_files, want_files):
+        if timestep is not None:
+            if timestep not in got:
+                continue
         found_diff = False
         max_rel_diff = 0
         max_abs_diff = 0
@@ -65,4 +69,8 @@ def compare_got_and_want():
         print("Numerical differences found ❌")
 
 if __name__ == "__main__":
-    compare_got_and_want()
+    parser = argparse.ArgumentParser(description="Run compare_got_and_want with a timestep.")
+    parser.add_argument("timestep", type=str, help="The timestep match string to filter, e.g. '_7.'")
+    args = parser.parse_args()
+
+    compare_got_and_want(timestep=args.timestep)

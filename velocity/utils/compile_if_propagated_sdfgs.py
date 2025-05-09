@@ -183,6 +183,8 @@ def compile_if_propagated_sdfgs(
     instrument: bool = False,
     generate_code: bool = True,
     lib = False,
+    ref = False,
+    stage_suffix = None
 ):
     sources = set()
     sources.add("src/reductions.cpp")
@@ -270,7 +272,13 @@ def compile_if_propagated_sdfgs(
 
     if not gpu:
         if not lib:
-            sources.add("main.cc")
+            if not ref:
+                if stage_suffix is not None:
+                    sources.add(f"main_{stage_suffix}.cc")
+                else:
+                    sources.add("main.cc")
+            else:
+                sources.add("main_ref.cc")
     else:
         if not lib:
             sources.add("main_gpu.cu")
