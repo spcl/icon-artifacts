@@ -1,76 +1,187 @@
 import argparse
+from concurrent.futures import ProcessPoolExecutor
+from itertools import zip_longest
 import os
+import re
+import sys
+from typing import Dict, Iterable, List, Optional, Tuple
 import numpy as np
+import math
+from pathlib import Path
+import polars as pl
+
+sys.stdout.reconfigure(line_buffering=True)
 
 
-def compare_got_and_want(timestep = None):
-    # Precision for double precision floating point numbers
-    abs_tol = np.finfo(np.float64).eps
-    rel_tol = np.finfo(np.float64).eps
+DEFAULT_WORKERS = int(os.environ.get("SLURM_CPUS_PER_TASK",
+                                     os.environ.get("SLURM_CPUS_ON_NODE",
+                                                     os.cpu_count() or 1)))
 
-    # Get list of .got and .want files
-    got_files = [f for f in os.listdir() if f.endswith(".got")]
-    want_files = [f.replace(".got", ".want") for f in got_files]
-    assert len(got_files) == len(
-        [f for f in os.listdir() if f.endswith(".want")]
-    ), "Number of .got and .want files do not match"
 
-    # Compare each .got file with its corresponding .want file
-    found_diff_all = False
-    for got, want in zip(got_files, want_files):
-        if timestep is not None:
-            if timestep not in got:
+
+def discover_timesteps(root: Path) -> List[int]:
+    ts_set: set[int] = set()
+    pat = re.compile(r"_(\d+)\.got$")
+    for p in root.glob("*.got"):
+        m = pat.search(p.name)
+        if m:
+            ts_set.add(int(m.group(1)))
+    for p in root.glob("*.want"):
+        m = pat.search(p.name)
+        if m:
+            ts_set.add(int(m.group(1)))
+    return sorted(ts_set)
+
+
+def find_comparable_files_at_timestep(timestep:int, root: Path) -> List[Tuple[Path, Path]]:
+    pairs: list[tuple[str, str]] = []
+
+    for want in root.glob('*.want'):
+        if not want.name.endswith(f"_{timestep}.want"):
+            continue
+        got = want.with_suffix(".got")
+        if not got.is_file():
+            print(f"⚠️  Skipping {want}: matching {got} not found")
+            continue
+        pairs.append((got, want))
+
+    return pairs
+
+
+def _stream_lines(path: Path) -> Iterable[str]:
+    with path.open("r", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            ls = line.rstrip("\n\r")
+            if not ls.strip():
                 continue
-        found_diff = False
-        max_rel_diff = 0
-        max_abs_diff = 0
-        with open(got, "r") as got_file, open(want, "r") as want_file:
-            got_lines = got_file.readlines()
-            want_lines = want_file.readlines()
+            yield ls
 
-            if len(got_lines) != len(want_lines):
-                print(f"{got} and {want} have different number of lines ❌")
-                found_diff = True
-                continue
 
-            # lines containing text should be identical, lines containing numbers should be close
-            for got_line, want_line in zip(got_lines, want_lines):
-                # Are the lines floating point numbers?
-                try:
-                    got_num = float(got_line)
-                    want_num = float(want_line)
+KNOWN_METADATA = {
+    "assoc",
+    "rank",
+    "size",
+    "lbound",
+    "entries",
+}
 
-                    abs_diff = abs(got_num - want_num)
-                    rel_diff = 0
-                    if want_num != 0:
-                        rel_diff = abs_diff / abs(want_num)
-                    max_rel_diff = max(max_rel_diff, rel_diff)
-                    max_abs_diff = max(max_abs_diff, abs_diff)
 
-                    if abs_diff > abs_tol or rel_diff > rel_tol:
-                        print(f"{got} and {want} have numerical differences ❌")
-                        found_diff = True
-                        break
+def compare_pair(
+    got: Path, want: Path,
+    abs_tol: float = np.finfo(np.float64).eps,
+    rel_tol: float = np.finfo(np.float64).eps,
+    verbose: bool = True,
+) -> Tuple[Optional[str], Dict[str, Dict[str, float]]]:
+    if verbose:
+        print(f"Comparing {got} vs. {want}")
 
-                except ValueError:
-                    # If not, they should be identical
-                    if got_line != want_line:
-                        print(f"{got} and {want} have different text ❌")
-                        found_diff = True
-                        break
-        if not found_diff:
-            print(f"{got} and {want} are OK ✅")
-        print(f"  Rel: {max_rel_diff}, Abs: {max_abs_diff}")
-        found_diff_all = found_diff_all or found_diff
+    per_var: Dict[str, Dict[str, float]] = {}
+    current_var: str = got.stem
 
-    if not found_diff_all:
-        print("No numerical differences found ✅")
-    else:
-        print("Numerical differences found ❌")
+    for got_line, want_line in zip_longest(_stream_lines(got), _stream_lines(want)):
+        if got_line is None or want_line is None:
+            msg = f"Different number of lines ❌"
+            if verbose:
+                print(msg)
+            return msg, per_var
+        
+        if got_line.startswith("# ") or want_line.startswith("# "):
+            if got_line != want_line:
+                msg = f"Different text ({got_line} vs. {want_line}) ❌"
+                if verbose:
+                    print(msg)
+                return msg, per_var
+            tag = got_line.lstrip("# ").strip().split()[0]
+            if tag and tag not in KNOWN_METADATA:
+                per_var.setdefault(tag, {"ok": True, "max_abs": 0.0, "max_rel": 0.0})
+                current_var = tag
+                if verbose:
+                    print(f"Checking: {current_var}")
+            continue
+
+        if got_line == want_line:
+            continue
+        assert current_var is not None
+        try:
+            got_num = float(got_line)
+            want_num = float(want_line)
+        except ValueError:
+            msg = f"Non-numeric data for `{current_var}` ({got_line} & {want_line}) ❌"
+            if verbose:
+                print(msg)
+            return msg, per_var
+        abs_diff = abs(got_num - want_num)
+        scale = max(abs(got_num), abs(want_num), abs_tol)
+        rel_diff = abs_diff / scale
+
+        stats = per_var.setdefault(current_var, {"ok": True, "max_abs": 0.0, "max_rel": 0.0})
+        stats["max_abs"] = max(stats["max_abs"], abs_diff)
+        stats["max_rel"] = max(stats["max_rel"], rel_diff)
+        if not math.isclose(got_num, want_num, rel_tol=rel_tol, abs_tol=abs_tol):
+            stats["ok"] = False
+
+    ok = all(v["ok"] for v in per_var.values())
+    msg = None if ok else "Numerical differences found ❌"
+    if msg and verbose:
+        print(msg)
+    return msg, per_var
+
+
+POLARS_SCHEMA = {
+    "timestep": pl.Int64,
+    "got_file": pl.Utf8,
+    "want_file": pl.Utf8,
+    "variable": pl.Utf8,
+    "status": pl.Utf8,
+    "max_abs": pl.Float64,
+    "max_rel": pl.Float64,
+}
+
+def make_comparison_for_timestep(ts: int) -> Tuple[int, pl.DataFrame]:
+    T = pl.DataFrame(schema=POLARS_SCHEMA)
+    fpairs = find_comparable_files_at_timestep(ts, root)
+    for got, want in fpairs:
+        err, per_var = compare_pair(got, want)
+        if not err:
+            print(f"{got.name} vs. {want.name} : No numerical differences found ✅")
+        else:
+            print(f"{got.name} vs. {want.name} : {err}")
+        for var, st in per_var.items():
+            status = "OK" if st["ok"] else "DIFF"
+            if status == 'DIFF':
+                print(f"  {var}: {status} | max_abs={st['max_abs']} | max_rel={st['max_rel']}")
+            T.extend(pl.DataFrame({
+                "timestep": ts,
+                "got_file": got.name,
+                "want_file": want.name,
+                "variable": var,
+                "status": status,
+                "max_abs": st["max_abs"],
+                "max_rel": st["max_rel"],
+            }, schema=POLARS_SCHEMA))
+        sys.stdout.flush()
+    return ts, T
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run compare_got_and_want with a timestep.")
-    parser.add_argument("timestep", type=str, help="The timestep match string to filter, e.g. '_7.'")
-    args = parser.parse_args()
+    argp = argparse.ArgumentParser(description="Run compare_got_and_want with a timestep.")
+    argp.add_argument("timesteps", type=str, nargs="?", default="",
+        help="Comma-separated list of timesteps. If omitted, all timesteps are processed.")
+    args = argp.parse_args()
 
-    compare_got_and_want(timestep=args.timestep)
+    root = Path.cwd()
+
+    timesteps = [ts.strip() for ts in args.timesteps.split(',') if ts.strip()]
+    assert all(ts.isdigit() for ts in timesteps)
+    timesteps = [int(ts) for ts in timesteps]
+    if not timesteps:
+        timesteps = discover_timesteps(root)
+    print(f"Comparing for timesteps: {timesteps}")
+    print(f"Will use {DEFAULT_WORKERS} workers.")
+
+    with ProcessPoolExecutor(max_workers=DEFAULT_WORKERS) as ex:
+        for ts, T in ex.map(make_comparison_for_timestep, timesteps):
+            csvpath = Path(f"numeric_differences_ts={ts}.csv")
+            print(f"Saving to: {csvpath}")
+            T.write_csv(csvpath, float_precision=None)
+

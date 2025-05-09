@@ -8,7 +8,6 @@ from utils.reductions import (
     levmask_to_reduction,
     add_all_reductions,
 )
-from utils.compare_got_and_want import compare_got_and_want
 from utils.compile_sdfg import compile_sdfg
 from utils.count import count_loops, count_max_maps_per_state, count_symbols_use_defs
 from utils.move_transients_to_top_level import move_transients_to_top_level
