@@ -147,7 +147,6 @@ int main (int argc, char* argv[]) {
 
         std::cerr << "All data read..." << std::endl;
 
-        std::cerr << "All data read..." << std::endl;
         if(ldeepatmo != 0){
           throw std::runtime_error("ldeepatmo is not 0");
         }

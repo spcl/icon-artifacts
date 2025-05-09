@@ -302,22 +302,17 @@ def compile_if_propagated_sdfgs(
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
         if not lib:
-            exit_code = os.system(
-                f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
-            )
+            compile_cmd = f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
         else:
-            exit_code = os.system(
-                f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
-            )
+            compile_cmd = f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
     else:
         if not lib:
-            exit_code = os.system(
-                f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
-            )
+            compile_cmd = f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
         else:
-            exit_code = os.system(
-                f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_cpu.so"
-            )
+            compile_cmd = f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_cpu.so"
+
+    print(f"Compiling: {compile_cmd}")
+    exit_code = os.system(compile_cmd)
 
     # check if compilation was successful
     if exit_code != 0:
