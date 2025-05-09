@@ -157,8 +157,8 @@ for sdfg_name in sdfg_names:
             sdfg.save(f"cpu_{sdfg_name}_stage3.sdfgz", compress=True)
 
     count_symbols_use_defs(sdfg, verbose=verbose, use_assert=True)
+    # Step 7 OK at this point
 
-    """
     if Path(f"cpu_{sdfg_name}_stage4.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage4.sdfgz")
     else:
@@ -209,8 +209,8 @@ for sdfg_name in sdfg_names:
         sdfg.validate()
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage4.sdfgz", compress=True)
-    """
-    """
+    # So far OK
+
     if Path(f"cpu_{sdfg_name}_stage5.sdfgz").exists() and use_cache:
         sdfg = dace.SDFG.from_file(f"cpu_{sdfg_name}_stage5.sdfgz")
     else:
@@ -268,11 +268,10 @@ for sdfg_name in sdfg_names:
         if "difcoef" in sdfg.arrays:
             _tmp_difcoef(sdfg)
 
-        make_arrays_persistent(sdfg)
+        # make_arrays_persistent(sdfg)
         # After this we are in GPU mode
         if use_cache:
             sdfg.save(f"cpu_{sdfg_name}_stage5.sdfgz", compress=True)
-    """
 
     sdfg.validate()
     sdfg.save(f"cpu_{sdfg_name}_result.sdfgz", compress=True)
