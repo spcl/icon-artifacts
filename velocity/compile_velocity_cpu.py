@@ -297,7 +297,7 @@ if instrument:
 
 compile_if_propagated_sdfgs(resulting_sdfgs, gpu=False, release=True,
                             instrument=instrument, generate_code=True, lib=False,
-                            stage_suffix="stage3") # stage3 if you need clip_count, else None, TODO: improve this
+                            stage_suffix=None) # stage3 if you need clip_count, else None, TODO: improve this
 
 exit()
 # check if execution was successful
