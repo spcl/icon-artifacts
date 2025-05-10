@@ -6,7 +6,13 @@
 /scratch/pmazumde/dycon/icon-artifacts/velocity
 ```
 
-#### 2. Run the script for that specific stage
+#### 2. Run If-Propagation if necessary:
+
+```commandline
+python propagate_ifs.py
+```
+
+#### 3. Run the script for that specific stage
 
 The example shown here is for stage#1. Note that the `python -m` style call is needed for now.
 ```commandline
