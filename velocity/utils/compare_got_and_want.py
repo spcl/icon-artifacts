@@ -183,5 +183,6 @@ if __name__ == "__main__":
         for ts, T in ex.map(make_comparison_for_timestep, timesteps):
             csvpath = Path(f"numeric_differences_ts={ts}.csv")
             print(f"Saving to: {csvpath}")
+            T.sort(['got_file', 'variable'])
             T.write_csv(csvpath, float_precision=None)
 

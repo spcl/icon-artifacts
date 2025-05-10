@@ -8,15 +8,49 @@
 #include "serde.h"
 #include "velocity_tendencies.h"
 
+template <std::ostream& CS>
+struct AtomicStream {
+  std::ostringstream s;
+  template <typename T>
+  AtomicStream& operator<<(const T& t) {
+    s << t;
+    return *this;
+  }
+  AtomicStream& operator<<(std::ostream& (*manip)(std::ostream&)) {
+    s << manip;
+    return *this;
+  }
+  ~AtomicStream() { CS << s.str(); }
+};
+using acout = AtomicStream<std::cout>;
+using acerr = AtomicStream<std::cerr>;
+
+template <typename F>
+auto spawn(std::vector<std::jthread>& pool, F&& f) {
+  using R = std::invoke_result_t<F>;
+
+  std::promise<R> prom;
+  std::future<R> fut = prom.get_future();
+
+  pool.emplace_back([p = std::move(prom), func = std::forward<F>(f)]() mutable {
+    try {
+      p.set_value(func());
+    } catch (...) {
+      p.set_exception(std::current_exception());
+    }
+  });
+  return fut;
+}
+
 std::ifstream open_ifstream(const std::filesystem::path& ROOT,
                             const std::string& name, int timestep) {
   const std::filesystem::path datapath =
       ROOT / (name + "." + std::to_string(timestep) + ".data");
   if (!std::filesystem::exists(datapath)) {
-    std::cerr << "Cannot find: " << datapath << std::endl;
+    acerr() << "Cannot find: " << datapath << std::endl;
     exit(EXIT_FAILURE);
   }
-  std::cout << "Reading from: " << datapath << std::endl;
+  acout() << "Reading from: " << datapath << std::endl;
   return {datapath};
 }
 
@@ -50,64 +84,57 @@ global_data_type read<global_data_type>(const std::filesystem::path& ROOT,
 template <typename T>
 std::pair<T, T> t0_t1_pair(const std::filesystem::path& ROOT,
                            const std::string& name, int timestep) {
-  auto t0 = read<T>(ROOT, name + ".t0", timestep);
-  auto t1 = read<T>(ROOT, name + ".t1", timestep);
-  return {t0, t1};
-}
-
-template <typename T>
-std::enable_if_t<std::is_pointer_v<T>, void> got_want_pair(
-    T got, T want, const std::string& name, int timestep) {
-  {
-    std::ofstream data(name + "_" + std::to_string(timestep) + ".got");
-    data << serde::serialize_array(got) << std::endl;
-  }
-  {
-    std::ofstream data(name + "_" + std::to_string(timestep) + ".want");
-    data << serde::serialize_array(want) << std::endl;
-  }
+  std::vector<std::jthread> pool;
+  auto ft0 = spawn(pool, [&] { return read<T>(ROOT, name + ".t0", timestep); });
+  auto ft1 = spawn(pool, [&] { return read<T>(ROOT, name + ".t1", timestep); });
+  return {ft0.get(), ft1.get()};
 }
 
 std::ofstream open_ofstream(const std::string& name, int timestep,
                             const std::string& suffix) {
   const std::filesystem::path datapath(name + "_" + std::to_string(timestep) +
                                        "." + suffix);
-  std::cout << "Writing to: " << datapath << std::endl;
+  acout() << "Writing to: " << datapath << std::endl;
   return {datapath};
+}
+
+template <typename T>
+std::enable_if_t<std::is_pointer_v<T>, void> got_want_pair(
+    T got, T want, const std::string& name, int timestep) {
+  std::jthread tgot([&] {
+    open_ofstream(name, timestep, "got")
+        << serde::serialize_array(got) << std::endl;
+  });
+  std::jthread twant([&] {
+    open_ofstream(name, timestep, "want")
+        << serde::serialize_array(want) << std::endl;
+  });
 }
 
 template <typename T>
 std::enable_if_t<std::is_class_v<T> || std::is_arithmetic_v<T>, void>
 got_want_pair(const T& got, const T& want, const std::string& name,
               int timestep) {
-  open_ofstream(name, timestep, "got") << serde::serialize(&got) << std::endl;
-  open_ofstream(name, timestep, "want") << serde::serialize(&want) << std::endl;
+  std::jthread tgot([&] {
+    open_ofstream(name, timestep, "got") << serde::serialize(&got) << std::endl;
+  });
+  std::jthread twant([&] {
+    open_ofstream(name, timestep, "want")
+        << serde::serialize(&want) << std::endl;
+  });
 }
 
 template <>
 void got_want_pair(const global_data_type& got, const global_data_type& want,
                    const std::string& name, int timestep) {
-  open_ofstream(name, timestep, "got")
-      << serde::serialize_global_data(&got) << std::endl;
-  open_ofstream(name, timestep, "want")
-      << serde::serialize_global_data(&want) << std::endl;
-}
-
-template <typename F>
-auto spawn(std::vector<std::jthread>& pool, F&& f) {
-  using R = std::invoke_result_t<F>;
-
-  std::promise<R> prom;
-  std::future<R> fut = prom.get_future();
-
-  pool.emplace_back([p = std::move(prom), func = std::forward<F>(f)]() mutable {
-    try {
-      p.set_value(func());
-    } catch (...) {
-      p.set_exception(std::current_exception());
-    }
+  std::jthread tgot([&] {
+    open_ofstream(name, timestep, "got")
+        << serde::serialize_global_data(&got) << std::endl;
   });
-  return fut;
+  std::jthread twant([&] {
+    open_ofstream(name, timestep, "want")
+        << serde::serialize_global_data(&want) << std::endl;
+  });
 }
 
 int main(int argc, char* argv[]) {
@@ -119,13 +146,13 @@ int main(int argc, char* argv[]) {
   if (argc == 2) {
     n1 = std::atoi(argv[1]);
   }
-  std::cout << "Running: " << n1 << std::endl;
+  acout() << "Running: " << n1 << std::endl;
   if (n1 > 0) {
     ns = {n1};
   }
 
   for (int n : ns) {
-    std::cerr << "Reading data for " << n << "..." << std::endl;
+    acerr() << "Reading data for " << n << "..." << std::endl;
 
     std::vector<std::jthread> pool;
 
@@ -175,7 +202,7 @@ int main(int argc, char* argv[]) {
     double dt_linintp_ubc = fut_dt_linintp.get();
     double dtime = fut_dtime.get();
 
-    std::cerr << "All data read..." << std::endl;
+    acerr() << "All data read..." << std::endl;
 
     if (ldeepatmo != 0) {
       throw std::runtime_error("ldeepatmo is not 0");
@@ -189,80 +216,80 @@ int main(int argc, char* argv[]) {
     if (lvn_only != 0 && lvn_only != 1) {
       throw std::runtime_error("lvn_only not 0 or 1");
     }
-    std::cout << "Step " << n
-              << " variables, extra_diffu: " << global_data.lextra_diffu
-              << ", istep: ";
-    std::cout << istep << ", lvn_only: " << lvn_only
-              << ", ldeepatmo: " << ldeepatmo << std::endl;
+    acout() << "Step " << n
+            << " variables, extra_diffu: " << global_data.lextra_diffu
+            << ", istep: ";
+    acout() << istep << ", lvn_only: " << lvn_only
+            << ", ldeepatmo: " << ldeepatmo << std::endl;
 
     if (lvn_only == 1 && istep == 1) {
       auto* h_1_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
           /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
           /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0),
           /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
           /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2),
           /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0),
           /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1),
           /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2),
           /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(0),
           /*__f2dace_OA_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(1),
           /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(2),
           dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
       __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
           h_1_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
           /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
           /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0),
           /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
           /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2),
           /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0),
           /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1),
           /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2),
           /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(0),
           /*__f2dace_OA_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(1),
           /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(2),
           dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
       int err =
           __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(h_1_1);
@@ -272,70 +299,70 @@ int main(int argc, char* argv[]) {
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
           /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
           /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0),
           /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
           /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2),
           /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0),
           /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1),
           /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2),
           /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(0),
           /*__f2dace_OA_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(1),
           /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(2),
           dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
       for (int j = 0; j < rep; j++) {
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
             h_0_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
             z_kin_hor_e, z_vt_ie, z_w_concorr_me,
             /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
             /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
             /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
             /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
             /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
+            serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0),
             /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
+            serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1),
             /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
             /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
             /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2),
             /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0),
             /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1),
             /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2),
             /*__f2dace_OA_z_w_concorr_me_d_0_s_154=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(0),
+            serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(0),
             /*__f2dace_OA_z_w_concorr_me_d_1_s_155=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(1),
+            serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(1),
             /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
-            serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2),
+            serde::ARRAY_META_DICT_AT(z_w_concorr_me).lbound.at(2),
             dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
       }
       int err =
@@ -346,49 +373,49 @@ int main(int argc, char* argv[]) {
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
           /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
           /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0),
           /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(2),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(2),
           /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
           /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-          dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2), dt_linintp_ubc,
+          dtime, istep, ldeepatmo, lvn_only, ntnd);
       __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
           h_1_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
           /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
 
           /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0),
           /*__f2dace_A_z_w_concorr_me_d_1_s_155=*/
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(1),
-          serde::ARRAY_META_DICT()->at(z_w_concorr_me).size.at(2),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(2),
           /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
           /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
-          dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2), dt_linintp_ubc,
+          dtime, istep, ldeepatmo, lvn_only, ntnd);
       int err =
           __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_2(h_1_2);
 
@@ -397,52 +424,52 @@ int main(int argc, char* argv[]) {
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
           /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
           /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
           /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
           /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
           /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-          serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2),
           /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0),
           /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1),
           /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-          serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2), dt_linintp_ubc,
+          serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2), dt_linintp_ubc,
           dtime, istep, ldeepatmo, lvn_only, ntnd);
       for (int j = 0; j < rep; j++) {
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
             h_0_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
             z_kin_hor_e, z_vt_ie, z_w_concorr_me,
             /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
             /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(1),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
             /*__f2dace_A_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(0),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
             /*__f2dace_A_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).size.at(1),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1),
             /*__f2dace_A_z_w_concorr_me_d_0_s_154=*/
             /*__f2dace_OA_z_kin_hor_e_d_0_s_157=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(0),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0),
             /*__f2dace_OA_z_kin_hor_e_d_1_s_158=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(1),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1),
             /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
-            serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2),
             /*__f2dace_OA_z_vt_ie_d_0_s_160=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(0),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0),
             /*__f2dace_OA_z_vt_ie_d_1_s_161=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(1),
+            serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1),
             /*__f2dace_OA_z_vt_ie_d_2_s_162=*/
-            serde::ARRAY_META_DICT()->at(z_vt_ie).lbound.at(2), dt_linintp_ubc,
+            serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2), dt_linintp_ubc,
             dtime, istep, ldeepatmo, lvn_only, ntnd);
       }
       int err =
@@ -451,7 +478,7 @@ int main(int argc, char* argv[]) {
     } else {
       throw std::runtime_error("Law of Logic and Mathematics violated");
     }
-    std::cout << "Step " << n << " done." << std::endl;
+    acout() << "Step " << n << " done." << std::endl;
 
     pool.clear();
     pool.emplace_back([&] {

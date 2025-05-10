@@ -9,6 +9,7 @@
 #include <map>
 #include <optional>
 #include <ranges>
+#include <mutex>
 #include <set>
 #include <sstream>
 #include <string_view>
@@ -60,7 +61,11 @@ const std::optional<std::string>& should_contain = {}) {
 }
 
 struct array_meta;
+
+namespace {
 std::map<void*, array_meta>* ARRAY_META_DICT ();
+static std::mutex meta_lock;
+} // namespace
 
 struct array_meta {
     int rank = 0;
@@ -72,16 +77,23 @@ struct array_meta {
 
     template <typename T> T* read (std::istream& s) const;
 };
+namespace {
 std::map<void*, array_meta>* ARRAY_META_DICT () {
     static auto* M = new std::map<void*, array_meta> ();
     return M;
 }
+} // namespace
 template <typename T> const array_meta& ARRAY_META_DICT_AT (T* a) {
     if constexpr (std::is_pointer_v<T>) {
         return ARRAY_META_DICT_AT (*a);
     } else {
+        std::lock_guard<std::mutex> g(meta_lock);
         return ARRAY_META_DICT ()->at (a);
     }
+}
+template <typename T> void ARRAY_META_DICT_SET (T* k, const array_meta& v) {
+    std::lock_guard<std::mutex> g(meta_lock);
+    (*ARRAY_META_DICT ())[k] = v;
 }
 
 template <typename T> void read_scalar (T& x, std::istream& s) {
@@ -2739,7 +2751,7 @@ template <typename T> T* array_meta::read (std::istream& s) const {
         for (int i = 0; i < volume (); ++i) {
             deserialize (&buf[i], s);
         }
-        (*ARRAY_META_DICT ())[buf] = *this;
+        ARRAY_META_DICT_SET(buf, *this);
     }
     return buf;
 }
