@@ -33,7 +33,10 @@ def stage_input(name:str, stage:int, codegen_dir=DEFAULT_CODEGEN_DIR):
     return starter_map[name]
 
 def stage_output(name:str, stage:int, codegen_dir=DEFAULT_CODEGEN_DIR):
-  return f"{codegen_dir}/cpu_{name}_stage{stage}.sdfgz"
+  if stage == 0:
+    return stage_input(name, stage+1, codegen_dir)
+  else:
+    return f"{codegen_dir}/cpu_{name}_stage{stage}.sdfgz"
 
 def stage_inputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
   return {name: stage_input(name, stage, codegen_dir) for name in sdfg_names()}
