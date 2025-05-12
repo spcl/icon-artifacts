@@ -5,6 +5,7 @@ import os
 import re
 import sys
 from typing import Dict, Iterable, List, Optional, Tuple
+from functools import partial
 import numpy as np
 import math
 from pathlib import Path
@@ -137,7 +138,7 @@ POLARS_SCHEMA = {
     "max_rel": pl.Float64,
 }
 
-def make_comparison_for_timestep(ts: int) -> Tuple[int, pl.DataFrame]:
+def make_comparison_for_timestep(ts: int, root: Path) -> Tuple[int, pl.DataFrame]:
     T = pl.DataFrame(schema=POLARS_SCHEMA)
     fpairs = find_comparable_files_at_timestep(ts, root)
     for got, want in fpairs:
@@ -180,7 +181,7 @@ if __name__ == "__main__":
     print(f"Will use {DEFAULT_WORKERS} workers.")
 
     with ProcessPoolExecutor(max_workers=DEFAULT_WORKERS) as ex:
-        for ts, T in ex.map(make_comparison_for_timestep, timesteps):
+        for ts, T in ex.map(partial(make_comparison_for_timestep, root=root), timesteps):
             csvpath = Path(f"numeric_differences_ts={ts}.csv")
             print(f"Saving to: {csvpath}")
             T = T.sort(['got_file', 'variable'])
