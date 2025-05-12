@@ -9,6 +9,7 @@ from utils.unique_names import unique_names
 from utils.benchmark_sdfg import instrument_sdfg
 from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
 import argparse
+from utils.init_transient_zero import init_transient_zero
 
 STAGE_ID = 1
 
@@ -40,6 +41,7 @@ def optimization_action(sdfg):
     sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
     if config.reduction:
         add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
+    init_transient_zero(sdfg)
     return sdfg
 
 def main():

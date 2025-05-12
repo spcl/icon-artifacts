@@ -46,3 +46,4 @@ from utils.combine import combine
 from utils.permute import permute_index, permute_maps, permute_all_maps, permute_all_maps_depending_on_input
 from utils.input_to_gpu import input_to_gpu
 from utils.pre_gpu_fixes import make_arrays_persistent
+from utils.init_transient_zero import init_transient_zero
