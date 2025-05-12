@@ -51,7 +51,7 @@ std::ifstream open_ifstream(const std::filesystem::path& ROOT,
     exit(EXIT_FAILURE);
   }
   acout() << "Reading from: " << datapath << std::endl;
-  return {datapath};
+  return std::ifstream{datapath};
 }
 
 template <typename T>
@@ -97,7 +97,7 @@ std::ofstream open_ofstream(const std::string& name, int timestep,
   const std::filesystem::path datapath(name + "_" + std::to_string(timestep) +
                                        "." + suffix);
   acout() << "Writing to: " << datapath << std::endl;
-  return {datapath};
+  return std::ofstream{datapath};
 }
 
 template <typename T>
@@ -187,6 +187,7 @@ int main(int argc, char* argv[]) {
         spawn(pool, [&] { return read<double>(ROOT, "dt_linintp_ubc", n); });
     auto fut_dtime =
         spawn(pool, [&] { return read<double>(ROOT, "dtime", n); });
+    pool.clear();
 
     auto global_data_pair = fut_global_data.get();
     auto& global_data = std::get<0>(global_data_pair);
@@ -504,7 +505,6 @@ int main(int argc, char* argv[]) {
     }
     acout() << "Step " << n << " done." << std::endl;
 
-    pool.clear();
     pool.emplace_back([&] {
       got_want_pair<global_data_type>(global_data, global_data_want,
                                       "global_data", n);
@@ -525,6 +525,7 @@ int main(int argc, char* argv[]) {
       got_want_pair<double*>(z_w_concorr_me, z_w_concorr_me_want,
                              "z_w_concorr_me", n);
     });
+    pool.clear();
   }
   return EXIT_SUCCESS;
 }
