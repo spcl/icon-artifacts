@@ -59,7 +59,9 @@ std::enable_if_t<std::is_pointer_v<T>, T> read(
     const std::filesystem::path& ROOT, const std::string& name, int timestep) {
   auto data = open_ifstream(ROOT, name, timestep);
   using Pointee = std::remove_pointer_t<T>;
-  auto [m, arr] = serde::read_array<Pointee>(data);
+  auto result = serde::read_array<Pointee>(data);
+  auto& m = std::get<0>(result);
+  auto& arr = std::get<1>(result);
   return arr;
 }
 
@@ -186,15 +188,37 @@ int main(int argc, char* argv[]) {
     auto fut_dtime =
         spawn(pool, [&] { return read<double>(ROOT, "dtime", n); });
 
-    auto [global_data, global_data_want] = fut_global_data.get();
-    auto [p_diag, p_diag_want] = fut_p_diag.get();
+    auto global_data_pair = fut_global_data.get();
+    auto& global_data = std::get<0>(global_data_pair);
+    auto& global_data_want = std::get<1>(global_data_pair);
+
+    auto p_diag_pair = fut_p_diag.get();
+    auto& p_diag = std::get<0>(p_diag_pair);
+    auto& p_diag_want = std::get<1>(p_diag_pair);
+
     auto p_int = fut_p_int.get();
-    auto [p_metrics, p_metrics_want] = fut_p_metrics.get();
+
+    auto p_metrics_pair = fut_p_metrics.get();
+    auto& p_metrics = std::get<0>(p_metrics_pair);
+    auto& p_metrics_want = std::get<1>(p_metrics_pair);
+
     auto p_patch = fut_p_patch.get();
-    auto [p_prog, p_prog_want] = fut_p_prog.get();
-    auto [z_kin_hor_e, z_kin_hor_e_want] = fut_z_kin_hor_e.get();
-    auto [z_vt_ie, z_vt_ie_want] = fut_z_vt_ie.get();
-    auto [z_w_concorr_me, z_w_concorr_me_want] = fut_z_w_concorr.get();
+
+    auto p_prog_pair = fut_p_prog.get();
+    auto& p_prog = std::get<0>(p_prog_pair);
+    auto& p_prog_want = std::get<1>(p_prog_pair);
+
+    auto z_kin_hor_e_pair = fut_z_kin_hor_e.get();
+    auto& z_kin_hor_e = std::get<0>(z_kin_hor_e_pair);
+    auto& z_kin_hor_e_want = std::get<1>(z_kin_hor_e_pair);
+
+    auto z_vt_ie_pair = fut_z_vt_ie.get();
+    auto& z_vt_ie = std::get<0>(z_vt_ie_pair);
+    auto& z_vt_ie_want = std::get<1>(z_vt_ie_pair);
+
+    auto z_w_concorr_me_pair = fut_z_w_concorr.get();
+    auto& z_w_concorr_me = std::get<0>(z_w_concorr_me_pair);
+    auto& z_w_concorr_me_want = std::get<1>(z_w_concorr_me_pair);
     int istep = fut_istep.get();
     int ldeepatmo = fut_ldeepatmo.get();
     int lvn_only = fut_lvn_only.get();
