@@ -20,7 +20,11 @@ struct AtomicStream {
     s << manip;
     return *this;
   }
-  ~AtomicStream() { CS << s.str(); }
+  ~AtomicStream() {
+    static std::mutex g;
+    std::lock_guard<std::mutex> lock(g);
+    CS << s.str();
+  }
 };
 using acout = AtomicStream<std::cout>;
 using acerr = AtomicStream<std::cerr>;
