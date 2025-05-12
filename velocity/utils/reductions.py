@@ -144,6 +144,8 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
     loop_node, _ = find_node_by_name(sdfg, loop_name)
     start = str(loop_analysis.get_init_assignment(loop_node))
     end = str(loop_analysis.get_loop_end(loop_node))
+    #print("map reduction clipping", start, end)
+
     vcfl_name = None
     for name in sdfg.arrays.keys():
         if "vcflmax" in name:
@@ -167,7 +169,7 @@ def loop_to_max_reduction(sdfg: dace.SDFG, loop_name, task_name):
         sdfg,
         loop_node,
         vcfl_name,
-        f"{end} - {start}",
+        f"({end} + 1 - {start})",
         f"{var_name}",
         "maxZ_to_scalar",
         in_expr=f"{vcfl_name}[{start}-1:{end}-1]",
@@ -199,6 +201,7 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
     loop, parent = find_node_by_name(sdfg, loop_name)
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
+    #print("cfl clipping", start, end)
 
     outer_loop = parent
     outer_it_var = outer_loop.loop_variable
@@ -218,7 +221,7 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
         parent,
         loop,
         "cfl_clipping",
-        f"{end} - {start}",
+        f"({end} + 1 - {start})",
         "out_val_0",
         "sum_to_address",
         in_expr=f"cfl_clipping[{start}-1:{end}-1,{outer_it_var}-1]",
@@ -265,6 +268,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     ol_end = str(loop_analysis.get_loop_end(loop))
     il_start = str(loop_analysis.get_init_assignment(inner_loop))
     il_end = str(loop_analysis.get_loop_end(inner_loop))
+    #print("ol il", ol_start, ol_end)
 
     # The sizes need to be symbolic for dace to allocate the array correctly
     ol_size_sym = parent.sdfg.add_symbol(
@@ -302,7 +306,7 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         loop_P,
         loop,
         "maxvcfl_arr",
-        f"({il_end} - {il_start}) * (87)",
+        f"({il_end} + 1 - {il_start}) * (87)",
         "maxvcfl",
         "maxZ_to_scalar",
         in_expr=f"maxvcfl_arr[{il_start}-1:{il_end}-1,0:87]",
@@ -319,6 +323,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     loop, parent = find_node_by_name(sdfg, loop_name)
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
+    #print("tmp_call_13", start, end)
 
     outer_loop = parent
     outer_it_var = outer_loop.loop_variable
@@ -327,7 +332,7 @@ def tmp_call_13_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
         parent,
         loop,
         "levmask",
-        f"{end} - {start}",
+        f"({end} + 1 - {start})",
         "levelmask",
         "scan",
         in_expr=f"levmask[{start}-1:{end}-1,{outer_it_var}-1]",
@@ -352,6 +357,7 @@ def levmask_to_reduction(sdfg: dace.SDFG, loop_name, task_name):
     prestate = parent.add_state_before(loop)
     start = str(loop_analysis.get_init_assignment(loop))
     end = str(loop_analysis.get_loop_end(loop))
+    #print("levmask", start, end)
 
     outer_loop = parent.parent_graph.parent_graph
     assert isinstance(outer_loop, LoopRegion)
