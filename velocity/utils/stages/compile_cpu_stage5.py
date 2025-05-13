@@ -41,6 +41,10 @@ def optimization_action(sdfg):
     # tmp_struct_symbol_15 == nblks_v
     # z_ekinh [ tmp_struct_symbol_16, tmp_struct_symbol_17, tmp_struct_symbol_18 ] (nproma,p_patch%nlev,p_patch%nblks_c)
     # tmp_struct_symbol_18 == nblks_c
+
+    # CAUSES DIFFERENCE IN `ddt_vn_apc_pc` AND `w_concorr_c`.
+    # TODO: BEFORE ENABLING THIS `move_transients_to_top_level`, MAKE SURE IT IS CORRECT.
+    '''
     move_transients_to_top_level(
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,
@@ -49,6 +53,7 @@ def optimization_action(sdfg):
                 "levmask", "cfl_clipping"],
         no_dim_change=True,
     )
+    '''
     move_transients_to_top_level(
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,
