@@ -5,59 +5,6 @@
 #include <dace/dace.h>
 
 
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
-int __f2dace_SA_c_lin_e_d_1_s_26 = {};
-int __f2dace_SA_c_lin_e_d_2_s_27 = {};
-int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
-int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
-int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
-int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
-int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
-int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
-int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
-int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
-int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
-int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
-int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
-int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
-int __f2dace_SA_geofac_rot_d_0_s_40 = {};
-int __f2dace_SA_geofac_rot_d_1_s_41 = {};
-int __f2dace_SA_geofac_rot_d_2_s_42 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
-int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
-int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
-int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
-int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
-int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
-int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
-int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
-int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
-int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
-int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
-int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
-int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
-int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
-int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
-int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
-int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
-int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
-int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
-double* c_lin_e = {};
-double* cells_aw_verts = {};
-double* e_bln_c_s = {};
-double* geofac_grdiv = {};
-double* geofac_n2s = {};
-double* geofac_rot = {};
-double* rbf_vec_coeff_e = {};
-};
-
-
 struct global_data_type {
     int i_am_accel_node = {};
 int lextra_diffu = {};
@@ -320,24 +267,6 @@ t_grid_vertices* verts = {};
 };
 
 
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s_288 = {};
-int __f2dace_SA_vn_d_1_s_289 = {};
-int __f2dace_SA_vn_d_2_s_290 = {};
-int __f2dace_SA_w_d_0_s_285 = {};
-int __f2dace_SA_w_d_1_s_286 = {};
-int __f2dace_SA_w_d_2_s_287 = {};
-int __f2dace_SOA_vn_d_0_s_288 = {};
-int __f2dace_SOA_vn_d_1_s_289 = {};
-int __f2dace_SOA_vn_d_2_s_290 = {};
-int __f2dace_SOA_w_d_0_s_285 = {};
-int __f2dace_SOA_w_d_1_s_286 = {};
-int __f2dace_SOA_w_d_2_s_287 = {};
-double* vn = {};
-double* w = {};
-};
-
-
 struct t_nh_metrics {
     int __f2dace_SA_coeff1_dwdz_d_0_s_332 = {};
 int __f2dace_SA_coeff1_dwdz_d_1_s_333 = {};
@@ -424,12 +353,83 @@ double* wgtfacq_e = {};
 };
 
 
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s_288 = {};
+int __f2dace_SA_vn_d_1_s_289 = {};
+int __f2dace_SA_vn_d_2_s_290 = {};
+int __f2dace_SA_w_d_0_s_285 = {};
+int __f2dace_SA_w_d_1_s_286 = {};
+int __f2dace_SA_w_d_2_s_287 = {};
+int __f2dace_SOA_vn_d_0_s_288 = {};
+int __f2dace_SOA_vn_d_1_s_289 = {};
+int __f2dace_SOA_vn_d_2_s_290 = {};
+int __f2dace_SOA_w_d_0_s_285 = {};
+int __f2dace_SOA_w_d_1_s_286 = {};
+int __f2dace_SOA_w_d_2_s_287 = {};
+double* vn = {};
+double* w = {};
+};
+
+
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
+int __f2dace_SA_c_lin_e_d_1_s_26 = {};
+int __f2dace_SA_c_lin_e_d_2_s_27 = {};
+int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
+int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
+int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
+int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
+int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
+int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
+int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
+int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
+int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
+int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
+int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
+int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
+int __f2dace_SA_geofac_rot_d_0_s_40 = {};
+int __f2dace_SA_geofac_rot_d_1_s_41 = {};
+int __f2dace_SA_geofac_rot_d_2_s_42 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
+int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
+int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
+int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
+int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
+int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
+int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
+int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
+int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
+int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
+int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
+int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
+int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
+int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
+int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
+int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
+int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
+int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
+int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
+double* c_lin_e = {};
+double* cells_aw_verts = {};
+double* e_bln_c_s = {};
+double* geofac_grdiv = {};
+double* geofac_n2s = {};
+double* geofac_rot = {};
+double* rbf_vec_coeff_e = {};
+};
+
+
 
 
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t;  // Forward declaration.
 
-DACE_EXPORTED velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(global_data_type* global_data, t_nh_diag* p_diag, t_int_state* p_int, t_nh_metrics* p_metrics, t_patch* p_patch, t_nh_prog* p_prog, double * __restrict__ z_kin_hor_e, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_me, int __f2dace_A_z_kin_hor_e_d_0_s_363, int __f2dace_A_z_kin_hor_e_d_1_s_364, int __f2dace_A_z_vt_ie_d_0_s_366, int __f2dace_A_z_vt_ie_d_1_s_367, int __f2dace_OA_z_kin_hor_e_d_0_s_363, int __f2dace_OA_z_kin_hor_e_d_1_s_364, int __f2dace_OA_z_kin_hor_e_d_2_s_365, int __f2dace_OA_z_vt_ie_d_0_s_366, int __f2dace_OA_z_vt_ie_d_1_s_367, int __f2dace_OA_z_vt_ie_d_2_s_368, double dt_linintp_ubc, double dtime, int istep, int ldeepatmo, int lvn_only, int ntnd, int ol_size);
+DACE_EXPORTED velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(global_data_type* global_data, t_nh_diag* p_diag, t_int_state* p_int, t_nh_metrics* p_metrics, t_patch* p_patch, t_nh_prog* p_prog, double * __restrict__ z_kin_hor_e, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_me, int __f2dace_A_z_kin_hor_e_d_0_s_363, int __f2dace_A_z_kin_hor_e_d_1_s_364, int __f2dace_A_z_vt_ie_d_0_s_366, int __f2dace_A_z_vt_ie_d_1_s_367, int __f2dace_OA_z_kin_hor_e_d_0_s_363, int __f2dace_OA_z_kin_hor_e_d_1_s_364, int __f2dace_OA_z_kin_hor_e_d_2_s_365, int __f2dace_OA_z_vt_ie_d_0_s_366, int __f2dace_OA_z_vt_ie_d_1_s_367, int __f2dace_OA_z_vt_ie_d_2_s_368, double dt_linintp_ubc, double dtime, int istep, int ldeepatmo, int lvn_only, int ntnd);
 DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state);
-DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, global_data_type* global_data, t_nh_diag* p_diag, t_int_state* p_int, t_nh_metrics* p_metrics, t_patch* p_patch, t_nh_prog* p_prog, double * __restrict__ z_kin_hor_e, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_me, int __f2dace_A_z_kin_hor_e_d_0_s_363, int __f2dace_A_z_kin_hor_e_d_1_s_364, int __f2dace_A_z_vt_ie_d_0_s_366, int __f2dace_A_z_vt_ie_d_1_s_367, int __f2dace_OA_z_kin_hor_e_d_0_s_363, int __f2dace_OA_z_kin_hor_e_d_1_s_364, int __f2dace_OA_z_kin_hor_e_d_2_s_365, int __f2dace_OA_z_vt_ie_d_0_s_366, int __f2dace_OA_z_vt_ie_d_1_s_367, int __f2dace_OA_z_vt_ie_d_2_s_368, double dt_linintp_ubc, double dtime, int istep, int ldeepatmo, int lvn_only, int ntnd, int ol_size);
+DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, global_data_type* global_data, t_nh_diag* p_diag, t_int_state* p_int, t_nh_metrics* p_metrics, t_patch* p_patch, t_nh_prog* p_prog, double * __restrict__ z_kin_hor_e, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_me, int __f2dace_A_z_kin_hor_e_d_0_s_363, int __f2dace_A_z_kin_hor_e_d_1_s_364, int __f2dace_A_z_vt_ie_d_0_s_366, int __f2dace_A_z_vt_ie_d_1_s_367, int __f2dace_OA_z_kin_hor_e_d_0_s_363, int __f2dace_OA_z_kin_hor_e_d_1_s_364, int __f2dace_OA_z_kin_hor_e_d_2_s_365, int __f2dace_OA_z_vt_ie_d_0_s_366, int __f2dace_OA_z_vt_ie_d_1_s_367, int __f2dace_OA_z_vt_ie_d_2_s_368, double dt_linintp_ubc, double dtime, int istep, int ldeepatmo, int lvn_only, int ntnd);
 
 #endif // __DACE_CODEGEN_VELOCITY_NO_NPROMA_IF_PROP_LVN_ONLY_0_ISTEP_2__
