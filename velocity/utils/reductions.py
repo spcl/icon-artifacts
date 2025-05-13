@@ -3,7 +3,7 @@ from dace.libraries.standard import CodeLibraryNode
 from dace.properties import make_properties, Property
 from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
-from dace.sdfg.state import ControlFlowRegion, LoopRegion
+from dace.sdfg.state import ControlFlowRegion, LoopRegion, ConditionalBlock
 
 
 @make_properties
@@ -230,6 +230,12 @@ def cfl_clipping_to_reduction(sdfg: dace.SDFG, task_name, cond_name, loop_name):
     )
     red_node._offloadable = True
     red_node._output = "array"
+
+    # Replace conditional clip_count with out_val_0[0]
+    succ = parent.successors(red_state)[0]
+    assert isinstance(succ, ConditionalBlock)
+
+    succ.replace_meta_accesses({"clip_count": "out_val_0[0]"})
 
     # Change interstate edge
     for oe in red_state.parent_graph.out_edges(red_state):
