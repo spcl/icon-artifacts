@@ -1,6 +1,6 @@
 import dace
 from dace.transformation.interstate import ContinueToCondition
-from dace.transformation.passes import StructToContainerGroups, SymbolPropagation
+from dace.transformation.passes import StructToContainerGroups, SymbolPropagation, ConstantPropagation
 from utils.clean_bad_views import clean_bad_views
 import utils.stages.common as common
 import utils.config as config
@@ -42,6 +42,8 @@ def optimization_action(sdfg):
     if config.reduction:
         add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
     init_transient_zero(sdfg)
+    # It is here to get rid of redundant symbols like `ol_size` (which are not correctly handled in other hacks later).
+    ConstantPropagation().apply_pass(sdfg, {})
     return sdfg
 
 def main():
