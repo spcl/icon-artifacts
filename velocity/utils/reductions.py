@@ -463,29 +463,20 @@ def add_all_reductions(sdfg: dace.SDFG):
         tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
         levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
     elif "no_nproma" in sdfg.name:
-        # TODO: AT LEAST SOME OF THE REDUCTIONS HERE MAKE BAD STRUCTURAL CHANGES LIKE REMOVING
-        # A INITIALIZING BRANCH FOR NO GOOD REASON. THE REMAINING ONE WOULD HAVE BEEN DISABLED
-        # TOO IF POSSIBLE.
-
         # Final reduction over nblocks, this will be on CPU -> write to scalar
-        # TODO: BEFORE ENABLING `loop_to_max_reduction` MAKE SURE IT IS CORRECT.
-        # loop_to_max_reduction(sdfg, f"FOR_l_652_c_652", "T_l652_c652")
+        loop_to_max_reduction(sdfg, f"FOR_l_652_c_652", "T_l652_c652")
         # Will be used on GPU next kernel, write to array
-        # TODO: BEFORE ENABLING `cfl_clipping_to_reduction` MAKE SURE IT IS CORRECT.
-        '''cfl_clipping_to_reduction(
+        cfl_clipping_to_reduction(
             sdfg, "T_l551_c551", "Conditional_l_551_c_551", "FOR_l_549_c_549"
-        )'''
+        )
 
         # vcflmax will be kept on the CPU so this should write to a scalar
-        # TODO: BEFORE ENABLING `maxvcfl_to_reduction` MAKE SURE IT IS CORRECT.
-        # maxvcfl_to_reduction(sdfg, "T_l558_c558", f"FOR_l_547_c_547")
+        maxvcfl_to_reduction(sdfg, "T_l558_c558", f"FOR_l_547_c_547")
 
-        # TODO: WE CANNOT EVEN DISABLE `tmp_call_13_to_reduction` WITHOUT BREAKING DOWN THE LINE.
         tmp_call_13_to_reduction(sdfg, f"FOR_l_600_c_600", "T_l600_c600")
 
         # This is a scan of size 1 for compatibility with future transformations
-        # TODO: BEFORE ENABLING `levmask_to_reduction` MAKE SURE IT IS CORRECT.
-        # levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
+        levmask_to_reduction(sdfg, f"FOR_l_554_c_554", "T_l556_c556")
 
     else:
         raise ValueError("Unknown NPROMA size")
