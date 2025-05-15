@@ -49,80 +49,56 @@ int* start_index = {};
 };
 
 
-struct t_grid_domain_decomp_info {
-    int __f2dace_SA_owner_mask_d_0_s_2 = {};
-int __f2dace_SA_owner_mask_d_1_s_3 = {};
-int __f2dace_SOA_owner_mask_d_0_s_2 = {};
-int __f2dace_SOA_owner_mask_d_1_s_3 = {};
-int* owner_mask = {};
-};
-
-
-struct t_grid_cells {
-    int __f2dace_SA_area_d_0_s_158 = {};
-int __f2dace_SA_area_d_1_s_159 = {};
-int __f2dace_SA_edge_blk_d_0_s_155 = {};
-int __f2dace_SA_edge_blk_d_1_s_156 = {};
-int __f2dace_SA_edge_blk_d_2_s_157 = {};
-int __f2dace_SA_edge_idx_d_0_s_152 = {};
-int __f2dace_SA_edge_idx_d_1_s_153 = {};
-int __f2dace_SA_edge_idx_d_2_s_154 = {};
-int __f2dace_SA_end_block_d_0_s_163 = {};
-int __f2dace_SA_end_index_d_0_s_161 = {};
-int __f2dace_SA_neighbor_blk_d_0_s_149 = {};
-int __f2dace_SA_neighbor_blk_d_1_s_150 = {};
-int __f2dace_SA_neighbor_blk_d_2_s_151 = {};
-int __f2dace_SA_neighbor_idx_d_0_s_146 = {};
-int __f2dace_SA_neighbor_idx_d_1_s_147 = {};
-int __f2dace_SA_neighbor_idx_d_2_s_148 = {};
-int __f2dace_SA_start_block_d_0_s_162 = {};
-int __f2dace_SA_start_index_d_0_s_160 = {};
-int __f2dace_SOA_area_d_0_s_158 = {};
-int __f2dace_SOA_area_d_1_s_159 = {};
-int __f2dace_SOA_edge_blk_d_0_s_155 = {};
-int __f2dace_SOA_edge_blk_d_1_s_156 = {};
-int __f2dace_SOA_edge_blk_d_2_s_157 = {};
-int __f2dace_SOA_edge_idx_d_0_s_152 = {};
-int __f2dace_SOA_edge_idx_d_1_s_153 = {};
-int __f2dace_SOA_edge_idx_d_2_s_154 = {};
-int __f2dace_SOA_end_block_d_0_s_163 = {};
-int __f2dace_SOA_end_index_d_0_s_161 = {};
-int __f2dace_SOA_neighbor_blk_d_0_s_149 = {};
-int __f2dace_SOA_neighbor_blk_d_1_s_150 = {};
-int __f2dace_SOA_neighbor_blk_d_2_s_151 = {};
-int __f2dace_SOA_neighbor_idx_d_0_s_146 = {};
-int __f2dace_SOA_neighbor_idx_d_1_s_147 = {};
-int __f2dace_SOA_neighbor_idx_d_2_s_148 = {};
-int __f2dace_SOA_start_block_d_0_s_162 = {};
-int __f2dace_SOA_start_index_d_0_s_160 = {};
-double* area = {};
-t_grid_domain_decomp_info* decomp_info = {};
-int* edge_blk = {};
-int* edge_idx = {};
-int* end_block = {};
-int* end_index = {};
-int* neighbor_blk = {};
-int* neighbor_idx = {};
-int* start_block = {};
-int* start_index = {};
-};
-
-
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s_288 = {};
-int __f2dace_SA_vn_d_1_s_289 = {};
-int __f2dace_SA_vn_d_2_s_290 = {};
-int __f2dace_SA_w_d_0_s_285 = {};
-int __f2dace_SA_w_d_1_s_286 = {};
-int __f2dace_SA_w_d_2_s_287 = {};
-int __f2dace_SOA_vn_d_0_s_288 = {};
-int __f2dace_SOA_vn_d_1_s_289 = {};
-int __f2dace_SOA_vn_d_2_s_290 = {};
-int __f2dace_SOA_w_d_0_s_285 = {};
-int __f2dace_SOA_w_d_1_s_286 = {};
-int __f2dace_SOA_w_d_2_s_287 = {};
-double* vn = {};
-double* w = {};
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
+int __f2dace_SA_c_lin_e_d_1_s_26 = {};
+int __f2dace_SA_c_lin_e_d_2_s_27 = {};
+int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
+int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
+int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
+int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
+int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
+int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
+int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
+int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
+int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
+int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
+int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
+int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
+int __f2dace_SA_geofac_rot_d_0_s_40 = {};
+int __f2dace_SA_geofac_rot_d_1_s_41 = {};
+int __f2dace_SA_geofac_rot_d_2_s_42 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
+int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
+int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
+int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
+int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
+int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
+int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
+int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
+int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
+int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
+int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
+int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
+int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
+int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
+int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
+int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
+int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
+int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
+int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
+double* c_lin_e = {};
+double* cells_aw_verts = {};
+double* e_bln_c_s = {};
+double* geofac_grdiv = {};
+double* geofac_n2s = {};
+double* geofac_rot = {};
+double* rbf_vec_coeff_e = {};
 };
 
 
@@ -219,56 +195,62 @@ int* vertex_idx = {};
 };
 
 
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
-int __f2dace_SA_c_lin_e_d_1_s_26 = {};
-int __f2dace_SA_c_lin_e_d_2_s_27 = {};
-int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
-int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
-int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
-int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
-int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
-int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
-int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
-int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
-int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
-int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
-int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
-int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
-int __f2dace_SA_geofac_rot_d_0_s_40 = {};
-int __f2dace_SA_geofac_rot_d_1_s_41 = {};
-int __f2dace_SA_geofac_rot_d_2_s_42 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
-int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
-int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
-int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
-int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
-int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
-int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
-int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
-int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
-int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
-int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
-int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
-int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
-int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
-int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
-int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
-int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
-int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
-int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
-double* c_lin_e = {};
-double* cells_aw_verts = {};
-double* e_bln_c_s = {};
-double* geofac_grdiv = {};
-double* geofac_n2s = {};
-double* geofac_rot = {};
-double* rbf_vec_coeff_e = {};
+struct t_grid_domain_decomp_info {
+    int __f2dace_SA_owner_mask_d_0_s_2 = {};
+int __f2dace_SA_owner_mask_d_1_s_3 = {};
+int __f2dace_SOA_owner_mask_d_0_s_2 = {};
+int __f2dace_SOA_owner_mask_d_1_s_3 = {};
+int* owner_mask = {};
+};
+
+
+struct t_grid_cells {
+    int __f2dace_SA_area_d_0_s_158 = {};
+int __f2dace_SA_area_d_1_s_159 = {};
+int __f2dace_SA_edge_blk_d_0_s_155 = {};
+int __f2dace_SA_edge_blk_d_1_s_156 = {};
+int __f2dace_SA_edge_blk_d_2_s_157 = {};
+int __f2dace_SA_edge_idx_d_0_s_152 = {};
+int __f2dace_SA_edge_idx_d_1_s_153 = {};
+int __f2dace_SA_edge_idx_d_2_s_154 = {};
+int __f2dace_SA_end_block_d_0_s_163 = {};
+int __f2dace_SA_end_index_d_0_s_161 = {};
+int __f2dace_SA_neighbor_blk_d_0_s_149 = {};
+int __f2dace_SA_neighbor_blk_d_1_s_150 = {};
+int __f2dace_SA_neighbor_blk_d_2_s_151 = {};
+int __f2dace_SA_neighbor_idx_d_0_s_146 = {};
+int __f2dace_SA_neighbor_idx_d_1_s_147 = {};
+int __f2dace_SA_neighbor_idx_d_2_s_148 = {};
+int __f2dace_SA_start_block_d_0_s_162 = {};
+int __f2dace_SA_start_index_d_0_s_160 = {};
+int __f2dace_SOA_area_d_0_s_158 = {};
+int __f2dace_SOA_area_d_1_s_159 = {};
+int __f2dace_SOA_edge_blk_d_0_s_155 = {};
+int __f2dace_SOA_edge_blk_d_1_s_156 = {};
+int __f2dace_SOA_edge_blk_d_2_s_157 = {};
+int __f2dace_SOA_edge_idx_d_0_s_152 = {};
+int __f2dace_SOA_edge_idx_d_1_s_153 = {};
+int __f2dace_SOA_edge_idx_d_2_s_154 = {};
+int __f2dace_SOA_end_block_d_0_s_163 = {};
+int __f2dace_SOA_end_index_d_0_s_161 = {};
+int __f2dace_SOA_neighbor_blk_d_0_s_149 = {};
+int __f2dace_SOA_neighbor_blk_d_1_s_150 = {};
+int __f2dace_SOA_neighbor_blk_d_2_s_151 = {};
+int __f2dace_SOA_neighbor_idx_d_0_s_146 = {};
+int __f2dace_SOA_neighbor_idx_d_1_s_147 = {};
+int __f2dace_SOA_neighbor_idx_d_2_s_148 = {};
+int __f2dace_SOA_start_block_d_0_s_162 = {};
+int __f2dace_SOA_start_index_d_0_s_160 = {};
+double* area = {};
+t_grid_domain_decomp_info* decomp_info = {};
+int* edge_blk = {};
+int* edge_idx = {};
+int* end_block = {};
+int* end_index = {};
+int* neighbor_blk = {};
+int* neighbor_idx = {};
+int* start_block = {};
+int* start_index = {};
 };
 
 
@@ -281,16 +263,6 @@ int* nrdmax = {};
 int timer_intp = {};
 int timer_solve_nh_veltend = {};
 int timers_level = {};
-};
-
-
-struct t_patch {
-    t_grid_cells* cells = {};
-t_grid_edges* edges = {};
-int nblks_c = {};
-int nblks_e = {};
-int nblks_v = {};
-t_grid_vertices* verts = {};
 };
 
 
@@ -421,6 +393,34 @@ double* deepatmo_invr_mc = {};
 double* wgtfac_c = {};
 double* wgtfac_e = {};
 double* wgtfacq_e = {};
+};
+
+
+struct t_patch {
+    t_grid_cells* cells = {};
+t_grid_edges* edges = {};
+int nblks_c = {};
+int nblks_e = {};
+int nblks_v = {};
+t_grid_vertices* verts = {};
+};
+
+
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s_288 = {};
+int __f2dace_SA_vn_d_1_s_289 = {};
+int __f2dace_SA_vn_d_2_s_290 = {};
+int __f2dace_SA_w_d_0_s_285 = {};
+int __f2dace_SA_w_d_1_s_286 = {};
+int __f2dace_SA_w_d_2_s_287 = {};
+int __f2dace_SOA_vn_d_0_s_288 = {};
+int __f2dace_SOA_vn_d_1_s_289 = {};
+int __f2dace_SOA_vn_d_2_s_290 = {};
+int __f2dace_SOA_w_d_0_s_285 = {};
+int __f2dace_SOA_w_d_1_s_286 = {};
+int __f2dace_SOA_w_d_2_s_287 = {};
+double* vn = {};
+double* w = {};
 };
 
 
