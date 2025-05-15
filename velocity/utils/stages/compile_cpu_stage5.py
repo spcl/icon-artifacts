@@ -44,16 +44,26 @@ def optimization_action(sdfg):
 
     # CAUSES DIFFERENCE IN `ddt_vn_apc_pc` AND `w_concorr_c`.
     # TODO: BEFORE ENABLING THIS `move_transients_to_top_level`, MAKE SURE IT IS CORRECT.
-    '''
     move_transients_to_top_level(
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,
-        only=["z_w_concorr_mc", "z_w_con_c", "z_v_grad_w",
-                "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full",
-                "levmask", "cfl_clipping"],
+        only=["z_w_con_c", "z_w_concorr_mc", "levmask", "cfl_clipping"],
+        no_dim_change=False,
+        offset=-1,
+        upper_bounds={
+            "z_w_concorr_mc": "tmp_struct_symbol_5",
+            "z_w_con_c": "tmp_struct_symbol_5",
+            "levmask": "tmp_struct_symbol_5",
+            "levmask": "tmp_struct_symbol_5",
+        },
+    )
+    move_transients_to_top_level(
+        root=sdfg,
+        ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+        only=["z_v_grad_w", "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full"],
         no_dim_change=True,
     )
-    '''
+
     move_transients_to_top_level(
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,
