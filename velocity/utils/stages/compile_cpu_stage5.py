@@ -83,6 +83,8 @@ def optimization_action(sdfg):
     )
     if "difcoef" in sdfg.arrays:
         _tmp_difcoef(sdfg)
+    sdfg.validate()
+
     return sdfg
 
 def main():

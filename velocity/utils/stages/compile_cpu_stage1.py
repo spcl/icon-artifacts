@@ -34,7 +34,8 @@ def optimization_action(sdfg):
         interface_to_gpu=False,
         clean_trivial_views=True,
         shallow_copy=False,
-        shallow_copy_to_gpu=False
+        shallow_copy_to_gpu=False,
+        taskloop = False,
     ).apply_pass(sdfg, {}) # Flattening pass
     sdfg.simplify(skip=["ArrayElimination"])
     SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp TODO: can be made into a proper transformation

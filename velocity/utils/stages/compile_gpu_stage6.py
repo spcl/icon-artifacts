@@ -15,7 +15,9 @@ STAGE_ID = 6
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
+    sdfg.validate()
     pre_gpu_fix(sdfg)
+    sdfg.validate()
     move_ifs_inside_maps(sdfg)
     flatten_lib, _ = find_node_by_name(sdfg, "flatten")
     deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
@@ -29,8 +31,6 @@ def optimization_action(sdfg):
     GPUKernelLaunchRestructure().apply_pass(sdfg, {})
     prune_unused_inputs_outputs(sdfg)
     #move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
-    #TODO: to_segmented_reduction(sdfg)
-    print("SEGMENTED REDUCTION BEG")
     to_segmented_reduction(sdfg)
     for arrname, arr in sdfg.arrays.items():
         if arr.transient:
