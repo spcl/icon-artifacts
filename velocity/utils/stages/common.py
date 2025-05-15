@@ -22,7 +22,7 @@ def sdfg_names(verify:bool=False):
   if verify:
     for f in STARTER_SDFG_FILES:
       assert Path(f).exists()
-  return {Path(f).stem for f in STARTER_SDFG_FILES}
+  return list(sorted(Path(f).stem for f in STARTER_SDFG_FILES))
 
 def stage_input(name:str, stage:int, codegen_dir=DEFAULT_CODEGEN_DIR):
   if stage > 6:
