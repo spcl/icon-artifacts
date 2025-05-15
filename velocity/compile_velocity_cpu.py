@@ -240,10 +240,28 @@ for sdfg_name in sdfg_names:
         # tmp_struct_symbol_15 == nblks_v
         # z_ekinh [ tmp_struct_symbol_16, tmp_struct_symbol_17, tmp_struct_symbol_18 ] (nproma,p_patch%nlev,p_patch%nblks_c)
         # tmp_struct_symbol_18 == nblks_c
+
+        # !$OMP DO PRIVATE(jb, jk, jc, i_startidx, i_endidx, i_startidx_2, i_endidx_2, z_w_con_c, &
+        # !$OMP            z_w_concorr_mc, difcoef, vcfl, maxvcfl, cfl_clipping, clip_count) ICON_OMP_DEFAULT_SCHEDULE
+        # DO jb = i_startblk, i_endblk
+        # startblk upper bound = nblks_e
+        # startblk_2 upper bound = nblks_c
+
         move_transients_to_top_level(
             root=sdfg,
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
-            only=["z_w_concorr_mc", "z_w_con_c", "z_v_grad_w",
+            only=["z_w_concorr_mc",]
+            no_dim_change=False,
+            offset=-1,
+            upper_bounds={
+                "z_w_concorr_mc": "tmp_struct_symbol_5",
+            }
+        )
+
+        move_transients_to_top_level(
+            root=sdfg,
+            ilifetime=dace.dtypes.AllocationLifetime.SDFG,
+            only=["z_w_con_c", "z_v_grad_w",
                   "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full",
                   "levmask", "cfl_clipping"],
             no_dim_change=True,
