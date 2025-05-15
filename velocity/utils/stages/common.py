@@ -25,7 +25,9 @@ def sdfg_names(verify:bool=False):
   return {Path(f).stem for f in STARTER_SDFG_FILES}
 
 def stage_input(name:str, stage:int, codegen_dir=DEFAULT_CODEGEN_DIR):
-  if stage > 1:
+  if stage > 6:
+    return f"{codegen_dir}/gpu_{name}_stage{stage - 1}.sdfgz"
+  elif stage > 1:
     return f"{codegen_dir}/cpu_{name}_stage{stage - 1}.sdfgz"
   else:
     starter_map = {Path(f).stem : f for f in STARTER_SDFG_FILES}
@@ -35,8 +37,10 @@ def stage_input(name:str, stage:int, codegen_dir=DEFAULT_CODEGEN_DIR):
 def stage_output(name:str, stage:int, codegen_dir=DEFAULT_CODEGEN_DIR):
   if stage == 0:
     return stage_input(name, stage+1, codegen_dir)
-  else:
+  elif stage <= 5:
     return f"{codegen_dir}/cpu_{name}_stage{stage}.sdfgz"
+  else:
+    return f"{codegen_dir}/gpu_{name}_stage{stage}.sdfgz"
 
 def stage_inputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
   return {name: stage_input(name, stage, codegen_dir) for name in sdfg_names()}
@@ -55,8 +59,9 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
       instrument_sdfg(sdfgs)
 
   dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
+  gpu = stage >= 6
   compile_if_propagated_sdfgs(
-      sdfgs, gpu=False, release=True,
+      sdfgs, gpu=gpu, release=True,
       instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
       generate_code=True, lib=False,
       stage_suffix=None, # stage3 if you need clip_count, else None, TODO: improve this
