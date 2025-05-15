@@ -250,7 +250,7 @@ for sdfg_name in sdfg_names:
         move_transients_to_top_level(
             root=sdfg,
             ilifetime=dace.dtypes.AllocationLifetime.SDFG,
-            only=["z_w_concorr_mc",]
+            only=["z_w_concorr_mc",],
             no_dim_change=False,
             offset=-1,
             upper_bounds={
