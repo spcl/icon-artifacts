@@ -137,7 +137,7 @@ def add_timers(file_path: str, gpu: bool):
     if not gpu:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
-        replacement1 += '   measure_time("Run"); \n cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
+        replacement1 = '   measure_time("Run"); \n cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
     # Pattern 2: Insert AFTER `__CG_p_diag__m_max_vcfl_dyn = p_diag_out_max_vcfl_dyn;`
     pattern2 = r'^(.*i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block\[\(\(- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2\) - 4\)\];.*)$'
     p2 = "i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];"
