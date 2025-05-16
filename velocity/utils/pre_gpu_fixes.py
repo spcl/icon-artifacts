@@ -4,8 +4,8 @@ from dace.transformation.dataflow.map_collapse import MapCollapse
 from utils import find_node_by_name
 from utils import MapStateFission
 from dace.sdfg.utils import set_nested_sdfg_parent_references
-from copy import deepcopy as dc
-from utils import prune_unused_inputs_outputs
+from copy import deepcopy
+
 def pre_gpu_fix(sdfg: dace.SDFG):
     step_1(sdfg)
     target_state = step_2(sdfg)
@@ -17,11 +17,11 @@ def step_1(sdfg: dace.SDFG):
     """
     # sdfg.simplify()
     # sdfg.save("debug_pre.sdfg")
-    library_node_reduction, library_node_reduction_parnet = find_node_by_name(sdfg, "reduce_sum_to_address")
+    library_node_reduction, library_node_reduction_parent = find_node_by_name(sdfg, "reduce_sum_to_address")
     assert isinstance(library_node_reduction, dace.nodes.LibraryNode)
 
     # Get the library node's in edges
-    in_edges = library_node_reduction_parnet.in_edges(library_node_reduction)
+    in_edges = library_node_reduction_parent.in_edges(library_node_reduction)
     assert len(in_edges) == 2
     cfl_edge = in_edges[0] if in_edges[0].src.data == "cfl_clipping" else in_edges[1]
     cfl = cfl_edge.src
@@ -30,19 +30,19 @@ def step_1(sdfg: dace.SDFG):
     reduction_sum_size = reduction_sum_size_edge.src
     assert reduction_sum_size.data == "reduce_sum_to_address_size"
 
-    tasklet_before_reduction_edges = library_node_reduction_parnet.in_edges(reduction_sum_size)[0]
+    tasklet_before_reduction_edges = library_node_reduction_parent.in_edges(reduction_sum_size)[0]
     tasklet_before_reduction = tasklet_before_reduction_edges.src
     assert tasklet_before_reduction.label == "size_reduce_sum_to_address"
 
     # Get the library node's out edges
-    out_edges = library_node_reduction_parnet.out_edges(library_node_reduction)
+    out_edges = library_node_reduction_parent.out_edges(library_node_reduction)
     assert len(out_edges) == 1
     reduction_sum_edge = out_edges[0]
     reduction_sum = reduction_sum_edge.dst
     assert reduction_sum.data == "out_val_0"
-    new_cfl = dc(cfl)
+    new_cfl = deepcopy(cfl)
     # Split into seprate state
-    new_state = library_node_reduction_parnet.sdfg.add_state_after(library_node_reduction_parnet)
+    new_state = library_node_reduction_parent.sdfg.add_state_after(library_node_reduction_parent)
     new_state.add_nodes_from([library_node_reduction, new_cfl , reduction_sum_size, tasklet_before_reduction,reduction_sum])
     new_state.add_edge(new_cfl, cfl_edge.src_conn, cfl_edge.dst, cfl_edge.dst_conn, cfl_edge.data)
     new_state.add_edge(reduction_sum_size_edge.src, reduction_sum_size_edge.src_conn, reduction_sum_size_edge.dst, reduction_sum_size_edge.dst_conn, reduction_sum_size_edge.data)
@@ -52,21 +52,22 @@ def step_1(sdfg: dace.SDFG):
 
 
     # remove things from the first state
-    library_node_reduction_parnet.remove_edge(cfl_edge)
-    library_node_reduction_parnet.remove_edge(reduction_sum_size_edge)
-    library_node_reduction_parnet.remove_edge(tasklet_before_reduction_edges)
-    library_node_reduction_parnet.remove_edge(reduction_sum_edge)
-    library_node_reduction_parnet.remove_nodes_from([reduction_sum_size, tasklet_before_reduction, library_node_reduction, reduction_sum])
+    library_node_reduction_parent.remove_edge(cfl_edge)
+    library_node_reduction_parent.remove_edge(reduction_sum_size_edge)
+    library_node_reduction_parent.remove_edge(tasklet_before_reduction_edges)
+    library_node_reduction_parent.remove_edge(reduction_sum_edge)
+    library_node_reduction_parent.remove_nodes_from([reduction_sum_size, tasklet_before_reduction, library_node_reduction, reduction_sum])
+    sdfg.save('buggy.sdfgz', compress=True)
 
 
 
     # Distribute the outer map and duplicate the inside
-    outer_state = library_node_reduction_parnet.sdfg.parent
-    state_copy_1 = outer_state.parent.add_state_after(outer_state)
+    outer_state = library_node_reduction_parent.sdfg.parent
+    state_copy_1 = outer_state.parent_graph.add_state_after(outer_state)
     map_of_copies = {}
     # Copy all the elements of the state to the copy
     for node in outer_state.nodes():
-        node_copy = dc(node)
+        node_copy = deepcopy(node)
         map_of_copies[node] = node_copy
         state_copy_1.add_node(node_copy)
 
@@ -75,13 +76,13 @@ def step_1(sdfg: dace.SDFG):
         dst = edge.dst
         src_copy = map_of_copies[src]
         dst_copy = map_of_copies[dst]
-        state_copy_1.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, dc(edge.data))
+        state_copy_1.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, deepcopy(edge.data))
 
-    state_copy_2 = outer_state.parent.add_state_after(state_copy_1)
+    state_copy_2 = outer_state.parent_graph.add_state_after(state_copy_1)
     map_of_copies = {}
     # Copy all the elements of the state to the copy
     for node in outer_state.nodes():
-        node_copy = dc(node)
+        node_copy = deepcopy(node)
         map_of_copies[node] = node_copy
         state_copy_2.add_node(node_copy)
 
@@ -90,7 +91,7 @@ def step_1(sdfg: dace.SDFG):
         dst = edge.dst
         src_copy = map_of_copies[src]
         dst_copy = map_of_copies[dst]
-        state_copy_2.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, dc(edge.data))
+        state_copy_2.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, deepcopy(edge.data))
 
     # ****** First state ******
     for node in outer_state.nodes():
@@ -357,7 +358,7 @@ def step_1(sdfg: dace.SDFG):
     # in_edges = parent.in_edges(node)
     # assert len(in_edges) == 1
     # in_edge = in_edges[0]
-    # parent.add_edge(in_edge.src, in_edge.src_conn, out_edge.dst, out_edge.dst_conn , dc(out_edge.data))
+    # parent.add_edge(in_edge.src, in_edge.src_conn, out_edge.dst, out_edge.dst_conn , deepcopy(out_edge.data))
     # parent.remove_node(node)
     sdfg.validate()
     sdfg.apply_transformations_repeated(MapCollapse)
@@ -389,14 +390,14 @@ def step_2(sdfg: dace.SDFG):
     assert isinstance(parent_sdfg, dace.SDFG)
 
     # Duplicate the conditional block
-    cond_block_copy = dc(cond_block)
+    cond_block_copy = deepcopy(cond_block)
     parent_sdfg.add_node(cond_block_copy)
 
     # Get the condition state
     cond_state_edge = parent_sdfg.in_edges(cond_block)[0]
     cond_state = cond_state_edge.src
     assert isinstance(cond_state, dace.SDFGState)
-    parent_sdfg.add_edge(cond_state, cond_block_copy, dc(cond_state_edge.data))
+    parent_sdfg.add_edge(cond_state, cond_block_copy, deepcopy(cond_state_edge.data))
 
     for node in reduction_parent.nodes():
         if node not in [reduction, out_edge.dst, in_edge.src, reduction_sum_size, tasklet_before_reduction]:
@@ -413,8 +414,8 @@ def step_2(sdfg: dace.SDFG):
     inside_state = list(cond_block_copy.all_states())
     assert len(inside_state) == 1
     inside_state = inside_state[0]
-    inside_state_copy = dc(inside_state)
-    parent_sdfg.add_edge(cond_state, inside_state_copy, dc(cond_state_edge.data))
+    inside_state_copy = deepcopy(inside_state)
+    parent_sdfg.add_edge(cond_state, inside_state_copy, deepcopy(cond_state_edge.data))
 
     # Get the nested SDFG condition inside to change it
     for node, parent in inside_state_copy.all_nodes_recursive():
@@ -441,7 +442,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
         # elif isinstance(node, dace.nodes.AccessNode) and node.data == "maxvcfl":
         #     target_state.remove_node(node)
         else:
-            copy_node = dc(node)
+            copy_node = deepcopy(node)
             target_state.add_node(copy_node)
             edge_map[node] = copy_node
 
@@ -450,7 +451,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
         dst = edge.dst
         src_copy = edge_map[src]
         dst_copy = edge_map[dst]
-        target_state.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, dc(edge.data))
+        target_state.add_edge(src_copy, edge.src_conn, dst_copy, edge.dst_conn, deepcopy(edge.data))
 
     i = 0
     for node in target_state.nodes():
@@ -505,7 +506,7 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
                                 edge.src.sdfg.remove_data(edge.src_conn)
                             target_state.remove_edge(edge)
             elif len(nnode.sdfg.nodes()) == 2:
-                sdfg.save("debug_step_3_4.sdfg")
+                # sdfg.save("debug_step_3_4.sdfg")
                 for edge in in_edges:
                     out_edge = list(target_state.out_edges_by_connector(node, edge.dst_conn.replace("IN_", "OUT_")))[0]
                     if out_edge.dst.data != "levmask":
@@ -535,10 +536,10 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             map_nsdfg.add_in_connector("out_val_0")
             map_state.add_edge(node, "OUT_5", map_nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
 
-    sdfg.save("debug_step_3_6.sdfg")
+    # sdfg.save("debug_step_3_6.sdfg")
     sdfg.simplify(validate=False)
     # sdfg.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
-    target_state.parent.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
+    target_state.parent_graph.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     node, parent = find_node_by_name(sdfg, "T_l562_c562")
     parent.parent.add_scalar("out_val_0", dtype=dace.float64)
     # sdfg.save("debug_step_3.sdfg")
