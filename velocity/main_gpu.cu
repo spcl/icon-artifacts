@@ -1,225 +1,262 @@
 #include <filesystem>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <string>
-#include <cuda_runtime.h>
+#include <thread>
 
 #include "serde_velocity_no_nproma_gpu.h"
 #include "velocity_tendencies_no_nproma_gpu.h"
 
+template <std::ostream& CS>
+struct AtomicStream {
+  std::ostringstream s;
+  template <typename T>
+  AtomicStream& operator<<(const T& t) {
+    s << t;
+    return *this;
+  }
+  AtomicStream& operator<<(std::ostream& (*manip)(std::ostream&)) {
+    s << manip;
+    return *this;
+  }
+  ~AtomicStream() {
+    static std::mutex g;
+    std::lock_guard<std::mutex> lock(g);
+    CS << s.str();
+  }
+};
+using acout = AtomicStream<std::cout>;
+using acerr = AtomicStream<std::cerr>;
+
+template <typename F>
+auto spawn(std::vector<std::jthread>& pool, F&& f) {
+  using R = std::invoke_result_t<F>;
+
+  std::promise<R> prom;
+  std::future<R> fut = prom.get_future();
+
+  pool.emplace_back([p = std::move(prom), func = std::forward<F>(f)]() mutable {
+    try {
+      p.set_value(func());
+    } catch (...) {
+      p.set_exception(std::current_exception());
+    }
+  });
+  return fut;
+}
+
+std::ifstream open_ifstream(const std::filesystem::path& ROOT,
+                            const std::string& name, int timestep) {
+  const std::filesystem::path datapath =
+      ROOT / (name + "." + std::to_string(timestep) + ".data");
+  if (!std::filesystem::exists(datapath)) {
+    acerr() << "Cannot find: " << datapath << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  acout() << "Reading from: " << datapath << std::endl;
+  return std::ifstream{datapath};
+}
+
+template <typename T>
+std::enable_if_t<std::is_pointer_v<T>, T> read(
+    const std::filesystem::path& ROOT, const std::string& name, int timestep) {
+  auto data = open_ifstream(ROOT, name, timestep);
+  using Pointee = std::remove_pointer_t<T>;
+  auto result = serde::read_array<Pointee>(data);
+  auto& m = std::get<0>(result);
+  auto& arr = std::get<1>(result);
+  return arr;
+}
+
+template <typename T>
+std::enable_if_t<std::is_class_v<T> || std::is_arithmetic_v<T>, T> read(
+    const std::filesystem::path& ROOT, const std::string& name, int timestep) {
+  auto data = open_ifstream(ROOT, name, timestep);
+  T t{};
+  serde::deserialize(&t, data);
+  return t;
+}
+
+template <>
+global_data_type read<global_data_type>(const std::filesystem::path& ROOT,
+                                        const std::string& name, int timestep) {
+  auto data = open_ifstream(ROOT, name, timestep);
+  global_data_type t{};
+  serde::deserialize_global_data(&t, data);
+  return t;
+}
+
+template <typename T>
+std::pair<T, T> t0_t1_pair(const std::filesystem::path& ROOT,
+                           const std::string& name, int timestep) {
+  std::vector<std::jthread> pool;
+  auto ft0 = spawn(pool, [&] { return read<T>(ROOT, name + ".t0", timestep); });
+  auto ft1 = spawn(pool, [&] { return read<T>(ROOT, name + ".t1", timestep); });
+  return {ft0.get(), ft1.get()};
+}
+
+std::ofstream open_ofstream(const std::string& name, int timestep,
+                            const std::string& suffix) {
+  const std::filesystem::path datapath(name + "_" + std::to_string(timestep) +
+                                       "." + suffix);
+  acout() << "Writing to: " << datapath << std::endl;
+  return std::ofstream{datapath};
+}
+
+template <typename T>
+std::enable_if_t<std::is_pointer_v<T>, void> got_want_pair(
+    T got, T want, const std::string& name, int timestep) {
+  std::jthread tgot([&] {
+    open_ofstream(name, timestep, "got")
+        << serde::serialize_array(got) << std::endl;
+  });
+  std::jthread twant([&] {
+    open_ofstream(name, timestep, "want")
+        << serde::serialize_array(want) << std::endl;
+  });
+}
+
+template <typename T>
+std::enable_if_t<std::is_class_v<T> || std::is_arithmetic_v<T>, void>
+got_want_pair(const T& got, const T& want, const std::string& name,
+              int timestep) {
+  std::jthread tgot([&] {
+    open_ofstream(name, timestep, "got") << serde::serialize(&got) << std::endl;
+  });
+  std::jthread twant([&] {
+    open_ofstream(name, timestep, "want")
+        << serde::serialize(&want) << std::endl;
+  });
+}
+
+template <>
+void got_want_pair(const global_data_type& got, const global_data_type& want,
+                   const std::string& name, int timestep) {
+  std::jthread tgot([&] {
+    open_ofstream(name, timestep, "got")
+        << serde::serialize_global_data(&got) << std::endl;
+  });
+  std::jthread twant([&] {
+    open_ofstream(name, timestep, "want")
+        << serde::serialize_global_data(&want) << std::endl;
+  });
+}
+
 int main(int argc, char* argv[]) {
-  const std::filesystem::path ROOT{"data_no_nproma"};
-  int max_n1 = 1;
-  int max_n2 = 5;
+  const std::filesystem::path ROOT{"data_nproma32"};
+  std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
+  int n1 = -1;
   int rep = 1;
 
-  if (argc >= 2) {
-    max_n1 = std::atoi(argv[1]);
-    max_n2 = max_n1;
+  if (argc == 2) {
+    n1 = std::atoi(argv[1]);
   }
-  if (argc >= 3) {
-    max_n2 = std::atoi(argv[2]);
+  acout() << "Running: " << n1 << std::endl;
+  if (n1 > 0) {
+    ns = {n1};
   }
-  if (argc >= 4) {
-    rep = std::atoi(argv[3]);
-  }
-  std::cout << "Running from " << max_n1 << " to " << max_n2 << std::endl;
 
-  for (int n = max_n1; n <= max_n2; ++n) {
-    std::cerr << "Reading data for " << n << "..." << std::endl;
+  for (int n : ns) {
+    acerr() << "Reading data for " << n << "..." << std::endl;
 
-    global_data_type global_data;
-    {
-      std::ifstream data(ROOT / ("global_data_t0." + std::to_string(n) + ".data"));
-      serde::deserialize_global_data(&global_data, data);
-    }
-    global_data_type global_data_want;
-    {
-      std::ifstream data(ROOT / ("global_data_t1." + std::to_string(n) + ".data"));
-      serde::deserialize_global_data(&global_data_want, data);
-    }
+    std::vector<std::jthread> pool;
 
-    t_nh_diag p_diag;
-    {
-      std::ifstream data(ROOT / ("p_diag_t0." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_diag, data);
-    }
-    t_nh_diag p_diag_want;
-    {
-      std::ifstream data(ROOT / ("p_diag_t1." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_diag_want, data);
-    }
+    auto fut_global_data = spawn(pool, [&] {
+      return t0_t1_pair<global_data_type>(ROOT, "global_data", n);
+    });
+    auto fut_p_diag =
+        spawn(pool, [&] { return t0_t1_pair<t_nh_diag>(ROOT, "p_diag", n); });
+    auto fut_p_int =
+        spawn(pool, [&] { return read<t_int_state>(ROOT, "p_int", n); });
+    auto fut_p_metrics = spawn(
+        pool, [&] { return t0_t1_pair<t_nh_metrics>(ROOT, "p_metrics", n); });
+    auto fut_p_patch =
+        spawn(pool, [&] { return read<t_patch>(ROOT, "p_patch", n); });
+    auto fut_p_prog =
+        spawn(pool, [&] { return t0_t1_pair<t_nh_prog>(ROOT, "p_prog", n); });
+    auto fut_z_kin_hor_e = spawn(
+        pool, [&] { return t0_t1_pair<double*>(ROOT, "z_kin_hor_e", n); });
+    auto fut_z_vt_ie =
+        spawn(pool, [&] { return t0_t1_pair<double*>(ROOT, "z_vt_ie", n); });
+    auto fut_z_w_concorr = spawn(
+        pool, [&] { return t0_t1_pair<double*>(ROOT, "z_w_concorr_me", n); });
+    auto fut_istep = spawn(pool, [&] { return read<int>(ROOT, "istep", n); });
+    auto fut_ldeepatmo =
+        spawn(pool, [&] { return read<int>(ROOT, "ldeepatmo", n); });
+    auto fut_lvn_only =
+        spawn(pool, [&] { return read<int>(ROOT, "lvn_only", n); });
+    auto fut_ntnd = spawn(pool, [&] { return read<int>(ROOT, "ntnd", n); });
+    auto fut_dt_linintp =
+        spawn(pool, [&] { return read<double>(ROOT, "dt_linintp_ubc", n); });
+    auto fut_dtime =
+        spawn(pool, [&] { return read<double>(ROOT, "dtime", n); });
+    pool.clear();
 
-    t_int_state p_int;
-    {
-      std::ifstream data(ROOT / ("p_int." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_int, data);
-    }
+    auto global_data_pair = fut_global_data.get();
+    auto& global_data = std::get<0>(global_data_pair);
+    auto& global_data_want = std::get<1>(global_data_pair);
 
-    t_nh_metrics p_metrics;
-    {
-      std::ifstream data(ROOT / ("p_metrics_t0." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_metrics, data);
-    }
-    t_nh_metrics p_metrics_want;
-    {
-      std::ifstream data(ROOT / ("p_metrics_t1." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_metrics_want, data);
-    }
+    auto p_diag_pair = fut_p_diag.get();
+    auto& p_diag = std::get<0>(p_diag_pair);
+    auto& p_diag_want = std::get<1>(p_diag_pair);
 
-    t_patch p_patch;
-    {
-      std::ifstream data(ROOT / ("p_patch." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_patch, data);
-    }
+    auto p_int = fut_p_int.get();
 
-    t_nh_prog p_prog;
-    {
-      std::ifstream data(ROOT / ("p_prog_t0." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_prog, data);
-    }
-    t_nh_prog p_prog_want;
-    {
-      std::ifstream data(ROOT / ("p_prog_t1." + std::to_string(n) + ".data"));
-      serde::deserialize(&p_prog_want, data);
-    }
+    auto p_metrics_pair = fut_p_metrics.get();
+    auto& p_metrics = std::get<0>(p_metrics_pair);
+    auto& p_metrics_want = std::get<1>(p_metrics_pair);
 
-    double *z_kin_hor_e = nullptr;
-    double *gpu_z_kin_hor_e = nullptr;
-    int z_kin_hor_e_vol = 0;
-    {
-      std::ifstream data(ROOT / ("z_kin_hor_e_t0." + std::to_string(n) + ".data"));
-      auto [m, arr] = serde::read_array<double>(data);
-      z_kin_hor_e = arr;
-      gpu_z_kin_hor_e = z_kin_hor_e;
+    auto p_patch = fut_p_patch.get();
 
-      // int z_kin_hor_e_vol = m.volume();
-      // cudaError_t err = cudaMalloc((void**)&gpu_z_kin_hor_e, z_kin_hor_e_vol * sizeof(double));
-      // if (err != cudaSuccess) {
-      //   std::cerr << "Error allocating GPU memory: " << cudaGetErrorString(err) << std::endl;
-      //   return -1;
-      // }
+    auto p_prog_pair = fut_p_prog.get();
+    auto& p_prog = std::get<0>(p_prog_pair);
+    auto& p_prog_want = std::get<1>(p_prog_pair);
 
-      // cudaError_t err2 = cudaMemcpy(gpu_z_kin_hor_e, z_kin_hor_e, z_kin_hor_e_vol * sizeof(double), cudaMemcpyHostToDevice);
-      // if (err != cudaSuccess) {
-      //   std::cerr << "Error copying data to GPU: " << cudaGetErrorString(err2) << std::endl;
-      //   return -1;
-      // }
-    }
-    double *z_kin_hor_e_want = nullptr;
-    {
-      std::ifstream data(ROOT / ("z_kin_hor_e_t1." + std::to_string(n) + ".data"));
-      auto [m, arr] = serde::read_array<double>(data);
-      z_kin_hor_e_want = arr;
-    }
+    auto z_kin_hor_e_pair = fut_z_kin_hor_e.get();
+    auto& z_kin_hor_e = std::get<0>(z_kin_hor_e_pair);
+    auto& z_kin_hor_e_want = std::get<1>(z_kin_hor_e_pair);
 
-    double *z_vt_ie = nullptr;
-    double *gpu_z_vt_ie = nullptr;
-    int z_vt_ie_vol = 0;
-    {
-      std::ifstream data(ROOT / ("z_vt_ie_t0." + std::to_string(n) + ".data"));
-      auto [m, arr] = serde::read_array<double>(data);
-      z_vt_ie = arr;
+    auto z_vt_ie_pair = fut_z_vt_ie.get();
+    auto& z_vt_ie = std::get<0>(z_vt_ie_pair);
+    auto& z_vt_ie_want = std::get<1>(z_vt_ie_pair);
 
-      gpu_z_vt_ie = z_vt_ie;
-      // int z_vt_ie_vol = m.volume();
-      // cudaError_t err = cudaMalloc((void**)&gpu_z_vt_ie, z_vt_ie_vol * sizeof(double));
-      // if (err != cudaSuccess) {
-      //   std::cerr << "Error allocating GPU memory: " << cudaGetErrorString(err) << std::endl;
-      //   return -1;
-      // }
+    auto z_w_concorr_me_pair = fut_z_w_concorr.get();
+    auto& z_w_concorr_me = std::get<0>(z_w_concorr_me_pair);
+    auto& z_w_concorr_me_want = std::get<1>(z_w_concorr_me_pair);
+    int istep = fut_istep.get();
+    int ldeepatmo = fut_ldeepatmo.get();
+    int lvn_only = fut_lvn_only.get();
+    int ntnd = fut_ntnd.get();
+    double dt_linintp_ubc = fut_dt_linintp.get();
+    double dtime = fut_dtime.get();
 
-      // cudaError_t err2 = cudaMemcpy(gpu_z_vt_ie, z_vt_ie, z_vt_ie_vol * sizeof(double), cudaMemcpyHostToDevice);
-      // if (err != cudaSuccess) {
-      //   std::cerr << "Error copying data to GPU: " << cudaGetErrorString(err2) << std::endl;
-      //   return -1;
-      // }
-    }
-    double *z_vt_ie_want = nullptr;
-    {
-      std::ifstream data(ROOT / ("z_vt_ie_t1." + std::to_string(n) + ".data"));
-      auto [m, arr] = serde::read_array<double>(data);
-      z_vt_ie_want = arr;
-    }
+    acerr() << "All data read..." << std::endl;
 
-    double *z_w_concorr_me = nullptr;
-    double *gpu_z_w_concorr_me = nullptr;
-    int z_w_concorr_me_vol = 0;
-    {
-      std::ifstream data(ROOT / ("z_w_concorr_me_t0." + std::to_string(n) + ".data"));
-      auto [m, arr] = serde::read_array<double>(data);
-      z_w_concorr_me = arr;
-      gpu_z_w_concorr_me = z_w_concorr_me;
-
-      // int z_w_concorr_me_vol = m.volume();
-      // cudaError_t err = cudaMalloc((void**)&gpu_z_w_concorr_me, z_w_concorr_me_vol * sizeof(double));
-      // if (err != cudaSuccess) {
-      //   std::cerr << "Error allocating GPU memory: " << cudaGetErrorString(err) << std::endl;
-      //   return -1;
-      // }
-
-      // cudaError_t err2 = cudaMemcpy(gpu_z_w_concorr_me, z_w_concorr_me, z_w_concorr_me_vol * sizeof(double), cudaMemcpyHostToDevice);
-      // if (err != cudaSuccess) {
-      //   std::cerr << "Error copying data to GPU: " << cudaGetErrorString(err2) << std::endl;
-      //   return -1;
-      // }
-    }
-    double *z_w_concorr_me_want = nullptr;
-    {
-      std::ifstream data(ROOT / ("z_w_concorr_me_t1." + std::to_string(n) + ".data"));
-      auto [m, arr] = serde::read_array<double>(data);
-      z_w_concorr_me_want = arr;
-    }
-
-    int istep, ldeepatmo, lvn_only, ntnd;
-    {
-      std::ifstream data(ROOT / ("istep." + std::to_string(n) + ".data"));
-      serde::deserialize(&istep, data);
-    }
-    {
-      std::ifstream data(ROOT / ("ldeepatmo." + std::to_string(n) + ".data"));
-      serde::deserialize(&ldeepatmo, data);
-    }
-    {
-      std::ifstream data(ROOT / ("lvn_only." + std::to_string(n) + ".data"));
-      serde::deserialize(&lvn_only, data);
-    }
-    {
-      std::ifstream data(ROOT / ("ntnd." + std::to_string(n) + ".data"));
-      serde::deserialize(&ntnd, data);
-    }
-    double dt_linintp_ubc, dtime;
-    {
-      std::ifstream data(ROOT / ("dt_linintp_ubc." + std::to_string(n) + ".data"));
-      serde::deserialize(&dt_linintp_ubc, data);
-    }
-    {
-      std::ifstream data(ROOT / ("dtime." + std::to_string(n) + ".data"));
-      serde::deserialize(&dtime, data);
-    }
-
-    std::cerr << "All data read..." << std::endl;
-    if(ldeepatmo != 0){
+    if (ldeepatmo != 0) {
       throw std::runtime_error("ldeepatmo is not 0");
     }
-    if(global_data.lextra_diffu != 1){
+    if (global_data.lextra_diffu != 1) {
       throw std::runtime_error("lextra_diffu is not 1");
     }
-    if(istep != 1 && istep != 2){
+    if (istep != 1 && istep != 2) {
       throw std::runtime_error("istep not 1 or 2");
     }
-    if(lvn_only != 0 && lvn_only != 1){
+    if (lvn_only != 0 && lvn_only != 1) {
       throw std::runtime_error("lvn_only not 0 or 1");
     }
-    std::cout << "Step " << n << " variables, extra_diffu: " << global_data.lextra_diffu << ", istep: ";
-    std::cout << istep << ", lvn_only: " << lvn_only << ", ldeepatmo: " << ldeepatmo << std::endl;
+    acout() << "Step " << n
+            << " variables, extra_diffu: " << global_data.lextra_diffu
+            << ", istep: ";
+    acout() << istep << ", lvn_only: " << lvn_only
+            << ", ldeepatmo: " << ldeepatmo << std::endl;
 
     if (lvn_only == 1 && istep == 1){
 
 
       auto *h_1_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie, gpu_z_w_concorr_me,
+        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie, z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -255,8 +292,8 @@ int main(int argc, char* argv[]) {
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), 0, dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
       __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-        h_1_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie, gpu_z_w_concorr_me,
+        h_1_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie, z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -295,8 +332,8 @@ int main(int argc, char* argv[]) {
 
     } else if (lvn_only == 0 && istep == 1){
       auto *h_0_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie, gpu_z_w_concorr_me,
+        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie, z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -334,7 +371,7 @@ int main(int argc, char* argv[]) {
       for (int j = 0; j < rep; j++){
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
         h_0_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
-        gpu_z_kin_hor_e, gpu_z_vt_ie, gpu_z_w_concorr_me,
+        z_kin_hor_e, z_vt_ie, z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -375,8 +412,8 @@ int main(int argc, char* argv[]) {
     } else if (lvn_only == 1 && istep == 2){
 
       auto *h_1_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie,  gpu_z_w_concorr_me,
+        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie,  z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -401,8 +438,8 @@ int main(int argc, char* argv[]) {
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
         0, dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
       __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-        h_1_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie,  gpu_z_w_concorr_me,
+        h_1_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie,  z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -431,8 +468,8 @@ int main(int argc, char* argv[]) {
     } else if (lvn_only == 0 && istep == 2){
 
       auto *h_0_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie,  gpu_z_w_concorr_me,
+        &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie,  z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -464,8 +501,8 @@ int main(int argc, char* argv[]) {
         dtime, istep, ldeepatmo, lvn_only, ntnd);
       for (int j = 0; j < rep; j++){
       __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-        h_0_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, gpu_z_kin_hor_e,
-        gpu_z_vt_ie,  gpu_z_w_concorr_me,
+        h_0_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
+        z_vt_ie,  z_w_concorr_me,
         /*__f2dace_A_z_kin_hor_e_d_0_s_157=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).size.at(0),
         /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
@@ -501,71 +538,29 @@ int main(int argc, char* argv[]) {
     } else {
       throw std::runtime_error("Law of Logic and Mathematics violated");
     }
-    std::cout << "Step " << n << " done." << std::endl;
+    acout() << "Step " << n << " done." << std::endl;
 
-
-    {
-      std::ofstream data("global_data_" + std::to_string(n) + ".got");
-      data << serde::serialize_global_data(&global_data) << std::endl;
-    }
-    {
-      std::ofstream data("global_data_" + std::to_string(n) + ".want");
-      data << serde::serialize_global_data(&global_data_want) << std::endl;
-    }
-    {
-      std::ofstream data("p_diag_" + std::to_string(n) + ".got");
-      data << serde::serialize(&p_diag) << std::endl;
-    }
-    {
-      std::ofstream data("p_diag_" + std::to_string(n) + ".want");
-      data << serde::serialize(&p_diag_want) << std::endl;
-    }
-    {
-      std::ofstream data("p_metrics_" + std::to_string(n) + ".got");
-      data << serde::serialize(&p_metrics) << std::endl;
-    }
-    {
-      std::ofstream data("p_metrics_" + std::to_string(n) + ".want");
-      data << serde::serialize(&p_metrics_want) << std::endl;
-    }
-    {
-      std::ofstream data("p_prog_" + std::to_string(n) + ".got");
-      data << serde::serialize(&p_prog) << std::endl;
-    }
-    {
-      std::ofstream data("p_prog_" + std::to_string(n) + ".want");
-      data << serde::serialize(&p_prog_want) << std::endl;
-    }
-    {
-      // cudaMemcpy(z_kin_hor_e, gpu_z_kin_hor_e, z_kin_hor_e_vol * sizeof(double), cudaMemcpyDeviceToHost);
-      // cudaFree(gpu_z_kin_hor_e);
-      std::ofstream data("z_kin_hor_e_" + std::to_string(n) + ".got");
-      data << serde::serialize_array(z_kin_hor_e) << std::endl;
-    }
-    {
-      std::ofstream data("z_kin_hor_e_" + std::to_string(n) + ".want");
-      data << serde::serialize_array(z_kin_hor_e_want) << std::endl;
-    }
-    {
-      // cudaMemcpy(z_vt_ie, gpu_z_vt_ie, z_vt_ie_vol * sizeof(double), cudaMemcpyDeviceToHost);
-      // cudaFree(gpu_z_vt_ie);
-      std::ofstream data("z_vt_ie_" + std::to_string(n) + ".got");
-      data << serde::serialize_array(z_vt_ie) << std::endl;
-    }
-    {
-      std::ofstream data("z_vt_ie_" + std::to_string(n) + ".want");
-      data << serde::serialize_array(z_vt_ie_want) << std::endl;
-    }
-    {
-      // cudaMemcpy(z_w_concorr_me, gpu_z_w_concorr_me, z_w_concorr_me_vol * sizeof(double), cudaMemcpyDeviceToHost);
-      // cudaFree(gpu_z_w_concorr_me);
-      std::ofstream data("z_w_concorr_me_" + std::to_string(n) + ".got");
-      data << serde::serialize_array(z_w_concorr_me) << std::endl;
-    }
-    {
-      std::ofstream data("z_w_concorr_me_" + std::to_string(n) + ".want");
-      data << serde::serialize_array(z_w_concorr_me_want) << std::endl;
-    }
+    pool.emplace_back([&] {
+      got_want_pair<global_data_type>(global_data, global_data_want,
+                                      "global_data", n);
+    });
+    pool.emplace_back(
+        [&] { got_want_pair<t_nh_diag>(p_diag, p_diag_want, "p_diag", n); });
+    pool.emplace_back([&] {
+      got_want_pair<t_nh_metrics>(p_metrics, p_metrics_want, "p_metrics", n);
+    });
+    pool.emplace_back(
+        [&] { got_want_pair<t_nh_prog>(p_prog, p_prog_want, "p_prog", n); });
+    pool.emplace_back([&] {
+      got_want_pair<double*>(z_kin_hor_e, z_kin_hor_e_want, "z_kin_hor_e", n);
+    });
+    pool.emplace_back(
+        [&] { got_want_pair<double*>(z_vt_ie, z_vt_ie_want, "z_vt_ie", n); });
+    pool.emplace_back([&] {
+      got_want_pair<double*>(z_w_concorr_me, z_w_concorr_me_want,
+                             "z_w_concorr_me", n);
+    });
+    pool.clear();
   }
   return EXIT_SUCCESS;
 }
