@@ -4,49 +4,6 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
-struct t_nh_diag {
-    int __f2dace_SA_ddt_vn_apc_pc_d_0_s_300 = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_1_s_301 = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_2_s_302 = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_3_s_303 = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_0_s_304 = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_1_s_305 = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_2_s_306 = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_3_s_307 = {};
-    int __f2dace_SA_vn_ie_d_0_s_294 = {};
-    int __f2dace_SA_vn_ie_d_1_s_295 = {};
-    int __f2dace_SA_vn_ie_d_2_s_296 = {};
-    int __f2dace_SA_vt_d_0_s_291 = {};
-    int __f2dace_SA_vt_d_1_s_292 = {};
-    int __f2dace_SA_vt_d_2_s_293 = {};
-    int __f2dace_SA_w_concorr_c_d_0_s_297 = {};
-    int __f2dace_SA_w_concorr_c_d_1_s_298 = {};
-    int __f2dace_SA_w_concorr_c_d_2_s_299 = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_300 = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_301 = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_302 = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_303 = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_0_s_304 = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_1_s_305 = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_2_s_306 = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_3_s_307 = {};
-    int __f2dace_SOA_vn_ie_d_0_s_294 = {};
-    int __f2dace_SOA_vn_ie_d_1_s_295 = {};
-    int __f2dace_SOA_vn_ie_d_2_s_296 = {};
-    int __f2dace_SOA_vt_d_0_s_291 = {};
-    int __f2dace_SOA_vt_d_1_s_292 = {};
-    int __f2dace_SOA_vt_d_2_s_293 = {};
-    int __f2dace_SOA_w_concorr_c_d_0_s_297 = {};
-    int __f2dace_SOA_w_concorr_c_d_1_s_298 = {};
-    int __f2dace_SOA_w_concorr_c_d_2_s_299 = {};
-    double* ddt_vn_apc_pc = {};
-    double* ddt_w_adv_pc = {};
-    double max_vcfl_dyn = {};
-    double* vn_ie = {};
-    double* vt = {};
-    double* w_concorr_c = {};
-};
-
 struct global_data_type {
     int i_am_accel_node = {};
     int lextra_diffu = {};
@@ -56,14 +13,6 @@ struct global_data_type {
     int timer_intp = {};
     int timer_solve_nh_veltend = {};
     int timers_level = {};
-};
-
-struct t_grid_domain_decomp_info {
-    int __f2dace_SA_owner_mask_d_0_s_2 = {};
-    int __f2dace_SA_owner_mask_d_1_s_3 = {};
-    int __f2dace_SOA_owner_mask_d_0_s_2 = {};
-    int __f2dace_SOA_owner_mask_d_1_s_3 = {};
-    int* owner_mask = {};
 };
 
 struct t_nh_prog {
@@ -81,58 +30,6 @@ struct t_nh_prog {
     int __f2dace_SOA_w_d_2_s_287 = {};
     double* vn = {};
     double* w = {};
-};
-
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
-    int __f2dace_SA_c_lin_e_d_1_s_26 = {};
-    int __f2dace_SA_c_lin_e_d_2_s_27 = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
-    int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
-    int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
-    int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
-    int __f2dace_SA_geofac_rot_d_0_s_40 = {};
-    int __f2dace_SA_geofac_rot_d_1_s_41 = {};
-    int __f2dace_SA_geofac_rot_d_2_s_42 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
-    int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
-    int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
-    int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
-    int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
-    int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
-    int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* geofac_grdiv = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* rbf_vec_coeff_e = {};
 };
 
 struct t_grid_edges {
@@ -227,6 +124,63 @@ struct t_grid_edges {
     int* vertex_idx = {};
 };
 
+struct t_grid_domain_decomp_info {
+    int __f2dace_SA_owner_mask_d_0_s_2 = {};
+    int __f2dace_SA_owner_mask_d_1_s_3 = {};
+    int __f2dace_SOA_owner_mask_d_0_s_2 = {};
+    int __f2dace_SOA_owner_mask_d_1_s_3 = {};
+    int* owner_mask = {};
+};
+
+struct t_grid_cells {
+    int __f2dace_SA_area_d_0_s_158 = {};
+    int __f2dace_SA_area_d_1_s_159 = {};
+    int __f2dace_SA_edge_blk_d_0_s_155 = {};
+    int __f2dace_SA_edge_blk_d_1_s_156 = {};
+    int __f2dace_SA_edge_blk_d_2_s_157 = {};
+    int __f2dace_SA_edge_idx_d_0_s_152 = {};
+    int __f2dace_SA_edge_idx_d_1_s_153 = {};
+    int __f2dace_SA_edge_idx_d_2_s_154 = {};
+    int __f2dace_SA_end_block_d_0_s_163 = {};
+    int __f2dace_SA_end_index_d_0_s_161 = {};
+    int __f2dace_SA_neighbor_blk_d_0_s_149 = {};
+    int __f2dace_SA_neighbor_blk_d_1_s_150 = {};
+    int __f2dace_SA_neighbor_blk_d_2_s_151 = {};
+    int __f2dace_SA_neighbor_idx_d_0_s_146 = {};
+    int __f2dace_SA_neighbor_idx_d_1_s_147 = {};
+    int __f2dace_SA_neighbor_idx_d_2_s_148 = {};
+    int __f2dace_SA_start_block_d_0_s_162 = {};
+    int __f2dace_SA_start_index_d_0_s_160 = {};
+    int __f2dace_SOA_area_d_0_s_158 = {};
+    int __f2dace_SOA_area_d_1_s_159 = {};
+    int __f2dace_SOA_edge_blk_d_0_s_155 = {};
+    int __f2dace_SOA_edge_blk_d_1_s_156 = {};
+    int __f2dace_SOA_edge_blk_d_2_s_157 = {};
+    int __f2dace_SOA_edge_idx_d_0_s_152 = {};
+    int __f2dace_SOA_edge_idx_d_1_s_153 = {};
+    int __f2dace_SOA_edge_idx_d_2_s_154 = {};
+    int __f2dace_SOA_end_block_d_0_s_163 = {};
+    int __f2dace_SOA_end_index_d_0_s_161 = {};
+    int __f2dace_SOA_neighbor_blk_d_0_s_149 = {};
+    int __f2dace_SOA_neighbor_blk_d_1_s_150 = {};
+    int __f2dace_SOA_neighbor_blk_d_2_s_151 = {};
+    int __f2dace_SOA_neighbor_idx_d_0_s_146 = {};
+    int __f2dace_SOA_neighbor_idx_d_1_s_147 = {};
+    int __f2dace_SOA_neighbor_idx_d_2_s_148 = {};
+    int __f2dace_SOA_start_block_d_0_s_162 = {};
+    int __f2dace_SOA_start_index_d_0_s_160 = {};
+    double* area = {};
+    t_grid_domain_decomp_info* decomp_info = {};
+    int* edge_blk = {};
+    int* edge_idx = {};
+    int* end_block = {};
+    int* end_index = {};
+    int* neighbor_blk = {};
+    int* neighbor_idx = {};
+    int* start_block = {};
+    int* start_index = {};
+};
+
 struct t_grid_vertices {
     int __f2dace_SA_cell_blk_d_0_s_203 = {};
     int __f2dace_SA_cell_blk_d_1_s_204 = {};
@@ -268,6 +222,67 @@ struct t_grid_vertices {
     int* end_index = {};
     int* start_block = {};
     int* start_index = {};
+};
+
+struct t_patch {
+    t_grid_cells* cells = {};
+    t_grid_edges* edges = {};
+    int nblks_c = {};
+    int nblks_e = {};
+    int nblks_v = {};
+    t_grid_vertices* verts = {};
+};
+
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
+    int __f2dace_SA_c_lin_e_d_1_s_26 = {};
+    int __f2dace_SA_c_lin_e_d_2_s_27 = {};
+    int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
+    int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
+    int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
+    int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
+    int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
+    int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
+    int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
+    int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
+    int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
+    int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
+    int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
+    int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
+    int __f2dace_SA_geofac_rot_d_0_s_40 = {};
+    int __f2dace_SA_geofac_rot_d_1_s_41 = {};
+    int __f2dace_SA_geofac_rot_d_2_s_42 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
+    int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
+    int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
+    int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
+    int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
+    int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
+    int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
+    int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
+    int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
+    int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
+    int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
+    int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
+    int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
+    int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
+    int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
+    int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
+    int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
+    int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
+    int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* geofac_grdiv = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* rbf_vec_coeff_e = {};
 };
 
 struct t_nh_metrics {
@@ -355,62 +370,47 @@ struct t_nh_metrics {
     double* wgtfacq_e = {};
 };
 
-struct t_grid_cells {
-    int __f2dace_SA_area_d_0_s_158 = {};
-    int __f2dace_SA_area_d_1_s_159 = {};
-    int __f2dace_SA_edge_blk_d_0_s_155 = {};
-    int __f2dace_SA_edge_blk_d_1_s_156 = {};
-    int __f2dace_SA_edge_blk_d_2_s_157 = {};
-    int __f2dace_SA_edge_idx_d_0_s_152 = {};
-    int __f2dace_SA_edge_idx_d_1_s_153 = {};
-    int __f2dace_SA_edge_idx_d_2_s_154 = {};
-    int __f2dace_SA_end_block_d_0_s_163 = {};
-    int __f2dace_SA_end_index_d_0_s_161 = {};
-    int __f2dace_SA_neighbor_blk_d_0_s_149 = {};
-    int __f2dace_SA_neighbor_blk_d_1_s_150 = {};
-    int __f2dace_SA_neighbor_blk_d_2_s_151 = {};
-    int __f2dace_SA_neighbor_idx_d_0_s_146 = {};
-    int __f2dace_SA_neighbor_idx_d_1_s_147 = {};
-    int __f2dace_SA_neighbor_idx_d_2_s_148 = {};
-    int __f2dace_SA_start_block_d_0_s_162 = {};
-    int __f2dace_SA_start_index_d_0_s_160 = {};
-    int __f2dace_SOA_area_d_0_s_158 = {};
-    int __f2dace_SOA_area_d_1_s_159 = {};
-    int __f2dace_SOA_edge_blk_d_0_s_155 = {};
-    int __f2dace_SOA_edge_blk_d_1_s_156 = {};
-    int __f2dace_SOA_edge_blk_d_2_s_157 = {};
-    int __f2dace_SOA_edge_idx_d_0_s_152 = {};
-    int __f2dace_SOA_edge_idx_d_1_s_153 = {};
-    int __f2dace_SOA_edge_idx_d_2_s_154 = {};
-    int __f2dace_SOA_end_block_d_0_s_163 = {};
-    int __f2dace_SOA_end_index_d_0_s_161 = {};
-    int __f2dace_SOA_neighbor_blk_d_0_s_149 = {};
-    int __f2dace_SOA_neighbor_blk_d_1_s_150 = {};
-    int __f2dace_SOA_neighbor_blk_d_2_s_151 = {};
-    int __f2dace_SOA_neighbor_idx_d_0_s_146 = {};
-    int __f2dace_SOA_neighbor_idx_d_1_s_147 = {};
-    int __f2dace_SOA_neighbor_idx_d_2_s_148 = {};
-    int __f2dace_SOA_start_block_d_0_s_162 = {};
-    int __f2dace_SOA_start_index_d_0_s_160 = {};
-    double* area = {};
-    t_grid_domain_decomp_info* decomp_info = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* neighbor_blk = {};
-    int* neighbor_idx = {};
-    int* start_block = {};
-    int* start_index = {};
-};
-
-struct t_patch {
-    t_grid_cells* cells = {};
-    t_grid_edges* edges = {};
-    int nblks_c = {};
-    int nblks_e = {};
-    int nblks_v = {};
-    t_grid_vertices* verts = {};
+struct t_nh_diag {
+    int __f2dace_SA_ddt_vn_apc_pc_d_0_s_300 = {};
+    int __f2dace_SA_ddt_vn_apc_pc_d_1_s_301 = {};
+    int __f2dace_SA_ddt_vn_apc_pc_d_2_s_302 = {};
+    int __f2dace_SA_ddt_vn_apc_pc_d_3_s_303 = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_0_s_304 = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_1_s_305 = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_2_s_306 = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_3_s_307 = {};
+    int __f2dace_SA_vn_ie_d_0_s_294 = {};
+    int __f2dace_SA_vn_ie_d_1_s_295 = {};
+    int __f2dace_SA_vn_ie_d_2_s_296 = {};
+    int __f2dace_SA_vt_d_0_s_291 = {};
+    int __f2dace_SA_vt_d_1_s_292 = {};
+    int __f2dace_SA_vt_d_2_s_293 = {};
+    int __f2dace_SA_w_concorr_c_d_0_s_297 = {};
+    int __f2dace_SA_w_concorr_c_d_1_s_298 = {};
+    int __f2dace_SA_w_concorr_c_d_2_s_299 = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_300 = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_301 = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_302 = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_303 = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_0_s_304 = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_1_s_305 = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_2_s_306 = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_3_s_307 = {};
+    int __f2dace_SOA_vn_ie_d_0_s_294 = {};
+    int __f2dace_SOA_vn_ie_d_1_s_295 = {};
+    int __f2dace_SOA_vn_ie_d_2_s_296 = {};
+    int __f2dace_SOA_vt_d_0_s_291 = {};
+    int __f2dace_SOA_vt_d_1_s_292 = {};
+    int __f2dace_SOA_vt_d_2_s_293 = {};
+    int __f2dace_SOA_w_concorr_c_d_0_s_297 = {};
+    int __f2dace_SOA_w_concorr_c_d_1_s_298 = {};
+    int __f2dace_SOA_w_concorr_c_d_2_s_299 = {};
+    double* ddt_vn_apc_pc = {};
+    double* ddt_w_adv_pc = {};
+    double max_vcfl_dyn = {};
+    double* vn_ie = {};
+    double* vt = {};
+    double* w_concorr_c = {};
 };
 
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t {
@@ -1136,9 +1136,9 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
             ///////////////////
 
             // Start flatten
-            #pragma omp parallel
+
             {
-                #pragma omp single
+
                 {
                     {
 
@@ -1155,7 +1155,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_owner_mask_d_1_s_3_decomp_info_cells_p_patch_3; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_owner_mask_d_0_s_2_decomp_info_cells_p_patch_3; i++){
@@ -1163,7 +1163,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_neighbor_idx_d_2_s_148_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_neighbor_idx_d_1_s_147_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -1173,7 +1173,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_neighbor_blk_d_2_s_151_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_neighbor_blk_d_1_s_150_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -1183,7 +1183,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_idx_d_2_s_154_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_idx_d_1_s_153_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -1193,7 +1193,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_blk_d_2_s_157_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_blk_d_1_s_156_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -1203,7 +1203,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_area_d_1_s_159_cells_p_patch_2; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_area_d_0_s_158_cells_p_patch_2; i++){
@@ -1231,7 +1231,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             __cg_p_patch__cg_cells__m_end_block[(i * (1))] = p_patch->cells->end_block[(i * (1))];
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_idx_d_2_s_166_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_idx_d_1_s_165_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -1241,7 +1241,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_blk_d_2_s_169_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_blk_d_1_s_168_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -1251,7 +1251,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vertex_idx_d_2_s_172_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_vertex_idx_d_1_s_171_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -1261,7 +1261,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vertex_blk_d_2_s_175_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_vertex_blk_d_1_s_174_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -1271,7 +1271,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_tangent_orientation_d_1_s_177_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_tangent_orientation_d_0_s_176_edges_p_patch_4; i++){
@@ -1279,7 +1279,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_quad_idx_d_2_s_180_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_quad_idx_d_1_s_179_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -1289,7 +1289,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_quad_blk_d_2_s_183_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_quad_blk_d_1_s_182_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -1299,7 +1299,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_inv_primal_edge_length_d_1_s_185_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_inv_primal_edge_length_d_0_s_184_edges_p_patch_4; i++){
@@ -1307,7 +1307,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_inv_dual_edge_length_d_1_s_187_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_inv_dual_edge_length_d_0_s_186_edges_p_patch_4; i++){
@@ -1315,7 +1315,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_area_edge_d_1_s_189_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_area_edge_d_0_s_188_edges_p_patch_4; i++){
@@ -1323,7 +1323,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_f_e_d_1_s_191_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_f_e_d_0_s_190_edges_p_patch_4; i++){
@@ -1351,7 +1351,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             __cg_p_patch__cg_edges__m_end_block[(i * (1))] = p_patch->edges->end_block[(i * (1))];
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_idx_d_2_s_202_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_idx_d_1_s_201_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -1361,7 +1361,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_blk_d_2_s_205_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -1371,7 +1371,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_idx_d_2_s_208_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_idx_d_1_s_207_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -1381,7 +1381,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_blk_d_2_s_211_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_blk_d_1_s_210_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -1412,7 +1412,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_c_lin_e_d_2_s_27_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_c_lin_e_d_1_s_26_p_int_6; j++){
                                 #pragma omp simd
@@ -1422,7 +1422,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_e_bln_c_s_d_2_s_30_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6; j++){
                                 #pragma omp simd
@@ -1432,7 +1432,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cells_aw_verts_d_2_s_33_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6; j++){
                                 #pragma omp simd
@@ -1442,7 +1442,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_geofac_grdiv_d_2_s_39_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_geofac_grdiv_d_1_s_38_p_int_6; j++){
                                 #pragma omp simd
@@ -1452,7 +1452,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_geofac_rot_d_2_s_42_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_geofac_rot_d_1_s_41_p_int_6; j++){
                                 #pragma omp simd
@@ -1462,7 +1462,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_geofac_n2s_d_2_s_45_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_geofac_n2s_d_1_s_44_p_int_6; j++){
                                 #pragma omp simd
@@ -1473,7 +1473,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_w_d_2_s_287_p_prog_7; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -1483,7 +1483,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vn_d_2_s_290_p_prog_7; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -1494,7 +1494,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_ddqz_z_full_e_d_2_s_316_p_metrics_8; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -1504,7 +1504,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_ddqz_z_half_d_2_s_319_p_metrics_8; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -1514,7 +1514,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_coeff_gradekin_d_2_s_331_p_metrics_8; k++){
                             for (auto j = 0; j < __f2dace_SA_coeff_gradekin_d_1_s_330_p_metrics_8; j++){
                                 #pragma omp simd
@@ -1524,7 +1524,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_coeff1_dwdz_d_2_s_334_p_metrics_8; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -1534,7 +1534,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_coeff2_dwdz_d_2_s_337_p_metrics_8; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -1547,7 +1547,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
 
                         __cg_p_diag__m_max_vcfl_dyn = p_diag->max_vcfl_dyn;
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vt_d_2_s_293_p_diag_9; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -1557,7 +1557,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vn_ie_d_2_s_296_p_diag_9; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -1567,7 +1567,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_w_concorr_c_d_2_s_299_p_diag_9; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -1577,7 +1577,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto l = 0; l < __f2dace_SA_ddt_vn_apc_pc_d_3_s_303_p_diag_9; l++){
                             for (auto k = 0; k < __f2dace_SA_ddt_vn_apc_pc_d_2_s_302_p_diag_9; k++){
                                 for (auto j = 0; j < 90; j++){
@@ -1589,7 +1589,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto l = 0; l < __f2dace_SA_ddt_w_adv_pc_d_3_s_307_p_diag_9; l++){
                             for (auto k = 0; k < __f2dace_SA_ddt_w_adv_pc_d_2_s_306_p_diag_9; k++){
                                 for (auto j = 0; j < 91; j++){
@@ -1603,7 +1603,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
 
 
                     }
-                    #pragma omp taskwait
+
                 }
             }
             // End flatten
@@ -2897,9 +2897,9 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
             ///////////////////
 
             // Start deflatten
-            #pragma omp parallel
+
             {
-                #pragma omp single
+
                 {
                     {
 
@@ -2916,7 +2916,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_owner_mask_d_1_s_3_decomp_info_cells_p_patch_3; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_owner_mask_d_0_s_2_decomp_info_cells_p_patch_3; i++){
@@ -2924,7 +2924,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_neighbor_idx_d_2_s_148_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_neighbor_idx_d_1_s_147_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -2934,7 +2934,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_neighbor_blk_d_2_s_151_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_neighbor_blk_d_1_s_150_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -2944,7 +2944,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_idx_d_2_s_154_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_idx_d_1_s_153_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -2954,7 +2954,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_blk_d_2_s_157_cells_p_patch_2; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_blk_d_1_s_156_cells_p_patch_2; j++){
                                 #pragma omp simd
@@ -2964,7 +2964,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_area_d_1_s_159_cells_p_patch_2; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_area_d_0_s_158_cells_p_patch_2; i++){
@@ -2992,7 +2992,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             p_patch->cells->end_block[(i * (1))] = __cg_p_patch__cg_cells__m_end_block[(i * (1))];
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_idx_d_2_s_166_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_idx_d_1_s_165_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -3002,7 +3002,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_blk_d_2_s_169_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_blk_d_1_s_168_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -3012,7 +3012,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vertex_idx_d_2_s_172_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_vertex_idx_d_1_s_171_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -3022,7 +3022,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vertex_blk_d_2_s_175_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_vertex_blk_d_1_s_174_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -3032,7 +3032,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_tangent_orientation_d_1_s_177_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_tangent_orientation_d_0_s_176_edges_p_patch_4; i++){
@@ -3040,7 +3040,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_quad_idx_d_2_s_180_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_quad_idx_d_1_s_179_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -3050,7 +3050,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_quad_blk_d_2_s_183_edges_p_patch_4; k++){
                             for (auto j = 0; j < __f2dace_SA_quad_blk_d_1_s_182_edges_p_patch_4; j++){
                                 #pragma omp simd
@@ -3060,7 +3060,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_inv_primal_edge_length_d_1_s_185_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_inv_primal_edge_length_d_0_s_184_edges_p_patch_4; i++){
@@ -3068,7 +3068,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_inv_dual_edge_length_d_1_s_187_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_inv_dual_edge_length_d_0_s_186_edges_p_patch_4; i++){
@@ -3076,7 +3076,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_area_edge_d_1_s_189_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_area_edge_d_0_s_188_edges_p_patch_4; i++){
@@ -3084,7 +3084,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp task
+
                         for (auto j = 0; j < __f2dace_SA_f_e_d_1_s_191_edges_p_patch_4; j++){
                             #pragma omp simd
                             for (auto i = 0; i < __f2dace_SA_f_e_d_0_s_190_edges_p_patch_4; i++){
@@ -3112,7 +3112,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             p_patch->edges->end_block[(i * (1))] = __cg_p_patch__cg_edges__m_end_block[(i * (1))];
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_idx_d_2_s_202_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_idx_d_1_s_201_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -3122,7 +3122,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cell_blk_d_2_s_205_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -3132,7 +3132,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_idx_d_2_s_208_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_idx_d_1_s_207_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -3142,7 +3142,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_edge_blk_d_2_s_211_verts_p_patch_5; k++){
                             for (auto j = 0; j < __f2dace_SA_edge_blk_d_1_s_210_verts_p_patch_5; j++){
                                 #pragma omp simd
@@ -3173,7 +3173,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_c_lin_e_d_2_s_27_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_c_lin_e_d_1_s_26_p_int_6; j++){
                                 #pragma omp simd
@@ -3183,7 +3183,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_e_bln_c_s_d_2_s_30_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6; j++){
                                 #pragma omp simd
@@ -3193,7 +3193,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_cells_aw_verts_d_2_s_33_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6; j++){
                                 #pragma omp simd
@@ -3203,7 +3203,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_geofac_grdiv_d_2_s_39_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_geofac_grdiv_d_1_s_38_p_int_6; j++){
                                 #pragma omp simd
@@ -3213,7 +3213,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_geofac_rot_d_2_s_42_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_geofac_rot_d_1_s_41_p_int_6; j++){
                                 #pragma omp simd
@@ -3223,7 +3223,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_geofac_n2s_d_2_s_45_p_int_6; k++){
                             for (auto j = 0; j < __f2dace_SA_geofac_n2s_d_1_s_44_p_int_6; j++){
                                 #pragma omp simd
@@ -3234,7 +3234,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_w_d_2_s_287_p_prog_7; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -3244,7 +3244,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vn_d_2_s_290_p_prog_7; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -3255,7 +3255,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                         }
 
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_ddqz_z_full_e_d_2_s_316_p_metrics_8; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -3265,7 +3265,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_ddqz_z_half_d_2_s_319_p_metrics_8; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -3275,7 +3275,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_coeff_gradekin_d_2_s_331_p_metrics_8; k++){
                             for (auto j = 0; j < __f2dace_SA_coeff_gradekin_d_1_s_330_p_metrics_8; j++){
                                 #pragma omp simd
@@ -3285,7 +3285,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_coeff1_dwdz_d_2_s_334_p_metrics_8; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -3295,7 +3295,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_coeff2_dwdz_d_2_s_337_p_metrics_8; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -3308,7 +3308,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
 
                         p_diag->max_vcfl_dyn = __cg_p_diag__m_max_vcfl_dyn;
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vt_d_2_s_293_p_diag_9; k++){
                             for (auto j = 0; j < 90; j++){
                                 #pragma omp simd
@@ -3318,7 +3318,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_vn_ie_d_2_s_296_p_diag_9; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -3328,7 +3328,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto k = 0; k < __f2dace_SA_w_concorr_c_d_2_s_299_p_diag_9; k++){
                             for (auto j = 0; j < 91; j++){
                                 #pragma omp simd
@@ -3338,7 +3338,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto l = 0; l < __f2dace_SA_ddt_vn_apc_pc_d_3_s_303_p_diag_9; l++){
                             for (auto k = 0; k < __f2dace_SA_ddt_vn_apc_pc_d_2_s_302_p_diag_9; k++){
                                 for (auto j = 0; j < 90; j++){
@@ -3350,7 +3350,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
                             }
                         }
 
-                        #pragma omp taskloop
+                        #pragma omp parallel for
                         for (auto l = 0; l < __f2dace_SA_ddt_w_adv_pc_d_3_s_307_p_diag_9; l++){
                             for (auto k = 0; k < __f2dace_SA_ddt_w_adv_pc_d_2_s_306_p_diag_9; k++){
                                 for (auto j = 0; j < 91; j++){
@@ -3364,7 +3364,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2_internal(velocity_n
 
 
                     }
-                    #pragma omp taskwait
+
                 }
             }
             // End deflatten
