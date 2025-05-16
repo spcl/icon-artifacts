@@ -23,7 +23,6 @@ def optimization_action(sdfg):
     deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
     sdfg.validate()
-    sdfg.save("gpu_velocity_transients.sdfgz", compress=True)
     ToGPU(verbose=config.verbose, cpu_library_nodes=[flatten_lib, deflatten_lib], exclude=["vcflmax"]).apply_pass(sdfg, {})
     sdfg.validate()
 

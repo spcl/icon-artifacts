@@ -77,7 +77,6 @@ def to_segmented_reduction(sdfg: dace.SDFG):
                     assert len(map_entry.range) == 1
                     b,e,s = map_entry.range[0]
                     in_arr = sdfg.arrays[input_edge.data.data]
-                    out_arr = sdfg.arrays[output_edge.data.data]
                     if input_edge.data.data != "gpu_cfl_clipping":
                         continue
                     segment_size = in_arr.shape[0]
