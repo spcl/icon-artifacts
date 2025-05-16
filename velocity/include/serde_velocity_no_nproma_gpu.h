@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <format>
 #include <iomanip>
 #include <iostream>
 #include <istream>
