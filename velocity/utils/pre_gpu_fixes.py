@@ -57,7 +57,6 @@ def step_1(sdfg: dace.SDFG):
     library_node_reduction_parent.remove_edge(tasklet_before_reduction_edges)
     library_node_reduction_parent.remove_edge(reduction_sum_edge)
     library_node_reduction_parent.remove_nodes_from([reduction_sum_size, tasklet_before_reduction, library_node_reduction, reduction_sum])
-    sdfg.save('buggy.sdfgz', compress=True)
 
 
 
