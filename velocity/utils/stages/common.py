@@ -66,7 +66,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
       generate_code=True, lib=False,
       stage_suffix=None, # stage3 if you need clip_count, else None, TODO: improve this
       )
-  binpath = Path('velocity_cpu')
+  binpath = Path('velocity_gpu') if gpu else Path('velocity_cpu')
   assert binpath.exists()
   binpath = binpath.rename(f"{binpath.name}.stage{stage}")
   print(f"Binary available: {binpath}")
