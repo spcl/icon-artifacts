@@ -3,4 +3,5 @@
 **.csv
 **/program.sdfg
 **/include/hash.h
+!gpu_*.sdfgz
 !cpu_*.sdfgz
