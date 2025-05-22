@@ -55,12 +55,20 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
       instrument_sdfg(sdfgs)
 
   dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
-  compile_if_propagated_sdfgs(
-      sdfgs, gpu=True, release=True,
-      instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
-      generate_code=True, lib=False,
-      stage_suffix=None, # stage3 if you need clip_count, else None, TODO: improve this
-      )
+  if stage > 5:
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True, release=True,
+        instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
+        generate_code=True, lib=False,
+        main_name="main_gpu.cu"
+        )
+  else:
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True, release=True,
+        instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
+        generate_code=True, lib=False,
+        main_name="main.cu"
+        )
   binpath = Path('velocity_gpu')
   assert binpath.exists()
   binpath = binpath.rename(f"{binpath.name}.stage{stage}")

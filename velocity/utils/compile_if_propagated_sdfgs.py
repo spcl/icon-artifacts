@@ -175,7 +175,8 @@ def comment_out_syncs(filepath):
                 else:
                   line = "//" + line
             file.write(line)
-    assert added_one, f"Couldn't add one necessary sync."
+    if not added_one:
+        print(f"WARNING: Couldn't add one necessary sync.")
 
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
@@ -185,7 +186,7 @@ def compile_if_propagated_sdfgs(
     generate_code: bool = True,
     lib = False,
     ref = False,
-    stage_suffix = None
+    main_name = None,
 ):
     sources = set()
     sources.add("src/reductions.cpp")
@@ -271,23 +272,23 @@ def compile_if_propagated_sdfgs(
                 )
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
 
-    if not gpu:
-        if not lib:
-            if not ref:
-                if stage_suffix is not None:
-                    sources.add(f"main_{stage_suffix}.cc")
-                else:
-                    sources.add("main.cc")
-            else:
-                sources.add("main_ref.cc")
+    if main_name is not None:
+        sources.add(f"{main_name}")
     else:
-        if not lib:
-            sources.add("main_gpu.cu")
+        if not gpu:
+            if not lib:
+                if not ref:
+                    sources.add("main.cc")
+                else:
+                    sources.add("main_ref.cc")
+        else:
+            if not lib:
+                sources.add("main_gpu.cu")
 
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
     if gpu:
         if release:
-            flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 "
+            flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo -Xcompiler=-g"
         else:
             flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:

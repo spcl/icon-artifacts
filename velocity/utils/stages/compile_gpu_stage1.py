@@ -31,7 +31,7 @@ def optimization_action(sdfg):
         verbose=config.verbose,
         simplify=False,
         interface_with_struct_copy=True,
-        interface_to_gpu=True,
+        interface_to_gpu=False,
         clean_trivial_views=True,
         shallow_copy=False,
         shallow_copy_to_gpu=False,

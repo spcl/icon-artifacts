@@ -8,6 +8,7 @@ from utils.find import find_node_by_name
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from dace.transformation.passes.to_gpu import ToGPU
 from dace.transformation.passes import GPUKernelLaunchRestructure
+from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 import argparse
 
 STAGE_ID = 6
@@ -15,6 +16,7 @@ STAGE_ID = 6
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
+    add_gpu_copies_to_flattener(sdfg)
     sdfg.validate()
     pre_gpu_fix(sdfg)
 
@@ -32,6 +34,7 @@ def optimization_action(sdfg):
     prune_unused_inputs_outputs(sdfg)
     #move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
     to_segmented_reduction(sdfg)
+
     for arrname, arr in sdfg.arrays.items():
         if arr.transient:
             if arr.storage == dace.dtypes.StorageType.GPU_Global:
