@@ -10,13 +10,53 @@ def pre_gpu_fix(sdfg: dace.SDFG):
     step_1(sdfg)
     target_state = step_2(sdfg)
     step_3(sdfg, target_state)
+    step_4(sdfg)
 
+def step_4(sdfg: dace.SDFG):
+    """
+    Avoid out_val_0 having the same name in scalar and array form.
+    """
+    condblock, _ = find_node_by_name(sdfg, "Conditional_l_553_c_553")
+    
+    # Change condition in the conditional block
+    assert isinstance(condblock, ConditionalBlock)
+    block_state = condblock.parent_graph.parent
+    
+    # Find the nested SDFG in the state with one output
+    for node in block_state.nodes():
+        if isinstance(node, dace.nodes.NestedSDFG): 
+            if  len(node.out_connectors) == 1:
+                nsdfg = node
+            else:
+                second_nsdfg = node
+    inner_sdfg = condblock.parent_graph
+    assert isinstance(nsdfg, dace.nodes.NestedSDFG)
+    condblock.branches[0] = (dace.nodes.CodeBlock("(not ((scalar_out_val_0 == 0) == 1))"), condblock.branches[0][1])
+    
+    # Change the array out_val_0 to scalar_out_val_0
+    inner_sdfg.add_scalar("scalar_out_val_0", dtype=nsdfg.sdfg.arrays["out_val_0"].dtype, transient=False)
+    inner_sdfg.remove_data("out_val_0")
+    nsdfg.add_in_connector("scalar_out_val_0")
+    list(block_state.in_edges_by_connector(nsdfg, "out_val_0"))[0].dst_conn = "scalar_out_val_0"
+    nsdfg.remove_in_connector("out_val_0")
+    
+    # Second nsdfg
+    second_nsdfg.add_in_connector("scalar_out_val_0")
+    list(block_state.in_edges_by_connector(second_nsdfg, "out_val_0"))[0].dst_conn = "scalar_out_val_0"
+    second_nsdfg.remove_in_connector("out_val_0")
+    for node in second_nsdfg.sdfg.nodes():
+        if isinstance(node, ConditionalBlock):
+            second_cond_block = node
+            break
+    second_nsdfg.sdfg.add_scalar("scalar_out_val_0", dtype=second_nsdfg.sdfg.arrays["out_val_0"].dtype, transient=False)
+    second_nsdfg.sdfg.remove_data("out_val_0")
+    second_cond_block.branches[0] = (dace.nodes.CodeBlock("((not ((scalar_out_val_0 == 0)==1)) and (_if_cond_18 == 1))"), second_cond_block.branches[0][1])
+    
+    sdfg.validate()
 def step_1(sdfg: dace.SDFG):
     """
     
     """
-    # sdfg.simplify()
-    # sdfg.save("debug_pre.sdfg")
     library_node_reduction, library_node_reduction_parent = find_node_by_name(sdfg, "reduce_sum_to_address")
     assert isinstance(library_node_reduction, dace.nodes.LibraryNode)
 
@@ -270,7 +310,7 @@ def step_1(sdfg: dace.SDFG):
 
     # create an array of size 1
     existing_array = nsdfg.sdfg.arrays["out_val_0"]
-    new_array = dace.data.Array(dtype=existing_array.dtype, shape=[1], transient=False)
+    new_array = dace.data.Array(dtype=existing_array.dtype, shape=[1], transient=False, storage=dace.dtypes.StorageType.GPU_Global)
     nsdfg.sdfg.arrays["out_val_0"] = new_array
     #add out_val_0 to the map exit
     nsdfg.add_out_connector("out_val_0")
@@ -278,10 +318,10 @@ def step_1(sdfg: dace.SDFG):
     map_exit.add_out_connector("OUT_1")
     state_copy_1.add_edge(nsdfg, "out_val_0", map_exit, "IN_1", dace.Memlet(expr="out_val_0[_for_it_35]"))
     new_shape = ["89"]
-    new_an = state_copy_1.add_array("out_val_0", dtype=nsdfg.sdfg.arrays["out_val_0"].dtype, shape=new_shape, transient=True)
+    new_an = state_copy_1.add_array("out_val_0", dtype=nsdfg.sdfg.arrays["out_val_0"].dtype, shape=new_shape, transient=True, storage=dace.dtypes.StorageType.GPU_Global)
     # state_copy_1.add_node(new_an)
     state_copy_1.add_edge(map_exit, "OUT_1", new_an, None, dace.Memlet(expr="out_val_0[0:89]"))
-
+    
     # prune inputs
     in_edges = state_copy_1.in_edges(map_entry_it_35)
     assert len(in_edges) == 5
@@ -315,11 +355,6 @@ def step_1(sdfg: dace.SDFG):
                         # Remove all the nodes inside
                         for n in s.nodes():
                             s.remove_node(n)
-                        # # get out interstate edge
-                        # out_edges = node.sdfg.out_edges(s)
-                        # assert len(out_edges) == 1
-                        # out_edge = out_edges[0]
-                        # out_edge.data.assignments = {'clip_count': 'out_val_0[0]'}
                     else:
                         node.sdfg.remove_node(s)
 
@@ -336,6 +371,7 @@ def step_1(sdfg: dace.SDFG):
             map_entry = node
             an = state_copy_2.add_access("out_val_0")
             nsdfg.sdfg.arrays["out_val_0"].transient = False
+            nsdfg.sdfg.arrays["out_val_0"].storage = dace.dtypes.StorageType.GPU_Global
             map_entry.add_in_connector("IN_6")
             map_entry.add_out_connector("OUT_6")
             state_copy_2.add_edge(an, None, map_entry, "IN_6", dace.Memlet(expr="out_val_0[0:89]"))
@@ -343,26 +379,12 @@ def step_1(sdfg: dace.SDFG):
             state_copy_2.add_edge(map_entry, "OUT_6", nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
 
     set_nested_sdfg_parent_references(sdfg)
-    # sdfg.save("debug_preval.sdfg")
     sdfg.validate()
     sdfg.reset_cfg_list()
-    # sdfg.simplify(validate=False)
-
-    # Quick hack fix after simplify
-    # node, parent = find_node_by_name(sdfg, "out_val_0_0")
-    # out_edges = parent.out_edges(node)
-    # assert len(out_edges) == 1
-    # out_edge = out_edges[0]
-
-    # in_edges = parent.in_edges(node)
-    # assert len(in_edges) == 1
-    # in_edge = in_edges[0]
-    # parent.add_edge(in_edge.src, in_edge.src_conn, out_edge.dst, out_edge.dst_conn , deepcopy(out_edge.data))
-    # parent.remove_node(node)
+    
+    # assert False
     sdfg.validate()
     sdfg.apply_transformations_repeated(MapCollapse)
-    # sdfg.save("debug.sdfg")
-    # assert False
 
 def step_2(sdfg: dace.SDFG):
     reduction, reduction_parent = find_node_by_name(sdfg, "reduce_scan")
@@ -391,7 +413,8 @@ def step_2(sdfg: dace.SDFG):
     # Duplicate the conditional block
     cond_block_copy = deepcopy(cond_block)
     parent_sdfg.add_node(cond_block_copy)
-
+    cond_block.branches[0] = (dace.nodes.CodeBlock("(not ((out_val_0 == 0) == 1))"), cond_block.branches[0][1])
+    # assert False
     # Get the condition state
     cond_state_edge = parent_sdfg.in_edges(cond_block)[0]
     cond_state = cond_state_edge.src
@@ -418,14 +441,15 @@ def step_2(sdfg: dace.SDFG):
 
     # Get the nested SDFG condition inside to change it
     for node, parent in inside_state_copy.all_nodes_recursive():
-        if isinstance(node, ConditionalBlock):
+        if isinstance(node, ConditionalBlock) and len(node.branches) == 1:
+            # print(f"Condition: {node.branches[0]}")
+            # assert False
             new_condition = "(not ((clip_count == 0)==1)) and (_if_cond_18 == 1)"
             node.branches[0] = (dace.nodes.CodeBlock(new_condition), node.branches[0][1])
         if isinstance(node, dace.nodes.NestedSDFG):
             node.symbol_mapping["clip_count"] = "out_val_0"
     parent_sdfg.remove_node(cond_block_copy)
     set_nested_sdfg_parent_references(sdfg)
-    # sdfg.save("debug_step_2.sdfg")
     sdfg.validate()
     return parent_sdfg.parent
 
@@ -434,7 +458,6 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
     """
     assert isinstance(target_state, dace.SDFGState)
     edge_map = {}
-    sdfg.save("debug_step_3_1.sdfg")
     for node in target_state.nodes():
         if node.label == "T_l546_c546":
             target_state.remove_node(node)
@@ -505,7 +528,6 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
                                 edge.src.sdfg.remove_data(edge.src_conn)
                             target_state.remove_edge(edge)
             elif len(nnode.sdfg.nodes()) == 2:
-                # sdfg.save("debug_step_3_4.sdfg")
                 for edge in in_edges:
                     out_edge = list(target_state.out_edges_by_connector(node, edge.dst_conn.replace("IN_", "OUT_")))[0]
                     if out_edge.dst.data != "levmask":
@@ -535,13 +557,11 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             map_nsdfg.add_in_connector("out_val_0")
             map_state.add_edge(node, "OUT_5", map_nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35]"))
 
-    # sdfg.save("debug_step_3_6.sdfg")
     sdfg.simplify(validate=False)
     # sdfg.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     target_state.parent_graph.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     node, parent = find_node_by_name(sdfg, "T_l562_c562")
     parent.parent.add_scalar("out_val_0", dtype=dace.float64)
-    # sdfg.save("debug_step_3.sdfg")
     sdfg.validate()
     # assert False
 
