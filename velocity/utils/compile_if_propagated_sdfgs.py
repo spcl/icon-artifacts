@@ -177,6 +177,7 @@ def comment_out_syncs(filepath):
             file.write(line)
     if not added_one:
         print(f"WARNING: Couldn't add one necessary sync.")
+        raise Exception(f"HA FUCK IT IS AN EXCEPTION NOW: Couldn't add one necessary sync.")
 
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
@@ -239,7 +240,7 @@ def compile_if_propagated_sdfgs(
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
-            # comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+            comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
