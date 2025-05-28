@@ -42,7 +42,7 @@ def optimization_action(sdfg):
     sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
     if config.reduction:
         add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
-    init_transient_zero(sdfg)
+    # init_transient_zero(sdfg)
     # It is here to get rid of redundant symbols like `ol_size` (which are not correctly handled in other hacks later).
     ConstantPropagation().apply_pass(sdfg, {})
     return sdfg

@@ -67,7 +67,8 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
         sdfgs, gpu=True, release=False,
         instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
         generate_code=True, lib=False,
-        main_name="main.cu"
+        main_name="main.cu",
+        stage=stage,
         )
   binpath = Path('velocity_gpu')
   assert binpath.exists()

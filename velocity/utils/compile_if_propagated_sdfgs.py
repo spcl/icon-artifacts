@@ -156,7 +156,7 @@ def add_timers(file_path: str, gpu: bool):
     with open(file_path, "w") as f:
         f.write(code)
 
-def comment_out_syncs(filepath):
+def comment_out_syncs(filepath, stage):
     # comment out (prepend //) any line containing cudaStreamSynchronize
     vcflmax_count = 0
     added_one = False
@@ -176,7 +176,7 @@ def comment_out_syncs(filepath):
                   line = "//" + line
             file.write(line)
     if not added_one:
-        print(f"WARNING: Couldn't add one necessary sync.")
+        #print(f"WARNING: Couldn't add one necessary sync (OK if not stage 6).")
         raise Exception(f"HA FUCK IT IS AN EXCEPTION NOW: Couldn't add one necessary sync.")
 
 def compile_if_propagated_sdfgs(
@@ -188,6 +188,7 @@ def compile_if_propagated_sdfgs(
     lib = False,
     ref = False,
     main_name = None,
+    stage = 1,
 ):
     sources = set()
     sources.add("src/reductions.cpp")
@@ -240,7 +241,8 @@ def compile_if_propagated_sdfgs(
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
-            comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+            if stage > 5:
+                comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu", stage)
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
