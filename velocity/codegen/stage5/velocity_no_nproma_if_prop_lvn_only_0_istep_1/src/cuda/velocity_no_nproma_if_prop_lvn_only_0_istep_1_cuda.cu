@@ -2,6 +2,16 @@
 #define __REDUCE_DEVICE__
 #include "reductions_device.cuh"
 #define __REDUCE_DEVICE__
+#include "reductions_device.cuh"
+#define __REDUCE_DEVICE__
+#include "reductions_device.cuh"
+#define __REDUCE_DEVICE__
+#include "reductions_device.cuh"
+#define __REDUCE_DEVICE__
+#include "reductions_device.cuh"
+#define __REDUCE_DEVICE__
+#include "reductions_device.cuh"
+#define __REDUCE_DEVICE__
 
 #include <cuda_runtime.h>
 #include <dace/dace.h>

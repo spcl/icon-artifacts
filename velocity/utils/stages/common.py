@@ -57,14 +57,14 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
   dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   if stage > 5:
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=True,
+        sdfgs, gpu=True, release=False,
         instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
         generate_code=True, lib=False,
         main_name="main_gpu.cu"
         )
   else:
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=True,
+        sdfgs, gpu=True, release=False,
         instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
         generate_code=True, lib=False,
         main_name="main.cu"
