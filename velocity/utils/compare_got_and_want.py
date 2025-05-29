@@ -166,11 +166,14 @@ def make_comparison_for_timestep(ts: int, root: Path) -> Tuple[int, pl.DataFrame
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(description="Run compare_got_and_want with a timestep.")
+    argp.add_argument("-r", "--root", type=str, default=".",
+        help="Root directory for the got and want files.")
     argp.add_argument("timesteps", type=str, nargs="?", default="",
         help="Comma-separated list of timesteps. If omitted, all timesteps are processed.")
     args = argp.parse_args()
 
-    root = Path.cwd()
+    root = Path(args.root)
+    print(f"Looking at: {root}")
 
     timesteps = [ts.strip() for ts in args.timesteps.split(',') if ts.strip()]
     assert all(ts.isdigit() for ts in timesteps)
@@ -182,7 +185,7 @@ if __name__ == "__main__":
 
     with ProcessPoolExecutor(max_workers=DEFAULT_WORKERS) as ex:
         for ts, T in ex.map(partial(make_comparison_for_timestep, root=root), timesteps):
-            csvpath = Path(f"numeric_differences_ts={ts}.csv")
+            csvpath = root.joinpath(Path(f"numeric_differences_ts={ts}.csv"))
             print(f"Saving to: {csvpath}")
             T = T.sort(['got_file', 'variable'])
             T.write_csv(csvpath, float_precision=None)
