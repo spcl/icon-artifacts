@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include "flags.h"
 
 #include "serde.h"
 #include "velocity_tendencies.h"
@@ -144,18 +145,20 @@ void got_want_pair(const global_data_type& got, const global_data_type& want,
 }
 
 int main(int argc, char* argv[]) {
-  const std::filesystem::path ROOT{"data_nproma20480"};
-  std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
-  int n1 = -1;
-  int rep = 1;
+  const flags::args args(argc, argv);
 
-  if (argc == 2) {
-    n1 = std::atoi(argv[1]);
+  const auto root = args.get<std::string>("data", "data_nproma20480");
+  const std::filesystem::path ROOT{root};
+
+  std::vector<int> ns;
+  for (const auto ts : args.positional()) {
+    ns.push_back(std::stoi(std::string(ts)));
   }
-  acout() << "Running: " << n1 << std::endl;
-  if (n1 > 0) {
-    ns = {n1};
+  if (ns.empty()) {
+    ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
   }
+
+  const int rep = 1;
 
   for (int n : ns) {
     acerr() << "Reading data for " << n << "..." << std::endl;
