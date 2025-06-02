@@ -7,7 +7,7 @@ from utils.reductions import add_all_reductions
 from utils.unique_names import unique_names
 from utils.benchmark_sdfg import instrument_sdfg
 from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
-
+from utils.config import release
 
 STARTER_SDFG_FILES = [
     "velocity_no_nproma_if_prop_lvn_only_0_istep_1.sdfgz",
@@ -57,15 +57,13 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
   dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   if stage > 5:
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=False,
-        instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
+        sdfgs, gpu=True, release=release,
         generate_code=True, lib=False,
-        main_name="main_gpu.cu"
+        main_name="main_gpu.cu", stage=stage,
         )
   else:
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=False,
-        instrument=config.instrument,  # Redundant. TODO: Remove from the interface.
+        sdfgs, gpu=True, release=release,
         generate_code=True, lib=False,
         main_name="main.cu",
         stage=stage,

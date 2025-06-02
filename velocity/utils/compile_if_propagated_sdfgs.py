@@ -156,7 +156,7 @@ def add_timers(file_path: str, gpu: bool):
     with open(file_path, "w") as f:
         f.write(code)
 
-def comment_out_syncs(filepath, stage):
+def comment_out_syncs(filepath):
     # comment out (prepend //) any line containing cudaStreamSynchronize
     vcflmax_count = 0
     added_one = False
@@ -181,14 +181,12 @@ def comment_out_syncs(filepath, stage):
 
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
-    gpu: bool = False,
-    release: bool = False,
-    instrument: bool = False,
-    generate_code: bool = True,
-    lib = False,
-    ref = False,
-    main_name = None,
-    stage = 1,
+    gpu: bool,
+    release: bool,
+    generate_code: bool,
+    lib: bool,
+    main_name: None | str,
+    stage: int,
 ):
     sources = set()
     sources.add("src/reductions.cpp")
@@ -242,7 +240,7 @@ def compile_if_propagated_sdfgs(
         if gpu:
             _replace_cpp_with_cu(build_loc)
             if stage > 5:
-                comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu", stage)
+                comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
@@ -281,10 +279,7 @@ def compile_if_propagated_sdfgs(
     else:
         if not gpu:
             if not lib:
-                if not ref:
-                    sources.add("main.cc")
-                else:
-                    sources.add("main_ref.cc")
+                sources.add("main.cc")
         else:
             if not lib:
                 sources.add("main_gpu.cu")
