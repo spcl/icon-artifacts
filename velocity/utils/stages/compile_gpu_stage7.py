@@ -10,12 +10,21 @@ from dace.transformation.passes.to_gpu import ToGPU
 from dace.transformation.passes import GPUKernelLaunchRestructure
 from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 import argparse
+from utils.pre_gpu_fixes import make_arrays_persistent
 
 STAGE_ID = 7
 
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
+    for arr_name, arr in sdfg.arrays.items():
+        if "maxvcfl_arr" in arr_name:
+            if "gpu" in arr_name:
+                arr.storage = dace.dtypes.StorageType.GPU_Global
+            else:
+                arr.storage = dace.dtypes.StorageType.CPU_Heap
+            arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
+    make_arrays_persistent(sdfg)
     return sdfg
 
 def main():

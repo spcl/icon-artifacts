@@ -53,8 +53,6 @@ def optimization_action(sdfg):
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35")
             #if e.data.subset =
     sdfg.validate()
-    """
-"""
     return sdfg
 
 def main():
