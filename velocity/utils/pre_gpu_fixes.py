@@ -575,7 +575,7 @@ def make_arrays_persistent(sdfg: dace.SDFG):
                         "gpu_cfl_clipping", "gpu_z_w_con_c", "gpu_levmask",
                         "gpu_zeta", "gpu_z_w_con_c_full", "gpu_out_val_0",
                         "gpu_z_v_grad_w", "gpu_z_ekinh", "gpu_z_w_concorr_mc",
-                        "vcflmax"
+                        "vcflmax", "out_val_0"
                        ]
     for node, parent in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.AccessNode) and node.data in move_persistent :

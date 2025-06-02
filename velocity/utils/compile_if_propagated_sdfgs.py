@@ -6,7 +6,7 @@ import typing
 import re
 
 from dace.sdfg import infer_types
-from utils.config import fix_out_val_0
+from utils.config import fix_out_val_0, rm_syncs
 
 # Replace cpp with cu
 def _replace_cpp_with_cu(directory):
@@ -188,6 +188,7 @@ def compile_if_propagated_sdfgs(
     main_name: None | str,
     stage: int,
 ):
+    dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
     sources = set()
     sources.add("src/reductions.cpp")
     sources.add("src/timer.cpp")
@@ -239,7 +240,7 @@ def compile_if_propagated_sdfgs(
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
-            if stage > 5:
+            if stage > 5 and rm_syncs:
                 comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()

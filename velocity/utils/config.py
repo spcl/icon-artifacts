@@ -8,3 +8,4 @@ tile = False
 remainder_loop = False
 fix_out_val_0 = False
 layout_transform = False
+rm_syncs = False
