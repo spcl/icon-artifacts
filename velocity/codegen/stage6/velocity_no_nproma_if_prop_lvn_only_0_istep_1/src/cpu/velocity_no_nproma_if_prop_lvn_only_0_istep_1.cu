@@ -5,6 +5,69 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
+};
+
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
+    int __f2dace_SA_c_lin_e_d_1_s_26 = {};
+    int __f2dace_SA_c_lin_e_d_2_s_27 = {};
+    int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
+    int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
+    int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
+    int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
+    int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
+    int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
+    int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
+    int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
+    int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
+    int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
+    int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
+    int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
+    int __f2dace_SA_geofac_rot_d_0_s_40 = {};
+    int __f2dace_SA_geofac_rot_d_1_s_41 = {};
+    int __f2dace_SA_geofac_rot_d_2_s_42 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
+    int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
+    int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
+    int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
+    int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
+    int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
+    int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
+    int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
+    int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
+    int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
+    int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
+    int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
+    int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
+    int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
+    int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
+    int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
+    int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
+    int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
+    int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* geofac_grdiv = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* rbf_vec_coeff_e = {};
+};
+
 struct t_nh_diag {
     int __f2dace_SA_ddt_vn_apc_pc_d_0_s_300 = {};
     int __f2dace_SA_ddt_vn_apc_pc_d_1_s_301 = {};
@@ -46,119 +109,6 @@ struct t_nh_diag {
     double* vn_ie = {};
     double* vt = {};
     double* w_concorr_c = {};
-};
-
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s_288 = {};
-    int __f2dace_SA_vn_d_1_s_289 = {};
-    int __f2dace_SA_vn_d_2_s_290 = {};
-    int __f2dace_SA_w_d_0_s_285 = {};
-    int __f2dace_SA_w_d_1_s_286 = {};
-    int __f2dace_SA_w_d_2_s_287 = {};
-    int __f2dace_SOA_vn_d_0_s_288 = {};
-    int __f2dace_SOA_vn_d_1_s_289 = {};
-    int __f2dace_SOA_vn_d_2_s_290 = {};
-    int __f2dace_SOA_w_d_0_s_285 = {};
-    int __f2dace_SOA_w_d_1_s_286 = {};
-    int __f2dace_SOA_w_d_2_s_287 = {};
-    double* vn = {};
-    double* w = {};
-};
-
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
-struct t_nh_metrics {
-    int __f2dace_SA_coeff1_dwdz_d_0_s_332 = {};
-    int __f2dace_SA_coeff1_dwdz_d_1_s_333 = {};
-    int __f2dace_SA_coeff1_dwdz_d_2_s_334 = {};
-    int __f2dace_SA_coeff2_dwdz_d_0_s_335 = {};
-    int __f2dace_SA_coeff2_dwdz_d_1_s_336 = {};
-    int __f2dace_SA_coeff2_dwdz_d_2_s_337 = {};
-    int __f2dace_SA_coeff_gradekin_d_0_s_329 = {};
-    int __f2dace_SA_coeff_gradekin_d_1_s_330 = {};
-    int __f2dace_SA_coeff_gradekin_d_2_s_331 = {};
-    int __f2dace_SA_ddqz_z_full_e_d_0_s_314 = {};
-    int __f2dace_SA_ddqz_z_full_e_d_1_s_315 = {};
-    int __f2dace_SA_ddqz_z_full_e_d_2_s_316 = {};
-    int __f2dace_SA_ddqz_z_half_d_0_s_317 = {};
-    int __f2dace_SA_ddqz_z_half_d_1_s_318 = {};
-    int __f2dace_SA_ddqz_z_half_d_2_s_319 = {};
-    int __f2dace_SA_ddxn_z_full_d_0_s_308 = {};
-    int __f2dace_SA_ddxn_z_full_d_1_s_309 = {};
-    int __f2dace_SA_ddxn_z_full_d_2_s_310 = {};
-    int __f2dace_SA_ddxt_z_full_d_0_s_311 = {};
-    int __f2dace_SA_ddxt_z_full_d_1_s_312 = {};
-    int __f2dace_SA_ddxt_z_full_d_2_s_313 = {};
-    int __f2dace_SA_deepatmo_gradh_ifc_d_0_s_340 = {};
-    int __f2dace_SA_deepatmo_gradh_mc_d_0_s_338 = {};
-    int __f2dace_SA_deepatmo_invr_ifc_d_0_s_341 = {};
-    int __f2dace_SA_deepatmo_invr_mc_d_0_s_339 = {};
-    int __f2dace_SA_wgtfac_c_d_0_s_320 = {};
-    int __f2dace_SA_wgtfac_c_d_1_s_321 = {};
-    int __f2dace_SA_wgtfac_c_d_2_s_322 = {};
-    int __f2dace_SA_wgtfac_e_d_0_s_323 = {};
-    int __f2dace_SA_wgtfac_e_d_1_s_324 = {};
-    int __f2dace_SA_wgtfac_e_d_2_s_325 = {};
-    int __f2dace_SA_wgtfacq_e_d_0_s_326 = {};
-    int __f2dace_SA_wgtfacq_e_d_1_s_327 = {};
-    int __f2dace_SA_wgtfacq_e_d_2_s_328 = {};
-    int __f2dace_SOA_coeff1_dwdz_d_0_s_332 = {};
-    int __f2dace_SOA_coeff1_dwdz_d_1_s_333 = {};
-    int __f2dace_SOA_coeff1_dwdz_d_2_s_334 = {};
-    int __f2dace_SOA_coeff2_dwdz_d_0_s_335 = {};
-    int __f2dace_SOA_coeff2_dwdz_d_1_s_336 = {};
-    int __f2dace_SOA_coeff2_dwdz_d_2_s_337 = {};
-    int __f2dace_SOA_coeff_gradekin_d_0_s_329 = {};
-    int __f2dace_SOA_coeff_gradekin_d_1_s_330 = {};
-    int __f2dace_SOA_coeff_gradekin_d_2_s_331 = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_0_s_314 = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_1_s_315 = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_2_s_316 = {};
-    int __f2dace_SOA_ddqz_z_half_d_0_s_317 = {};
-    int __f2dace_SOA_ddqz_z_half_d_1_s_318 = {};
-    int __f2dace_SOA_ddqz_z_half_d_2_s_319 = {};
-    int __f2dace_SOA_ddxn_z_full_d_0_s_308 = {};
-    int __f2dace_SOA_ddxn_z_full_d_1_s_309 = {};
-    int __f2dace_SOA_ddxn_z_full_d_2_s_310 = {};
-    int __f2dace_SOA_ddxt_z_full_d_0_s_311 = {};
-    int __f2dace_SOA_ddxt_z_full_d_1_s_312 = {};
-    int __f2dace_SOA_ddxt_z_full_d_2_s_313 = {};
-    int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s_340 = {};
-    int __f2dace_SOA_deepatmo_gradh_mc_d_0_s_338 = {};
-    int __f2dace_SOA_deepatmo_invr_ifc_d_0_s_341 = {};
-    int __f2dace_SOA_deepatmo_invr_mc_d_0_s_339 = {};
-    int __f2dace_SOA_wgtfac_c_d_0_s_320 = {};
-    int __f2dace_SOA_wgtfac_c_d_1_s_321 = {};
-    int __f2dace_SOA_wgtfac_c_d_2_s_322 = {};
-    int __f2dace_SOA_wgtfac_e_d_0_s_323 = {};
-    int __f2dace_SOA_wgtfac_e_d_1_s_324 = {};
-    int __f2dace_SOA_wgtfac_e_d_2_s_325 = {};
-    int __f2dace_SOA_wgtfacq_e_d_0_s_326 = {};
-    int __f2dace_SOA_wgtfacq_e_d_1_s_327 = {};
-    int __f2dace_SOA_wgtfacq_e_d_2_s_328 = {};
-    double* coeff1_dwdz = {};
-    double* coeff2_dwdz = {};
-    double* coeff_gradekin = {};
-    double* ddqz_z_full_e = {};
-    double* ddqz_z_half = {};
-    double* ddxn_z_full = {};
-    double* ddxt_z_full = {};
-    double* deepatmo_gradh_ifc = {};
-    double* deepatmo_gradh_mc = {};
-    double* deepatmo_invr_ifc = {};
-    double* deepatmo_invr_mc = {};
-    double* wgtfac_c = {};
-    double* wgtfac_e = {};
-    double* wgtfacq_e = {};
 };
 
 struct t_grid_domain_decomp_info {
@@ -362,56 +312,106 @@ struct t_patch {
     t_grid_vertices* verts = {};
 };
 
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
-    int __f2dace_SA_c_lin_e_d_1_s_26 = {};
-    int __f2dace_SA_c_lin_e_d_2_s_27 = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
-    int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
-    int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
-    int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
-    int __f2dace_SA_geofac_rot_d_0_s_40 = {};
-    int __f2dace_SA_geofac_rot_d_1_s_41 = {};
-    int __f2dace_SA_geofac_rot_d_2_s_42 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
-    int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
-    int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
-    int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
-    int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
-    int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
-    int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* geofac_grdiv = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* rbf_vec_coeff_e = {};
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s_288 = {};
+    int __f2dace_SA_vn_d_1_s_289 = {};
+    int __f2dace_SA_vn_d_2_s_290 = {};
+    int __f2dace_SA_w_d_0_s_285 = {};
+    int __f2dace_SA_w_d_1_s_286 = {};
+    int __f2dace_SA_w_d_2_s_287 = {};
+    int __f2dace_SOA_vn_d_0_s_288 = {};
+    int __f2dace_SOA_vn_d_1_s_289 = {};
+    int __f2dace_SOA_vn_d_2_s_290 = {};
+    int __f2dace_SOA_w_d_0_s_285 = {};
+    int __f2dace_SOA_w_d_1_s_286 = {};
+    int __f2dace_SOA_w_d_2_s_287 = {};
+    double* vn = {};
+    double* w = {};
+};
+
+struct t_nh_metrics {
+    int __f2dace_SA_coeff1_dwdz_d_0_s_332 = {};
+    int __f2dace_SA_coeff1_dwdz_d_1_s_333 = {};
+    int __f2dace_SA_coeff1_dwdz_d_2_s_334 = {};
+    int __f2dace_SA_coeff2_dwdz_d_0_s_335 = {};
+    int __f2dace_SA_coeff2_dwdz_d_1_s_336 = {};
+    int __f2dace_SA_coeff2_dwdz_d_2_s_337 = {};
+    int __f2dace_SA_coeff_gradekin_d_0_s_329 = {};
+    int __f2dace_SA_coeff_gradekin_d_1_s_330 = {};
+    int __f2dace_SA_coeff_gradekin_d_2_s_331 = {};
+    int __f2dace_SA_ddqz_z_full_e_d_0_s_314 = {};
+    int __f2dace_SA_ddqz_z_full_e_d_1_s_315 = {};
+    int __f2dace_SA_ddqz_z_full_e_d_2_s_316 = {};
+    int __f2dace_SA_ddqz_z_half_d_0_s_317 = {};
+    int __f2dace_SA_ddqz_z_half_d_1_s_318 = {};
+    int __f2dace_SA_ddqz_z_half_d_2_s_319 = {};
+    int __f2dace_SA_ddxn_z_full_d_0_s_308 = {};
+    int __f2dace_SA_ddxn_z_full_d_1_s_309 = {};
+    int __f2dace_SA_ddxn_z_full_d_2_s_310 = {};
+    int __f2dace_SA_ddxt_z_full_d_0_s_311 = {};
+    int __f2dace_SA_ddxt_z_full_d_1_s_312 = {};
+    int __f2dace_SA_ddxt_z_full_d_2_s_313 = {};
+    int __f2dace_SA_deepatmo_gradh_ifc_d_0_s_340 = {};
+    int __f2dace_SA_deepatmo_gradh_mc_d_0_s_338 = {};
+    int __f2dace_SA_deepatmo_invr_ifc_d_0_s_341 = {};
+    int __f2dace_SA_deepatmo_invr_mc_d_0_s_339 = {};
+    int __f2dace_SA_wgtfac_c_d_0_s_320 = {};
+    int __f2dace_SA_wgtfac_c_d_1_s_321 = {};
+    int __f2dace_SA_wgtfac_c_d_2_s_322 = {};
+    int __f2dace_SA_wgtfac_e_d_0_s_323 = {};
+    int __f2dace_SA_wgtfac_e_d_1_s_324 = {};
+    int __f2dace_SA_wgtfac_e_d_2_s_325 = {};
+    int __f2dace_SA_wgtfacq_e_d_0_s_326 = {};
+    int __f2dace_SA_wgtfacq_e_d_1_s_327 = {};
+    int __f2dace_SA_wgtfacq_e_d_2_s_328 = {};
+    int __f2dace_SOA_coeff1_dwdz_d_0_s_332 = {};
+    int __f2dace_SOA_coeff1_dwdz_d_1_s_333 = {};
+    int __f2dace_SOA_coeff1_dwdz_d_2_s_334 = {};
+    int __f2dace_SOA_coeff2_dwdz_d_0_s_335 = {};
+    int __f2dace_SOA_coeff2_dwdz_d_1_s_336 = {};
+    int __f2dace_SOA_coeff2_dwdz_d_2_s_337 = {};
+    int __f2dace_SOA_coeff_gradekin_d_0_s_329 = {};
+    int __f2dace_SOA_coeff_gradekin_d_1_s_330 = {};
+    int __f2dace_SOA_coeff_gradekin_d_2_s_331 = {};
+    int __f2dace_SOA_ddqz_z_full_e_d_0_s_314 = {};
+    int __f2dace_SOA_ddqz_z_full_e_d_1_s_315 = {};
+    int __f2dace_SOA_ddqz_z_full_e_d_2_s_316 = {};
+    int __f2dace_SOA_ddqz_z_half_d_0_s_317 = {};
+    int __f2dace_SOA_ddqz_z_half_d_1_s_318 = {};
+    int __f2dace_SOA_ddqz_z_half_d_2_s_319 = {};
+    int __f2dace_SOA_ddxn_z_full_d_0_s_308 = {};
+    int __f2dace_SOA_ddxn_z_full_d_1_s_309 = {};
+    int __f2dace_SOA_ddxn_z_full_d_2_s_310 = {};
+    int __f2dace_SOA_ddxt_z_full_d_0_s_311 = {};
+    int __f2dace_SOA_ddxt_z_full_d_1_s_312 = {};
+    int __f2dace_SOA_ddxt_z_full_d_2_s_313 = {};
+    int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s_340 = {};
+    int __f2dace_SOA_deepatmo_gradh_mc_d_0_s_338 = {};
+    int __f2dace_SOA_deepatmo_invr_ifc_d_0_s_341 = {};
+    int __f2dace_SOA_deepatmo_invr_mc_d_0_s_339 = {};
+    int __f2dace_SOA_wgtfac_c_d_0_s_320 = {};
+    int __f2dace_SOA_wgtfac_c_d_1_s_321 = {};
+    int __f2dace_SOA_wgtfac_c_d_2_s_322 = {};
+    int __f2dace_SOA_wgtfac_e_d_0_s_323 = {};
+    int __f2dace_SOA_wgtfac_e_d_1_s_324 = {};
+    int __f2dace_SOA_wgtfac_e_d_2_s_325 = {};
+    int __f2dace_SOA_wgtfacq_e_d_0_s_326 = {};
+    int __f2dace_SOA_wgtfacq_e_d_1_s_327 = {};
+    int __f2dace_SOA_wgtfacq_e_d_2_s_328 = {};
+    double* coeff1_dwdz = {};
+    double* coeff2_dwdz = {};
+    double* coeff_gradekin = {};
+    double* ddqz_z_full_e = {};
+    double* ddqz_z_half = {};
+    double* ddxn_z_full = {};
+    double* ddxt_z_full = {};
+    double* deepatmo_gradh_ifc = {};
+    double* deepatmo_gradh_mc = {};
+    double* deepatmo_invr_ifc = {};
+    double* deepatmo_invr_mc = {};
+    double* wgtfac_c = {};
+    double* wgtfac_e = {};
+    double* wgtfacq_e = {};
 };
 
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t {
@@ -744,7 +744,7 @@ inline void loop_body_0_0_5(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_
     {
 
         __dace_runkernel_single_state_body_map_0_0_1_1_6(__state, gpu___CG_p_int__m_cells_aw_verts, gpu___CG_p_patch__CG_verts__m_cell_blk, gpu___CG_p_patch__CG_verts__m_cell_idx, gpu___CG_p_prog__m_w, gpu_z_w_v, __f2dace_SA_cell_blk_d_0_s_203_verts_p_patch_5, __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5, __f2dace_SA_cell_idx_d_0_s_200_verts_p_patch_5, __f2dace_SA_cell_idx_d_1_s_201_verts_p_patch_5, __f2dace_SA_cells_aw_verts_d_0_s_31_p_int_6, __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6, __f2dace_SA_w_d_0_s_285_p_prog_7, __f2dace_SOA_cell_blk_d_0_s_203_verts_p_patch_5, __f2dace_SOA_cell_blk_d_1_s_204_verts_p_patch_5, __f2dace_SOA_cell_blk_d_2_s_205_verts_p_patch_5, __f2dace_SOA_cell_idx_d_0_s_200_verts_p_patch_5, __f2dace_SOA_cell_idx_d_1_s_201_verts_p_patch_5, __f2dace_SOA_cell_idx_d_2_s_202_verts_p_patch_5, __f2dace_SOA_cells_aw_verts_d_0_s_31_p_int_6, __f2dace_SOA_cells_aw_verts_d_1_s_32_p_int_6, __f2dace_SOA_cells_aw_verts_d_2_s_33_p_int_6, __f2dace_SOA_w_d_0_s_285_p_prog_7, __f2dace_SOA_w_d_1_s_286_p_prog_7, __f2dace_SOA_w_d_2_s_287_p_prog_7, _for_it_0_0_0, i_endidx_var_47_0_0, i_startidx_var_46_0_0, tmp_struct_symbol_6);
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
 
 
     }
@@ -836,11 +836,10 @@ inline void loop_body_0_0_24(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state
 
         __dace_runkernel_single_state_body_map_0_0_17_2_17(__state, gpu___CG_p_diag__m_vt, gpu___CG_p_int__m_rbf_vec_coeff_e, gpu___CG_p_patch__CG_edges__m_quad_blk, gpu___CG_p_patch__CG_edges__m_quad_idx, gpu___CG_p_prog__m_vn, __f2dace_SA_quad_blk_d_0_s_181_edges_p_patch_4, __f2dace_SA_quad_blk_d_1_s_182_edges_p_patch_4, __f2dace_SA_quad_idx_d_0_s_178_edges_p_patch_4, __f2dace_SA_quad_idx_d_1_s_179_edges_p_patch_4, __f2dace_SA_rbf_vec_coeff_e_d_0_s_34_p_int_6, __f2dace_SA_rbf_vec_coeff_e_d_1_s_35_p_int_6, __f2dace_SA_vn_d_0_s_288_p_prog_7, __f2dace_SA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_quad_blk_d_0_s_181_edges_p_patch_4, __f2dace_SOA_quad_blk_d_1_s_182_edges_p_patch_4, __f2dace_SOA_quad_blk_d_2_s_183_edges_p_patch_4, __f2dace_SOA_quad_idx_d_0_s_178_edges_p_patch_4, __f2dace_SOA_quad_idx_d_1_s_179_edges_p_patch_4, __f2dace_SOA_quad_idx_d_2_s_180_edges_p_patch_4, __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34_p_int_6, __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35_p_int_6, __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36_p_int_6, __f2dace_SOA_vn_d_0_s_288_p_prog_7, __f2dace_SOA_vn_d_1_s_289_p_prog_7, __f2dace_SOA_vn_d_2_s_290_p_prog_7, __f2dace_SOA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_vt_d_1_s_292_p_diag_9, __f2dace_SOA_vt_d_2_s_293_p_diag_9, _for_it_6, i_endidx_var_149, i_startidx_var_148);
         cudaEventRecord(__state->gpu_context->events[3], __state->gpu_context->streams[0]);
-        cudaStreamWaitEvent(__state->gpu_context->streams[1], __state->gpu_context->events[3], 0);
+        cudaStreamWaitEvent(__state->gpu_context->streams[0], __state->gpu_context->events[3], 0);
         __dace_runkernel_single_state_body_3_map_0_0_17_2_21(__state, gpu___CG_p_diag__m_vt, gpu___CG_p_metrics__m_wgtfac_e, gpu_z_vt_ie, __f2dace_A_z_vt_ie_d_0_s_366, __f2dace_A_z_vt_ie_d_1_s_367, __f2dace_OA_z_vt_ie_d_0_s_366, __f2dace_OA_z_vt_ie_d_1_s_367, __f2dace_OA_z_vt_ie_d_2_s_368, __f2dace_SA_vt_d_0_s_291_p_diag_9, __f2dace_SA_wgtfac_e_d_0_s_323_p_metrics_8, __f2dace_SOA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_vt_d_1_s_292_p_diag_9, __f2dace_SOA_vt_d_2_s_293_p_diag_9, __f2dace_SOA_wgtfac_e_d_0_s_323_p_metrics_8, __f2dace_SOA_wgtfac_e_d_1_s_324_p_metrics_8, __f2dace_SOA_wgtfac_e_d_2_s_325_p_metrics_8, _for_it_6, i_endidx_var_149, i_startidx_var_148);
         __dace_runkernel_single_state_body_0_map_0_0_17_2_19(__state, gpu___CG_p_diag__m_vn_ie, gpu___CG_p_diag__m_vt, gpu___CG_p_metrics__m_wgtfac_e, gpu___CG_p_prog__m_vn, gpu_z_kin_hor_e, __f2dace_A_z_kin_hor_e_d_0_s_363, __f2dace_A_z_kin_hor_e_d_1_s_364, __f2dace_OA_z_kin_hor_e_d_0_s_363, __f2dace_OA_z_kin_hor_e_d_1_s_364, __f2dace_OA_z_kin_hor_e_d_2_s_365, __f2dace_SA_vn_d_0_s_288_p_prog_7, __f2dace_SA_vn_ie_d_0_s_294_p_diag_9, __f2dace_SA_vt_d_0_s_291_p_diag_9, __f2dace_SA_wgtfac_e_d_0_s_323_p_metrics_8, __f2dace_SOA_vn_d_0_s_288_p_prog_7, __f2dace_SOA_vn_d_1_s_289_p_prog_7, __f2dace_SOA_vn_d_2_s_290_p_prog_7, __f2dace_SOA_vn_ie_d_0_s_294_p_diag_9, __f2dace_SOA_vn_ie_d_1_s_295_p_diag_9, __f2dace_SOA_vn_ie_d_2_s_296_p_diag_9, __f2dace_SOA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_vt_d_1_s_292_p_diag_9, __f2dace_SOA_vt_d_2_s_293_p_diag_9, __f2dace_SOA_wgtfac_e_d_0_s_323_p_metrics_8, __f2dace_SOA_wgtfac_e_d_1_s_324_p_metrics_8, __f2dace_SOA_wgtfac_e_d_2_s_325_p_metrics_8, _for_it_6, i_endidx_var_149, i_startidx_var_148);
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
 
 
     }
@@ -850,7 +849,6 @@ inline void loop_body_0_0_24(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state
         __dace_runkernel_single_state_body_1_map_0_0_17_3_20(__state, gpu___CG_p_diag__m_vt, gpu___CG_p_metrics__m_ddxn_z_full, gpu___CG_p_metrics__m_ddxt_z_full, gpu___CG_p_prog__m_vn, gpu_z_w_concorr_me, __f2dace_A_z_w_concorr_me_d_0_s_360, __f2dace_A_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_0_s_360, __f2dace_OA_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_2_s_362, __f2dace_SA_ddxn_z_full_d_0_s_308_p_metrics_8, __f2dace_SA_ddxt_z_full_d_0_s_311_p_metrics_8, __f2dace_SA_vn_d_0_s_288_p_prog_7, __f2dace_SA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_ddxn_z_full_d_0_s_308_p_metrics_8, __f2dace_SOA_ddxn_z_full_d_1_s_309_p_metrics_8, __f2dace_SOA_ddxn_z_full_d_2_s_310_p_metrics_8, __f2dace_SOA_ddxt_z_full_d_0_s_311_p_metrics_8, __f2dace_SOA_ddxt_z_full_d_1_s_312_p_metrics_8, __f2dace_SOA_ddxt_z_full_d_2_s_313_p_metrics_8, __f2dace_SOA_vn_d_0_s_288_p_prog_7, __f2dace_SOA_vn_d_1_s_289_p_prog_7, __f2dace_SOA_vn_d_2_s_290_p_prog_7, __f2dace_SOA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_vt_d_1_s_292_p_diag_9, __f2dace_SOA_vt_d_2_s_293_p_diag_9, _for_it_6, i_endidx_var_149, i_startidx_var_148, nflatlev_jg);
         __dace_runkernel_single_state_body_2_map_0_0_17_3_10(__state, gpu___CG_p_diag__m_vn_ie, gpu___CG_p_diag__m_vt, gpu___CG_p_metrics__m_wgtfacq_e, gpu___CG_p_prog__m_vn, gpu_z_kin_hor_e, gpu_z_vt_ie, __f2dace_A_z_kin_hor_e_d_0_s_363, __f2dace_A_z_kin_hor_e_d_1_s_364, __f2dace_A_z_vt_ie_d_0_s_366, __f2dace_A_z_vt_ie_d_1_s_367, __f2dace_OA_z_kin_hor_e_d_0_s_363, __f2dace_OA_z_kin_hor_e_d_1_s_364, __f2dace_OA_z_kin_hor_e_d_2_s_365, __f2dace_OA_z_vt_ie_d_0_s_366, __f2dace_OA_z_vt_ie_d_1_s_367, __f2dace_OA_z_vt_ie_d_2_s_368, __f2dace_SA_vn_d_0_s_288_p_prog_7, __f2dace_SA_vn_ie_d_0_s_294_p_diag_9, __f2dace_SA_vt_d_0_s_291_p_diag_9, __f2dace_SA_wgtfacq_e_d_0_s_326_p_metrics_8, __f2dace_SA_wgtfacq_e_d_1_s_327_p_metrics_8, __f2dace_SOA_vn_d_0_s_288_p_prog_7, __f2dace_SOA_vn_d_1_s_289_p_prog_7, __f2dace_SOA_vn_d_2_s_290_p_prog_7, __f2dace_SOA_vn_ie_d_0_s_294_p_diag_9, __f2dace_SOA_vn_ie_d_1_s_295_p_diag_9, __f2dace_SOA_vn_ie_d_2_s_296_p_diag_9, __f2dace_SOA_vt_d_0_s_291_p_diag_9, __f2dace_SOA_vt_d_1_s_292_p_diag_9, __f2dace_SOA_vt_d_2_s_293_p_diag_9, __f2dace_SOA_wgtfacq_e_d_0_s_326_p_metrics_8, __f2dace_SOA_wgtfacq_e_d_1_s_327_p_metrics_8, __f2dace_SOA_wgtfacq_e_d_2_s_328_p_metrics_8, _for_it_6, i_endidx_var_149, i_startidx_var_148);
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
 
 
     }
@@ -959,9 +957,6 @@ inline void loop_body_0_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_
         __dace_runkernel_single_state_body_0_map_0_0_24_3_15(__state, gpu___CG_p_prog__m_w, gpu_z_w_con_c, __f2dace_SA_w_d_0_s_285_p_prog_7, __f2dace_SOA_w_d_0_s_285_p_prog_7, __f2dace_SOA_w_d_1_s_286_p_prog_7, __f2dace_SOA_w_d_2_s_287_p_prog_7, _for_it_22, i_endidx_var_149, i_startidx_var_148, tmp_struct_symbol_1);
         __dace_runkernel_single_state_body_6_map_0_0_24_3_13(__state, gpu___CG_p_int__m_e_bln_c_s, gpu___CG_p_patch__CG_cells__m_edge_blk, gpu___CG_p_patch__CG_cells__m_edge_idx, gpu_z_w_concorr_mc, gpu_z_w_concorr_me, __f2dace_A_z_w_concorr_me_d_0_s_360, __f2dace_A_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_0_s_360, __f2dace_OA_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_2_s_362, __f2dace_SA_e_bln_c_s_d_0_s_28_p_int_6, __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6, __f2dace_SA_edge_blk_d_0_s_155_cells_p_patch_2, __f2dace_SA_edge_blk_d_1_s_156_cells_p_patch_2, __f2dace_SA_edge_idx_d_0_s_152_cells_p_patch_2, __f2dace_SA_edge_idx_d_1_s_153_cells_p_patch_2, __f2dace_SOA_e_bln_c_s_d_0_s_28_p_int_6, __f2dace_SOA_e_bln_c_s_d_1_s_29_p_int_6, __f2dace_SOA_e_bln_c_s_d_2_s_30_p_int_6, __f2dace_SOA_edge_blk_d_0_s_155_cells_p_patch_2, __f2dace_SOA_edge_blk_d_1_s_156_cells_p_patch_2, __f2dace_SOA_edge_blk_d_2_s_157_cells_p_patch_2, __f2dace_SOA_edge_idx_d_0_s_152_cells_p_patch_2, __f2dace_SOA_edge_idx_d_1_s_153_cells_p_patch_2, __f2dace_SOA_edge_idx_d_2_s_154_cells_p_patch_2, _for_it_22, i_endidx_var_149, i_startidx_var_148, nflatlev_jg, tmp_struct_symbol_0);
         __dace_runkernel_single_state_body_7_map_0_0_24_3_19(__state, gpu___CG_p_diag__m_w_concorr_c, gpu___CG_p_metrics__m_wgtfac_c, gpu_z_w_concorr_mc, __f2dace_SA_w_concorr_c_d_0_s_297_p_diag_9, __f2dace_SA_wgtfac_c_d_0_s_320_p_metrics_8, __f2dace_SOA_w_concorr_c_d_0_s_297_p_diag_9, __f2dace_SOA_w_concorr_c_d_1_s_298_p_diag_9, __f2dace_SOA_w_concorr_c_d_2_s_299_p_diag_9, __f2dace_SOA_wgtfac_c_d_0_s_320_p_metrics_8, __f2dace_SOA_wgtfac_c_d_1_s_321_p_metrics_8, __f2dace_SOA_wgtfac_c_d_2_s_322_p_metrics_8, _for_it_22, i_endidx_var_149, i_startidx_var_148, nflatlev_jg, tmp_struct_symbol_0);
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
 
 
     }
@@ -1008,8 +1003,6 @@ inline void loop_body_0_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_
             ///////////////////
 
         }
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
 
 
     }
@@ -1037,7 +1030,7 @@ inline void loop_body_0_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_
             double out;
 
             ///////////////////
-            int __dace_current_stream_id = 2;
+            int __dace_current_stream_id = 0;
             cudaStream_t __dace_current_stream = __state->gpu_context->streams[__dace_current_stream_id];
 
             #define __REDUCE_GPU__
@@ -1056,7 +1049,7 @@ inline void loop_body_0_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_
 
             maxvcfl = out;
         }
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
         {
             double maxvcfl_0_in = maxvcfl;
             double vcflmax_out_0;
@@ -1068,10 +1061,9 @@ inline void loop_body_0_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_
 
             vcflmax[(_for_it_22 - 1)] = vcflmax_out_0;
         }
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
 
 cudaStreamSynchronize(__state->gpu_context->streams[0]);
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
 
 
     }
@@ -1406,35 +1398,35 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
     DACE_GPU_CHECK(cudaMalloc((void**)&gpu___CG_p_prog__m_vn, (((90 * __f2dace_SA_vn_d_0_s_288_p_prog_7) * (__f2dace_SA_vn_d_2_s_290_p_prog_7 - 1)) + (90 * __f2dace_SA_vn_d_0_s_288_p_prog_7)) * sizeof(double)));
     double * gpu___CG_p_prog__m_w;
     DACE_GPU_CHECK(cudaMalloc((void**)&gpu___CG_p_prog__m_w, (((91 * __f2dace_SA_w_d_0_s_285_p_prog_7) * (__f2dace_SA_w_d_2_s_287_p_prog_7 - 1)) + (91 * __f2dace_SA_w_d_0_s_285_p_prog_7)) * sizeof(double)));
-    double * gpu_zeta;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_zeta, (((90 * tmp_struct_symbol_8) * (tmp_struct_symbol_9 - 1)) + (90 * tmp_struct_symbol_8)) * sizeof(double)));
+    double * gpu_maxvcfl_arr;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_maxvcfl_arr, (((88 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (88 * tmp_struct_symbol_4)) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMemset(gpu_maxvcfl_arr, 0, (((88 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (88 * tmp_struct_symbol_4)) * sizeof(double)));
     double * gpu_z_vt_ie;
     DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_vt_ie, ((((__f2dace_A_z_vt_ie_d_0_s_366 * __f2dace_A_z_vt_ie_d_1_s_367) * (__f2dace_A_z_vt_ie_d_2_s_368 - 1)) + (__f2dace_A_z_vt_ie_d_0_s_366 * (__f2dace_A_z_vt_ie_d_1_s_367 - 1))) + __f2dace_A_z_vt_ie_d_0_s_366) * sizeof(double)));
-    double * gpu_z_ekinh;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_ekinh, (((90 * tmp_struct_symbol_10) * (tmp_struct_symbol_11 - 1)) + (90 * tmp_struct_symbol_10)) * sizeof(double)));
-    int * gpu_levmask;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_levmask, (90 * tmp_struct_symbol_13) * sizeof(int)));
-    int * gpu_levelmask;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_levelmask, 90 * sizeof(int)));
-    double * gpu_z_v_grad_w;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_v_grad_w, (((90 * tmp_struct_symbol_4) * (tmp_struct_symbol_5 - 1)) + (90 * tmp_struct_symbol_4)) * sizeof(double)));
-    double * gpu_z_w_v;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_v, (((91 * tmp_struct_symbol_6) * (tmp_struct_symbol_7 - 1)) + (91 * tmp_struct_symbol_6)) * sizeof(double)));
-    double * gpu_z_w_con_c;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_con_c, (((91 * tmp_struct_symbol_1) * (tmp_struct_symbol_5 - 1)) + (91 * tmp_struct_symbol_1)) * sizeof(double)));
-    int * gpu_cfl_clipping;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_cfl_clipping, (91 * tmp_struct_symbol_14) * sizeof(int)));
     double * gpu_z_kin_hor_e;
     DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_kin_hor_e, ((((__f2dace_A_z_kin_hor_e_d_0_s_363 * __f2dace_A_z_kin_hor_e_d_1_s_364) * (__f2dace_A_z_kin_hor_e_d_2_s_365 - 1)) + (__f2dace_A_z_kin_hor_e_d_0_s_363 * (__f2dace_A_z_kin_hor_e_d_1_s_364 - 1))) + __f2dace_A_z_kin_hor_e_d_0_s_363) * sizeof(double)));
     double * gpu_z_w_concorr_me;
     DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_concorr_me, ((((__f2dace_A_z_w_concorr_me_d_0_s_360 * __f2dace_A_z_w_concorr_me_d_1_s_361) * (__f2dace_A_z_w_concorr_me_d_2_s_362 - 1)) + (__f2dace_A_z_w_concorr_me_d_0_s_360 * (__f2dace_A_z_w_concorr_me_d_1_s_361 - 1))) + __f2dace_A_z_w_concorr_me_d_0_s_360) * sizeof(double)));
-    double * gpu_z_w_concorr_mc;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_concorr_mc, (((90 * tmp_struct_symbol_0) * (tmp_struct_symbol_5 - 1)) + (90 * tmp_struct_symbol_0)) * sizeof(double)));
-    double * gpu_maxvcfl_arr;
-    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_maxvcfl_arr, (((88 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (88 * tmp_struct_symbol_4)) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMemset(gpu_maxvcfl_arr, 0, (((88 * tmp_struct_symbol_4) * (tmp_struct_symbol_11 - 1)) + (88 * tmp_struct_symbol_4)) * sizeof(double)));
+    double * gpu_zeta;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_zeta, (((90 * tmp_struct_symbol_8) * (tmp_struct_symbol_9 - 1)) + (90 * tmp_struct_symbol_8)) * sizeof(double)));
+    double * gpu_z_v_grad_w;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_v_grad_w, (((90 * tmp_struct_symbol_4) * (tmp_struct_symbol_5 - 1)) + (90 * tmp_struct_symbol_4)) * sizeof(double)));
+    int * gpu_levmask;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_levmask, (90 * tmp_struct_symbol_13) * sizeof(int)));
+    double * gpu_z_w_con_c;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_con_c, (((91 * tmp_struct_symbol_1) * (tmp_struct_symbol_5 - 1)) + (91 * tmp_struct_symbol_1)) * sizeof(double)));
     double * gpu_z_w_con_c_full;
     DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_con_c_full, (((90 * tmp_struct_symbol_2) * (tmp_struct_symbol_3 - 1)) + (90 * tmp_struct_symbol_2)) * sizeof(double)));
+    double * gpu_z_w_concorr_mc;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_concorr_mc, (((90 * tmp_struct_symbol_0) * (tmp_struct_symbol_5 - 1)) + (90 * tmp_struct_symbol_0)) * sizeof(double)));
+    int * gpu_cfl_clipping;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_cfl_clipping, (91 * tmp_struct_symbol_14) * sizeof(int)));
+    double * gpu_z_ekinh;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_ekinh, (((90 * tmp_struct_symbol_10) * (tmp_struct_symbol_11 - 1)) + (90 * tmp_struct_symbol_10)) * sizeof(double)));
+    double * gpu_z_w_v;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_z_w_v, (((91 * tmp_struct_symbol_6) * (tmp_struct_symbol_7 - 1)) + (91 * tmp_struct_symbol_6)) * sizeof(double)));
+    int * gpu_levelmask;
+    DACE_GPU_CHECK(cudaMalloc((void**)&gpu_levelmask, 90 * sizeof(int)));
     int nrdmax_jg;
     int nflatlev_jg;
     int i_startblk_var_140_0;
@@ -2055,71 +2047,68 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
             __CG_p_diag__m_max_vcfl_dyn = __cg_p_diag__m_max_vcfl_dyn;
         }
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_global_data__m_nflatlev, __CG_global_data__m_nflatlev, 10 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_global_data__m_nrdmax, __CG_global_data__m_nrdmax, 10 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_ddt_vn_apc_pc, __CG_p_diag__m_ddt_vn_apc_pc, (((90 * __f2dace_SA_ddt_vn_apc_pc_d_0_s_300_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_2_s_302_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_3_s_303_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_global_data__m_nrdmax, __CG_global_data__m_nrdmax, 10 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_ddt_vn_apc_pc, __CG_p_diag__m_ddt_vn_apc_pc, (((90 * __f2dace_SA_ddt_vn_apc_pc_d_0_s_300_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_2_s_302_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_3_s_303_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_ddt_w_adv_pc, __CG_p_diag__m_ddt_w_adv_pc, (((91 * __f2dace_SA_ddt_w_adv_pc_d_0_s_304_p_diag_9) * __f2dace_SA_ddt_w_adv_pc_d_2_s_306_p_diag_9) * __f2dace_SA_ddt_w_adv_pc_d_3_s_307_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_vn_ie, __CG_p_diag__m_vn_ie, ((91 * __f2dace_SA_vn_ie_d_0_s_294_p_diag_9) * __f2dace_SA_vn_ie_d_2_s_296_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_vt, __CG_p_diag__m_vt, ((90 * __f2dace_SA_vt_d_0_s_291_p_diag_9) * __f2dace_SA_vt_d_2_s_293_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_vn_ie, __CG_p_diag__m_vn_ie, ((91 * __f2dace_SA_vn_ie_d_0_s_294_p_diag_9) * __f2dace_SA_vn_ie_d_2_s_296_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_vt, __CG_p_diag__m_vt, ((90 * __f2dace_SA_vt_d_0_s_291_p_diag_9) * __f2dace_SA_vt_d_2_s_293_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_diag__m_w_concorr_c, __CG_p_diag__m_w_concorr_c, ((91 * __f2dace_SA_w_concorr_c_d_0_s_297_p_diag_9) * __f2dace_SA_w_concorr_c_d_2_s_299_p_diag_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_c_lin_e, __CG_p_int__m_c_lin_e, ((__f2dace_SA_c_lin_e_d_0_s_25_p_int_6 * __f2dace_SA_c_lin_e_d_1_s_26_p_int_6) * __f2dace_SA_c_lin_e_d_2_s_27_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_cells_aw_verts, __CG_p_int__m_cells_aw_verts, ((__f2dace_SA_cells_aw_verts_d_0_s_31_p_int_6 * __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6) * __f2dace_SA_cells_aw_verts_d_2_s_33_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_e_bln_c_s, __CG_p_int__m_e_bln_c_s, ((__f2dace_SA_e_bln_c_s_d_0_s_28_p_int_6 * __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6) * __f2dace_SA_e_bln_c_s_d_2_s_30_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_c_lin_e, __CG_p_int__m_c_lin_e, ((__f2dace_SA_c_lin_e_d_0_s_25_p_int_6 * __f2dace_SA_c_lin_e_d_1_s_26_p_int_6) * __f2dace_SA_c_lin_e_d_2_s_27_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_cells_aw_verts, __CG_p_int__m_cells_aw_verts, ((__f2dace_SA_cells_aw_verts_d_0_s_31_p_int_6 * __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6) * __f2dace_SA_cells_aw_verts_d_2_s_33_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_e_bln_c_s, __CG_p_int__m_e_bln_c_s, ((__f2dace_SA_e_bln_c_s_d_0_s_28_p_int_6 * __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6) * __f2dace_SA_e_bln_c_s_d_2_s_30_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_geofac_grdiv, __CG_p_int__m_geofac_grdiv, ((__f2dace_SA_geofac_grdiv_d_0_s_37_p_int_6 * __f2dace_SA_geofac_grdiv_d_1_s_38_p_int_6) * __f2dace_SA_geofac_grdiv_d_2_s_39_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_geofac_n2s, __CG_p_int__m_geofac_n2s, ((__f2dace_SA_geofac_n2s_d_0_s_43_p_int_6 * __f2dace_SA_geofac_n2s_d_1_s_44_p_int_6) * __f2dace_SA_geofac_n2s_d_2_s_45_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_geofac_rot, __CG_p_int__m_geofac_rot, ((__f2dace_SA_geofac_rot_d_0_s_40_p_int_6 * __f2dace_SA_geofac_rot_d_1_s_41_p_int_6) * __f2dace_SA_geofac_rot_d_2_s_42_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_rbf_vec_coeff_e, __CG_p_int__m_rbf_vec_coeff_e, ((__f2dace_SA_rbf_vec_coeff_e_d_0_s_34_p_int_6 * __f2dace_SA_rbf_vec_coeff_e_d_1_s_35_p_int_6) * __f2dace_SA_rbf_vec_coeff_e_d_2_s_36_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_geofac_n2s, __CG_p_int__m_geofac_n2s, ((__f2dace_SA_geofac_n2s_d_0_s_43_p_int_6 * __f2dace_SA_geofac_n2s_d_1_s_44_p_int_6) * __f2dace_SA_geofac_n2s_d_2_s_45_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_geofac_rot, __CG_p_int__m_geofac_rot, ((__f2dace_SA_geofac_rot_d_0_s_40_p_int_6 * __f2dace_SA_geofac_rot_d_1_s_41_p_int_6) * __f2dace_SA_geofac_rot_d_2_s_42_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_int__m_rbf_vec_coeff_e, __CG_p_int__m_rbf_vec_coeff_e, ((__f2dace_SA_rbf_vec_coeff_e_d_0_s_34_p_int_6 * __f2dace_SA_rbf_vec_coeff_e_d_1_s_35_p_int_6) * __f2dace_SA_rbf_vec_coeff_e_d_2_s_36_p_int_6) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_coeff1_dwdz, __CG_p_metrics__m_coeff1_dwdz, ((90 * __f2dace_SA_coeff1_dwdz_d_0_s_332_p_metrics_8) * __f2dace_SA_coeff1_dwdz_d_2_s_334_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_coeff2_dwdz, __CG_p_metrics__m_coeff2_dwdz, ((90 * __f2dace_SA_coeff2_dwdz_d_0_s_335_p_metrics_8) * __f2dace_SA_coeff2_dwdz_d_2_s_337_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_coeff_gradekin, __CG_p_metrics__m_coeff_gradekin, ((__f2dace_SA_coeff_gradekin_d_0_s_329_p_metrics_8 * __f2dace_SA_coeff_gradekin_d_1_s_330_p_metrics_8) * __f2dace_SA_coeff_gradekin_d_2_s_331_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddqz_z_full_e, __CG_p_metrics__m_ddqz_z_full_e, ((90 * __f2dace_SA_ddqz_z_full_e_d_0_s_314_p_metrics_8) * __f2dace_SA_ddqz_z_full_e_d_2_s_316_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_coeff2_dwdz, __CG_p_metrics__m_coeff2_dwdz, ((90 * __f2dace_SA_coeff2_dwdz_d_0_s_335_p_metrics_8) * __f2dace_SA_coeff2_dwdz_d_2_s_337_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_coeff_gradekin, __CG_p_metrics__m_coeff_gradekin, ((__f2dace_SA_coeff_gradekin_d_0_s_329_p_metrics_8 * __f2dace_SA_coeff_gradekin_d_1_s_330_p_metrics_8) * __f2dace_SA_coeff_gradekin_d_2_s_331_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddqz_z_full_e, __CG_p_metrics__m_ddqz_z_full_e, ((90 * __f2dace_SA_ddqz_z_full_e_d_0_s_314_p_metrics_8) * __f2dace_SA_ddqz_z_full_e_d_2_s_316_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddqz_z_half, __CG_p_metrics__m_ddqz_z_half, ((91 * __f2dace_SA_ddqz_z_half_d_0_s_317_p_metrics_8) * __f2dace_SA_ddqz_z_half_d_2_s_319_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddxn_z_full, __CG_p_metrics__m_ddxn_z_full, ((90 * __f2dace_SA_ddxn_z_full_d_0_s_308_p_metrics_8) * __f2dace_SA_ddxn_z_full_d_2_s_310_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddxt_z_full, __CG_p_metrics__m_ddxt_z_full, ((90 * __f2dace_SA_ddxt_z_full_d_0_s_311_p_metrics_8) * __f2dace_SA_ddxt_z_full_d_2_s_313_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_wgtfac_c, __CG_p_metrics__m_wgtfac_c, ((91 * __f2dace_SA_wgtfac_c_d_0_s_320_p_metrics_8) * __f2dace_SA_wgtfac_c_d_2_s_322_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddxn_z_full, __CG_p_metrics__m_ddxn_z_full, ((90 * __f2dace_SA_ddxn_z_full_d_0_s_308_p_metrics_8) * __f2dace_SA_ddxn_z_full_d_2_s_310_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_ddxt_z_full, __CG_p_metrics__m_ddxt_z_full, ((90 * __f2dace_SA_ddxt_z_full_d_0_s_311_p_metrics_8) * __f2dace_SA_ddxt_z_full_d_2_s_313_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_wgtfac_c, __CG_p_metrics__m_wgtfac_c, ((91 * __f2dace_SA_wgtfac_c_d_0_s_320_p_metrics_8) * __f2dace_SA_wgtfac_c_d_2_s_322_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_wgtfac_e, __CG_p_metrics__m_wgtfac_e, ((91 * __f2dace_SA_wgtfac_e_d_0_s_323_p_metrics_8) * __f2dace_SA_wgtfac_e_d_2_s_325_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_wgtfacq_e, __CG_p_metrics__m_wgtfacq_e, ((__f2dace_SA_wgtfacq_e_d_0_s_326_p_metrics_8 * __f2dace_SA_wgtfacq_e_d_1_s_327_p_metrics_8) * __f2dace_SA_wgtfacq_e_d_2_s_328_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, __CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (__f2dace_SA_owner_mask_d_0_s_2_decomp_info_cells_p_patch_3 * __f2dace_SA_owner_mask_d_1_s_3_decomp_info_cells_p_patch_3) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_area, __CG_p_patch__CG_cells__m_area, (__f2dace_SA_area_d_0_s_158_cells_p_patch_2 * __f2dace_SA_area_d_1_s_159_cells_p_patch_2) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_metrics__m_wgtfacq_e, __CG_p_metrics__m_wgtfacq_e, ((__f2dace_SA_wgtfacq_e_d_0_s_326_p_metrics_8 * __f2dace_SA_wgtfacq_e_d_1_s_327_p_metrics_8) * __f2dace_SA_wgtfacq_e_d_2_s_328_p_metrics_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, __CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (__f2dace_SA_owner_mask_d_0_s_2_decomp_info_cells_p_patch_3 * __f2dace_SA_owner_mask_d_1_s_3_decomp_info_cells_p_patch_3) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_area, __CG_p_patch__CG_cells__m_area, (__f2dace_SA_area_d_0_s_158_cells_p_patch_2 * __f2dace_SA_area_d_1_s_159_cells_p_patch_2) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_edge_blk, __CG_p_patch__CG_cells__m_edge_blk, ((__f2dace_SA_edge_blk_d_0_s_155_cells_p_patch_2 * __f2dace_SA_edge_blk_d_1_s_156_cells_p_patch_2) * __f2dace_SA_edge_blk_d_2_s_157_cells_p_patch_2) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_edge_idx, __CG_p_patch__CG_cells__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_152_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_153_cells_p_patch_2) * __f2dace_SA_edge_idx_d_2_s_154_cells_p_patch_2) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_end_block, __CG_p_patch__CG_cells__m_end_block, __f2dace_SA_end_block_d_0_s_163_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_end_index, __CG_p_patch__CG_cells__m_end_index, __f2dace_SA_end_index_d_0_s_161_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_edge_idx, __CG_p_patch__CG_cells__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_152_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_153_cells_p_patch_2) * __f2dace_SA_edge_idx_d_2_s_154_cells_p_patch_2) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_end_block, __CG_p_patch__CG_cells__m_end_block, __f2dace_SA_end_block_d_0_s_163_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_end_index, __CG_p_patch__CG_cells__m_end_index, __f2dace_SA_end_index_d_0_s_161_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_neighbor_blk, __CG_p_patch__CG_cells__m_neighbor_blk, ((__f2dace_SA_neighbor_blk_d_0_s_149_cells_p_patch_2 * __f2dace_SA_neighbor_blk_d_1_s_150_cells_p_patch_2) * __f2dace_SA_neighbor_blk_d_2_s_151_cells_p_patch_2) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_neighbor_idx, __CG_p_patch__CG_cells__m_neighbor_idx, ((__f2dace_SA_neighbor_idx_d_0_s_146_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_147_cells_p_patch_2) * __f2dace_SA_neighbor_idx_d_2_s_148_cells_p_patch_2) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_start_block, __CG_p_patch__CG_cells__m_start_block, __f2dace_SA_start_block_d_0_s_162_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_start_index, __CG_p_patch__CG_cells__m_start_index, __f2dace_SA_start_index_d_0_s_160_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_neighbor_idx, __CG_p_patch__CG_cells__m_neighbor_idx, ((__f2dace_SA_neighbor_idx_d_0_s_146_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_147_cells_p_patch_2) * __f2dace_SA_neighbor_idx_d_2_s_148_cells_p_patch_2) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_start_block, __CG_p_patch__CG_cells__m_start_block, __f2dace_SA_start_block_d_0_s_162_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_cells__m_start_index, __CG_p_patch__CG_cells__m_start_index, __f2dace_SA_start_index_d_0_s_160_cells_p_patch_2 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_area_edge, __CG_p_patch__CG_edges__m_area_edge, (__f2dace_SA_area_edge_d_0_s_188_edges_p_patch_4 * __f2dace_SA_area_edge_d_1_s_189_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_cell_blk, __CG_p_patch__CG_edges__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_167_edges_p_patch_4 * __f2dace_SA_cell_blk_d_1_s_168_edges_p_patch_4) * __f2dace_SA_cell_blk_d_2_s_169_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_cell_idx, __CG_p_patch__CG_edges__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_164_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_165_edges_p_patch_4) * __f2dace_SA_cell_idx_d_2_s_166_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_end_block, __CG_p_patch__CG_edges__m_end_block, __f2dace_SA_end_block_d_0_s_199_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_cell_blk, __CG_p_patch__CG_edges__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_167_edges_p_patch_4 * __f2dace_SA_cell_blk_d_1_s_168_edges_p_patch_4) * __f2dace_SA_cell_blk_d_2_s_169_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_cell_idx, __CG_p_patch__CG_edges__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_164_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_165_edges_p_patch_4) * __f2dace_SA_cell_idx_d_2_s_166_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_end_block, __CG_p_patch__CG_edges__m_end_block, __f2dace_SA_end_block_d_0_s_199_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_end_index, __CG_p_patch__CG_edges__m_end_index, __f2dace_SA_end_index_d_0_s_197_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_f_e, __CG_p_patch__CG_edges__m_f_e, (__f2dace_SA_f_e_d_0_s_190_edges_p_patch_4 * __f2dace_SA_f_e_d_1_s_191_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_inv_dual_edge_length, __CG_p_patch__CG_edges__m_inv_dual_edge_length, (__f2dace_SA_inv_dual_edge_length_d_0_s_186_edges_p_patch_4 * __f2dace_SA_inv_dual_edge_length_d_1_s_187_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, __CG_p_patch__CG_edges__m_inv_primal_edge_length, (__f2dace_SA_inv_primal_edge_length_d_0_s_184_edges_p_patch_4 * __f2dace_SA_inv_primal_edge_length_d_1_s_185_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_f_e, __CG_p_patch__CG_edges__m_f_e, (__f2dace_SA_f_e_d_0_s_190_edges_p_patch_4 * __f2dace_SA_f_e_d_1_s_191_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_inv_dual_edge_length, __CG_p_patch__CG_edges__m_inv_dual_edge_length, (__f2dace_SA_inv_dual_edge_length_d_0_s_186_edges_p_patch_4 * __f2dace_SA_inv_dual_edge_length_d_1_s_187_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, __CG_p_patch__CG_edges__m_inv_primal_edge_length, (__f2dace_SA_inv_primal_edge_length_d_0_s_184_edges_p_patch_4 * __f2dace_SA_inv_primal_edge_length_d_1_s_185_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_quad_blk, __CG_p_patch__CG_edges__m_quad_blk, ((__f2dace_SA_quad_blk_d_0_s_181_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_182_edges_p_patch_4) * __f2dace_SA_quad_blk_d_2_s_183_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_quad_idx, __CG_p_patch__CG_edges__m_quad_idx, ((__f2dace_SA_quad_idx_d_0_s_178_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_179_edges_p_patch_4) * __f2dace_SA_quad_idx_d_2_s_180_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_start_block, __CG_p_patch__CG_edges__m_start_block, __f2dace_SA_start_block_d_0_s_198_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_start_index, __CG_p_patch__CG_edges__m_start_index, __f2dace_SA_start_index_d_0_s_196_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_quad_idx, __CG_p_patch__CG_edges__m_quad_idx, ((__f2dace_SA_quad_idx_d_0_s_178_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_179_edges_p_patch_4) * __f2dace_SA_quad_idx_d_2_s_180_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_start_block, __CG_p_patch__CG_edges__m_start_block, __f2dace_SA_start_block_d_0_s_198_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_start_index, __CG_p_patch__CG_edges__m_start_index, __f2dace_SA_start_index_d_0_s_196_edges_p_patch_4 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_tangent_orientation, __CG_p_patch__CG_edges__m_tangent_orientation, (__f2dace_SA_tangent_orientation_d_0_s_176_edges_p_patch_4 * __f2dace_SA_tangent_orientation_d_1_s_177_edges_p_patch_4) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_vertex_blk, __CG_p_patch__CG_edges__m_vertex_blk, ((__f2dace_SA_vertex_blk_d_0_s_173_edges_p_patch_4 * __f2dace_SA_vertex_blk_d_1_s_174_edges_p_patch_4) * __f2dace_SA_vertex_blk_d_2_s_175_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_vertex_idx, __CG_p_patch__CG_edges__m_vertex_idx, ((__f2dace_SA_vertex_idx_d_0_s_170_edges_p_patch_4 * __f2dace_SA_vertex_idx_d_1_s_171_edges_p_patch_4) * __f2dace_SA_vertex_idx_d_2_s_172_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_cell_blk, __CG_p_patch__CG_verts__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_203_verts_p_patch_5 * __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5) * __f2dace_SA_cell_blk_d_2_s_205_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_vertex_blk, __CG_p_patch__CG_edges__m_vertex_blk, ((__f2dace_SA_vertex_blk_d_0_s_173_edges_p_patch_4 * __f2dace_SA_vertex_blk_d_1_s_174_edges_p_patch_4) * __f2dace_SA_vertex_blk_d_2_s_175_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_edges__m_vertex_idx, __CG_p_patch__CG_edges__m_vertex_idx, ((__f2dace_SA_vertex_idx_d_0_s_170_edges_p_patch_4 * __f2dace_SA_vertex_idx_d_1_s_171_edges_p_patch_4) * __f2dace_SA_vertex_idx_d_2_s_172_edges_p_patch_4) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_cell_blk, __CG_p_patch__CG_verts__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_203_verts_p_patch_5 * __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5) * __f2dace_SA_cell_blk_d_2_s_205_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_cell_idx, __CG_p_patch__CG_verts__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_200_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_201_verts_p_patch_5) * __f2dace_SA_cell_idx_d_2_s_202_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_edge_blk, __CG_p_patch__CG_verts__m_edge_blk, ((__f2dace_SA_edge_blk_d_0_s_209_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_210_verts_p_patch_5) * __f2dace_SA_edge_blk_d_2_s_211_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_edge_idx, __CG_p_patch__CG_verts__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_206_verts_p_patch_5 * __f2dace_SA_edge_idx_d_1_s_207_verts_p_patch_5) * __f2dace_SA_edge_idx_d_2_s_208_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_end_block, __CG_p_patch__CG_verts__m_end_block, __f2dace_SA_end_block_d_0_s_215_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_edge_blk, __CG_p_patch__CG_verts__m_edge_blk, ((__f2dace_SA_edge_blk_d_0_s_209_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_210_verts_p_patch_5) * __f2dace_SA_edge_blk_d_2_s_211_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_edge_idx, __CG_p_patch__CG_verts__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_206_verts_p_patch_5 * __f2dace_SA_edge_idx_d_1_s_207_verts_p_patch_5) * __f2dace_SA_edge_idx_d_2_s_208_verts_p_patch_5) * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_end_block, __CG_p_patch__CG_verts__m_end_block, __f2dace_SA_end_block_d_0_s_215_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_end_index, __CG_p_patch__CG_verts__m_end_index, __f2dace_SA_end_index_d_0_s_213_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_start_block, __CG_p_patch__CG_verts__m_start_block, __f2dace_SA_start_block_d_0_s_214_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_start_index, __CG_p_patch__CG_verts__m_start_index, __f2dace_SA_start_index_d_0_s_212_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_prog__m_vn, __CG_p_prog__m_vn, ((90 * __f2dace_SA_vn_d_0_s_288_p_prog_7) * __f2dace_SA_vn_d_2_s_290_p_prog_7) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_start_block, __CG_p_patch__CG_verts__m_start_block, __f2dace_SA_start_block_d_0_s_214_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_patch__CG_verts__m_start_index, __CG_p_patch__CG_verts__m_start_index, __f2dace_SA_start_index_d_0_s_212_verts_p_patch_5 * sizeof(int), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_prog__m_vn, __CG_p_prog__m_vn, ((90 * __f2dace_SA_vn_d_0_s_288_p_prog_7) * __f2dace_SA_vn_d_2_s_290_p_prog_7) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(gpu___CG_p_prog__m_w, __CG_p_prog__m_w, ((91 * __f2dace_SA_w_d_0_s_285_p_prog_7) * __f2dace_SA_w_d_2_s_287_p_prog_7) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu_z_w_concorr_me, z_w_concorr_me, ((__f2dace_A_z_w_concorr_me_d_0_s_360 * __f2dace_A_z_w_concorr_me_d_1_s_361) * __f2dace_A_z_w_concorr_me_d_2_s_362) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu_z_kin_hor_e, z_kin_hor_e, ((__f2dace_A_z_kin_hor_e_d_0_s_363 * __f2dace_A_z_kin_hor_e_d_1_s_364) * __f2dace_A_z_kin_hor_e_d_2_s_365) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(gpu_z_vt_ie, z_vt_ie, ((__f2dace_A_z_vt_ie_d_0_s_366 * __f2dace_A_z_vt_ie_d_1_s_367) * __f2dace_A_z_vt_ie_d_2_s_368) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu_z_w_concorr_me, z_w_concorr_me, ((__f2dace_A_z_w_concorr_me_d_0_s_360 * __f2dace_A_z_w_concorr_me_d_1_s_361) * __f2dace_A_z_w_concorr_me_d_2_s_362) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu_z_kin_hor_e, z_kin_hor_e, ((__f2dace_A_z_kin_hor_e_d_0_s_363 * __f2dace_A_z_kin_hor_e_d_1_s_364) * __f2dace_A_z_kin_hor_e_d_2_s_365) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(gpu_z_vt_ie, z_vt_ie, ((__f2dace_A_z_vt_ie_d_0_s_366 * __f2dace_A_z_vt_ie_d_1_s_367) * __f2dace_A_z_vt_ie_d_2_s_368) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 
 
     }
@@ -2180,10 +2169,6 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
                 loop_body_0_0_24(__state, __CG_global_data__m_nproma, &gpu___CG_p_int__m_rbf_vec_coeff_e[0], &gpu___CG_p_metrics__m_ddxn_z_full[0], &gpu___CG_p_metrics__m_ddxt_z_full[0], &gpu___CG_p_metrics__m_wgtfac_e[0], &gpu___CG_p_metrics__m_wgtfacq_e[0], &__CG_p_patch__CG_edges__m_end_index[0], &gpu___CG_p_patch__CG_edges__m_quad_blk[0], &gpu___CG_p_patch__CG_edges__m_quad_idx[0], &__CG_p_patch__CG_edges__m_start_index[0], &gpu___CG_p_prog__m_vn[0], &gpu___CG_p_diag__m_vn_ie[0], &gpu___CG_p_diag__m_vt[0], &gpu_z_kin_hor_e[0], &gpu_z_vt_ie[0], &gpu_z_w_concorr_me[0], __f2dace_A_z_kin_hor_e_d_0_s_363, __f2dace_A_z_kin_hor_e_d_1_s_364, __f2dace_A_z_vt_ie_d_0_s_366, __f2dace_A_z_vt_ie_d_1_s_367, __f2dace_A_z_w_concorr_me_d_0_s_360, __f2dace_A_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_kin_hor_e_d_0_s_363, __f2dace_OA_z_kin_hor_e_d_1_s_364, __f2dace_OA_z_kin_hor_e_d_2_s_365, __f2dace_OA_z_vt_ie_d_0_s_366, __f2dace_OA_z_vt_ie_d_1_s_367, __f2dace_OA_z_vt_ie_d_2_s_368, __f2dace_OA_z_w_concorr_me_d_0_s_360, __f2dace_OA_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_2_s_362, _for_it_6, i_endblk_var_147, i_startblk_var_146, nflatlev_jg);
             }
         }
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 
 
     }
@@ -2213,10 +2198,6 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
             }
         }
         __dace_runkernel_single_state_body_0_map_0_0_0_4_39(__state, gpu_levelmask, gpu_levmask, i_endblk_var_147, i_startblk_var_146, nrdmax_jg, tmp_struct_symbol_13);
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 
 
     }
@@ -2306,124 +2287,124 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
 
             __CG_p_diag__m_max_vcfl_dyn = p_diag_out_max_vcfl_dyn;
         }
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_global_data__m_nflatlev, gpu___CG_global_data__m_nflatlev, 10 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_global_data__m_nrdmax, gpu___CG_global_data__m_nrdmax, 10 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_ddt_vn_apc_pc, gpu___CG_p_diag__m_ddt_vn_apc_pc, (((90 * __f2dace_SA_ddt_vn_apc_pc_d_0_s_300_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_2_s_302_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_3_s_303_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_global_data__m_nflatlev, gpu___CG_global_data__m_nflatlev, 10 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_global_data__m_nrdmax, gpu___CG_global_data__m_nrdmax, 10 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_ddt_vn_apc_pc, gpu___CG_p_diag__m_ddt_vn_apc_pc, (((90 * __f2dace_SA_ddt_vn_apc_pc_d_0_s_300_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_2_s_302_p_diag_9) * __f2dace_SA_ddt_vn_apc_pc_d_3_s_303_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_ddt_w_adv_pc, gpu___CG_p_diag__m_ddt_w_adv_pc, (((91 * __f2dace_SA_ddt_w_adv_pc_d_0_s_304_p_diag_9) * __f2dace_SA_ddt_w_adv_pc_d_2_s_306_p_diag_9) * __f2dace_SA_ddt_w_adv_pc_d_3_s_307_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_vn_ie, gpu___CG_p_diag__m_vn_ie, ((91 * __f2dace_SA_vn_ie_d_0_s_294_p_diag_9) * __f2dace_SA_vn_ie_d_2_s_296_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_vt, gpu___CG_p_diag__m_vt, ((90 * __f2dace_SA_vt_d_0_s_291_p_diag_9) * __f2dace_SA_vt_d_2_s_293_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_w_concorr_c, gpu___CG_p_diag__m_w_concorr_c, ((91 * __f2dace_SA_w_concorr_c_d_0_s_297_p_diag_9) * __f2dace_SA_w_concorr_c_d_2_s_299_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_vn_ie, gpu___CG_p_diag__m_vn_ie, ((91 * __f2dace_SA_vn_ie_d_0_s_294_p_diag_9) * __f2dace_SA_vn_ie_d_2_s_296_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_vt, gpu___CG_p_diag__m_vt, ((90 * __f2dace_SA_vt_d_0_s_291_p_diag_9) * __f2dace_SA_vt_d_2_s_293_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_diag__m_w_concorr_c, gpu___CG_p_diag__m_w_concorr_c, ((91 * __f2dace_SA_w_concorr_c_d_0_s_297_p_diag_9) * __f2dace_SA_w_concorr_c_d_2_s_299_p_diag_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_c_lin_e, gpu___CG_p_int__m_c_lin_e, ((__f2dace_SA_c_lin_e_d_0_s_25_p_int_6 * __f2dace_SA_c_lin_e_d_1_s_26_p_int_6) * __f2dace_SA_c_lin_e_d_2_s_27_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_cells_aw_verts, gpu___CG_p_int__m_cells_aw_verts, ((__f2dace_SA_cells_aw_verts_d_0_s_31_p_int_6 * __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6) * __f2dace_SA_cells_aw_verts_d_2_s_33_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_e_bln_c_s, gpu___CG_p_int__m_e_bln_c_s, ((__f2dace_SA_e_bln_c_s_d_0_s_28_p_int_6 * __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6) * __f2dace_SA_e_bln_c_s_d_2_s_30_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_geofac_grdiv, gpu___CG_p_int__m_geofac_grdiv, ((__f2dace_SA_geofac_grdiv_d_0_s_37_p_int_6 * __f2dace_SA_geofac_grdiv_d_1_s_38_p_int_6) * __f2dace_SA_geofac_grdiv_d_2_s_39_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_cells_aw_verts, gpu___CG_p_int__m_cells_aw_verts, ((__f2dace_SA_cells_aw_verts_d_0_s_31_p_int_6 * __f2dace_SA_cells_aw_verts_d_1_s_32_p_int_6) * __f2dace_SA_cells_aw_verts_d_2_s_33_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_e_bln_c_s, gpu___CG_p_int__m_e_bln_c_s, ((__f2dace_SA_e_bln_c_s_d_0_s_28_p_int_6 * __f2dace_SA_e_bln_c_s_d_1_s_29_p_int_6) * __f2dace_SA_e_bln_c_s_d_2_s_30_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_geofac_grdiv, gpu___CG_p_int__m_geofac_grdiv, ((__f2dace_SA_geofac_grdiv_d_0_s_37_p_int_6 * __f2dace_SA_geofac_grdiv_d_1_s_38_p_int_6) * __f2dace_SA_geofac_grdiv_d_2_s_39_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_geofac_n2s, gpu___CG_p_int__m_geofac_n2s, ((__f2dace_SA_geofac_n2s_d_0_s_43_p_int_6 * __f2dace_SA_geofac_n2s_d_1_s_44_p_int_6) * __f2dace_SA_geofac_n2s_d_2_s_45_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_geofac_rot, gpu___CG_p_int__m_geofac_rot, ((__f2dace_SA_geofac_rot_d_0_s_40_p_int_6 * __f2dace_SA_geofac_rot_d_1_s_41_p_int_6) * __f2dace_SA_geofac_rot_d_2_s_42_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_rbf_vec_coeff_e, gpu___CG_p_int__m_rbf_vec_coeff_e, ((__f2dace_SA_rbf_vec_coeff_e_d_0_s_34_p_int_6 * __f2dace_SA_rbf_vec_coeff_e_d_1_s_35_p_int_6) * __f2dace_SA_rbf_vec_coeff_e_d_2_s_36_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_coeff1_dwdz, gpu___CG_p_metrics__m_coeff1_dwdz, ((90 * __f2dace_SA_coeff1_dwdz_d_0_s_332_p_metrics_8) * __f2dace_SA_coeff1_dwdz_d_2_s_334_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_geofac_rot, gpu___CG_p_int__m_geofac_rot, ((__f2dace_SA_geofac_rot_d_0_s_40_p_int_6 * __f2dace_SA_geofac_rot_d_1_s_41_p_int_6) * __f2dace_SA_geofac_rot_d_2_s_42_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_int__m_rbf_vec_coeff_e, gpu___CG_p_int__m_rbf_vec_coeff_e, ((__f2dace_SA_rbf_vec_coeff_e_d_0_s_34_p_int_6 * __f2dace_SA_rbf_vec_coeff_e_d_1_s_35_p_int_6) * __f2dace_SA_rbf_vec_coeff_e_d_2_s_36_p_int_6) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_coeff1_dwdz, gpu___CG_p_metrics__m_coeff1_dwdz, ((90 * __f2dace_SA_coeff1_dwdz_d_0_s_332_p_metrics_8) * __f2dace_SA_coeff1_dwdz_d_2_s_334_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_coeff2_dwdz, gpu___CG_p_metrics__m_coeff2_dwdz, ((90 * __f2dace_SA_coeff2_dwdz_d_0_s_335_p_metrics_8) * __f2dace_SA_coeff2_dwdz_d_2_s_337_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_coeff_gradekin, gpu___CG_p_metrics__m_coeff_gradekin, ((__f2dace_SA_coeff_gradekin_d_0_s_329_p_metrics_8 * __f2dace_SA_coeff_gradekin_d_1_s_330_p_metrics_8) * __f2dace_SA_coeff_gradekin_d_2_s_331_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddqz_z_full_e, gpu___CG_p_metrics__m_ddqz_z_full_e, ((90 * __f2dace_SA_ddqz_z_full_e_d_0_s_314_p_metrics_8) * __f2dace_SA_ddqz_z_full_e_d_2_s_316_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddqz_z_half, gpu___CG_p_metrics__m_ddqz_z_half, ((91 * __f2dace_SA_ddqz_z_half_d_0_s_317_p_metrics_8) * __f2dace_SA_ddqz_z_half_d_2_s_319_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_coeff_gradekin, gpu___CG_p_metrics__m_coeff_gradekin, ((__f2dace_SA_coeff_gradekin_d_0_s_329_p_metrics_8 * __f2dace_SA_coeff_gradekin_d_1_s_330_p_metrics_8) * __f2dace_SA_coeff_gradekin_d_2_s_331_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddqz_z_full_e, gpu___CG_p_metrics__m_ddqz_z_full_e, ((90 * __f2dace_SA_ddqz_z_full_e_d_0_s_314_p_metrics_8) * __f2dace_SA_ddqz_z_full_e_d_2_s_316_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddqz_z_half, gpu___CG_p_metrics__m_ddqz_z_half, ((91 * __f2dace_SA_ddqz_z_half_d_0_s_317_p_metrics_8) * __f2dace_SA_ddqz_z_half_d_2_s_319_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddxn_z_full, gpu___CG_p_metrics__m_ddxn_z_full, ((90 * __f2dace_SA_ddxn_z_full_d_0_s_308_p_metrics_8) * __f2dace_SA_ddxn_z_full_d_2_s_310_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddxt_z_full, gpu___CG_p_metrics__m_ddxt_z_full, ((90 * __f2dace_SA_ddxt_z_full_d_0_s_311_p_metrics_8) * __f2dace_SA_ddxt_z_full_d_2_s_313_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_wgtfac_c, gpu___CG_p_metrics__m_wgtfac_c, ((91 * __f2dace_SA_wgtfac_c_d_0_s_320_p_metrics_8) * __f2dace_SA_wgtfac_c_d_2_s_322_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_wgtfac_e, gpu___CG_p_metrics__m_wgtfac_e, ((91 * __f2dace_SA_wgtfac_e_d_0_s_323_p_metrics_8) * __f2dace_SA_wgtfac_e_d_2_s_325_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_ddxt_z_full, gpu___CG_p_metrics__m_ddxt_z_full, ((90 * __f2dace_SA_ddxt_z_full_d_0_s_311_p_metrics_8) * __f2dace_SA_ddxt_z_full_d_2_s_313_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_wgtfac_c, gpu___CG_p_metrics__m_wgtfac_c, ((91 * __f2dace_SA_wgtfac_c_d_0_s_320_p_metrics_8) * __f2dace_SA_wgtfac_c_d_2_s_322_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_wgtfac_e, gpu___CG_p_metrics__m_wgtfac_e, ((91 * __f2dace_SA_wgtfac_e_d_0_s_323_p_metrics_8) * __f2dace_SA_wgtfac_e_d_2_s_325_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_metrics__m_wgtfacq_e, gpu___CG_p_metrics__m_wgtfacq_e, ((__f2dace_SA_wgtfacq_e_d_0_s_326_p_metrics_8 * __f2dace_SA_wgtfacq_e_d_1_s_327_p_metrics_8) * __f2dace_SA_wgtfacq_e_d_2_s_328_p_metrics_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (__f2dace_SA_owner_mask_d_0_s_2_decomp_info_cells_p_patch_3 * __f2dace_SA_owner_mask_d_1_s_3_decomp_info_cells_p_patch_3) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_area, gpu___CG_p_patch__CG_cells__m_area, (__f2dace_SA_area_d_0_s_158_cells_p_patch_2 * __f2dace_SA_area_d_1_s_159_cells_p_patch_2) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_edge_blk, gpu___CG_p_patch__CG_cells__m_edge_blk, ((__f2dace_SA_edge_blk_d_0_s_155_cells_p_patch_2 * __f2dace_SA_edge_blk_d_1_s_156_cells_p_patch_2) * __f2dace_SA_edge_blk_d_2_s_157_cells_p_patch_2) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (__f2dace_SA_owner_mask_d_0_s_2_decomp_info_cells_p_patch_3 * __f2dace_SA_owner_mask_d_1_s_3_decomp_info_cells_p_patch_3) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_area, gpu___CG_p_patch__CG_cells__m_area, (__f2dace_SA_area_d_0_s_158_cells_p_patch_2 * __f2dace_SA_area_d_1_s_159_cells_p_patch_2) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_edge_blk, gpu___CG_p_patch__CG_cells__m_edge_blk, ((__f2dace_SA_edge_blk_d_0_s_155_cells_p_patch_2 * __f2dace_SA_edge_blk_d_1_s_156_cells_p_patch_2) * __f2dace_SA_edge_blk_d_2_s_157_cells_p_patch_2) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_edge_idx, gpu___CG_p_patch__CG_cells__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_152_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_153_cells_p_patch_2) * __f2dace_SA_edge_idx_d_2_s_154_cells_p_patch_2) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_end_block, gpu___CG_p_patch__CG_cells__m_end_block, __f2dace_SA_end_block_d_0_s_163_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_end_index, gpu___CG_p_patch__CG_cells__m_end_index, __f2dace_SA_end_index_d_0_s_161_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_neighbor_blk, gpu___CG_p_patch__CG_cells__m_neighbor_blk, ((__f2dace_SA_neighbor_blk_d_0_s_149_cells_p_patch_2 * __f2dace_SA_neighbor_blk_d_1_s_150_cells_p_patch_2) * __f2dace_SA_neighbor_blk_d_2_s_151_cells_p_patch_2) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_end_block, gpu___CG_p_patch__CG_cells__m_end_block, __f2dace_SA_end_block_d_0_s_163_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_end_index, gpu___CG_p_patch__CG_cells__m_end_index, __f2dace_SA_end_index_d_0_s_161_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_neighbor_blk, gpu___CG_p_patch__CG_cells__m_neighbor_blk, ((__f2dace_SA_neighbor_blk_d_0_s_149_cells_p_patch_2 * __f2dace_SA_neighbor_blk_d_1_s_150_cells_p_patch_2) * __f2dace_SA_neighbor_blk_d_2_s_151_cells_p_patch_2) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_neighbor_idx, gpu___CG_p_patch__CG_cells__m_neighbor_idx, ((__f2dace_SA_neighbor_idx_d_0_s_146_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_147_cells_p_patch_2) * __f2dace_SA_neighbor_idx_d_2_s_148_cells_p_patch_2) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_start_block, gpu___CG_p_patch__CG_cells__m_start_block, __f2dace_SA_start_block_d_0_s_162_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_start_index, gpu___CG_p_patch__CG_cells__m_start_index, __f2dace_SA_start_index_d_0_s_160_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_area_edge, gpu___CG_p_patch__CG_edges__m_area_edge, (__f2dace_SA_area_edge_d_0_s_188_edges_p_patch_4 * __f2dace_SA_area_edge_d_1_s_189_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_start_block, gpu___CG_p_patch__CG_cells__m_start_block, __f2dace_SA_start_block_d_0_s_162_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_cells__m_start_index, gpu___CG_p_patch__CG_cells__m_start_index, __f2dace_SA_start_index_d_0_s_160_cells_p_patch_2 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_area_edge, gpu___CG_p_patch__CG_edges__m_area_edge, (__f2dace_SA_area_edge_d_0_s_188_edges_p_patch_4 * __f2dace_SA_area_edge_d_1_s_189_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_cell_blk, gpu___CG_p_patch__CG_edges__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_167_edges_p_patch_4 * __f2dace_SA_cell_blk_d_1_s_168_edges_p_patch_4) * __f2dace_SA_cell_blk_d_2_s_169_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_cell_idx, gpu___CG_p_patch__CG_edges__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_164_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_165_edges_p_patch_4) * __f2dace_SA_cell_idx_d_2_s_166_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_end_block, gpu___CG_p_patch__CG_edges__m_end_block, __f2dace_SA_end_block_d_0_s_199_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_end_index, gpu___CG_p_patch__CG_edges__m_end_index, __f2dace_SA_end_index_d_0_s_197_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_cell_idx, gpu___CG_p_patch__CG_edges__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_164_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_165_edges_p_patch_4) * __f2dace_SA_cell_idx_d_2_s_166_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_end_block, gpu___CG_p_patch__CG_edges__m_end_block, __f2dace_SA_end_block_d_0_s_199_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_end_index, gpu___CG_p_patch__CG_edges__m_end_index, __f2dace_SA_end_index_d_0_s_197_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_f_e, gpu___CG_p_patch__CG_edges__m_f_e, (__f2dace_SA_f_e_d_0_s_190_edges_p_patch_4 * __f2dace_SA_f_e_d_1_s_191_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_inv_dual_edge_length, gpu___CG_p_patch__CG_edges__m_inv_dual_edge_length, (__f2dace_SA_inv_dual_edge_length_d_0_s_186_edges_p_patch_4 * __f2dace_SA_inv_dual_edge_length_d_1_s_187_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_inv_primal_edge_length, gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, (__f2dace_SA_inv_primal_edge_length_d_0_s_184_edges_p_patch_4 * __f2dace_SA_inv_primal_edge_length_d_1_s_185_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_quad_blk, gpu___CG_p_patch__CG_edges__m_quad_blk, ((__f2dace_SA_quad_blk_d_0_s_181_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_182_edges_p_patch_4) * __f2dace_SA_quad_blk_d_2_s_183_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_inv_dual_edge_length, gpu___CG_p_patch__CG_edges__m_inv_dual_edge_length, (__f2dace_SA_inv_dual_edge_length_d_0_s_186_edges_p_patch_4 * __f2dace_SA_inv_dual_edge_length_d_1_s_187_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_inv_primal_edge_length, gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, (__f2dace_SA_inv_primal_edge_length_d_0_s_184_edges_p_patch_4 * __f2dace_SA_inv_primal_edge_length_d_1_s_185_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_quad_blk, gpu___CG_p_patch__CG_edges__m_quad_blk, ((__f2dace_SA_quad_blk_d_0_s_181_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_182_edges_p_patch_4) * __f2dace_SA_quad_blk_d_2_s_183_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_quad_idx, gpu___CG_p_patch__CG_edges__m_quad_idx, ((__f2dace_SA_quad_idx_d_0_s_178_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_179_edges_p_patch_4) * __f2dace_SA_quad_idx_d_2_s_180_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_start_block, gpu___CG_p_patch__CG_edges__m_start_block, __f2dace_SA_start_block_d_0_s_198_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_start_index, gpu___CG_p_patch__CG_edges__m_start_index, __f2dace_SA_start_index_d_0_s_196_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_tangent_orientation, gpu___CG_p_patch__CG_edges__m_tangent_orientation, (__f2dace_SA_tangent_orientation_d_0_s_176_edges_p_patch_4 * __f2dace_SA_tangent_orientation_d_1_s_177_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_start_block, gpu___CG_p_patch__CG_edges__m_start_block, __f2dace_SA_start_block_d_0_s_198_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_start_index, gpu___CG_p_patch__CG_edges__m_start_index, __f2dace_SA_start_index_d_0_s_196_edges_p_patch_4 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_tangent_orientation, gpu___CG_p_patch__CG_edges__m_tangent_orientation, (__f2dace_SA_tangent_orientation_d_0_s_176_edges_p_patch_4 * __f2dace_SA_tangent_orientation_d_1_s_177_edges_p_patch_4) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_vertex_blk, gpu___CG_p_patch__CG_edges__m_vertex_blk, ((__f2dace_SA_vertex_blk_d_0_s_173_edges_p_patch_4 * __f2dace_SA_vertex_blk_d_1_s_174_edges_p_patch_4) * __f2dace_SA_vertex_blk_d_2_s_175_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_vertex_idx, gpu___CG_p_patch__CG_edges__m_vertex_idx, ((__f2dace_SA_vertex_idx_d_0_s_170_edges_p_patch_4 * __f2dace_SA_vertex_idx_d_1_s_171_edges_p_patch_4) * __f2dace_SA_vertex_idx_d_2_s_172_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_cell_blk, gpu___CG_p_patch__CG_verts__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_203_verts_p_patch_5 * __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5) * __f2dace_SA_cell_blk_d_2_s_205_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_cell_idx, gpu___CG_p_patch__CG_verts__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_200_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_201_verts_p_patch_5) * __f2dace_SA_cell_idx_d_2_s_202_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_edges__m_vertex_idx, gpu___CG_p_patch__CG_edges__m_vertex_idx, ((__f2dace_SA_vertex_idx_d_0_s_170_edges_p_patch_4 * __f2dace_SA_vertex_idx_d_1_s_171_edges_p_patch_4) * __f2dace_SA_vertex_idx_d_2_s_172_edges_p_patch_4) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_cell_blk, gpu___CG_p_patch__CG_verts__m_cell_blk, ((__f2dace_SA_cell_blk_d_0_s_203_verts_p_patch_5 * __f2dace_SA_cell_blk_d_1_s_204_verts_p_patch_5) * __f2dace_SA_cell_blk_d_2_s_205_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_cell_idx, gpu___CG_p_patch__CG_verts__m_cell_idx, ((__f2dace_SA_cell_idx_d_0_s_200_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_201_verts_p_patch_5) * __f2dace_SA_cell_idx_d_2_s_202_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_edge_blk, gpu___CG_p_patch__CG_verts__m_edge_blk, ((__f2dace_SA_edge_blk_d_0_s_209_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_210_verts_p_patch_5) * __f2dace_SA_edge_blk_d_2_s_211_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_edge_idx, gpu___CG_p_patch__CG_verts__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_206_verts_p_patch_5 * __f2dace_SA_edge_idx_d_1_s_207_verts_p_patch_5) * __f2dace_SA_edge_idx_d_2_s_208_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_end_block, gpu___CG_p_patch__CG_verts__m_end_block, __f2dace_SA_end_block_d_0_s_215_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_end_index, gpu___CG_p_patch__CG_verts__m_end_index, __f2dace_SA_end_index_d_0_s_213_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_edge_idx, gpu___CG_p_patch__CG_verts__m_edge_idx, ((__f2dace_SA_edge_idx_d_0_s_206_verts_p_patch_5 * __f2dace_SA_edge_idx_d_1_s_207_verts_p_patch_5) * __f2dace_SA_edge_idx_d_2_s_208_verts_p_patch_5) * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_end_block, gpu___CG_p_patch__CG_verts__m_end_block, __f2dace_SA_end_block_d_0_s_215_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_end_index, gpu___CG_p_patch__CG_verts__m_end_index, __f2dace_SA_end_index_d_0_s_213_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_start_block, gpu___CG_p_patch__CG_verts__m_start_block, __f2dace_SA_start_block_d_0_s_214_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_start_index, gpu___CG_p_patch__CG_verts__m_start_index, __f2dace_SA_start_index_d_0_s_212_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_prog__m_vn, gpu___CG_p_prog__m_vn, ((90 * __f2dace_SA_vn_d_0_s_288_p_prog_7) * __f2dace_SA_vn_d_2_s_290_p_prog_7) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_prog__m_w, gpu___CG_p_prog__m_w, ((91 * __f2dace_SA_w_d_0_s_285_p_prog_7) * __f2dace_SA_w_d_2_s_287_p_prog_7) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[3]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_patch__CG_verts__m_start_index, gpu___CG_p_patch__CG_verts__m_start_index, __f2dace_SA_start_index_d_0_s_212_verts_p_patch_5 * sizeof(int), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_prog__m_vn, gpu___CG_p_prog__m_vn, ((90 * __f2dace_SA_vn_d_0_s_288_p_prog_7) * __f2dace_SA_vn_d_2_s_290_p_prog_7) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__CG_p_prog__m_w, gpu___CG_p_prog__m_w, ((91 * __f2dace_SA_w_d_0_s_285_p_prog_7) * __f2dace_SA_w_d_2_s_287_p_prog_7) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
+//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
         {
             int* __cg_global_data__m_nflatlev = &__CG_global_data__m_nflatlev[0];
             int __cg_global_data__m_nproma = __CG_global_data__m_nproma;
@@ -3025,12 +3006,9 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
 
         }
         DACE_GPU_CHECK(cudaMemcpyAsync(z_w_concorr_me, gpu_z_w_concorr_me, ((__f2dace_A_z_w_concorr_me_d_0_s_360 * __f2dace_A_z_w_concorr_me_d_1_s_361) * __f2dace_A_z_w_concorr_me_d_2_s_362) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_kin_hor_e, gpu_z_kin_hor_e, ((__f2dace_A_z_kin_hor_e_d_0_s_363 * __f2dace_A_z_kin_hor_e_d_1_s_364) * __f2dace_A_z_kin_hor_e_d_2_s_365) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[1]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_vt_ie, gpu_z_vt_ie, ((__f2dace_A_z_vt_ie_d_0_s_366 * __f2dace_A_z_vt_ie_d_1_s_367) * __f2dace_A_z_vt_ie_d_2_s_368) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[2]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_kin_hor_e, gpu_z_kin_hor_e, ((__f2dace_A_z_kin_hor_e_d_0_s_363 * __f2dace_A_z_kin_hor_e_d_1_s_364) * __f2dace_A_z_kin_hor_e_d_2_s_365) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_vt_ie, gpu_z_vt_ie, ((__f2dace_A_z_vt_ie_d_0_s_366 * __f2dace_A_z_vt_ie_d_1_s_367) * __f2dace_A_z_vt_ie_d_2_s_368) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[1]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[2]));
-//        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[3]));
 
 
     }
@@ -3154,20 +3132,20 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
     DACE_GPU_CHECK(cudaFree(gpu___CG_p_patch__CG_verts__m_start_index));
     DACE_GPU_CHECK(cudaFree(gpu___CG_p_prog__m_vn));
     DACE_GPU_CHECK(cudaFree(gpu___CG_p_prog__m_w));
-    DACE_GPU_CHECK(cudaFree(gpu_zeta));
+    DACE_GPU_CHECK(cudaFree(gpu_maxvcfl_arr));
     DACE_GPU_CHECK(cudaFree(gpu_z_vt_ie));
-    DACE_GPU_CHECK(cudaFree(gpu_z_ekinh));
-    DACE_GPU_CHECK(cudaFree(gpu_levmask));
-    DACE_GPU_CHECK(cudaFree(gpu_levelmask));
-    DACE_GPU_CHECK(cudaFree(gpu_z_v_grad_w));
-    DACE_GPU_CHECK(cudaFree(gpu_z_w_v));
-    DACE_GPU_CHECK(cudaFree(gpu_z_w_con_c));
-    DACE_GPU_CHECK(cudaFree(gpu_cfl_clipping));
     DACE_GPU_CHECK(cudaFree(gpu_z_kin_hor_e));
     DACE_GPU_CHECK(cudaFree(gpu_z_w_concorr_me));
-    DACE_GPU_CHECK(cudaFree(gpu_z_w_concorr_mc));
-    DACE_GPU_CHECK(cudaFree(gpu_maxvcfl_arr));
+    DACE_GPU_CHECK(cudaFree(gpu_zeta));
+    DACE_GPU_CHECK(cudaFree(gpu_z_v_grad_w));
+    DACE_GPU_CHECK(cudaFree(gpu_levmask));
+    DACE_GPU_CHECK(cudaFree(gpu_z_w_con_c));
     DACE_GPU_CHECK(cudaFree(gpu_z_w_con_c_full));
+    DACE_GPU_CHECK(cudaFree(gpu_z_w_concorr_mc));
+    DACE_GPU_CHECK(cudaFree(gpu_cfl_clipping));
+    DACE_GPU_CHECK(cudaFree(gpu_z_ekinh));
+    DACE_GPU_CHECK(cudaFree(gpu_z_w_v));
+    DACE_GPU_CHECK(cudaFree(gpu_levelmask));
 }
 
 DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *__state, global_data_type* global_data, t_nh_diag* p_diag, t_int_state* p_int, t_nh_metrics* p_metrics, t_patch* p_patch, t_nh_prog* p_prog, double * __restrict__ z_kin_hor_e, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_me, int __f2dace_A_z_kin_hor_e_d_0_s_363, int __f2dace_A_z_kin_hor_e_d_1_s_364, int __f2dace_A_z_kin_hor_e_d_2_s_365, int __f2dace_A_z_vt_ie_d_0_s_366, int __f2dace_A_z_vt_ie_d_1_s_367, int __f2dace_A_z_vt_ie_d_2_s_368, int __f2dace_A_z_w_concorr_me_d_0_s_360, int __f2dace_A_z_w_concorr_me_d_1_s_361, int __f2dace_A_z_w_concorr_me_d_2_s_362, int __f2dace_OA_z_kin_hor_e_d_0_s_363, int __f2dace_OA_z_kin_hor_e_d_1_s_364, int __f2dace_OA_z_kin_hor_e_d_2_s_365, int __f2dace_OA_z_vt_ie_d_0_s_366, int __f2dace_OA_z_vt_ie_d_1_s_367, int __f2dace_OA_z_vt_ie_d_2_s_368, int __f2dace_OA_z_w_concorr_me_d_0_s_360, int __f2dace_OA_z_w_concorr_me_d_1_s_361, int __f2dace_OA_z_w_concorr_me_d_2_s_362, double dt_linintp_ubc, double dtime, int istep, int ldeepatmo, int lvn_only, int ntnd)
