@@ -11,7 +11,7 @@ from dace.transformation.passes import GPUKernelLaunchRestructure
 from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 import argparse
 from utils.pre_gpu_fixes import make_arrays_persistent
-
+from utils.int64_to_int32 import int64_to_int32
 STAGE_ID = 7
 
 
@@ -25,6 +25,8 @@ def optimization_action(sdfg):
                 arr.storage = dace.dtypes.StorageType.CPU_Heap
             arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
     make_arrays_persistent(sdfg)
+    int64_to_int32(sdfg)
+    dace.config.Config.set('compiler', 'default_data_types', value='C')
     return sdfg
 
 def main():
