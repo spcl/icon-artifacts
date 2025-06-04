@@ -272,20 +272,22 @@ def compile_if_propagated_sdfgs(
                 sources.add("main_gpu.cu")
 
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
+    implicit_conversions = "-Wconversion -Wsign-conversion -Wfloat-conversion"
+    implicit_conversions_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion"
     if gpu:
         if release:
-            flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo -Xcompiler=-g"
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo -Xcompiler=-g"
         else:
-            flags = f" {supress_flags} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
             flags += " -std=c++20 "
     else:
         if release:
-            flags = " -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 -g "
+            flags = f" {implicit_conversions} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 -g "
         else:
-            flags = " -fsanitize=address -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -g -ggdb "
+            flags = f" {implicit_conversions} -fsanitize=address -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -g -ggdb "
 
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
