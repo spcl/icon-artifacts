@@ -57,6 +57,7 @@ def optimization_action(sdfg):
     # Prevents some transformations from being applied
     # This is not a symbol anymore (?)
     # TODO: check if this is necessary, if so fix
+    assert "tmp_call_18" in sdfg.symbols
     if "tmp_call_18" in sdfg.symbols:
         demote_symbol_to_scalar(sdfg, "tmp_call_18")
     sdfg.validate()

@@ -43,10 +43,9 @@ def optimization_action(sdfg):
 
     for e, graph in sdfg.all_edges_recursive():
         if e.data is not None and hasattr(e.data, "data") and (e.data.data == "gpu_out_val_0" or e.data.data == "out_val_0"):
-            sb = dace.subsets.Range.from_string("2*_for_it_35")
-            #print(sb, e.data.subset)
+            sb = dace.subsets.Range.from_string("2*_for_it_35 - 2")
             if sb == e.data.subset:
-                e.data.subset = dace.subsets.Range.from_string("_for_it_35")
+                e.data.subset = dace.subsets.Range.from_string("_for_it_35 - 1")
     sdfg.validate()
     return sdfg
 

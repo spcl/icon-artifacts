@@ -13,6 +13,7 @@ import argparse
 from utils.pre_gpu_fixes import make_arrays_persistent
 from utils.int64_to_int32 import int64_to_int32
 from utils.tile import tile_kernels
+from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs, prune_unused_inputs_outputs_recursive
 STAGE_ID = 7
 
 
@@ -21,6 +22,10 @@ def optimization_action(sdfg):
     make_arrays_persistent(sdfg)
     int64_to_int32(sdfg)
     tile_kernels(sdfg)
+    # If you run the function it removes out_val_0 but it should not
+    #prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
+    #prune_unused_inputs_outputs_recursive(sdfg) # A posible error related to ntnd if this is called
+    sdfg.validate()
     return sdfg
 
 def main():
