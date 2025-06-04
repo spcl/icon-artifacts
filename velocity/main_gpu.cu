@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
   const std::filesystem::path ROOT{"data_nproma32"};
   std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
   int n1 = -1;
-  int rep = 1;
+  int rep = 2;
 
   if (argc == 2) {
     n1 = std::atoi(argv[1]);
@@ -291,6 +291,7 @@ int main(int argc, char* argv[]) {
         /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
+        for (int j = 0; j < rep; j++){
       __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
         h_1_1, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
         z_vt_ie, z_w_concorr_me,
@@ -328,6 +329,7 @@ int main(int argc, char* argv[]) {
         /*__f2dace_OA_z_w_concorr_me_d_2_s_156=*/
         serde::ARRAY_META_DICT()->at(z_w_concorr_me).lbound.at(2), dt_linintp_ubc,
         dtime, istep, ldeepatmo, lvn_only, ntnd);
+      }
         int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(h_1_1);
 
     } else if (lvn_only == 0 && istep == 1){
@@ -437,6 +439,7 @@ int main(int argc, char* argv[]) {
         /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
         dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
+        for (int j = 0; j < rep; j++){
       __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
         h_1_2, &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog, z_kin_hor_e,
         z_vt_ie,  z_w_concorr_me,
@@ -463,6 +466,7 @@ int main(int argc, char* argv[]) {
         /*__f2dace_OA_z_kin_hor_e_d_2_s_159=*/
         serde::ARRAY_META_DICT()->at(z_kin_hor_e).lbound.at(2),
         dt_linintp_ubc, dtime, istep, ldeepatmo, lvn_only, ntnd);
+      }
     int err = __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_2(h_1_2);
 
     } else if (lvn_only == 0 && istep == 2){
