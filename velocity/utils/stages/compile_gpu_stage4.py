@@ -9,7 +9,8 @@ from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
 from utils.map_state_fission import MapStateFission
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 import argparse
-
+from utils.propagate_if_cond import propagate_if_cond
+from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
 STAGE_ID = 4
 
 
@@ -52,11 +53,12 @@ def optimization_action(sdfg):
     sdfg.simplify(skip=["StateFusion"])
     # I saw trurthy ifs, propagate those conditions and try to fuse states agian
     # Currently crashes, TODO: fix
-    # propagate_if_cond(sdfg, sdfg, None, None, verbose)
+    propagate_if_cond(sdfg, sdfg, None, None, True)
     # Prevents some transformations from being applied
     # This is not a symbol anymore (?)
     # TODO: check if this is necessary, if so fix
-    # demote_symbol_to_scalar(sdfg, "tmp_call_18")
+    if "tmp_call_18" in sdfg.symbols:
+        demote_symbol_to_scalar(sdfg, "tmp_call_18")
     sdfg.validate()
     sdfg.simplify(skip=["StateFusion"])
     sdfg.validate()

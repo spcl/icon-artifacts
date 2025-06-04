@@ -9,6 +9,10 @@ from utils.benchmark_sdfg import instrument_sdfg
 from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
 from utils.config import release
 
+dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
+dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
+dace.config.Config.set('compiler', 'default_data_types', value='C')
+
 STARTER_SDFG_FILES = [
     "velocity_no_nproma_if_prop_lvn_only_0_istep_1.sdfgz",
     "velocity_no_nproma_if_prop_lvn_only_1_istep_1.sdfgz",
@@ -45,6 +49,9 @@ def stage_outputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
   return {name: stage_output(name, stage, codegen_dir) for name in sdfg_names()}
 
 def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
+  dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
+  dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
+  dace.config.Config.set('compiler', 'default_data_types', value='C')
   for name, g in sdfgs.items():
       g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
   sdfgs = list(sdfgs.values())

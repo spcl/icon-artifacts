@@ -18,9 +18,6 @@ STAGE_ID = 7
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
-    dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
-    dace.config.Config.set('compiler', 'default_data_types', value='C')
     make_arrays_persistent(sdfg)
     int64_to_int32(sdfg)
     tile_kernels(sdfg)

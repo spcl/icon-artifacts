@@ -132,11 +132,11 @@ def add_timers(file_path: str, gpu: bool):
     if not gpu:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
-        replacement1 = '   measure_time("Run"); \n cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
+        replacement1 = '   cudaDeviceSynchronize();\n    measure_time("Run");\n    cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
     # Pattern 2: Insert AFTER `tmp_call_18 = out_val;`
     pattern2 = r'^\s*tmp_call_18 = out_val;\s*$'
     if gpu:
-        replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n'
+        replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    cudaDeviceSynchronize();\n'
         replacement2 += '  measure_time("Run");\n'
     else:
         replacement2 = '\\g<0>  measure_time("Run");\n'
