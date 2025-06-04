@@ -144,7 +144,7 @@ void got_want_pair(const global_data_type& got, const global_data_type& want,
 }
 
 int main(int argc, char* argv[]) {
-  const std::filesystem::path ROOT{"data_nproma32"};
+  const std::filesystem::path ROOT{"data_nproma20480"};
   std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
   int n1 = -1;
   int rep = 2;
