@@ -272,11 +272,11 @@ def compile_if_propagated_sdfgs(
                 sources.add("main_gpu.cu")
 
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
-    implicit_conversions = "-Wconversion -Wsign-conversion -Wfloat-conversion"
+    implicit_conversions = "-Wconversion -Wno-sign-conversion -Wfloat-conversion"
     implicit_conversions_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion"
     if gpu:
         if release:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo -Xcompiler=-g"
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo -Xcompiler=-g --use_fast_math --ftz=true --prec-div=false --prec-sqrt=false --fmad=true"
         else:
             flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
