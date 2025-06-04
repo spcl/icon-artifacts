@@ -123,26 +123,18 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
     _process_folder(script_dir, sdfg, instrument)
 
 def add_timers(file_path: str, gpu: bool):
-    """
-    """
-    import re
 
     with open(file_path, "r") as f:
         code = f.read()
 
     # Pattern 1: Insert BEFORE `nrdmax_jg = __CG_global_data__m_nrdmax[0];`
-    # Pattern 1: Insert BEFORE `nrdmax_jg = __CG_global_data__m_nrdmax[0];`
     pattern1 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
-    #replacement1 = '    cudaDeviceSynchronize();\n    measure_time("Run");\n\\g<0>'
     if not gpu:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
         replacement1 = '   measure_time("Run"); \n cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
-    # Pattern 2: Insert AFTER `__CG_p_diag__m_max_vcfl_dyn = p_diag_out_max_vcfl_dyn;`
-    pattern2 = r'^(.*i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block\[\(\(- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2\) - 4\)\];.*)$'
-    p2 = "i_endblk_var_147 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];"
-    escaped_p2 = re.escape(p2)
-    #replacement2 = '\\1\n    cudaDeviceSynchronize();\n    measure_time("Run");'
+    # Pattern 2: Insert AFTER `tmp_call_18 = out_val;`
+    pattern2 = r'^\s*tmp_call_18 = out_val;\s*$'
     if gpu:
         replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n'
         replacement2 += '  measure_time("Run");\n'
@@ -164,20 +156,14 @@ def comment_out_syncs(filepath):
         lines = file.readlines()
     with open(filepath, "w") as file:
         for line in lines:
-            if "vcflmax_out_0 = maxvcfl_0_in;" in line:
-                vcflmax_count = 1
-            if "cudaStreamSynchronize" in line:
-                if vcflmax_count > 0:
-                    vcflmax_count -= 1
-                    line = "//" + line
-                    line += "\ncudaStreamSynchronize(__state->gpu_context->streams[0]);\n"
-                    added_one = True
+            if ("cudaStreamSynchronize" in line) or ("EventRecord" in line) or ("StreamWaitEvent" in line):
+                if ("stop" in line) or ("start" in line):
+                    line = line
                 else:
-                  line = "//" + line
+                    line = "//" + line
+            if "tmp_call_18 = -1.7976931348623157e+308;" in line:
+                line = "DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));\n" + line
             file.write(line)
-    if not added_one:
-        #print(f"WARNING: Couldn't add one necessary sync (OK if not stage 6).")
-        raise Exception(f"HA FUCK IT IS AN EXCEPTION NOW: Couldn't add one necessary sync.")
 
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],

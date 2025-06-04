@@ -17,13 +17,6 @@ STAGE_ID = 7
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    for arr_name, arr in sdfg.arrays.items():
-        if "maxvcfl_arr" in arr_name:
-            if "gpu" in arr_name:
-                arr.storage = dace.dtypes.StorageType.GPU_Global
-            else:
-                arr.storage = dace.dtypes.StorageType.CPU_Heap
-            arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
     make_arrays_persistent(sdfg)
     int64_to_int32(sdfg)
     dace.config.Config.set('compiler', 'default_data_types', value='C')

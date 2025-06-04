@@ -36,22 +36,17 @@ def optimization_action(sdfg):
     move_lib_schedules(sdfg, dace.dtypes.ScheduleType.GPU_Device)
     to_segmented_reduction(sdfg)
 
-
     for arrname, arr in sdfg.arrays.items():
         if arr.transient:
             if arr.storage == dace.dtypes.StorageType.GPU_Global:
                 arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
-        #if arrname == "gpu_maxvcfl_arr":
-        #    raise Exception(arr, arr.transient, arr.lifetime, arr.storage)
 
     for e, graph in sdfg.all_edges_recursive():
         if e.data is not None and hasattr(e.data, "data") and (e.data.data == "gpu_out_val_0" or e.data.data == "out_val_0"):
             sb = dace.subsets.Range.from_string("2*_for_it_35")
             #print(sb, e.data.subset)
             if sb == e.data.subset:
-                #raise Exception(f"{sb}| {e.data.subset} uwu")
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35")
-            #if e.data.subset =
     sdfg.validate()
     return sdfg
 
