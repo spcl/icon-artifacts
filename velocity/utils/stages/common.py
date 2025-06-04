@@ -68,6 +68,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
         sdfgs, gpu=True, release=release,
         generate_code=True, lib=False,
         main_name="main_gpu.cu", stage=stage,
+        debuginfo=False,
         )
   else:
     compile_if_propagated_sdfgs(
@@ -75,6 +76,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
         generate_code=True, lib=False,
         main_name="main.cu",
         stage=stage,
+        debuginfo=False,
         )
   binpath = Path('velocity_gpu')
   assert binpath.exists()

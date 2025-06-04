@@ -173,6 +173,7 @@ def compile_if_propagated_sdfgs(
     lib: bool,
     main_name: None | str,
     stage: int,
+    debuginfo: bool,
 ):
     dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
     sources = set()
@@ -275,19 +276,24 @@ def compile_if_propagated_sdfgs(
     implicit_conversions = "-Wconversion -Wno-sign-conversion -Wfloat-conversion"
     implicit_conversions_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion"
     if gpu:
+        debuginfo_flags = "-Xcompiler=-g -lineinfo" if debuginfo else ""
+    else:
+        debuginfo_flags = "-g" if debuginfo else ""
+
+    if gpu:
         if release:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo -Xcompiler=-g --use_fast_math --ftz=true --prec-div=false --prec-sqrt=false --fmad=true"
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas -O3,-v -dlto -dopt=on -Xcompiler=-march=native -Ofc=0 --extra-device-vectorization --restrict"
         else:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G -g -Xcompiler=-g --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
             flags += " -std=c++20 "
     else:
         if release:
-            flags = f" {implicit_conversions} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 -g "
+            flags = f" {implicit_conversions} {debuginfo_flags} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 "
         else:
-            flags = f" {implicit_conversions} -fsanitize=address -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -g -ggdb "
+            flags = f" {implicit_conversions} -fsanitize=address -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -ggdb {debuginfo_flags} "
 
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
