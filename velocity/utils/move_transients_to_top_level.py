@@ -274,7 +274,7 @@ def move_transients_to_top_level(root: dace.SDFG,
                 return all(simplify(e - a) == 0 for e, a in zip(expected, second_list))
             assert check_col_major_strides(old_shape, old_strides), f"{arr_name}, desc:{old_desc}, {old_shape}, {old_strides}"
 
-            prod = reduce(operator.mul, arr_desc.shape[:-1], 1)
+            prod = reduce(operator.mul, arr_desc.shape[:], 1)
             assert all(arr_desc.offset[i] == 0 for i in range(len(arr_desc.offset))), f"{arr_desc}, {arr_desc.offset}"
             new_desc = dace.data.Array(
                 dtype=arr_desc.dtype,
@@ -314,13 +314,13 @@ def move_transients_to_top_level(root: dace.SDFG,
                 if edge.data.data == arr_name:
                     mem_range = copy.deepcopy(edge.data.subset)
                     mem_range_list = []
+                    for b,e,s in mem_range.ranges:
+                        mem_range_list += [(b, e, s)]
                     if not no_dim_change:
                         if offset == 0:
                             mem_range_list += [(param_sym, param_sym, 1)]
                         else:
                             mem_range_list += [(param_sym+offset, param_sym+offset, 1)]
-                    for b,e,s in mem_range.ranges:
-                        mem_range_list += [(b, e, s)]
                     state.remove_edge(edge)
                     state.add_edge(
                         edge.src,

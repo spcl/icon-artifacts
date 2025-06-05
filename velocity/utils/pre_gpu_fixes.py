@@ -31,7 +31,7 @@ def step_4(sdfg: dace.SDFG):
                 second_nsdfg = node
     inner_sdfg = condblock.parent_graph
     assert isinstance(nsdfg, dace.nodes.NestedSDFG)
-    condblock.branches[0] = (dace.nodes.CodeBlock("(not ((out_val_0[_for_it_35 -1] == 0) == 1))"), condblock.branches[0][1])
+    condblock.branches[0] = (dace.nodes.CodeBlock("(not ((out_val_0 == 0) == 1))"), condblock.branches[0][1])
 
     # Change the array out_val_0 to scalar_out_val_0
     #inner_sdfg.add_array("out_val_0", dtype=nsdfg.sdfg.arrays["out_val_0"].dtype, shape=nsdfg.sdfg.arrays["out_val_0"].shape, transient=False)
@@ -50,7 +50,7 @@ def step_4(sdfg: dace.SDFG):
             break
     #second_nsdfg.sdfg.add_scalar("scalar_out_val_0", dtype=second_nsdfg.sdfg.arrays["out_val_0"].dtype, transient=False)
     #second_nsdfg.sdfg.remove_data("out_val_0")
-    second_cond_block.branches[0] = (dace.nodes.CodeBlock("((not ((out_val_0[_for_it_35 - 1] == 0)==1)) and (_if_cond_18 == 1))"), second_cond_block.branches[0][1])
+    second_cond_block.branches[0] = (dace.nodes.CodeBlock("((not ((out_val_0 == 0)==1)) and (_if_cond_18 == 1))"), second_cond_block.branches[0][1])
 
     sdfg.validate()
 def step_1(sdfg: dace.SDFG):

@@ -54,7 +54,7 @@ def optimization_action(sdfg):
             "z_w_concorr_mc": "tmp_struct_symbol_5",
             "z_w_con_c": "tmp_struct_symbol_5",
             "levmask": "tmp_struct_symbol_5",
-            "levmask": "tmp_struct_symbol_5",
+            "cfl_clipping": "tmp_struct_symbol_5",
         },
     )
     move_transients_to_top_level(
