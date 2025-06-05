@@ -291,9 +291,11 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
         },
     )
 
+    # Ensure column-major order (canonical layout for all arrays)
     arr_name, arr = parent.sdfg.add_array(
         "maxvcfl_arr",
         shape=[f"tmp_struct_symbol_4", f"{ol_size_sym}"],
+        strides=[1, dace.symbolic.SymExpr(f"tmp_struct_symbol_4")],
         dtype=dace.float64,
         transient=True,
         find_new_name=True,

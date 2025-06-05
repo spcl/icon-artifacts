@@ -257,15 +257,34 @@ def move_transients_to_top_level(root: dace.SDFG,
 
         assert arr_desc.start_offset == 0, f"{arr_desc}, {arr_desc.start_offset}"
         if not no_dim_change:
+            old_desc = arr_desc
+            old_shape = list(arr_desc.shape)
+            old_strides  = list(arr_desc.strides)
+            from sympy import symbols, simplify
+            from functools import reduce
+            import operator
+
+            def check_col_major_strides(lst, second_list):
+                if not second_list or second_list[0] != 1:
+                    return False
+                expected = [1]
+                for i in range(1, len(second_list)):
+                    prod = reduce(operator.mul, lst[:i], 1)
+                    expected.append(prod)
+                return all(simplify(e - a) == 0 for e, a in zip(expected, second_list))
+            assert check_col_major_strides(old_shape, old_strides), f"{arr_name}, desc:{old_desc}, {old_shape}, {old_strides}"
+
+            prod = reduce(operator.mul, arr_desc.shape[:-1], 1)
+            assert all(arr_desc.offset[i] == 0 for i in range(len(arr_desc.offset))), f"{arr_desc}, {arr_desc.offset}"
             new_desc = dace.data.Array(
                 dtype=arr_desc.dtype,
-                shape=[bound] + list(arr_desc.shape),
-                strides=[arr_desc.total_size] + list(arr_desc.strides),
+                shape=list(arr_desc.shape) + [bound],
+                strides=list(arr_desc.strides) + [prod],
                 transient=True,
                 storage=arr_desc.storage,
                 location=arr_desc.location,
                 allow_conflicts=arr_desc.allow_conflicts,
-                offset=[0] + list(arr_desc.offset),
+                offset=list(arr_desc.offset) + [0],
                 may_alias=arr_desc.may_alias,
                 lifetime=lifetime,
                 alignment=arr_desc.alignment,
