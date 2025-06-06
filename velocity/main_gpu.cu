@@ -143,8 +143,28 @@ void got_want_pair(const global_data_type& got, const global_data_type& want,
   });
 }
 
+#include <cstdlib>           // for std::getenv
+#include <filesystem>
+#include <string>
+#include <sstream>
+
+std::string get_root_path() {
+    const char* env_val = std::getenv("NPROMA");
+    int nproma = 20480; // default value
+
+    if (env_val != nullptr) {
+        std::istringstream iss(env_val);
+        int val;
+        if (iss >> val && val > 0) {
+            nproma = val;
+        }
+    }
+
+    return "data_nproma" + std::to_string(nproma);
+}
 int main(int argc, char* argv[]) {
-  const std::filesystem::path ROOT{"data_nproma20480"};
+  std::string nproma_path_str = get_root_path();
+  const std::filesystem::path ROOT{nproma_path_str};
   std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
   int n1 = -1;
   int rep = 2;

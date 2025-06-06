@@ -2,7 +2,10 @@ use_cache = True
 instrument = False
 cleanup = False
 reduction = True
-release = False
+import os
+_release =  os.getenv("RELEASE")
+assert _release == "TRUE" or _release == "FALSE"
+release = _release == "TRUE"
 verbose = False
 tile = False
 remainder_loop = False
