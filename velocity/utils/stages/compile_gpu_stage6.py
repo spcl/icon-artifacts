@@ -11,7 +11,7 @@ from dace.transformation.passes import GPUKernelLaunchRestructure
 from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 import argparse
 from utils.move_lib_schedules import move_lib_schedules
-
+from utils.reassign_vars import reassign_vars
 STAGE_ID = 6
 
 
@@ -19,6 +19,7 @@ def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
     add_gpu_copies_to_flattener(sdfg)
     sdfg.validate()
+
     pre_gpu_fix(sdfg)
 
     sdfg.validate()

@@ -248,12 +248,18 @@ def move_transients_to_top_level(root: dace.SDFG,
         if arr_name in upper_bounds:
             bound = upper_bounds[arr_name] if isinstance(upper_bounds[arr_name], int) else dace.symbolic.symbol(upper_bounds[arr_name])
             lifetime = dace.AllocationLifetime.SDFG
+            if bound not in child_sdfg.symbols:
+                child_sdfg.add_symbol(str(bound), dace.int32, False)
+                nsdfg.symbol_mapping[str(bound)] = str(bound)
         else:
             b, e, s = map_entry.map.range[0]
             bound = (e+1-b)//s
             lifetime = dace.AllocationLifetime.Scope
             if ilifetime is not None:
                 lifetime = ilifetime # can break but if user passed something they should now it
+            for bs in bound.free_symbols:
+                child_sdfg.add_symbol(bs, dace.int32, False)
+                nsdfg.symbol_mapping[bs] = bs
 
         assert arr_desc.start_offset == 0, f"{arr_desc}, {arr_desc.start_offset}"
         if not no_dim_change:

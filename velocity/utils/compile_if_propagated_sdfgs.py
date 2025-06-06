@@ -292,7 +292,7 @@ def compile_if_propagated_sdfgs(
         if release:
             flags = f" {implicit_conversions} {debuginfo_flags} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 "
         else:
-            flags = f" {implicit_conversions} -fsanitize=address -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -ggdb {debuginfo_flags} "
+            flags = f" {implicit_conversions} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -ggdb {debuginfo_flags} "
 
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:

@@ -23,8 +23,10 @@ def optimization_action(sdfg):
     prune_unused_inputs_outputs_recursive(sdfg) # A posible error related to ntnd if this is called
     sdfg.validate()
 
-    # preprocess_tough_nut(sdfg) # Leads to invalid SDFG is more than one block
-    # prune_unused_inputs_outputs(sdfg)
+    # Problematic
+    #Problems with move if top
+    #preprocess_tough_nut(sdfg) # Leads to invalid SDFG is more than one block
+    #prune_unused_inputs_outputs(sdfg)
 
     sdfg.apply_transformations_repeated(ConditionFusion)
     prune_unused_inputs_outputs(sdfg)

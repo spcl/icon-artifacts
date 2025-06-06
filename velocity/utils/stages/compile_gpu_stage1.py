@@ -10,7 +10,7 @@ from utils.benchmark_sdfg import instrument_sdfg
 from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
 import argparse
 from utils.init_transient_zero import init_transient_zero
-
+from utils.reassign_vars import reassign_vars
 STAGE_ID = 1
 
 

@@ -49,3 +49,4 @@ from utils.pre_gpu_fixes import make_arrays_persistent
 from utils.init_transient_zero import init_transient_zero
 from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 from utils.int64_to_int32 import int64_to_int32
+from utils.reassign_vars import reassign_vars
