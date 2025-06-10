@@ -3,6 +3,7 @@ import dace
 import ast
 
 from dace.codegen.control_flow import ConditionalBlock, LoopRegion
+import dace.properties
 
 def rename_on_if(cfg, src: str, dst: str, recursive=False, exact=False):
     gpu_host_name_map = {src: dst}
@@ -92,6 +93,21 @@ def rename_on_map(cfg, src: str, dst: str, recursive=False, exact=False):
                     #    raise Exception((b,e,s), (nb, ne, ns))
                     new_range_arr.append((nb, ne, ns))
                 node.map.range = dace.subsets.Range(ranges=new_range_arr)
+
+def rename_on_tasklet(cfg, src: str, dst: str, recursive=False):
+    for _, cfg_or_state in enumerate([cfg] + cfg.nodes()) if not recursive else cfg.all_nodes_recursive():
+        if isinstance(cfg_or_state, dace.SDFGState):
+            for node in cfg_or_state.nodes():
+                if not isinstance(node, dace.nodes.Tasklet):
+                    continue
+                code_str = node.code.as_string
+                code_lang = node.code.language
+                code_str.replace(src, dst)
+                node.code = dace.properties.CodeBlock(
+                    code=code_str,
+                    language=code_lang,
+                )
+
 
 def rename_on_if2(cfg, m, recursive=False, exact=False):
     gpu_host_name_map = m

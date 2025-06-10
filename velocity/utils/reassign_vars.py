@@ -1,15 +1,27 @@
 import dace
 
-from utils.rename_on_if import rename_on_if, rename_on_for, rename_on_map
+from dace.sdfg.state import ControlFlowRegion
+from utils.rename_on_if import rename_on_if, rename_on_for, rename_on_map, rename_on_tasklet
 
 def replace(sdfg: dace.SDFG, start_block, old_symbol_str: str, new_symbol_str: str):
     """
     Replace all occurrences of old_symbol with new_symbol in the SDFG starting from start_block.
     """
+    assert isinstance(start_block, dace.SDFGState) or isinstance(start_block, ControlFlowRegion), "start_block must be a SDFGState or ControlFlowRegion."
+    assert start_block in sdfg.bfs_nodes(source=start_block), "start_block must be a valid starting point in the SDFG."
+
     for node in sdfg.bfs_nodes(source=start_block):
         out_edges = sdfg.out_edges(node)
 
-        #node.replace(old_symbol_str, new_symbol_str)
+        # If an SDFG State just replace, if CFG ensure replacing only on out edges to not replace in edge twice
+        if isinstance(start_block, dace.SDFGState):
+            node.replace(old_symbol_str, new_symbol_str)
+        else:
+            for n in node.nodes():
+                n.replace(old_symbol_str, new_symbol_str)
+                for e in sdfg.out_edges(n):
+                    e.data.replace(old_symbol_str, new_symbol_str)
+
         for out_edge in out_edges:
             out_edge.data.replace(old_symbol_str, new_symbol_str)
 
@@ -17,6 +29,7 @@ def replace(sdfg: dace.SDFG, start_block, old_symbol_str: str, new_symbol_str: s
         rename_on_if(node, old_symbol_str, new_symbol_str, True, True)
         rename_on_for(node, old_symbol_str, new_symbol_str, True, True)
         rename_on_map(node, old_symbol_str, new_symbol_str, True, True)
+        rename_on_tasklet(node, old_symbol_str, new_symbol_str, True)
 
 def reassign_vars(sdfg: dace.SDFG):
     re_counter = 0
