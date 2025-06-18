@@ -86,7 +86,5 @@ def change_reduction_schedule(sdfg: dace.SDFG):
         if isinstance(node, dace.nodes.AccessNode) and node.data == "gpu_vcflmax":
             node.data = "vcflmax"
             for oe in last_state.out_edges(node):
-                if oe.data.data == "gpu_maxvcfl":
-                    oe.data.data = "maxvcfl"
-
-    sdfg.save("a.sdfg")
+                if oe.data.data == "gpu_vcflmax":
+                    oe.data.data = "vcflmax"
