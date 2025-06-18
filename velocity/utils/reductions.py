@@ -5,6 +5,318 @@ from utils import find_node_by_name
 from dace.transformation.passes.analysis import loop_analysis
 from dace.sdfg.state import ControlFlowRegion, LoopRegion, ConditionalBlock
 
+reduction_code_dict = {
+    "maxZ_to_scalar_device": f"""
+{{
+    double max_val = 0.0;
+    #pragma unroll
+    for (int i = 0; i < in_size; i++){{
+        max_val = (in_arr[i] > max_val) ? in_arr[i] : max_val;
+    }}
+    out = max_val;
+}}
+""",
+    "maxZ_to_address_device": f"""
+{{
+    double max_val = 0.0;
+    #pragma unroll
+    for (int i = 0; i < in_size; i++){{
+        max_val = (in_arr[i] > max_val) ? in_arr[i] : max_val;
+    }}
+    out[0] = max_val;
+}}
+""",
+    "sum_to_scalar_device": f"""
+{{
+    int sum = 0;
+    #pragma unroll
+    for (int i = 0; i < size; i++){{
+        sum += in_arr[i];
+    }}
+    out = sum;
+}}
+""",
+    "sum_to_address_device": f"""
+{{
+    int sum = 0;
+    #pragma unroll
+    for (int i = 0; i < in_size; i++){{
+        sum += in_arr[i];
+    }}
+    out[0] = sum;
+}}
+""",
+    "scan_device": f"""
+{{
+    int sum = 0;
+    #pragma unroll
+    for (int i = 0; i < in_size; i++){{
+        sum += in_arr[i];
+    }}
+    out = sum ? 1 : 0;
+}}
+"""
+}
+
+gpu_kernel_code = """
+#include <cuda_runtime.h>
+#include <thrust/reduce.h>
+#include <thrust/functional.h>
+#include <thrust/execution_policy.h>
+#include <thrust/device_vector.h>
+
+////////////////////////////////////////////////////
+// We are running on host, but the data is on device
+////////////////////////////////////////////////////
+
+// max zero reduction interface
+static void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in, double*__restrict__ d_out, int size, cudaStream_t stream)
+{
+  void* d_temp_storage = nullptr;
+  size_t temp_storage_bytes = 0;
+
+  // Step 1: query temp storage size
+  cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, stream);
+
+  // Step 2: allocate once
+  if (temp_storage_bytes != 0) {
+    cudaMalloc(&d_temp_storage, temp_storage_bytes);
+  }
+
+  // Step 3: call the reduction
+  cub::DeviceReduce::Max(d_temp_storage, temp_storage_bytes, d_in, d_out, size, stream);
+
+  // Cleanup later
+  if (temp_storage_bytes != 0) {
+    cudaFree(d_temp_storage);
+  }
+
+}
+
+static double reduce_maxZ_to_scalar_gpu(const double *__restrict__ d_in, int size, cudaStream_t stream)
+{
+  cudaError_t err = cudaGetLastError();
+if (err != cudaSuccess) {
+    printf("2CUDA error: %s\n", cudaGetErrorString(err));
+}
+  thrust::device_ptr<const double> d_ptr = thrust::device_pointer_cast(d_in);
+  double maxval = thrust::reduce(thrust::cuda::par.on(stream), d_ptr, d_ptr + size, 0.0, thrust::maximum<double>());
+   err = cudaGetLastError();
+  if (err != cudaSuccess) {
+      printf("3CUDA error: %s\n", cudaGetErrorString(err));
+  }
+  return maxval;
+}
+
+// sum reduction interface
+static void reduce_sum_to_address_gpu(const int *__restrict__ d_in, int*__restrict__ d_out, int size, cudaStream_t stream)
+{
+  void* d_temp_storage = nullptr;
+  size_t temp_storage_bytes = 0;
+
+  // Step 1: query temp storage size
+  cub::DeviceReduce::Sum(nullptr, temp_storage_bytes, d_in, d_out, size, stream);
+
+  // Step 2: allocate once
+  if (temp_storage_bytes != 0) {
+    cudaMalloc(&d_temp_storage, temp_storage_bytes);
+  }
+
+  // Step 3: call the reduction
+  cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, d_in, d_out, size, stream);
+
+  // Cleanup later
+  if (temp_storage_bytes != 0) {
+    cudaFree(d_temp_storage);
+  }
+}
+
+static int reduce_sum_to_scalar_gpu(const int *__restrict__ d_in, int size, cudaStream_t stream)
+{
+  thrust::device_ptr<const int> d_ptr = thrust::device_pointer_cast(d_in);
+  int sumval = thrust::reduce(thrust::cuda::par.on(stream), d_ptr, d_ptr + size, 0, thrust::plus<int>());
+  return sumval;
+}
+
+// scan reduction interface
+static int reduce_scan_gpu(const int *__restrict__ d_in, int size, cudaStream_t stream)
+{
+  return (reduce_sum_to_scalar_gpu(d_in, size, stream) > 0)? 1 : 0;
+}
+
+// scan reduction interface
+static int reduce_scan_gpu(int d_in, int size, cudaStream_t stream)
+{
+  return (d_in > 0)? 1 : 0;
+}
+
+#include <cstdio>
+
+__device__ __forceinline__ int shared_data_reduce_sum_v2(int* __restrict__ shared_data)
+{
+    constexpr int NUM_THREADS = 1024;
+    constexpr int NUM_WARPS{NUM_THREADS / 32};
+    int sum{0};
+#pragma unroll
+    for (int i{0}; i < NUM_WARPS; ++i)
+    {
+        sum += shared_data[i];
+    }
+    return sum;
+}
+
+__device__ __forceinline__ int warp_reduce_sum(int val)
+{
+    constexpr unsigned int FULL_MASK{0xffffffff};
+#pragma unroll
+    for (int offset{16}; offset > 0; offset /= 2)
+    {
+        val += __shfl_down_sync(FULL_MASK, val, offset);
+    }
+    return val;
+}
+
+__device__ __forceinline__ int block_reduce_sum_v2(int const* __restrict__ input_data,
+                                    int* __restrict__ shared_data,
+                                    int num_elements)
+{
+    constexpr int NUM_THREADS = 1024;
+    constexpr int NUM_WARPS{NUM_THREADS / 32};
+    int const num_elements_per_thread{(num_elements + NUM_THREADS - 1) / NUM_THREADS};
+    int const thread_idx{threadIdx.x};
+    int sum{0};
+    for (int i{0}; i < num_elements_per_thread; ++i)
+    {
+        int const offset{thread_idx + i * NUM_THREADS};
+        if (offset < num_elements)
+        {
+            sum += input_data[offset];
+        }
+    }
+    sum = warp_reduce_sum(sum);
+    if (threadIdx.x % 32 == 0)
+    {
+        shared_data[threadIdx.x / 32] = sum;
+    }
+    __syncthreads();
+    int const block_sum{shared_data_reduce_sum_v2(shared_data)};
+    return block_sum;
+}
+
+
+static __global__ void batched_reduce_sum_v2(int* __restrict__ output_data,
+                                      int const* __restrict__ input_data,
+                                      int num_elements_per_batch)
+{
+    constexpr int NUM_THREADS = 1024;
+    constexpr int NUM_WARPS{NUM_THREADS / 32};
+    int const block_idx{blockIdx.x};
+    int const thread_idx{threadIdx.x};
+    __shared__ int shared_data[NUM_WARPS];
+    int const block_sum{block_reduce_sum_v2(
+        input_data + block_idx * num_elements_per_batch, shared_data,
+        num_elements_per_batch)};
+    if (thread_idx == 0)
+    {
+        output_data[block_idx] = block_sum;
+    }
+}
+
+static void reduce_segmented_to_address_gpu(const int *__restrict__ d_in, int*__restrict__ d_out, int size, int batch_size, cudaStream_t stream)
+{
+    /*
+    cudaError_t err1 = cudaGetLastError();
+    if (err1 != cudaSuccess) {
+        printf("0CUDA error: %s\n", cudaGetErrorString(err1));
+    }
+    */
+    void *batched_reduce_sum_v2_args[] = {
+        (void *)&d_out,
+        (void *)&d_in,
+        (void *)&size
+    };
+    constexpr int NUM_WARPS{1024 / 32};
+    /*
+    printf("NUM_WARPS: %d\n", NUM_WARPS);
+    printf("batch_size: %d\n", batch_size);
+    printf("size: %d\n", size);
+    */
+
+    cudaError_t err = cudaLaunchKernel(
+        (void*)batched_reduce_sum_v2,
+        dim3(batch_size, 1, 1),
+        dim3(1024, 1, 1),
+        (void**)batched_reduce_sum_v2_args,
+        0,
+        stream
+    );
+    //if (err != cudaSuccess) {
+    //    printf("1CUDA error: %s\n", cudaGetErrorString(err));
+    //}
+    //DACE_KERNEL_LAUNCH_CHECK(err, "batched_reduce_sum_v2", batch_size, 1, 1, NUM_THREADS, 1, 1);
+    //batched_reduce_sum_v2<NUM_THREADS><<<batch_size, NUM_THREADS>>>(d_out, d_in, size);
+}
+"""
+
+cpu_code = """
+// max zero reduction interface
+static double reduce_maxZ_to_scalar_cpu(const double *d_in, int size)
+{
+  double max_val = 0;
+#pragma omp parallel for reduction(max : max_val)
+  for (int i = 0; i < size; i++)
+  {
+    max_val = (d_in[i] > max_val) ? d_in[i] : max_val;
+  }
+  return max_val;
+}
+
+static void reduce_maxZ_to_address_cpu(const double *d_in, double* d_out, int size)
+{
+  double max_val = 0;
+#pragma omp parallel for reduction(max : max_val)
+  for (int i = 0; i < size; i++)
+  {
+    max_val = (d_in[i] > max_val) ? d_in[i] : max_val;
+  }
+  d_out[0] = max_val;
+}
+
+
+// sum reduction interface
+static int reduce_sum_to_scalar_cpu(const int *d_in, int size)
+{
+  int sum = 0.0;
+#pragma omp parallel for reduction(+ : sum)
+  for (int i = 0; i < size; i++){
+    sum += d_in[i];
+  }
+  return sum;
+}
+
+static void reduce_sum_to_address_cpu(const int *d_in, int* d_out, int size)
+{
+  int sum = 0.0;
+#pragma omp parallel for reduction(+ : sum)
+  for (int i = 0; i < size; i++){
+    sum += d_in[i];
+  }
+  d_out[0] = sum;
+}
+
+
+// scan reduction interface
+static int reduce_scan_cpu(const int *d_in, int size)
+{
+  return reduce_sum_to_scalar_cpu(d_in, size) > 0? 1 : 0;
+}
+
+// scan reduction interface
+static int reduce_scan_cpu(const int d_in, int size)
+{
+  return d_in > 0? 1 : 0;
+}
+"""
 
 @make_properties
 class LibNode(CodeLibraryNode):
@@ -45,13 +357,13 @@ def _insert_reduction(
     red_state = parent.add_state_after(state)
 
     # Choose the library node
-    red_node = LibNode(
-        name=f"reduce_{type}",
-        input_names=["in_arr", "in_size"],
-        output_names=["out"],
+    red_node = dace.nodes.Tasklet(
+        label=f"reduce_{type}",
+        inputs=["in_arr", "in_size"],
+        outputs=["out"],
         code=f"""
         #ifdef __REDUCE_DEVICE__
-          out = reduce_{type}_device(in_arr, in_size);
+          {reduction_code_dict[f"{type}_device"]};
         #elif defined(__REDUCE_GPU__)
           out = reduce_{type}_gpu(in_arr, in_size, __dace_current_stream);
         #else
@@ -59,13 +371,14 @@ def _insert_reduction(
         #endif
         """ if "address" not in type else f"""
         #ifdef __REDUCE_DEVICE__
-          reduce_{type}_device(in_arr, out, in_size);
+          {reduction_code_dict[f"{type}_device"]}
         #elif defined(__REDUCE_GPU__)
           reduce_{type}_gpu(in_arr, out, in_size, __dace_current_stream);
         #else
           reduce_{type}_cpu(in_arr, out, in_size);
         #endif
         """,
+        language=dace.Language.CPP,
     )
 
     # Route array
@@ -280,14 +593,14 @@ def maxvcfl_to_reduction(sdfg: dace.SDFG, task_name, loop_name):
     ol_size_sym = parent.sdfg.add_symbol(
         "ol_size", stype=dace.dtypes.int32, find_new_name=True
     )
-    il_size_sym = parent.sdfg.add_symbol(
-        "il_size", stype=dace.dtypes.int64, find_new_name=True
-    )
+    #il_size_sym = parent.sdfg.add_symbol(
+    #    "il_size", stype=dace.dtypes.int64, find_new_name=True
+    #)
     sdfg.add_state_after(
         sdfg.start_state,
         assignments={
             f"{ol_size_sym}": f"{ol_end} + 1",
-            f"{il_size_sym}": f"__CG_global_data__m_nproma",
+            #f"{il_size_sym}": f"__CG_global_data__m_nproma",
         },
     )
 
@@ -445,6 +758,15 @@ def add_all_reductions(sdfg: dace.SDFG):
     #    warnings.warn("vcflmax is a symbol, demoting to a scalar")
     #    _demote_vcflmax(sdfg)
     assert "vcflmax" not in sdfg.symbols, "vcflmax is a symbol, demoting to a scalar"
+
+    sdfg.append_global_code(
+        cpp_code=gpu_kernel_code,
+        location="cuda"
+    )
+    sdfg.append_global_code(
+        cpp_code=cpu_code,
+        location="frame"
+    )
 
     # We assume the array names and iteration variable names never change
     if "nproma32" in sdfg.name:

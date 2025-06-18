@@ -5,10 +5,13 @@
 NPROMA_VALUES=(20480 32)
 RELEASE_MODES=(FALSE TRUE)
 
+rm *.err
+rm *.log
+
 for _RELEASE in "${RELEASE_MODES[@]}"; do
   for _NPROMA in "${NPROMA_VALUES[@]}"; do
     rm -rf *.got *.want
-    rm -f velocity_gpu.stage*
+    #rm -f velocity_gpu.stage*
     rm *.csv
 
     export RELEASE=${_RELEASE}
@@ -34,11 +37,11 @@ for _RELEASE in "${RELEASE_MODES[@]}"; do
     python utils/compare_got_and_want.py 2>"$ERR_DIFF_FILE" 1>"$LOG_DIFF_FILE"
 
     rm -rf *.got *.want
-    rm -f velocity_gpu.stage*
+    #rm -f velocity_gpu.stage*
     rm *.csv
   done
 done
 
 rm -rf *.got *.want
-rm -f velocity_gpu.stage*
+#rm -f velocity_gpu.stage*
 rm *.csv

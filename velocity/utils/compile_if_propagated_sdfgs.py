@@ -232,7 +232,7 @@ def compile_if_propagated_sdfgs(
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
                 file.write(
-                    '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
+                    '//#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
                     + main_cu_code
                 )
             if fix_out_val_0:
@@ -248,7 +248,7 @@ def compile_if_propagated_sdfgs(
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "w") as file:
                 file.write(
-                    '#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n#include "timer.h"\n'
+                    '//#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n#include "timer.h"\n'
                     + main_cu_code
                 )
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
@@ -257,7 +257,7 @@ def compile_if_propagated_sdfgs(
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "w") as file:
                 file.write(
-                    '#include "reductions_cpu.h"\n#include "timer.h"\n' + main_cu_code
+                    '//#include "reductions_cpu.h"\n#include "timer.h"\n' + main_cu_code
                 )
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
 

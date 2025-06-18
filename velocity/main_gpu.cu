@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
   const std::filesystem::path ROOT{nproma_path_str};
   std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
   int n1 = -1;
-  int rep = 20;
+  int rep = 1;
 
   if (argc == 2) {
     n1 = std::atoi(argv[1]);

@@ -29,13 +29,15 @@ def optimization_action(sdfg):
         validate=False,
         save_steps=False,
         verbose=config.verbose,
+        clean_container_groups=False,
         simplify=False,
-        interface_with_struct_copy=True,
+        interface_with_struct_copy=False,
         interface_to_gpu=False,
         clean_trivial_views=True,
         shallow_copy=False,
         shallow_copy_to_gpu=False,
         taskloop = False,
+        clean_structs=False,
     ).apply_pass(sdfg, {}) # Flattening pass
     sdfg.simplify(skip=["ArrayElimination"])
     SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp TODO: can be made into a proper transformation
