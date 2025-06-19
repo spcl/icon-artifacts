@@ -54,7 +54,8 @@ def change_reduction_schedule(sdfg: dace.SDFG):
                                 new_edge = copy.deepcopy(graph.out_edges(dst_dst)[0])
                                 subset = copy.deepcopy(new_edge.data.subset)
                                 new_subset = [(b,e+1,s) for b, e, s in subset]
-                                new_memlet = dace.subsets.Range(new_subset)
+                                new_memlet = dace.memlet.Memlet(data=new_edge.data,
+                                                                subset= dace.subsets.Range(new_subset))
                                 graph.add_node(new_lib_node)
                                 for ie in in_edges:
                                     graph.add_edge(ie.src, ie.src_conn, new_lib_node, ie.dst_conn, ie.data)
