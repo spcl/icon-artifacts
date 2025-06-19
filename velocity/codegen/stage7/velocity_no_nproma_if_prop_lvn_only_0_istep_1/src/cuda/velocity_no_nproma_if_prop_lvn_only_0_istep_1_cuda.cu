@@ -5,17 +5,6 @@
 #include <dace/dace.h>
 
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
 struct t_int_state {
     int __f2dace_SA_c_lin_e_d_0_s_25 = {};
     int __f2dace_SA_c_lin_e_d_1_s_26 = {};
@@ -412,6 +401,17 @@ struct t_nh_diag {
     double* vn_ie = {};
     double* vt = {};
     double* w_concorr_c = {};
+};
+
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
 };
 
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t {
@@ -2422,14 +2422,14 @@ __global__ void __launch_bounds__(256) GPU_DeviceMap_0_0_0_0_103(int * __restric
 
                         ///////////////////
                         // Tasklet code (size_reduce_scan)
-                        size = ((replaced_var_3 + 1) - replaced_var_2);
+                        size = ((replaced_var_2 + 1) - replaced_var_3);
                         ///////////////////
 
                         loop_body_reduce_scan_size = size;
                     }
                     {
                         int in_size = loop_body_reduce_scan_size;
-                        const int * in_arr = &gpu_levmask[((replaced_var_2 + (tmp_struct_symbol_13 * (_for_it_46 - 1))) - 1)];
+                        const int * in_arr = &gpu_levmask[((replaced_var_3 + (tmp_struct_symbol_13 * (_for_it_46 - 1))) - 1)];
                         int out;
 
                         ///////////////////

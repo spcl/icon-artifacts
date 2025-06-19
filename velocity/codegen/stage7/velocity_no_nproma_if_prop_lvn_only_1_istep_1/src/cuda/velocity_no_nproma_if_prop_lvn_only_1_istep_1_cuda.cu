@@ -5,17 +5,6 @@
 #include <dace/dace.h>
 
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
 struct t_int_state {
     int __f2dace_SA_c_lin_e_d_0_s_25 = {};
     int __f2dace_SA_c_lin_e_d_1_s_26 = {};
@@ -412,6 +401,17 @@ struct t_nh_diag {
     double* vn_ie = {};
     double* vt = {};
     double* w_concorr_c = {};
+};
+
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
 };
 
 struct velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t {
@@ -1880,7 +1880,7 @@ void __dace_runkernel_GPU_DeviceMap_2_2_16_4_23(velocity_no_nproma_if_prop_lvn_o
     gpuError_t __err = cudaLaunchKernel((void*)GPU_DeviceMap_2_2_16_4_23, dim3(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 256), 10, 1), dim3(256, 1, 1), GPU_DeviceMap_2_2_16_4_23_args, 0, __state->gpu_context->streams[0]);
     DACE_KERNEL_LAUNCH_CHECK(__err, "GPU_DeviceMap_2_2_16_4_23", int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 256), 10, 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) GPU_DeviceMap_2_2_0_0_81(int * __restrict__ gpu_levelmask, const int * __restrict__ gpu_levmask, int nrdmax_jg, int replaced_var_2, int replaced_var_3, int tmp_struct_symbol_13) {
+__global__ void __launch_bounds__(256) GPU_DeviceMap_2_2_0_0_81(int * __restrict__ gpu_levelmask, const int * __restrict__ gpu_levmask, int nrdmax_jg, int replaced_var_1, int replaced_var_3, int tmp_struct_symbol_13) {
     {
         int b__for_it_46 = ((256 * blockIdx.x) + Max(3, (nrdmax_jg - 2)));
         {
@@ -1893,14 +1893,14 @@ __global__ void __launch_bounds__(256) GPU_DeviceMap_2_2_0_0_81(int * __restrict
 
                         ///////////////////
                         // Tasklet code (size_reduce_scan)
-                        size = ((replaced_var_3 + 1) - replaced_var_2);
+                        size = ((replaced_var_3 + 1) - replaced_var_1);
                         ///////////////////
 
                         loop_body_reduce_scan_size = size;
                     }
                     {
                         int in_size = loop_body_reduce_scan_size;
-                        const int * in_arr = &gpu_levmask[((replaced_var_2 + (tmp_struct_symbol_13 * (_for_it_46 - 1))) - 1)];
+                        const int * in_arr = &gpu_levmask[((replaced_var_1 + (tmp_struct_symbol_13 * (_for_it_46 - 1))) - 1)];
                         int out;
 
                         ///////////////////
@@ -1928,8 +1928,8 @@ __global__ void __launch_bounds__(256) GPU_DeviceMap_2_2_0_0_81(int * __restrict
 }
 
 
-DACE_EXPORTED void __dace_runkernel_GPU_DeviceMap_2_2_0_0_81(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int * __restrict__ gpu_levelmask, const int * __restrict__ gpu_levmask, int nrdmax_jg, int replaced_var_2, int replaced_var_3, int tmp_struct_symbol_13);
-void __dace_runkernel_GPU_DeviceMap_2_2_0_0_81(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int * __restrict__ gpu_levelmask, const int * __restrict__ gpu_levmask, int nrdmax_jg, int replaced_var_2, int replaced_var_3, int tmp_struct_symbol_13)
+DACE_EXPORTED void __dace_runkernel_GPU_DeviceMap_2_2_0_0_81(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int * __restrict__ gpu_levelmask, const int * __restrict__ gpu_levmask, int nrdmax_jg, int replaced_var_1, int replaced_var_3, int tmp_struct_symbol_13);
+void __dace_runkernel_GPU_DeviceMap_2_2_0_0_81(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int * __restrict__ gpu_levelmask, const int * __restrict__ gpu_levmask, int nrdmax_jg, int replaced_var_1, int replaced_var_3, int tmp_struct_symbol_13)
 {
 
     //if ((int_ceil((88 - Max(3, (nrdmax_jg - 2))), 256)) == 0) {
@@ -1937,7 +1937,7 @@ void __dace_runkernel_GPU_DeviceMap_2_2_0_0_81(velocity_no_nproma_if_prop_lvn_on
         //    return;
     //}
 
-    void  *GPU_DeviceMap_2_2_0_0_81_args[] = { (void *)&gpu_levelmask, (void *)&gpu_levmask, (void *)&nrdmax_jg, (void *)&replaced_var_2, (void *)&replaced_var_3, (void *)&tmp_struct_symbol_13 };
+    void  *GPU_DeviceMap_2_2_0_0_81_args[] = { (void *)&gpu_levelmask, (void *)&gpu_levmask, (void *)&nrdmax_jg, (void *)&replaced_var_1, (void *)&replaced_var_3, (void *)&tmp_struct_symbol_13 };
     gpuError_t __err = cudaLaunchKernel((void*)GPU_DeviceMap_2_2_0_0_81, dim3(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 256), 1, 1), dim3(256, 1, 1), GPU_DeviceMap_2_2_0_0_81_args, 0, __state->gpu_context->streams[0]);
     DACE_KERNEL_LAUNCH_CHECK(__err, "GPU_DeviceMap_2_2_0_0_81", int_ceil((88 - Max(3, (nrdmax_jg - 2))), 256), 1, 1, 256, 1, 1);
 }

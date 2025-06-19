@@ -5,17 +5,6 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
 struct t_int_state {
     int __f2dace_SA_c_lin_e_d_0_s_25 = {};
     int __f2dace_SA_c_lin_e_d_1_s_26 = {};
@@ -412,6 +401,17 @@ struct t_nh_diag {
     double* vn_ie = {};
     double* vt = {};
     double* w_concorr_c = {};
+};
+
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
 };
 
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t {
@@ -1037,7 +1037,7 @@ inline void loop_body_0_0_53(velocity_no_nproma_if_prop_lvn_only_0_istep_1_state
         {
             double * in_arr = &gpu_maxvcfl_arr[((i_startidx_var_148 + ((88 * tmp_struct_symbol_4) * (_for_it_22 - 1))) - 1)];
             int in_size = reduce_maxZ_to_scalar_size_0;
-            double out = gpu_vcflmax[(_for_it_22 - 1)];
+            double * out = &gpu_vcflmax[(_for_it_22 - 1)];
 
             ///////////////////
             int __dace_current_stream_id = 0;
@@ -2105,8 +2105,8 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
     replaced_var_1 = __CG_p_patch__CG_edges__m_end_block[((- __f2dace_SOA_end_block_d_0_s_199_edges_p_patch_4) - 9)];
     i_startblk_2 = __CG_p_patch__CG_cells__m_start_block[(5 - __f2dace_SOA_start_block_d_0_s_162_cells_p_patch_2)];
     i_endblk_2 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];
-    replaced_var_2 = __CG_p_patch__CG_cells__m_start_block[(4 - __f2dace_SOA_start_block_d_0_s_162_cells_p_patch_2)];
-    replaced_var_3 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 5)];
+    replaced_var_2 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 5)];
+    replaced_var_3 = __CG_p_patch__CG_cells__m_start_block[(4 - __f2dace_SOA_start_block_d_0_s_162_cells_p_patch_2)];
     replaced_var_4 = __CG_p_patch__CG_edges__m_end_block[((- __f2dace_SOA_end_block_d_0_s_199_edges_p_patch_4) - 8)];
     replaced_var_5 = __CG_p_patch__CG_edges__m_start_block[(10 - __f2dace_SOA_start_block_d_0_s_198_edges_p_patch_4)];
 
@@ -2159,8 +2159,8 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
             }
         }
         {
-            for (auto _for_it_22 = replaced_var_2; _for_it_22 < (replaced_var_3 + 1); _for_it_22 += 1) {
-                loop_body_0_0_53(__state, __CG_global_data__m_nproma, cfl_w_limit, dtime, &gpu___CG_p_int__m_e_bln_c_s[0], &gpu___CG_p_int__m_geofac_n2s[0], &gpu___CG_p_metrics__m_coeff1_dwdz[0], &gpu___CG_p_metrics__m_coeff2_dwdz[0], &gpu___CG_p_metrics__m_ddqz_z_half[0], &gpu___CG_p_metrics__m_wgtfac_c[0], &gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[0], &gpu___CG_p_patch__CG_cells__m_area[0], &gpu___CG_p_patch__CG_cells__m_edge_blk[0], &gpu___CG_p_patch__CG_cells__m_edge_idx[0], &__CG_p_patch__CG_cells__m_end_index[0], &gpu___CG_p_patch__CG_cells__m_neighbor_blk[0], &gpu___CG_p_patch__CG_cells__m_neighbor_idx[0], &__CG_p_patch__CG_cells__m_start_index[0], &gpu___CG_p_prog__m_w[0], &gpu_z_kin_hor_e[0], &__state->__0_gpu_z_v_grad_w[0], &gpu_z_w_concorr_me[0], scalfac_exdiff, &gpu___CG_p_diag__m_ddt_w_adv_pc[0], &gpu___CG_p_diag__m_w_concorr_c[0], &__state->__0_gpu_cfl_clipping[0], &__state->__0_gpu_levmask[0], &__state->__0_gpu_maxvcfl_arr[0], &__state->__0_gpu_vcflmax[0], &__state->__0_gpu_z_ekinh[0], &__state->__0_gpu_z_w_con_c[0], &__state->__0_gpu_z_w_con_c_full[0], &__state->__0_gpu_z_w_concorr_mc[0], __f2dace_A_z_kin_hor_e_d_0_s_363, __f2dace_A_z_kin_hor_e_d_1_s_364, __f2dace_A_z_w_concorr_me_d_0_s_360, __f2dace_A_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_kin_hor_e_d_0_s_363, __f2dace_OA_z_kin_hor_e_d_1_s_364, __f2dace_OA_z_kin_hor_e_d_2_s_365, __f2dace_OA_z_w_concorr_me_d_0_s_360, __f2dace_OA_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_2_s_362, _for_it_22, i_endblk_2, replaced_var_3, i_startblk_2, replaced_var_2, nflatlev_jg, nrdmax_jg, ntnd, tmp_struct_symbol_0, tmp_struct_symbol_1, tmp_struct_symbol_10, tmp_struct_symbol_13, tmp_struct_symbol_14, tmp_struct_symbol_2, tmp_struct_symbol_4);
+            for (auto _for_it_22 = replaced_var_3; _for_it_22 < (replaced_var_2 + 1); _for_it_22 += 1) {
+                loop_body_0_0_53(__state, __CG_global_data__m_nproma, cfl_w_limit, dtime, &gpu___CG_p_int__m_e_bln_c_s[0], &gpu___CG_p_int__m_geofac_n2s[0], &gpu___CG_p_metrics__m_coeff1_dwdz[0], &gpu___CG_p_metrics__m_coeff2_dwdz[0], &gpu___CG_p_metrics__m_ddqz_z_half[0], &gpu___CG_p_metrics__m_wgtfac_c[0], &gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[0], &gpu___CG_p_patch__CG_cells__m_area[0], &gpu___CG_p_patch__CG_cells__m_edge_blk[0], &gpu___CG_p_patch__CG_cells__m_edge_idx[0], &__CG_p_patch__CG_cells__m_end_index[0], &gpu___CG_p_patch__CG_cells__m_neighbor_blk[0], &gpu___CG_p_patch__CG_cells__m_neighbor_idx[0], &__CG_p_patch__CG_cells__m_start_index[0], &gpu___CG_p_prog__m_w[0], &gpu_z_kin_hor_e[0], &__state->__0_gpu_z_v_grad_w[0], &gpu_z_w_concorr_me[0], scalfac_exdiff, &gpu___CG_p_diag__m_ddt_w_adv_pc[0], &gpu___CG_p_diag__m_w_concorr_c[0], &__state->__0_gpu_cfl_clipping[0], &__state->__0_gpu_levmask[0], &__state->__0_gpu_maxvcfl_arr[0], &__state->__0_gpu_vcflmax[0], &__state->__0_gpu_z_ekinh[0], &__state->__0_gpu_z_w_con_c[0], &__state->__0_gpu_z_w_con_c_full[0], &__state->__0_gpu_z_w_concorr_mc[0], __f2dace_A_z_kin_hor_e_d_0_s_363, __f2dace_A_z_kin_hor_e_d_1_s_364, __f2dace_A_z_w_concorr_me_d_0_s_360, __f2dace_A_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_kin_hor_e_d_0_s_363, __f2dace_OA_z_kin_hor_e_d_1_s_364, __f2dace_OA_z_kin_hor_e_d_2_s_365, __f2dace_OA_z_w_concorr_me_d_0_s_360, __f2dace_OA_z_w_concorr_me_d_1_s_361, __f2dace_OA_z_w_concorr_me_d_2_s_362, _for_it_22, i_endblk_2, replaced_var_2, i_startblk_2, replaced_var_3, nflatlev_jg, nrdmax_jg, ntnd, tmp_struct_symbol_0, tmp_struct_symbol_1, tmp_struct_symbol_10, tmp_struct_symbol_13, tmp_struct_symbol_14, tmp_struct_symbol_2, tmp_struct_symbol_4);
             }
         }
         DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_vcflmax, __state->__0_gpu_vcflmax, tmp_struct_symbol_12 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
@@ -2175,8 +2175,8 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
 
 
     }
-    replaced_var_6 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];
-    replaced_var_7 = __CG_p_patch__CG_cells__m_start_block[(4 - __f2dace_SOA_start_block_d_0_s_162_cells_p_patch_2)];
+    replaced_var_6 = __CG_p_patch__CG_cells__m_start_block[(4 - __f2dace_SOA_start_block_d_0_s_162_cells_p_patch_2)];
+    replaced_var_7 = __CG_p_patch__CG_cells__m_end_block[((- __f2dace_SOA_end_block_d_0_s_163_cells_p_patch_2) - 4)];
 
     {
         double max_vcfl_dyn_var_152;
@@ -2188,14 +2188,13 @@ void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal(velocity_n
 
             ///////////////////
             // Tasklet code (size_reduce_maxZ_to_scalar)
-            size = ((replaced_var_6 + 1) - replaced_var_7);
+            size = ((replaced_var_7 + 1) - replaced_var_6);
             ///////////////////
 
             reduce_maxZ_to_scalar_size = size;
         }
         {
-cudaDeviceSynchronize();
-            double* in_arr = &__state->__0_vcflmax[(replaced_var_7 - 1)];
+            double* in_arr = &__state->__0_vcflmax[(replaced_var_6 - 1)];
             int in_size = reduce_maxZ_to_scalar_size;
             double out;
 
