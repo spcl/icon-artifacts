@@ -5,23 +5,6 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s_288 = {};
-    int __f2dace_SA_vn_d_1_s_289 = {};
-    int __f2dace_SA_vn_d_2_s_290 = {};
-    int __f2dace_SA_w_d_0_s_285 = {};
-    int __f2dace_SA_w_d_1_s_286 = {};
-    int __f2dace_SA_w_d_2_s_287 = {};
-    int __f2dace_SOA_vn_d_0_s_288 = {};
-    int __f2dace_SOA_vn_d_1_s_289 = {};
-    int __f2dace_SOA_vn_d_2_s_290 = {};
-    int __f2dace_SOA_w_d_0_s_285 = {};
-    int __f2dace_SOA_w_d_1_s_286 = {};
-    int __f2dace_SOA_w_d_2_s_287 = {};
-    double* vn = {};
-    double* w = {};
-};
-
 struct t_nh_diag {
     int __f2dace_SA_ddt_vn_apc_pc_d_0_s_300 = {};
     int __f2dace_SA_ddt_vn_apc_pc_d_1_s_301 = {};
@@ -63,6 +46,17 @@ struct t_nh_diag {
     double* vn_ie = {};
     double* vt = {};
     double* w_concorr_c = {};
+};
+
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
 };
 
 struct t_grid_domain_decomp_info {
@@ -318,17 +312,6 @@ struct t_int_state {
     double* rbf_vec_coeff_e = {};
 };
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
 struct t_nh_metrics {
     int __f2dace_SA_coeff1_dwdz_d_0_s_332 = {};
     int __f2dace_SA_coeff1_dwdz_d_1_s_333 = {};
@@ -412,6 +395,23 @@ struct t_nh_metrics {
     double* wgtfac_c = {};
     double* wgtfac_e = {};
     double* wgtfacq_e = {};
+};
+
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s_288 = {};
+    int __f2dace_SA_vn_d_1_s_289 = {};
+    int __f2dace_SA_vn_d_2_s_290 = {};
+    int __f2dace_SA_w_d_0_s_285 = {};
+    int __f2dace_SA_w_d_1_s_286 = {};
+    int __f2dace_SA_w_d_2_s_287 = {};
+    int __f2dace_SOA_vn_d_0_s_288 = {};
+    int __f2dace_SOA_vn_d_1_s_289 = {};
+    int __f2dace_SOA_vn_d_2_s_290 = {};
+    int __f2dace_SOA_w_d_0_s_285 = {};
+    int __f2dace_SOA_w_d_1_s_286 = {};
+    int __f2dace_SOA_w_d_2_s_287 = {};
+    double* vn = {};
+    double* w = {};
 };
 
 struct velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t {
@@ -1778,10 +1778,10 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1_internal(velocity_n
     }
    cudaDeviceSynchronize();
     measure_time("Run");
-    cudaEvent_t start1, stop1;
-    cudaEventCreate(&start1);
-    cudaEventCreate(&stop1);
-    cudaEventRecord(start1); 
+   //// cudaEvent_t start1, stop1;
+    ////cudaEventCreate(&start1);
+    //cudaEventCreate(&stop1);
+    //cudaEventRecord(start1); 
     nrdmax_jg = __CG_global_data__m_nrdmax[0];
     nflatlev_jg = __CG_global_data__m_nflatlev[0];
     i_startblk_var_118_0 = __CG_p_patch__CG_verts__m_start_block[(2 - __f2dace_SOA_start_block_d_0_s_214_verts_p_patch_5)];
@@ -1838,8 +1838,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1_internal(velocity_n
         }
 //        DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
 
-        dace::CopyNDDynamic<double, 1, false, 1>::template ConstDst<1>::Copy(
-        __state->__0_gpu_vcflmax, __state->__0_vcflmax, tmp_struct_symbol_12, 1);
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_vcflmax, __state->__0_gpu_vcflmax, tmp_struct_symbol_12 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         __dace_runkernel_GPU_DeviceMap_2_2_0_0_81(__state, __state->__0_gpu_levelmask, __state->__0_gpu_levmask, nrdmax_jg, replaced_var_1, replaced_var_3, tmp_struct_symbol_13);
         {
             for (auto _for_it_47 = replaced_var_4; _for_it_47 < (replaced_var_5 + 1); _for_it_47 += 1) {
@@ -1868,6 +1867,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1_internal(velocity_n
             reduce_maxZ_to_scalar_size = size;
         }
         {
+cudaDeviceSynchronize();
             double* in_arr = &__state->__0_vcflmax[(replaced_var_6 - 1)];
             int in_size = reduce_maxZ_to_scalar_size;
             double out;
@@ -1900,14 +1900,14 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1_internal(velocity_n
         {
             double max_vcfl_dyn_var_152_0_in = max_vcfl_dyn_var_152;
             double p_diag_out_max_vcfl_dyn;
-  cudaEventRecord(stop1);
-    cudaEventSynchronize(stop1);
-    float milliseconds1 = 0;
-    cudaEventElapsedTime(&milliseconds1, start1, stop1);
-    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;
-    cudaEventDestroy(start1);
-    cudaEventDestroy(stop1);
-    cudaDeviceSynchronize();
+  //cudaEventRecord(stop1);
+    //cudaEventSynchronize(stop1);
+    //float milliseconds1 = 0;
+    //cudaEventElapsedTime(&milliseconds1, start1, stop1);
+    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;
+    //cudaEventDestroy(start1);
+    //cudaEventDestroy(stop1);
+    //cudaDeviceSynchronize();
   measure_time("Run");
 
             ///////////////////

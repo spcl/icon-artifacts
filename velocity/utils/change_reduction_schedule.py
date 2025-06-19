@@ -70,11 +70,13 @@ def change_reduction_schedule(sdfg: dace.SDFG):
             if graph.in_degree(node) == 1:
                 src = graph.in_edges(node)[0].src
                 src_conn = graph.in_edges(node)[0].src_conn
+                graph.in_edges(node)[0].dynamic = False
                 dst = graph.add_access("vcflmax")
-                graph.add_edge(node, None, dst, None, dace.Memlet.from_array(
+                e = graph.add_edge(node, None, dst, None, dace.Memlet.from_array(
                     dataname="gpu_vcflmax",
                     datadesc=graph.sdfg.arrays["gpu_vcflmax"],
                 ))
+                e.dynamic = False
                 if "vcflmax" not in sdfg.arrays:
                     desc = copy.deepcopy(graph.sdfg.arrays["gpu_vcflmax"])
                     desc.storage = dace.StorageType.CPU_Heap

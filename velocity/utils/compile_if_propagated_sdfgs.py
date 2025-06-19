@@ -132,10 +132,10 @@ def add_timers(file_path: str, gpu: bool):
     if not gpu:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
-        replacement1 = '   cudaDeviceSynchronize();\n    measure_time("Run");\n    cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n\\g<0>'
+        replacement1 = '   cudaDeviceSynchronize();\n    measure_time("Run");\n   //// cudaEvent_t start1, stop1;\n    ////cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
     if gpu:
-        replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    cudaDeviceSynchronize();\n'
+        replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize();\n'
         replacement2 += '  measure_time("Run");\n'
     else:
         replacement2 = '\\g<0>  measure_time("Run");\n'
@@ -143,6 +143,21 @@ def add_timers(file_path: str, gpu: bool):
     code = re.sub(pattern1, replacement1, code, flags=re.MULTILINE)
     code = re.sub(pattern2, replacement2, code, flags=re.MULTILINE)
 
+    if gpu:
+        pattern4 = """dace::CopyNDDynamic<double, 1, false, 1>::template ConstDst<1>::Copy(
+        __state->__0_gpu_vcflmax, __state->__0_vcflmax, tmp_struct_symbol_12, 1);"""
+
+        replacement4 = "DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_vcflmax, __state->__0_gpu_vcflmax, tmp_struct_symbol_12 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));"
+        assert pattern4 in code
+
+        code = code.replace(pattern4, replacement4);
+        #code = re.sub(pattern4, replacement4, code, flags=re.MULTILINE)
+        assert replacement4 in code
+
+        pattern5 = r'(^\s*double\s*\*\s*\w+\s*=\s*.*vcflmax.*;)'
+        replacement5 = r'cudaDeviceSynchronize();\n\1'
+
+        code = re.sub(pattern5, replacement5, code, flags=re.MULTILINE)
 
     with open(file_path, "w") as f:
         f.write(code)
