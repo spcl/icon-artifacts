@@ -24,6 +24,7 @@ def rename_on_if(cfg, src: str, dst: str, recursive=False, exact=False):
                         def replace_x_with_y(expr: ast.Expr, repl_dict) -> ast.Expr:
                             expr_str = ast.unparse(expr).strip()
                             for src, dst in repl_dict.items():
+                                print(src, dst, expr_str, src in expr_str)
                                 if not exact:
                                     modified_str = expr_str.replace(src, dst)
                                 else:

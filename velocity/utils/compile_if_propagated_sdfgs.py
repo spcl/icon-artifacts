@@ -154,7 +154,7 @@ def add_timers(file_path: str, gpu: bool):
         #code = re.sub(pattern4, replacement4, code, flags=re.MULTILINE)
         #assert replacement4 in code
 
-        pattern5 = r'(^\s*double\s*\*\s*\w+\s*=\s*.*vcflmax.*;)'
+        pattern5 = r'(^\s*double\s*\*\s*\w+in_arr\s*=\s*.*vcflmax.*;)'
         replacement5 = r'cudaDeviceSynchronize();\n\1'
 
         code = re.sub(pattern5, replacement5, code, flags=re.MULTILINE)

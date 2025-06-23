@@ -13,7 +13,7 @@ import argparse
 from utils.move_lib_schedules import move_lib_schedules
 from utils.reassign_vars import reassign_vars
 STAGE_ID = 6
-
+from utils.rm_segmented_reduce import rm_segmented_reduce
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
@@ -48,6 +48,9 @@ def optimization_action(sdfg):
             if sb == e.data.subset:
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35 - 1")
     sdfg.validate()
+    rm_segmented_reduce(sdfg)
+    sdfg.validate()
+
     return sdfg
 
 def main():
