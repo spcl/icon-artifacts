@@ -1,20 +1,15 @@
-import dace
-from utils.move_ifs_inside_maps import move_ifs_inside_maps
-from utils.pre_gpu_fixes import pre_gpu_fix
-from utils.segmented_reduction import to_segmented_reduction
-import utils.stages.common as common
-import utils.config as config
-from utils.find import find_node_by_name
-from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
-from dace.transformation.passes.to_gpu import ToGPU
-from dace.transformation.passes import GPUKernelLaunchRestructure
-from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 import argparse
-from utils.pre_gpu_fixes import make_arrays_persistent
+
+import dace
+from dace.transformation.passes import GPUKernelLaunchRestructure
+from dace.transformation.passes.to_gpu import ToGPU
+
+import utils.stages.common as common
 from utils.int64_to_int32 import int64_to_int32
-from utils.tile import tile_kernels
-from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs, prune_unused_inputs_outputs_recursive
+from utils.pre_gpu_fixes import make_arrays_persistent
 from utils.reassign_vars import reassign_vars
+from utils.tile import tile_kernels
+
 STAGE_ID = 7
 
 

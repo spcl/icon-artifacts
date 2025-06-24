@@ -1,14 +1,13 @@
-import dace
-import utils.stages.common as common
-import utils.config as config
-from utils.find import find_node_by_name
-from utils.move_transients_to_top_level import move_transients_to_top_level
-from utils.move_scalar_to_array import _tmp_difcoef
-from utils.unique_names import unique_names
-from utils.benchmark_sdfg import instrument_sdfg
-from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
-from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 import argparse
+
+import dace
+
+import utils.stages.common as common
+from utils.find import find_node_by_name
+from utils.move_scalar_to_array import _tmp_difcoef
+from utils.move_transients_to_top_level import move_transients_to_top_level
+from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
+from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 
 STAGE_ID = 5
 
@@ -83,6 +82,10 @@ def optimization_action(sdfg):
     )
     if "difcoef" in sdfg.arrays:
         _tmp_difcoef(sdfg)
+    sdfg.validate()
+
+    remove_unused_inconnectors_from_nestedsdfg(sdfg)
+    sdfg.simplify()
     sdfg.validate()
 
     return sdfg
