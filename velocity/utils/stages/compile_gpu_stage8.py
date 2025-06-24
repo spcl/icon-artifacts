@@ -56,7 +56,8 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        common.compile_action(STAGE_ID, sdfgs, lib=True, allocation_names_to_comment_out=_allocation_names_to_comment_out)
+        assert _allocation_names_to_comment_out is not None and _allocation_names_to_comment_out != set()
+        common.compile_action(STAGE_ID, sdfgs, True, _allocation_names_to_comment_out, True)
 
 if __name__ == "__main__":
     main()

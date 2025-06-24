@@ -156,9 +156,10 @@ def add_timers(file_path: str, gpu: bool):
         test_line = "double* in_arr = &__state->__0_vcflmax[(replaced_var_6 - 1)];"
 
         if re.match(pattern5, test_line):
-            print("Pattern matches!")
+            #print("Pattern matches!")
+            pass
         else:
-            print("Pattern doesn't match")
+            #print("Pattern doesn't match")
             assert False
         code = re.sub(pattern5, replacement5, code, flags=re.MULTILINE)
 
@@ -189,14 +190,24 @@ static cudaStream_t open_acc_stream;
         i = 0
 
         def _process_line(line:str) -> str:
-            _l = line.replace("__state->gpu_context->streams[0]", "open_acc_stream")
-            _l = _l.replace("__dace_current_stream", "open_acc_stream")
-            _l = _l.replace("cudaStreamCreateWithFlags", "//cudaStreamCreateWithFlags")
-            _l = _l.replace("cudaStreamDestroy", "//cudaStreamDestroy")
-            _l = _l.replace("cudaEventCreateWithFlags", "//cudaEventCreateWithFlags")
-            _l = _l.replace("cudaEventDestroy", "//cudaEventDestroy")
+            if "__dace_current_stream = __state->gpu_context->streams" in line:
+                _l = "cudaStream_t __dace_current_stream = open_acc_stream;\n"
+            elif (
+                "cudaStreamCreateWithFlags" in line or
+                "cudaStreamDestroy" in line or
+                "cudaEventCreateWithFlags" in line or
+                "cudaEventDestroy" in line or
+                "__state->gpu_context->internal_streams[" in line) and (
+                    "cudaLaunchKernel" not in line
+                ):
+                _l = "//" + line
+            elif "__state->gpu_context->streams[0]" in line:
+                _l = line.replace("__state->gpu_context->streams[0]", "open_acc_stream")
+            else:
+                _l = line
             return _l
 
+        c = False
         while i < len(lines):
             line = lines[i]
 
@@ -204,6 +215,16 @@ static cudaStream_t open_acc_stream;
             if check in line:
                 modified_lines.append(_process_line(line))
                 i += 1
+
+                if c is True:
+                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
+                    c = False
+
+                if check in line and "{" in line:
+                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
+                elif check in line and "{" not in line and ";" not in line:
+                    c = True
+
 
                 # Check if next line is opening brace
                 if i < len(lines) and lines[i].strip() == "{":
@@ -304,7 +325,8 @@ def compile_if_propagated_sdfgs(
     main_name: None | str,
     stage: int,
     debuginfo: bool,
-    allocation_names_to_comment_out: set = None,
+    allocation_names_to_comment_out: set | None,
+    use_openacc_stream: bool,
 ):
     dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
     sources = set()
@@ -391,8 +413,19 @@ def compile_if_propagated_sdfgs(
             _replace_cpp_with_cu(build_loc)
             if stage > 5 and rm_syncs:
                 comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+            assert allocation_names_to_comment_out is not None, "Allocation names to comment out must be provided for GPU code generation"
+            assert use_openacc_stream is True
             if allocation_names_to_comment_out is not None:
+                assert stage == 8, "Allocation names to comment out are only supported in stage 8"
                 comment_out_allocs_and_frees(f"{build_loc}/src/cpu/{sdfg_name}.cu", allocation_names_to_comment_out)
+            if use_openacc_stream:
+                assert stage == 8, "OpenACC stream is only supported in stage 8"
+                assert gpu is True, "OpenACC stream is only supported for GPU code"
+                change_to_openacc_stream(
+                    f"{build_loc}/src/cpu/{sdfg_name}.cu",
+                    f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu",
+                    gpu
+                )
 
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()

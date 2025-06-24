@@ -48,8 +48,9 @@ def stage_inputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
 def stage_outputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
   return {name: stage_output(name, stage, codegen_dir) for name in sdfg_names()}
 
-def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib=False,
-                    allocation_names_to_comment_out: set = None):
+def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
+                    allocation_names_to_comment_out: set,
+                    use_openacc_stream: bool):
   dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
   dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   dace.config.Config.set('compiler', 'default_data_types', value='C')
@@ -67,27 +68,39 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib=False,
   if lib:
     assert stage == 8
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=release,
-        generate_code=True, lib=True,
-        main_name=None, stage=stage,
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=True,
+        main_name=None,
+        stage=stage,
         debuginfo=False,
         allocation_names_to_comment_out=allocation_names_to_comment_out,
+        use_openacc_stream=use_openacc_stream,
       )
-
-  if stage > 5:
+  elif stage > 5:
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=release,
-        generate_code=True, lib=False,
-        main_name="main_gpu.cu", stage=stage,
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=False,
+        main_name="main_gpu.cu",
+        stage=stage,
         debuginfo=False,
+        allocation_names_to_comment_out=None,
+        use_openacc_stream=False,
       )
   else:
     compile_if_propagated_sdfgs(
-        sdfgs, gpu=True, release=release,
-        generate_code=True, lib=False,
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=False,
         main_name="main.cu",
         stage=stage,
         debuginfo=False,
+        allocation_names_to_comment_out=None,
+        use_openacc_stream=False,
       )
   if not lib:
     binpath = Path('velocity_gpu')

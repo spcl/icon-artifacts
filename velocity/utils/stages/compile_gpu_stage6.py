@@ -87,7 +87,7 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        common.compile_action(STAGE_ID, sdfgs)
+        common.compile_action(STAGE_ID, sdfgs, False, None, False)
 
 if __name__ == "__main__":
     main()
