@@ -63,7 +63,6 @@ def optimization_action(sdfg):
         only=["z_v_grad_w", "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full"],
         no_dim_change=True,
     )
-
     move_transients_to_top_level(
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,

@@ -48,7 +48,8 @@ def stage_inputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
 def stage_outputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
   return {name: stage_output(name, stage, codegen_dir) for name in sdfg_names()}
 
-def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
+def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib=False,
+                    allocation_names_to_comment_out: set = None):
   dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
   dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   dace.config.Config.set('compiler', 'default_data_types', value='C')
@@ -63,13 +64,23 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
 
   dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
+  if lib:
+    assert stage == 8
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True, release=release,
+        generate_code=True, lib=True,
+        main_name=None, stage=stage,
+        debuginfo=False,
+        allocation_names_to_comment_out=allocation_names_to_comment_out,
+      )
+
   if stage > 5:
     compile_if_propagated_sdfgs(
         sdfgs, gpu=True, release=release,
         generate_code=True, lib=False,
         main_name="main_gpu.cu", stage=stage,
         debuginfo=False,
-        )
+      )
   else:
     compile_if_propagated_sdfgs(
         sdfgs, gpu=True, release=release,
@@ -77,8 +88,14 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG]):
         main_name="main.cu",
         stage=stage,
         debuginfo=False,
-        )
-  binpath = Path('velocity_gpu')
-  assert binpath.exists()
-  binpath = binpath.rename(f"{binpath.name}.stage{stage}")
-  print(f"Binary available: {binpath}")
+      )
+  if not lib:
+    binpath = Path('velocity_gpu')
+    assert binpath.exists()
+    binpath = binpath.rename(f"{binpath.name}.stage{stage}")
+    print(f"Binary available: {binpath}")
+  else:
+    libpath = Path('libvelocity_gpu.so')
+    assert libpath.exists()
+    libpath = libpath.rename(f"libvelocity_gpu_stage{stage}.so")
+    print(f"Library available: {libpath}")
