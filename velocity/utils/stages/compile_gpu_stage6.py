@@ -1,17 +1,20 @@
-import dace
-from utils.move_ifs_inside_maps import move_ifs_inside_maps
-from utils.pre_gpu_fixes import pre_gpu_fix
-from utils.segmented_reduction import to_segmented_reduction
-import utils.stages.common as common
-import utils.config as config
-from utils.find import find_node_by_name
-from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
-from dace.transformation.passes.to_gpu import ToGPU
-from dace.transformation.passes import GPUKernelLaunchRestructure
-from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
 import argparse
+
+import dace
+from dace.transformation.passes import GPUKernelLaunchRestructure
+from dace.transformation.passes.to_gpu import ToGPU
+
+import utils.config as config
+import utils.stages.common as common
+from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
+from utils.find import find_node_by_name
+from utils.move_ifs_inside_maps import move_ifs_inside_maps
 from utils.move_lib_schedules import move_lib_schedules
-from utils.reassign_vars import reassign_vars
+from utils.pre_gpu_fixes import pre_gpu_fix
+from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
+from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
+from utils.segmented_reduction import to_segmented_reduction
+
 STAGE_ID = 6
 from utils.rm_segmented_reduce import rm_segmented_reduce
 
@@ -49,6 +52,8 @@ def optimization_action(sdfg):
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35 - 1")
     sdfg.validate()
     rm_segmented_reduce(sdfg)
+    remove_unused_inconnectors_from_nestedsdfg(sdfg)
+    sdfg.simplify()
     sdfg.validate()
 
     return sdfg
