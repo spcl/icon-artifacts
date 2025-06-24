@@ -413,8 +413,8 @@ def compile_if_propagated_sdfgs(
             _replace_cpp_with_cu(build_loc)
             if stage > 5 and rm_syncs:
                 comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
-            assert allocation_names_to_comment_out is not None, "Allocation names to comment out must be provided for GPU code generation"
-            assert use_openacc_stream is True
+            #assert allocation_names_to_comment_out is not None, "Allocation names to comment out must be provided for GPU code generation"
+            #assert use_openacc_stream is True
             if allocation_names_to_comment_out is not None:
                 assert stage == 8, "Allocation names to comment out are only supported in stage 8"
                 comment_out_allocs_and_frees(f"{build_loc}/src/cpu/{sdfg_name}.cu", allocation_names_to_comment_out)
