@@ -130,17 +130,41 @@ def tile_kernels(sdfg: dace.SDFG):
         for n in graph.nodes():
             if isinstance(n, dace.nodes.MapEntry):
                 if n.schedule == dace.ScheduleType.GPU_Device:
-                    AddComputeElementBlockMap.apply_to(
-                        sdfg=graph.sdfg,
-                        verify=False,
-                        map_entry=n,
-                        options={
-                            "compute_element_group_dims": [256, 1, 1],
-                            "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
-                            "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
-                            "tiles_evenly": False,
-                        },
-                    )
+                    _coarsening_factors = []
+
+                    if len(n.map.range) < 2:
+                        continue
+                    (b, e, s) = n.map.range[1]
+                    range1 = (e+1-b)//s
+                    dim = 1
+                    try:
+                        dim = range1
+                    except:
+                        dim = 1
+                    if dim == 92:
+                        coarsening_factor = 2
+                    if dim == 91:
+                        coarsening_factor = 1 # could be 7 but it is probablly too much
+                    elif dim == 90:
+                        coarsening_factor = 3
+                    elif dim == 89:
+                        coarsening_factor = 1
+                    else:
+                        coarsening_factor = 1
+                    _coarsening_factors.append(coarsening_factor)
+
+                    if  _coarsening_factors != 1:
+                        AddComputeElementBlockMap.apply_to(
+                            sdfg=graph.sdfg,
+                            verify=False,
+                            map_entry=n,
+                            options={
+                                "compute_element_group_dims": [256, 1, 1],
+                                "map_schedule": dace.dtypes.ScheduleType.GPU_Device,
+                                "schedule_to_add": dace.dtypes.ScheduleType.GPU_ThreadBlock,
+                                "tiles_evenly": False,
+                            },
+                        )
 
 
     for graph in [v for v, _ in list(sdfg.all_nodes_recursive()) if isinstance(v, dace.SDFGState)]:
