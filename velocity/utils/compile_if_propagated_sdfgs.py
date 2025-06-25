@@ -258,27 +258,63 @@ static cudaStream_t open_acc_stream;
             f.writelines(modified_lines)
 
 
-def fix_levelmask_calls(filepath: str, host : bool):
-    with open(filepath, "r") as file:
-        lines = file.readlines()
-    with open(filepath, "w") as file:
-        i = 0
-        while i < len(lines):
-            if host:
-                p1 = "uint8_t  gpu_levelmask, double *"
-                r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
-                p2 = "gpu_levelmask, &"
-                r2 = "&gpu_levelmask[0], &"
-            else:
-                p1 = "uint8_t  gpu_levelmask, double *"
-                r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
-                p2 = "gpu_levelmask, &"
-                r2 = "gpu_levelmask[0], &"
-            line = lines[i]
-            line2 = line.replace(p1, r1).replace(p2, r2) + "\n"
-            file.write(line2)
-            i += 1
-
+def fix_levelmask_calls(filepath: str, host : bool, stage: int):
+    if stage <= 5:
+        with open(filepath, "r") as file:
+            lines = file.readlines()
+        with open(filepath, "w") as file:
+            i = 0
+            while i < len(lines):
+                line = lines[i]
+                if host:
+                    p1 = "uint8_t  gpu_levelmask, double *"
+                    r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
+                    p2 = "gpu_levelmask, &"
+                    r2 = "&gpu_levelmask[0], &"
+                else:
+                    p1 = "uint8_t  gpu_levelmask, double *"
+                    r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
+                    p2 = "gpu_levelmask, &"
+                    r2 = "gpu_levelmask[0], &"
+                    #p3 = ", gpu_cfl_clipping, &"
+                    #p4 = "(gpu_cfl_clipping, &"
+                    p5 = "uint8_t in_arr = gpu_cfl_clipping;"
+                    r5 = "uint8_t in_arr = gpu_cfl_clipping[((_for_it_22 + (tmp_struct_symbol_14 * (_for_it_35 - 1))) - 1)];"
+                    p6 = "uint8_t  gpu_cfl_clipping,"
+                    r6 = "uint8_t* __restrict__  gpu_cfl_clipping,"
+                    line = line.replace(p5, r5).replace(p6, r6)
+                line2 = line.replace(p1, r1).replace(p2, r2)
+                file.write(line2)
+                i += 1
+    else:
+        with open(filepath, "r") as file:
+            lines = file.readlines()
+        with open(filepath, "w") as file:
+            i = 0
+            while i < len(lines):
+                line = lines[i]
+                if host:
+                    p1 = "uint8_t  gpu_levelmask, double *"
+                    r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
+                    p2 = "__state->__0_gpu_levelmask, &"
+                    r2 = "&__state->__0_gpu_levelmask[0], &"
+                else:
+                    p1 = "uint8_t gpu_levelmask, double *"
+                    r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
+                    p2 = "&__state->__0_gpu_levelmask, &"
+                    r2 = "&__state->__0_gpu_levelmask[0], &"
+                    #p3 = ", gpu_cfl_clipping, &"
+                    #p4 = "(gpu_cfl_clipping, &"
+                    p5 = "uint8_t in_arr = gpu_cfl_clipping;"
+                    r5 = "uint8_t in_arr = gpu_cfl_clipping[((_for_it_22 + (tmp_struct_symbol_14 * (_for_it_35 - 1))) - 1)];"
+                    p6 = "uint8_t  gpu_cfl_clipping,"
+                    r6 = "uint8_t* __restrict__  gpu_cfl_clipping,"
+                    line = line.replace(p5, r5).replace(p6, r6)
+                p7 = ", &gpu_levelmask,"
+                r7 = ", &gpu_levelmask[0],"
+                line2 = line.replace(p1, r1).replace(p2, r2).replace(p7, r7)
+                file.write(line2)
+                i += 1
 
 def add_reduce_clean_up_calls(filepath: str):
     pattern1 = "DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop"
@@ -486,8 +522,8 @@ def compile_if_propagated_sdfgs(
                     gpu
                 )
             add_reduce_clean_up_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu")
-            fix_levelmask_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu", True)
-            fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False)
+            fix_levelmask_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu", True, stage)
+            fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False, stage)
 
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()

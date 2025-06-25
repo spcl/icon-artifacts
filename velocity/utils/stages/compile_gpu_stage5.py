@@ -10,7 +10,7 @@ from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 from utils.merge_maps import merge_maps_in_sdfg
 from utils.change_array_dtypes import change_array_dtypes
-
+from dace.transformation.passes.constant_propagation import ConstantPropagation
 STAGE_ID = 5
 
 
@@ -97,7 +97,9 @@ def optimization_action(sdfg):
                         new_type=dace.uint8)
     sdfg.validate()
 
-
+    ConstantPropagation().apply_pass(sdfg, {})
+    sdfg.simplify()
+    sdfg.validate()
     return sdfg
 
 def main():
