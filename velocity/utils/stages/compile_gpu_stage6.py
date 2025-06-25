@@ -14,6 +14,7 @@ from utils.pre_gpu_fixes import pre_gpu_fix
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 from utils.segmented_reduction import to_segmented_reduction
+from utils.change_array_dtypes import setzero_to_memset
 
 STAGE_ID = 6
 from utils.rm_segmented_reduce import rm_segmented_reduce
@@ -54,6 +55,9 @@ def optimization_action(sdfg):
     rm_segmented_reduce(sdfg)
     remove_unused_inconnectors_from_nestedsdfg(sdfg)
     sdfg.simplify()
+    sdfg.validate()
+
+    setzero_to_memset(sdfg)
     sdfg.validate()
 
     return sdfg

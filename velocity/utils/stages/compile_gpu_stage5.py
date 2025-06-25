@@ -9,6 +9,8 @@ from utils.move_transients_to_top_level import move_transients_to_top_level
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 from utils.merge_maps import merge_maps_in_sdfg
+from utils.change_array_dtypes import change_array_dtypes
+
 STAGE_ID = 5
 
 
@@ -89,6 +91,12 @@ def optimization_action(sdfg):
     remove_unused_inconnectors_from_nestedsdfg(sdfg)
     sdfg.simplify()
     sdfg.validate()
+
+    change_array_dtypes(sdfg,
+                        array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"},
+                        new_type=dace.uint8)
+    sdfg.validate()
+
 
     return sdfg
 

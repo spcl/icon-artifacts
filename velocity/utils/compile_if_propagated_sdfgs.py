@@ -198,64 +198,87 @@ static cudaStream_t open_acc_stream;
         with open(file_path, "r") as f:
             lines = f.readlines()
 
-            modified_lines = [stream_decl]
-            i = 0
+        modified_lines = [stream_decl]
+        i = 0
 
-            def _process_line(line:str) -> str:
-                if "__dace_current_stream = __state->gpu_context->streams" in line:
-                    _l = "cudaStream_t __dace_current_stream = open_acc_stream;\n"
-                elif (
-                    "cudaStreamCreateWithFlags" in line or
-                    "cudaStreamDestroy" in line or
-                    "cudaEventCreateWithFlags" in line or
-                    "cudaEventDestroy" in line or
-                    "__state->gpu_context->internal_streams[" in line) and (
-                        "cudaLaunchKernel" not in line
-                    ):
-                    _l = "//" + line
-                elif "__state->gpu_context->streams[0]" in line:
-                    _l = line.replace("__state->gpu_context->streams[0]", "open_acc_stream")
-                else:
-                    _l = line
-                return _l
+        def _process_line(line:str) -> str:
+            if "__dace_current_stream = __state->gpu_context->streams" in line:
+                _l = "cudaStream_t __dace_current_stream = open_acc_stream;\n"
+            elif (
+                "cudaStreamCreateWithFlags" in line or
+                "cudaStreamDestroy" in line or
+                "cudaEventCreateWithFlags" in line or
+                "cudaEventDestroy" in line or
+                "__state->gpu_context->internal_streams[" in line) and (
+                    "cudaLaunchKernel" not in line
+                ):
+                _l = "//" + line
+            elif "__state->gpu_context->streams[0]" in line:
+                _l = line.replace("__state->gpu_context->streams[0]", "open_acc_stream")
+            else:
+                _l = line
+            return _l
 
-            c = False
-            while i < len(lines):
-                line = lines[i]
+        c = False
+        while i < len(lines):
+            line = lines[i]
 
-                # Check if line starts with the target function name
-                if check in line:
-                    modified_lines.append(_process_line(line))
-                    i += 1
+            # Check if line starts with the target function name
+            if check in line:
+                modified_lines.append(_process_line(line))
+                i += 1
 
-                    is_host_check = (check == host_check)
-                    #raise Exception(is_host_check, check, host_check)
-                    if is_host_check:
-                        if "_internal" in line:
-                            if check in line and check == host_check and ("{" not in line) and (";" not in line) and ("DACE_EXPORTED" not in line):
-                                c = True
-                                print(line, check)
-                                if i < len(lines) and lines[i].strip() == "{":
-                                    modified_lines.append(_process_line("{\n"))  # Add the opening brace
+                is_host_check = (check == host_check)
+                #raise Exception(is_host_check, check, host_check)
+                if is_host_check:
+                    if "_internal" in line:
+                        if check in line and check == host_check and ("{" not in line) and (";" not in line) and ("DACE_EXPORTED" not in line):
+                            c = True
+                            print(line, check)
+                            if i < len(lines) and lines[i].strip() == "{":
+                                modified_lines.append(_process_line("{\n"))  # Add the opening brace
 
-                                    # Add the stream declarations after the opening brace
-                                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
-                                    modified_lines.append("cudaStreamSynchronize(open_acc_stream); //EntryStreamSync\n")
-                                    modified_lines.append('measure_time("Run");\n')
+                                # Add the stream declarations after the opening brace
+                                modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
+                                modified_lines.append("cudaStreamSynchronize(open_acc_stream); //EntryStreamSync\n")
+                                modified_lines.append('measure_time("Run");\n')
 
-                                    i += 1
-                                #raise Exception(line, check)
-                    elif not is_host_check:
-                        if check in line and check == dev_check and check != host_check and "{" in line:
-                            modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
+                                i += 1
+                            #raise Exception(line, check)
+                elif not is_host_check:
+                    if check in line and check == dev_check and check != host_check and "{" in line:
+                        modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
 
-                else:
-                    modified_lines.append(_process_line(line))
-                    i += 1
+            else:
+                modified_lines.append(_process_line(line))
+                i += 1
 
-                # Write the modified content back to the file
-                with open(file_path, "w") as f:
-                    f.writelines(modified_lines)
+        # Write the modified content back to the file
+        with open(file_path, "w") as f:
+            f.writelines(modified_lines)
+
+
+def fix_levelmask_calls(filepath: str, host : bool):
+    with open(filepath, "r") as file:
+        lines = file.readlines()
+    with open(filepath, "w") as file:
+        i = 0
+        while i < len(lines):
+            if host:
+                p1 = "uint8_t  gpu_levelmask, double *"
+                r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
+                p2 = "gpu_levelmask, &"
+                r2 = "&gpu_levelmask[0], &"
+            else:
+                p1 = "uint8_t  gpu_levelmask, double *"
+                r1 = "uint8_t* __restrict__  gpu_levelmask, double *"
+                p2 = "gpu_levelmask, &"
+                r2 = "gpu_levelmask[0], &"
+            line = lines[i]
+            line2 = line.replace(p1, r1).replace(p2, r2) + "\n"
+            file.write(line2)
+            i += 1
+
 
 def add_reduce_clean_up_calls(filepath: str):
     pattern1 = "DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop"
@@ -269,10 +292,10 @@ def add_reduce_clean_up_calls(filepath: str):
                 assert lines[i+1].strip() == "{"
                 line = lines[i]
                 file.write(line)
-                file.write("{")
-                file.write("cleanup_reduce_sum_gpu();")
-                file.write("cleanup_reduce_maxZ_gpu()")
-                i+1
+                file.write("{\n")
+                file.write("cleanup_reduce_sum_gpu();\n")
+                file.write("cleanup_reduce_maxZ_gpu();\n")
+                i += 1
             else:
                 line = lines[i]
                 file.write(line)
@@ -441,10 +464,10 @@ def compile_if_propagated_sdfgs(
             modify_files_in_directory(build_loc)
             add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp", gpu, stage)
             # insert_measure_time_calls(build_loc, sdfg, instrument)
-            if fix_out_val_0:
-                  fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
-                  fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &maxvcfl_arr")
-                  fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
+            #if fix_out_val_0:
+            #      fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
+            #      fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &maxvcfl_arr")
+            #      fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &z_w_con_c")
         if gpu:
             _replace_cpp_with_cu(build_loc)
             if stage > 5 and rm_syncs:
@@ -463,6 +486,8 @@ def compile_if_propagated_sdfgs(
                     gpu
                 )
             add_reduce_clean_up_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+            fix_levelmask_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu", True)
+            fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False)
 
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
@@ -471,14 +496,14 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
                     + main_cu_code
                 )
-            if fix_out_val_0:
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_levmask")
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
-                fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &gpu_levmask")
+            #if fix_out_val_0:
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_levmask")
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
+            #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &gpu_levmask")
             sources.add(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()
