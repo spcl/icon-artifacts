@@ -149,10 +149,48 @@ __global__ void batched_reduce_max_v2(double* __restrict__ output_data,
     }
 }
 
+static void* maxZ_temp_storage = nullptr;
+void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in,
+                                 double* __restrict__ d_out,
+                                 int size,
+                                 cudaStream_t stream)
+{
+  // Static variables to persist across calls
+  static size_t temp_storage_bytes = 0;
+  static int last_size = -1;
+
+  // Only allocate once, or if size has changed
+  if (maxZ_temp_storage == nullptr || size != last_size) {
+    if (maxZ_temp_storage != nullptr) {
+      cudaFree(maxZ_temp_storage);
+      maxZ_temp_storage = nullptr;
+    }
+    temp_storage_bytes = 0;
+    cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, stream);
+    if (temp_storage_bytes != 0) {
+      cudaMalloc(&maxZ_temp_storage, temp_storage_bytes);
+    }
+    last_size = size;
+  }
+
+  // Call the reduction
+  cub::DeviceReduce::Max(maxZ_temp_storage, temp_storage_bytes, d_in, d_out, size, stream);
+}
+
+// Manual cleanup function to call when done
+void cleanup_reduce_maxZ_gpu()
+{
+  if (maxZ_temp_storage != nullptr) {
+    cudaFree(maxZ_temp_storage);
+    maxZ_temp_storage = nullptr;
+  }
+}
+
+
 // max zero reduction interface
+/*
 void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in, double*__restrict__ d_out, int size, cudaStream_t stream)
 {
-  /*
   void* d_temp_storage = nullptr;
   size_t temp_storage_bytes = 0;
 
@@ -171,7 +209,7 @@ void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in, double*__restri
   if (temp_storage_bytes != 0) {
     cudaFree(d_temp_storage);
   }
-  */
+
   void *batched_reduce_max_v2_args[] = {
       (void *)&d_out,
       (void *)&d_in,
@@ -185,8 +223,8 @@ void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in, double*__restri
       0,
       stream
   );
-
 }
+*/
 
 double reduce_maxZ_to_scalar_gpu(const double *__restrict__ d_in, int size, cudaStream_t stream)
 {
@@ -196,6 +234,7 @@ double reduce_maxZ_to_scalar_gpu(const double *__restrict__ d_in, int size, cuda
 }
 
 // sum reduction interface
+/*
 void reduce_sum_to_address_gpu(const int *__restrict__ d_in, int*__restrict__ d_out, int size, cudaStream_t stream)
 {
   void *batched_reduce_sum_v2_args[] = {
@@ -211,8 +250,46 @@ void reduce_sum_to_address_gpu(const int *__restrict__ d_in, int*__restrict__ d_
       0,
       stream
   );
-
 }
+*/
+
+static void* sum_temp_storage = nullptr;
+void reduce_sum_to_address_gpu(const double *__restrict__ d_in,
+                                 double* __restrict__ d_out,
+                                 int size,
+                                 cudaStream_t stream)
+{
+  // Static variables to persist across calls
+  static size_t temp_storage_bytes = 0;
+  static int last_size = -1;
+
+  // Only allocate once, or if size has changed
+  if (sum_temp_storage == nullptr || size != last_size) {
+    if (sum_temp_storage != nullptr) {
+      cudaFree(sum_temp_storage);
+      sum_temp_storage = nullptr;
+    }
+    temp_storage_bytes = 0;
+    cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, stream);
+    if (temp_storage_bytes != 0) {
+      cudaMalloc(&sum_temp_storage, temp_storage_bytes);
+    }
+    last_size = size;
+  }
+
+  // Call the reduction
+  cub::DeviceReduce::Max(sum_temp_storage, temp_storage_bytes, d_in, d_out, size, stream);
+}
+
+// Manual cleanup function to call when done
+void cleanup_reduce_sum_gpu()
+{
+  if (sum_temp_storage != nullptr) {
+    cudaFree(sum_temp_storage);
+    sum_temp_storage = nullptr;
+  }
+}
+
 
 int reduce_sum_to_scalar_gpu(const int *__restrict__ d_in, int size, cudaStream_t stream)
 {
