@@ -122,46 +122,57 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
         script_dir = path
     _process_folder(script_dir, sdfg, instrument)
 
-def add_timers(file_path: str, gpu: bool):
+def add_timers(file_path: str, gpu: bool, stage:int):
 
     with open(file_path, "r") as f:
         code = f.read()
 
     # Pattern 1: Insert BEFORE `nrdmax_jg = __CG_global_data__m_nrdmax[0];`
     pattern1 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
-    if not gpu:
+    if gpu is False:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
-        replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n    measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    ////cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+        if stage > 5 and stage < 8:
+            replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n    measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+        elif stage == 8:
+            # Stage 8 adds it after open acc stream
+            replacement1 = '   //cudaStreamSynchronize(__state->gpu_context->streams[0]); //RE\n    measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+        else:
+            assert stage < 5
+            replacement1 = '   cudaDeviceSynchronize(); //Repl\n    //measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
-    if gpu:
-        replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]);\n'
-        replacement2 += '  measure_time("Run");\n'
+    if gpu is True:
+        if stage > 5:
+            replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]);\n'
+            replacement2 += '  measure_time("Run");\n'
+        else:
+            replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize();\n'
     else:
         replacement2 = '\\g<0>  measure_time("Run");\n'
     # Apply replacements
     code = re.sub(pattern1, replacement1, code, flags=re.MULTILINE)
     code = re.sub(pattern2, replacement2, code, flags=re.MULTILINE)
 
-    if gpu:
-        pattern4 = """dace::CopyNDDynamic<double, 1, false, 1>::template ConstDst<1>::Copy(
-        __state->__0_gpu_vcflmax, __state->__0_vcflmax, tmp_struct_symbol_12, 1);"""
+    if gpu is True:
+        if stage > 5:
+            pattern4 = """dace::CopyNDDynamic<double, 1, false, 1>::template ConstDst<1>::Copy(
+            __state->__0_gpu_vcflmax, __state->__0_vcflmax, tmp_struct_symbol_12, 1);"""
 
-        replacement4 = "DACE_GPU_CHECK(cudaMemcpyAsync((void*)__state->__0_vcflmax, (void*)__state->__0_gpu_vcflmax, static_cast<size_t>(tmp_struct_symbol_12) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));"
+            replacement4 = "DACE_GPU_CHECK(cudaMemcpyAsync((void*)__state->__0_vcflmax, (void*)__state->__0_gpu_vcflmax, static_cast<size_t>(tmp_struct_symbol_12) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));"
 
-        code = code.replace(pattern4, replacement4)
+            code = code.replace(pattern4, replacement4)
 
-        pattern5 = r'(^\s*double\s*.*\s*in_arr\s*=.*vcflmax.*;)'
-        replacement5 = r'cudaStreamSynchronize(__state->gpu_context->streams[0]);//ExitStreamSync\n\1'
-        test_line = "double* in_arr = &__state->__0_vcflmax[(replaced_var_6 - 1)];"
+            pattern5 = r'(^\s*double\s*.*\s*in_arr\s*=.*vcflmax.*;)'
+            replacement5 = r'cudaStreamSynchronize(__state->gpu_context->streams[0]);//ExitStreamSync\n\1'
+            test_line = "double* in_arr = &__state->__0_vcflmax[(replaced_var_6 - 1)];"
 
-        if re.match(pattern5, test_line):
-            #print("Pattern matches!")
-            pass
-        else:
-            #print("Pattern doesn't match")
-            assert False
-        code = re.sub(pattern5, replacement5, code, flags=re.MULTILINE)
+            if re.match(pattern5, test_line):
+                #print("Pattern matches!")
+                pass
+            else:
+                #print("Pattern doesn't match")
+                assert False
+            code = re.sub(pattern5, replacement5, code, flags=re.MULTILINE)
 
     with open(file_path, "w") as f:
         f.write(code)
@@ -177,7 +188,7 @@ def change_to_openacc_stream(host_file_path: str, dev_file_path: str, gpu: bool)
 static cudaStream_t open_acc_stream;
 // END
 """
-    host_check = "void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1_internal"
+    host_check = "void __program_velocity_no_nproma_if_prop"
     dev_check = "DACE_EXPORTED int __dace_init_cuda_"
     for (file_path, check) in [
         (host_file_path, host_check),
@@ -186,66 +197,66 @@ static cudaStream_t open_acc_stream;
         with open(file_path, "r") as f:
             lines = f.readlines()
 
-        modified_lines = [stream_decl]
-        i = 0
+            modified_lines = [stream_decl]
+            i = 0
 
-        def _process_line(line:str) -> str:
-            if "__dace_current_stream = __state->gpu_context->streams" in line:
-                _l = "cudaStream_t __dace_current_stream = open_acc_stream;\n"
-            elif (
-                "cudaStreamCreateWithFlags" in line or
-                "cudaStreamDestroy" in line or
-                "cudaEventCreateWithFlags" in line or
-                "cudaEventDestroy" in line or
-                "__state->gpu_context->internal_streams[" in line) and (
-                    "cudaLaunchKernel" not in line
-                ):
-                _l = "//" + line
-            elif "__state->gpu_context->streams[0]" in line:
-                _l = line.replace("__state->gpu_context->streams[0]", "open_acc_stream")
-            else:
-                _l = line
-            return _l
-
-        c = False
-        while i < len(lines):
-            line = lines[i]
-
-            # Check if line starts with the target function name
-            if check in line:
-                modified_lines.append(_process_line(line))
-                i += 1
-
-                if c is True:
-                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
-                    c = False
-
-                if check in line and "{" in line:
-                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
-                elif check in line and "{" not in line and ";" not in line:
-                    c = True
-
-
-                # Check if next line is opening brace
-                if i < len(lines) and lines[i].strip() == "{":
-                    modified_lines.append(_process_line(lines[i]))  # Add the opening brace
-
-                    # Add the stream declarations after the opening brace
-                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
-
-                    i += 1
+            def _process_line(line:str) -> str:
+                if "__dace_current_stream = __state->gpu_context->streams" in line:
+                    _l = "cudaStream_t __dace_current_stream = open_acc_stream;\n"
+                elif (
+                    "cudaStreamCreateWithFlags" in line or
+                    "cudaStreamDestroy" in line or
+                    "cudaEventCreateWithFlags" in line or
+                    "cudaEventDestroy" in line or
+                    "__state->gpu_context->internal_streams[" in line) and (
+                        "cudaLaunchKernel" not in line
+                    ):
+                    _l = "//" + line
+                elif "__state->gpu_context->streams[0]" in line:
+                    _l = line.replace("__state->gpu_context->streams[0]", "open_acc_stream")
                 else:
-                    # If next line is not "{", just continue
-                    continue
-            else:
-                modified_lines.append(_process_line(line))
-                i += 1
+                    _l = line
+                return _l
 
-        # Write the modified content back to the file
-        with open(file_path, "w") as f:
-            f.writelines(modified_lines)
+            c = False
+            while i < len(lines):
+                line = lines[i]
 
-def comment_out_syncs(filepath):
+                # Check if line starts with the target function name
+                if check in line:
+                    modified_lines.append(_process_line(line))
+                    i += 1
+
+                    is_host_check = (check == host_check)
+                    #raise Exception(is_host_check, check, host_check)
+                    if is_host_check:
+                        if "_internal" in line:
+                            if check in line and check == host_check and ("{" not in line) and (";" not in line) and ("DACE_EXPORTED" not in line):
+                                c = True
+                                print(line, check)
+                                if i < len(lines) and lines[i].strip() == "{":
+                                    modified_lines.append(_process_line("{\n"))  # Add the opening brace
+
+                                    # Add the stream declarations after the opening brace
+                                    modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
+                                    modified_lines.append("cudaStreamSynchronize(open_acc_stream); //EntryStreamSync\n")
+                                    modified_lines.append('measure_time("Run");\n')
+
+                                    i += 1
+                                #raise Exception(line, check)
+                    elif not is_host_check:
+                        if check in line and check == dev_check and check != host_check and "{" in line:
+                            modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
+
+                else:
+                    modified_lines.append(_process_line(line))
+                    i += 1
+
+                # Write the modified content back to the file
+                with open(file_path, "w") as f:
+                    f.writelines(modified_lines)
+
+def comment_out_syncs(filepath: str, gpu: bool):
     # comment out (prepend //) any line containing cudaStreamSynchronize
     vcflmax_count = 0
     added_one = False
@@ -259,7 +270,10 @@ def comment_out_syncs(filepath):
                 else:
                     line = "//" + line
             if "tmp_call_18 = -1.7976931348623157e+308;" in line:
-                line = "DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));\n" + line
+                if gpu:
+                    line = "DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));\n" + line
+                else:
+                    line = "//" + line
             file.write(line)
 
 def comment_out_allocs_and_frees(filepath: str, name_set: typing.Set[str]):
@@ -403,7 +417,7 @@ def compile_if_propagated_sdfgs(
             compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
 
             modify_files_in_directory(build_loc)
-            add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp", gpu)
+            add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp", gpu, stage)
             # insert_measure_time_calls(build_loc, sdfg, instrument)
             if fix_out_val_0:
                   fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
@@ -412,7 +426,7 @@ def compile_if_propagated_sdfgs(
         if gpu:
             _replace_cpp_with_cu(build_loc)
             if stage > 5 and rm_syncs:
-                comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+                comment_out_syncs(f"{build_loc}/src/cpu/{sdfg_name}.cu", gpu)
             #assert allocation_names_to_comment_out is not None, "Allocation names to comment out must be provided for GPU code generation"
             #assert use_openacc_stream is True
             if allocation_names_to_comment_out is not None:
