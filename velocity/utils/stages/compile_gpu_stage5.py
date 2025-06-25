@@ -8,7 +8,7 @@ from utils.move_scalar_to_array import _tmp_difcoef
 from utils.move_transients_to_top_level import move_transients_to_top_level
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
-
+from utils.merge_maps import merge_maps_in_sdfg
 STAGE_ID = 5
 
 
@@ -18,7 +18,7 @@ def optimization_action(sdfg):
     prune_unused_inputs_outputs(sdfg)
     sdfg.validate()
     # prune_unused_inputs_outputs_recursive(sdfg) # Missing symbol ntnd error
-    sdfg.validate()
+    #sdfg.validate()
     # Hardcoded fixes for the GPU version
     # pre_gpu_fix(sdfg)
     # move_ifs_inside_maps(sdfg)
@@ -81,6 +81,9 @@ def optimization_action(sdfg):
     )
     if "difcoef" in sdfg.arrays:
         _tmp_difcoef(sdfg)
+    sdfg.validate()
+
+    merge_maps_in_sdfg(sdfg)
     sdfg.validate()
 
     remove_unused_inconnectors_from_nestedsdfg(sdfg)

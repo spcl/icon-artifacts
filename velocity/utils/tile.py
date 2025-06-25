@@ -165,11 +165,11 @@ def tile_kernels(sdfg: dace.SDFG):
                         except:
                             dim = 1
                         if dim == 92:
-                            coarsening_factor = 8
+                            coarsening_factor = 2
                         if dim == 91:
-                            coarsening_factor = 7
+                            coarsening_factor = 1 # could be 7 but it is probablly too much
                         elif dim == 90:
-                            coarsening_factor = 9
+                            coarsening_factor = 3
                         elif dim == 89:
                             coarsening_factor = 1
                         else:

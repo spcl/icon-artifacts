@@ -136,9 +136,9 @@ def add_timers(file_path: str, gpu: bool, stage:int):
             replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n    measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
         elif stage == 8:
             # Stage 8 adds it after open acc stream
-            replacement1 = '   //cudaStreamSynchronize(__state->gpu_context->streams[0]); //RE\n    measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+            replacement1 = '   //cudaStreamSynchronize(__state->gpu_context->streams[0]); //RE\n    //measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
         else:
-            assert stage < 5
+            assert stage <= 5
             replacement1 = '   cudaDeviceSynchronize(); //Repl\n    //measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
     if gpu is True:
@@ -176,6 +176,7 @@ def add_timers(file_path: str, gpu: bool, stage:int):
 
     with open(file_path, "w") as f:
         f.write(code)
+
 
 def change_to_openacc_stream(host_file_path: str, dev_file_path: str, gpu: bool):
     assert gpu is True
@@ -255,6 +256,27 @@ static cudaStream_t open_acc_stream;
                 # Write the modified content back to the file
                 with open(file_path, "w") as f:
                     f.writelines(modified_lines)
+
+def add_reduce_clean_up_calls(filepath: str):
+    pattern1 = "DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop"
+    with open(filepath, "r") as file:
+        lines = file.readlines()
+    with open(filepath, "w") as file:
+        i = 0
+        while i < len(lines):
+            if pattern1 in lines[i]:
+                assert i < len(lines)
+                assert lines[i+1].strip() == "{"
+                line = lines[i]
+                file.write(line)
+                file.write("{")
+                file.write("cleanup_reduce_sum_gpu();")
+                file.write("cleanup_reduce_maxZ_gpu()")
+                i+1
+            else:
+                line = lines[i]
+                file.write(line)
+            i += 1
 
 def comment_out_syncs(filepath: str, gpu: bool):
     # comment out (prepend //) any line containing cudaStreamSynchronize
@@ -440,6 +462,7 @@ def compile_if_propagated_sdfgs(
                     f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu",
                     gpu
                 )
+            add_reduce_clean_up_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu")
 
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
