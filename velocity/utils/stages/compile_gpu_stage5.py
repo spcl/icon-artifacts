@@ -92,9 +92,10 @@ def optimization_action(sdfg):
     sdfg.simplify()
     sdfg.validate()
 
-    change_array_dtypes(sdfg,
-                        array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"},
-                        new_type=dace.uint8)
+    # GPU read-write has unit size of 32bits, uint8_t won't help
+    #change_array_dtypes(sdfg,
+    #                    array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"},
+    #                    new_type=dace.uint8)
     sdfg.validate()
 
     ConstantPropagation().apply_pass(sdfg, {})

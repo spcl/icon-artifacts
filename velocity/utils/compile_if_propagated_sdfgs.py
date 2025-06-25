@@ -61,6 +61,7 @@ import re
 
 
 def _insert_measure_time(filename, path, hash):
+    return
     with open(filename, "r") as f:
         lines = f.readlines()
 
@@ -133,20 +134,19 @@ def add_timers(file_path: str, gpu: bool, stage:int):
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
         if stage > 5 and stage < 8:
-            replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n    measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+            replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
         elif stage == 8:
             # Stage 8 adds it after open acc stream
-            replacement1 = '   //cudaStreamSynchronize(__state->gpu_context->streams[0]); //RE\n    //measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+            replacement1 = '\\g<0>'
         else:
             assert stage <= 5
-            replacement1 = '   cudaDeviceSynchronize(); //Repl\n    //measure_time("Run");\n   // cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n\\g<0>'
+            replacement1 = '   cudaDeviceSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
     if gpu is True:
         if stage > 5:
-            replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]);\n'
-            replacement2 += '  measure_time("Run");\n'
+            replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]); \n  std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;\n'
         else:
-            replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;\n    //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize();\n'
+            replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize(); \n  std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;\n'
     else:
         replacement2 = '\\g<0>  measure_time("Run");\n'
     # Apply replacements
@@ -241,6 +241,9 @@ static cudaStream_t open_acc_stream;
                                 # Add the stream declarations after the opening brace
                                 modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
                                 modified_lines.append("cudaStreamSynchronize(open_acc_stream); //EntryStreamSync\n")
+                                modified_lines.append(
+                                       """//EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n """
+                                )
                                 modified_lines.append('measure_time("Run");\n')
 
                                 i += 1
@@ -578,9 +581,9 @@ def compile_if_propagated_sdfgs(
 
     if gpu:
         if release:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp"
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp"
         else:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
+            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:

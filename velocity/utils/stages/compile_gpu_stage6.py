@@ -59,6 +59,14 @@ def optimization_action(sdfg):
 
     setzero_to_memset(sdfg)
     sdfg.validate()
+    for arr_name, arr in sdfg.arrays.items():
+        if "maxvcfl_arr" in arr_name:
+            if "gpu" in arr_name:
+                arr.storage = dace.dtypes.StorageType.GPU_Global
+            else:
+                arr.storage = dace.dtypes.StorageType.CPU_Heap
+            arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
+    sdfg.validate()
 
     return sdfg
 
