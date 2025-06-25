@@ -22,6 +22,69 @@ struct t_nh_prog {
     double* w = {};
 };
 
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
+};
+
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
+    int __f2dace_SA_c_lin_e_d_1_s_26 = {};
+    int __f2dace_SA_c_lin_e_d_2_s_27 = {};
+    int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
+    int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
+    int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
+    int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
+    int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
+    int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
+    int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
+    int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
+    int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
+    int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
+    int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
+    int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
+    int __f2dace_SA_geofac_rot_d_0_s_40 = {};
+    int __f2dace_SA_geofac_rot_d_1_s_41 = {};
+    int __f2dace_SA_geofac_rot_d_2_s_42 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
+    int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
+    int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
+    int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
+    int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
+    int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
+    int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
+    int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
+    int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
+    int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
+    int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
+    int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
+    int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
+    int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
+    int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
+    int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
+    int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
+    int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
+    int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* geofac_grdiv = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* rbf_vec_coeff_e = {};
+};
+
 struct t_grid_domain_decomp_info {
     int __f2dace_SA_owner_mask_d_0_s_2 = {};
     int __f2dace_SA_owner_mask_d_1_s_3 = {};
@@ -223,17 +286,6 @@ struct t_patch {
     t_grid_vertices* verts = {};
 };
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
 struct t_nh_metrics {
     int __f2dace_SA_coeff1_dwdz_d_0_s_332 = {};
     int __f2dace_SA_coeff1_dwdz_d_1_s_333 = {};
@@ -317,58 +369,6 @@ struct t_nh_metrics {
     double* wgtfac_c = {};
     double* wgtfac_e = {};
     double* wgtfacq_e = {};
-};
-
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_25 = {};
-    int __f2dace_SA_c_lin_e_d_1_s_26 = {};
-    int __f2dace_SA_c_lin_e_d_2_s_27 = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s_31 = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s_32 = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s_33 = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s_28 = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s_29 = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s_30 = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s_37 = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s_38 = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s_39 = {};
-    int __f2dace_SA_geofac_n2s_d_0_s_43 = {};
-    int __f2dace_SA_geofac_n2s_d_1_s_44 = {};
-    int __f2dace_SA_geofac_n2s_d_2_s_45 = {};
-    int __f2dace_SA_geofac_rot_d_0_s_40 = {};
-    int __f2dace_SA_geofac_rot_d_1_s_41 = {};
-    int __f2dace_SA_geofac_rot_d_2_s_42 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_34 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_35 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_36 = {};
-    int __f2dace_SOA_c_lin_e_d_0_s_25 = {};
-    int __f2dace_SOA_c_lin_e_d_1_s_26 = {};
-    int __f2dace_SOA_c_lin_e_d_2_s_27 = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s_31 = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s_32 = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s_33 = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s_28 = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s_29 = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s_30 = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s_37 = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s_38 = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s_39 = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s_43 = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s_44 = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s_45 = {};
-    int __f2dace_SOA_geofac_rot_d_0_s_40 = {};
-    int __f2dace_SOA_geofac_rot_d_1_s_41 = {};
-    int __f2dace_SOA_geofac_rot_d_2_s_42 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_34 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_35 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_36 = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* geofac_grdiv = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* rbf_vec_coeff_e = {};
 };
 
 struct t_nh_diag {
@@ -1504,7 +1504,7 @@ inline void loop_body_35_0_0(velocity_no_nproma_if_prop_lvn_only_1_istep_2_state
 
 }
 
-inline void loop_body_26_2_18(velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *__state, double* __restrict__ __CG_p_int__m_c_lin_e, double* __restrict__ __CG_p_int__m_geofac_grdiv, double* __restrict__ __CG_p_metrics__m_ddqz_z_full_e, double* __restrict__ __CG_p_patch__CG_edges__m_area_edge, int* __restrict__ __CG_p_patch__CG_edges__m_cell_blk, int* __restrict__ __CG_p_patch__CG_edges__m_cell_idx, double* __restrict__ __CG_p_patch__CG_edges__m_inv_primal_edge_length, int* __restrict__ __CG_p_patch__CG_edges__m_quad_blk, int* __restrict__ __CG_p_patch__CG_edges__m_quad_idx, double* __restrict__ __CG_p_patch__CG_edges__m_tangent_orientation, int* __restrict__ __CG_p_patch__CG_edges__m_vertex_blk, int* __restrict__ __CG_p_patch__CG_edges__m_vertex_idx, double* __restrict__ __CG_p_prog__m_vn, const double&  cfl_w_limit, const double&  dtime, int* __restrict__ levelmask, const double&  scalfac_exdiff, double* __restrict__ z_w_con_c_full, double* __restrict__ zeta, double* __restrict__ __CG_p_diag__m_ddt_vn_apc_pc, int _for_it_47, int _for_it_52, int i_endidx_var_149, int i_startidx_var_148, int ntnd, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
+inline void loop_body_26_2_28(velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *__state, double* __restrict__ __CG_p_int__m_c_lin_e, double* __restrict__ __CG_p_int__m_geofac_grdiv, double* __restrict__ __CG_p_metrics__m_ddqz_z_full_e, double* __restrict__ __CG_p_patch__CG_edges__m_area_edge, int* __restrict__ __CG_p_patch__CG_edges__m_cell_blk, int* __restrict__ __CG_p_patch__CG_edges__m_cell_idx, double* __restrict__ __CG_p_patch__CG_edges__m_inv_primal_edge_length, int* __restrict__ __CG_p_patch__CG_edges__m_quad_blk, int* __restrict__ __CG_p_patch__CG_edges__m_quad_idx, double* __restrict__ __CG_p_patch__CG_edges__m_tangent_orientation, int* __restrict__ __CG_p_patch__CG_edges__m_vertex_blk, int* __restrict__ __CG_p_patch__CG_edges__m_vertex_idx, double* __restrict__ __CG_p_prog__m_vn, const double&  cfl_w_limit, const double&  dtime, int* __restrict__ levelmask, const double&  scalfac_exdiff, double* __restrict__ z_w_con_c_full, double* __restrict__ zeta, double* __restrict__ __CG_p_diag__m_ddt_vn_apc_pc, int _for_it_47, int _for_it_52, int i_endidx_var_149, int i_startidx_var_148, int ntnd, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
     bool _if_cond_28;
 
 
@@ -1569,7 +1569,7 @@ inline void loop_body_0_4_0(velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_
         }
         {
             for (auto _for_it_52 = Max(3, (nrdmax_jg - 2)); _for_it_52 < 87; _for_it_52 += 1) {
-                loop_body_26_2_18(__state, &__CG_p_int__m_c_lin_e[0], &__CG_p_int__m_geofac_grdiv[0], &__CG_p_metrics__m_ddqz_z_full_e[0], &__CG_p_patch__CG_edges__m_area_edge[0], &__CG_p_patch__CG_edges__m_cell_blk[0], &__CG_p_patch__CG_edges__m_cell_idx[0], &__CG_p_patch__CG_edges__m_inv_primal_edge_length[0], &__CG_p_patch__CG_edges__m_quad_blk[0], &__CG_p_patch__CG_edges__m_quad_idx[0], &__CG_p_patch__CG_edges__m_tangent_orientation[0], &__CG_p_patch__CG_edges__m_vertex_blk[0], &__CG_p_patch__CG_edges__m_vertex_idx[0], &__CG_p_prog__m_vn[0], cfl_w_limit, dtime, &levelmask[0], scalfac_exdiff, &z_w_con_c_full[0], &zeta[0], &__CG_p_diag__m_ddt_vn_apc_pc[0], _for_it_47, _for_it_52, i_endidx_var_149, i_startidx_var_148, ntnd, tmp_struct_symbol_2, tmp_struct_symbol_8);
+                loop_body_26_2_28(__state, &__CG_p_int__m_c_lin_e[0], &__CG_p_int__m_geofac_grdiv[0], &__CG_p_metrics__m_ddqz_z_full_e[0], &__CG_p_patch__CG_edges__m_area_edge[0], &__CG_p_patch__CG_edges__m_cell_blk[0], &__CG_p_patch__CG_edges__m_cell_idx[0], &__CG_p_patch__CG_edges__m_inv_primal_edge_length[0], &__CG_p_patch__CG_edges__m_quad_blk[0], &__CG_p_patch__CG_edges__m_quad_idx[0], &__CG_p_patch__CG_edges__m_tangent_orientation[0], &__CG_p_patch__CG_edges__m_vertex_blk[0], &__CG_p_patch__CG_edges__m_vertex_idx[0], &__CG_p_prog__m_vn[0], cfl_w_limit, dtime, &levelmask[0], scalfac_exdiff, &z_w_con_c_full[0], &zeta[0], &__CG_p_diag__m_ddt_vn_apc_pc[0], _for_it_47, _for_it_52, i_endidx_var_149, i_startidx_var_148, ntnd, tmp_struct_symbol_2, tmp_struct_symbol_8);
             }
         }
 
@@ -2095,13 +2095,13 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2_internal(velocity_n
         }
 
     }
-   cudaDeviceSynchronize(); //Repl
-    //measure_time("Run");
-   // cudaEvent_t start1, stop1;
-    //cudaEventCreate(&start1);
-    //cudaEventCreate(&stop1);
-    //cudaEventRecord(start1); 
-    nrdmax_jg = __CG_global_data__m_nrdmax[0];
+   cudaDeviceSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync
+      cudaEvent_t start1, stop1;
+    cudaEventCreate(&start1);
+    cudaEventCreate(&stop1);
+    cudaEventRecord(start1); 
+ measure_time("Run");
+     nrdmax_jg = __CG_global_data__m_nrdmax[0];
     nflatlev_jg = __CG_global_data__m_nflatlev[0];
     i_startblk_var_118_0 = __CG_p_patch__CG_verts__m_start_block[(2 - __f2dace_SOA_start_block_d_0_s_214_verts_p_patch_5)];
     i_endblk_var_119_0 = __CG_p_patch__CG_verts__m_end_block[((- __f2dace_SOA_end_block_d_0_s_215_verts_p_patch_5) - 5)];
@@ -2260,14 +2260,15 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2_internal(velocity_n
         {
             double max_vcfl_dyn_var_152_0_in = max_vcfl_dyn_var_152;
             double p_diag_out_max_vcfl_dyn;
-  //cudaEventRecord(stop1);
-    //cudaEventSynchronize(stop1);
-    //float milliseconds1 = 0;
-    //cudaEventElapsedTime(&milliseconds1, start1, stop1);
-    //std::cout << "Total time: " << milliseconds1 << " ms" << std::endl;
-    //cudaEventDestroy(start1);
-    //cudaEventDestroy(stop1);
-    //cudaDeviceSynchronize();
+  cudaEventRecord(stop1);
+    cudaEventSynchronize(stop1);
+    float milliseconds1 = 0;
+    cudaEventElapsedTime(&milliseconds1, start1, stop1);
+     measure_time("Host Based C++ Timer"); 
+  cudaEventDestroy(start1);
+    cudaEventDestroy(stop1);
+    //cudaDeviceSynchronize(); 
+  std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;
 
             ///////////////////
             // Tasklet code (T_l653_c653)

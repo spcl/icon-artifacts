@@ -140,7 +140,7 @@ def add_timers(file_path: str, gpu: bool, stage:int):
             replacement1 = '\\g<0>'
         else:
             assert stage <= 5
-            replacement1 = '   cudaDeviceSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
+            replacement1 = '   cudaDeviceSynchronize(); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
     if gpu is True:
         if stage > 5:

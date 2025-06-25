@@ -49,7 +49,7 @@ def optimization_action(sdfg):
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,
         only=["z_w_con_c", "z_w_concorr_mc", "levmask", "cfl_clipping"],
-        no_dim_change=False,
+        no_dim_change=True,
         offset=-1,
         upper_bounds={
             "z_w_concorr_mc": "tmp_struct_symbol_5",
