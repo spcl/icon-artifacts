@@ -134,19 +134,19 @@ def add_timers(file_path: str, gpu: bool, stage:int):
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
         if stage > 5 and stage < 8:
-            replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
+            replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
         elif stage == 8:
             # Stage 8 adds it after open acc stream
             replacement1 = '\\g<0>'
         else:
             assert stage <= 5
-            replacement1 = '   cudaDeviceSynchronize(); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
+            replacement1 = '   cudaDeviceSynchronize(); //EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
     if gpu is True:
         if stage > 5:
-            replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]); \n  std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;\n'
+            replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]); \n  //std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;\n'
         else:
-            replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize(); \n  std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;\n'
+            replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize(); \n  //std::cout << "CUDA Events Based Total time: " << milliseconds1 << " ms" << std::endl;\n'
     else:
         replacement2 = '\\g<0>  measure_time("Run");\n'
     # Apply replacements
@@ -242,7 +242,7 @@ static cudaStream_t open_acc_stream;
                                 modified_lines.append("open_acc_stream = (cudaStream_t) acc_get_cuda_stream(1);\n")
                                 modified_lines.append("cudaStreamSynchronize(open_acc_stream); //EntryStreamSync\n")
                                 modified_lines.append(
-                                       """//EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n """
+                                       """//EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n """
                                 )
                                 modified_lines.append('measure_time("Run");\n')
 
@@ -576,7 +576,7 @@ def compile_if_propagated_sdfgs(
     implicit_conversions = "-Wconversion -Wno-sign-conversion -Wfloat-conversion"
     implicit_conversions_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion"
     if gpu:
-        debuginfo_flags = "-Xcompiler=-g -lineinfo" if debuginfo else ""
+        debuginfo_flags = "-lineinfo" if debuginfo else ""
     else:
         debuginfo_flags = "-g" if debuginfo else ""
 

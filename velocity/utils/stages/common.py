@@ -86,9 +86,9 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         lib=False,
         main_name="main_gpu.cu",
         stage=stage,
-        debuginfo=False,
         allocation_names_to_comment_out=None,
         use_openacc_stream=False,
+        debuginfo=True
       )
   else:
     compile_if_propagated_sdfgs(
@@ -98,7 +98,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         lib=False,
         main_name="main.cu",
         stage=stage,
-        debuginfo=False,
+        debuginfo=True,
         allocation_names_to_comment_out=None,
         use_openacc_stream=False,
       )

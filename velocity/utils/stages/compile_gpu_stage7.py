@@ -22,7 +22,7 @@ def optimization_action(sdfg):
     print("Stage #7: Validate")
     sdfg.validate()
     sdfg.simplify()
-    tile_kernels(sdfg)
+    #tile_kernels(sdfg)
     sdfg.simplify()
 
     # If you run the function it removes out_val_0 but it should not
