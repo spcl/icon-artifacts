@@ -19,6 +19,7 @@ def add_set_zero(sdfg: dace.SDFG, array_name:str):
         language=dace.Language.CPP,
         side_effects=True
     )
+    t.add_in_connector("_in")
     a = state.add_access(array_name)
     state.add_edge(
         a, None, t, "_in", dace.Memlet.from_array(array_name, sdfg.arrays[array_name])

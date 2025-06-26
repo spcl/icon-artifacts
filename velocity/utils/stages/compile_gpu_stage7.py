@@ -10,7 +10,7 @@ from utils.pre_gpu_fixes import make_arrays_persistent
 from utils.reassign_vars import reassign_vars
 from utils.change_reduction_schedule import change_reduction_schedule
 from utils.tile import tile_kernels
-
+from utils.reshape_kernels import reshape_kernels
 STAGE_ID = 7
 
 
@@ -22,6 +22,7 @@ def optimization_action(sdfg):
     print("Stage #7: Validate")
     sdfg.validate()
     sdfg.simplify()
+    reshape_kernels(sdfg, True)
     #tile_kernels(sdfg)
     sdfg.simplify()
 
