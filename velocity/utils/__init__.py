@@ -56,3 +56,5 @@ from utils.rm_segmented_reduce import rm_segmented_reduce
 from utils.change_flatten_lib_to_shallow_copy import change_flatten_lib_to_shallow_copy
 from utils.add_set_zero import add_set_zero
 from utils.change_array_dtypes import change_array_dtypes
+
+from utils.reshape_kernels import reshape_kernels
