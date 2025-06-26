@@ -341,6 +341,18 @@ double* wgtfacq_e = {};
 };
 
 
+struct global_data_type {
+    int i_am_accel_node = {};
+int lextra_diffu = {};
+int* nflatlev = {};
+int nproma = {};
+int* nrdmax = {};
+int timer_intp = {};
+int timer_solve_nh_veltend = {};
+int timers_level = {};
+};
+
+
 struct t_nh_prog {
     int __f2dace_SA_vn_d_0_s_288 = {};
 int __f2dace_SA_vn_d_1_s_289 = {};
@@ -356,18 +368,6 @@ int __f2dace_SOA_w_d_1_s_286 = {};
 int __f2dace_SOA_w_d_2_s_287 = {};
 double* vn = {};
 double* w = {};
-};
-
-
-struct global_data_type {
-    int i_am_accel_node = {};
-int lextra_diffu = {};
-int* nflatlev = {};
-int nproma = {};
-int* nrdmax = {};
-int timer_intp = {};
-int timer_solve_nh_veltend = {};
-int timers_level = {};
 };
 
 
