@@ -576,7 +576,7 @@ def compile_if_propagated_sdfgs(
     implicit_conversions = "-Wconversion -Wno-sign-conversion -Wfloat-conversion"
     implicit_conversions_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion"
     if gpu:
-        debuginfo_flags = "-Xcompiler=-g -lineinfo" if debuginfo else ""
+        debuginfo_flags = "-lineinfo" if debuginfo else ""
     else:
         debuginfo_flags = "-g" if debuginfo else ""
 
