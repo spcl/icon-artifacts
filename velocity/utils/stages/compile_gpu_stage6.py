@@ -52,7 +52,7 @@ def optimization_action(sdfg):
             if sb == e.data.subset:
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35 - 1")
     sdfg.validate()
-    rm_segmented_reduce(sdfg)
+    #rm_segmented_reduce(sdfg)
     remove_unused_inconnectors_from_nestedsdfg(sdfg)
     sdfg.simplify()
     sdfg.validate()
