@@ -47,20 +47,20 @@ def reassign_vars(sdfg: dace.SDFG):
             assert isinstance(out_edge.data, dace.InterstateEdge), f"Outgoing edge of node {node} is not an InterstateEdge."
             new_assignments = set(out_edge.data.assignments.keys())
             reassignments = new_assignments.intersection(current_symbols)
-            print("Reassigning these symbols:", reassignments)
+            #print("Reassigning these symbols:", reassignments)
             current_symbols.update(new_assignments)
 
             # Replace all occurences of the reassigned symbols in the assignments in the following nodes
             for reassignment in reassignments:
                 if re_counter > 9:
                     raise ValueError("Reassignment counter exceeded 9, TODO")
-                print(f"Replacing {reassignment} with replaced_var_{re_counter}")
+                #print(f"Replacing {reassignment} with replaced_var_{re_counter}")
                 out_edge.data.replace(reassignment, f"replaced_var_{re_counter}")
                 replace(sdfg, out_edge.dst, reassignment, f"replaced_var_{re_counter}")
                 current_symbols.add(f"replaced_var_{re_counter}")
                 re_counter += 1
 
-        print("Current Symbols:", current_symbols)
+        #print("Current Symbols:", current_symbols)
 
 
     # Why would this happen? This is a workaround for the issue where nested SDFGs do not have their symbols properly assigned.

@@ -58,7 +58,7 @@ def _replace_on_lines(sdfg: SDFG, old_name:str, new_name:str, permute_list:List[
                     for k, v in e.data.assignments.items():
                         _in = False
                         if old_name in v:
-                            print(f"Replacing {old_name} with {new_name} in {k} -> {v}")
+                            #print(f"Replacing {old_name} with {new_name} in {k} -> {v}")
                             _in = True
                         _v = copy.deepcopy(v)
                         pattern = r'(' + re.escape(old_name) + r')\[(.*?)\]'
@@ -82,7 +82,7 @@ def _replace_on_lines(sdfg: SDFG, old_name:str, new_name:str, permute_list:List[
                             # For each permutation, rewrite the function
                             new_expr = f'{new_name}[{", ".join(newargs)}]'
                             _v = re.sub(old_pattern, new_expr, _v, count=1)
-                            print(f"Replaced {old_pattern} with {new_expr} in {k} -> {_v}")
+                            #print(f"Replaced {old_pattern} with {new_expr} in {k} -> {_v}")
                             replaced = True
                             if _in:
                                 assert replaced
@@ -147,7 +147,8 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                     for dim in per_shape[:-1]:
                         strides.append(strides[-1] * dim)
                     if per_shape[0] == 90:
-                        print(strides, per_shape, arr_shape)
+                        #print(strides, per_shape, arr_shape)
+                        pass
                     per_arr = dace.data.Array(
                         dtype=arr.dtype,
                         shape=per_shape,
@@ -197,7 +198,7 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
 
                 """
                 per_shape = sdfg.arrays[newn].shape
-                print(f"To {arr_shape} -> {per_shape}")
+                #print(f"To {arr_shape} -> {per_shape}")
                 t=TensorTranspose(name=f"transpose_in_{oldn}", axes=permute_indices, alpha=1, beta=0)
                 t.implementation = "cuTensor"
                 t.schedule = dtypes.ScheduleType.GPU_Device
@@ -246,7 +247,7 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
                 """
                 rev_permute_indices = list(range(len(permute_indices)))
                 arr_shape = sdfg.arrays[oldn].shape
-                print(f"Back {per_shape} -> {arr_shape}")
+                #print(f"Back {per_shape} -> {arr_shape}")
                 t=TensorTranspose(name=f"transpose_out_{oldn}",axes=rev_permute_indices, alpha=1, beta=0)
 
                 #inputs={"_inp_tensor"}, outputs={"_out_tensor"}
@@ -365,12 +366,12 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
     if root.label == sdfg.label:
         root.save(root.name + "_perm_1.sdfgz", compress=True)
 
-    print("Replacing names on interstate edges")
+    #print("Replacing names on interstate edges")
 
     for old_name, new_name in orig_map.items():
         assert old_name in orig_permute_map or new_name in orig_permute_map, f"Array {old_name} or {new_name} not in permute map"
         perm = orig_permute_map[old_name] if old_name in orig_permute_map else orig_permute_map[new_name]
-        print(old_name, " -> ", new_name)
+        #print(old_name, " -> ", new_name)
         _replace_on_lines(sdfg, old_name, new_name, perm)
 
     for n, g in sdfg.all_nodes_recursive():
@@ -378,7 +379,7 @@ def permute_index(root: dace.SDFG, sdfg: dace.SDFG, permute_map : Dict[str, List
             for old_name, new_name in orig_map.items():
                 assert old_name in orig_permute_map or new_name in orig_permute_map, f"Array {old_name} or {new_name} not in permute map"
                 perm = orig_permute_map[old_name] if old_name in orig_permute_map else orig_permute_map[new_name]
-                print(old_name, " -> ", new_name)
+                #print(old_name, " -> ", new_name)
                 _replace_on_lines(n.sdfg, old_name, new_name, perm)
 
     #raise Exception("UWU")
@@ -430,5 +431,5 @@ def permute_all_maps_depending_on_input(sdfg: dace.SDFG, permute_list, inout_set
             if len(n.map.range) == len(local_permute_list):
                 for j in range(len(local_permute_list)):
                     new_params.append(old_params[local_permute_list[j]])
-                print("Permuting map", n.map.label, "with", local_permute_list, "from", old_params, "to", new_params)
+                #print("Permuting map", n.map.label, "with", local_permute_list, "from", old_params, "to", new_params)
                 MapDimShuffle.apply_to(g.sdfg, verify=True, map_entry=n, options={"parameters": new_params})

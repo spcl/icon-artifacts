@@ -10,9 +10,9 @@ from utils.pre_gpu_fixes import make_arrays_persistent
 from utils.reassign_vars import reassign_vars
 from utils.change_reduction_schedule import change_reduction_schedule
 from utils.tile import tile_kernels
-from utils.reshape_kernels import reshape_kernels
+from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
 STAGE_ID = 7
-
+import os
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
@@ -22,7 +22,22 @@ def optimization_action(sdfg):
     print("Stage #7: Validate")
     sdfg.validate()
     sdfg.simplify()
-    reshape_kernels(sdfg, True)
+    #reshape_kernels(sdfg, True)
+    # Must be individualized for each kernel
+    x_coarsening = int(os.environ.get("X_COARSENING", 2))
+    y_coarsening = int(os.environ.get("Y_COARSENING", 2))
+    x_block_size = int(os.environ.get("X_BLOCK_SIZE", 128))
+    y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 2))
+    y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 2))
+    reshape_kernels_w_coarsening(sdfg,
+                                 x_coarsening=x_coarsening,
+                                 y_coarsening=y_coarsening,
+                                 x_block_size=x_block_size,
+                                 y_block_size=y_block_size,
+                                 unroll_x=True,
+                                 unroll_x_factor=None,
+                                 unroll_y=True,
+                                 unroll_y_factor=y_unroll_factor,)
     #tile_kernels(sdfg)
     sdfg.simplify()
 

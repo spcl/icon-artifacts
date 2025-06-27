@@ -24,10 +24,11 @@ def int64_to_int32(sdfg: dace.SDFG):
                     #print(inconn_name, inconn_type)
                     if inconn_type == dace.int64:
                         node.in_connectors[inconn_name] = dace.int32
-                        print(inconn_name, inconn_type, node.in_connectors[inconn_name])
+                        #print(inconn_name, inconn_type, node.in_connectors[inconn_name])
                 for outconn_name, outconn_type in node.out_connectors.items():
                     if outconn_type == dace.int64:
-                        print(outconn_name, outconn_type, node.out_connectors[outconn_name])
+                        #print(outconn_name, outconn_type, node.out_connectors[outconn_name])
+                        pass
                     if outconn_name == "i_startidx_var_148":
                         raise Exception(sym_name)
                 nsdfgs.add(node.sdfg)

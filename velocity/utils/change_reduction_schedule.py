@@ -60,7 +60,7 @@ def change_reduction_schedule(sdfg: dace.SDFG):
                                 for ie in in_edges:
                                     graph.add_edge(ie.src, ie.src_conn, new_lib_node, ie.dst_conn, ie.data)
                                 #graph.add_edge(new_lib_node, out_edges[0].src_conn, dst_dst_dst, None, new_memlet.data)
-                                print(node.out_connectors.items())
+                                #print(node.out_connectors.items())
                                 src_conn = out_edges[0].src_conn
                                 conntype = node.out_connectors[src_conn]
                                 _t = lib_node.remove_out_connector(src_conn)

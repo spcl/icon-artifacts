@@ -386,7 +386,7 @@ def move_transients_to_top_level(root: dace.SDFG,
         #                    print(f"z_w_con_c: {oe}")
         #                    raise Exception("uwu")
         if ("OUT_" + arr_name not in map_exit.out_connectors) and has_write:
-            print(has_write, map_exit.out_connectors)
+            #print(has_write, map_exit.out_connectors)
             #raise Exception(f"{map_exit} not in {parent_state.nodes()}")
             a1 = parent_state.add_access(arr_name)
             map_exit.add_in_connector("IN_" + arr_name)
