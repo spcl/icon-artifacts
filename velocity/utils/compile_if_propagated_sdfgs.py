@@ -426,6 +426,7 @@ def compile_if_propagated_sdfgs(
     allocation_names_to_comment_out: set | None,
     use_openacc_stream: bool,
 ):
+    use_nvhpc = os.getenv('_USE_NVHPC', '0').lower() in ('1', 'true', 'yes')
     dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
     sources = set()
     sources.add("src/reductions.cpp")
@@ -572,9 +573,12 @@ def compile_if_propagated_sdfgs(
             if not lib:
                 sources.add("main_gpu.cu")
 
+    nvhpc_flags = "-ccbin=nvc++" if use_nvhpc else ""
+
+
     supress_flags = "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 --diag-suppress 1835 --diag-suppress 177 --diag-suppress 20012 --diag-suppress 1098"
-    implicit_conversions = "-Wconversion -Wno-sign-conversion -Wfloat-conversion"
-    implicit_conversions_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion"
+    no_nvhpc_flags = "-Wconversion -Wno-sign-conversion -Wfloat-conversion -Wno-unknown-pragmas -faligned-new" if not use_nvhpc else ""
+    no_nvhpc_flags_gpu = "-Xcompiler=-Wconversion -Xcompiler=-Wsign-conversion -Xcompiler=-Wfloat-conversion -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new" if not use_nvhpc else ""
     if gpu:
         debuginfo_flags = "-lineinfo" if debuginfo else ""
     else:
@@ -582,25 +586,25 @@ def compile_if_propagated_sdfgs(
 
     if gpu:
         if release:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-O3 -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp"
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch=native --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp"
         else:
-            flags = f" {supress_flags} {implicit_conversions_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-Wno-unknown-pragmas -Xcompiler=-faligned-new --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
             flags += " -std=c++20 "
     else:
         if release:
-            flags = f" {implicit_conversions} {debuginfo_flags} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -faligned-new -O3 "
+            flags = f" {no_nvhpc_flags} {debuginfo_flags} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fopenmp -O3 "
         else:
-            flags = f" {implicit_conversions} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -faligned-new -O0 -ggdb {debuginfo_flags} "
+            flags = f" {no_nvhpc_flags} -std=c++20 -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas -O0 -ggdb {debuginfo_flags} "
 
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
         if not lib:
-            compile_cmd = f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
+            compile_cmd = f"nvcc {nvhpc_flags} {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
         else:
-            compile_cmd = f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
+            compile_cmd = f"nvcc {nvhpc_flags} {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
     else:
         if not lib:
             compile_cmd = f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
