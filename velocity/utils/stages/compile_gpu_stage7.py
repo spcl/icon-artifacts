@@ -24,12 +24,11 @@ def optimization_action(sdfg):
     sdfg.simplify()
     #reshape_kernels(sdfg, True)
     # Must be individualized for each kernel
-    x_coarsening = int(os.environ.get("X_COARSENING", 2))
-    y_coarsening = int(os.environ.get("Y_COARSENING", 2))
-    x_block_size = int(os.environ.get("X_BLOCK_SIZE", 128))
-    y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 2))
-    y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 2))
-    """
+    x_coarsening = int(os.environ.get("X_COARSENING", 1))
+    y_coarsening = int(os.environ.get("Y_COARSENING", 1))
+    x_block_size = int(os.environ.get("X_BLOCK_SIZE", 256))
+    y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 1))
+    y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 1))
     reshape_kernels_w_coarsening(sdfg,
                                  x_coarsening=x_coarsening,
                                  y_coarsening=y_coarsening,
@@ -39,7 +38,6 @@ def optimization_action(sdfg):
                                  unroll_x_factor=None,
                                  unroll_y=True,
                                  unroll_y_factor=y_unroll_factor,)
-    """
     #tile_kernels(sdfg)
     sdfg.simplify()
 
