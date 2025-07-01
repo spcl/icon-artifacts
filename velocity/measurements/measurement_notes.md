@@ -22,14 +22,22 @@ export LIB_FLAGS="--expt-relaxed-constexpr -arch=native -O3 -Xcompiler=-O3 -line
 ## Outline of Profiling ICON
 
 ```fortran
-!Code-snippet for Fortran Velocity Tendencies Measurements
+! Code-snippet for Fortran Velocity Tendencies Measurements
+! In solve_nonhydro
+!$ACC WAIT (added it manually)
+CALL velocity_tendencies(...)
+
+! In velocity_advection
 print *, "Called istep=<ISTEP>, lvn_only=<LVN_ONLY>"
+! Commented out
 !IF (timers_level > 5) CALL timer_stop(timer_solve_nh_veltend)
 CALL cpu_time(start_time)
 
 !Velocity Tendencies Code
 
+! Commented out
 !IF (timers_level > 5) CALL timer_stop(timer_solve_nh_veltend)
+!$ACC WAIT (Did not add this manually, their code has it)
 CALL cpu_time(end_time)
 elapsed_time = end_time - start_time
 print *, 'Elapsed time (seconds): ', elapsed_time
@@ -81,20 +89,15 @@ Mean: 445.7 µs, Median: 442.5 µs, (istep: 2, lvn Only: 0)
 export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=FALSE
+# Example, output file name prob. should be when running another day
 python -m utils.stages.compile_gpu_stage7 1>run_a100_host_timer_jul_1.out 2>run_a100_host_timer_jul_1.err
-# From file run_a100_host_timer_jun_30.err
-Mean: 991.2 µs, Median: 908.0 µs, (timestep: 1, istep: 1, lvn Only: 0)
-Mean: 680 µs, Median: 644.0 µs, (timestep: 2, istep: 2, lvn Only: 0)
-Mean: 688.15 µs, Median: 655.5 µs, (timestep: 7, istep: 1, lvn Only: 1)
-Mean: 644.7 µs, Median: 644.0 µs, (timestep: 9, istep: 2, lvn Only: 0)
-Mean: 693.85 µs, Median: 658.0 µs, (timestep: 43, istep: 1, lvn Only: 1)
-Mean: 640.6 µs, Median: 640.0 µs, (timestep: 93, istep: 2, lvn Only: 0)
-Mean: 657.75 µs, Median: 657.5 µs, (timestep: 463, istep: 1, lvn Only: 1)
-Mean: 655.6 µs, Median: 645.0 µs, (timestep: 519, istep: 2, lvn Only: 0)
-Mean: 644.75 µs, Median: 643.0 µs, (timestep: 1140, istep: 2, lvn Only: 0)
-Mean: 643.65 µs, Median: 643.0 µs, (timestep: 1814, istep: 2, lvn Only: 0)
-Mean: 656.45 µs, Median: 656.0 µs, (timestep: 2593, istep: 1, lvn Only: 1)
-Mean: 658.55 µs, Median: 658.5 µs, (timestep: 5701, istep: 1, lvn Only: 1)
+# From file run_a100_host_timer_jul_1.err
+Mean: 1006.15 µs, Median: 918.50 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 685.55 µs, Median: 649.00 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 694.95 µs, Median: 663.00 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 647.55 µs, Median: 647.00 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 664.00 µs, Median: 664.00 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 648.45 µs, Median: 649.00 µs, (timestep: 93, istep: 2, lvn Only: 0)
 ```
 
 ### GH200
@@ -103,21 +106,21 @@ export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=FALSE
 uenv start --view=default icon/25.2:v1@santis
+# Example, output file name prob. should be when running another day
 python -m utils.stages.compile_gpu_stage7 1>run_gh200_host_timer_jul_1.out 2>run_gh200_host_timer_jul_1.err
-
-# From file run_gh200_host_timer_jun_30.err
-Mean: 535.4 µs, Median: 459.0 µs, (timestep: 1, istep: 1, lvn Only: 0)
-Mean: 381.3 µs, Median: 349.0 µs, (timestep: 2, istep: 2, lvn Only: 0)
-Mean: 399.35 µs, Median: 362.0 µs, (timestep: 7, istep: 1, lvn Only: 1)
-Mean: 351.75 µs, Median: 351.5 µs, (timestep: 9, istep: 2, lvn Only: 0)
-Mean: 357.35 µs, Median: 356.0 µs, (timestep: 43, istep: 1, lvn Only: 1)
-Mean: 352.9 µs, Median: 351.0 µs, (timestep: 93, istep: 2, lvn Only: 0)
-Mean: 358.2 µs, Median: 355.0 µs, (timestep: 463, istep: 1, lvn Only: 1)
-Mean: 355.6 µs, Median: 353.5 µs, (timestep: 519, istep: 2, lvn Only: 0)
-Mean: 351.9 µs, Median: 351.0 µs, (timestep: 1140, istep: 2, lvn Only: 0)
-Mean: 350.6 µs, Median: 348.5 µs, (timestep: 1814, istep: 2, lvn Only: 0)
-Mean: 353.25 µs, Median: 352.0 µs, (timestep: 2593, istep: 1, lvn Only: 1)
-Mean: 357.3 µs, Median: 355.0 µs, (timestep: 5701, istep: 1, lvn Only: 1)
+# From file run_gh200_host_timer_jul_1.err
+Mean: 549.30 µs, Median: 469.50 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 385.75 µs, Median: 347.00 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 395.50 µs, Median: 359.00 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 348.30 µs, Median: 348.00 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 360.85 µs, Median: 360.50 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 352.10 µs, Median: 350.00 µs, (timestep: 93, istep: 2, lvn Only: 0)
+Mean: 356.75 µs, Median: 355.50 µs, (timestep: 463, istep: 1, lvn Only: 1)
+Mean: 353.30 µs, Median: 351.50 µs, (timestep: 519, istep: 2, lvn Only: 0)
+Mean: 350.50 µs, Median: 349.00 µs, (timestep: 1140, istep: 2, lvn Only: 0)
+Mean: 350.65 µs, Median: 349.50 µs, (timestep: 1814, istep: 2, lvn Only: 0)
+Mean: 354.15 µs, Median: 353.00 µs, (timestep: 2593, istep: 1, lvn Only: 1)
+Mean: 357.90 µs, Median: 356.50 µs, (timestep: 5701, istep: 1, lvn Only: 1)
 ```
 
 ## No-Tiling w/o Clipping
@@ -128,6 +131,10 @@ Mean: 357.3 µs, Median: 355.0 µs, (timestep: 5701, istep: 1, lvn Only: 1)
 
 # Standlone Pipeline w. CUDA Event Timers
 ## No-Tiling w. Clipping
+
+General observation: since we need to a synchronization on the threads for data to return to the CPU for the reduction, only using events do not perform better.
+The measurements here are stale.
+
 ### A100
 ```bash
 export _RELEASE=TRUE
