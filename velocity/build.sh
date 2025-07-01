@@ -1,4 +1,4 @@
 #!/bin/bash
-for STAGE in {1..7}; do
-    python -m utils.stages.compile_gpu_stage${STAGE} --optimize --compile
+for STAGE in {1..8}; do
+    python -m utils.stages.compile_gpu_stage${STAGE} --optimize --compile 1>>build.out 2>>build.err
 done
