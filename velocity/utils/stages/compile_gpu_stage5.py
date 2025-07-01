@@ -71,7 +71,7 @@ def optimization_action(sdfg):
             "maxvcfl_arr": "tmp_struct_symbol_11"
         },
         only=["maxvcfl_arr"],
-        no_dim_change=True,
+        no_dim_change=False,
         offset=-1,
         set_zero=True,
     )
