@@ -3,6 +3,9 @@ import argparse
 import dace
 from dace.transformation.passes import GPUKernelLaunchRestructure
 from dace.transformation.passes.to_gpu import ToGPU
+from dace import nodes
+from dace.sdfg.sdfg import InterstateEdge
+from dace.sdfg.state import SDFGState
 
 import utils.stages.common as common
 from utils.int64_to_int32 import int64_to_int32
@@ -11,6 +14,7 @@ from utils.reassign_vars import reassign_vars
 from utils.change_reduction_schedule import change_reduction_schedule
 from utils.tile import tile_kernels
 from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
+from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
 STAGE_ID = 7
 import os
 
@@ -49,7 +53,12 @@ def optimization_action(sdfg):
     sdfg.validate()
     change_reduction_schedule(sdfg)
     sdfg.validate()
+
+    sdfg = hacky_cfl_clipping_related_kernel_removal(sdfg)
+    sdfg.simplify()
+    sdfg.validate()
     return sdfg
+
 
 def main():
     argp = argparse.ArgumentParser()
