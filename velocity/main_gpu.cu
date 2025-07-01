@@ -96,23 +96,23 @@ std::pair<T, T> t0_t1_pair(const std::filesystem::path& ROOT,
   return {ft0.get(), ft1.get()};
 }
 
-std::ofstream open_ofstream(const std::string& name, int timestep,
+std::ofstream open_ofstream(const std::filesystem::path& ROOT, const std::string& name, int timestep,
                             const std::string& suffix) {
   const std::filesystem::path datapath(name + "_" + std::to_string(timestep) +
                                        "." + suffix);
-  acout() << "Writing to: " << datapath << std::endl;
-  return std::ofstream{datapath};
+  acout() << "Writing to: " << ROOT / datapath << std::endl;
+  return std::ofstream{ROOT / datapath};
 }
 
 template <typename T>
 std::enable_if_t<std::is_pointer_v<T>, void> got_want_pair(
-    T got, T want, const std::string& name, int timestep) {
+    T got, T want, const std::string& name, int timestep, const std::filesystem::path& ROOT) {
   std::jthread tgot([&] {
-    open_ofstream(name, timestep, "got")
+    open_ofstream(ROOT, name, timestep, "got")
         << serde::serialize_array(got) << std::endl;
   });
   std::jthread twant([&] {
-    open_ofstream(name, timestep, "want")
+    open_ofstream(ROOT, name, timestep, "want")
         << serde::serialize_array(want) << std::endl;
   });
 }
@@ -120,25 +120,25 @@ std::enable_if_t<std::is_pointer_v<T>, void> got_want_pair(
 template <typename T>
 std::enable_if_t<std::is_class_v<T> || std::is_arithmetic_v<T>, void>
 got_want_pair(const T& got, const T& want, const std::string& name,
-              int timestep) {
+              int timestep, const std::filesystem::path& ROOT) {
   std::jthread tgot([&] {
-    open_ofstream(name, timestep, "got") << serde::serialize(&got) << std::endl;
+    open_ofstream(ROOT, name, timestep, "got") << serde::serialize(&got) << std::endl;
   });
   std::jthread twant([&] {
-    open_ofstream(name, timestep, "want")
+    open_ofstream(ROOT, name, timestep, "want")
         << serde::serialize(&want) << std::endl;
   });
 }
 
 template <>
 void got_want_pair(const global_data_type& got, const global_data_type& want,
-                   const std::string& name, int timestep) {
+                   const std::string& name, int timestep, const std::filesystem::path& ROOT) {
   std::jthread tgot([&] {
-    open_ofstream(name, timestep, "got")
+    open_ofstream(ROOT, name, timestep, "got")
         << serde::serialize_global_data(&got) << std::endl;
   });
   std::jthread twant([&] {
-    open_ofstream(name, timestep, "want")
+    open_ofstream(ROOT, name, timestep, "want")
         << serde::serialize_global_data(&want) << std::endl;
   });
 }
@@ -165,6 +165,15 @@ std::string get_root_path() {
 int main(int argc, char* argv[]) {
   std::string nproma_path_str = get_root_path();
   const std::filesystem::path ROOT{nproma_path_str};
+  acerr() << "Will be reading data from: " << ROOT << std::endl;
+  const std::filesystem::path DUMP = std::filesystem::current_path() / "gotwant" / ROOT.filename();
+  std::error_code ec;
+  if (!std::filesystem::create_directories(DUMP, ec) && ec) {
+    acerr() << "Failed to create directory: " << ec.message() << std::endl;
+  }
+  acerr() << "Will be writing got and want files to: " << DUMP << std::endl;
+
+
   std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
   int n1 = -1;
   int rep = 20;
@@ -569,23 +578,23 @@ int main(int argc, char* argv[]) {
 
     pool.emplace_back([&] {
       got_want_pair<global_data_type>(global_data, global_data_want,
-                                      "global_data", n);
+                                      "global_data", n, DUMP);
     });
     pool.emplace_back(
-        [&] { got_want_pair<t_nh_diag>(p_diag, p_diag_want, "p_diag", n); });
+        [&] { got_want_pair<t_nh_diag>(p_diag, p_diag_want, "p_diag", n, DUMP); });
     pool.emplace_back([&] {
-      got_want_pair<t_nh_metrics>(p_metrics, p_metrics_want, "p_metrics", n);
+      got_want_pair<t_nh_metrics>(p_metrics, p_metrics_want, "p_metrics", n, DUMP);
     });
     pool.emplace_back(
-        [&] { got_want_pair<t_nh_prog>(p_prog, p_prog_want, "p_prog", n); });
+        [&] { got_want_pair<t_nh_prog>(p_prog, p_prog_want, "p_prog", n, DUMP); });
     pool.emplace_back([&] {
-      got_want_pair<double*>(z_kin_hor_e, z_kin_hor_e_want, "z_kin_hor_e", n);
+      got_want_pair<double*>(z_kin_hor_e, z_kin_hor_e_want, "z_kin_hor_e", n, DUMP);
     });
     pool.emplace_back(
-        [&] { got_want_pair<double*>(z_vt_ie, z_vt_ie_want, "z_vt_ie", n); });
+        [&] { got_want_pair<double*>(z_vt_ie, z_vt_ie_want, "z_vt_ie", n, DUMP); });
     pool.emplace_back([&] {
       got_want_pair<double*>(z_w_concorr_me, z_w_concorr_me_want,
-                             "z_w_concorr_me", n);
+                             "z_w_concorr_me", n, DUMP);
     });
     pool.clear();
   }

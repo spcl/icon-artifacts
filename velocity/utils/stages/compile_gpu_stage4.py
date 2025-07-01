@@ -16,9 +16,6 @@ STAGE_ID = 4
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    #TODO: Reenable once we know exact issue
-    # merge_maps_in_sdfg(sdfg)
-
     sdfg.validate()
     sdfg.simplify(skip=["StateFusion"])
     sdfg.validate()
@@ -52,14 +49,15 @@ def optimization_action(sdfg):
 
     sdfg.simplify(skip=["StateFusion"])
     # I saw trurthy ifs, propagate those conditions and try to fuse states agian
-    # Currently crashes, TODO: fix
+    # TODO: Crashes sometimes
     propagate_if_cond(sdfg, sdfg, None, None, True)
     # Prevents some transformations from being applied
-    # This is not a symbol anymore (?)
-    # TODO: check if this is necessary, if so fix
+    # This is not a symbol anymore (? - it was before why)
+    # TODO: Check if this is necessary, if so fix
     assert "tmp_call_18" in sdfg.symbols
     if "tmp_call_18" in sdfg.symbols:
         demote_symbol_to_scalar(sdfg, "tmp_call_18")
+
     sdfg.validate()
     sdfg.simplify(skip=["StateFusion"])
     sdfg.validate()

@@ -52,12 +52,16 @@ def optimization_action(sdfg):
             if sb == e.data.subset:
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35 - 1")
     sdfg.validate()
-    #rm_segmented_reduce(sdfg)
+    # TODO: Make sure this does not break numerical validation
+    # rm_segmented_reduce(sdfg)
+    # Rm segmented reduce results with trivial if conditions
+    # propagate_if_cond(sdfg, sdfg, None, None, True)
     remove_unused_inconnectors_from_nestedsdfg(sdfg)
     sdfg.simplify()
     sdfg.validate()
 
-    #setzero_to_memset(sdfg)
+    # Transformation does not detect anything, check
+    # setzero_to_memset(sdfg)
     sdfg.validate()
     for arr_name, arr in sdfg.arrays.items():
         if "maxvcfl_arr" in arr_name:

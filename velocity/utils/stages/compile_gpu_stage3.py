@@ -20,13 +20,8 @@ def optimization_action(sdfg):
     sdfg.apply_transformations_repeated(MapStateFission, {"allow_transients": True})
 
     prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
-    prune_unused_inputs_outputs_recursive(sdfg) # A posible error related to ntnd if this is called
+    prune_unused_inputs_outputs_recursive(sdfg)
     sdfg.validate()
-
-    # Problematic
-    #Problems with move if top
-    #preprocess_tough_nut(sdfg) # Leads to invalid SDFG is more than one block
-    #prune_unused_inputs_outputs(sdfg)
 
     sdfg.apply_transformations_repeated(ConditionFusion)
     prune_unused_inputs_outputs(sdfg)
@@ -56,7 +51,7 @@ def optimization_action(sdfg):
         print(f"Applied MapCollapse {k} time(s)")
 
     prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
-    prune_unused_inputs_outputs_recursive(sdfg) # A posible error related to ntnd if this is called
+    prune_unused_inputs_outputs_recursive(sdfg)
     sdfg.validate()
 
     return sdfg

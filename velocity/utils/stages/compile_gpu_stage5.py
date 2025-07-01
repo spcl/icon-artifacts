@@ -19,13 +19,6 @@ def optimization_action(sdfg):
     sdfg.validate()
     prune_unused_inputs_outputs(sdfg)
     sdfg.validate()
-    # prune_unused_inputs_outputs_recursive(sdfg) # Missing symbol ntnd error
-    #sdfg.validate()
-    # Hardcoded fixes for the GPU version
-    # pre_gpu_fix(sdfg)
-    # move_ifs_inside_maps(sdfg)
-    flatten_lib, _ = find_node_by_name(sdfg, "flatten")
-    deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
     # if nlev and nlevp1 are propagated
     # z_v_grad_w [ tmp_struct_symbol_4, 90, tmp_struct_symbol_5 ] (nproma,p_patch%nlev,p_patch%nblks_e)
@@ -34,7 +27,6 @@ def optimization_action(sdfg):
     # tmp_struct_symbol_9 == nblks_v
     # z_ekinh [ tmp_struct_symbol_10, 90, tmp_struct_symbol_11 ] (nproma,p_patch%nlev,p_patch%nblks_c)
     # tmp_struct_symbol_11 == nblks_c
-
     # if nlev and nlevp1 are not propagated
     # z_v_grad_w [ tmp_struct_symbol_7, tmp_struct_symbol_8, tmp_struct_symbol_9 ] (nproma,p_patch%nlev,p_patch%nblks_e)
     # tmp_struct_symbol_9 == nblks_e
@@ -43,13 +35,12 @@ def optimization_action(sdfg):
     # z_ekinh [ tmp_struct_symbol_16, tmp_struct_symbol_17, tmp_struct_symbol_18 ] (nproma,p_patch%nlev,p_patch%nblks_c)
     # tmp_struct_symbol_18 == nblks_c
 
-    # CAUSES DIFFERENCE IN `ddt_vn_apc_pc` AND `w_concorr_c` if no dim_change is True.
-    # TODO: BEFORE ENABLING THIS `move_transients_to_top_level`, MAKE SURE IT IS CORRECT.
+    # CAUSES DIFFERENCE IN `ddt_vn_apc_pc` AND `w_concorr_c` in certain settings
     move_transients_to_top_level(
         root=sdfg,
         ilifetime=dace.dtypes.AllocationLifetime.SDFG,
         only=["z_w_con_c", "z_w_concorr_mc", "levmask", "cfl_clipping"],
-        no_dim_change=False,
+        no_dim_change=True,
         offset=-1,
         upper_bounds={
             "z_w_concorr_mc": "tmp_struct_symbol_5",
@@ -92,10 +83,8 @@ def optimization_action(sdfg):
     sdfg.simplify()
     sdfg.validate()
 
-    # GPU read-write has unit size of 32bits, uint8_t won't help
-    #change_array_dtypes(sdfg,
-    #                    array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"},
-    #                    new_type=dace.uint8)
+    # TODO: GPU read-write has unit size of 32-bits, uint8_t won't help unless we tile
+    # change_array_dtypes(sdfg, array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"}, new_type=dace.uint8)
     sdfg.validate()
 
     ConstantPropagation().apply_pass(sdfg, {})
