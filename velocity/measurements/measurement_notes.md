@@ -73,7 +73,7 @@ In the configuration, different from `clariden_ben_dace_gpu.gh200.nvidia` config
 ### A100
 
 ```bash
-export RELEASE=TRUE
+export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=FALSE
 # From file run_a100_host_timer_jun_30.err
@@ -93,7 +93,7 @@ Mean: 658.55 µs, Median: 658.5 µs, (timestep: 5701, istep: 1, lvn Only: 1)
 
 ### GH200
 ```bash
-export RELEASE=TRUE
+export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=FALSE
 uenv start --view=default icon/25.2:v1@santis
@@ -122,7 +122,7 @@ Mean: 357.3 µs, Median: 355.0 µs, (timestep: 5701, istep: 1, lvn Only: 1)
 ## No-Tiling w. Clipping
 ### A100
 ```bash
-export RELEASE=TRUE
+export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=TRUE
 Mean: 993.33 µs, Median: 907.26 µs, (timestep: 1, istep: 1, lvn Only: 0)
@@ -139,7 +139,7 @@ Mean: 644.15 µs, Median: 643.07 µs, (timestep: 1814, istep: 2, lvn Only: 0)
 
 ## GH200
 ```bash
-export RELEASE=TRUE
+export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=TRUE
 uenv start --view=default icon/25.2:v1@santis
