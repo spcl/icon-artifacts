@@ -62,6 +62,11 @@ In the configuration, different from `clariden_ben_dace_gpu.gh200.nvidia` config
 ### A100
 
 ### GH200
+```bash
+Mean: 3869.1 µs, Median: 3869.1 µs, (istep: 1, lvn Only: 0)
+Mean: 442.4 µs, Median: 442.5 µs, (istep: 1, lvn Only: 1)
+Mean: 445.7 µs, Median: 442.5 µs, (istep: 2, lvn Only: 0)
+```
 
 # OpenACC + SDFG Integration (GB Submission)
 ### A100
@@ -76,6 +81,7 @@ In the configuration, different from `clariden_ben_dace_gpu.gh200.nvidia` config
 export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=FALSE
+python -m utils.stages.compile_gpu_stage7 1>run_a100_host_timer_jul_1.out 2>run_a100_host_timer_jul_1.err
 # From file run_a100_host_timer_jun_30.err
 Mean: 991.2 µs, Median: 908.0 µs, (timestep: 1, istep: 1, lvn Only: 0)
 Mean: 680 µs, Median: 644.0 µs, (timestep: 2, istep: 2, lvn Only: 0)
@@ -97,6 +103,8 @@ export _RELEASE=TRUE
 export _USE_NVHPC=TRUE
 export _USE_CUDA_EVENTS=FALSE
 uenv start --view=default icon/25.2:v1@santis
+python -m utils.stages.compile_gpu_stage7 1>run_gh200_host_timer_jul_1.out 2>run_gh200_host_timer_jul_1.err
+
 # From file run_gh200_host_timer_jun_30.err
 Mean: 535.4 µs, Median: 459.0 µs, (timestep: 1, istep: 1, lvn Only: 0)
 Mean: 381.3 µs, Median: 349.0 µs, (timestep: 2, istep: 2, lvn Only: 0)
