@@ -1,0 +1,158 @@
+# Optimization-Relevant Flags
+## ICON
+```bash
+# Ask Ben why -g and not -lineinfo?
+export CUDA_FLAGS="-g -O3 -arch=sm_90 -ccbin=nvc++"
+# ICON has issues with -O3 if I remember correctly
+export FCFLAGS="-g -O2 -Mrecursive -Mallocatable=03 -Mstack_arrays -acc=gpu -gpu=cc90"
+```
+
+## Standalone Pipeline
+```bash
+# BIN_FLAGS when build a binary for the standalone verificaiton pipeline
+export BIN_FLAGS="-Xcompiler=-O3 --expt-relaxed-constexpr -arch=native --use_fast_math -O3 -lineinfo --ftz=true --prec-div=false
+--prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp -std=c++20"
+
+# LIB_FLAGS when building the library
+export LIB_FLAGS="--expt-relaxed-constexpr -arch=native -O3 -Xcompiler=-O3 -lineinfo --fmad=true --prec-div=false --prec-sqrt=false
+--ftz=false -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
+```
+
+# OpenACC + ICON
+## Outline of Profiling ICON
+
+```fortran
+!Code-snippet for Fortran Velocity Tendencies Measurements
+print *, "Called istep=<ISTEP>, lvn_only=<LVN_ONLY>"
+!IF (timers_level > 5) CALL timer_stop(timer_solve_nh_veltend)
+CALL cpu_time(start_time)
+
+!Velocity Tendencies Code
+
+!IF (timers_level > 5) CALL timer_stop(timer_solve_nh_veltend)
+CALL cpu_time(end_time)
+elapsed_time = end_time - start_time
+print *, 'Elapsed time (seconds): ', elapsed_time
+```
+
+## Relevant Configuration
+
+The following parameters are set in `R02B9` which uses a grid from `R02B04` committed to the repi.
+```bash
+# Radiation Disabled
+inwp_radiation=0
+
+# Nproma set to be the same
+nproma=20480
+num_io_procs=0
+
+# In the resulting .run file:
+# For Radiation
+nproma=20480
+nproma_sub=48
+nblocks_c=1
+proc0_shift=0
+```
+
+In the configuration, different from `clariden_ben_dace_gpu.gh200.nvidia` configuration wrapper:
+```bash
+--disable-mpi
+```
+
+### A100
+
+### GH200
+
+# OpenACC + SDFG Integration (GB Submission)
+### A100
+
+### GH200
+
+# Standalone Pipeline w. Host-side Timers
+## No-Tiling w. Clipping
+### A100
+
+```bash
+export RELEASE=TRUE
+export _USE_NVHPC=TRUE
+export _USE_CUDA_EVENTS=FALSE
+# From file run_a100_host_timer_jun_30.err
+Mean: 991.2 µs, Median: 908.0 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 680 µs, Median: 644.0 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 688.15 µs, Median: 655.5 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 644.7 µs, Median: 644.0 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 693.85 µs, Median: 658.0 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 640.6 µs, Median: 640.0 µs, (timestep: 93, istep: 2, lvn Only: 0)
+Mean: 657.75 µs, Median: 657.5 µs, (timestep: 463, istep: 1, lvn Only: 1)
+Mean: 655.6 µs, Median: 645.0 µs, (timestep: 519, istep: 2, lvn Only: 0)
+Mean: 644.75 µs, Median: 643.0 µs, (timestep: 1140, istep: 2, lvn Only: 0)
+Mean: 643.65 µs, Median: 643.0 µs, (timestep: 1814, istep: 2, lvn Only: 0)
+Mean: 656.45 µs, Median: 656.0 µs, (timestep: 2593, istep: 1, lvn Only: 1)
+Mean: 658.55 µs, Median: 658.5 µs, (timestep: 5701, istep: 1, lvn Only: 1)
+```
+
+### GH200
+```bash
+export RELEASE=TRUE
+export _USE_NVHPC=TRUE
+export _USE_CUDA_EVENTS=FALSE
+uenv start --view=default icon/25.2:v1@santis
+# From file run_gh200_host_timer_jun_30.err
+Mean: 535.4 µs, Median: 459.0 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 381.3 µs, Median: 349.0 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 399.35 µs, Median: 362.0 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 351.75 µs, Median: 351.5 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 357.35 µs, Median: 356.0 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 352.9 µs, Median: 351.0 µs, (timestep: 93, istep: 2, lvn Only: 0)
+Mean: 358.2 µs, Median: 355.0 µs, (timestep: 463, istep: 1, lvn Only: 1)
+Mean: 355.6 µs, Median: 353.5 µs, (timestep: 519, istep: 2, lvn Only: 0)
+Mean: 351.9 µs, Median: 351.0 µs, (timestep: 1140, istep: 2, lvn Only: 0)
+Mean: 350.6 µs, Median: 348.5 µs, (timestep: 1814, istep: 2, lvn Only: 0)
+Mean: 353.25 µs, Median: 352.0 µs, (timestep: 2593, istep: 1, lvn Only: 1)
+Mean: 357.3 µs, Median: 355.0 µs, (timestep: 5701, istep: 1, lvn Only: 1)
+```
+
+## No-Tiling w/o Clipping
+### A100
+
+### GH200
+
+
+# Standlone Pipeline w. CUDA Event Timers
+## No-Tiling w. Clipping
+### A100
+```bash
+export RELEASE=TRUE
+export _USE_NVHPC=TRUE
+export _USE_CUDA_EVENTS=TRUE
+Mean: 993.33 µs, Median: 907.26 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 678.30 µs, Median: 643.07 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 691.66 µs, Median: 655.87 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 642.92 µs, Median: 643.07 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 656.54 µs, Median: 655.87 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 643.79 µs, Median: 642.05 µs, (timestep: 93, istep: 2, lvn Only: 0)
+Mean: 655.72 µs, Median: 655.36 µs, (timestep: 463, istep: 1, lvn Only: 1)
+Mean: 645.12 µs, Median: 644.10 µs, (timestep: 519, istep: 2, lvn Only: 0)
+Mean: 643.02 µs, Median: 642.56 µs, (timestep: 1140, istep: 2, lvn Only: 0)
+Mean: 644.15 µs, Median: 643.07 µs, (timestep: 1814, istep: 2, lvn Only: 0)
+```
+
+## GH200
+```bash
+export RELEASE=TRUE
+export _USE_NVHPC=TRUE
+export _USE_CUDA_EVENTS=TRUE
+uenv start --view=default icon/25.2:v1@santis
+Mean: 530.11 µs, Median: 450.94 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 347.07 µs, Median: 307.10 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 407.59 µs, Median: 364.80 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 354.89 µs, Median: 351.66 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 377.35 µs, Median: 370.32 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 359.06 µs, Median: 357.15 µs, (timestep: 93, istep: 2, lvn Only: 0)
+Mean: 369.44 µs, Median: 368.14 µs, (timestep: 463, istep: 1, lvn Only: 1)
+Mean: 354.23 µs, Median: 352.66 µs, (timestep: 519, istep: 2, lvn Only: 0)
+Mean: 356.74 µs, Median: 355.31 µs, (timestep: 1140, istep: 2, lvn Only: 0)
+Mean: 355.88 µs, Median: 354.34 µs, (timestep: 1814, istep: 2, lvn Only: 0)
+Mean: 366.32 µs, Median: 365.52 µs, (timestep: 2593, istep: 1, lvn Only: 1)
+Mean: 368.16 µs, Median: 366.77 µs, (timestep: 5701, istep: 1, lvn Only: 1)
+```
