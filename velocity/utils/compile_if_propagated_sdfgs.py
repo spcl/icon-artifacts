@@ -131,7 +131,10 @@ def add_timers(file_path: str, gpu: bool, stage:int):
         code = f.read()
 
     # Pattern 1: Insert BEFORE `nrdmax_jg = __CG_global_data__m_nrdmax[0];`
-    pattern1 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
+    if stage < 7:
+        pattern1 = r'^\s*nrdmax_jg\s*=\s*__CG_global_data__m_nrdmax\[0\];\s*$'
+    else:
+        pattern1 = r'^\s*nflatlev_jg\s*=\s*__CG_global_data__m_nflatlev\[0\];\s*$'
     if gpu is False:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
