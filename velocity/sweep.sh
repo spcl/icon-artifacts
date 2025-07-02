@@ -25,14 +25,14 @@ for x_c in $X_COARSENINGS; do
           export Y_BLOCK_SIZE=$y_bs
 
           # Compile and optimize kernel
-          python -m utils.stages.compile_gpu_stage7 --optimize --compile
+          python -m utils.stages.compile_gpu_stage8 --optimize --compile
           if [ $? -ne 0 ]; then
             echo "❌ Compilation failed for this config"
             continue
           fi
 
           # Run the velocity executable
-          ./velocity_gpu.stage7 7
+          ./velocity_gpu.stage8 7
           if [ $? -ne 0 ]; then
             echo "❌ Execution failed for this config"
           fi

@@ -24,13 +24,13 @@ for _RELEASE in "${RELEASE_MODES[@]}"; do
     echo "===> Log file: $LOG_FILE"
     echo "===> Error file: $ERR_FILE"
 
-    for STAGE in {1..6}; do
+    for STAGE in {1..7}; do
       python -m utils.stages.compile_gpu_stage${STAGE} --optimize --no-compile
     done
 
-    python -m utils.stages.compile_gpu_stage7 --optimize --compile
+    python -m utils.stages.compile_gpu_stage8 --optimize --compile
 
-    ./velocity_gpu.stage7 2>"$ERR_FILE" 1>"$LOG_FILE"
+    ./velocity_gpu.stage8 2>"$ERR_FILE" 1>"$LOG_FILE"
     python utils/compare_got_and_want.py 2>"$ERR_DIFF_FILE" 1>"$LOG_DIFF_FILE"
 
     rm -rf *.got *.want
