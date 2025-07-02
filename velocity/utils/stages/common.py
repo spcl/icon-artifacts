@@ -66,7 +66,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
   dace.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
   if lib:
-    assert stage == 8
+    assert stage == 9
     compile_if_propagated_sdfgs(
         sdfgs, gpu=True,
         release=release,

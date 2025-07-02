@@ -1,33 +1,50 @@
-import dace
 import argparse
-import utils.stages.common as common
-from utils.change_flatten_lib_to_shallow_copy import change_flatten_lib_to_shallow_copy
-from utils.input_to_gpu import input_to_gpu
-from utils.add_set_zero import add_set_zero
-STAGE_ID = 8
 
-_allocation_names_to_comment_out = set()
+import dace
+from dace.transformation.passes import GPUKernelLaunchRestructure
+from dace.transformation.passes.to_gpu import ToGPU
+from dace import nodes
+from dace.sdfg.sdfg import InterstateEdge
+from dace.sdfg.state import SDFGState
+
+import utils.stages.common as common
+from utils.int64_to_int32 import int64_to_int32
+from utils.pre_gpu_fixes import make_arrays_persistent
+from utils.reassign_vars import reassign_vars
+from utils.change_reduction_schedule import change_reduction_schedule
+from utils.tile import tile_kernels
+from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
+from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
+STAGE_ID = 8
+import os
 
 def optimization_action(sdfg):
-    global _allocation_names_to_comment_out
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    # Prepares SDFG to be built as a GPU library
-    # Move to shallow COPY variant (remove copy in copy out nodes)
-    # A good way to remove it from being simplified away
-    shallow_copy_used_structs = ["p_prog", "p_int", "p_metrics", "p_patch", "p_diag"]
-    deflatten_used_structs = ["p_diag"]
-    _allocation_names_to_comment_out =  change_flatten_lib_to_shallow_copy(sdfg, shallow_copy_used_structs, deflatten_used_structs)
-    sdfg.validate()
-    add_set_zero(sdfg, "gpu_maxvcfl_arr")
-    sdfg.validate()
-    input_to_gpu(sdfg, "z_w_concorr_me")
-    input_to_gpu(sdfg, "z_kin_hor_e")
-    input_to_gpu(sdfg, "z_vt_ie")
+    # Assigning a warp to the column is not a very good idea
+    # reshape_kernels(sdfg, True)
+    # Must be individualized for each kernel
+    x_coarsening = int(os.environ.get("X_COARSENING", 1))
+    y_coarsening = int(os.environ.get("Y_COARSENING", 1))
+    x_block_size = int(os.environ.get("X_BLOCK_SIZE", 256))
+    y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 1))
+    y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 1))
+    #reshape_kernels(sdfg)
+    #reshape_kernels_w_coarsening(sdfg,
+    #                             x_coarsening=x_coarsening,
+    #                             y_coarsening=y_coarsening,
+    #                             x_block_size=x_block_size,
+    #                             y_block_size=y_block_size,
+    #                             unroll_x=True,
+    #                             unroll_x_factor=None,
+    #                             unroll_y=True,
+    #                             unroll_y_factor=y_unroll_factor,)
+    #tile_kernels(sdfg)
+    sdfg.simplify()
     sdfg.validate()
     return sdfg
 
+
 def main():
-    global _allocation_names_to_comment_out
     argp = argparse.ArgumentParser()
     argp.add_argument('--optimize', action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument('--compile', action=argparse.BooleanOptionalAction, default=False)
@@ -56,8 +73,7 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        assert _allocation_names_to_comment_out is not None and _allocation_names_to_comment_out != set()
-        common.compile_action(STAGE_ID, sdfgs, True, _allocation_names_to_comment_out, True)
+        common.compile_action(STAGE_ID, sdfgs, False, None, False)
 
 if __name__ == "__main__":
     main()

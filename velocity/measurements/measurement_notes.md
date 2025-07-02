@@ -69,7 +69,12 @@ In the configuration, different from `clariden_ben_dace_gpu.gh200.nvidia` config
 
 ### A100
 
+TODO
+
 ### GH200
+
+Note: `istep=1, lvn_only=0` is called only once, and involves first-touch data allocation too.
+
 ```bash
 Mean: 3869.1 µs, Median: 3869.1 µs, (istep: 1, lvn Only: 0)
 Mean: 442.4 µs, Median: 442.5 µs, (istep: 1, lvn Only: 1)
@@ -79,7 +84,11 @@ Mean: 445.7 µs, Median: 442.5 µs, (istep: 2, lvn Only: 0)
 # OpenACC + SDFG Integration (GB Submission)
 ### A100
 
+TODO
+
 ### GH200
+
+TODO
 
 # Standalone Pipeline w. Host-side Timers
 ## No-Tiling w. Clipping
@@ -126,8 +135,11 @@ Mean: 357.90 µs, Median: 356.50 µs, (timestep: 5701, istep: 1, lvn Only: 1)
 ## No-Tiling w/o Clipping
 ### A100
 
+TODO
+
 ### GH200
 
+TODO
 
 # Standlone Pipeline w. CUDA Event Timers
 ## No-Tiling w. Clipping

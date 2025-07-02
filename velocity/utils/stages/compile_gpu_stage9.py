@@ -1,33 +1,33 @@
-import argparse
 import dace
+import argparse
 import utils.stages.common as common
-from utils.int64_to_int32 import int64_to_int32
-from utils.pre_gpu_fixes import make_arrays_persistent
-from utils.reassign_vars import reassign_vars
-from utils.change_reduction_schedule import change_reduction_schedule
-from utils.tile import prune_unused_inputs_outputs
-from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
-from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
-STAGE_ID = 7
+from utils.change_flatten_lib_to_shallow_copy import change_flatten_lib_to_shallow_copy
+from utils.input_to_gpu import input_to_gpu
+from utils.add_set_zero import add_set_zero
+STAGE_ID = 9
+
+_allocation_names_to_comment_out = set()
 
 def optimization_action(sdfg):
+    global _allocation_names_to_comment_out
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    make_arrays_persistent(sdfg)
-    int64_to_int32(sdfg)
-    reassign_vars(sdfg)
-    sdfg.simplify()
-    prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
+    # Prepares SDFG to be built as a GPU library
+    # Move to shallow COPY variant (remove copy in copy out nodes)
+    # A good way to remove it from being simplified away
+    shallow_copy_used_structs = ["p_prog", "p_int", "p_metrics", "p_patch", "p_diag"]
+    deflatten_used_structs = ["p_diag"]
+    _allocation_names_to_comment_out =  change_flatten_lib_to_shallow_copy(sdfg, shallow_copy_used_structs, deflatten_used_structs)
     sdfg.validate()
-    change_reduction_schedule(sdfg)
+    add_set_zero(sdfg, "gpu_maxvcfl_arr")
     sdfg.validate()
-    sdfg = hacky_cfl_clipping_related_kernel_removal(sdfg)
-    sdfg.simplify()
+    input_to_gpu(sdfg, "z_w_concorr_me")
+    input_to_gpu(sdfg, "z_kin_hor_e")
+    input_to_gpu(sdfg, "z_vt_ie")
     sdfg.validate()
-    prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
-    remove_unused_inconnectors_from_nestedsdfg(sdfg)
     return sdfg
 
 def main():
+    global _allocation_names_to_comment_out
     argp = argparse.ArgumentParser()
     argp.add_argument('--optimize', action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument('--compile', action=argparse.BooleanOptionalAction, default=False)
@@ -56,7 +56,8 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        common.compile_action(STAGE_ID, sdfgs, False, None, False)
+        assert _allocation_names_to_comment_out is not None and _allocation_names_to_comment_out != set()
+        common.compile_action(STAGE_ID, sdfgs, True, _allocation_names_to_comment_out, True)
 
 if __name__ == "__main__":
     main()

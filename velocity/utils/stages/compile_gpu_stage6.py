@@ -1,9 +1,7 @@
 import argparse
-
 import dace
 from dace.transformation.passes import GPUKernelLaunchRestructure
 from dace.transformation.passes.to_gpu import ToGPU
-
 import utils.config as config
 import utils.stages.common as common
 from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
@@ -14,10 +12,7 @@ from utils.pre_gpu_fixes import pre_gpu_fix
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 from utils.segmented_reduction import to_segmented_reduction
-from utils.change_array_dtypes import setzero_to_memset
-
 STAGE_ID = 6
-from utils.rm_segmented_reduce import rm_segmented_reduce
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """

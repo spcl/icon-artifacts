@@ -135,13 +135,13 @@ def add_timers(file_path: str, gpu: bool, stage:int):
     if gpu is False:
         replacement1 = ' measure_time("Run"); \n\\g<0>'
     else:
-        if stage > 5 and stage < 8:
+        if stage > 5 and stage < 9:
             if use_cuda_events:
                 # Stage 6 adds it before cudaStreamSynchronize
                 replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      cudaEvent_t start1, stop1;\n    cudaEventCreate(&start1);\n    cudaEventCreate(&stop1);\n    cudaEventRecord(start1); \n //measure_time("Run");\n \\g<0>'
             else:
                 replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
-        elif stage == 8:
+        elif stage == 9:
             # Stage 8 adds it after open acc stream
             replacement1 = '\\g<0>'
         else:
@@ -532,10 +532,10 @@ def compile_if_propagated_sdfgs(
             #assert allocation_names_to_comment_out is not None, "Allocation names to comment out must be provided for GPU code generation"
             #assert use_openacc_stream is True
             if allocation_names_to_comment_out is not None:
-                assert stage == 8, "Allocation names to comment out are only supported in stage 8"
+                assert stage == 9, "Allocation names to comment out are only supported in stage 9"
                 comment_out_allocs_and_frees(f"{build_loc}/src/cpu/{sdfg_name}.cu", allocation_names_to_comment_out)
             if use_openacc_stream:
-                assert stage == 8, "OpenACC stream is only supported in stage 8"
+                assert stage == 9, "OpenACC stream is only supported in stage 9"
                 assert gpu is True, "OpenACC stream is only supported for GPU code"
                 change_to_openacc_stream(
                     f"{build_loc}/src/cpu/{sdfg_name}.cu",
