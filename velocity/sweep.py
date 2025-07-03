@@ -56,7 +56,10 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
 
     try:
         with open("tile.log", "a") as logf:
+            print(f"=== Running for {label} ===", file=logf)
+            logf.flush()
             subprocess.run(["./velocity_gpu.stage8", "7"], stdout=logf, check=True, env=env)
+            logf.flush()
     except subprocess.CalledProcessError:
         print("❌ Execution failed for this config")
 
