@@ -54,8 +54,12 @@ def main():
 
     file_path = sys.argv[1]
     results = parse_timer_log_by_step(file_path)
+    medians = [stats['median'] for stats in results if not (stats['istep'] == 1 and stats['lvn_only'] == 0)]
+    avg_median = sum(medians) / len(medians)
     for stats in results:
         print(f"Mean: {stats['mean']:.2f} µs, Median: {stats['median']:.2f} µs, (timestep: {stats['step']}, istep: {stats['istep']}, lvn Only: {stats['lvn_only']})")
+    print(f"Average of medians: {avg_median:.2f} µs (timestep 1 skipped)")
+
 
 # Uncomment to test directly within script-enabled environments
 if __name__ == "__main__":

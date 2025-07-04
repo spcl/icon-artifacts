@@ -1,0 +1,837 @@
+Running: -1
+Reading from: "data_nproma20480/global_data.t0.1.data"
+Reading from: "data_nproma20480/global_data.t1.1.data"
+Reading from: "data_nproma20480/p_patch.1.data"
+Reading from: "data_nproma20480/p_int.1.data"
+Reading from: "data_nproma20480/istep.1.data"
+Reading from: "data_nproma20480/ldeepatmo.1.data"
+Reading from: "data_nproma20480/p_diag.t0.1.data"
+Reading from: "data_nproma20480/lvn_only.1.data"
+Reading from: "data_nproma20480/p_metrics.t0.1.data"
+Reading from: "data_nproma20480/p_metrics.t1.1.data"
+Reading from: "data_nproma20480/ntnd.1.data"
+Reading from: "data_nproma20480/dtime.1.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.1.data"
+Reading from: "data_nproma20480/p_diag.t1.1.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.1.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.1.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.1.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.1.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.1.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.1.data"
+Reading from: "data_nproma20480/p_prog.t1.1.data"
+Reading from: "data_nproma20480/p_prog.t0.1.data"
+Step 1 variables, extra_diffu: 1, istep: 1, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 2363 us
+Iteration: 1
+Timer Host Based C++ Timer took 828 us
+Iteration: 2
+Timer Host Based C++ Timer took 822 us
+Iteration: 3
+Timer Host Based C++ Timer took 824 us
+Iteration: 4
+Timer Host Based C++ Timer took 824 us
+Iteration: 5
+Timer Host Based C++ Timer took 824 us
+Iteration: 6
+Timer Host Based C++ Timer took 824 us
+Iteration: 7
+Timer Host Based C++ Timer took 824 us
+Iteration: 8
+Timer Host Based C++ Timer took 827 us
+Iteration: 9
+Timer Host Based C++ Timer took 821 us
+Iteration: 10
+Timer Host Based C++ Timer took 821 us
+Iteration: 11
+Timer Host Based C++ Timer took 824 us
+Iteration: 12
+Timer Host Based C++ Timer took 824 us
+Iteration: 13
+Timer Host Based C++ Timer took 824 us
+Iteration: 14
+Timer Host Based C++ Timer took 821 us
+Iteration: 15
+Timer Host Based C++ Timer took 818 us
+Iteration: 16
+Timer Host Based C++ Timer took 823 us
+Iteration: 17
+Timer Host Based C++ Timer took 817 us
+Iteration: 18
+Timer Host Based C++ Timer took 820 us
+Iteration: 19
+Timer Host Based C++ Timer took 826 us
+Step 1 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_1.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_1.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_1.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_1.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_1.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_1.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_1.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_1.got"
+Reading from: "data_nproma20480/global_data.t1.2.data"
+Reading from: "data_nproma20480/global_data.t0.2.data"
+Reading from: "data_nproma20480/p_prog.t1.2.data"
+Reading from: "data_nproma20480/p_prog.t0.2.data"
+Reading from: "data_nproma20480/istep.2.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.2.data"
+Reading from: "data_nproma20480/ldeepatmo.2.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.2.data"
+Reading from: "data_nproma20480/lvn_only.2.data"
+Reading from: "data_nproma20480/ntnd.2.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.2.data"
+Reading from: "data_nproma20480/dtime.2.data"
+Reading from: "data_nproma20480/p_patch.2.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.2.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.2.data"
+Reading from: "data_nproma20480/p_int.2.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.2.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.2.data"
+Reading from: "data_nproma20480/p_metrics.t0.2.data"
+Reading from: "data_nproma20480/p_metrics.t1.2.data"
+Reading from: "data_nproma20480/p_diag.t0.2.data"
+Reading from: "data_nproma20480/p_diag.t1.2.data"
+Step 2 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 1137 us
+Iteration: 1
+Timer Host Based C++ Timer took 554 us
+Iteration: 2
+Timer Host Based C++ Timer took 558 us
+Iteration: 3
+Timer Host Based C++ Timer took 554 us
+Iteration: 4
+Timer Host Based C++ Timer took 556 us
+Iteration: 5
+Timer Host Based C++ Timer took 555 us
+Iteration: 6
+Timer Host Based C++ Timer took 553 us
+Iteration: 7
+Timer Host Based C++ Timer took 549 us
+Iteration: 8
+Timer Host Based C++ Timer took 557 us
+Iteration: 9
+Timer Host Based C++ Timer took 550 us
+Iteration: 10
+Timer Host Based C++ Timer took 552 us
+Iteration: 11
+Timer Host Based C++ Timer took 553 us
+Iteration: 12
+Timer Host Based C++ Timer took 556 us
+Iteration: 13
+Timer Host Based C++ Timer took 554 us
+Iteration: 14
+Timer Host Based C++ Timer took 557 us
+Iteration: 15
+Timer Host Based C++ Timer took 554 us
+Iteration: 16
+Timer Host Based C++ Timer took 550 us
+Iteration: 17
+Timer Host Based C++ Timer took 550 us
+Iteration: 18
+Timer Host Based C++ Timer took 554 us
+Iteration: 19
+Timer Host Based C++ Timer took 557 us
+Step 2 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_2.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_2.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_2.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_2.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_2.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_2.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_2.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_2.want"
+Reading from: "data_nproma20480/global_data.t1.7.data"
+Reading from: "data_nproma20480/global_data.t0.7.data"
+Reading from: "data_nproma20480/p_patch.7.data"
+Reading from: "data_nproma20480/istep.7.data"
+Reading from: "data_nproma20480/ldeepatmo.7.data"
+Reading from: "data_nproma20480/ntnd.7.data"
+Reading from: "data_nproma20480/lvn_only.7.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.7.data"
+Reading from: "data_nproma20480/dtime.7.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.7.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.7.data"
+Reading from: "data_nproma20480/p_metrics.t0.7.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.7.data"
+Reading from: "data_nproma20480/p_metrics.t1.7.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.7.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.7.data"
+Reading from: "data_nproma20480/p_prog.t0.7.data"
+Reading from: "data_nproma20480/p_prog.t1.7.data"
+Reading from: "data_nproma20480/p_int.7.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.7.data"
+Reading from: "data_nproma20480/p_diag.t1.7.data"
+Reading from: "data_nproma20480/p_diag.t0.7.data"
+Step 7 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+Timer Host Based C++ Timer took 1136 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 574 us
+Timer Host Based C++ Timer took 574 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 573 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 584 us
+Timer Host Based C++ Timer took 584 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 575 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 575 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 573 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 577 us
+Step 7 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_7.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_7.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_7.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_7.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_7.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_7.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_7.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_7.want"
+Reading from: "data_nproma20480/global_data.t0.9.data"
+Reading from: "data_nproma20480/global_data.t1.9.data"
+Reading from: "data_nproma20480/p_prog.t1.9.data"
+Reading from: "data_nproma20480/p_prog.t0.9.data"
+Reading from: "data_nproma20480/istep.9.data"
+Reading from: "data_nproma20480/ldeepatmo.9.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.9.data"
+Reading from: "data_nproma20480/lvn_only.9.data"
+Reading from: "data_nproma20480/ntnd.9.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.9.data"
+Reading from: "data_nproma20480/p_patch.9.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.9.data"
+Reading from: "data_nproma20480/p_int.9.data"
+Reading from: "data_nproma20480/dtime.9.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.9.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.9.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.9.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.9.data"
+Reading from: "data_nproma20480/p_metrics.t0.9.data"
+Reading from: "data_nproma20480/p_metrics.t1.9.data"
+Reading from: "data_nproma20480/p_diag.t0.9.data"
+Reading from: "data_nproma20480/p_diag.t1.9.data"
+Step 9 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 556 us
+Iteration: 1
+Timer Host Based C++ Timer took 552 us
+Iteration: 2
+Timer Host Based C++ Timer took 556 us
+Iteration: 3
+Timer Host Based C++ Timer took 550 us
+Iteration: 4
+Timer Host Based C++ Timer took 556 us
+Iteration: 5
+Timer Host Based C++ Timer took 559 us
+Iteration: 6
+Timer Host Based C++ Timer took 554 us
+Iteration: 7
+Timer Host Based C++ Timer took 557 us
+Iteration: 8
+Timer Host Based C++ Timer took 553 us
+Iteration: 9
+Timer Host Based C++ Timer took 554 us
+Iteration: 10
+Timer Host Based C++ Timer took 553 us
+Iteration: 11
+Timer Host Based C++ Timer took 555 us
+Iteration: 12
+Timer Host Based C++ Timer took 560 us
+Iteration: 13
+Timer Host Based C++ Timer took 550 us
+Iteration: 14
+Timer Host Based C++ Timer took 556 us
+Iteration: 15
+Timer Host Based C++ Timer took 552 us
+Iteration: 16
+Timer Host Based C++ Timer took 555 us
+Iteration: 17
+Timer Host Based C++ Timer took 554 us
+Iteration: 18
+Timer Host Based C++ Timer took 554 us
+Iteration: 19
+Timer Host Based C++ Timer took 557 us
+Step 9 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_9.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_9.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_9.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_9.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_9.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_9.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_9.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_9.want"
+Reading from: "data_nproma20480/global_data.t0.43.data"
+Reading from: "data_nproma20480/global_data.t1.43.data"
+Reading from: "data_nproma20480/p_patch.43.data"
+Reading from: "data_nproma20480/istep.43.data"
+Reading from: "data_nproma20480/lvn_only.43.data"
+Reading from: "data_nproma20480/ldeepatmo.43.data"
+Reading from: "data_nproma20480/ntnd.43.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.43.data"
+Reading from: "data_nproma20480/dtime.43.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.43.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.43.data"
+Reading from: "data_nproma20480/p_prog.t0.43.data"
+Reading from: "data_nproma20480/p_prog.t1.43.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.43.data"
+Reading from: "data_nproma20480/p_int.43.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.43.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.43.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.43.data"
+Reading from: "data_nproma20480/p_diag.t1.43.data"
+Reading from: "data_nproma20480/p_metrics.t0.43.data"
+Reading from: "data_nproma20480/p_metrics.t1.43.data"
+Reading from: "data_nproma20480/p_diag.t0.43.data"
+Step 43 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+Timer Host Based C++ Timer took 582 us
+Timer Host Based C++ Timer took 582 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 573 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 577 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 574 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 579 us
+Step 43 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_43.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_43.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_43.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_43.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_43.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_43.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_43.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_43.want"
+Reading from: "data_nproma20480/global_data.t0.93.data"
+Reading from: "data_nproma20480/global_data.t1.93.data"
+Reading from: "data_nproma20480/p_prog.t0.93.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.93.data"
+Reading from: "data_nproma20480/ntnd.93.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.93.data"
+Reading from: "data_nproma20480/dtime.93.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.93.data"
+Reading from: "data_nproma20480/ldeepatmo.93.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.93.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.93.data"
+Reading from: "data_nproma20480/lvn_only.93.data"
+Reading from: "data_nproma20480/istep.93.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.93.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.93.data"
+Reading from: "data_nproma20480/p_patch.93.data"
+Reading from: "data_nproma20480/p_metrics.t0.93.data"
+Reading from: "data_nproma20480/p_int.93.data"
+Reading from: "data_nproma20480/p_prog.t1.93.data"
+Reading from: "data_nproma20480/p_metrics.t1.93.data"
+Reading from: "data_nproma20480/p_diag.t0.93.data"
+Reading from: "data_nproma20480/p_diag.t1.93.data"
+Step 93 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 556 us
+Iteration: 1
+Timer Host Based C++ Timer took 552 us
+Iteration: 2
+Timer Host Based C++ Timer took 552 us
+Iteration: 3
+Timer Host Based C++ Timer took 552 us
+Iteration: 4
+Timer Host Based C++ Timer took 553 us
+Iteration: 5
+Timer Host Based C++ Timer took 558 us
+Iteration: 6
+Timer Host Based C++ Timer took 550 us
+Iteration: 7
+Timer Host Based C++ Timer took 550 us
+Iteration: 8
+Timer Host Based C++ Timer took 557 us
+Iteration: 9
+Timer Host Based C++ Timer took 555 us
+Iteration: 10
+Timer Host Based C++ Timer took 556 us
+Iteration: 11
+Timer Host Based C++ Timer took 547 us
+Iteration: 12
+Timer Host Based C++ Timer took 557 us
+Iteration: 13
+Timer Host Based C++ Timer took 549 us
+Iteration: 14
+Timer Host Based C++ Timer took 554 us
+Iteration: 15
+Timer Host Based C++ Timer took 553 us
+Iteration: 16
+Timer Host Based C++ Timer took 553 us
+Iteration: 17
+Timer Host Based C++ Timer took 557 us
+Iteration: 18
+Timer Host Based C++ Timer took 553 us
+Iteration: 19
+Timer Host Based C++ Timer took 552 us
+Step 93 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_93.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_93.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_93.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_93.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_93.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_93.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_93.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_93.want"
+Reading from: "data_nproma20480/p_patch.463.data"
+Reading from: "data_nproma20480/global_data.t1.463.data"
+Reading from: "data_nproma20480/global_data.t0.463.data"
+Reading from: "data_nproma20480/ntnd.463.data"
+Reading from: "data_nproma20480/ldeepatmo.463.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.463.data"
+Reading from: "data_nproma20480/dtime.463.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.463.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.463.data"
+Reading from: "data_nproma20480/lvn_only.463.data"
+Reading from: "data_nproma20480/istep.463.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.463.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.463.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.463.data"
+Reading from: "data_nproma20480/p_metrics.t0.463.data"
+Reading from: "data_nproma20480/p_metrics.t1.463.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.463.data"
+Reading from: "data_nproma20480/p_int.463.data"
+Reading from: "data_nproma20480/p_prog.t1.463.data"
+Reading from: "data_nproma20480/p_diag.t0.463.data"
+Reading from: "data_nproma20480/p_prog.t0.463.data"
+Reading from: "data_nproma20480/p_diag.t1.463.data"
+Step 463 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 575 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 575 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 577 us
+Timer Host Based C++ Timer took 582 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 579 us
+Step 463 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_463.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_463.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_463.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_463.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_463.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_463.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_463.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_463.got"
+Reading from: "data_nproma20480/global_data.t1.519.data"
+Reading from: "data_nproma20480/global_data.t0.519.data"
+Reading from: "data_nproma20480/p_prog.t1.519.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.519.data"
+Reading from: "data_nproma20480/p_prog.t0.519.data"
+Reading from: "data_nproma20480/istep.519.data"
+Reading from: "data_nproma20480/ldeepatmo.519.data"
+Reading from: "data_nproma20480/ntnd.519.data"
+Reading from: "data_nproma20480/p_patch.519.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.519.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.519.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.519.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.519.data"
+Reading from: "data_nproma20480/lvn_only.519.data"
+Reading from: "data_nproma20480/dtime.519.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.519.data"
+Reading from: "data_nproma20480/p_metrics.t0.519.data"
+Reading from: "data_nproma20480/p_metrics.t1.519.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.519.data"
+Reading from: "data_nproma20480/p_int.519.data"
+Reading from: "data_nproma20480/p_diag.t1.519.data"
+Reading from: "data_nproma20480/p_diag.t0.519.data"
+Step 519 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 966 us
+Iteration: 1
+Timer Host Based C++ Timer took 555 us
+Iteration: 2
+Timer Host Based C++ Timer took 552 us
+Iteration: 3
+Timer Host Based C++ Timer took 556 us
+Iteration: 4
+Timer Host Based C++ Timer took 558 us
+Iteration: 5
+Timer Host Based C++ Timer took 552 us
+Iteration: 6
+Timer Host Based C++ Timer took 558 us
+Iteration: 7
+Timer Host Based C++ Timer took 551 us
+Iteration: 8
+Timer Host Based C++ Timer took 558 us
+Iteration: 9
+Timer Host Based C++ Timer took 556 us
+Iteration: 10
+Timer Host Based C++ Timer took 557 us
+Iteration: 11
+Timer Host Based C++ Timer took 553 us
+Iteration: 12
+Timer Host Based C++ Timer took 558 us
+Iteration: 13
+Timer Host Based C++ Timer took 556 us
+Iteration: 14
+Timer Host Based C++ Timer took 557 us
+Iteration: 15
+Timer Host Based C++ Timer took 556 us
+Iteration: 16
+Timer Host Based C++ Timer took 557 us
+Iteration: 17
+Timer Host Based C++ Timer took 550 us
+Iteration: 18
+Timer Host Based C++ Timer took 554 us
+Iteration: 19
+Timer Host Based C++ Timer took 559 us
+Step 519 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_519.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_519.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_519.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_519.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_519.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_519.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_519.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_519.want"
+Reading from: "data_nproma20480/p_patch.1140.data"
+Reading from: "data_nproma20480/global_data.t1.1140.data"
+Reading from: "data_nproma20480/global_data.t0.1140.data"
+Reading from: "data_nproma20480/istep.1140.data"
+Reading from: "data_nproma20480/ntnd.1140.data"
+Reading from: "data_nproma20480/ldeepatmo.1140.data"
+Reading from: "data_nproma20480/p_prog.t0.1140.data"
+Reading from: "data_nproma20480/lvn_only.1140.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.1140.data"
+Reading from: "data_nproma20480/dtime.1140.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.1140.data"
+Reading from: "data_nproma20480/p_prog.t1.1140.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.1140.data"
+Reading from: "data_nproma20480/p_int.1140.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.1140.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.1140.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.1140.data"
+Reading from: "data_nproma20480/p_metrics.t1.1140.data"
+Reading from: "data_nproma20480/p_metrics.t0.1140.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.1140.data"
+Reading from: "data_nproma20480/p_diag.t1.1140.data"
+Reading from: "data_nproma20480/p_diag.t0.1140.data"
+Step 1140 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 557 us
+Iteration: 1
+Timer Host Based C++ Timer took 555 us
+Iteration: 2
+Timer Host Based C++ Timer took 547 us
+Iteration: 3
+Timer Host Based C++ Timer took 552 us
+Iteration: 4
+Timer Host Based C++ Timer took 551 us
+Iteration: 5
+Timer Host Based C++ Timer took 557 us
+Iteration: 6
+Timer Host Based C++ Timer took 559 us
+Iteration: 7
+Timer Host Based C++ Timer took 553 us
+Iteration: 8
+Timer Host Based C++ Timer took 556 us
+Iteration: 9
+Timer Host Based C++ Timer took 555 us
+Iteration: 10
+Timer Host Based C++ Timer took 559 us
+Iteration: 11
+Timer Host Based C++ Timer took 555 us
+Iteration: 12
+Timer Host Based C++ Timer took 557 us
+Iteration: 13
+Timer Host Based C++ Timer took 554 us
+Iteration: 14
+Timer Host Based C++ Timer took 552 us
+Iteration: 15
+Timer Host Based C++ Timer took 548 us
+Iteration: 16
+Timer Host Based C++ Timer took 556 us
+Iteration: 17
+Timer Host Based C++ Timer took 552 us
+Iteration: 18
+Timer Host Based C++ Timer took 550 us
+Iteration: 19
+Timer Host Based C++ Timer took 552 us
+Step 1140 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_1140.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_1140.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_1140.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_1140.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_1140.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_1140.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_1140.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_1140.want"
+Reading from: "data_nproma20480/global_data.t1.1814.data"
+Reading from: "data_nproma20480/global_data.t0.1814.data"
+Reading from: "data_nproma20480/p_patch.1814.data"
+Reading from: "data_nproma20480/ntnd.1814.data"
+Reading from: "data_nproma20480/lvn_only.1814.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.1814.data"
+Reading from: "data_nproma20480/p_prog.t0.1814.data"
+Reading from: "data_nproma20480/dtime.1814.data"
+Reading from: "data_nproma20480/istep.1814.data"
+Reading from: "data_nproma20480/ldeepatmo.1814.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.1814.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.1814.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.1814.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.1814.data"
+Reading from: "data_nproma20480/p_prog.t1.1814.data"
+Reading from: "data_nproma20480/p_metrics.t1.1814.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.1814.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.1814.data"
+Reading from: "data_nproma20480/p_metrics.t0.1814.data"
+Reading from: "data_nproma20480/p_int.1814.data"
+Reading from: "data_nproma20480/p_diag.t0.1814.data"
+Reading from: "data_nproma20480/p_diag.t1.1814.data"
+Step 1814 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 557 us
+Iteration: 1
+Timer Host Based C++ Timer took 556 us
+Iteration: 2
+Timer Host Based C++ Timer took 551 us
+Iteration: 3
+Timer Host Based C++ Timer took 556 us
+Iteration: 4
+Timer Host Based C++ Timer took 556 us
+Iteration: 5
+Timer Host Based C++ Timer took 558 us
+Iteration: 6
+Timer Host Based C++ Timer took 559 us
+Iteration: 7
+Timer Host Based C++ Timer took 556 us
+Iteration: 8
+Timer Host Based C++ Timer took 554 us
+Iteration: 9
+Timer Host Based C++ Timer took 556 us
+Iteration: 10
+Timer Host Based C++ Timer took 558 us
+Iteration: 11
+Timer Host Based C++ Timer took 551 us
+Iteration: 12
+Timer Host Based C++ Timer took 554 us
+Iteration: 13
+Timer Host Based C++ Timer took 551 us
+Iteration: 14
+Timer Host Based C++ Timer took 557 us
+Iteration: 15
+Timer Host Based C++ Timer took 555 us
+Iteration: 16
+Timer Host Based C++ Timer took 551 us
+Iteration: 17
+Timer Host Based C++ Timer took 557 us
+Iteration: 18
+Timer Host Based C++ Timer took 552 us
+Iteration: 19
+Timer Host Based C++ Timer took 552 us
+Step 1814 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_1814.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_1814.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_1814.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_1814.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_1814.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_1814.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_1814.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_1814.want"
+Reading from: "data_nproma20480/global_data.t0.2593.data"
+Reading from: "data_nproma20480/p_int.2593.data"
+Reading from: "data_nproma20480/p_metrics.t0.2593.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.2593.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.2593.data"
+Reading from: "data_nproma20480/ldeepatmo.2593.data"
+Reading from: "data_nproma20480/p_patch.2593.data"
+Reading from: "data_nproma20480/p_prog.t0.2593.data"
+Reading from: "data_nproma20480/lvn_only.2593.data"
+Reading from: "data_nproma20480/global_data.t1.2593.data"
+Reading from: "data_nproma20480/istep.2593.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.2593.data"
+Reading from: "data_nproma20480/ntnd.2593.data"
+Reading from: "data_nproma20480/dtime.2593.data"
+Reading from: "data_nproma20480/p_prog.t1.2593.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.2593.data"
+Reading from: "data_nproma20480/p_metrics.t1.2593.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.2593.data"
+Reading from: "data_nproma20480/p_diag.t1.2593.data"
+Reading from: "data_nproma20480/p_diag.t0.2593.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.2593.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.2593.data"
+Step 2593 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+Timer Host Based C++ Timer took 904 us
+Timer Host Based C++ Timer took 575 us
+Timer Host Based C++ Timer took 584 us
+Timer Host Based C++ Timer took 577 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 584 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 587 us
+Timer Host Based C++ Timer took 584 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 582 us
+Step 2593 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_2593.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_2593.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_2593.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_2593.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_2593.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_2593.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_2593.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_2593.want"
+Reading from: "data_nproma20480/p_patch.5701.data"
+Reading from: "data_nproma20480/p_diag.t0.5701.data"
+Reading from: "data_nproma20480/lvn_only.5701.data"
+Reading from: "data_nproma20480/istep.5701.data"
+Reading from: "data_nproma20480/ldeepatmo.5701.data"
+Reading from: "data_nproma20480/global_data.t0.5701.data"
+Reading from: "data_nproma20480/p_diag.t1.5701.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.5701.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.5701.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.5701.data"
+Reading from: "data_nproma20480/global_data.t1.5701.data"
+Reading from: "data_nproma20480/p_int.5701.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.5701.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.5701.data"
+Reading from: "data_nproma20480/p_prog.t1.5701.data"
+Reading from: "data_nproma20480/p_prog.t0.5701.data"
+Reading from: "data_nproma20480/dtime.5701.data"
+Reading from: "data_nproma20480/p_metrics.t1.5701.data"
+Reading from: "data_nproma20480/ntnd.5701.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.5701.data"
+Reading from: "data_nproma20480/p_metrics.t0.5701.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.5701.data"
+Step 5701 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+Timer Host Based C++ Timer took 940 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 573 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 580 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 574 us
+Timer Host Based C++ Timer took 583 us
+Timer Host Based C++ Timer took 579 us
+Timer Host Based C++ Timer took 578 us
+Timer Host Based C++ Timer took 576 us
+Timer Host Based C++ Timer took 582 us
+Timer Host Based C++ Timer took 586 us
+Timer Host Based C++ Timer took 581 us
+Timer Host Based C++ Timer took 580 us
+Step 5701 done.
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/global_data_5701.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_5701.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_diag_5701.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_prog_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_5701.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_kin_hor_e_5701.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_5701.want"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_vt_ie_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/z_w_concorr_me_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_5701.got"
+Writing to: "/scratch/ybudanaz/icon-artifacts/velocity/gotwant/data_nproma20480/p_metrics_5701.want"

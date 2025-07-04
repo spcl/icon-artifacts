@@ -1,0 +1,489 @@
+Looking at: gotwant/data_nproma20480
+Comparing for timesteps: [1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701]
+Will use 288 workers.
+Comparing gotwant/data_nproma20480/global_data_2593.got vs. gotwant/data_nproma20480/global_data_2593.want
+Comparing gotwant/data_nproma20480/global_data_7.got vs. gotwant/data_nproma20480/global_data_7.want
+Comparing gotwant/data_nproma20480/z_vt_ie_2.got vs. gotwant/data_nproma20480/z_vt_ie_2.want
+Comparing gotwant/data_nproma20480/p_diag_1814.got vs. gotwant/data_nproma20480/p_diag_1814.want
+Comparing gotwant/data_nproma20480/p_prog_9.got vs. gotwant/data_nproma20480/p_prog_9.want
+Comparing gotwant/data_nproma20480/z_w_concorr_me_1140.got vs. gotwant/data_nproma20480/z_w_concorr_me_1140.want
+Comparing gotwant/data_nproma20480/p_diag_43.got vs. gotwant/data_nproma20480/p_diag_43.want
+Comparing gotwant/data_nproma20480/p_metrics_5701.got vs. gotwant/data_nproma20480/p_metrics_5701.want
+Comparing gotwant/data_nproma20480/p_metrics_463.got vs. gotwant/data_nproma20480/p_metrics_463.want
+Comparing gotwant/data_nproma20480/z_vt_ie_93.got vs. gotwant/data_nproma20480/z_vt_ie_93.want
+Comparing gotwant/data_nproma20480/z_w_concorr_me_519.got vs. gotwant/data_nproma20480/z_w_concorr_me_519.want
+Comparing gotwant/data_nproma20480/global_data_1.got vs. gotwant/data_nproma20480/global_data_1.want
+Checking: vt
+Checking: ddxn_z_full
+Checking: w
+Checking: vt
+Checking: ddxn_z_full
+global_data_2593.got vs. global_data_2593.want : No numerical differences found ✅
+global_data_7.got vs. global_data_7.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_2593.got vs. gotwant/data_nproma20480/p_diag_2593.want
+global_data_1.got vs. global_data_1.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_7.got vs. gotwant/data_nproma20480/p_prog_7.want
+Comparing gotwant/data_nproma20480/p_prog_1.got vs. gotwant/data_nproma20480/p_prog_1.want
+Checking: vt
+Checking: w
+Checking: w
+Checking: vn
+Checking: vn
+Checking: vn
+Checking: ddxt_z_full
+Checking: ddxt_z_full
+z_w_concorr_me_1140.got vs. z_w_concorr_me_1140.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_1140.got vs. gotwant/data_nproma20480/z_kin_hor_e_1140.want
+z_w_concorr_me_519.got vs. z_w_concorr_me_519.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_519.got vs. gotwant/data_nproma20480/p_metrics_519.want
+Checking: ddxn_z_full
+z_vt_ie_2.got vs. z_vt_ie_2.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_2.got vs. gotwant/data_nproma20480/p_prog_2.want
+Checking: w
+z_vt_ie_93.got vs. z_vt_ie_93.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_93.got vs. gotwant/data_nproma20480/p_metrics_93.want
+Checking: ddxn_z_full
+Checking: vn_ie
+p_prog_1.got vs. p_prog_1.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_1.got vs. gotwant/data_nproma20480/p_metrics_1.want
+Checking: ddxn_z_full
+Checking: vn
+p_prog_9.got vs. p_prog_9.want : No numerical differences found ✅
+p_prog_7.got vs. p_prog_7.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_9.got vs. gotwant/data_nproma20480/p_diag_9.want
+Checking: vt
+Comparing gotwant/data_nproma20480/z_kin_hor_e_7.got vs. gotwant/data_nproma20480/z_kin_hor_e_7.want
+Checking: ddxt_z_full
+Checking: vn_ie
+Checking: vn_ie
+Checking: ddxt_z_full
+Checking: ddqz_z_full_e
+Checking: ddqz_z_full_e
+z_kin_hor_e_1140.got vs. z_kin_hor_e_1140.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_vt_ie_1140.got vs. gotwant/data_nproma20480/z_vt_ie_1140.want
+Checking: ddxt_z_full
+Checking: w_concorr_c
+p_prog_2.got vs. p_prog_2.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_2.got vs. gotwant/data_nproma20480/p_metrics_2.want
+Checking: vn_ie
+Checking: ddxn_z_full
+Checking: ddqz_z_full_e
+Checking: ddqz_z_half
+Checking: ddqz_z_half
+z_vt_ie_1140.got vs. z_vt_ie_1140.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_1140.got vs. gotwant/data_nproma20480/p_prog_1140.want
+Checking: w
+Checking: ddqz_z_full_e
+Checking: ddt_vn_apc_pc
+Numerical differences found ❌
+z_kin_hor_e_7.got vs. z_kin_hor_e_7.want : Numerical differences found ❌
+  z_kin_hor_e_7: DIFF | max_abs=5.684341886080801e-13 | max_rel=1.0727428914867873e-15
+Comparing gotwant/data_nproma20480/z_w_concorr_me_7.got vs. gotwant/data_nproma20480/z_w_concorr_me_7.want
+Checking: wgtfac_c
+Checking: wgtfac_c
+Checking: ddqz_z_full_e
+Checking: w_concorr_c
+Checking: ddxt_z_full
+Checking: vn
+Checking: w_concorr_c
+Checking: w_concorr_c
+Checking: ddqz_z_half
+Checking: wgtfac_e
+Checking: ddqz_z_half
+Checking: wgtfac_e
+Checking: ddt_vn_apc_pc
+Checking: ddt_vn_apc_pc
+Checking: wgtfac_c
+Checking: ddqz_z_half
+p_prog_1140.got vs. p_prog_1140.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_1140.got vs. gotwant/data_nproma20480/p_metrics_1140.want
+Checking: ddqz_z_full_e
+Checking: ddxn_z_full
+Checking: wgtfac_c
+Checking: ddt_vn_apc_pc
+z_w_concorr_me_7.got vs. z_w_concorr_me_7.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_7.got vs. gotwant/data_nproma20480/p_diag_7.want
+Checking: vt
+Checking: wgtfac_e
+Checking: wgtfacq_e
+Checking: wgtfac_c
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: wgtfac_e
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: wgtfac_e
+Checking: ddqz_z_half
+Checking: coeff2_dwdz
+Checking: ddxt_z_full
+Checking: coeff2_dwdz
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: wgtfac_c
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_5701.got vs. p_metrics_5701.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_w_concorr_me_5701.got vs. gotwant/data_nproma20480/z_w_concorr_me_5701.want
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_463.got vs. p_metrics_463.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_463.got vs. gotwant/data_nproma20480/global_data_463.want
+global_data_463.got vs. global_data_463.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_463.got vs. gotwant/data_nproma20480/p_prog_463.want
+Checking: w
+Checking: vn_ie
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff2_dwdz
+Checking: coeff1_dwdz
+Checking: wgtfac_e
+Checking: ddqz_z_full_e
+Checking: vn
+Checking: ddt_w_adv_pc
+Checking: coeff2_dwdz
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+Checking: coeff2_dwdz
+p_metrics_519.got vs. p_metrics_519.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_vt_ie_519.got vs. gotwant/data_nproma20480/z_vt_ie_519.want
+z_w_concorr_me_5701.got vs. z_w_concorr_me_5701.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_5701.got vs. gotwant/data_nproma20480/p_diag_5701.want
+Checking: vt
+Checking: wgtfacq_e
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_93.got vs. p_metrics_93.want : No numerical differences found ✅
+Checking: coeff_gradekin
+Comparing gotwant/data_nproma20480/p_diag_93.got vs. gotwant/data_nproma20480/p_diag_93.want
+Checking: vt
+Checking: coeff1_dwdz
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_1.got vs. p_metrics_1.want : No numerical differences found ✅
+Checking: ddqz_z_half
+Comparing gotwant/data_nproma20480/z_vt_ie_1.got vs. gotwant/data_nproma20480/z_vt_ie_1.want
+Checking: ddt_w_adv_pc
+p_prog_463.got vs. p_prog_463.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_463.got vs. gotwant/data_nproma20480/p_diag_463.want
+Checking: vt
+Checking: w_concorr_c
+z_vt_ie_519.got vs. z_vt_ie_519.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_519.got vs. gotwant/data_nproma20480/p_diag_519.want
+Checking: vt
+Checking: wgtfac_c
+Checking: coeff2_dwdz
+Checking: ddt_w_adv_pc
+Checking: ddt_w_adv_pc
+Checking: vn_ie
+Checking: wgtfac_e
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_2.got vs. p_metrics_2.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_w_concorr_me_2.got vs. gotwant/data_nproma20480/z_w_concorr_me_2.want
+Checking: ddt_vn_apc_pc
+Checking: vn_ie
+Checking: max_vcfl_dyn
+Numerical differences found ❌
+p_diag_43.got vs. p_diag_43.want : Numerical differences found ❌
+  vt: DIFF | max_abs=1.4210854715202004e-14 | max_rel=2.151753947089003e-09
+  vn_ie: DIFF | max_abs=7.105427357601002e-15 | max_rel=5.780492609253761e-14
+Comparing gotwant/data_nproma20480/global_data_43.got vs. gotwant/data_nproma20480/global_data_43.want
+global_data_43.got vs. global_data_43.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_43.got vs. gotwant/data_nproma20480/z_kin_hor_e_43.want
+Checking: vn_ie
+Checking: max_vcfl_dyn
+Numerical differences found ❌
+p_diag_2593.got vs. p_diag_2593.want : Numerical differences found ❌
+  vt: DIFF | max_abs=1.4210854715202004e-14 | max_rel=1.2362895780838352e-11
+  vn_ie: DIFF | max_abs=7.105427357601002e-15 | max_rel=2.003698064801334e-12
+Comparing gotwant/data_nproma20480/z_w_concorr_me_2593.got vs. gotwant/data_nproma20480/z_w_concorr_me_2593.want
+Numerical differences found ❌
+z_vt_ie_1.got vs. z_vt_ie_1.want : Numerical differences found ❌
+  z_vt_ie_1: DIFF | max_abs=1.4210854715202004e-14 | max_rel=1.9854895129317032
+Comparing gotwant/data_nproma20480/p_diag_1.got vs. gotwant/data_nproma20480/p_diag_1.want
+Checking: vt
+Checking: w_concorr_c
+z_w_concorr_me_2.got vs. z_w_concorr_me_2.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_2.got vs. gotwant/data_nproma20480/global_data_2.want
+global_data_2.got vs. global_data_2.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_2.got vs. gotwant/data_nproma20480/p_diag_2.want
+Checking: vt
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: vn_ie
+Checking: coeff1_dwdz
+Checking: max_vcfl_dyn
+p_diag_1814.got vs. p_diag_1814.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_1814.got vs. gotwant/data_nproma20480/global_data_1814.want
+global_data_1814.got vs. global_data_1814.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_w_concorr_me_1814.got vs. gotwant/data_nproma20480/z_w_concorr_me_1814.want
+Checking: ddt_vn_apc_pc
+Checking: coeff2_dwdz
+Checking: max_vcfl_dyn
+p_diag_9.got vs. p_diag_9.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_9.got vs. gotwant/data_nproma20480/global_data_9.want
+global_data_9.got vs. global_data_9.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_9.got vs. gotwant/data_nproma20480/p_metrics_9.want
+Checking: ddxn_z_full
+Checking: w_concorr_c
+Checking: vn_ie
+z_w_concorr_me_1814.got vs. z_w_concorr_me_1814.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_1814.got vs. gotwant/data_nproma20480/p_prog_1814.want
+Checking: w
+z_w_concorr_me_2593.got vs. z_w_concorr_me_2593.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_2593.got vs. gotwant/data_nproma20480/z_kin_hor_e_2593.want
+Checking: w_concorr_c
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_1140.got vs. p_metrics_1140.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_1140.got vs. gotwant/data_nproma20480/global_data_1140.want
+global_data_1140.got vs. global_data_1140.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_diag_1140.got vs. gotwant/data_nproma20480/p_diag_1140.want
+Checking: vt
+Checking: ddt_vn_apc_pc
+Numerical differences found ❌
+z_kin_hor_e_43.got vs. z_kin_hor_e_43.want : Numerical differences found ❌
+  z_kin_hor_e_43: DIFF | max_abs=5.684341886080801e-13 | max_rel=1.0360219207052056e-15
+Comparing gotwant/data_nproma20480/z_vt_ie_43.got vs. gotwant/data_nproma20480/z_vt_ie_43.want
+Checking: ddxt_z_full
+Checking: vn
+Checking: vn_ie
+Checking: w_concorr_c
+Checking: w_concorr_c
+Checking: ddt_vn_apc_pc
+Numerical differences found ❌
+z_vt_ie_43.got vs. z_vt_ie_43.want : Numerical differences found ❌
+  z_vt_ie_43: DIFF | max_abs=7.105427357601002e-15 | max_rel=3.2124378234890633e-10
+Comparing gotwant/data_nproma20480/p_metrics_43.got vs. gotwant/data_nproma20480/p_metrics_43.want
+Checking: ddxn_z_full
+Checking: vn_ie
+Checking: ddt_vn_apc_pc
+Checking: ddqz_z_full_e
+p_prog_1814.got vs. p_prog_1814.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_1814.got vs. gotwant/data_nproma20480/z_kin_hor_e_1814.want
+Checking: ddt_vn_apc_pc
+Numerical differences found ❌
+z_kin_hor_e_2593.got vs. z_kin_hor_e_2593.want : Numerical differences found ❌
+  z_kin_hor_e_2593: DIFF | max_abs=5.684341886080801e-13 | max_rel=1.6335341026299e-14
+Comparing gotwant/data_nproma20480/z_vt_ie_2593.got vs. gotwant/data_nproma20480/z_vt_ie_2593.want
+Checking: ddt_w_adv_pc
+Checking: ddxt_z_full
+Checking: w_concorr_c
+Checking: ddqz_z_half
+z_kin_hor_e_1814.got vs. z_kin_hor_e_1814.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_metrics_1814.got vs. gotwant/data_nproma20480/p_metrics_1814.want
+Checking: ddxn_z_full
+Checking: w_concorr_c
+Numerical differences found ❌
+z_vt_ie_2593.got vs. z_vt_ie_2593.want : Numerical differences found ❌
+  z_vt_ie_2593: DIFF | max_abs=1.4210854715202004e-14 | max_rel=2.891147771264883e-13
+Comparing gotwant/data_nproma20480/p_metrics_2593.got vs. gotwant/data_nproma20480/p_metrics_2593.want
+Checking: ddxn_z_full
+Checking: max_vcfl_dyn
+Numerical differences found ❌
+p_diag_7.got vs. p_diag_7.want : Numerical differences found ❌
+  vt: DIFF | max_abs=1.4210854715202004e-14 | max_rel=4.3454201833360124e-09
+  vn_ie: DIFF | max_abs=7.105427357601002e-15 | max_rel=3.013061961607216e-14
+Comparing gotwant/data_nproma20480/z_vt_ie_7.got vs. gotwant/data_nproma20480/z_vt_ie_7.want
+Checking: wgtfac_c
+Checking: ddqz_z_full_e
+Checking: ddt_vn_apc_pc
+Checking: ddt_vn_apc_pc
+Checking: ddt_w_adv_pc
+Checking: ddxt_z_full
+Checking: ddxt_z_full
+Checking: wgtfac_e
+Numerical differences found ❌
+z_vt_ie_7.got vs. z_vt_ie_7.want : Numerical differences found ❌
+  z_vt_ie_7: DIFF | max_abs=7.105427357601002e-15 | max_rel=1.7624625452857634e-11
+Comparing gotwant/data_nproma20480/p_metrics_7.got vs. gotwant/data_nproma20480/p_metrics_7.want
+Checking: ddxn_z_full
+Checking: ddqz_z_half
+Checking: ddt_w_adv_pc
+Checking: ddqz_z_full_e
+Checking: ddxt_z_full
+Checking: wgtfacq_e
+Checking: ddqz_z_full_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: wgtfac_c
+Checking: ddt_w_adv_pc
+Checking: coeff2_dwdz
+Checking: ddt_w_adv_pc
+Checking: wgtfac_e
+Checking: ddqz_z_half
+Checking: ddqz_z_full_e
+Checking: ddqz_z_half
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_9.got vs. p_metrics_9.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_vt_ie_9.got vs. gotwant/data_nproma20480/z_vt_ie_9.want
+Checking: max_vcfl_dyn
+p_diag_93.got vs. p_diag_93.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_93.got vs. gotwant/data_nproma20480/z_kin_hor_e_93.want
+Checking: wgtfac_c
+Checking: max_vcfl_dyn
+Numerical differences found ❌
+p_diag_5701.got vs. p_diag_5701.want : Numerical differences found ❌
+  vt: DIFF | max_abs=1.4210854715202004e-14 | max_rel=5.480554387548323e-12
+  vn_ie: DIFF | max_abs=7.105427357601002e-15 | max_rel=7.848144555508736e-12
+Comparing gotwant/data_nproma20480/z_vt_ie_5701.got vs. gotwant/data_nproma20480/z_vt_ie_5701.want
+Checking: ddt_w_adv_pc
+Checking: wgtfac_c
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: ddqz_z_half
+Checking: wgtfac_e
+z_vt_ie_9.got vs. z_vt_ie_9.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_w_concorr_me_9.got vs. gotwant/data_nproma20480/z_w_concorr_me_9.want
+Checking: ddt_w_adv_pc
+Checking: wgtfac_e
+Checking: coeff2_dwdz
+Numerical differences found ❌
+z_vt_ie_5701.got vs. z_vt_ie_5701.want : Numerical differences found ❌
+  z_vt_ie_5701: DIFF | max_abs=1.4210854715202004e-14 | max_rel=1.1723546368623837e-12
+Comparing gotwant/data_nproma20480/global_data_5701.got vs. gotwant/data_nproma20480/global_data_5701.want
+global_data_5701.got vs. global_data_5701.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_5701.got vs. gotwant/data_nproma20480/z_kin_hor_e_5701.want
+z_kin_hor_e_93.got vs. z_kin_hor_e_93.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_93.got vs. gotwant/data_nproma20480/global_data_93.want
+global_data_93.got vs. global_data_93.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_93.got vs. gotwant/data_nproma20480/p_prog_93.want
+Checking: w
+Checking: ddt_w_adv_pc
+Checking: max_vcfl_dyn
+p_diag_519.got vs. p_diag_519.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/global_data_519.got vs. gotwant/data_nproma20480/global_data_519.want
+global_data_519.got vs. global_data_519.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_519.got vs. gotwant/data_nproma20480/p_prog_519.want
+Checking: w
+Checking: wgtfac_c
+Checking: max_vcfl_dyn
+Numerical differences found ❌
+p_diag_463.got vs. p_diag_463.want : Numerical differences found ❌
+  vt: DIFF | max_abs=1.4210854715202004e-14 | max_rel=5.472065736750405e-10
+  vn_ie: DIFF | max_abs=7.105427357601002e-15 | max_rel=8.567293596751419e-13
+Comparing gotwant/data_nproma20480/z_w_concorr_me_463.got vs. gotwant/data_nproma20480/z_w_concorr_me_463.want
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_43.got vs. p_metrics_43.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_43.got vs. gotwant/data_nproma20480/p_prog_43.want
+Checking: w
+Checking: vn
+Checking: max_vcfl_dyn
+Numerical differences found ❌
+p_diag_1.got vs. p_diag_1.want : Numerical differences found ❌
+  vt: DIFF | max_abs=1.4210854715202004e-14 | max_rel=1.2507383886257506
+  vn_ie: DIFF | max_abs=7.105427357601002e-15 | max_rel=4.050267560913234e-16
+Comparing gotwant/data_nproma20480/z_kin_hor_e_1.got vs. gotwant/data_nproma20480/z_kin_hor_e_1.want
+Checking: vn
+z_w_concorr_me_9.got vs. z_w_concorr_me_9.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_9.got vs. gotwant/data_nproma20480/z_kin_hor_e_9.want
+Checking: wgtfac_e
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Checking: coeff1_dwdz
+Checking: vn
+Checking: max_vcfl_dyn
+p_diag_2.got vs. p_diag_2.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_2.got vs. gotwant/data_nproma20480/z_kin_hor_e_2.want
+Checking: coeff2_dwdz
+Checking: coeff2_dwdz
+p_prog_93.got vs. p_prog_93.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_w_concorr_me_93.got vs. gotwant/data_nproma20480/z_w_concorr_me_93.want
+z_kin_hor_e_9.got vs. z_kin_hor_e_9.want : No numerical differences found ✅
+p_prog_519.got vs. p_prog_519.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_519.got vs. gotwant/data_nproma20480/z_kin_hor_e_519.want
+Checking: wgtfacq_e
+Checking: coeff_gradekin
+Numerical differences found ❌
+z_kin_hor_e_5701.got vs. z_kin_hor_e_5701.want : Numerical differences found ❌
+  z_kin_hor_e_5701: DIFF | max_abs=9.094947017729282e-13 | max_rel=1.424889964395942e-14
+Comparing gotwant/data_nproma20480/p_prog_5701.got vs. gotwant/data_nproma20480/p_prog_5701.want
+Checking: w
+Checking: coeff1_dwdz
+z_w_concorr_me_463.got vs. z_w_concorr_me_463.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_kin_hor_e_463.got vs. gotwant/data_nproma20480/z_kin_hor_e_463.want
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_1814.got vs. p_metrics_1814.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_vt_ie_1814.got vs. gotwant/data_nproma20480/z_vt_ie_1814.want
+p_prog_43.got vs. p_prog_43.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/z_w_concorr_me_43.got vs. gotwant/data_nproma20480/z_w_concorr_me_43.want
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_2593.got vs. p_metrics_2593.want : No numerical differences found ✅
+Comparing gotwant/data_nproma20480/p_prog_2593.got vs. gotwant/data_nproma20480/p_prog_2593.want
+Checking: w
+z_kin_hor_e_2.got vs. z_kin_hor_e_2.want : No numerical differences found ✅
+Checking: coeff2_dwdz
+Numerical differences found ❌
+z_kin_hor_e_1.got vs. z_kin_hor_e_1.want : Numerical differences found ❌
+  z_kin_hor_e_1: DIFF | max_abs=4.547473508864641e-13 | max_rel=1.0730572788071329e-15
+Comparing gotwant/data_nproma20480/z_w_concorr_me_1.got vs. gotwant/data_nproma20480/z_w_concorr_me_1.want
+Checking: vn
+z_w_concorr_me_93.got vs. z_w_concorr_me_93.want : No numerical differences found ✅
+Checking: max_vcfl_dyn
+p_diag_1140.got vs. p_diag_1140.want : No numerical differences found ✅
+Checking: vn
+z_kin_hor_e_519.got vs. z_kin_hor_e_519.want : No numerical differences found ✅
+Checking: deepatmo_gradh_mc
+Checking: deepatmo_invr_mc
+Checking: deepatmo_gradh_ifc
+Checking: deepatmo_invr_ifc
+p_metrics_7.got vs. p_metrics_7.want : No numerical differences found ✅
+z_vt_ie_1814.got vs. z_vt_ie_1814.want : No numerical differences found ✅
+z_w_concorr_me_43.got vs. z_w_concorr_me_43.want : No numerical differences found ✅
+p_prog_5701.got vs. p_prog_5701.want : No numerical differences found ✅
+z_w_concorr_me_1.got vs. z_w_concorr_me_1.want : No numerical differences found ✅
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=1.csv
+p_prog_2593.got vs. p_prog_2593.want : No numerical differences found ✅
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=2.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=7.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=9.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=43.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=93.csv
+Numerical differences found ❌
+z_kin_hor_e_463.got vs. z_kin_hor_e_463.want : Numerical differences found ❌
+  z_kin_hor_e_463: DIFF | max_abs=6.821210263296962e-13 | max_rel=1.222251197440983e-14
+Comparing gotwant/data_nproma20480/z_vt_ie_463.got vs. gotwant/data_nproma20480/z_vt_ie_463.want
+Numerical differences found ❌
+z_vt_ie_463.got vs. z_vt_ie_463.want : Numerical differences found ❌
+  z_vt_ie_463: DIFF | max_abs=7.105427357601002e-15 | max_rel=1.1954522977053255e-13
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=463.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=519.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=1140.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=1814.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=2593.csv
+Saving to: gotwant/data_nproma20480/numeric_differences_ts=5701.csv
