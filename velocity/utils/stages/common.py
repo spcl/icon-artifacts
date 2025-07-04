@@ -76,7 +76,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         stage=stage,
         debuginfo=False,
         allocation_names_to_comment_out=allocation_names_to_comment_out,
-        use_openacc_stream=use_openacc_stream,
+        use_openacc_stream=False,
       )
   elif stage > 5:
     compile_if_propagated_sdfgs(
