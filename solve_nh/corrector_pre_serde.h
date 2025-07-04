@@ -166,6 +166,28 @@ void deserialize(long &x, std::istream &s) { read_scalar(x, s); }
 void deserialize(long long &x, std::istream &s) { read_scalar(x, s); }
 void deserialize(bool &x, std::istream &s) { read_scalar(x, s); }
 
+void deserialize(t_grid_domain_decomp_info *x, std::istream &s) {
+  bool yep;
+  array_meta m;
+  read_line(s, {"# owner_mask"}); // Should contain '# owner_mask'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_owner_mask_d_0_s_32 = m.size[0];
+    x->__f2dace_SA_owner_mask_d_1_s_33 = m.size[1];
+    x->__f2dace_SOA_owner_mask_d_0_s_32 = m.lbound[0];
+    x->__f2dace_SOA_owner_mask_d_1_s_33 = m.lbound[1];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->owner_mask =
+        m.read<std::remove_pointer<decltype(x->owner_mask)>::type>(s);
+
+  } // CONCLUDING IF
+}
+
 void deserialize(t_int_state *x, std::istream &s) {
   bool yep;
   array_meta m;
@@ -741,6 +763,141 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_block_d_0_s_197 = m.size[0];
     x->__f2dace_SOA_end_block_d_0_s_197 = m.lbound[0];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
+
+  } // CONCLUDING IF
+}
+
+void deserialize(t_grid_vertices *x, std::istream &s) {
+  bool yep;
+  array_meta m;
+  read_line(s, {"# cell_idx"}); // Should contain '# cell_idx'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_cell_idx_d_0_s_198 = m.size[0];
+    x->__f2dace_SA_cell_idx_d_1_s_199 = m.size[1];
+    x->__f2dace_SA_cell_idx_d_2_s_200 = m.size[2];
+    x->__f2dace_SOA_cell_idx_d_0_s_198 = m.lbound[0];
+    x->__f2dace_SOA_cell_idx_d_1_s_199 = m.lbound[1];
+    x->__f2dace_SOA_cell_idx_d_2_s_200 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->cell_idx = m.read<std::remove_pointer<decltype(x->cell_idx)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# cell_blk"}); // Should contain '# cell_blk'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_cell_blk_d_0_s_201 = m.size[0];
+    x->__f2dace_SA_cell_blk_d_1_s_202 = m.size[1];
+    x->__f2dace_SA_cell_blk_d_2_s_203 = m.size[2];
+    x->__f2dace_SOA_cell_blk_d_0_s_201 = m.lbound[0];
+    x->__f2dace_SOA_cell_blk_d_1_s_202 = m.lbound[1];
+    x->__f2dace_SOA_cell_blk_d_2_s_203 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->cell_blk = m.read<std::remove_pointer<decltype(x->cell_blk)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# edge_idx"}); // Should contain '# edge_idx'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_edge_idx_d_0_s_204 = m.size[0];
+    x->__f2dace_SA_edge_idx_d_1_s_205 = m.size[1];
+    x->__f2dace_SA_edge_idx_d_2_s_206 = m.size[2];
+    x->__f2dace_SOA_edge_idx_d_0_s_204 = m.lbound[0];
+    x->__f2dace_SOA_edge_idx_d_1_s_205 = m.lbound[1];
+    x->__f2dace_SOA_edge_idx_d_2_s_206 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->edge_idx = m.read<std::remove_pointer<decltype(x->edge_idx)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# edge_blk"}); // Should contain '# edge_blk'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_edge_blk_d_0_s_207 = m.size[0];
+    x->__f2dace_SA_edge_blk_d_1_s_208 = m.size[1];
+    x->__f2dace_SA_edge_blk_d_2_s_209 = m.size[2];
+    x->__f2dace_SOA_edge_blk_d_0_s_207 = m.lbound[0];
+    x->__f2dace_SOA_edge_blk_d_1_s_208 = m.lbound[1];
+    x->__f2dace_SOA_edge_blk_d_2_s_209 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->edge_blk = m.read<std::remove_pointer<decltype(x->edge_blk)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# start_index"}); // Should contain '# start_index'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_start_index_d_0_s_210 = m.size[0];
+    x->__f2dace_SOA_start_index_d_0_s_210 = m.lbound[0];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->start_index =
+        m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# end_index"}); // Should contain '# end_index'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_end_index_d_0_s_211 = m.size[0];
+    x->__f2dace_SOA_end_index_d_0_s_211 = m.lbound[0];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# start_block"}); // Should contain '# start_block'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_start_block_d_0_s_212 = m.size[0];
+    x->__f2dace_SOA_start_block_d_0_s_212 = m.lbound[0];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->start_block =
+        m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# end_block"}); // Should contain '# end_block'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_end_block_d_0_s_213 = m.size[0];
+    x->__f2dace_SOA_end_block_d_0_s_213 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
@@ -1614,6 +1771,37 @@ std::string serialize(long double x) {
 }
 std::string serialize(bool x) { return serialize(int(x)); }
 
+std::string serialize(const t_grid_domain_decomp_info *x) {
+  std::stringstream s;
+  add_line("# owner_mask", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->owner_mask != nullptr), s);
+  if (x->owner_mask) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->owner_mask);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->owner_mask[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  std::string out = s.str();
+  if (out.length() > 0)
+    out.pop_back();
+  return out;
+}
+
 std::string serialize(const t_int_state *x) {
   std::stringstream s;
   add_line("# c_lin_e", s);
@@ -2282,6 +2470,198 @@ std::string serialize(const t_grid_edges *x) {
       add_line("# entries", s);
       for (int i = 0; i < m.volume(); ++i) {
         add_line(serialize(x->ft_e[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# start_index", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->start_index != nullptr), s);
+  if (x->start_index) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->start_index);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->start_index[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# end_index", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->end_index != nullptr), s);
+  if (x->end_index) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->end_index);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->end_index[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# start_block", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->start_block != nullptr), s);
+  if (x->start_block) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->start_block);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->start_block[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# end_block", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->end_block != nullptr), s);
+  if (x->end_block) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->end_block);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->end_block[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  std::string out = s.str();
+  if (out.length() > 0)
+    out.pop_back();
+  return out;
+}
+
+std::string serialize(const t_grid_vertices *x) {
+  std::stringstream s;
+  add_line("# cell_idx", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->cell_idx != nullptr), s);
+  if (x->cell_idx) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->cell_idx);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->cell_idx[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# cell_blk", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->cell_blk != nullptr), s);
+  if (x->cell_blk) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->cell_blk);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->cell_blk[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# edge_idx", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->edge_idx != nullptr), s);
+  if (x->edge_idx) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->edge_idx);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->edge_idx[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# edge_blk", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->edge_blk != nullptr), s);
+  if (x->edge_blk) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->edge_blk);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->edge_blk[i]), s);
       }
     }
 

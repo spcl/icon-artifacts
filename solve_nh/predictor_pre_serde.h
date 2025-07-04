@@ -166,6 +166,28 @@ void deserialize(long &x, std::istream &s) { read_scalar(x, s); }
 void deserialize(long long &x, std::istream &s) { read_scalar(x, s); }
 void deserialize(bool &x, std::istream &s) { read_scalar(x, s); }
 
+void deserialize(t_grid_domain_decomp_info *x, std::istream &s) {
+  bool yep;
+  array_meta m;
+  read_line(s, {"# owner_mask"}); // Should contain '# owner_mask'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_owner_mask_d_0_s_62 = m.size[0];
+    x->__f2dace_SA_owner_mask_d_1_s_63 = m.size[1];
+    x->__f2dace_SOA_owner_mask_d_0_s_62 = m.lbound[0];
+    x->__f2dace_SOA_owner_mask_d_1_s_63 = m.lbound[1];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->owner_mask =
+        m.read<std::remove_pointer<decltype(x->owner_mask)>::type>(s);
+
+  } // CONCLUDING IF
+}
+
 void deserialize(t_int_state *x, std::istream &s) {
   bool yep;
   array_meta m;
@@ -2250,6 +2272,37 @@ std::string serialize(long double x) {
   return s.str();
 }
 std::string serialize(bool x) { return serialize(int(x)); }
+
+std::string serialize(const t_grid_domain_decomp_info *x) {
+  std::stringstream s;
+  add_line("# owner_mask", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->owner_mask != nullptr), s);
+  if (x->owner_mask) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->owner_mask);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->owner_mask[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  std::string out = s.str();
+  if (out.length() > 0)
+    out.pop_back();
+  return out;
+}
 
 std::string serialize(const t_int_state *x) {
   std::stringstream s;

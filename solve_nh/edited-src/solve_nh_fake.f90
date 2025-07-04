@@ -681,6 +681,8 @@ MODULE fake_mo_solve_nonhydro
   CONTAINS
   SUBROUTINE solve_nh_predictor_pre(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+use serde_base, only: generation, at
+use predictor_pre, only: serialize
     USE mo_nonhydro_types, ONLY: t_nh_state
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
@@ -741,6 +743,11 @@ MODULE fake_mo_solve_nonhydro
     INTEGER, intent(inout) :: nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start
     LOGICAL, intent(inout) :: lvn_only, lvn_pos
     LOGICAL, intent(inout) :: l_vert_nested, l_child_vertnest
+
+if (generation == 20) then
+INCLUDE 'prepre_t0.inc'
+end if
+
     istep = 1
     ! DO istep = 1, 2
       IF (istep == 1) THEN
@@ -1155,9 +1162,16 @@ MODULE fake_mo_solve_nonhydro
           END DO
         END DO
       END IF
+
+if (generation == 20) then
+INCLUDE 'prepre_t1.inc'
+end if
+
   END SUBROUTINE solve_nh_predictor_pre
   SUBROUTINE solve_nh_predictor_post(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+use serde_base, only: generation, at
+use predictor_post, only: serialize
     USE mo_nonhydro_types, ONLY: t_nh_state
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
@@ -1218,6 +1232,11 @@ MODULE fake_mo_solve_nonhydro
     INTEGER, intent(inout) :: nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start
     LOGICAL, intent(inout) :: lvn_only, lvn_pos
     LOGICAL, intent(inout) :: l_vert_nested, l_child_vertnest
+
+if (generation == 20) then
+INCLUDE 'prepost_t0.inc'
+end if
+
     istep = 1
       rl_start = 5
       rl_end = -10
@@ -1591,9 +1610,16 @@ MODULE fake_mo_solve_nonhydro
           END IF
         END DO
       END IF
+
+if (generation == 20) then
+INCLUDE 'prepost_t1.inc'
+end if
+
   END SUBROUTINE solve_nh_predictor_post
   SUBROUTINE solve_nh_corrector_pre(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+use serde_base, only: generation, at
+use corrector_pre, only: serialize
     USE mo_nonhydro_types, ONLY: t_nh_state
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
@@ -1654,6 +1680,11 @@ MODULE fake_mo_solve_nonhydro
     INTEGER, intent(inout) :: nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start
     LOGICAL, intent(inout) :: lvn_only, lvn_pos
     LOGICAL, intent(inout) :: l_vert_nested, l_child_vertnest
+
+if (generation == 20) then
+INCLUDE 'corpre_t0.inc'
+end if
+
     istep = 2
     ! DO istep = 1, 2
       IF (istep == 1) THEN
@@ -2068,9 +2099,16 @@ MODULE fake_mo_solve_nonhydro
           END DO
         END DO
       END IF
+
+if (generation == 20) then
+INCLUDE 'corpre_t1.inc'
+end if
+
   END SUBROUTINE solve_nh_corrector_pre
   SUBROUTINE solve_nh_corrector_post(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+use serde_base, only: generation, at
+use corrector_post, only: serialize
     USE mo_nonhydro_types, ONLY: t_nh_state
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
@@ -2131,6 +2169,11 @@ MODULE fake_mo_solve_nonhydro
     INTEGER, intent(inout) :: nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start
     LOGICAL, intent(inout) :: lvn_only, lvn_pos
     LOGICAL, intent(inout) :: l_vert_nested, l_child_vertnest
+
+if (generation == 20) then
+INCLUDE 'corpost_t0.inc'
+end if
+
     istep = 2
       rl_start = 5
       rl_end = -10
@@ -2504,6 +2547,11 @@ MODULE fake_mo_solve_nonhydro
           END IF
         END DO
       END IF
+
+if (generation == 20) then
+INCLUDE 'corpost_t1.inc'
+end if
+
   END SUBROUTINE solve_nh_corrector_post
   SUBROUTINE solve_nh(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc)
     USE mo_nonhydro_types, ONLY: t_nh_state
