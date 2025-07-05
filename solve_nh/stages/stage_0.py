@@ -49,9 +49,6 @@ def main():
         sdfgs = {
             name: SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names
         }
-        # TODO: REMOVE THESE ONCE THE SDFGs ARE FIXED.
-        sdfgs.pop("solve_nh_predictor_pre")
-        sdfgs.pop("solve_nh_corrector_pre")
         print(f"Stage #{STAGE_ID}: Generating code for {len(sdfgs)} SDFGs")
         common.codegen_action(STAGE_ID, sdfgs)
 

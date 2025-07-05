@@ -93,10 +93,10 @@ def consolidate_generated_code(
 
     combined_header = "\n".join(
         wrap_namespace(name, content).strip() for name, content in all_headers.items()
-    )
+    ).replace("__restrict__", "")
     combined_source = "\n".join(
         wrap_namespace(name, content).strip() for name, content in all_sources.items()
-    )
+    ).replace("__restrict__", "")
     store.mkdir(parents=True, exist_ok=True)
     (store / "solve_nh_parts.h").write_text(combined_header)
     (store / "solve_nh_parts.cpp").write_text(combined_source)
