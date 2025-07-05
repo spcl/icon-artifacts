@@ -1,5 +1,5 @@
-#ifndef __DACE_SERDE__
-#define __DACE_SERDE__
+#ifndef __DACE_PREDICTOR_POST_SERDE__
+#define __DACE_PREDICTOR_POST_SERDE__
 
 #include <algorithm>
 #include <cassert>
@@ -17,7 +17,7 @@
 
 #include "solve_nh_predictor_post.h"
 
-namespace serde {
+namespace predictor_post {
 std::vector<std::string_view> split(std::string_view s, char delim) {
   std::vector<std::string_view> parts;
   for (int start_pos = 0, next_pos; start_pos < s.length();
@@ -136,7 +136,7 @@ array_meta read_array_meta(std::istream &s) {
 }
 
 template <typename T> std::pair<array_meta, T *> read_array(std::istream &s) {
-  auto m = serde::read_array_meta(s);
+  auto m =read_array_meta(s);
   auto *y = m.read<T>(s);
   return {m, y};
 }
@@ -2462,6 +2462,6 @@ end module global_data_assertion
   return s.str();
 }
 
-} // namespace serde
+} // namespace predictor_post
 
-#endif // __DACE_SERDE__
+#endif // __DACE_PREDICTOR_POST_SERDE__

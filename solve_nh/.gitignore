@@ -1,0 +1,13 @@
+**.mod
+**.concrete.sdfgz
+**.pyc
+
+codegen/**
+!codegen/*.sdfgz
+!codegen/stage*
+!codegen/stage*/solve_nh*/
+!codegen/stage*/solve_nh*/include
+!codegen/stage*/solve_nh*/src
+!codegen/stage*/solve_nh*/include/solve_nh*.h
+!codegen/stage*/solve_nh*/src/cpu/solve_nh*.cpp
+!codegen/stage*/solve_nh*/dace.conf
