@@ -59,6 +59,9 @@ def main():
         sdfgs = {
             name: SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names
         }
+        sdfgs.pop("solve_nh_predictor_pre")
+        sdfgs.pop("solve_nh_corrector_pre")
+        sdfgs.pop("solve_nh_corrector_post")
         print(f"Stage #{STAGE_ID}: Compiling {len(sdfgs)} SDFGs")
         common.compile_action(STAGE_ID, sdfgs)
 

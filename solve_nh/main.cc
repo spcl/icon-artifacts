@@ -5,14 +5,16 @@
 #include <string>
 #include <string_view>
 
-#include "predictor_pre_serde.h"
-//#include "predictor_post_serde.h"
+// #include "predictor_pre_serde.h"
+#include "predictor_post_serde.h"
 //#include "corrector_pre_serde.h"
 //#include "corrector_post_serde.h"
-namespace serde = ::predictor_pre;
+namespace serde = ::predictor_post;
 
 #include "utils.h"
 using namespace standalone_utils;
+
+#include "macro.h"
 
 #include "flags.h"
 
@@ -43,95 +45,29 @@ int main(int argc, char* argv[]) {
     acerr() << "Reading data for " << n << "..." << std::endl;
 
     std::vector<std::jthread> pool;
-
-    auto fut_global_data = spawn(pool, [&] {
-      return t0_t1_pair<global_data_type>(ROOT, "global_data", n);
-    });
-    auto fut_p_diag =
-        spawn(pool, [&] { return t0_t1_pair<t_nh_diag>(ROOT, "p_diag", n); });
-    auto fut_p_int =
-        spawn(pool, [&] { return read<t_int_state>(ROOT, "p_int", n); });
-    auto fut_p_metrics = spawn(
-        pool, [&] { return t0_t1_pair<t_nh_metrics>(ROOT, "p_metrics", n); });
-    auto fut_p_patch =
-        spawn(pool, [&] { return read<t_patch>(ROOT, "p_patch", n); });
-    auto fut_p_prog =
-        spawn(pool, [&] { return t0_t1_pair<t_nh_prog>(ROOT, "p_prog", n); });
-    auto fut_z_kin_hor_e = spawn(
-        pool, [&] { return t0_t1_pair<double*>(ROOT, "z_kin_hor_e", n); });
-    auto fut_z_vt_ie =
-        spawn(pool, [&] { return t0_t1_pair<double*>(ROOT, "z_vt_ie", n); });
-    auto fut_z_w_concorr = spawn(
-        pool, [&] { return t0_t1_pair<double*>(ROOT, "z_w_concorr_me", n); });
-    auto fut_istep = spawn(pool, [&] { return read<int>(ROOT, "istep", n); });
-    auto fut_ldeepatmo =
-        spawn(pool, [&] { return read<int>(ROOT, "ldeepatmo", n); });
-    auto fut_lvn_only =
-        spawn(pool, [&] { return read<int>(ROOT, "lvn_only", n); });
-    auto fut_ntnd = spawn(pool, [&] { return read<int>(ROOT, "ntnd", n); });
-    auto fut_dt_linintp =
-        spawn(pool, [&] { return read<double>(ROOT, "dt_linintp_ubc", n); });
-    auto fut_dtime =
-        spawn(pool, [&] { return read<double>(ROOT, "dtime", n); });
+    SPAWN_ALL_DIAGS(prepost);
     pool.clear();
-
-    auto global_data_pair = fut_global_data.get();
-    auto& global_data = std::get<0>(global_data_pair);
-    auto& global_data_want = std::get<1>(global_data_pair);
-
-    auto p_diag_pair = fut_p_diag.get();
-    auto& p_diag = std::get<0>(p_diag_pair);
-    auto& p_diag_want = std::get<1>(p_diag_pair);
-
-    auto p_int = fut_p_int.get();
-
-    auto p_metrics_pair = fut_p_metrics.get();
-    auto& p_metrics = std::get<0>(p_metrics_pair);
-    auto& p_metrics_want = std::get<1>(p_metrics_pair);
-
-    auto p_patch = fut_p_patch.get();
-
-    auto p_prog_pair = fut_p_prog.get();
-    auto& p_prog = std::get<0>(p_prog_pair);
-    auto& p_prog_want = std::get<1>(p_prog_pair);
-
-    auto z_kin_hor_e_pair = fut_z_kin_hor_e.get();
-    auto& z_kin_hor_e = std::get<0>(z_kin_hor_e_pair);
-    auto& z_kin_hor_e_want = std::get<1>(z_kin_hor_e_pair);
-
-    auto z_vt_ie_pair = fut_z_vt_ie.get();
-    auto& z_vt_ie = std::get<0>(z_vt_ie_pair);
-    auto& z_vt_ie_want = std::get<1>(z_vt_ie_pair);
-
-    auto z_w_concorr_me_pair = fut_z_w_concorr.get();
-    auto& z_w_concorr_me = std::get<0>(z_w_concorr_me_pair);
-    auto& z_w_concorr_me_want = std::get<1>(z_w_concorr_me_pair);
-    int istep = fut_istep.get();
-    int ldeepatmo = fut_ldeepatmo.get();
-    int lvn_only = fut_lvn_only.get();
-    int ntnd = fut_ntnd.get();
-    double dt_linintp_ubc = fut_dt_linintp.get();
-    double dtime = fut_dtime.get();
+    UNWRAP_ALL_DIAGS;
 
     acerr() << "All data read..." << std::endl;
 
-    if (ldeepatmo != 0) {
-      throw std::runtime_error("ldeepatmo is not 0");
-    }
-    if (global_data.lextra_diffu != 1) {
-      throw std::runtime_error("lextra_diffu is not 1");
-    }
-    if (istep != 1 && istep != 2) {
-      throw std::runtime_error("istep not 1 or 2");
-    }
-    if (lvn_only != 0 && lvn_only != 1) {
-      throw std::runtime_error("lvn_only not 0 or 1");
-    }
-    acout() << "Step " << n
-            << " variables, extra_diffu: " << global_data.lextra_diffu
-            << ", istep: ";
-    acout() << istep << ", lvn_only: " << lvn_only
-            << ", ldeepatmo: " << ldeepatmo << std::endl;
+    // if (ldeepatmo != 0) {
+    //   throw std::runtime_error("ldeepatmo is not 0");
+    // }
+    // if (global_data.lextra_diffu != 1) {
+    //   throw std::runtime_error("lextra_diffu is not 1");
+    // }
+    // if (istep != 1 && istep != 2) {
+    //   throw std::runtime_error("istep not 1 or 2");
+    // }
+    // if (lvn_only != 0 && lvn_only != 1) {
+    //   throw std::runtime_error("lvn_only not 0 or 1");
+    // }
+    // acout() << "Step " << n
+    //         << " variables, extra_diffu: " << global_data.lextra_diffu
+    //         << ", istep: ";
+    // acout() << istep << ", lvn_only: " << lvn_only
+    //         << ", ldeepatmo: " << ldeepatmo << std::endl;
 
     // if (lvn_only == 1 && istep == 1) {
     //   auto* h_1_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
