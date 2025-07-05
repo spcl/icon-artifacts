@@ -1,403 +1,405 @@
-#define SPAWN_DIAG(prefix, name, type)                                         \
-  auto fut_##name = spawn(                                                     \
-      pool, [&] { return t0_t1_pair<type>(ROOT, #prefix "." #name, n); });
-
-#define UNWRAP_DIAG(name) auto [name##_in, name##_want] = fut_##name.get();
-
-#define DUMP_DIAG(prefix, name, type)                                          \
-  pool.emplace_back([&] {                                                      \
-    got_want_pair<type>(name##_in, name##_want, #prefix "." #name, n, DUMP);   \
+#define SPAWN_READERS(prefix, name, type, namespc)                             \
+  auto fut_##name = spawn(pool, [&] {                                          \
+    return namespc::t0_t1_pair<type>(ROOT, #prefix "." #name, n);              \
   });
 
-#define SPAWN_ALL_DIAGS(prefix)                                                \
-  SPAWN_DIAG(prefix, global_data, global_data_type)                            \
-  SPAWN_DIAG(prefix, p_nh, t_nh_state)                                         \
-  SPAWN_DIAG(prefix, p_patch, t_patch)                                         \
-  SPAWN_DIAG(prefix, p_int, t_int_state)                                       \
-  SPAWN_DIAG(prefix, prep_adv, t_prepare_adv)                                  \
-  SPAWN_DIAG(prefix, nnow, int)                                                \
-  SPAWN_DIAG(prefix, nnew, int)                                                \
-  SPAWN_DIAG(prefix, l_init, int)                                              \
-  SPAWN_DIAG(prefix, l_recompute, int)                                         \
-  SPAWN_DIAG(prefix, lsave_mflx, int)                                          \
-  SPAWN_DIAG(prefix, lprep_adv, int)                                           \
-  SPAWN_DIAG(prefix, lclean_mflx, int)                                         \
-  SPAWN_DIAG(prefix, idyn_timestep, int)                                       \
-  SPAWN_DIAG(prefix, jstep, int)                                               \
-  SPAWN_DIAG(prefix, dtime, int)                                               \
-  SPAWN_DIAG(prefix, lacc, int)                                                \
-  SPAWN_DIAG(prefix, jb, int)                                                  \
-  SPAWN_DIAG(prefix, jk, int)                                                  \
-  SPAWN_DIAG(prefix, jc, int)                                                  \
-  SPAWN_DIAG(prefix, je, int)                                                  \
-  SPAWN_DIAG(prefix, jks, int)                                                 \
-  SPAWN_DIAG(prefix, jg, int)                                                  \
-  SPAWN_DIAG(prefix, nlev, int)                                                \
-  SPAWN_DIAG(prefix, nlevp1, int)                                              \
-  SPAWN_DIAG(prefix, i_startblk, int)                                          \
-  SPAWN_DIAG(prefix, i_endblk, int)                                            \
-  SPAWN_DIAG(prefix, i_startidx, int)                                          \
-  SPAWN_DIAG(prefix, i_endidx, int)                                            \
-  SPAWN_DIAG(prefix, ishift, int)                                              \
-  SPAWN_DIAG(prefix, rl_start, int)                                            \
-  SPAWN_DIAG(prefix, rl_end, int)                                              \
-  SPAWN_DIAG(prefix, istep, int)                                               \
-  SPAWN_DIAG(prefix, ntl1, int)                                                \
-  SPAWN_DIAG(prefix, ntl2, int)                                                \
-  SPAWN_DIAG(prefix, nvar, int)                                                \
-  SPAWN_DIAG(prefix, nshift, int)                                              \
-  SPAWN_DIAG(prefix, nshift_total, int)                                        \
-  SPAWN_DIAG(prefix, z_theta_v_fl_e, double *)                                 \
-  SPAWN_DIAG(prefix, z_theta_v_e, double *)                                    \
-  SPAWN_DIAG(prefix, z_rho_e, double *)                                        \
-  SPAWN_DIAG(prefix, z_theta_v_v, double *)                                    \
-  SPAWN_DIAG(prefix, z_rho_v, double *)                                        \
-  SPAWN_DIAG(prefix, z_th_ddz_exner_c, double *)                               \
-  SPAWN_DIAG(prefix, z_dexner_dz_c, double *)                                  \
-  SPAWN_DIAG(prefix, z_vt_ie, double *)                                        \
-  SPAWN_DIAG(prefix, z_kin_hor_e, double *)                                    \
-  SPAWN_DIAG(prefix, z_exner_ex_pr, double *)                                  \
-  SPAWN_DIAG(prefix, z_gradh_exner, double *)                                  \
-  SPAWN_DIAG(prefix, z_rth_pr, double *)                                       \
-  SPAWN_DIAG(prefix, z_grad_rth, double *)                                     \
-  SPAWN_DIAG(prefix, z_w_concorr_me, double *)                                 \
-  SPAWN_DIAG(prefix, z_graddiv_vn, double *)                                   \
-  SPAWN_DIAG(prefix, z_w_expl, double *)                                       \
-  SPAWN_DIAG(prefix, z_vn_avg, double *)                                       \
-  SPAWN_DIAG(prefix, z_mflx_top, double *)                                     \
-  SPAWN_DIAG(prefix, z_contr_w_fl_l, double *)                                 \
-  SPAWN_DIAG(prefix, z_rho_expl, double *)                                     \
-  SPAWN_DIAG(prefix, z_exner_expl, double *)                                   \
-  SPAWN_DIAG(prefix, z_theta_tavg_m1, double)                                  \
-  SPAWN_DIAG(prefix, z_theta_tavg, double)                                     \
-  SPAWN_DIAG(prefix, z_rho_tavg_m1, double)                                    \
-  SPAWN_DIAG(prefix, z_rho_tavg, double)                                       \
-  SPAWN_DIAG(prefix, z_alpha, double *)                                        \
-  SPAWN_DIAG(prefix, z_beta, double *)                                         \
-  SPAWN_DIAG(prefix, z_q, double *)                                            \
-  SPAWN_DIAG(prefix, z_graddiv2_vn, double *)                                  \
-  SPAWN_DIAG(prefix, z_theta_v_pr_ic, double *)                                \
-  SPAWN_DIAG(prefix, z_exner_ic, double *)                                     \
-  SPAWN_DIAG(prefix, z_w_concorr_mc, double *)                                 \
-  SPAWN_DIAG(prefix, z_flxdiv_mass, double *)                                  \
-  SPAWN_DIAG(prefix, z_flxdiv_theta, double *)                                 \
-  SPAWN_DIAG(prefix, z_hydro_corr, double *)                                   \
-  SPAWN_DIAG(prefix, z_a, double)                                              \
-  SPAWN_DIAG(prefix, z_b, double)                                              \
-  SPAWN_DIAG(prefix, z_c, double)                                              \
-  SPAWN_DIAG(prefix, z_g, double)                                              \
-  SPAWN_DIAG(prefix, z_gamma, double)                                          \
-  SPAWN_DIAG(prefix, z_w_backtraj, double)                                     \
-  SPAWN_DIAG(prefix, z_theta_v_pr_mc_m1, double)                               \
-  SPAWN_DIAG(prefix, z_theta_v_pr_mc, double)                                  \
-  SPAWN_DIAG(prefix, z_theta1, double)                                         \
-  SPAWN_DIAG(prefix, z_theta2, double)                                         \
-  SPAWN_DIAG(prefix, wgt_nnow_vel, double)                                     \
-  SPAWN_DIAG(prefix, wgt_nnew_vel, double)                                     \
-  SPAWN_DIAG(prefix, dt_shift, double)                                         \
-  SPAWN_DIAG(prefix, wgt_nnow_rth, double)                                     \
-  SPAWN_DIAG(prefix, wgt_nnew_rth, double)                                     \
-  SPAWN_DIAG(prefix, dthalf, double)                                           \
-  SPAWN_DIAG(prefix, r_nsubsteps, double)                                      \
-  SPAWN_DIAG(prefix, r_dtimensubsteps, double)                                 \
-  SPAWN_DIAG(prefix, scal_divdamp_o2, double)                                  \
-  SPAWN_DIAG(prefix, alin, double)                                             \
-  SPAWN_DIAG(prefix, dz32, double)                                             \
-  SPAWN_DIAG(prefix, df32, double)                                             \
-  SPAWN_DIAG(prefix, dz42, double)                                             \
-  SPAWN_DIAG(prefix, df42, double)                                             \
-  SPAWN_DIAG(prefix, bqdr, double)                                             \
-  SPAWN_DIAG(prefix, aqdr, double)                                             \
-  SPAWN_DIAG(prefix, zf, double)                                               \
-  SPAWN_DIAG(prefix, dzlin, double)                                            \
-  SPAWN_DIAG(prefix, dzqdr, double)                                            \
-  SPAWN_DIAG(prefix, dt_linintp_ubc, double)                                   \
-  SPAWN_DIAG(prefix, dt_linintp_ubc_nnow, double)                              \
-  SPAWN_DIAG(prefix, dt_linintp_ubc_nnew, double)                              \
-  SPAWN_DIAG(prefix, z_raylfac, double *)                                      \
-  SPAWN_DIAG(prefix, z_ntdistv_bary_1, double)                                 \
-  SPAWN_DIAG(prefix, distv_bary_1, double)                                     \
-  SPAWN_DIAG(prefix, z_ntdistv_bary_2, double)                                 \
-  SPAWN_DIAG(prefix, distv_bary_2, double)                                     \
-  SPAWN_DIAG(prefix, scal_divdamp, double *)                                   \
-  SPAWN_DIAG(prefix, bdy_divdamp, double *)                                    \
-  SPAWN_DIAG(prefix, enh_divdamp_fac, double *)                                \
-  SPAWN_DIAG(prefix, z_dwdz_dd, double *)                                      \
-  SPAWN_DIAG(prefix, z_ddt_vn_dyn, double)                                     \
-  SPAWN_DIAG(prefix, z_ddt_vn_apc, double)                                     \
-  SPAWN_DIAG(prefix, z_ddt_vn_cor, double)                                     \
-  SPAWN_DIAG(prefix, z_ddt_vn_pgr, double)                                     \
-  SPAWN_DIAG(prefix, z_ddt_vn_ray, double)                                     \
-  SPAWN_DIAG(prefix, z_d_vn_dmp, double)                                       \
-  SPAWN_DIAG(prefix, z_d_vn_iau, double)                                       \
-  SPAWN_DIAG(prefix, nproma_gradp, int)                                        \
-  SPAWN_DIAG(prefix, nblks_gradp, int)                                         \
-  SPAWN_DIAG(prefix, npromz_gradp, int)                                        \
-  SPAWN_DIAG(prefix, nlen_gradp, int)                                          \
-  SPAWN_DIAG(prefix, jk_start, int)                                            \
-  SPAWN_DIAG(prefix, lvn_only, int)                                            \
-  SPAWN_DIAG(prefix, lvn_pos, int)                                             \
-  SPAWN_DIAG(prefix, l_vert_nested, int)                                       \
-  SPAWN_DIAG(prefix, l_child_vertnest, int)
+#define UNWRAP_DATA_PAIR(name) auto [name##_in, name##_want] = fut_##name.get();
 
-#define UNWRAP_ALL_DIAGS                                                       \
-  UNWRAP_DIAG(alin)                                                            \
-  UNWRAP_DIAG(aqdr)                                                            \
-  UNWRAP_DIAG(bdy_divdamp)                                                     \
-  UNWRAP_DIAG(bqdr)                                                            \
-  UNWRAP_DIAG(df32)                                                            \
-  UNWRAP_DIAG(df42)                                                            \
-  UNWRAP_DIAG(distv_bary_1)                                                    \
-  UNWRAP_DIAG(distv_bary_2)                                                    \
-  UNWRAP_DIAG(dt_linintp_ubc)                                                  \
-  UNWRAP_DIAG(dt_linintp_ubc_nnew)                                             \
-  UNWRAP_DIAG(dt_linintp_ubc_nnow)                                             \
-  UNWRAP_DIAG(dt_shift)                                                        \
-  UNWRAP_DIAG(dthalf)                                                          \
-  UNWRAP_DIAG(dtime)                                                           \
-  UNWRAP_DIAG(dz32)                                                            \
-  UNWRAP_DIAG(dz42)                                                            \
-  UNWRAP_DIAG(dzlin)                                                           \
-  UNWRAP_DIAG(dzqdr)                                                           \
-  UNWRAP_DIAG(enh_divdamp_fac)                                                 \
-  UNWRAP_DIAG(global_data)                                                     \
-  UNWRAP_DIAG(i_endblk)                                                        \
-  UNWRAP_DIAG(i_endidx)                                                        \
-  UNWRAP_DIAG(i_startblk)                                                      \
-  UNWRAP_DIAG(i_startidx)                                                      \
-  UNWRAP_DIAG(idyn_timestep)                                                   \
-  UNWRAP_DIAG(ishift)                                                          \
-  UNWRAP_DIAG(istep)                                                           \
-  UNWRAP_DIAG(jb)                                                              \
-  UNWRAP_DIAG(jc)                                                              \
-  UNWRAP_DIAG(je)                                                              \
-  UNWRAP_DIAG(jg)                                                              \
-  UNWRAP_DIAG(jk_start)                                                        \
-  UNWRAP_DIAG(jk)                                                              \
-  UNWRAP_DIAG(jks)                                                             \
-  UNWRAP_DIAG(jstep)                                                           \
-  UNWRAP_DIAG(l_child_vertnest)                                                \
-  UNWRAP_DIAG(l_init)                                                          \
-  UNWRAP_DIAG(l_recompute)                                                     \
-  UNWRAP_DIAG(l_vert_nested)                                                   \
-  UNWRAP_DIAG(lacc)                                                            \
-  UNWRAP_DIAG(lclean_mflx)                                                     \
-  UNWRAP_DIAG(lprep_adv)                                                       \
-  UNWRAP_DIAG(lsave_mflx)                                                      \
-  UNWRAP_DIAG(lvn_only)                                                        \
-  UNWRAP_DIAG(lvn_pos)                                                         \
-  UNWRAP_DIAG(nblks_gradp)                                                     \
-  UNWRAP_DIAG(nlen_gradp)                                                      \
-  UNWRAP_DIAG(nlev)                                                            \
-  UNWRAP_DIAG(nlevp1)                                                          \
-  UNWRAP_DIAG(nnew)                                                            \
-  UNWRAP_DIAG(nnow)                                                            \
-  UNWRAP_DIAG(nproma_gradp)                                                    \
-  UNWRAP_DIAG(npromz_gradp)                                                    \
-  UNWRAP_DIAG(nshift_total)                                                    \
-  UNWRAP_DIAG(nshift)                                                          \
-  UNWRAP_DIAG(ntl1)                                                            \
-  UNWRAP_DIAG(ntl2)                                                            \
-  UNWRAP_DIAG(nvar)                                                            \
-  UNWRAP_DIAG(p_int)                                                           \
-  UNWRAP_DIAG(p_nh)                                                            \
-  UNWRAP_DIAG(p_patch)                                                         \
-  UNWRAP_DIAG(prep_adv)                                                        \
-  UNWRAP_DIAG(r_dtimensubsteps)                                                \
-  UNWRAP_DIAG(r_nsubsteps)                                                     \
-  UNWRAP_DIAG(rl_end)                                                          \
-  UNWRAP_DIAG(rl_start)                                                        \
-  UNWRAP_DIAG(scal_divdamp_o2)                                                 \
-  UNWRAP_DIAG(scal_divdamp)                                                    \
-  UNWRAP_DIAG(wgt_nnew_rth)                                                    \
-  UNWRAP_DIAG(wgt_nnew_vel)                                                    \
-  UNWRAP_DIAG(wgt_nnow_rth)                                                    \
-  UNWRAP_DIAG(wgt_nnow_vel)                                                    \
-  UNWRAP_DIAG(z_a)                                                             \
-  UNWRAP_DIAG(z_alpha)                                                         \
-  UNWRAP_DIAG(z_b)                                                             \
-  UNWRAP_DIAG(z_beta)                                                          \
-  UNWRAP_DIAG(z_c)                                                             \
-  UNWRAP_DIAG(z_contr_w_fl_l)                                                  \
-  UNWRAP_DIAG(z_d_vn_dmp)                                                      \
-  UNWRAP_DIAG(z_d_vn_iau)                                                      \
-  UNWRAP_DIAG(z_ddt_vn_apc)                                                    \
-  UNWRAP_DIAG(z_ddt_vn_cor)                                                    \
-  UNWRAP_DIAG(z_ddt_vn_dyn)                                                    \
-  UNWRAP_DIAG(z_ddt_vn_pgr)                                                    \
-  UNWRAP_DIAG(z_ddt_vn_ray)                                                    \
-  UNWRAP_DIAG(z_dexner_dz_c)                                                   \
-  UNWRAP_DIAG(z_dwdz_dd)                                                       \
-  UNWRAP_DIAG(z_exner_ex_pr)                                                   \
-  UNWRAP_DIAG(z_exner_expl)                                                    \
-  UNWRAP_DIAG(z_exner_ic)                                                      \
-  UNWRAP_DIAG(z_flxdiv_mass)                                                   \
-  UNWRAP_DIAG(z_flxdiv_theta)                                                  \
-  UNWRAP_DIAG(z_g)                                                             \
-  UNWRAP_DIAG(z_gamma)                                                         \
-  UNWRAP_DIAG(z_grad_rth)                                                      \
-  UNWRAP_DIAG(z_graddiv_vn)                                                    \
-  UNWRAP_DIAG(z_graddiv2_vn)                                                   \
-  UNWRAP_DIAG(z_gradh_exner)                                                   \
-  UNWRAP_DIAG(z_hydro_corr)                                                    \
-  UNWRAP_DIAG(z_kin_hor_e)                                                     \
-  UNWRAP_DIAG(z_mflx_top)                                                      \
-  UNWRAP_DIAG(z_ntdistv_bary_1)                                                \
-  UNWRAP_DIAG(z_ntdistv_bary_2)                                                \
-  UNWRAP_DIAG(z_q)                                                             \
-  UNWRAP_DIAG(z_raylfac)                                                       \
-  UNWRAP_DIAG(z_rho_e)                                                         \
-  UNWRAP_DIAG(z_rho_expl)                                                      \
-  UNWRAP_DIAG(z_rho_tavg_m1)                                                   \
-  UNWRAP_DIAG(z_rho_tavg)                                                      \
-  UNWRAP_DIAG(z_rho_v)                                                         \
-  UNWRAP_DIAG(z_rth_pr)                                                        \
-  UNWRAP_DIAG(z_th_ddz_exner_c)                                                \
-  UNWRAP_DIAG(z_theta_tavg_m1)                                                 \
-  UNWRAP_DIAG(z_theta_tavg)                                                    \
-  UNWRAP_DIAG(z_theta_v_e)                                                     \
-  UNWRAP_DIAG(z_theta_v_fl_e)                                                  \
-  UNWRAP_DIAG(z_theta_v_pr_ic)                                                 \
-  UNWRAP_DIAG(z_theta_v_pr_mc_m1)                                              \
-  UNWRAP_DIAG(z_theta_v_pr_mc)                                                 \
-  UNWRAP_DIAG(z_theta_v_v)                                                     \
-  UNWRAP_DIAG(z_theta1)                                                        \
-  UNWRAP_DIAG(z_theta2)                                                        \
-  UNWRAP_DIAG(z_vn_avg)                                                        \
-  UNWRAP_DIAG(z_vt_ie)                                                         \
-  UNWRAP_DIAG(z_w_backtraj)                                                    \
-  UNWRAP_DIAG(z_w_concorr_mc)                                                  \
-  UNWRAP_DIAG(z_w_concorr_me)                                                  \
-  UNWRAP_DIAG(z_w_expl)                                                        \
-  UNWRAP_DIAG(zf)
+#define SPAWN_WRITERS(prefix, name, type, namespc)                             \
+  pool.emplace_back([&] {                                                      \
+    namespc::got_want_pair<type>(name##_in, name##_want, #prefix "." #name, n, \
+                                 DUMP);                                        \
+  });
 
-#define DUMP_ALL_DIAGS(prefix)                                                 \
-  DUMP_DIAG(prefix, global_data, global_data_type)                             \
-  DUMP_DIAG(prefix, p_nh, t_nh_state)                                          \
-  DUMP_DIAG(prefix, p_patch, t_patch)                                          \
-  DUMP_DIAG(prefix, p_int, t_int_state)                                        \
-  DUMP_DIAG(prefix, prep_adv, t_prepare_adv)                                   \
-  DUMP_DIAG(prefix, nnow, int)                                                 \
-  DUMP_DIAG(prefix, nnew, int)                                                 \
-  DUMP_DIAG(prefix, l_init, int)                                               \
-  DUMP_DIAG(prefix, l_recompute, int)                                          \
-  DUMP_DIAG(prefix, lsave_mflx, int)                                           \
-  DUMP_DIAG(prefix, lprep_adv, int)                                            \
-  DUMP_DIAG(prefix, lclean_mflx, int)                                          \
-  DUMP_DIAG(prefix, idyn_timestep, int)                                        \
-  DUMP_DIAG(prefix, jstep, int)                                                \
-  DUMP_DIAG(prefix, dtime, double)                                             \
-  DUMP_DIAG(prefix, lacc, int)                                                 \
-  DUMP_DIAG(prefix, jb, int)                                                   \
-  DUMP_DIAG(prefix, jk, int)                                                   \
-  DUMP_DIAG(prefix, jc, int)                                                   \
-  DUMP_DIAG(prefix, je, int)                                                   \
-  DUMP_DIAG(prefix, jks, int)                                                  \
-  DUMP_DIAG(prefix, jg, int)                                                   \
-  DUMP_DIAG(prefix, nlev, int)                                                 \
-  DUMP_DIAG(prefix, nlevp1, int)                                               \
-  DUMP_DIAG(prefix, i_startblk, int)                                           \
-  DUMP_DIAG(prefix, i_endblk, int)                                             \
-  DUMP_DIAG(prefix, i_startidx, int)                                           \
-  DUMP_DIAG(prefix, i_endidx, int)                                             \
-  DUMP_DIAG(prefix, ishift, int)                                               \
-  DUMP_DIAG(prefix, rl_start, int)                                             \
-  DUMP_DIAG(prefix, rl_end, int)                                               \
-  DUMP_DIAG(prefix, istep, int)                                                \
-  DUMP_DIAG(prefix, ntl1, int)                                                 \
-  DUMP_DIAG(prefix, ntl2, int)                                                 \
-  DUMP_DIAG(prefix, nvar, int)                                                 \
-  DUMP_DIAG(prefix, nshift, int)                                               \
-  DUMP_DIAG(prefix, nshift_total, int)                                         \
-  DUMP_DIAG(prefix, z_theta_v_fl_e, double *)                                  \
-  DUMP_DIAG(prefix, z_theta_v_e, double *)                                     \
-  DUMP_DIAG(prefix, z_rho_e, double *)                                         \
-  DUMP_DIAG(prefix, z_theta_v_v, double *)                                     \
-  DUMP_DIAG(prefix, z_rho_v, double *)                                         \
-  DUMP_DIAG(prefix, z_th_ddz_exner_c, double *)                                \
-  DUMP_DIAG(prefix, z_dexner_dz_c, double *)                                   \
-  DUMP_DIAG(prefix, z_vt_ie, double *)                                         \
-  DUMP_DIAG(prefix, z_kin_hor_e, double *)                                     \
-  DUMP_DIAG(prefix, z_exner_ex_pr, double *)                                   \
-  DUMP_DIAG(prefix, z_gradh_exner, double *)                                   \
-  DUMP_DIAG(prefix, z_rth_pr, double *)                                        \
-  DUMP_DIAG(prefix, z_grad_rth, double *)                                      \
-  DUMP_DIAG(prefix, z_w_concorr_me, double *)                                  \
-  DUMP_DIAG(prefix, z_graddiv_vn, double *)                                    \
-  DUMP_DIAG(prefix, z_w_expl, double *)                                        \
-  DUMP_DIAG(prefix, z_vn_avg, double *)                                        \
-  DUMP_DIAG(prefix, z_mflx_top, double *)                                      \
-  DUMP_DIAG(prefix, z_contr_w_fl_l, double *)                                  \
-  DUMP_DIAG(prefix, z_rho_expl, double *)                                      \
-  DUMP_DIAG(prefix, z_exner_expl, double *)                                    \
-  DUMP_DIAG(prefix, z_theta_tavg_m1, double)                                   \
-  DUMP_DIAG(prefix, z_theta_tavg, double)                                      \
-  DUMP_DIAG(prefix, z_rho_tavg_m1, double)                                     \
-  DUMP_DIAG(prefix, z_rho_tavg, double)                                        \
-  DUMP_DIAG(prefix, z_alpha, double *)                                         \
-  DUMP_DIAG(prefix, z_beta, double *)                                          \
-  DUMP_DIAG(prefix, z_q, double *)                                             \
-  DUMP_DIAG(prefix, z_graddiv2_vn, double *)                                   \
-  DUMP_DIAG(prefix, z_theta_v_pr_ic, double *)                                 \
-  DUMP_DIAG(prefix, z_exner_ic, double *)                                      \
-  DUMP_DIAG(prefix, z_w_concorr_mc, double *)                                  \
-  DUMP_DIAG(prefix, z_flxdiv_mass, double *)                                   \
-  DUMP_DIAG(prefix, z_flxdiv_theta, double *)                                  \
-  DUMP_DIAG(prefix, z_hydro_corr, double *)                                    \
-  DUMP_DIAG(prefix, z_a, double)                                               \
-  DUMP_DIAG(prefix, z_b, double)                                               \
-  DUMP_DIAG(prefix, z_c, double)                                               \
-  DUMP_DIAG(prefix, z_g, double)                                               \
-  DUMP_DIAG(prefix, z_gamma, double)                                           \
-  DUMP_DIAG(prefix, z_w_backtraj, double)                                      \
-  DUMP_DIAG(prefix, z_theta_v_pr_mc_m1, double)                                \
-  DUMP_DIAG(prefix, z_theta_v_pr_mc, double)                                   \
-  DUMP_DIAG(prefix, z_theta1, double)                                          \
-  DUMP_DIAG(prefix, z_theta2, double)                                          \
-  DUMP_DIAG(prefix, wgt_nnow_vel, double)                                      \
-  DUMP_DIAG(prefix, wgt_nnew_vel, double)                                      \
-  DUMP_DIAG(prefix, dt_shift, double)                                          \
-  DUMP_DIAG(prefix, wgt_nnow_rth, double)                                      \
-  DUMP_DIAG(prefix, wgt_nnew_rth, double)                                      \
-  DUMP_DIAG(prefix, dthalf, double)                                            \
-  DUMP_DIAG(prefix, r_nsubsteps, double)                                       \
-  DUMP_DIAG(prefix, r_dtimensubsteps, double)                                  \
-  DUMP_DIAG(prefix, scal_divdamp_o2, double)                                   \
-  DUMP_DIAG(prefix, alin, double)                                              \
-  DUMP_DIAG(prefix, dz32, double)                                              \
-  DUMP_DIAG(prefix, df32, double)                                              \
-  DUMP_DIAG(prefix, dz42, double)                                              \
-  DUMP_DIAG(prefix, df42, double)                                              \
-  DUMP_DIAG(prefix, bqdr, double)                                              \
-  DUMP_DIAG(prefix, aqdr, double)                                              \
-  DUMP_DIAG(prefix, zf, double)                                                \
-  DUMP_DIAG(prefix, dzlin, double)                                             \
-  DUMP_DIAG(prefix, dzqdr, double)                                             \
-  DUMP_DIAG(prefix, dt_linintp_ubc, double)                                    \
-  DUMP_DIAG(prefix, dt_linintp_ubc_nnow, double)                               \
-  DUMP_DIAG(prefix, dt_linintp_ubc_nnew, double)                               \
-  DUMP_DIAG(prefix, z_raylfac, double *)                                       \
-  DUMP_DIAG(prefix, z_ntdistv_bary_1, double)                                  \
-  DUMP_DIAG(prefix, distv_bary_1, double)                                      \
-  DUMP_DIAG(prefix, z_ntdistv_bary_2, double)                                  \
-  DUMP_DIAG(prefix, distv_bary_2, double)                                      \
-  DUMP_DIAG(prefix, scal_divdamp, double *)                                    \
-  DUMP_DIAG(prefix, bdy_divdamp, double *)                                     \
-  DUMP_DIAG(prefix, enh_divdamp_fac, double *)                                 \
-  DUMP_DIAG(prefix, z_dwdz_dd, double *)                                       \
-  DUMP_DIAG(prefix, z_ddt_vn_dyn, double)                                      \
-  DUMP_DIAG(prefix, z_ddt_vn_apc, double)                                      \
-  DUMP_DIAG(prefix, z_ddt_vn_cor, double)                                      \
-  DUMP_DIAG(prefix, z_ddt_vn_pgr, double)                                      \
-  DUMP_DIAG(prefix, z_ddt_vn_ray, double)                                      \
-  DUMP_DIAG(prefix, z_d_vn_dmp, double)                                        \
-  DUMP_DIAG(prefix, z_d_vn_iau, double)                                        \
-  DUMP_DIAG(prefix, nproma_gradp, int)                                         \
-  DUMP_DIAG(prefix, nblks_gradp, int)                                          \
-  DUMP_DIAG(prefix, npromz_gradp, int)                                         \
-  DUMP_DIAG(prefix, nlen_gradp, int)                                           \
-  DUMP_DIAG(prefix, jk_start, int)                                             \
-  DUMP_DIAG(prefix, lvn_only, int)                                             \
-  DUMP_DIAG(prefix, lvn_pos, int)                                              \
-  DUMP_DIAG(prefix, l_vert_nested, int)                                        \
-  DUMP_DIAG(prefix, l_child_vertnest, int)
+#define SPAWN_ALL_READERS(prefix, namespc)                                     \
+  SPAWN_READERS(prefix, global_data, namespc::global_data_type, namespc)       \
+  SPAWN_READERS(prefix, p_nh, namespc::t_nh_state, namespc)                    \
+  SPAWN_READERS(prefix, p_patch, namespc::t_patch, namespc)                    \
+  SPAWN_READERS(prefix, p_int, namespc::t_int_state, namespc)                  \
+  SPAWN_READERS(prefix, prep_adv, namespc::t_prepare_adv, namespc)             \
+  SPAWN_READERS(prefix, nnow, int, namespc)                                    \
+  SPAWN_READERS(prefix, nnew, int, namespc)                                    \
+  SPAWN_READERS(prefix, l_init, int, namespc)                                  \
+  SPAWN_READERS(prefix, l_recompute, int, namespc)                             \
+  SPAWN_READERS(prefix, lsave_mflx, int, namespc)                              \
+  SPAWN_READERS(prefix, lprep_adv, int, namespc)                               \
+  SPAWN_READERS(prefix, lclean_mflx, int, namespc)                             \
+  SPAWN_READERS(prefix, idyn_timestep, int, namespc)                           \
+  SPAWN_READERS(prefix, jstep, int, namespc)                                   \
+  SPAWN_READERS(prefix, dtime, int, namespc)                                   \
+  SPAWN_READERS(prefix, lacc, int, namespc)                                    \
+  SPAWN_READERS(prefix, jb, int, namespc)                                      \
+  SPAWN_READERS(prefix, jk, int, namespc)                                      \
+  SPAWN_READERS(prefix, jc, int, namespc)                                      \
+  SPAWN_READERS(prefix, je, int, namespc)                                      \
+  SPAWN_READERS(prefix, jks, int, namespc)                                     \
+  SPAWN_READERS(prefix, jg, int, namespc)                                      \
+  SPAWN_READERS(prefix, nlev, int, namespc)                                    \
+  SPAWN_READERS(prefix, nlevp1, int, namespc)                                  \
+  SPAWN_READERS(prefix, i_startblk, int, namespc)                              \
+  SPAWN_READERS(prefix, i_endblk, int, namespc)                                \
+  SPAWN_READERS(prefix, i_startidx, int, namespc)                              \
+  SPAWN_READERS(prefix, i_endidx, int, namespc)                                \
+  SPAWN_READERS(prefix, ishift, int, namespc)                                  \
+  SPAWN_READERS(prefix, rl_start, int, namespc)                                \
+  SPAWN_READERS(prefix, rl_end, int, namespc)                                  \
+  SPAWN_READERS(prefix, istep, int, namespc)                                   \
+  SPAWN_READERS(prefix, ntl1, int, namespc)                                    \
+  SPAWN_READERS(prefix, ntl2, int, namespc)                                    \
+  SPAWN_READERS(prefix, nvar, int, namespc)                                    \
+  SPAWN_READERS(prefix, nshift, int, namespc)                                  \
+  SPAWN_READERS(prefix, nshift_total, int, namespc)                            \
+  SPAWN_READERS(prefix, z_theta_v_fl_e, double *, namespc)                     \
+  SPAWN_READERS(prefix, z_theta_v_e, double *, namespc)                        \
+  SPAWN_READERS(prefix, z_rho_e, double *, namespc)                            \
+  SPAWN_READERS(prefix, z_theta_v_v, double *, namespc)                        \
+  SPAWN_READERS(prefix, z_rho_v, double *, namespc)                            \
+  SPAWN_READERS(prefix, z_th_ddz_exner_c, double *, namespc)                   \
+  SPAWN_READERS(prefix, z_dexner_dz_c, double *, namespc)                      \
+  SPAWN_READERS(prefix, z_vt_ie, double *, namespc)                            \
+  SPAWN_READERS(prefix, z_kin_hor_e, double *, namespc)                        \
+  SPAWN_READERS(prefix, z_exner_ex_pr, double *, namespc)                      \
+  SPAWN_READERS(prefix, z_gradh_exner, double *, namespc)                      \
+  SPAWN_READERS(prefix, z_rth_pr, double *, namespc)                           \
+  SPAWN_READERS(prefix, z_grad_rth, double *, namespc)                         \
+  SPAWN_READERS(prefix, z_w_concorr_me, double *, namespc)                     \
+  SPAWN_READERS(prefix, z_graddiv_vn, double *, namespc)                       \
+  SPAWN_READERS(prefix, z_w_expl, double *, namespc)                           \
+  SPAWN_READERS(prefix, z_vn_avg, double *, namespc)                           \
+  SPAWN_READERS(prefix, z_mflx_top, double *, namespc)                         \
+  SPAWN_READERS(prefix, z_contr_w_fl_l, double *, namespc)                     \
+  SPAWN_READERS(prefix, z_rho_expl, double *, namespc)                         \
+  SPAWN_READERS(prefix, z_exner_expl, double *, namespc)                       \
+  SPAWN_READERS(prefix, z_theta_tavg_m1, double, namespc)                      \
+  SPAWN_READERS(prefix, z_theta_tavg, double, namespc)                         \
+  SPAWN_READERS(prefix, z_rho_tavg_m1, double, namespc)                        \
+  SPAWN_READERS(prefix, z_rho_tavg, double, namespc)                           \
+  SPAWN_READERS(prefix, z_alpha, double *, namespc)                            \
+  SPAWN_READERS(prefix, z_beta, double *, namespc)                             \
+  SPAWN_READERS(prefix, z_q, double *, namespc)                                \
+  SPAWN_READERS(prefix, z_graddiv2_vn, double *, namespc)                      \
+  SPAWN_READERS(prefix, z_theta_v_pr_ic, double *, namespc)                    \
+  SPAWN_READERS(prefix, z_exner_ic, double *, namespc)                         \
+  SPAWN_READERS(prefix, z_w_concorr_mc, double *, namespc)                     \
+  SPAWN_READERS(prefix, z_flxdiv_mass, double *, namespc)                      \
+  SPAWN_READERS(prefix, z_flxdiv_theta, double *, namespc)                     \
+  SPAWN_READERS(prefix, z_hydro_corr, double *, namespc)                       \
+  SPAWN_READERS(prefix, z_a, double, namespc)                                  \
+  SPAWN_READERS(prefix, z_b, double, namespc)                                  \
+  SPAWN_READERS(prefix, z_c, double, namespc)                                  \
+  SPAWN_READERS(prefix, z_g, double, namespc)                                  \
+  SPAWN_READERS(prefix, z_gamma, double, namespc)                              \
+  SPAWN_READERS(prefix, z_w_backtraj, double, namespc)                         \
+  SPAWN_READERS(prefix, z_theta_v_pr_mc_m1, double, namespc)                   \
+  SPAWN_READERS(prefix, z_theta_v_pr_mc, double, namespc)                      \
+  SPAWN_READERS(prefix, z_theta1, double, namespc)                             \
+  SPAWN_READERS(prefix, z_theta2, double, namespc)                             \
+  SPAWN_READERS(prefix, wgt_nnow_vel, double, namespc)                         \
+  SPAWN_READERS(prefix, wgt_nnew_vel, double, namespc)                         \
+  SPAWN_READERS(prefix, dt_shift, double, namespc)                             \
+  SPAWN_READERS(prefix, wgt_nnow_rth, double, namespc)                         \
+  SPAWN_READERS(prefix, wgt_nnew_rth, double, namespc)                         \
+  SPAWN_READERS(prefix, dthalf, double, namespc)                               \
+  SPAWN_READERS(prefix, r_nsubsteps, double, namespc)                          \
+  SPAWN_READERS(prefix, r_dtimensubsteps, double, namespc)                     \
+  SPAWN_READERS(prefix, scal_divdamp_o2, double, namespc)                      \
+  SPAWN_READERS(prefix, alin, double, namespc)                                 \
+  SPAWN_READERS(prefix, dz32, double, namespc)                                 \
+  SPAWN_READERS(prefix, df32, double, namespc)                                 \
+  SPAWN_READERS(prefix, dz42, double, namespc)                                 \
+  SPAWN_READERS(prefix, df42, double, namespc)                                 \
+  SPAWN_READERS(prefix, bqdr, double, namespc)                                 \
+  SPAWN_READERS(prefix, aqdr, double, namespc)                                 \
+  SPAWN_READERS(prefix, zf, double, namespc)                                   \
+  SPAWN_READERS(prefix, dzlin, double, namespc)                                \
+  SPAWN_READERS(prefix, dzqdr, double, namespc)                                \
+  SPAWN_READERS(prefix, dt_linintp_ubc, double, namespc)                       \
+  SPAWN_READERS(prefix, dt_linintp_ubc_nnow, double, namespc)                  \
+  SPAWN_READERS(prefix, dt_linintp_ubc_nnew, double, namespc)                  \
+  SPAWN_READERS(prefix, z_raylfac, double *, namespc)                          \
+  SPAWN_READERS(prefix, z_ntdistv_bary_1, double, namespc)                     \
+  SPAWN_READERS(prefix, distv_bary_1, double, namespc)                         \
+  SPAWN_READERS(prefix, z_ntdistv_bary_2, double, namespc)                     \
+  SPAWN_READERS(prefix, distv_bary_2, double, namespc)                         \
+  SPAWN_READERS(prefix, scal_divdamp, double *, namespc)                       \
+  SPAWN_READERS(prefix, bdy_divdamp, double *, namespc)                        \
+  SPAWN_READERS(prefix, enh_divdamp_fac, double *, namespc)                    \
+  SPAWN_READERS(prefix, z_dwdz_dd, double *, namespc)                          \
+  SPAWN_READERS(prefix, z_ddt_vn_dyn, double, namespc)                         \
+  SPAWN_READERS(prefix, z_ddt_vn_apc, double, namespc)                         \
+  SPAWN_READERS(prefix, z_ddt_vn_cor, double, namespc)                         \
+  SPAWN_READERS(prefix, z_ddt_vn_pgr, double, namespc)                         \
+  SPAWN_READERS(prefix, z_ddt_vn_ray, double, namespc)                         \
+  SPAWN_READERS(prefix, z_d_vn_dmp, double, namespc)                           \
+  SPAWN_READERS(prefix, z_d_vn_iau, double, namespc)                           \
+  SPAWN_READERS(prefix, nproma_gradp, int, namespc)                            \
+  SPAWN_READERS(prefix, nblks_gradp, int, namespc)                             \
+  SPAWN_READERS(prefix, npromz_gradp, int, namespc)                            \
+  SPAWN_READERS(prefix, nlen_gradp, int, namespc)                              \
+  SPAWN_READERS(prefix, jk_start, int, namespc)                                \
+  SPAWN_READERS(prefix, lvn_only, int, namespc)                                \
+  SPAWN_READERS(prefix, lvn_pos, int, namespc)                                 \
+  SPAWN_READERS(prefix, l_vert_nested, int, namespc)                           \
+  SPAWN_READERS(prefix, l_child_vertnest, int, namespc)
+
+#define UNWRAP_ALL_DATA_PAIRS()                                                \
+  UNWRAP_DATA_PAIR(alin)                                                       \
+  UNWRAP_DATA_PAIR(aqdr)                                                       \
+  UNWRAP_DATA_PAIR(bdy_divdamp)                                                \
+  UNWRAP_DATA_PAIR(bqdr)                                                       \
+  UNWRAP_DATA_PAIR(df32)                                                       \
+  UNWRAP_DATA_PAIR(df42)                                                       \
+  UNWRAP_DATA_PAIR(distv_bary_1)                                               \
+  UNWRAP_DATA_PAIR(distv_bary_2)                                               \
+  UNWRAP_DATA_PAIR(dt_linintp_ubc)                                             \
+  UNWRAP_DATA_PAIR(dt_linintp_ubc_nnew)                                        \
+  UNWRAP_DATA_PAIR(dt_linintp_ubc_nnow)                                        \
+  UNWRAP_DATA_PAIR(dt_shift)                                                   \
+  UNWRAP_DATA_PAIR(dthalf)                                                     \
+  UNWRAP_DATA_PAIR(dtime)                                                      \
+  UNWRAP_DATA_PAIR(dz32)                                                       \
+  UNWRAP_DATA_PAIR(dz42)                                                       \
+  UNWRAP_DATA_PAIR(dzlin)                                                      \
+  UNWRAP_DATA_PAIR(dzqdr)                                                      \
+  UNWRAP_DATA_PAIR(enh_divdamp_fac)                                            \
+  UNWRAP_DATA_PAIR(global_data)                                                \
+  UNWRAP_DATA_PAIR(i_endblk)                                                   \
+  UNWRAP_DATA_PAIR(i_endidx)                                                   \
+  UNWRAP_DATA_PAIR(i_startblk)                                                 \
+  UNWRAP_DATA_PAIR(i_startidx)                                                 \
+  UNWRAP_DATA_PAIR(idyn_timestep)                                              \
+  UNWRAP_DATA_PAIR(ishift)                                                     \
+  UNWRAP_DATA_PAIR(istep)                                                      \
+  UNWRAP_DATA_PAIR(jb)                                                         \
+  UNWRAP_DATA_PAIR(jc)                                                         \
+  UNWRAP_DATA_PAIR(je)                                                         \
+  UNWRAP_DATA_PAIR(jg)                                                         \
+  UNWRAP_DATA_PAIR(jk_start)                                                   \
+  UNWRAP_DATA_PAIR(jk)                                                         \
+  UNWRAP_DATA_PAIR(jks)                                                        \
+  UNWRAP_DATA_PAIR(jstep)                                                      \
+  UNWRAP_DATA_PAIR(l_child_vertnest)                                           \
+  UNWRAP_DATA_PAIR(l_init)                                                     \
+  UNWRAP_DATA_PAIR(l_recompute)                                                \
+  UNWRAP_DATA_PAIR(l_vert_nested)                                              \
+  UNWRAP_DATA_PAIR(lacc)                                                       \
+  UNWRAP_DATA_PAIR(lclean_mflx)                                                \
+  UNWRAP_DATA_PAIR(lprep_adv)                                                  \
+  UNWRAP_DATA_PAIR(lsave_mflx)                                                 \
+  UNWRAP_DATA_PAIR(lvn_only)                                                   \
+  UNWRAP_DATA_PAIR(lvn_pos)                                                    \
+  UNWRAP_DATA_PAIR(nblks_gradp)                                                \
+  UNWRAP_DATA_PAIR(nlen_gradp)                                                 \
+  UNWRAP_DATA_PAIR(nlev)                                                       \
+  UNWRAP_DATA_PAIR(nlevp1)                                                     \
+  UNWRAP_DATA_PAIR(nnew)                                                       \
+  UNWRAP_DATA_PAIR(nnow)                                                       \
+  UNWRAP_DATA_PAIR(nproma_gradp)                                               \
+  UNWRAP_DATA_PAIR(npromz_gradp)                                               \
+  UNWRAP_DATA_PAIR(nshift_total)                                               \
+  UNWRAP_DATA_PAIR(nshift)                                                     \
+  UNWRAP_DATA_PAIR(ntl1)                                                       \
+  UNWRAP_DATA_PAIR(ntl2)                                                       \
+  UNWRAP_DATA_PAIR(nvar)                                                       \
+  UNWRAP_DATA_PAIR(p_int)                                                      \
+  UNWRAP_DATA_PAIR(p_nh)                                                       \
+  UNWRAP_DATA_PAIR(p_patch)                                                    \
+  UNWRAP_DATA_PAIR(prep_adv)                                                   \
+  UNWRAP_DATA_PAIR(r_dtimensubsteps)                                           \
+  UNWRAP_DATA_PAIR(r_nsubsteps)                                                \
+  UNWRAP_DATA_PAIR(rl_end)                                                     \
+  UNWRAP_DATA_PAIR(rl_start)                                                   \
+  UNWRAP_DATA_PAIR(scal_divdamp_o2)                                            \
+  UNWRAP_DATA_PAIR(scal_divdamp)                                               \
+  UNWRAP_DATA_PAIR(wgt_nnew_rth)                                               \
+  UNWRAP_DATA_PAIR(wgt_nnew_vel)                                               \
+  UNWRAP_DATA_PAIR(wgt_nnow_rth)                                               \
+  UNWRAP_DATA_PAIR(wgt_nnow_vel)                                               \
+  UNWRAP_DATA_PAIR(z_a)                                                        \
+  UNWRAP_DATA_PAIR(z_alpha)                                                    \
+  UNWRAP_DATA_PAIR(z_b)                                                        \
+  UNWRAP_DATA_PAIR(z_beta)                                                     \
+  UNWRAP_DATA_PAIR(z_c)                                                        \
+  UNWRAP_DATA_PAIR(z_contr_w_fl_l)                                             \
+  UNWRAP_DATA_PAIR(z_d_vn_dmp)                                                 \
+  UNWRAP_DATA_PAIR(z_d_vn_iau)                                                 \
+  UNWRAP_DATA_PAIR(z_ddt_vn_apc)                                               \
+  UNWRAP_DATA_PAIR(z_ddt_vn_cor)                                               \
+  UNWRAP_DATA_PAIR(z_ddt_vn_dyn)                                               \
+  UNWRAP_DATA_PAIR(z_ddt_vn_pgr)                                               \
+  UNWRAP_DATA_PAIR(z_ddt_vn_ray)                                               \
+  UNWRAP_DATA_PAIR(z_dexner_dz_c)                                              \
+  UNWRAP_DATA_PAIR(z_dwdz_dd)                                                  \
+  UNWRAP_DATA_PAIR(z_exner_ex_pr)                                              \
+  UNWRAP_DATA_PAIR(z_exner_expl)                                               \
+  UNWRAP_DATA_PAIR(z_exner_ic)                                                 \
+  UNWRAP_DATA_PAIR(z_flxdiv_mass)                                              \
+  UNWRAP_DATA_PAIR(z_flxdiv_theta)                                             \
+  UNWRAP_DATA_PAIR(z_g)                                                        \
+  UNWRAP_DATA_PAIR(z_gamma)                                                    \
+  UNWRAP_DATA_PAIR(z_grad_rth)                                                 \
+  UNWRAP_DATA_PAIR(z_graddiv_vn)                                               \
+  UNWRAP_DATA_PAIR(z_graddiv2_vn)                                              \
+  UNWRAP_DATA_PAIR(z_gradh_exner)                                              \
+  UNWRAP_DATA_PAIR(z_hydro_corr)                                               \
+  UNWRAP_DATA_PAIR(z_kin_hor_e)                                                \
+  UNWRAP_DATA_PAIR(z_mflx_top)                                                 \
+  UNWRAP_DATA_PAIR(z_ntdistv_bary_1)                                           \
+  UNWRAP_DATA_PAIR(z_ntdistv_bary_2)                                           \
+  UNWRAP_DATA_PAIR(z_q)                                                        \
+  UNWRAP_DATA_PAIR(z_raylfac)                                                  \
+  UNWRAP_DATA_PAIR(z_rho_e)                                                    \
+  UNWRAP_DATA_PAIR(z_rho_expl)                                                 \
+  UNWRAP_DATA_PAIR(z_rho_tavg_m1)                                              \
+  UNWRAP_DATA_PAIR(z_rho_tavg)                                                 \
+  UNWRAP_DATA_PAIR(z_rho_v)                                                    \
+  UNWRAP_DATA_PAIR(z_rth_pr)                                                   \
+  UNWRAP_DATA_PAIR(z_th_ddz_exner_c)                                           \
+  UNWRAP_DATA_PAIR(z_theta_tavg_m1)                                            \
+  UNWRAP_DATA_PAIR(z_theta_tavg)                                               \
+  UNWRAP_DATA_PAIR(z_theta_v_e)                                                \
+  UNWRAP_DATA_PAIR(z_theta_v_fl_e)                                             \
+  UNWRAP_DATA_PAIR(z_theta_v_pr_ic)                                            \
+  UNWRAP_DATA_PAIR(z_theta_v_pr_mc_m1)                                         \
+  UNWRAP_DATA_PAIR(z_theta_v_pr_mc)                                            \
+  UNWRAP_DATA_PAIR(z_theta_v_v)                                                \
+  UNWRAP_DATA_PAIR(z_theta1)                                                   \
+  UNWRAP_DATA_PAIR(z_theta2)                                                   \
+  UNWRAP_DATA_PAIR(z_vn_avg)                                                   \
+  UNWRAP_DATA_PAIR(z_vt_ie)                                                    \
+  UNWRAP_DATA_PAIR(z_w_backtraj)                                               \
+  UNWRAP_DATA_PAIR(z_w_concorr_mc)                                             \
+  UNWRAP_DATA_PAIR(z_w_concorr_me)                                             \
+  UNWRAP_DATA_PAIR(z_w_expl)                                                   \
+  UNWRAP_DATA_PAIR(zf)
+
+#define SPAWN_ALL_WRITERS(prefix, namespc)                                     \
+  SPAWN_WRITERS(prefix, global_data, namespc::global_data_type, namespc)       \
+  SPAWN_WRITERS(prefix, p_nh, namespc::t_nh_state, namespc)                    \
+  SPAWN_WRITERS(prefix, p_patch, namespc::t_patch, namespc)                    \
+  SPAWN_WRITERS(prefix, p_int, namespc::t_int_state, namespc)                  \
+  SPAWN_WRITERS(prefix, prep_adv, namespc::t_prepare_adv, namespc)             \
+  SPAWN_WRITERS(prefix, nnow, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, nnew, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, l_init, int, namespc)                                  \
+  SPAWN_WRITERS(prefix, l_recompute, int, namespc)                             \
+  SPAWN_WRITERS(prefix, lsave_mflx, int, namespc)                              \
+  SPAWN_WRITERS(prefix, lprep_adv, int, namespc)                               \
+  SPAWN_WRITERS(prefix, lclean_mflx, int, namespc)                             \
+  SPAWN_WRITERS(prefix, idyn_timestep, int, namespc)                           \
+  SPAWN_WRITERS(prefix, jstep, int, namespc)                                   \
+  SPAWN_WRITERS(prefix, dtime, double, namespc)                                \
+  SPAWN_WRITERS(prefix, lacc, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, jb, int, namespc)                                      \
+  SPAWN_WRITERS(prefix, jk, int, namespc)                                      \
+  SPAWN_WRITERS(prefix, jc, int, namespc)                                      \
+  SPAWN_WRITERS(prefix, je, int, namespc)                                      \
+  SPAWN_WRITERS(prefix, jks, int, namespc)                                     \
+  SPAWN_WRITERS(prefix, jg, int, namespc)                                      \
+  SPAWN_WRITERS(prefix, nlev, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, nlevp1, int, namespc)                                  \
+  SPAWN_WRITERS(prefix, i_startblk, int, namespc)                              \
+  SPAWN_WRITERS(prefix, i_endblk, int, namespc)                                \
+  SPAWN_WRITERS(prefix, i_startidx, int, namespc)                              \
+  SPAWN_WRITERS(prefix, i_endidx, int, namespc)                                \
+  SPAWN_WRITERS(prefix, ishift, int, namespc)                                  \
+  SPAWN_WRITERS(prefix, rl_start, int, namespc)                                \
+  SPAWN_WRITERS(prefix, rl_end, int, namespc)                                  \
+  SPAWN_WRITERS(prefix, istep, int, namespc)                                   \
+  SPAWN_WRITERS(prefix, ntl1, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, ntl2, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, nvar, int, namespc)                                    \
+  SPAWN_WRITERS(prefix, nshift, int, namespc)                                  \
+  SPAWN_WRITERS(prefix, nshift_total, int, namespc)                            \
+  SPAWN_WRITERS(prefix, z_theta_v_fl_e, double *, namespc)                     \
+  SPAWN_WRITERS(prefix, z_theta_v_e, double *, namespc)                        \
+  SPAWN_WRITERS(prefix, z_rho_e, double *, namespc)                            \
+  SPAWN_WRITERS(prefix, z_theta_v_v, double *, namespc)                        \
+  SPAWN_WRITERS(prefix, z_rho_v, double *, namespc)                            \
+  SPAWN_WRITERS(prefix, z_th_ddz_exner_c, double *, namespc)                   \
+  SPAWN_WRITERS(prefix, z_dexner_dz_c, double *, namespc)                      \
+  SPAWN_WRITERS(prefix, z_vt_ie, double *, namespc)                            \
+  SPAWN_WRITERS(prefix, z_kin_hor_e, double *, namespc)                        \
+  SPAWN_WRITERS(prefix, z_exner_ex_pr, double *, namespc)                      \
+  SPAWN_WRITERS(prefix, z_gradh_exner, double *, namespc)                      \
+  SPAWN_WRITERS(prefix, z_rth_pr, double *, namespc)                           \
+  SPAWN_WRITERS(prefix, z_grad_rth, double *, namespc)                         \
+  SPAWN_WRITERS(prefix, z_w_concorr_me, double *, namespc)                     \
+  SPAWN_WRITERS(prefix, z_graddiv_vn, double *, namespc)                       \
+  SPAWN_WRITERS(prefix, z_w_expl, double *, namespc)                           \
+  SPAWN_WRITERS(prefix, z_vn_avg, double *, namespc)                           \
+  SPAWN_WRITERS(prefix, z_mflx_top, double *, namespc)                         \
+  SPAWN_WRITERS(prefix, z_contr_w_fl_l, double *, namespc)                     \
+  SPAWN_WRITERS(prefix, z_rho_expl, double *, namespc)                         \
+  SPAWN_WRITERS(prefix, z_exner_expl, double *, namespc)                       \
+  SPAWN_WRITERS(prefix, z_theta_tavg_m1, double, namespc)                      \
+  SPAWN_WRITERS(prefix, z_theta_tavg, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_rho_tavg_m1, double, namespc)                        \
+  SPAWN_WRITERS(prefix, z_rho_tavg, double, namespc)                           \
+  SPAWN_WRITERS(prefix, z_alpha, double *, namespc)                            \
+  SPAWN_WRITERS(prefix, z_beta, double *, namespc)                             \
+  SPAWN_WRITERS(prefix, z_q, double *, namespc)                                \
+  SPAWN_WRITERS(prefix, z_graddiv2_vn, double *, namespc)                      \
+  SPAWN_WRITERS(prefix, z_theta_v_pr_ic, double *, namespc)                    \
+  SPAWN_WRITERS(prefix, z_exner_ic, double *, namespc)                         \
+  SPAWN_WRITERS(prefix, z_w_concorr_mc, double *, namespc)                     \
+  SPAWN_WRITERS(prefix, z_flxdiv_mass, double *, namespc)                      \
+  SPAWN_WRITERS(prefix, z_flxdiv_theta, double *, namespc)                     \
+  SPAWN_WRITERS(prefix, z_hydro_corr, double *, namespc)                       \
+  SPAWN_WRITERS(prefix, z_a, double, namespc)                                  \
+  SPAWN_WRITERS(prefix, z_b, double, namespc)                                  \
+  SPAWN_WRITERS(prefix, z_c, double, namespc)                                  \
+  SPAWN_WRITERS(prefix, z_g, double, namespc)                                  \
+  SPAWN_WRITERS(prefix, z_gamma, double, namespc)                              \
+  SPAWN_WRITERS(prefix, z_w_backtraj, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_theta_v_pr_mc_m1, double, namespc)                   \
+  SPAWN_WRITERS(prefix, z_theta_v_pr_mc, double, namespc)                      \
+  SPAWN_WRITERS(prefix, z_theta1, double, namespc)                             \
+  SPAWN_WRITERS(prefix, z_theta2, double, namespc)                             \
+  SPAWN_WRITERS(prefix, wgt_nnow_vel, double, namespc)                         \
+  SPAWN_WRITERS(prefix, wgt_nnew_vel, double, namespc)                         \
+  SPAWN_WRITERS(prefix, dt_shift, double, namespc)                             \
+  SPAWN_WRITERS(prefix, wgt_nnow_rth, double, namespc)                         \
+  SPAWN_WRITERS(prefix, wgt_nnew_rth, double, namespc)                         \
+  SPAWN_WRITERS(prefix, dthalf, double, namespc)                               \
+  SPAWN_WRITERS(prefix, r_nsubsteps, double, namespc)                          \
+  SPAWN_WRITERS(prefix, r_dtimensubsteps, double, namespc)                     \
+  SPAWN_WRITERS(prefix, scal_divdamp_o2, double, namespc)                      \
+  SPAWN_WRITERS(prefix, alin, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, dz32, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, df32, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, dz42, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, df42, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, bqdr, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, aqdr, double, namespc)                                 \
+  SPAWN_WRITERS(prefix, zf, double, namespc)                                   \
+  SPAWN_WRITERS(prefix, dzlin, double, namespc)                                \
+  SPAWN_WRITERS(prefix, dzqdr, double, namespc)                                \
+  SPAWN_WRITERS(prefix, dt_linintp_ubc, double, namespc)                       \
+  SPAWN_WRITERS(prefix, dt_linintp_ubc_nnow, double, namespc)                  \
+  SPAWN_WRITERS(prefix, dt_linintp_ubc_nnew, double, namespc)                  \
+  SPAWN_WRITERS(prefix, z_raylfac, double *, namespc)                          \
+  SPAWN_WRITERS(prefix, z_ntdistv_bary_1, double, namespc)                     \
+  SPAWN_WRITERS(prefix, distv_bary_1, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_ntdistv_bary_2, double, namespc)                     \
+  SPAWN_WRITERS(prefix, distv_bary_2, double, namespc)                         \
+  SPAWN_WRITERS(prefix, scal_divdamp, double *, namespc)                       \
+  SPAWN_WRITERS(prefix, bdy_divdamp, double *, namespc)                        \
+  SPAWN_WRITERS(prefix, enh_divdamp_fac, double *, namespc)                    \
+  SPAWN_WRITERS(prefix, z_dwdz_dd, double *, namespc)                          \
+  SPAWN_WRITERS(prefix, z_ddt_vn_dyn, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_ddt_vn_apc, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_ddt_vn_cor, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_ddt_vn_pgr, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_ddt_vn_ray, double, namespc)                         \
+  SPAWN_WRITERS(prefix, z_d_vn_dmp, double, namespc)                           \
+  SPAWN_WRITERS(prefix, z_d_vn_iau, double, namespc)                           \
+  SPAWN_WRITERS(prefix, nproma_gradp, int, namespc)                            \
+  SPAWN_WRITERS(prefix, nblks_gradp, int, namespc)                             \
+  SPAWN_WRITERS(prefix, npromz_gradp, int, namespc)                            \
+  SPAWN_WRITERS(prefix, nlen_gradp, int, namespc)                              \
+  SPAWN_WRITERS(prefix, jk_start, int, namespc)                                \
+  SPAWN_WRITERS(prefix, lvn_only, int, namespc)                                \
+  SPAWN_WRITERS(prefix, lvn_pos, int, namespc)                                 \
+  SPAWN_WRITERS(prefix, l_vert_nested, int, namespc)                           \
+  SPAWN_WRITERS(prefix, l_child_vertnest, int, namespc)
