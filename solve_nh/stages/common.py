@@ -55,14 +55,6 @@ def canonicalize_sdfgs(
     unique_names(sdfgs)
 
 
-def populate_build_folders(
-    stage: int,
-    sdfgs: dict[str, SDFG],
-) -> None:
-    for name, g in sdfgs.items():
-        g.build_folder = f"{DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
-
-
 def codegen_action(
     stage: int,
     sdfgs: dict[str, SDFG],
@@ -71,8 +63,8 @@ def codegen_action(
     dace.config.Config.set("compiler", "cuda", "default_block_size", value="256,1,1")
     dace.config.Config.set("compiler", "default_data_types", value="C")
 
-    populate_build_folders(stage, sdfgs)
-    for _, g in sdfgs.items():
+    for name, g in sdfgs.items():
+        g.build_folder = f"{DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
         generate_code_from_sdfg(g)
     SDFG_INCLUDES = [Path(g.build_folder) / "include/" for _, g in sdfgs.items()]
     SDFG_SRCS = [
