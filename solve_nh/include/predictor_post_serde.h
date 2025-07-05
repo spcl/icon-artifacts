@@ -136,7 +136,7 @@ array_meta read_array_meta(std::istream &s) {
 }
 
 template <typename T> std::pair<array_meta, T *> read_array(std::istream &s) {
-  auto m =read_array_meta(s);
+  auto m = read_array_meta(s);
   auto *y = m.read<T>(s);
   return {m, y};
 }

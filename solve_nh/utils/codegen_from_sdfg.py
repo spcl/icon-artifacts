@@ -49,7 +49,8 @@ def compile_generated_code_for(sdfg_includes: list[Path], sdfg_srcs: list[Path])
 
     BIN = f"verify_solve_nh_parts"
 
-    DIAGNOSIS_FLAGS = "-fmax-errors=1 -g -Wall -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare".split(
+    ERRLIMIT_FLAG = "-fmax-errors=1" if CC.startswith("g++") else "-ferror-limit=1"
+    DIAGNOSIS_FLAGS = f"{ERRLIMIT_FLAG} -g -Wall -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare -Wno-parentheses-equality -Wno-constant-logical-operand".split(
         " "
     )
     OPTIMIZATION_FLAGS = (
