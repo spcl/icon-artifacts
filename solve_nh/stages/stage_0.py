@@ -40,17 +40,16 @@ def main():
 
             g = optimization_action(g)
 
+            g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
             sdfgs[name] = g
-        common.codegen_action(STAGE_ID, sdfgs)
-        for _, g in sdfgs.items():
-            g.save(outfile, compress=True)
 
     if args.codegen:
         # Read back the written files as we prepare for compilation.
         sdfgs = {
             name: SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names
         }
+        # TODO: REMOVE THESE ONCE THE SDFGs ARE FIXED.
         sdfgs.pop("solve_nh_predictor_pre")
         sdfgs.pop("solve_nh_corrector_pre")
         print(f"Stage #{STAGE_ID}: Generating code for {len(sdfgs)} SDFGs")
