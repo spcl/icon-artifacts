@@ -5,6 +5,45 @@
 #include <dace/dace.h>
 
 
+struct t_int_state {
+    int __f2dace_SA_e_bln_c_s_d_0_s_15 = {};
+int __f2dace_SA_e_bln_c_s_d_1_s_16 = {};
+int __f2dace_SA_e_bln_c_s_d_2_s_17 = {};
+int __f2dace_SA_e_flx_avg_d_0_s_18 = {};
+int __f2dace_SA_e_flx_avg_d_1_s_19 = {};
+int __f2dace_SA_e_flx_avg_d_2_s_20 = {};
+int __f2dace_SA_geofac_div_d_0_s_24 = {};
+int __f2dace_SA_geofac_div_d_1_s_25 = {};
+int __f2dace_SA_geofac_div_d_2_s_26 = {};
+int __f2dace_SA_geofac_grdiv_d_0_s_27 = {};
+int __f2dace_SA_geofac_grdiv_d_1_s_28 = {};
+int __f2dace_SA_geofac_grdiv_d_2_s_29 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_0_s_21 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_1_s_22 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_2_s_23 = {};
+int __f2dace_SOA_e_bln_c_s_d_0_s_15 = {};
+int __f2dace_SOA_e_bln_c_s_d_1_s_16 = {};
+int __f2dace_SOA_e_bln_c_s_d_2_s_17 = {};
+int __f2dace_SOA_e_flx_avg_d_0_s_18 = {};
+int __f2dace_SOA_e_flx_avg_d_1_s_19 = {};
+int __f2dace_SOA_e_flx_avg_d_2_s_20 = {};
+int __f2dace_SOA_geofac_div_d_0_s_24 = {};
+int __f2dace_SOA_geofac_div_d_1_s_25 = {};
+int __f2dace_SOA_geofac_div_d_2_s_26 = {};
+int __f2dace_SOA_geofac_grdiv_d_0_s_27 = {};
+int __f2dace_SOA_geofac_grdiv_d_1_s_28 = {};
+int __f2dace_SOA_geofac_grdiv_d_2_s_29 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_21 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_22 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_23 = {};
+double* e_bln_c_s = {};
+double* e_flx_avg = {};
+double* geofac_div = {};
+double* geofac_grdiv = {};
+double* rbf_vec_coeff_e = {};
+};
+
+
 struct t_nh_prog {
     int __f2dace_SA_exner_d_0_s_202 = {};
 int __f2dace_SA_exner_d_1_s_203 = {};
@@ -340,6 +379,11 @@ int timers_level = {};
 };
 
 
+struct t_prepare_adv {
+    
+};
+
+
 struct t_grid_cells {
     int __f2dace_SA_edge_blk_d_0_s_53 = {};
 int __f2dace_SA_edge_blk_d_1_s_54 = {};
@@ -367,50 +411,6 @@ int* end_block = {};
 int* end_index = {};
 int* start_block = {};
 int* start_index = {};
-};
-
-
-struct t_int_state {
-    int __f2dace_SA_e_bln_c_s_d_0_s_15 = {};
-int __f2dace_SA_e_bln_c_s_d_1_s_16 = {};
-int __f2dace_SA_e_bln_c_s_d_2_s_17 = {};
-int __f2dace_SA_e_flx_avg_d_0_s_18 = {};
-int __f2dace_SA_e_flx_avg_d_1_s_19 = {};
-int __f2dace_SA_e_flx_avg_d_2_s_20 = {};
-int __f2dace_SA_geofac_div_d_0_s_24 = {};
-int __f2dace_SA_geofac_div_d_1_s_25 = {};
-int __f2dace_SA_geofac_div_d_2_s_26 = {};
-int __f2dace_SA_geofac_grdiv_d_0_s_27 = {};
-int __f2dace_SA_geofac_grdiv_d_1_s_28 = {};
-int __f2dace_SA_geofac_grdiv_d_2_s_29 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_0_s_21 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_1_s_22 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_2_s_23 = {};
-int __f2dace_SOA_e_bln_c_s_d_0_s_15 = {};
-int __f2dace_SOA_e_bln_c_s_d_1_s_16 = {};
-int __f2dace_SOA_e_bln_c_s_d_2_s_17 = {};
-int __f2dace_SOA_e_flx_avg_d_0_s_18 = {};
-int __f2dace_SOA_e_flx_avg_d_1_s_19 = {};
-int __f2dace_SOA_e_flx_avg_d_2_s_20 = {};
-int __f2dace_SOA_geofac_div_d_0_s_24 = {};
-int __f2dace_SOA_geofac_div_d_1_s_25 = {};
-int __f2dace_SOA_geofac_div_d_2_s_26 = {};
-int __f2dace_SOA_geofac_grdiv_d_0_s_27 = {};
-int __f2dace_SOA_geofac_grdiv_d_1_s_28 = {};
-int __f2dace_SOA_geofac_grdiv_d_2_s_29 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_21 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_22 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_23 = {};
-double* e_bln_c_s = {};
-double* e_flx_avg = {};
-double* geofac_div = {};
-double* geofac_grdiv = {};
-double* rbf_vec_coeff_e = {};
-};
-
-
-struct t_prepare_adv {
-    
 };
 
 
