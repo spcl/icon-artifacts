@@ -5,11 +5,20 @@
 #include <string>
 #include <string_view>
 
+#include "solve_nh_parts.h"
+
 // #include "predictor_pre_serde.h"
 #include "predictor_post_serde.h"
 // #include "corrector_pre_serde.h"
 // #include "corrector_post_serde.h"
 namespace serde = ::predictor_post;
+using predictor_post::global_data_type;
+using predictor_post::t_grid_cells;
+using predictor_post::t_grid_edges;
+using predictor_post::t_int_state;
+using predictor_post::t_nh_state;
+using predictor_post::t_patch;
+using predictor_post::t_prepare_adv;
 
 #include "utils.h"
 using namespace standalone_utils;

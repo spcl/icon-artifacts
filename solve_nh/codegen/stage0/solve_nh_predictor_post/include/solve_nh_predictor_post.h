@@ -44,133 +44,6 @@ double* w = {};
 };
 
 
-struct t_prepare_adv {
-    
-};
-
-
-struct t_nh_ref {
-    int __f2dace_SA_w_ref_d_0_s_272 = {};
-int __f2dace_SA_w_ref_d_1_s_273 = {};
-int __f2dace_SA_w_ref_d_2_s_274 = {};
-int __f2dace_SOA_w_ref_d_0_s_272 = {};
-int __f2dace_SOA_w_ref_d_1_s_273 = {};
-int __f2dace_SOA_w_ref_d_2_s_274 = {};
-double* w_ref = {};
-};
-
-
-struct t_grid_cells {
-    int __f2dace_SA_edge_blk_d_0_s_53 = {};
-int __f2dace_SA_edge_blk_d_1_s_54 = {};
-int __f2dace_SA_edge_blk_d_2_s_55 = {};
-int __f2dace_SA_edge_idx_d_0_s_50 = {};
-int __f2dace_SA_edge_idx_d_1_s_51 = {};
-int __f2dace_SA_edge_idx_d_2_s_52 = {};
-int __f2dace_SA_end_block_d_0_s_59 = {};
-int __f2dace_SA_end_index_d_0_s_57 = {};
-int __f2dace_SA_start_block_d_0_s_58 = {};
-int __f2dace_SA_start_index_d_0_s_56 = {};
-int __f2dace_SOA_edge_blk_d_0_s_53 = {};
-int __f2dace_SOA_edge_blk_d_1_s_54 = {};
-int __f2dace_SOA_edge_blk_d_2_s_55 = {};
-int __f2dace_SOA_edge_idx_d_0_s_50 = {};
-int __f2dace_SOA_edge_idx_d_1_s_51 = {};
-int __f2dace_SOA_edge_idx_d_2_s_52 = {};
-int __f2dace_SOA_end_block_d_0_s_59 = {};
-int __f2dace_SOA_end_index_d_0_s_57 = {};
-int __f2dace_SOA_start_block_d_0_s_58 = {};
-int __f2dace_SOA_start_index_d_0_s_56 = {};
-int* edge_blk = {};
-int* edge_idx = {};
-int* end_block = {};
-int* end_index = {};
-int* start_block = {};
-int* start_index = {};
-};
-
-
-struct t_grid_edges {
-    int __f2dace_SA_end_block_d_0_s_69 = {};
-int __f2dace_SA_end_index_d_0_s_67 = {};
-int __f2dace_SA_quad_blk_d_0_s_63 = {};
-int __f2dace_SA_quad_blk_d_1_s_64 = {};
-int __f2dace_SA_quad_blk_d_2_s_65 = {};
-int __f2dace_SA_quad_idx_d_0_s_60 = {};
-int __f2dace_SA_quad_idx_d_1_s_61 = {};
-int __f2dace_SA_quad_idx_d_2_s_62 = {};
-int __f2dace_SA_start_block_d_0_s_68 = {};
-int __f2dace_SA_start_index_d_0_s_66 = {};
-int __f2dace_SOA_end_block_d_0_s_69 = {};
-int __f2dace_SOA_end_index_d_0_s_67 = {};
-int __f2dace_SOA_quad_blk_d_0_s_63 = {};
-int __f2dace_SOA_quad_blk_d_1_s_64 = {};
-int __f2dace_SOA_quad_blk_d_2_s_65 = {};
-int __f2dace_SOA_quad_idx_d_0_s_60 = {};
-int __f2dace_SOA_quad_idx_d_1_s_61 = {};
-int __f2dace_SOA_quad_idx_d_2_s_62 = {};
-int __f2dace_SOA_start_block_d_0_s_68 = {};
-int __f2dace_SOA_start_index_d_0_s_66 = {};
-int* end_block = {};
-int* end_index = {};
-int* quad_blk = {};
-int* quad_idx = {};
-int* start_block = {};
-int* start_index = {};
-};
-
-
-struct t_patch {
-    t_grid_cells* cells = {};
-t_grid_edges* edges = {};
-int id = {};
-int nblks_c = {};
-int nblks_e = {};
-int nblks_v = {};
-int nlev = {};
-int nlevp1 = {};
-};
-
-
-struct t_int_state {
-    int __f2dace_SA_e_bln_c_s_d_0_s_15 = {};
-int __f2dace_SA_e_bln_c_s_d_1_s_16 = {};
-int __f2dace_SA_e_bln_c_s_d_2_s_17 = {};
-int __f2dace_SA_e_flx_avg_d_0_s_18 = {};
-int __f2dace_SA_e_flx_avg_d_1_s_19 = {};
-int __f2dace_SA_e_flx_avg_d_2_s_20 = {};
-int __f2dace_SA_geofac_div_d_0_s_24 = {};
-int __f2dace_SA_geofac_div_d_1_s_25 = {};
-int __f2dace_SA_geofac_div_d_2_s_26 = {};
-int __f2dace_SA_geofac_grdiv_d_0_s_27 = {};
-int __f2dace_SA_geofac_grdiv_d_1_s_28 = {};
-int __f2dace_SA_geofac_grdiv_d_2_s_29 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_0_s_21 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_1_s_22 = {};
-int __f2dace_SA_rbf_vec_coeff_e_d_2_s_23 = {};
-int __f2dace_SOA_e_bln_c_s_d_0_s_15 = {};
-int __f2dace_SOA_e_bln_c_s_d_1_s_16 = {};
-int __f2dace_SOA_e_bln_c_s_d_2_s_17 = {};
-int __f2dace_SOA_e_flx_avg_d_0_s_18 = {};
-int __f2dace_SOA_e_flx_avg_d_1_s_19 = {};
-int __f2dace_SOA_e_flx_avg_d_2_s_20 = {};
-int __f2dace_SOA_geofac_div_d_0_s_24 = {};
-int __f2dace_SOA_geofac_div_d_1_s_25 = {};
-int __f2dace_SOA_geofac_div_d_2_s_26 = {};
-int __f2dace_SOA_geofac_grdiv_d_0_s_27 = {};
-int __f2dace_SOA_geofac_grdiv_d_1_s_28 = {};
-int __f2dace_SOA_geofac_grdiv_d_2_s_29 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_21 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_22 = {};
-int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_23 = {};
-double* e_bln_c_s = {};
-double* e_flx_avg = {};
-double* geofac_div = {};
-double* geofac_grdiv = {};
-double* rbf_vec_coeff_e = {};
-};
-
-
 struct t_nh_diag {
     int __f2dace_SA_ddt_exner_phy_d_0_s_256 = {};
 int __f2dace_SA_ddt_exner_phy_d_1_s_257 = {};
@@ -324,6 +197,17 @@ double* w_ubc = {};
 };
 
 
+struct t_nh_ref {
+    int __f2dace_SA_w_ref_d_0_s_272 = {};
+int __f2dace_SA_w_ref_d_1_s_273 = {};
+int __f2dace_SA_w_ref_d_2_s_274 = {};
+int __f2dace_SOA_w_ref_d_0_s_272 = {};
+int __f2dace_SOA_w_ref_d_1_s_273 = {};
+int __f2dace_SOA_w_ref_d_2_s_274 = {};
+double* w_ref = {};
+};
+
+
 struct t_nh_metrics {
     int __f2dace_SA_bdy_mflx_e_blk_d_0_s_311 = {};
 int __f2dace_SA_bdy_mflx_e_idx_d_0_s_310 = {};
@@ -456,12 +340,128 @@ int timers_level = {};
 };
 
 
+struct t_grid_cells {
+    int __f2dace_SA_edge_blk_d_0_s_53 = {};
+int __f2dace_SA_edge_blk_d_1_s_54 = {};
+int __f2dace_SA_edge_blk_d_2_s_55 = {};
+int __f2dace_SA_edge_idx_d_0_s_50 = {};
+int __f2dace_SA_edge_idx_d_1_s_51 = {};
+int __f2dace_SA_edge_idx_d_2_s_52 = {};
+int __f2dace_SA_end_block_d_0_s_59 = {};
+int __f2dace_SA_end_index_d_0_s_57 = {};
+int __f2dace_SA_start_block_d_0_s_58 = {};
+int __f2dace_SA_start_index_d_0_s_56 = {};
+int __f2dace_SOA_edge_blk_d_0_s_53 = {};
+int __f2dace_SOA_edge_blk_d_1_s_54 = {};
+int __f2dace_SOA_edge_blk_d_2_s_55 = {};
+int __f2dace_SOA_edge_idx_d_0_s_50 = {};
+int __f2dace_SOA_edge_idx_d_1_s_51 = {};
+int __f2dace_SOA_edge_idx_d_2_s_52 = {};
+int __f2dace_SOA_end_block_d_0_s_59 = {};
+int __f2dace_SOA_end_index_d_0_s_57 = {};
+int __f2dace_SOA_start_block_d_0_s_58 = {};
+int __f2dace_SOA_start_index_d_0_s_56 = {};
+int* edge_blk = {};
+int* edge_idx = {};
+int* end_block = {};
+int* end_index = {};
+int* start_block = {};
+int* start_index = {};
+};
+
+
+struct t_int_state {
+    int __f2dace_SA_e_bln_c_s_d_0_s_15 = {};
+int __f2dace_SA_e_bln_c_s_d_1_s_16 = {};
+int __f2dace_SA_e_bln_c_s_d_2_s_17 = {};
+int __f2dace_SA_e_flx_avg_d_0_s_18 = {};
+int __f2dace_SA_e_flx_avg_d_1_s_19 = {};
+int __f2dace_SA_e_flx_avg_d_2_s_20 = {};
+int __f2dace_SA_geofac_div_d_0_s_24 = {};
+int __f2dace_SA_geofac_div_d_1_s_25 = {};
+int __f2dace_SA_geofac_div_d_2_s_26 = {};
+int __f2dace_SA_geofac_grdiv_d_0_s_27 = {};
+int __f2dace_SA_geofac_grdiv_d_1_s_28 = {};
+int __f2dace_SA_geofac_grdiv_d_2_s_29 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_0_s_21 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_1_s_22 = {};
+int __f2dace_SA_rbf_vec_coeff_e_d_2_s_23 = {};
+int __f2dace_SOA_e_bln_c_s_d_0_s_15 = {};
+int __f2dace_SOA_e_bln_c_s_d_1_s_16 = {};
+int __f2dace_SOA_e_bln_c_s_d_2_s_17 = {};
+int __f2dace_SOA_e_flx_avg_d_0_s_18 = {};
+int __f2dace_SOA_e_flx_avg_d_1_s_19 = {};
+int __f2dace_SOA_e_flx_avg_d_2_s_20 = {};
+int __f2dace_SOA_geofac_div_d_0_s_24 = {};
+int __f2dace_SOA_geofac_div_d_1_s_25 = {};
+int __f2dace_SOA_geofac_div_d_2_s_26 = {};
+int __f2dace_SOA_geofac_grdiv_d_0_s_27 = {};
+int __f2dace_SOA_geofac_grdiv_d_1_s_28 = {};
+int __f2dace_SOA_geofac_grdiv_d_2_s_29 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_21 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_22 = {};
+int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_23 = {};
+double* e_bln_c_s = {};
+double* e_flx_avg = {};
+double* geofac_div = {};
+double* geofac_grdiv = {};
+double* rbf_vec_coeff_e = {};
+};
+
+
+struct t_prepare_adv {
+    
+};
+
+
+struct t_grid_edges {
+    int __f2dace_SA_end_block_d_0_s_69 = {};
+int __f2dace_SA_end_index_d_0_s_67 = {};
+int __f2dace_SA_quad_blk_d_0_s_63 = {};
+int __f2dace_SA_quad_blk_d_1_s_64 = {};
+int __f2dace_SA_quad_blk_d_2_s_65 = {};
+int __f2dace_SA_quad_idx_d_0_s_60 = {};
+int __f2dace_SA_quad_idx_d_1_s_61 = {};
+int __f2dace_SA_quad_idx_d_2_s_62 = {};
+int __f2dace_SA_start_block_d_0_s_68 = {};
+int __f2dace_SA_start_index_d_0_s_66 = {};
+int __f2dace_SOA_end_block_d_0_s_69 = {};
+int __f2dace_SOA_end_index_d_0_s_67 = {};
+int __f2dace_SOA_quad_blk_d_0_s_63 = {};
+int __f2dace_SOA_quad_blk_d_1_s_64 = {};
+int __f2dace_SOA_quad_blk_d_2_s_65 = {};
+int __f2dace_SOA_quad_idx_d_0_s_60 = {};
+int __f2dace_SOA_quad_idx_d_1_s_61 = {};
+int __f2dace_SOA_quad_idx_d_2_s_62 = {};
+int __f2dace_SOA_start_block_d_0_s_68 = {};
+int __f2dace_SOA_start_index_d_0_s_66 = {};
+int* end_block = {};
+int* end_index = {};
+int* quad_blk = {};
+int* quad_idx = {};
+int* start_block = {};
+int* start_index = {};
+};
+
+
+struct t_patch {
+    t_grid_cells* cells = {};
+t_grid_edges* edges = {};
+int id = {};
+int nblks_c = {};
+int nblks_e = {};
+int nblks_v = {};
+int nlev = {};
+int nlevp1 = {};
+};
+
+
 
 
 struct solve_nh_predictor_post_state_t;  // Forward declaration.
 
-DACE_EXPORTED solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(double *  bdy_divdamp, double *  enh_divdamp_fac, global_data_type* global_data, t_int_state* p_int, t_nh_state* p_nh, t_patch* p_patch, t_prepare_adv* prep_adv, double *  scal_divdamp, double *  z_alpha, double *  z_beta, double *  z_contr_w_fl_l, double *  z_dexner_dz_c, double *  z_dwdz_dd, double *  z_exner_ex_pr, double *  z_exner_expl, double *  z_exner_ic, double *  z_flxdiv_mass, double *  z_flxdiv_theta, double *  z_grad_rth, double *  z_graddiv2_vn, double *  z_graddiv_vn, double *  z_gradh_exner, double *  z_hydro_corr, double *  z_kin_hor_e, double *  z_mflx_top, double *  z_q, double *  z_raylfac, double *  z_rho_e, double *  z_rho_expl, double *  z_rho_v, double *  z_rth_pr, double *  z_th_ddz_exner_c, double *  z_theta_v_e, double *  z_theta_v_fl_e, double *  z_theta_v_pr_ic, double *  z_theta_v_v, double *  z_vn_avg, double *  z_vt_ie, double *  z_w_concorr_mc, double *  z_w_concorr_me, double *  z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx, int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp, int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start, double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c, double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g, double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2, double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+DACE_EXPORTED solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(double * __restrict__ bdy_divdamp, double * __restrict__ enh_divdamp_fac, global_data_type* global_data, t_int_state* p_int, t_nh_state* p_nh, t_patch* p_patch, t_prepare_adv* prep_adv, double * __restrict__ scal_divdamp, double * __restrict__ z_alpha, double * __restrict__ z_beta, double * __restrict__ z_contr_w_fl_l, double * __restrict__ z_dexner_dz_c, double * __restrict__ z_dwdz_dd, double * __restrict__ z_exner_ex_pr, double * __restrict__ z_exner_expl, double * __restrict__ z_exner_ic, double * __restrict__ z_flxdiv_mass, double * __restrict__ z_flxdiv_theta, double * __restrict__ z_grad_rth, double * __restrict__ z_graddiv2_vn, double * __restrict__ z_graddiv_vn, double * __restrict__ z_gradh_exner, double * __restrict__ z_hydro_corr, double * __restrict__ z_kin_hor_e, double * __restrict__ z_mflx_top, double * __restrict__ z_q, double * __restrict__ z_raylfac, double * __restrict__ z_rho_e, double * __restrict__ z_rho_expl, double * __restrict__ z_rho_v, double * __restrict__ z_rth_pr, double * __restrict__ z_th_ddz_exner_c, double * __restrict__ z_theta_v_e, double * __restrict__ z_theta_v_fl_e, double * __restrict__ z_theta_v_pr_ic, double * __restrict__ z_theta_v_v, double * __restrict__ z_vn_avg, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_mc, double * __restrict__ z_w_concorr_me, double * __restrict__ z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx, int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp, int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start, double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c, double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g, double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2, double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
 DACE_EXPORTED int __dace_exit_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state);
-DACE_EXPORTED void __program_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state, double *  bdy_divdamp, double *  enh_divdamp_fac, global_data_type* global_data, t_int_state* p_int, t_nh_state* p_nh, t_patch* p_patch, t_prepare_adv* prep_adv, double *  scal_divdamp, double *  z_alpha, double *  z_beta, double *  z_contr_w_fl_l, double *  z_dexner_dz_c, double *  z_dwdz_dd, double *  z_exner_ex_pr, double *  z_exner_expl, double *  z_exner_ic, double *  z_flxdiv_mass, double *  z_flxdiv_theta, double *  z_grad_rth, double *  z_graddiv2_vn, double *  z_graddiv_vn, double *  z_gradh_exner, double *  z_hydro_corr, double *  z_kin_hor_e, double *  z_mflx_top, double *  z_q, double *  z_raylfac, double *  z_rho_e, double *  z_rho_expl, double *  z_rho_v, double *  z_rth_pr, double *  z_th_ddz_exner_c, double *  z_theta_v_e, double *  z_theta_v_fl_e, double *  z_theta_v_pr_ic, double *  z_theta_v_v, double *  z_vn_avg, double *  z_vt_ie, double *  z_w_concorr_mc, double *  z_w_concorr_me, double *  z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx, int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp, int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start, double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c, double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g, double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2, double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+DACE_EXPORTED void __program_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state, double * __restrict__ bdy_divdamp, double * __restrict__ enh_divdamp_fac, global_data_type* global_data, t_int_state* p_int, t_nh_state* p_nh, t_patch* p_patch, t_prepare_adv* prep_adv, double * __restrict__ scal_divdamp, double * __restrict__ z_alpha, double * __restrict__ z_beta, double * __restrict__ z_contr_w_fl_l, double * __restrict__ z_dexner_dz_c, double * __restrict__ z_dwdz_dd, double * __restrict__ z_exner_ex_pr, double * __restrict__ z_exner_expl, double * __restrict__ z_exner_ic, double * __restrict__ z_flxdiv_mass, double * __restrict__ z_flxdiv_theta, double * __restrict__ z_grad_rth, double * __restrict__ z_graddiv2_vn, double * __restrict__ z_graddiv_vn, double * __restrict__ z_gradh_exner, double * __restrict__ z_hydro_corr, double * __restrict__ z_kin_hor_e, double * __restrict__ z_mflx_top, double * __restrict__ z_q, double * __restrict__ z_raylfac, double * __restrict__ z_rho_e, double * __restrict__ z_rho_expl, double * __restrict__ z_rho_v, double * __restrict__ z_rth_pr, double * __restrict__ z_th_ddz_exner_c, double * __restrict__ z_theta_v_e, double * __restrict__ z_theta_v_fl_e, double * __restrict__ z_theta_v_pr_ic, double * __restrict__ z_theta_v_v, double * __restrict__ z_vn_avg, double * __restrict__ z_vt_ie, double * __restrict__ z_w_concorr_mc, double * __restrict__ z_w_concorr_me, double * __restrict__ z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx, int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp, int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start, double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c, double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g, double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2, double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
 
 #endif // __DACE_CODEGEN_SOLVE_NH_PREDICTOR_POST__

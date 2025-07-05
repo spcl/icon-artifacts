@@ -51,19 +51,14 @@ def main():
         sdfgs = {
             name: SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names
         }
+        sdfgs.pop("solve_nh_predictor_pre")
+        sdfgs.pop("solve_nh_corrector_pre")
         print(f"Stage #{STAGE_ID}: Generating code for {len(sdfgs)} SDFGs")
         common.codegen_action(STAGE_ID, sdfgs)
 
     if args.compile:
-        # Read back the written files as we prepare for compilation.
-        sdfgs = {
-            name: SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names
-        }
-        sdfgs.pop("solve_nh_predictor_pre")
-        sdfgs.pop("solve_nh_corrector_pre")
-        sdfgs.pop("solve_nh_corrector_post")
-        print(f"Stage #{STAGE_ID}: Compiling {len(sdfgs)} SDFGs")
-        common.compile_action(STAGE_ID, sdfgs)
+        print(f"Stage #{STAGE_ID}: Compiling SDFGs")
+        common.compile_action(STAGE_ID)
 
 
 if __name__ == "__main__":

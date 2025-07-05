@@ -8,14 +8,13 @@
 #include <iostream>
 #include <istream>
 #include <map>
+#include <numeric>
 #include <optional>
 #include <ranges>
 #include <set>
 #include <sstream>
 #include <string_view>
 #include <vector>
-
-#include "solve_nh_predictor_pre.h"
 
 namespace predictor_pre {
 std::vector<std::string_view> split(std::string_view s, char delim) {

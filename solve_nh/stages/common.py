@@ -2,7 +2,11 @@ from pathlib import Path
 import dace
 from dace import SDFG
 from utils.unique_names import unique_names
-from utils.codegen_from_sdfg import generate_code_from_sdfg, compile_generated_code_for
+from utils.codegen_from_sdfg import (
+    generate_code_from_sdfg,
+    compile_generated_code_for,
+    consolidate_generated_code,
+)
 
 STARTER_SDFG_FILES = [
     "solve_nh_predictor_pre.sdfgz",
@@ -70,16 +74,17 @@ def codegen_action(
     populate_build_folders(stage, sdfgs)
     for _, g in sdfgs.items():
         generate_code_from_sdfg(g)
-
-
-def compile_action(
-    stage: int,
-    sdfgs: dict[str, SDFG],
-) -> None:
-    populate_build_folders(stage, sdfgs)
-    SDFG_INCLUDES = [
-      Path(g.build_folder) / "include/" for _, g in sdfgs.items()]
+    SDFG_INCLUDES = [Path(g.build_folder) / "include/" for _, g in sdfgs.items()]
     SDFG_SRCS = [
-      Path(g.build_folder) / "src/cpu" / f"{g.name}.cpp" for _, g in sdfgs.items()]
+        Path(g.build_folder) / "src/cpu" / f"{g.name}.cpp" for _, g in sdfgs.items()
+    ]
+    consolidate_generated_code(
+        SDFG_INCLUDES, SDFG_SRCS, Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")
+    )
+
+
+def compile_action(stage: int) -> None:
+    SDFG_INCLUDES = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")]
+    SDFG_SRCS = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}") / "solve_nh_parts.cpp"]
 
     compile_generated_code_for(SDFG_INCLUDES, SDFG_SRCS)

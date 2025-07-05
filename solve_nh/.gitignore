@@ -1,6 +1,11 @@
 **.mod
 **.concrete.sdfgz
 **.pyc
+**.DS_Store
+**.vscode
+**.idea
+**.dacecache
+**.dSYM
 
 codegen/**
 !codegen/*.sdfgz
@@ -11,3 +16,6 @@ codegen/**
 !codegen/stage*/solve_nh*/include/solve_nh*.h
 !codegen/stage*/solve_nh*/src/cpu/solve_nh*.cpp
 !codegen/stage*/solve_nh*/dace.conf
+
+gotwant
+verify_solve_nh_parts
