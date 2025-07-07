@@ -80,7 +80,7 @@ def compare_pair(
         print(f"Comparing {got} vs. {want}")
 
     per_var: Dict[str, Dict[str, Any]] = {}
-    current_var: str = got.stem
+    current_var: str = got.stem.removeprefix(f"{got.stem.split('.')[0]}.")
 
     for got_line, want_line in zip_longest(_stream_lines(got), _stream_lines(want)):
         if got_line is None or want_line is None:
