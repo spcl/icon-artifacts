@@ -18,7 +18,7 @@ def optimization_action(sdfg):
     deflatten_used_structs = ["p_diag"]
     _allocation_names_to_comment_out =  change_flatten_lib_to_shallow_copy(sdfg, shallow_copy_used_structs, deflatten_used_structs)
     sdfg.validate()
-    add_set_zero(sdfg, "gpu_maxvcfl_arr")
+    #add_set_zero(sdfg, "gpu_maxvcfl_arr")
     sdfg.validate()
     input_to_gpu(sdfg, "z_w_concorr_me")
     input_to_gpu(sdfg, "z_kin_hor_e")

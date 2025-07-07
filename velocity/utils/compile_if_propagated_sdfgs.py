@@ -125,7 +125,7 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
         script_dir = path
     _process_folder(script_dir, sdfg, instrument)
 
-def add_timers(file_path: str, gpu: bool, stage:int):
+def add_timers(file_path: str, gpu: bool, stage:int, use_openacc_stream: bool = False):
 
     with open(file_path, "r") as f:
         code = f.read()
@@ -145,8 +145,11 @@ def add_timers(file_path: str, gpu: bool, stage:int):
             else:
                 replacement1 = '   cudaStreamSynchronize(__state->gpu_context->streams[0]); //EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
         elif stage == 9:
-            # Stage 8 adds it after open acc stream
-            replacement1 = '\\g<0>'
+            if use_openacc_stream:
+                # Stage 8 adds it after open acc stream
+                replacement1 = '\\g<0>'
+            else:
+                replacement1 = '   cudaDeviceSynchronize(); //EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
         else:
             assert stage <= 5
             if use_cuda_events:
@@ -155,11 +158,16 @@ def add_timers(file_path: str, gpu: bool, stage:int):
                 replacement1 = '   cudaDeviceSynchronize(); //EntryStreamSync\n      //cudaEvent_t start1, stop1;\n    //cudaEventCreate(&start1);\n    //cudaEventCreate(&stop1);\n    //cudaEventRecord(start1); \n measure_time("Run");\n \\g<0>'
     pattern2 = r'^\s*double p_diag_out_max_vcfl_dyn;\s*$'
     if gpu is True:
-        if stage > 5:
+        if stage > 5 and stage < 9:
             if not use_cuda_events:
                 replacement2 = '\\g<0>  //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaStreamSynchronize(__state->gpu_context->streams[0]); \n  //std::cout << "CUDA Events Based Total time: " << milliseconds1*1000.0 << " us" << std::endl;\n'
             else:
                 replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     //measure_time("Host Based C++ Timer"); \n  cudaEventDestroy(start1);\n    cudaEventDestroy(stop1);\n    cudaStreamSynchronize(__state->gpu_context->streams[0]); \n  std::cout << "CUDA Events Based Total time: " << milliseconds1*1000.0 << " us" << std::endl;\n'
+        elif stage == 9:
+            if use_openacc_stream:
+                replacement2 = '\\g<0>  cudaStreamSynchronize(__state->gpu_context->streams[0]);\n    //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    //cudaDeviceSynchronize(); \n  //std::cout << "CUDA Events Based Total time: " << milliseconds1*1000.0 << " us" << std::endl;\n'
+            else:
+                replacement2 = '\\g<0>  cudaStreamSynchronize(__state->gpu_context->streams[0]);\n    //cudaEventRecord(stop1);\n    //cudaEventSynchronize(stop1);\n    //float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     measure_time("Host Based C++ Timer"); \n  //cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    cudaDeviceSynchronize(); \n  //std::cout << "CUDA Events Based Total time: " << milliseconds1*1000.0 << " us" << std::endl;\n'
         else:
             if use_cuda_events:
                 replacement2 = '\\g<0>  cudaEventRecord(stop1);\n    cudaEventSynchronize(stop1);\n    float milliseconds1 = 0;\n    //cudaEventElapsedTime(&milliseconds1, start1, stop1);\n     //measure_time("Host Based C++ Timer"); \n  cudaEventDestroy(start1);\n    //cudaEventDestroy(stop1);\n    cudaDeviceSynchronize(); \n  std::cout << "CUDA Events Based Total time: " << milliseconds1*1000.0 << " us" << std::endl;\n'
@@ -603,12 +611,14 @@ def compile_if_propagated_sdfgs(
         debuginfo_flags = "-lineinfo" if debuginfo else ""
     else:
         debuginfo_flags = "-g" if debuginfo else ""
+    nvhpc_flags += "  " if use_nvhpc else ""
 
+    cuda_arch = os.getenv('_CUDA_ARCH', 'native')
     if gpu:
         if release:
-            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch=native --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp"
+            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch={cuda_arch} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp --relocatable-device-code=true -rdc=true -dlto "
         else:
-            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch=native -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch={cuda_arch} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
@@ -622,9 +632,9 @@ def compile_if_propagated_sdfgs(
     dace_include = os.path.dirname(dace.__file__) + "/runtime/include/"
     if gpu:
         if not lib:
-            compile_cmd = f"nvcc {nvhpc_flags} {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
+            compile_cmd = f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_gpu"
         else:
-            compile_cmd = f"nvcc {nvhpc_flags} {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
+            compile_cmd = f"nvcc {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o libvelocity_gpu.so"
     else:
         if not lib:
             compile_cmd = f"c++ {' '.join(sources)} -I{build_loc}/include -I{dace_include} {' '.join(headers)} {flags} -o velocity_cpu"
