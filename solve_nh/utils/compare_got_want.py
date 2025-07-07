@@ -1,91 +1,90 @@
 import argparse
-from concurrent.futures import ProcessPoolExecutor
-from itertools import zip_longest
+import math
+import io
 import os
 import re
 import sys
-from typing import Dict, Iterable, List, Optional, Tuple
-from functools import partial
-import numpy as np
-import math
+from concurrent.futures import ProcessPoolExecutor
+from itertools import zip_longest, product
 from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+import numpy as np
 import polars as pl
 
-sys.stdout.reconfigure(line_buffering=True)
-
+# Ensure stdout is flushed line-by-line
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout.reconfigure(line_buffering=True)
 
 DEFAULT_WORKERS = int(
     os.environ.get(
-        "SLURM_CPUS_PER_TASK", os.environ.get("SLURM_CPUS_ON_NODE", os.cpu_count() or 1)
+        "SLURM_CPUS_PER_TASK",
+        os.environ.get("SLURM_CPUS_ON_NODE", os.cpu_count() or 1),
     )
 )
+
+KNOWN_METADATA = {"assoc", "rank", "size", "lbound", "entries"}
+
+POLARS_SCHEMA = {
+    "timestep": pl.Int64,
+    "got_file": pl.Utf8,
+    "want_file": pl.Utf8,
+    "variable": pl.Utf8,
+    "status": pl.Utf8,
+    "max_abs": pl.Float64,
+    "max_rel": pl.Float64,
+}
 
 
 def discover_timesteps(root: Path) -> List[int]:
     ts_set: set[int] = set()
     pat = re.compile(r"_(\d+)\.got$")
     for p in root.glob("*.got"):
-        m = pat.search(p.name)
-        if m:
+        if m := pat.search(p.name):
             ts_set.add(int(m.group(1)))
     for p in root.glob("*.want"):
-        m = pat.search(p.name)
-        if m:
+        if m := pat.search(p.name):
             ts_set.add(int(m.group(1)))
     return sorted(ts_set)
 
 
 def find_comparable_files_at_timestep(
-    timestep: int, root: Path
+    prefix: str, timestep: int, root: Path
 ) -> List[Tuple[Path, Path]]:
-    pairs: list[tuple[Path, Path]] = []
-
-    for want in root.glob("*.want"):
-        if not want.name.endswith(f"_{timestep}.want"):
-            continue
+    pairs: List[Tuple[Path, Path]] = []
+    for want in root.glob(f"{prefix}.*_{timestep}.want"):
         got = want.with_suffix(".got")
         if not got.is_file():
             print(f"⚠️  Skipping {want}: matching {got} not found")
             continue
         pairs.append((got, want))
-
-    return pairs
+    return sorted(pairs, key=lambda x: (x[0].name, x[1].name))
 
 
 def _stream_lines(path: Path) -> Iterable[str]:
     with path.open("r", encoding="utf-8", errors="replace") as f:
         for line in f:
             ls = line.rstrip("\n\r")
-            if not ls.strip():
-                continue
-            yield ls
-
-
-KNOWN_METADATA = {
-    "assoc",
-    "rank",
-    "size",
-    "lbound",
-    "entries",
-}
+            if ls.strip():
+                yield ls
 
 
 def compare_pair(
     got: Path,
     want: Path,
-    abs_tol: float = np.finfo(np.float64).eps,
-    rel_tol: float = np.finfo(np.float64).eps,
+    abs_tol: np.float64 = np.finfo(np.float64).eps,
+    rel_tol: np.float64 = np.finfo(np.float64).eps,
     verbose: bool = True,
-) -> Tuple[Optional[str], Dict[str, Dict[str, float]]]:
+) -> Tuple[Optional[str], Dict[str, Dict[str, Any]]]:
     if verbose:
         print(f"Comparing {got} vs. {want}")
 
-    per_var: Dict[str, Dict[str, float]] = {}
+    per_var: Dict[str, Dict[str, Any]] = {}
     current_var: str = got.stem
 
     for got_line, want_line in zip_longest(_stream_lines(got), _stream_lines(want)):
         if got_line is None or want_line is None:
-            msg = f"Different number of lines ❌"
+            msg = "Different number of lines ❌"
             if verbose:
                 print(msg)
             return msg, per_var
@@ -106,7 +105,7 @@ def compare_pair(
 
         if got_line == want_line:
             continue
-        assert current_var is not None
+
         try:
             got_num = float(got_line)
             want_num = float(want_line)
@@ -115,8 +114,9 @@ def compare_pair(
             if verbose:
                 print(msg)
             return msg, per_var
+
         abs_diff = abs(got_num - want_num)
-        scale = max(abs(got_num), abs(want_num), abs_tol)
+        scale = max([abs(got_num), abs(want_num), abs_tol])
         rel_diff = abs_diff / scale
 
         stats = per_var.setdefault(
@@ -134,20 +134,11 @@ def compare_pair(
     return msg, per_var
 
 
-POLARS_SCHEMA = {
-    "timestep": pl.Int64,
-    "got_file": pl.Utf8,
-    "want_file": pl.Utf8,
-    "variable": pl.Utf8,
-    "status": pl.Utf8,
-    "max_abs": pl.Float64,
-    "max_rel": pl.Float64,
-}
-
-
-def make_comparison_for_timestep(ts: int, root: Path) -> Tuple[int, pl.DataFrame]:
+def make_comparison_for_timestep(
+    prefix: str, ts: int, root: Path
+) -> Tuple[str, int, pl.DataFrame]:
     T = pl.DataFrame(schema=POLARS_SCHEMA)
-    fpairs = find_comparable_files_at_timestep(ts, root)
+    fpairs = find_comparable_files_at_timestep(prefix, ts, root)
     for got, want in fpairs:
         err, per_var = compare_pair(got, want)
         if not err:
@@ -175,12 +166,17 @@ def make_comparison_for_timestep(ts: int, root: Path) -> Tuple[int, pl.DataFrame
                 )
             )
         sys.stdout.flush()
-    return ts, T
+    return prefix, ts, T
+
+
+def wrapper(args: Tuple[str, int, str]) -> Tuple[str, int, pl.DataFrame]:
+    prefix, ts, root_str = args
+    return make_comparison_for_timestep(prefix, ts, Path(root_str))
 
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
-        description="Run compare_got_and_want with a timestep."
+        description="Compare `.got` and `.want` files for numerical differences."
     )
     argp.add_argument(
         "-r",
@@ -209,11 +205,12 @@ if __name__ == "__main__":
     print(f"Comparing for timesteps: {timesteps}")
     print(f"Will use {DEFAULT_WORKERS} workers.")
 
+    prefixes = ["prepre", "prepost", "corpre", "corpost"]
+
     with ProcessPoolExecutor(max_workers=DEFAULT_WORKERS) as ex:
-        for ts, T in ex.map(
-            partial(make_comparison_for_timestep, root=root), timesteps
-        ):
-            csvpath = root.joinpath(Path(f"numeric_differences_ts={ts}.csv"))
+        task_args = [(p, ts, str(root)) for p, ts in product(prefixes, timesteps)]
+        for pref, ts, T in ex.map(wrapper, task_args):
+            csvpath = root.joinpath(f"numeric_differences_prefix={pref}_ts={ts}.csv")
             print(f"Saving to: {csvpath}")
             T = T.sort(["got_file", "variable"])
             T.write_csv(csvpath, float_precision=None)
