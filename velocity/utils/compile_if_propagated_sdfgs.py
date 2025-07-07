@@ -547,8 +547,8 @@ def compile_if_propagated_sdfgs(
                 )
             add_reduce_clean_up_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu")
             #This fix is needed for uint8_t
-            #fix_levelmask_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu", True, stage)
-            #fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False, stage)
+            fix_levelmask_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu", True, stage)
+            fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False, stage)
 
             with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
                 main_cu_code = file.read()
