@@ -8,6 +8,7 @@ from utils.change_reduction_schedule import change_reduction_schedule
 from utils.tile import prune_unused_inputs_outputs
 from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
+from utils.change_array_dtypes import change_array_dtypes
 STAGE_ID = 7
 
 def optimization_action(sdfg):
@@ -25,6 +26,7 @@ def optimization_action(sdfg):
     sdfg.validate()
     prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
     remove_unused_inconnectors_from_nestedsdfg(sdfg)
+    change_array_dtypes(sdfg, array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"}, new_type=dace.uint8)
     return sdfg
 
 def main():

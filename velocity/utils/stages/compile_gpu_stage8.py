@@ -15,11 +15,55 @@ from utils.change_reduction_schedule import change_reduction_schedule
 from utils.tile import tile_kernels
 from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
 from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
+from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays
+
 STAGE_ID = 8
 import os
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
+    print("Array values that can be lowered:")
+    print("\n".join(
+        sorted(
+            [f'"{array_name}",' for array_name, array in sdfg.arrays.items() if
+            ((array.dtype == dace.int32 or array.dtype == dace.int64) and isinstance(array, dace.data.Array) and not isinstance(array, dace.data.View))
+            ]
+            )
+        )
+    )
+    print("\n")
+    decrease_bitwidth_of_const_arrays(sdfg,
+                                      {
+                                        "gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask",
+                                        "gpu___CG_p_patch__CG_cells__m_edge_blk",
+                                        "gpu___CG_p_patch__CG_cells__m_edge_idx",
+                                        "gpu___CG_p_patch__CG_cells__m_end_block",
+                                        "gpu___CG_p_patch__CG_cells__m_end_index",
+                                        "gpu___CG_p_patch__CG_cells__m_neighbor_blk",
+                                        "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
+                                        "gpu___CG_p_patch__CG_cells__m_start_block",
+                                        "gpu___CG_p_patch__CG_cells__m_start_index",
+                                        "gpu___CG_p_patch__CG_edges__m_cell_blk",
+                                        "gpu___CG_p_patch__CG_edges__m_cell_idx",
+                                        "gpu___CG_p_patch__CG_edges__m_end_block",
+                                        "gpu___CG_p_patch__CG_edges__m_end_index",
+                                        "gpu___CG_p_patch__CG_edges__m_quad_blk",
+                                        "gpu___CG_p_patch__CG_edges__m_quad_idx",
+                                        "gpu___CG_p_patch__CG_edges__m_start_block",
+                                        "gpu___CG_p_patch__CG_edges__m_start_index",
+                                        "gpu___CG_p_patch__CG_edges__m_vertex_blk",
+                                        "gpu___CG_p_patch__CG_edges__m_vertex_idx",
+                                        "gpu___CG_p_patch__CG_verts__m_cell_blk",
+                                        "gpu___CG_p_patch__CG_verts__m_cell_idx",
+                                        "gpu___CG_p_patch__CG_verts__m_edge_blk",
+                                        "gpu___CG_p_patch__CG_verts__m_edge_idx",
+                                        "gpu___CG_p_patch__CG_verts__m_end_block",
+                                        "gpu___CG_p_patch__CG_verts__m_end_index",
+                                        "gpu___CG_p_patch__CG_verts__m_start_block",
+                                        "gpu___CG_p_patch__CG_verts__m_start_index",
+                                      })
+
+    # TODO: GPU read-write has unit size of 32-bits, uint8_t won't help unless we tile
     # Assigning a warp to the column is not a very good idea
     # reshape_kernels(sdfg, True)
     # Must be individualized for each kernel
@@ -29,15 +73,15 @@ def optimization_action(sdfg):
     y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 1))
     y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 1))
     #reshape_kernels(sdfg)
-    #reshape_kernels_w_coarsening(sdfg,
-    #                             x_coarsening=x_coarsening,
-    #                             y_coarsening=y_coarsening,
-    #                             x_block_size=x_block_size,
-    #                             y_block_size=y_block_size,
-    #                             unroll_x=True,
-    #                             unroll_x_factor=None,
-    #                             unroll_y=True,
-    #                             unroll_y_factor=y_unroll_factor,)
+    reshape_kernels_w_coarsening(sdfg,
+                                 x_coarsening=x_coarsening,
+                                 y_coarsening=y_coarsening,
+                                 x_block_size=x_block_size,
+                                 y_block_size=y_block_size,
+                                 unroll_x=True,
+                                 unroll_x_factor=None,
+                                 unroll_y=True,
+                                 unroll_y_factor=y_unroll_factor,)
     #tile_kernels(sdfg)
     sdfg.simplify()
     sdfg.validate()
