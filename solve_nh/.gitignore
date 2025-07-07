@@ -10,6 +10,7 @@
 codegen/**
 !codegen/*.sdfgz
 !codegen/stage*
+!codegen/stage*/solve_nh_parts.*
 !codegen/stage*/solve_nh*/
 !codegen/stage*/solve_nh*/include
 !codegen/stage*/solve_nh*/src
