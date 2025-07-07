@@ -21,7 +21,8 @@ def optimization_action(sdfg):
     sdfg.validate()
     change_reduction_schedule(sdfg)
     sdfg.validate()
-    sdfg = hacky_cfl_clipping_related_kernel_removal(sdfg)
+    # Do not perform this semantics-changing transformation.
+    # sdfg = hacky_cfl_clipping_related_kernel_removal(sdfg)
     sdfg.simplify()
     sdfg.validate()
     prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them

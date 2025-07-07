@@ -58,3 +58,4 @@ from utils.add_set_zero import add_set_zero
 from utils.change_array_dtypes import change_array_dtypes
 
 from utils.reshape_kernels import reshape_kernels
+from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays

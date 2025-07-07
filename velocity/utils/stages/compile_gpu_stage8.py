@@ -22,8 +22,7 @@ import os
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    print("Array values that can be lowered:")
-    print("\n".join(
+    print("Array values that can be lowered:" + "\n".join(
         sorted(
             [f'"{array_name}",' for array_name, array in sdfg.arrays.items() if
             ((array.dtype == dace.int32 or array.dtype == dace.int64) and isinstance(array, dace.data.Array) and not isinstance(array, dace.data.View))
@@ -31,9 +30,8 @@ def optimization_action(sdfg):
             )
         )
     )
-    print("\n")
-    decrease_bitwidth_of_const_arrays(sdfg,
-                                      {
+    sdfg = decrease_bitwidth_of_const_arrays(sdfg,
+                                      array_names={
                                         "gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask",
                                         "gpu___CG_p_patch__CG_cells__m_edge_blk",
                                         "gpu___CG_p_patch__CG_cells__m_edge_idx",
@@ -62,6 +60,11 @@ def optimization_action(sdfg):
                                         "gpu___CG_p_patch__CG_verts__m_start_block",
                                         "gpu___CG_p_patch__CG_verts__m_start_index",
                                       })
+    # start_index and end_index are between [1, nproma] -> ~20k in our data, ~200k in some other cases int16 is -32768, 32767
+    # start_block and end_blocks are between [0, nblks] -> usually 1 or 2 as we pass nblocks_c for the science config
+    # Force start and end blks to int8?
+    # TODO: force start_block and end_block to int8
+
 
     # TODO: GPU read-write has unit size of 32-bits, uint8_t won't help unless we tile
     # Assigning a warp to the column is not a very good idea
@@ -83,7 +86,7 @@ def optimization_action(sdfg):
                                  unroll_y=True,
                                  unroll_y_factor=y_unroll_factor,)
     #tile_kernels(sdfg)
-    sdfg.simplify()
+    #sdfg.simplify()
     sdfg.validate()
     return sdfg
 
