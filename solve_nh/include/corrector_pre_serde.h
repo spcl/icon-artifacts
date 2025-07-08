@@ -89,25 +89,6 @@ template <typename T> const array_meta &ARRAY_META_DICT_AT(T *a) {
   }
 }
 
-template <typename T> void read_scalar(T &x, std::istream &s) {
-  if (s.eof())
-    return;
-  scroll_space(s);
-  s >> x;
-}
-
-void read_scalar(float &x, std::istream &s) {
-  long double xx;
-  read_scalar(xx, s);
-  x = static_cast<float>(xx);
-}
-
-void read_scalar(double &x, std::istream &s) {
-  long double xx;
-  read_scalar(xx, s);
-  x = static_cast<double>(xx);
-}
-
 void read_scalar(long double &x, std::istream &s) {
   if (s.eof())
     return;
@@ -139,7 +120,27 @@ void read_scalar(long double &x, std::istream &s) {
   // Parse the (potentially modified) string
   std::istringstream iss(line);
   iss >> x;
-  assert(!iss.fail());
+  if (iss.fail())
+    x = 0;
+}
+
+void read_scalar(float &x, std::istream &s) {
+  long double xx;
+  read_scalar(xx, s);
+  x = static_cast<float>(xx);
+}
+
+void read_scalar(double &x, std::istream &s) {
+  long double xx;
+  read_scalar(xx, s);
+  x = static_cast<double>(xx);
+}
+
+template <typename T> void read_scalar(T &x, std::istream &s) {
+  if (s.eof())
+    return;
+  scroll_space(s);
+  s >> x;
 }
 
 void read_scalar(bool &x, std::istream &s) {
