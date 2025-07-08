@@ -1,5 +1,7 @@
 ! Content for expanded_corpre_t0.inc
 call serialize(at("corpre.p_nh.t0"), p_nh)
+call serialize(at("corpre.p_nh_prog_nnow.t0"), p_nh_prog_nnow)
+call serialize(at("corpre.p_nh_prog_nnew.t0"), p_nh_prog_nnew)
 call serialize(at("corpre.p_patch.t0"), p_patch)
 call serialize(at("corpre.p_int.t0"), p_int)
 call serialize(at("corpre.prep_adv.t0"), prep_adv)

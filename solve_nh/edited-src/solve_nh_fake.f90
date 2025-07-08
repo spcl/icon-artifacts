@@ -679,11 +679,11 @@ MODULE fake_mo_solve_nonhydro
   sync_patch_array_mult, sync_patch_array_mult_mp
   IMPLICIT NONE
   CONTAINS
-  SUBROUTINE solve_nh_predictor_pre(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
+  SUBROUTINE solve_nh_predictor_pre(p_nh, p_nh_prog_nnow, p_nh_prog_nnew, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 use serde_base, only: generation, at
 use predictor_pre, only: serialize, serialize_global_data
-    USE mo_nonhydro_types, ONLY: t_nh_state
+    USE mo_nonhydro_types, ONLY: t_nh_state, t_nh_prog
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
     USE mo_prepadv_types, ONLY: t_prepare_adv
@@ -711,6 +711,7 @@ use predictor_pre, only: serialize, serialize_global_data
     TYPE(t_int_state), TARGET, INTENT(IN) :: p_int
     TYPE(t_patch), TARGET, INTENT(INOUT) :: p_patch
     TYPE(t_prepare_adv), TARGET, INTENT(INOUT) :: prep_adv
+    TYPE(t_nh_prog), TARGET, INTENT(INOUT) :: p_nh_prog_nnow, p_nh_prog_nnew
     LOGICAL, INTENT(IN) :: l_init
     LOGICAL, INTENT(IN) :: l_recompute
     LOGICAL, INTENT(IN) :: lsave_mflx
@@ -757,12 +758,12 @@ end if
           ELSE
             lvn_only = .FALSE.
           END IF
-          CALL velocity_tendencies(p_nh % prog(nnow), p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl1, istep, lvn_only, dtime, dt_linintp_ubc_nnow, ldeepatmo)
+          CALL velocity_tendencies(p_nh_prog_nnow, p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl1, istep, lvn_only, dtime, dt_linintp_ubc_nnow, ldeepatmo)
         END IF
         nvar = nnow
       ELSE
         lvn_only = .FALSE.
-        CALL velocity_tendencies(p_nh % prog(nnew), p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl2, istep, .FALSE., dtime, dt_linintp_ubc_nnew, ldeepatmo)
+        CALL velocity_tendencies(p_nh_prog_nnew, p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl2, istep, .FALSE., dtime, dt_linintp_ubc_nnew, ldeepatmo)
         nvar = nnew
       END IF
       IF (istep == 1 .AND. (igradp_method == 3 .OR. igradp_method == 5)) THEN
@@ -792,8 +793,8 @@ end if
         IF (istep == 1) THEN
           DO jk = 1, nlev
             DO jc = i_startidx, i_endidx
-              z_exner_ex_pr(jc, jk, jb) = (1.0D0 + p_nh % metrics % exner_exfac(jc, jk, jb)) * (p_nh % prog(nnow) % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)) - p_nh % metrics % exner_exfac(jc, jk, jb) * p_nh % diag % exner_pr(jc, jk, jb)
-              p_nh % diag % exner_pr(jc, jk, jb) = p_nh % prog(nnow) % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)
+              z_exner_ex_pr(jc, jk, jb) = (1.0D0 + p_nh % metrics % exner_exfac(jc, jk, jb)) * (p_nh_prog_nnow % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)) - p_nh % metrics % exner_exfac(jc, jk, jb) * p_nh % diag % exner_pr(jc, jk, jb)
+              p_nh % diag % exner_pr(jc, jk, jb) = p_nh_prog_nnow % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)
             END DO
           END DO
           z_exner_ex_pr(:, nlevp1, jb) = 0.0D0
@@ -819,27 +820,27 @@ end if
             END IF
           END IF
           DO jc = i_startidx, i_endidx
-            z_rth_pr(1, jc, 1, jb) = p_nh % prog(nnow) % rho(jc, 1, jb) - p_nh % metrics % rho_ref_mc(jc, 1, jb)
-            z_rth_pr(2, jc, 1, jb) = p_nh % prog(nnow) % theta_v(jc, 1, jb) - p_nh % metrics % theta_ref_mc(jc, 1, jb)
+            z_rth_pr(1, jc, 1, jb) = p_nh_prog_nnow % rho(jc, 1, jb) - p_nh % metrics % rho_ref_mc(jc, 1, jb)
+            z_rth_pr(2, jc, 1, jb) = p_nh_prog_nnow % theta_v(jc, 1, jb) - p_nh % metrics % theta_ref_mc(jc, 1, jb)
           END DO
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh % prog(nnow) % rho(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh % prog(nnow) % rho(jc, jk - 1, jb)
-              z_rth_pr(1, jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
-              z_rth_pr(2, jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
+              p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh_prog_nnow % rho(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh_prog_nnow % rho(jc, jk - 1, jb)
+              z_rth_pr(1, jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
+              z_rth_pr(2, jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
               z_theta_v_pr_ic(jc, jk) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_rth_pr(2, jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_rth_pr(2, jc, jk - 1, jb)
-              p_nh % diag % theta_v_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh % prog(nnow) % theta_v(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh % prog(nnow) % theta_v(jc, jk - 1, jb)
+              p_nh % diag % theta_v_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh_prog_nnow % theta_v(jc, jk - 1, jb)
               z_th_ddz_exner_c(jc, jk, jb) = p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, jk, jb) * (p_nh % diag % exner_pr(jc, jk - 1, jb) - p_nh % diag % exner_pr(jc, jk, jb)) / p_nh % metrics % ddqz_z_half(jc, jk, jb) + z_theta_v_pr_ic(jc, jk) * p_nh % metrics % d_exner_dz_ref_ic(jc, jk, jb)
             END DO
           END DO
         ELSE
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_w_backtraj = - (p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb)) * dtime * 0.5D0 / p_nh % metrics % ddqz_z_half(jc, jk, jb)
-              z_rho_tavg_m1 = wgt_nnow_rth * p_nh % prog(nnow) % rho(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk - 1, jb)
-              z_theta_tavg_m1 = wgt_nnow_rth * p_nh % prog(nnow) % theta_v(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk - 1, jb)
-              z_rho_tavg = wgt_nnow_rth * p_nh % prog(nnow) % rho(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk, jb)
-              z_theta_tavg = wgt_nnow_rth * p_nh % prog(nnow) % theta_v(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk, jb)
+              z_w_backtraj = - (p_nh_prog_nnew % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb)) * dtime * 0.5D0 / p_nh % metrics % ddqz_z_half(jc, jk, jb)
+              z_rho_tavg_m1 = wgt_nnow_rth * p_nh_prog_nnow % rho(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk - 1, jb)
+              z_theta_tavg_m1 = wgt_nnow_rth * p_nh_prog_nnow % theta_v(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk - 1, jb)
+              z_rho_tavg = wgt_nnow_rth * p_nh_prog_nnow % rho(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk, jb)
+              z_theta_tavg = wgt_nnow_rth * p_nh_prog_nnow % theta_v(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk, jb)
               p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_rho_tavg + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_rho_tavg_m1 + z_w_backtraj * (z_rho_tavg_m1 - z_rho_tavg)
               z_theta_v_pr_mc_m1 = z_theta_tavg_m1 - p_nh % metrics % theta_ref_mc(jc, jk - 1, jb)
               z_theta_v_pr_mc = z_theta_tavg - p_nh % metrics % theta_ref_mc(jc, jk, jb)
@@ -873,8 +874,8 @@ end if
           CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, -6, -6)
           DO jk = 1, nlev
             DO jc = i_startidx, i_endidx
-              z_rth_pr(1, jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
-              z_rth_pr(2, jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
+              z_rth_pr(1, jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
+              z_rth_pr(2, jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
             END DO
           END DO
         END DO
@@ -885,8 +886,8 @@ end if
       END IF
       IF (istep == 1) THEN
         IF (iadv_rhotheta == 1) THEN
-          CALL cells2verts_scalar_dp_deconiface_8(p_nh % prog(nnow) % rho, p_patch, p_int % cells_aw_verts, z_rho_v, opt_rlend = -5)
-          CALL cells2verts_scalar_dp_deconiface_9(p_nh % prog(nnow) % theta_v, p_patch, p_int % cells_aw_verts, z_theta_v_v, opt_rlend = -5)
+          CALL cells2verts_scalar_dp_deconiface_8(p_nh_prog_nnow % rho, p_patch, p_int % cells_aw_verts, z_rho_v, opt_rlend = -5)
+          CALL cells2verts_scalar_dp_deconiface_9(p_nh_prog_nnow % theta_v, p_patch, p_int % cells_aw_verts, z_theta_v_v, opt_rlend = -5)
         ELSE IF (iadv_rhotheta == 2) THEN
           CALL grad_green_gauss_cell_dycore_deconiface_10(z_rth_pr, p_patch, p_int, z_grad_rth, opt_rlstart = 3, opt_rlend = -5, opt_acc_async = .TRUE.)
         END IF
@@ -911,10 +912,10 @@ end if
           IF (iadv_rhotheta == 2) THEN
             DO jk = 1, nlev
               DO je = i_startidx, i_endidx
-                lvn_pos = p_nh % prog(nnow) % vn(je, jk, jb) >= 0.0D0
+                lvn_pos = p_nh_prog_nnow % vn(je, jk, jb) >= 0.0D0
                 ilc0 = MERGE(p_patch % edges % cell_idx(je, jb, 1), p_patch % edges % cell_idx(je, jb, 2), lvn_pos)
                 ibc0 = MERGE(p_patch % edges % cell_blk(je, jb, 1), p_patch % edges % cell_blk(je, jb, 2), lvn_pos)
-                z_ntdistv_bary_1 = - (p_nh % prog(nnow) % vn(je, jk, jb) * dthalf + MERGE(p_int % pos_on_tplane_e(je, 1, 1, jb), p_int % pos_on_tplane_e(je, 2, 1, jb), lvn_pos)) * p_nh % metrics % deepatmo_gradh_mc(jk)
+                z_ntdistv_bary_1 = - (p_nh_prog_nnow % vn(je, jk, jb) * dthalf + MERGE(p_int % pos_on_tplane_e(je, 1, 1, jb), p_int % pos_on_tplane_e(je, 2, 1, jb), lvn_pos)) * p_nh % metrics % deepatmo_gradh_mc(jk)
                 z_ntdistv_bary_2 = - (p_nh % diag % vt(je, jk, jb) * dthalf + MERGE(p_int % pos_on_tplane_e(je, 1, 2, jb), p_int % pos_on_tplane_e(je, 2, 2, jb), lvn_pos)) * p_nh % metrics % deepatmo_gradh_mc(jk)
                 distv_bary_1 = z_ntdistv_bary_1 * MERGE(p_patch % edges % primal_normal_cell(je, jb, 1) % v1, p_patch % edges % primal_normal_cell(je, jb, 2) % v1, lvn_pos) + z_ntdistv_bary_2 * MERGE(p_patch % edges % dual_normal_cell(je, jb, 1) % v1, p_patch % edges % dual_normal_cell(je, jb, 2) % v1, lvn_pos)
                 distv_bary_2 = z_ntdistv_bary_1 * MERGE(p_patch % edges % primal_normal_cell(je, jb, 1) % v2, p_patch % edges % primal_normal_cell(je, jb, 2) % v2, lvn_pos) + z_ntdistv_bary_2 * MERGE(p_patch % edges % dual_normal_cell(je, jb, 1) % v2, p_patch % edges % dual_normal_cell(je, jb, 2) % v2, lvn_pos)
@@ -925,8 +926,8 @@ end if
           ELSE
             DO jk = 1, nlev
               DO je = i_startidx, i_endidx
-                z_rho_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh % prog(nnow) % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_rho_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_rho_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
-                z_theta_v_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh % prog(nnow) % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
+                z_rho_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh_prog_nnow % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_rho_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_rho_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
+                z_theta_v_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh_prog_nnow % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
               END DO
             END DO
           END IF
@@ -982,16 +983,16 @@ end if
           END IF
           IF (igradp_method == 3) THEN
             DO je = i_startidx, i_endidx
-              z_theta1 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) + p_nh % metrics % zdiff_gradp(1, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1))
-              z_theta2 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) + p_nh % metrics % zdiff_gradp(2, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2))
+              z_theta1 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) + p_nh % metrics % zdiff_gradp(1, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1))
+              z_theta2 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) + p_nh % metrics % zdiff_gradp(2, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2))
               z_hydro_corr(je, jb) = 0.00976135730211817D0 * p_patch % edges % inv_dual_edge_length(je, jb) * (z_theta2 - z_theta1) * 4.0D0 / (z_theta1 + z_theta2) ** 2
             END DO
           ELSE IF (igradp_method == 5) THEN
             DO je = i_startidx, i_endidx
               ikp1 = MIN(nlev, p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 2)
               ikp2 = MIN(nlev, p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 2)
-              z_theta1 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(1, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(2, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(3, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), ikp1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(4, je, nlev, jb)
-              z_theta2 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(5, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(6, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(7, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), ikp2, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(8, je, nlev, jb)
+              z_theta1 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(1, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(2, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(3, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), ikp1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(4, je, nlev, jb)
+              z_theta2 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(5, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(6, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(7, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), ikp2, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(8, je, nlev, jb)
               z_hydro_corr(je, jb) = 0.00976135730211817D0 * p_patch % edges % inv_dual_edge_length(je, jb) * (z_theta2 - z_theta1) * 4.0D0 / (z_theta1 + z_theta2) ** 2
             END DO
           END IF
@@ -1019,7 +1020,7 @@ end if
               z_ddt_vn_apc = p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl1) * wgt_nnow_vel + p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl2) * wgt_nnew_vel
               z_ddt_vn_pgr = - 1004.64D0 * z_theta_v_e(je, jk, jb) * z_gradh_exner(je, jk, jb)
               z_ddt_vn_dyn = z_ddt_vn_apc + z_ddt_vn_pgr + p_nh % diag % ddt_vn_phy(je, jk, jb)
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnow) % vn(je, jk, jb) + dtime * z_ddt_vn_dyn
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnow % vn(je, jk, jb) + dtime * z_ddt_vn_dyn
               IF (p_nh % diag % ddt_vn_adv_is_associated .OR. p_nh % diag % ddt_vn_cor_is_associated) THEN
                 z_ddt_vn_cor = p_nh % diag % ddt_vn_cor_pc(je, jk, jb, ntl1) * wgt_nnow_vel + p_nh % diag % ddt_vn_cor_pc(je, jk, jb, ntl2) * wgt_nnew_vel
                 IF (p_nh % diag % ddt_vn_adv_is_associated) THEN
@@ -1043,7 +1044,7 @@ end if
         ELSE
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnow) % vn(je, jk, jb) + dtime * (p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl1) - 1004.64D0 * z_theta_v_e(je, jk, jb) * z_gradh_exner(je, jk, jb) + p_nh % diag % ddt_vn_phy(je, jk, jb))
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnow % vn(je, jk, jb) + dtime * (p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl1) - 1004.64D0 * z_theta_v_e(je, jk, jb) * z_gradh_exner(je, jk, jb) + p_nh % diag % ddt_vn_phy(je, jk, jb))
             END DO
           END DO
         END IF
@@ -1059,7 +1060,7 @@ end if
             DO jk = 1, nlev
               DO je = i_startidx, i_endidx
                 z_d_vn_dmp = scal_divdamp_o2 * z_graddiv_vn(je, jk, jb)
-                p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_dmp
+                p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_dmp
                 IF (p_nh % diag % ddt_vn_dmp_is_associated) THEN
                   p_nh % diag % ddt_vn_dmp(je, jk, jb) = p_nh % diag % ddt_vn_dmp(je, jk, jb) + z_d_vn_dmp * r_dtimensubsteps
                 END IF
@@ -1074,7 +1075,7 @@ end if
               DO jk = 1, nlev
                 DO je = i_startidx, i_endidx
                   z_d_vn_dmp = (scal_divdamp(jk) + bdy_divdamp(jk) * p_int % nudgecoeff_e(je, jb)) * z_graddiv2_vn(je, jk)
-                  p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_dmp
+                  p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_dmp
                   IF (p_nh % diag % ddt_vn_dmp_is_associated) THEN
                     p_nh % diag % ddt_vn_dmp(je, jk, jb) = p_nh % diag % ddt_vn_dmp(je, jk, jb) + z_d_vn_dmp * r_dtimensubsteps
                   END IF
@@ -1087,7 +1088,7 @@ end if
               DO jk = 1, nlev
                 DO je = i_startidx, i_endidx
                   z_d_vn_dmp = scal_divdamp(jk) * z_graddiv2_vn(je, jk)
-                  p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_dmp
+                  p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_dmp
                   IF (p_nh % diag % ddt_vn_dmp_is_associated) THEN
                     p_nh % diag % ddt_vn_dmp(je, jk, jb) = p_nh % diag % ddt_vn_dmp(je, jk, jb) + z_d_vn_dmp * r_dtimensubsteps
                   END IF
@@ -1103,7 +1104,7 @@ end if
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
               z_d_vn_iau = iau_wgt_dyn * p_nh % diag % vn_incr(je, jk, jb)
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_iau
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_iau
               IF (istep == 2) THEN
                 IF (p_nh % diag % ddt_vn_iau_is_associated) THEN
                   p_nh % diag % ddt_vn_iau(je, jk, jb) = p_nh % diag % ddt_vn_iau(je, jk, jb) + z_d_vn_iau * r_dtimensubsteps
@@ -1118,8 +1119,8 @@ end if
         IF (rayleigh_type == 1) THEN
           DO jk = 1, nrdmax(jg)
             DO je = i_startidx, i_endidx
-              z_ddt_vn_ray = - p_nh % metrics % rayleigh_vn(jk) * (p_nh % prog(nnew) % vn(je, jk, jb) - p_nh % ref % vn_ref(je, jk, jb))
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_ddt_vn_ray * dtime
+              z_ddt_vn_ray = - p_nh % metrics % rayleigh_vn(jk) * (p_nh_prog_nnew % vn(je, jk, jb) - p_nh % ref % vn_ref(je, jk, jb))
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_ddt_vn_ray * dtime
               IF (istep == 2) THEN
                 IF (p_nh % diag % ddt_vn_ray_is_associated) THEN
                   p_nh % diag % ddt_vn_ray(je, jk, jb) = p_nh % diag % ddt_vn_ray(je, jk, jb) + z_ddt_vn_ray * r_nsubsteps
@@ -1141,7 +1142,7 @@ end if
           CALL get_indices_e(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 1, 9)
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnow) % vn(je, jk, jb) + p_nh % diag % grf_tend_vn(je, jk, jb) * dtime
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnow % vn(je, jk, jb) + p_nh % diag % grf_tend_vn(je, jk, jb) * dtime
               IF (p_nh % diag % ddt_vn_grf_is_associated) THEN
                 p_nh % diag % ddt_vn_grf(je, jk, jb) = p_nh % diag % ddt_vn_grf(je, jk, jb) + p_nh % diag % grf_tend_vn(je, jk, jb) * r_nsubsteps
               END IF
@@ -1168,11 +1169,11 @@ INCLUDE 'prepre_t1.inc'
 end if
 
   END SUBROUTINE solve_nh_predictor_pre
-  SUBROUTINE solve_nh_predictor_post(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
+  SUBROUTINE solve_nh_predictor_post(p_nh, p_nh_prog_nnow, p_nh_prog_nnew, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 use serde_base, only: generation, at
 use predictor_post, only: serialize, serialize_global_data
-    USE mo_nonhydro_types, ONLY: t_nh_state
+    USE mo_nonhydro_types, ONLY: t_nh_state, t_nh_prog
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
     USE mo_prepadv_types, ONLY: t_prepare_adv
@@ -1200,6 +1201,7 @@ use predictor_post, only: serialize, serialize_global_data
     TYPE(t_int_state), TARGET, INTENT(IN) :: p_int
     TYPE(t_patch), TARGET, INTENT(INOUT) :: p_patch
     TYPE(t_prepare_adv), TARGET, INTENT(INOUT) :: prep_adv
+    TYPE(t_nh_prog), TARGET, INTENT(INOUT) :: p_nh_prog_nnow, p_nh_prog_nnew
     LOGICAL, INTENT(IN) :: l_init
     LOGICAL, INTENT(IN) :: l_recompute
     LOGICAL, INTENT(IN) :: lsave_mflx
@@ -1247,22 +1249,22 @@ end if
         IF (istep == 1) THEN
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
-              z_graddiv_vn(je, jk, jb) = p_int % geofac_grdiv(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % geofac_grdiv(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % geofac_grdiv(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % geofac_grdiv(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % geofac_grdiv(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
-              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_graddiv_vn(je, jk, jb) = p_int % geofac_grdiv(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % geofac_grdiv(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % geofac_grdiv(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % geofac_grdiv(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % geofac_grdiv(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
             END DO
           END DO
         ELSE IF (itime_scheme >= 5) THEN
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
-              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
             END DO
           END DO
         ELSE
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
             END DO
           END DO
         END IF
@@ -1300,31 +1302,31 @@ end if
         IF (istep == 1 .OR. itime_scheme >= 5) THEN
           DO jk = nflatlev(jg), nlev
             DO je = i_startidx, i_endidx
-              z_w_concorr_me(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) * p_nh % metrics % ddxn_z_full(je, jk, jb) + p_nh % diag % vt(je, jk, jb) * p_nh % metrics % ddxt_z_full(je, jk, jb)
+              z_w_concorr_me(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) * p_nh % metrics % ddxn_z_full(je, jk, jb) + p_nh % diag % vt(je, jk, jb) * p_nh % metrics % ddxt_z_full(je, jk, jb)
             END DO
           END DO
         END IF
         IF (istep == 1) THEN
           DO jk = 2, nlev
             DO je = i_startidx, i_endidx
-              p_nh % diag % vn_ie(je, jk, jb) = p_nh % metrics % wgtfac_e(je, jk, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_e(je, jk, jb)) * p_nh % prog(nnew) % vn(je, jk - 1, jb)
+              p_nh % diag % vn_ie(je, jk, jb) = p_nh % metrics % wgtfac_e(je, jk, jb) * p_nh_prog_nnew % vn(je, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_e(je, jk, jb)) * p_nh_prog_nnew % vn(je, jk - 1, jb)
               z_vt_ie(je, jk, jb) = p_nh % metrics % wgtfac_e(je, jk, jb) * p_nh % diag % vt(je, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_e(je, jk, jb)) * p_nh % diag % vt(je, jk - 1, jb)
-              z_kin_hor_e(je, jk, jb) = 0.5D0 * (p_nh % prog(nnew) % vn(je, jk, jb) ** 2 + p_nh % diag % vt(je, jk, jb) ** 2)
+              z_kin_hor_e(je, jk, jb) = 0.5D0 * (p_nh_prog_nnew % vn(je, jk, jb) ** 2 + p_nh % diag % vt(je, jk, jb) ** 2)
             END DO
           END DO
           IF (.NOT. l_vert_nested) THEN
             DO je = i_startidx, i_endidx
-              p_nh % diag % vn_ie(je, 1, jb) = p_nh % prog(nnew) % vn(je, 1, jb)
+              p_nh % diag % vn_ie(je, 1, jb) = p_nh_prog_nnew % vn(je, 1, jb)
               z_vt_ie(je, 1, jb) = p_nh % diag % vt(je, 1, jb)
-              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh % prog(nnew) % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
-              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh % prog(nnew) % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh % prog(nnew) % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh % prog(nnew) % vn(je, nlev - 2, jb)
+              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh_prog_nnew % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
+              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh_prog_nnew % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh_prog_nnew % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh_prog_nnew % vn(je, nlev - 2, jb)
             END DO
           ELSE
             DO je = i_startidx, i_endidx
               p_nh % diag % vn_ie(je, 1, jb) = p_nh % diag % vn_ie_ubc(je, 1, jb) + dt_linintp_ubc_nnew * p_nh % diag % vn_ie_ubc(je, 2, jb)
               z_vt_ie(je, 1, jb) = p_nh % diag % vt(je, 1, jb)
-              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh % prog(nnew) % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
-              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh % prog(nnew) % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh % prog(nnew) % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh % prog(nnew) % vn(je, nlev - 2, jb)
+              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh_prog_nnew % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
+              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh_prog_nnew % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh_prog_nnew % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh_prog_nnew % vn(je, nlev - 2, jb)
             END DO
           END IF
         END IF
@@ -1404,21 +1406,21 @@ end if
         IF (istep == 2 .AND. (itime_scheme >= 4)) THEN
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_w_expl(jc, jk) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * (wgt_nnow_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) + wgt_nnew_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl2) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
-              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
+              z_w_expl(jc, jk) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * (wgt_nnow_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) + wgt_nnew_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl2) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
+              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
             END DO
           END DO
         ELSE
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_w_expl(jc, jk) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * (p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
-              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
+              z_w_expl(jc, jk) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * (p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
+              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
             END DO
           END DO
         END IF
         DO jk = 1, nlev
           DO jc = i_startidx, i_endidx
-            z_beta(jc, jk) = dtime * 287.04D0 * p_nh % prog(nnow) % exner(jc, jk, jb) / (717.5999999999999D0 * p_nh % prog(nnow) % rho(jc, jk, jb) * p_nh % prog(nnow) % theta_v(jc, jk, jb)) * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb)
+            z_beta(jc, jk) = dtime * 287.04D0 * p_nh_prog_nnow % exner(jc, jk, jb) / (717.5999999999999D0 * p_nh_prog_nnow % rho(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb)) * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb)
             z_alpha(jc, jk) = p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, jk, jb) * p_nh % diag % rho_ic(jc, jk, jb)
           END DO
         END DO
@@ -1428,26 +1430,26 @@ end if
         END DO
         IF (.NOT. l_vert_nested) THEN
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % w(jc, 1, jb) = 0.0D0
+            p_nh_prog_nnew % w(jc, 1, jb) = 0.0D0
             z_contr_w_fl_l(jc, 1) = 0.0D0
           END DO
         ELSE
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % w(jc, 1, jb) = p_nh % diag % w_ubc(jc, jb, 1) + dt_linintp_ubc_nnew * p_nh % diag % w_ubc(jc, jb, 2)
+            p_nh_prog_nnew % w(jc, 1, jb) = p_nh % diag % w_ubc(jc, jb, 1) + dt_linintp_ubc_nnew * p_nh % diag % w_ubc(jc, jb, 2)
             z_contr_w_fl_l(jc, 1) = z_mflx_top(jc, jb) * p_nh % metrics % vwind_expl_wgt(jc, jb)
           END DO
         END IF
         DO jc = i_startidx, i_endidx
-          p_nh % prog(nnew) % w(jc, nlevp1, jb) = p_nh % diag % w_concorr_c(jc, nlevp1, jb)
+          p_nh_prog_nnew % w(jc, nlevp1, jb) = p_nh % diag % w_concorr_c(jc, nlevp1, jb)
           z_contr_w_fl_l(jc, nlevp1) = 0.0D0
         END DO
         DO jc = i_startidx, i_endidx
-          z_rho_expl(jc, 1) = p_nh % prog(nnow) % rho(jc, 1, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_flxdiv_mass(jc, 1) + z_contr_w_fl_l(jc, 1) * p_nh % metrics % deepatmo_divzu_mc(1) - z_contr_w_fl_l(jc, 2) * p_nh % metrics % deepatmo_divzl_mc(1))
+          z_rho_expl(jc, 1) = p_nh_prog_nnow % rho(jc, 1, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_flxdiv_mass(jc, 1) + z_contr_w_fl_l(jc, 1) * p_nh % metrics % deepatmo_divzu_mc(1) - z_contr_w_fl_l(jc, 2) * p_nh % metrics % deepatmo_divzl_mc(1))
           z_exner_expl(jc, 1) = p_nh % diag % exner_pr(jc, 1, jb) - z_beta(jc, 1) * (z_flxdiv_theta(jc, 1) + p_nh % diag % theta_v_ic(jc, 1, jb) * z_contr_w_fl_l(jc, 1) * p_nh % metrics % deepatmo_divzu_mc(1) - p_nh % diag % theta_v_ic(jc, 2, jb) * z_contr_w_fl_l(jc, 2) * p_nh % metrics % deepatmo_divzl_mc(1)) + dtime * p_nh % diag % ddt_exner_phy(jc, 1, jb)
         END DO
         DO jk = 2, nlev
           DO jc = i_startidx, i_endidx
-            z_rho_expl(jc, jk) = p_nh % prog(nnow) % rho(jc, jk, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (z_flxdiv_mass(jc, jk) + z_contr_w_fl_l(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_contr_w_fl_l(jc, jk + 1) * p_nh % metrics % deepatmo_divzl_mc(jk))
+            z_rho_expl(jc, jk) = p_nh_prog_nnow % rho(jc, jk, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (z_flxdiv_mass(jc, jk) + z_contr_w_fl_l(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_contr_w_fl_l(jc, jk + 1) * p_nh % metrics % deepatmo_divzl_mc(jk))
             z_exner_expl(jc, jk) = p_nh % diag % exner_pr(jc, jk, jb) - z_beta(jc, jk) * (z_flxdiv_theta(jc, jk) + p_nh % diag % theta_v_ic(jc, jk, jb) * z_contr_w_fl_l(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk) - p_nh % diag % theta_v_ic(jc, jk + 1, jb) * z_contr_w_fl_l(jc, jk + 1) * p_nh % metrics % deepatmo_divzl_mc(jk)) + dtime * p_nh % diag % ddt_exner_phy(jc, jk, jb)
           END DO
         END DO
@@ -1467,46 +1469,46 @@ end if
             z_b = 1.0D0 + z_gamma * z_alpha(jc, jk) * (z_beta(jc, jk - 1) * p_nh % metrics % deepatmo_divzl_mc(jk - 1) + z_beta(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk))
             z_g = 1.0D0 / (z_b + z_a * z_q(jc, jk - 1))
             z_q(jc, jk) = - z_c * z_g
-            p_nh % prog(nnew) % w(jc, jk, jb) = z_w_expl(jc, jk) - z_gamma * (z_exner_expl(jc, jk - 1) - z_exner_expl(jc, jk))
-            p_nh % prog(nnew) % w(jc, jk, jb) = (p_nh % prog(nnew) % w(jc, jk, jb) - z_a * p_nh % prog(nnew) % w(jc, jk - 1, jb)) * z_g
+            p_nh_prog_nnew % w(jc, jk, jb) = z_w_expl(jc, jk) - z_gamma * (z_exner_expl(jc, jk - 1) - z_exner_expl(jc, jk))
+            p_nh_prog_nnew % w(jc, jk, jb) = (p_nh_prog_nnew % w(jc, jk, jb) - z_a * p_nh_prog_nnew % w(jc, jk - 1, jb)) * z_g
           END DO
         END DO
         DO jk = nlev - 1, 2, - 1
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnew) % w(jc, jk, jb) + p_nh % prog(nnew) % w(jc, jk + 1, jb) * z_q(jc, jk)
+            p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnew % w(jc, jk, jb) + p_nh_prog_nnew % w(jc, jk + 1, jb) * z_q(jc, jk)
           END DO
         END DO
         IF (rayleigh_type == 2) THEN
           DO jk = 2, nrdmax(jg)
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, jk, jb) = z_raylfac(jk) * p_nh % prog(nnew) % w(jc, jk, jb) + (1.0D0 - z_raylfac(jk)) * p_nh % prog(nnew) % w(jc, 1, jb)
+              p_nh_prog_nnew % w(jc, jk, jb) = z_raylfac(jk) * p_nh_prog_nnew % w(jc, jk, jb) + (1.0D0 - z_raylfac(jk)) * p_nh_prog_nnew % w(jc, 1, jb)
             END DO
           END DO
         ELSE IF (rayleigh_type == 1) THEN
           DO jk = 2, nrdmax(jg)
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnew) % w(jc, jk, jb) - dtime * p_nh % metrics % rayleigh_w(jk) * (p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % ref % w_ref(jc, jk, jb))
+              p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnew % w(jc, jk, jb) - dtime * p_nh % metrics % rayleigh_w(jk) * (p_nh_prog_nnew % w(jc, jk, jb) - p_nh % ref % w_ref(jc, jk, jb))
             END DO
           END DO
         END IF
         DO jk = jk_start, nlev
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % rho(jc, jk, jb) = z_rho_expl(jc, jk) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (p_nh % diag % rho_ic(jc, jk, jb) * p_nh % prog(nnew) % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - p_nh % diag % rho_ic(jc, jk + 1, jb) * p_nh % prog(nnew) % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
-            p_nh % prog(nnew) % exner(jc, jk, jb) = z_exner_expl(jc, jk) + p_nh % metrics % exner_ref_mc(jc, jk, jb) - z_beta(jc, jk) * (z_alpha(jc, jk) * p_nh % prog(nnew) % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_alpha(jc, jk + 1) * p_nh % prog(nnew) % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
-            p_nh % prog(nnew) % theta_v(jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) * p_nh % prog(nnow) % theta_v(jc, jk, jb) * ((p_nh % prog(nnew) % exner(jc, jk, jb) / p_nh % prog(nnow) % exner(jc, jk, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh % prog(nnew) % rho(jc, jk, jb)
+            p_nh_prog_nnew % rho(jc, jk, jb) = z_rho_expl(jc, jk) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (p_nh % diag % rho_ic(jc, jk, jb) * p_nh_prog_nnew % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - p_nh % diag % rho_ic(jc, jk + 1, jb) * p_nh_prog_nnew % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
+            p_nh_prog_nnew % exner(jc, jk, jb) = z_exner_expl(jc, jk) + p_nh % metrics % exner_ref_mc(jc, jk, jb) - z_beta(jc, jk) * (z_alpha(jc, jk) * p_nh_prog_nnew % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_alpha(jc, jk + 1) * p_nh_prog_nnew % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
+            p_nh_prog_nnew % theta_v(jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb) * ((p_nh_prog_nnew % exner(jc, jk, jb) / p_nh_prog_nnow % exner(jc, jk, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh_prog_nnew % rho(jc, jk, jb)
           END DO
         END DO
         IF (l_vert_nested) THEN
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % rho(jc, 1, jb) = z_rho_expl(jc, 1) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - p_nh % diag % rho_ic(jc, 2, jb) * p_nh % prog(nnew) % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
-            p_nh % prog(nnew) % exner(jc, 1, jb) = z_exner_expl(jc, 1) + p_nh % metrics % exner_ref_mc(jc, 1, jb) - z_beta(jc, 1) * (p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, 1, jb) * z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - z_alpha(jc, 2) * p_nh % prog(nnew) % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
-            p_nh % prog(nnew) % theta_v(jc, 1, jb) = p_nh % prog(nnow) % rho(jc, 1, jb) * p_nh % prog(nnow) % theta_v(jc, 1, jb) * ((p_nh % prog(nnew) % exner(jc, 1, jb) / p_nh % prog(nnow) % exner(jc, 1, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh % prog(nnew) % rho(jc, 1, jb)
+            p_nh_prog_nnew % rho(jc, 1, jb) = z_rho_expl(jc, 1) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - p_nh % diag % rho_ic(jc, 2, jb) * p_nh_prog_nnew % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
+            p_nh_prog_nnew % exner(jc, 1, jb) = z_exner_expl(jc, 1) + p_nh % metrics % exner_ref_mc(jc, 1, jb) - z_beta(jc, 1) * (p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, 1, jb) * z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - z_alpha(jc, 2) * p_nh_prog_nnew % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
+            p_nh_prog_nnew % theta_v(jc, 1, jb) = p_nh_prog_nnow % rho(jc, 1, jb) * p_nh_prog_nnow % theta_v(jc, 1, jb) * ((p_nh_prog_nnew % exner(jc, 1, jb) / p_nh_prog_nnow % exner(jc, 1, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh_prog_nnew % rho(jc, 1, jb)
           END DO
         END IF
         IF (istep == 1 .AND. divdamp_type >= 3) THEN
           DO jk = kstart_dd3d(jg), nlev
             DO jc = i_startidx, i_endidx
-              z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % prog(nnew) % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
+              z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh_prog_nnew % w(jc, jk, jb) - p_nh_prog_nnew % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
             END DO
           END DO
         END IF
@@ -1521,7 +1523,7 @@ end if
           END IF
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_a = r_nsubsteps * (z_contr_w_fl_l(jc, jk) + p_nh % diag % rho_ic(jc, jk, jb) * p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % prog(nnew) % w(jc, jk, jb))
+              z_a = r_nsubsteps * (z_contr_w_fl_l(jc, jk) + p_nh % diag % rho_ic(jc, jk, jb) * p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh_prog_nnew % w(jc, jk, jb))
               prep_adv % mass_flx_ic(jc, jk, jb) = prep_adv % mass_flx_ic(jc, jk, jb) + z_a
               prep_adv % vol_flx_ic(jc, jk, jb) = prep_adv % vol_flx_ic(jc, jk, jb) + z_a / p_nh % diag % rho_ic(jc, jk, jb)
             END DO
@@ -1536,22 +1538,22 @@ end if
         IF (istep == 1 .AND. idyn_timestep == 1) THEN
           DO jk = kstart_moist(jg), nlev
             DO jc = i_startidx, i_endidx
-              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh % prog(nnow) % exner(jc, jk, jb)
+              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh_prog_nnow % exner(jc, jk, jb)
             END DO
           END DO
         ELSE IF (istep == 2 .AND. idyn_timestep == ndyn_substeps_var(jg)) THEN
           DO jk = kstart_moist(jg), nlev
             DO jc = i_startidx, i_endidx
-              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh % prog(nnew) % exner(jc, jk, jb) - (p_nh % diag % exner_dyn_incr(jc, jk, jb) + ndyn_substeps_var(jg) * dtime * p_nh % diag % ddt_exner_phy(jc, jk, jb))
+              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh_prog_nnew % exner(jc, jk, jb) - (p_nh % diag % exner_dyn_incr(jc, jk, jb) + ndyn_substeps_var(jg) * dtime * p_nh % diag % ddt_exner_phy(jc, jk, jb))
             END DO
           END DO
         END IF
         IF (istep == 2 .AND. l_child_vertnest) THEN
           DO jc = i_startidx, i_endidx
-            p_nh % diag % w_int(jc, jb, idyn_timestep) = 0.5D0 * (p_nh % prog(nnow) % w(jc, nshift, jb) + p_nh % prog(nnew) % w(jc, nshift, jb))
+            p_nh % diag % w_int(jc, jb, idyn_timestep) = 0.5D0 * (p_nh_prog_nnow % w(jc, nshift, jb) + p_nh_prog_nnew % w(jc, nshift, jb))
             p_nh % diag % theta_v_ic_int(jc, jb, idyn_timestep) = p_nh % diag % theta_v_ic(jc, nshift, jb)
             p_nh % diag % rho_ic_int(jc, jb, idyn_timestep) = p_nh % diag % rho_ic(jc, nshift, jb)
-            p_nh % diag % mflx_ic_int(jc, jb, idyn_timestep) = p_nh % diag % rho_ic(jc, nshift, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, nshift, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % prog(nnew) % w(jc, nshift, jb))
+            p_nh % diag % mflx_ic_int(jc, jb, idyn_timestep) = p_nh % diag % rho_ic(jc, nshift, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, nshift, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh_prog_nnew % w(jc, nshift, jb))
           END DO
         END IF
       END DO
@@ -1565,31 +1567,31 @@ end if
           IF (istep == 1 .AND. my_process_is_mpi_all_seq()) THEN
             DO jk = 1, nlev
               DO jc = i_startidx, i_endidx
-                p_nh % prog(nnew) % rho(jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
-                p_nh % prog(nnew) % theta_v(jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
-                p_nh % prog(nnew) % exner(jc, jk, jb) = EXP(0.4000000000000001D0 * LOG(0.0028704000000000004D0 * p_nh % prog(nnew) % rho(jc, jk, jb) * p_nh % prog(nnew) % theta_v(jc, jk, jb)))
-                p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
+                p_nh_prog_nnew % rho(jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
+                p_nh_prog_nnew % theta_v(jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
+                p_nh_prog_nnew % exner(jc, jk, jb) = EXP(0.4000000000000001D0 * LOG(0.0028704000000000004D0 * p_nh_prog_nnew % rho(jc, jk, jb) * p_nh_prog_nnew % theta_v(jc, jk, jb)))
+                p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
               END DO
             END DO
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, nlevp1, jb) = p_nh % prog(nnow) % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
+              p_nh_prog_nnew % w(jc, nlevp1, jb) = p_nh_prog_nnow % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
             END DO
           ELSE IF (istep == 1) THEN
             DO jk = 1, nlev
               DO jc = i_startidx, i_endidx
-                p_nh % prog(nnew) % rho(jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
-                p_nh % prog(nnew) % exner(jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
-                p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
+                p_nh_prog_nnew % rho(jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
+                p_nh_prog_nnew % exner(jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
+                p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
               END DO
             END DO
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, nlevp1, jb) = p_nh % prog(nnow) % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
+              p_nh_prog_nnew % w(jc, nlevp1, jb) = p_nh_prog_nnow % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
             END DO
           END IF
           IF (istep == 1 .AND. divdamp_type >= 3) THEN
             DO jk = kstart_dd3d(jg), nlev
               DO jc = i_startidx, i_endidx
-                z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % prog(nnew) % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
+                z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh_prog_nnew % w(jc, jk, jb) - p_nh_prog_nnew % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
               END DO
             END DO
           END IF
@@ -1599,7 +1601,7 @@ end if
             END IF
             DO jk = 2, nlev
               DO jc = i_startidx, i_endidx
-                prep_adv % mass_flx_ic(jc, jk, jb) = prep_adv % mass_flx_ic(jc, jk, jb) + r_nsubsteps * p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, jk, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
+                prep_adv % mass_flx_ic(jc, jk, jb) = prep_adv % mass_flx_ic(jc, jk, jb) + r_nsubsteps * p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, jk, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh_prog_nnew % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
               END DO
             END DO
             IF (l_vert_nested) THEN
@@ -1616,11 +1618,11 @@ INCLUDE 'prepost_t1.inc'
 end if
 
   END SUBROUTINE solve_nh_predictor_post
-  SUBROUTINE solve_nh_corrector_pre(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
+  SUBROUTINE solve_nh_corrector_pre(p_nh, p_nh_prog_nnow, p_nh_prog_nnew, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 use serde_base, only: generation, at
 use corrector_pre, only: serialize, serialize_global_data
-    USE mo_nonhydro_types, ONLY: t_nh_state
+    USE mo_nonhydro_types, ONLY: t_nh_state, t_nh_prog
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
     USE mo_prepadv_types, ONLY: t_prepare_adv
@@ -1648,6 +1650,7 @@ use corrector_pre, only: serialize, serialize_global_data
     TYPE(t_int_state), TARGET, INTENT(IN) :: p_int
     TYPE(t_patch), TARGET, INTENT(INOUT) :: p_patch
     TYPE(t_prepare_adv), TARGET, INTENT(INOUT) :: prep_adv
+    TYPE(t_nh_prog), TARGET, INTENT(INOUT) :: p_nh_prog_nnow, p_nh_prog_nnew
     LOGICAL, INTENT(IN) :: l_init
     LOGICAL, INTENT(IN) :: l_recompute
     LOGICAL, INTENT(IN) :: lsave_mflx
@@ -1694,12 +1697,12 @@ end if
           ELSE
             lvn_only = .FALSE.
           END IF
-          CALL velocity_tendencies(p_nh % prog(nnow), p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl1, istep, lvn_only, dtime, dt_linintp_ubc_nnow, ldeepatmo)
+          CALL velocity_tendencies(p_nh_prog_nnow, p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl1, istep, lvn_only, dtime, dt_linintp_ubc_nnow, ldeepatmo)
         END IF
         nvar = nnow
       ELSE
         lvn_only = .FALSE.
-        CALL velocity_tendencies(p_nh % prog(nnew), p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl2, istep, .FALSE., dtime, dt_linintp_ubc_nnew, ldeepatmo)
+        CALL velocity_tendencies(p_nh_prog_nnew, p_patch, p_int, p_nh % metrics, p_nh % diag, z_w_concorr_me, z_kin_hor_e, z_vt_ie, ntl2, istep, .FALSE., dtime, dt_linintp_ubc_nnew, ldeepatmo)
         nvar = nnew
       END IF
       IF (istep == 1 .AND. (igradp_method == 3 .OR. igradp_method == 5)) THEN
@@ -1729,8 +1732,8 @@ end if
         IF (istep == 1) THEN
           DO jk = 1, nlev
             DO jc = i_startidx, i_endidx
-              z_exner_ex_pr(jc, jk, jb) = (1.0D0 + p_nh % metrics % exner_exfac(jc, jk, jb)) * (p_nh % prog(nnow) % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)) - p_nh % metrics % exner_exfac(jc, jk, jb) * p_nh % diag % exner_pr(jc, jk, jb)
-              p_nh % diag % exner_pr(jc, jk, jb) = p_nh % prog(nnow) % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)
+              z_exner_ex_pr(jc, jk, jb) = (1.0D0 + p_nh % metrics % exner_exfac(jc, jk, jb)) * (p_nh_prog_nnow % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)) - p_nh % metrics % exner_exfac(jc, jk, jb) * p_nh % diag % exner_pr(jc, jk, jb)
+              p_nh % diag % exner_pr(jc, jk, jb) = p_nh_prog_nnow % exner(jc, jk, jb) - p_nh % metrics % exner_ref_mc(jc, jk, jb)
             END DO
           END DO
           z_exner_ex_pr(:, nlevp1, jb) = 0.0D0
@@ -1756,27 +1759,27 @@ end if
             END IF
           END IF
           DO jc = i_startidx, i_endidx
-            z_rth_pr(1, jc, 1, jb) = p_nh % prog(nnow) % rho(jc, 1, jb) - p_nh % metrics % rho_ref_mc(jc, 1, jb)
-            z_rth_pr(2, jc, 1, jb) = p_nh % prog(nnow) % theta_v(jc, 1, jb) - p_nh % metrics % theta_ref_mc(jc, 1, jb)
+            z_rth_pr(1, jc, 1, jb) = p_nh_prog_nnow % rho(jc, 1, jb) - p_nh % metrics % rho_ref_mc(jc, 1, jb)
+            z_rth_pr(2, jc, 1, jb) = p_nh_prog_nnow % theta_v(jc, 1, jb) - p_nh % metrics % theta_ref_mc(jc, 1, jb)
           END DO
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh % prog(nnow) % rho(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh % prog(nnow) % rho(jc, jk - 1, jb)
-              z_rth_pr(1, jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
-              z_rth_pr(2, jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
+              p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh_prog_nnow % rho(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh_prog_nnow % rho(jc, jk - 1, jb)
+              z_rth_pr(1, jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
+              z_rth_pr(2, jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
               z_theta_v_pr_ic(jc, jk) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_rth_pr(2, jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_rth_pr(2, jc, jk - 1, jb)
-              p_nh % diag % theta_v_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh % prog(nnow) % theta_v(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh % prog(nnow) % theta_v(jc, jk - 1, jb)
+              p_nh % diag % theta_v_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh_prog_nnow % theta_v(jc, jk - 1, jb)
               z_th_ddz_exner_c(jc, jk, jb) = p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, jk, jb) * (p_nh % diag % exner_pr(jc, jk - 1, jb) - p_nh % diag % exner_pr(jc, jk, jb)) / p_nh % metrics % ddqz_z_half(jc, jk, jb) + z_theta_v_pr_ic(jc, jk) * p_nh % metrics % d_exner_dz_ref_ic(jc, jk, jb)
             END DO
           END DO
         ELSE
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_w_backtraj = - (p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb)) * dtime * 0.5D0 / p_nh % metrics % ddqz_z_half(jc, jk, jb)
-              z_rho_tavg_m1 = wgt_nnow_rth * p_nh % prog(nnow) % rho(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk - 1, jb)
-              z_theta_tavg_m1 = wgt_nnow_rth * p_nh % prog(nnow) % theta_v(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk - 1, jb)
-              z_rho_tavg = wgt_nnow_rth * p_nh % prog(nnow) % rho(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk, jb)
-              z_theta_tavg = wgt_nnow_rth * p_nh % prog(nnow) % theta_v(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk, jb)
+              z_w_backtraj = - (p_nh_prog_nnew % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb)) * dtime * 0.5D0 / p_nh % metrics % ddqz_z_half(jc, jk, jb)
+              z_rho_tavg_m1 = wgt_nnow_rth * p_nh_prog_nnow % rho(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk - 1, jb)
+              z_theta_tavg_m1 = wgt_nnow_rth * p_nh_prog_nnow % theta_v(jc, jk - 1, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk - 1, jb)
+              z_rho_tavg = wgt_nnow_rth * p_nh_prog_nnow % rho(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % rho(jc, jk, jb)
+              z_theta_tavg = wgt_nnow_rth * p_nh_prog_nnow % theta_v(jc, jk, jb) + wgt_nnew_rth * p_nh % prog(nvar) % theta_v(jc, jk, jb)
               p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_rho_tavg + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_rho_tavg_m1 + z_w_backtraj * (z_rho_tavg_m1 - z_rho_tavg)
               z_theta_v_pr_mc_m1 = z_theta_tavg_m1 - p_nh % metrics % theta_ref_mc(jc, jk - 1, jb)
               z_theta_v_pr_mc = z_theta_tavg - p_nh % metrics % theta_ref_mc(jc, jk, jb)
@@ -1810,8 +1813,8 @@ end if
           CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, -6, -6)
           DO jk = 1, nlev
             DO jc = i_startidx, i_endidx
-              z_rth_pr(1, jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
-              z_rth_pr(2, jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
+              z_rth_pr(1, jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
+              z_rth_pr(2, jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
             END DO
           END DO
         END DO
@@ -1822,8 +1825,8 @@ end if
       END IF
       IF (istep == 1) THEN
         IF (iadv_rhotheta == 1) THEN
-          CALL cells2verts_scalar_dp_deconiface_8(p_nh % prog(nnow) % rho, p_patch, p_int % cells_aw_verts, z_rho_v, opt_rlend = -5)
-          CALL cells2verts_scalar_dp_deconiface_9(p_nh % prog(nnow) % theta_v, p_patch, p_int % cells_aw_verts, z_theta_v_v, opt_rlend = -5)
+          CALL cells2verts_scalar_dp_deconiface_8(p_nh_prog_nnow % rho, p_patch, p_int % cells_aw_verts, z_rho_v, opt_rlend = -5)
+          CALL cells2verts_scalar_dp_deconiface_9(p_nh_prog_nnow % theta_v, p_patch, p_int % cells_aw_verts, z_theta_v_v, opt_rlend = -5)
         ELSE IF (iadv_rhotheta == 2) THEN
           CALL grad_green_gauss_cell_dycore_deconiface_10(z_rth_pr, p_patch, p_int, z_grad_rth, opt_rlstart = 3, opt_rlend = -5, opt_acc_async = .TRUE.)
         END IF
@@ -1848,10 +1851,10 @@ end if
           IF (iadv_rhotheta == 2) THEN
             DO jk = 1, nlev
               DO je = i_startidx, i_endidx
-                lvn_pos = p_nh % prog(nnow) % vn(je, jk, jb) >= 0.0D0
+                lvn_pos = p_nh_prog_nnow % vn(je, jk, jb) >= 0.0D0
                 ilc0 = MERGE(p_patch % edges % cell_idx(je, jb, 1), p_patch % edges % cell_idx(je, jb, 2), lvn_pos)
                 ibc0 = MERGE(p_patch % edges % cell_blk(je, jb, 1), p_patch % edges % cell_blk(je, jb, 2), lvn_pos)
-                z_ntdistv_bary_1 = - (p_nh % prog(nnow) % vn(je, jk, jb) * dthalf + MERGE(p_int % pos_on_tplane_e(je, 1, 1, jb), p_int % pos_on_tplane_e(je, 2, 1, jb), lvn_pos)) * p_nh % metrics % deepatmo_gradh_mc(jk)
+                z_ntdistv_bary_1 = - (p_nh_prog_nnow % vn(je, jk, jb) * dthalf + MERGE(p_int % pos_on_tplane_e(je, 1, 1, jb), p_int % pos_on_tplane_e(je, 2, 1, jb), lvn_pos)) * p_nh % metrics % deepatmo_gradh_mc(jk)
                 z_ntdistv_bary_2 = - (p_nh % diag % vt(je, jk, jb) * dthalf + MERGE(p_int % pos_on_tplane_e(je, 1, 2, jb), p_int % pos_on_tplane_e(je, 2, 2, jb), lvn_pos)) * p_nh % metrics % deepatmo_gradh_mc(jk)
                 distv_bary_1 = z_ntdistv_bary_1 * MERGE(p_patch % edges % primal_normal_cell(je, jb, 1) % v1, p_patch % edges % primal_normal_cell(je, jb, 2) % v1, lvn_pos) + z_ntdistv_bary_2 * MERGE(p_patch % edges % dual_normal_cell(je, jb, 1) % v1, p_patch % edges % dual_normal_cell(je, jb, 2) % v1, lvn_pos)
                 distv_bary_2 = z_ntdistv_bary_1 * MERGE(p_patch % edges % primal_normal_cell(je, jb, 1) % v2, p_patch % edges % primal_normal_cell(je, jb, 2) % v2, lvn_pos) + z_ntdistv_bary_2 * MERGE(p_patch % edges % dual_normal_cell(je, jb, 1) % v2, p_patch % edges % dual_normal_cell(je, jb, 2) % v2, lvn_pos)
@@ -1862,8 +1865,8 @@ end if
           ELSE
             DO jk = 1, nlev
               DO je = i_startidx, i_endidx
-                z_rho_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh % prog(nnow) % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh % prog(nnow) % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_rho_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_rho_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
-                z_theta_v_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh % prog(nnow) % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
+                z_rho_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh_prog_nnow % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh_prog_nnow % rho(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_rho_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_rho_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
+                z_theta_v_e(je, jk, jb) = p_int % c_lin_e(je, 1, jb) * p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1)) + p_int % c_lin_e(je, 2, jb) * p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - dtime * (p_nh_prog_nnow % vn(je, jk, jb) * p_patch % edges % inv_dual_edge_length(je, jb) * (p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), jk, p_patch % edges % cell_blk(je, jb, 2)) - p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), jk, p_patch % edges % cell_blk(je, jb, 1))) + p_nh % diag % vt(je, jk, jb) * p_patch % edges % inv_primal_edge_length(je, jb) * p_patch % edges % tangent_orientation(je, jb) * (z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 2), jk, p_patch % edges % vertex_blk(je, jb, 2)) - z_theta_v_v(p_patch % edges % vertex_idx(je, jb, 1), jk, p_patch % edges % vertex_blk(je, jb, 1))))
               END DO
             END DO
           END IF
@@ -1919,16 +1922,16 @@ end if
           END IF
           IF (igradp_method == 3) THEN
             DO je = i_startidx, i_endidx
-              z_theta1 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) + p_nh % metrics % zdiff_gradp(1, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1))
-              z_theta2 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) + p_nh % metrics % zdiff_gradp(2, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2))
+              z_theta1 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) + p_nh % metrics % zdiff_gradp(1, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1))
+              z_theta2 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) + p_nh % metrics % zdiff_gradp(2, je, nlev, jb) * (p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) - p_nh % diag % theta_v_ic(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2))) * p_nh % metrics % inv_ddqz_z_full(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2))
               z_hydro_corr(je, jb) = 0.00976135730211817D0 * p_patch % edges % inv_dual_edge_length(je, jb) * (z_theta2 - z_theta1) * 4.0D0 / (z_theta1 + z_theta2) ** 2
             END DO
           ELSE IF (igradp_method == 5) THEN
             DO je = i_startidx, i_endidx
               ikp1 = MIN(nlev, p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 2)
               ikp2 = MIN(nlev, p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 2)
-              z_theta1 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(1, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(2, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(3, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 1), ikp1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(4, je, nlev, jb)
-              z_theta2 = p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(5, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(6, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(7, je, nlev, jb) + p_nh % prog(nnow) % theta_v(p_patch % edges % cell_idx(je, jb, 2), ikp2, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(8, je, nlev, jb)
+              z_theta1 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(1, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(2, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), p_nh % metrics % vertidx_gradp(1, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(3, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 1), ikp1, p_patch % edges % cell_blk(je, jb, 1)) * p_nh % metrics % coeff_gradp(4, je, nlev, jb)
+              z_theta2 = p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) - 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(5, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb), p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(6, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), p_nh % metrics % vertidx_gradp(2, je, nlev, jb) + 1, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(7, je, nlev, jb) + p_nh_prog_nnow % theta_v(p_patch % edges % cell_idx(je, jb, 2), ikp2, p_patch % edges % cell_blk(je, jb, 2)) * p_nh % metrics % coeff_gradp(8, je, nlev, jb)
               z_hydro_corr(je, jb) = 0.00976135730211817D0 * p_patch % edges % inv_dual_edge_length(je, jb) * (z_theta2 - z_theta1) * 4.0D0 / (z_theta1 + z_theta2) ** 2
             END DO
           END IF
@@ -1956,7 +1959,7 @@ end if
               z_ddt_vn_apc = p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl1) * wgt_nnow_vel + p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl2) * wgt_nnew_vel
               z_ddt_vn_pgr = - 1004.64D0 * z_theta_v_e(je, jk, jb) * z_gradh_exner(je, jk, jb)
               z_ddt_vn_dyn = z_ddt_vn_apc + z_ddt_vn_pgr + p_nh % diag % ddt_vn_phy(je, jk, jb)
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnow) % vn(je, jk, jb) + dtime * z_ddt_vn_dyn
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnow % vn(je, jk, jb) + dtime * z_ddt_vn_dyn
               IF (p_nh % diag % ddt_vn_adv_is_associated .OR. p_nh % diag % ddt_vn_cor_is_associated) THEN
                 z_ddt_vn_cor = p_nh % diag % ddt_vn_cor_pc(je, jk, jb, ntl1) * wgt_nnow_vel + p_nh % diag % ddt_vn_cor_pc(je, jk, jb, ntl2) * wgt_nnew_vel
                 IF (p_nh % diag % ddt_vn_adv_is_associated) THEN
@@ -1980,7 +1983,7 @@ end if
         ELSE
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnow) % vn(je, jk, jb) + dtime * (p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl1) - 1004.64D0 * z_theta_v_e(je, jk, jb) * z_gradh_exner(je, jk, jb) + p_nh % diag % ddt_vn_phy(je, jk, jb))
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnow % vn(je, jk, jb) + dtime * (p_nh % diag % ddt_vn_apc_pc(je, jk, jb, ntl1) - 1004.64D0 * z_theta_v_e(je, jk, jb) * z_gradh_exner(je, jk, jb) + p_nh % diag % ddt_vn_phy(je, jk, jb))
             END DO
           END DO
         END IF
@@ -1996,7 +1999,7 @@ end if
             DO jk = 1, nlev
               DO je = i_startidx, i_endidx
                 z_d_vn_dmp = scal_divdamp_o2 * z_graddiv_vn(je, jk, jb)
-                p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_dmp
+                p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_dmp
                 IF (p_nh % diag % ddt_vn_dmp_is_associated) THEN
                   p_nh % diag % ddt_vn_dmp(je, jk, jb) = p_nh % diag % ddt_vn_dmp(je, jk, jb) + z_d_vn_dmp * r_dtimensubsteps
                 END IF
@@ -2011,7 +2014,7 @@ end if
               DO jk = 1, nlev
                 DO je = i_startidx, i_endidx
                   z_d_vn_dmp = (scal_divdamp(jk) + bdy_divdamp(jk) * p_int % nudgecoeff_e(je, jb)) * z_graddiv2_vn(je, jk)
-                  p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_dmp
+                  p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_dmp
                   IF (p_nh % diag % ddt_vn_dmp_is_associated) THEN
                     p_nh % diag % ddt_vn_dmp(je, jk, jb) = p_nh % diag % ddt_vn_dmp(je, jk, jb) + z_d_vn_dmp * r_dtimensubsteps
                   END IF
@@ -2024,7 +2027,7 @@ end if
               DO jk = 1, nlev
                 DO je = i_startidx, i_endidx
                   z_d_vn_dmp = scal_divdamp(jk) * z_graddiv2_vn(je, jk)
-                  p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_dmp
+                  p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_dmp
                   IF (p_nh % diag % ddt_vn_dmp_is_associated) THEN
                     p_nh % diag % ddt_vn_dmp(je, jk, jb) = p_nh % diag % ddt_vn_dmp(je, jk, jb) + z_d_vn_dmp * r_dtimensubsteps
                   END IF
@@ -2040,7 +2043,7 @@ end if
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
               z_d_vn_iau = iau_wgt_dyn * p_nh % diag % vn_incr(je, jk, jb)
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_d_vn_iau
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_d_vn_iau
               IF (istep == 2) THEN
                 IF (p_nh % diag % ddt_vn_iau_is_associated) THEN
                   p_nh % diag % ddt_vn_iau(je, jk, jb) = p_nh % diag % ddt_vn_iau(je, jk, jb) + z_d_vn_iau * r_dtimensubsteps
@@ -2055,8 +2058,8 @@ end if
         IF (rayleigh_type == 1) THEN
           DO jk = 1, nrdmax(jg)
             DO je = i_startidx, i_endidx
-              z_ddt_vn_ray = - p_nh % metrics % rayleigh_vn(jk) * (p_nh % prog(nnew) % vn(je, jk, jb) - p_nh % ref % vn_ref(je, jk, jb))
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) + z_ddt_vn_ray * dtime
+              z_ddt_vn_ray = - p_nh % metrics % rayleigh_vn(jk) * (p_nh_prog_nnew % vn(je, jk, jb) - p_nh % ref % vn_ref(je, jk, jb))
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) + z_ddt_vn_ray * dtime
               IF (istep == 2) THEN
                 IF (p_nh % diag % ddt_vn_ray_is_associated) THEN
                   p_nh % diag % ddt_vn_ray(je, jk, jb) = p_nh % diag % ddt_vn_ray(je, jk, jb) + z_ddt_vn_ray * r_nsubsteps
@@ -2078,7 +2081,7 @@ end if
           CALL get_indices_e(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 1, 9)
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              p_nh % prog(nnew) % vn(je, jk, jb) = p_nh % prog(nnow) % vn(je, jk, jb) + p_nh % diag % grf_tend_vn(je, jk, jb) * dtime
+              p_nh_prog_nnew % vn(je, jk, jb) = p_nh_prog_nnow % vn(je, jk, jb) + p_nh % diag % grf_tend_vn(je, jk, jb) * dtime
               IF (p_nh % diag % ddt_vn_grf_is_associated) THEN
                 p_nh % diag % ddt_vn_grf(je, jk, jb) = p_nh % diag % ddt_vn_grf(je, jk, jb) + p_nh % diag % grf_tend_vn(je, jk, jb) * r_nsubsteps
               END IF
@@ -2105,11 +2108,11 @@ INCLUDE 'corpre_t1.inc'
 end if
 
   END SUBROUTINE solve_nh_corrector_pre
-  SUBROUTINE solve_nh_corrector_post(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
+  SUBROUTINE solve_nh_corrector_post(p_nh, p_nh_prog_nnow, p_nh_prog_nnew, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, &
     jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 use serde_base, only: generation, at
 use corrector_post, only: serialize, serialize_global_data
-    USE mo_nonhydro_types, ONLY: t_nh_state
+    USE mo_nonhydro_types, ONLY: t_nh_state, t_nh_prog
     USE mo_intp_data_strc, ONLY: t_int_state
     USE mo_model_domain, ONLY: t_patch
     USE mo_prepadv_types, ONLY: t_prepare_adv
@@ -2137,6 +2140,7 @@ use corrector_post, only: serialize, serialize_global_data
     TYPE(t_int_state), TARGET, INTENT(IN) :: p_int
     TYPE(t_patch), TARGET, INTENT(INOUT) :: p_patch
     TYPE(t_prepare_adv), TARGET, INTENT(INOUT) :: prep_adv
+    TYPE(t_nh_prog), TARGET, INTENT(INOUT) :: p_nh_prog_nnow, p_nh_prog_nnew
     LOGICAL, INTENT(IN) :: l_init
     LOGICAL, INTENT(IN) :: l_recompute
     LOGICAL, INTENT(IN) :: lsave_mflx
@@ -2184,22 +2188,22 @@ end if
         IF (istep == 1) THEN
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
-              z_graddiv_vn(je, jk, jb) = p_int % geofac_grdiv(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % geofac_grdiv(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % geofac_grdiv(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % geofac_grdiv(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % geofac_grdiv(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
-              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_graddiv_vn(je, jk, jb) = p_int % geofac_grdiv(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % geofac_grdiv(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % geofac_grdiv(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % geofac_grdiv(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % geofac_grdiv(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
             END DO
           END DO
         ELSE IF (itime_scheme >= 5) THEN
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
-              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              p_nh % diag % vt(je, jk, jb) = p_int % rbf_vec_coeff_e(1, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % rbf_vec_coeff_e(2, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % rbf_vec_coeff_e(3, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % rbf_vec_coeff_e(4, je, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
             END DO
           END DO
         ELSE
           DO jk = 1, nlev
             DO je = i_startidx, i_endidx
-              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh % prog(nnew) % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
+              z_vn_avg(je, jk) = p_int % e_flx_avg(je, 1, jb) * p_nh_prog_nnew % vn(je, jk, jb) + p_int % e_flx_avg(je, 2, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 1), jk, p_patch % edges % quad_blk(je, jb, 1)) + p_int % e_flx_avg(je, 3, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 2), jk, p_patch % edges % quad_blk(je, jb, 2)) + p_int % e_flx_avg(je, 4, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 3), jk, p_patch % edges % quad_blk(je, jb, 3)) + p_int % e_flx_avg(je, 5, jb) * p_nh_prog_nnew % vn(p_patch % edges % quad_idx(je, jb, 4), jk, p_patch % edges % quad_blk(je, jb, 4))
             END DO
           END DO
         END IF
@@ -2237,31 +2241,31 @@ end if
         IF (istep == 1 .OR. itime_scheme >= 5) THEN
           DO jk = nflatlev(jg), nlev
             DO je = i_startidx, i_endidx
-              z_w_concorr_me(je, jk, jb) = p_nh % prog(nnew) % vn(je, jk, jb) * p_nh % metrics % ddxn_z_full(je, jk, jb) + p_nh % diag % vt(je, jk, jb) * p_nh % metrics % ddxt_z_full(je, jk, jb)
+              z_w_concorr_me(je, jk, jb) = p_nh_prog_nnew % vn(je, jk, jb) * p_nh % metrics % ddxn_z_full(je, jk, jb) + p_nh % diag % vt(je, jk, jb) * p_nh % metrics % ddxt_z_full(je, jk, jb)
             END DO
           END DO
         END IF
         IF (istep == 1) THEN
           DO jk = 2, nlev
             DO je = i_startidx, i_endidx
-              p_nh % diag % vn_ie(je, jk, jb) = p_nh % metrics % wgtfac_e(je, jk, jb) * p_nh % prog(nnew) % vn(je, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_e(je, jk, jb)) * p_nh % prog(nnew) % vn(je, jk - 1, jb)
+              p_nh % diag % vn_ie(je, jk, jb) = p_nh % metrics % wgtfac_e(je, jk, jb) * p_nh_prog_nnew % vn(je, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_e(je, jk, jb)) * p_nh_prog_nnew % vn(je, jk - 1, jb)
               z_vt_ie(je, jk, jb) = p_nh % metrics % wgtfac_e(je, jk, jb) * p_nh % diag % vt(je, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_e(je, jk, jb)) * p_nh % diag % vt(je, jk - 1, jb)
-              z_kin_hor_e(je, jk, jb) = 0.5D0 * (p_nh % prog(nnew) % vn(je, jk, jb) ** 2 + p_nh % diag % vt(je, jk, jb) ** 2)
+              z_kin_hor_e(je, jk, jb) = 0.5D0 * (p_nh_prog_nnew % vn(je, jk, jb) ** 2 + p_nh % diag % vt(je, jk, jb) ** 2)
             END DO
           END DO
           IF (.NOT. l_vert_nested) THEN
             DO je = i_startidx, i_endidx
-              p_nh % diag % vn_ie(je, 1, jb) = p_nh % prog(nnew) % vn(je, 1, jb)
+              p_nh % diag % vn_ie(je, 1, jb) = p_nh_prog_nnew % vn(je, 1, jb)
               z_vt_ie(je, 1, jb) = p_nh % diag % vt(je, 1, jb)
-              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh % prog(nnew) % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
-              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh % prog(nnew) % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh % prog(nnew) % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh % prog(nnew) % vn(je, nlev - 2, jb)
+              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh_prog_nnew % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
+              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh_prog_nnew % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh_prog_nnew % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh_prog_nnew % vn(je, nlev - 2, jb)
             END DO
           ELSE
             DO je = i_startidx, i_endidx
               p_nh % diag % vn_ie(je, 1, jb) = p_nh % diag % vn_ie_ubc(je, 1, jb) + dt_linintp_ubc_nnew * p_nh % diag % vn_ie_ubc(je, 2, jb)
               z_vt_ie(je, 1, jb) = p_nh % diag % vt(je, 1, jb)
-              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh % prog(nnew) % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
-              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh % prog(nnew) % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh % prog(nnew) % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh % prog(nnew) % vn(je, nlev - 2, jb)
+              z_kin_hor_e(je, 1, jb) = 0.5D0 * (p_nh_prog_nnew % vn(je, 1, jb) ** 2 + p_nh % diag % vt(je, 1, jb) ** 2)
+              p_nh % diag % vn_ie(je, nlevp1, jb) = p_nh % metrics % wgtfacq_e(je, 1, jb) * p_nh_prog_nnew % vn(je, nlev, jb) + p_nh % metrics % wgtfacq_e(je, 2, jb) * p_nh_prog_nnew % vn(je, nlev - 1, jb) + p_nh % metrics % wgtfacq_e(je, 3, jb) * p_nh_prog_nnew % vn(je, nlev - 2, jb)
             END DO
           END IF
         END IF
@@ -2341,21 +2345,21 @@ end if
         IF (istep == 2 .AND. (itime_scheme >= 4)) THEN
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_w_expl(jc, jk) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * (wgt_nnow_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) + wgt_nnew_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl2) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
-              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
+              z_w_expl(jc, jk) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * (wgt_nnow_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) + wgt_nnew_vel * p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl2) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
+              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
             END DO
           END DO
         ELSE
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_w_expl(jc, jk) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * (p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
-              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
+              z_w_expl(jc, jk) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * (p_nh % diag % ddt_w_adv_pc(jc, jk, jb, ntl1) - 1004.64D0 * z_th_ddz_exner_c(jc, jk, jb))
+              z_contr_w_fl_l(jc, jk) = p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
             END DO
           END DO
         END IF
         DO jk = 1, nlev
           DO jc = i_startidx, i_endidx
-            z_beta(jc, jk) = dtime * 287.04D0 * p_nh % prog(nnow) % exner(jc, jk, jb) / (717.5999999999999D0 * p_nh % prog(nnow) % rho(jc, jk, jb) * p_nh % prog(nnow) % theta_v(jc, jk, jb)) * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb)
+            z_beta(jc, jk) = dtime * 287.04D0 * p_nh_prog_nnow % exner(jc, jk, jb) / (717.5999999999999D0 * p_nh_prog_nnow % rho(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb)) * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb)
             z_alpha(jc, jk) = p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, jk, jb) * p_nh % diag % rho_ic(jc, jk, jb)
           END DO
         END DO
@@ -2365,26 +2369,26 @@ end if
         END DO
         IF (.NOT. l_vert_nested) THEN
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % w(jc, 1, jb) = 0.0D0
+            p_nh_prog_nnew % w(jc, 1, jb) = 0.0D0
             z_contr_w_fl_l(jc, 1) = 0.0D0
           END DO
         ELSE
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % w(jc, 1, jb) = p_nh % diag % w_ubc(jc, jb, 1) + dt_linintp_ubc_nnew * p_nh % diag % w_ubc(jc, jb, 2)
+            p_nh_prog_nnew % w(jc, 1, jb) = p_nh % diag % w_ubc(jc, jb, 1) + dt_linintp_ubc_nnew * p_nh % diag % w_ubc(jc, jb, 2)
             z_contr_w_fl_l(jc, 1) = z_mflx_top(jc, jb) * p_nh % metrics % vwind_expl_wgt(jc, jb)
           END DO
         END IF
         DO jc = i_startidx, i_endidx
-          p_nh % prog(nnew) % w(jc, nlevp1, jb) = p_nh % diag % w_concorr_c(jc, nlevp1, jb)
+          p_nh_prog_nnew % w(jc, nlevp1, jb) = p_nh % diag % w_concorr_c(jc, nlevp1, jb)
           z_contr_w_fl_l(jc, nlevp1) = 0.0D0
         END DO
         DO jc = i_startidx, i_endidx
-          z_rho_expl(jc, 1) = p_nh % prog(nnow) % rho(jc, 1, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_flxdiv_mass(jc, 1) + z_contr_w_fl_l(jc, 1) * p_nh % metrics % deepatmo_divzu_mc(1) - z_contr_w_fl_l(jc, 2) * p_nh % metrics % deepatmo_divzl_mc(1))
+          z_rho_expl(jc, 1) = p_nh_prog_nnow % rho(jc, 1, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_flxdiv_mass(jc, 1) + z_contr_w_fl_l(jc, 1) * p_nh % metrics % deepatmo_divzu_mc(1) - z_contr_w_fl_l(jc, 2) * p_nh % metrics % deepatmo_divzl_mc(1))
           z_exner_expl(jc, 1) = p_nh % diag % exner_pr(jc, 1, jb) - z_beta(jc, 1) * (z_flxdiv_theta(jc, 1) + p_nh % diag % theta_v_ic(jc, 1, jb) * z_contr_w_fl_l(jc, 1) * p_nh % metrics % deepatmo_divzu_mc(1) - p_nh % diag % theta_v_ic(jc, 2, jb) * z_contr_w_fl_l(jc, 2) * p_nh % metrics % deepatmo_divzl_mc(1)) + dtime * p_nh % diag % ddt_exner_phy(jc, 1, jb)
         END DO
         DO jk = 2, nlev
           DO jc = i_startidx, i_endidx
-            z_rho_expl(jc, jk) = p_nh % prog(nnow) % rho(jc, jk, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (z_flxdiv_mass(jc, jk) + z_contr_w_fl_l(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_contr_w_fl_l(jc, jk + 1) * p_nh % metrics % deepatmo_divzl_mc(jk))
+            z_rho_expl(jc, jk) = p_nh_prog_nnow % rho(jc, jk, jb) - dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (z_flxdiv_mass(jc, jk) + z_contr_w_fl_l(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_contr_w_fl_l(jc, jk + 1) * p_nh % metrics % deepatmo_divzl_mc(jk))
             z_exner_expl(jc, jk) = p_nh % diag % exner_pr(jc, jk, jb) - z_beta(jc, jk) * (z_flxdiv_theta(jc, jk) + p_nh % diag % theta_v_ic(jc, jk, jb) * z_contr_w_fl_l(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk) - p_nh % diag % theta_v_ic(jc, jk + 1, jb) * z_contr_w_fl_l(jc, jk + 1) * p_nh % metrics % deepatmo_divzl_mc(jk)) + dtime * p_nh % diag % ddt_exner_phy(jc, jk, jb)
           END DO
         END DO
@@ -2404,46 +2408,46 @@ end if
             z_b = 1.0D0 + z_gamma * z_alpha(jc, jk) * (z_beta(jc, jk - 1) * p_nh % metrics % deepatmo_divzl_mc(jk - 1) + z_beta(jc, jk) * p_nh % metrics % deepatmo_divzu_mc(jk))
             z_g = 1.0D0 / (z_b + z_a * z_q(jc, jk - 1))
             z_q(jc, jk) = - z_c * z_g
-            p_nh % prog(nnew) % w(jc, jk, jb) = z_w_expl(jc, jk) - z_gamma * (z_exner_expl(jc, jk - 1) - z_exner_expl(jc, jk))
-            p_nh % prog(nnew) % w(jc, jk, jb) = (p_nh % prog(nnew) % w(jc, jk, jb) - z_a * p_nh % prog(nnew) % w(jc, jk - 1, jb)) * z_g
+            p_nh_prog_nnew % w(jc, jk, jb) = z_w_expl(jc, jk) - z_gamma * (z_exner_expl(jc, jk - 1) - z_exner_expl(jc, jk))
+            p_nh_prog_nnew % w(jc, jk, jb) = (p_nh_prog_nnew % w(jc, jk, jb) - z_a * p_nh_prog_nnew % w(jc, jk - 1, jb)) * z_g
           END DO
         END DO
         DO jk = nlev - 1, 2, - 1
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnew) % w(jc, jk, jb) + p_nh % prog(nnew) % w(jc, jk + 1, jb) * z_q(jc, jk)
+            p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnew % w(jc, jk, jb) + p_nh_prog_nnew % w(jc, jk + 1, jb) * z_q(jc, jk)
           END DO
         END DO
         IF (rayleigh_type == 2) THEN
           DO jk = 2, nrdmax(jg)
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, jk, jb) = z_raylfac(jk) * p_nh % prog(nnew) % w(jc, jk, jb) + (1.0D0 - z_raylfac(jk)) * p_nh % prog(nnew) % w(jc, 1, jb)
+              p_nh_prog_nnew % w(jc, jk, jb) = z_raylfac(jk) * p_nh_prog_nnew % w(jc, jk, jb) + (1.0D0 - z_raylfac(jk)) * p_nh_prog_nnew % w(jc, 1, jb)
             END DO
           END DO
         ELSE IF (rayleigh_type == 1) THEN
           DO jk = 2, nrdmax(jg)
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnew) % w(jc, jk, jb) - dtime * p_nh % metrics % rayleigh_w(jk) * (p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % ref % w_ref(jc, jk, jb))
+              p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnew % w(jc, jk, jb) - dtime * p_nh % metrics % rayleigh_w(jk) * (p_nh_prog_nnew % w(jc, jk, jb) - p_nh % ref % w_ref(jc, jk, jb))
             END DO
           END DO
         END IF
         DO jk = jk_start, nlev
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % rho(jc, jk, jb) = z_rho_expl(jc, jk) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (p_nh % diag % rho_ic(jc, jk, jb) * p_nh % prog(nnew) % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - p_nh % diag % rho_ic(jc, jk + 1, jb) * p_nh % prog(nnew) % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
-            p_nh % prog(nnew) % exner(jc, jk, jb) = z_exner_expl(jc, jk) + p_nh % metrics % exner_ref_mc(jc, jk, jb) - z_beta(jc, jk) * (z_alpha(jc, jk) * p_nh % prog(nnew) % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_alpha(jc, jk + 1) * p_nh % prog(nnew) % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
-            p_nh % prog(nnew) % theta_v(jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) * p_nh % prog(nnow) % theta_v(jc, jk, jb) * ((p_nh % prog(nnew) % exner(jc, jk, jb) / p_nh % prog(nnow) % exner(jc, jk, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh % prog(nnew) % rho(jc, jk, jb)
+            p_nh_prog_nnew % rho(jc, jk, jb) = z_rho_expl(jc, jk) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * (p_nh % diag % rho_ic(jc, jk, jb) * p_nh_prog_nnew % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - p_nh % diag % rho_ic(jc, jk + 1, jb) * p_nh_prog_nnew % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
+            p_nh_prog_nnew % exner(jc, jk, jb) = z_exner_expl(jc, jk) + p_nh % metrics % exner_ref_mc(jc, jk, jb) - z_beta(jc, jk) * (z_alpha(jc, jk) * p_nh_prog_nnew % w(jc, jk, jb) * p_nh % metrics % deepatmo_divzu_mc(jk) - z_alpha(jc, jk + 1) * p_nh_prog_nnew % w(jc, jk + 1, jb) * p_nh % metrics % deepatmo_divzl_mc(jk))
+            p_nh_prog_nnew % theta_v(jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb) * ((p_nh_prog_nnew % exner(jc, jk, jb) / p_nh_prog_nnow % exner(jc, jk, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh_prog_nnew % rho(jc, jk, jb)
           END DO
         END DO
         IF (l_vert_nested) THEN
           DO jc = i_startidx, i_endidx
-            p_nh % prog(nnew) % rho(jc, 1, jb) = z_rho_expl(jc, 1) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - p_nh % diag % rho_ic(jc, 2, jb) * p_nh % prog(nnew) % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
-            p_nh % prog(nnew) % exner(jc, 1, jb) = z_exner_expl(jc, 1) + p_nh % metrics % exner_ref_mc(jc, 1, jb) - z_beta(jc, 1) * (p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, 1, jb) * z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - z_alpha(jc, 2) * p_nh % prog(nnew) % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
-            p_nh % prog(nnew) % theta_v(jc, 1, jb) = p_nh % prog(nnow) % rho(jc, 1, jb) * p_nh % prog(nnow) % theta_v(jc, 1, jb) * ((p_nh % prog(nnew) % exner(jc, 1, jb) / p_nh % prog(nnow) % exner(jc, 1, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh % prog(nnew) % rho(jc, 1, jb)
+            p_nh_prog_nnew % rho(jc, 1, jb) = z_rho_expl(jc, 1) - p_nh % metrics % vwind_impl_wgt(jc, jb) * dtime * p_nh % metrics % inv_ddqz_z_full(jc, 1, jb) * (z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - p_nh % diag % rho_ic(jc, 2, jb) * p_nh_prog_nnew % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
+            p_nh_prog_nnew % exner(jc, 1, jb) = z_exner_expl(jc, 1) + p_nh % metrics % exner_ref_mc(jc, 1, jb) - z_beta(jc, 1) * (p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, 1, jb) * z_mflx_top(jc, jb) * p_nh % metrics % deepatmo_divzu_mc(1) - z_alpha(jc, 2) * p_nh_prog_nnew % w(jc, 2, jb) * p_nh % metrics % deepatmo_divzl_mc(1))
+            p_nh_prog_nnew % theta_v(jc, 1, jb) = p_nh_prog_nnow % rho(jc, 1, jb) * p_nh_prog_nnow % theta_v(jc, 1, jb) * ((p_nh_prog_nnew % exner(jc, 1, jb) / p_nh_prog_nnow % exner(jc, 1, jb) - 1.0D0) * 2.4999999999999996D0 + 1.0D0) / p_nh_prog_nnew % rho(jc, 1, jb)
           END DO
         END IF
         IF (istep == 1 .AND. divdamp_type >= 3) THEN
           DO jk = kstart_dd3d(jg), nlev
             DO jc = i_startidx, i_endidx
-              z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % prog(nnew) % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
+              z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh_prog_nnew % w(jc, jk, jb) - p_nh_prog_nnew % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
             END DO
           END DO
         END IF
@@ -2458,7 +2462,7 @@ end if
           END IF
           DO jk = 2, nlev
             DO jc = i_startidx, i_endidx
-              z_a = r_nsubsteps * (z_contr_w_fl_l(jc, jk) + p_nh % diag % rho_ic(jc, jk, jb) * p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % prog(nnew) % w(jc, jk, jb))
+              z_a = r_nsubsteps * (z_contr_w_fl_l(jc, jk) + p_nh % diag % rho_ic(jc, jk, jb) * p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh_prog_nnew % w(jc, jk, jb))
               prep_adv % mass_flx_ic(jc, jk, jb) = prep_adv % mass_flx_ic(jc, jk, jb) + z_a
               prep_adv % vol_flx_ic(jc, jk, jb) = prep_adv % vol_flx_ic(jc, jk, jb) + z_a / p_nh % diag % rho_ic(jc, jk, jb)
             END DO
@@ -2473,22 +2477,22 @@ end if
         IF (istep == 1 .AND. idyn_timestep == 1) THEN
           DO jk = kstart_moist(jg), nlev
             DO jc = i_startidx, i_endidx
-              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh % prog(nnow) % exner(jc, jk, jb)
+              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh_prog_nnow % exner(jc, jk, jb)
             END DO
           END DO
         ELSE IF (istep == 2 .AND. idyn_timestep == ndyn_substeps_var(jg)) THEN
           DO jk = kstart_moist(jg), nlev
             DO jc = i_startidx, i_endidx
-              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh % prog(nnew) % exner(jc, jk, jb) - (p_nh % diag % exner_dyn_incr(jc, jk, jb) + ndyn_substeps_var(jg) * dtime * p_nh % diag % ddt_exner_phy(jc, jk, jb))
+              p_nh % diag % exner_dyn_incr(jc, jk, jb) = p_nh_prog_nnew % exner(jc, jk, jb) - (p_nh % diag % exner_dyn_incr(jc, jk, jb) + ndyn_substeps_var(jg) * dtime * p_nh % diag % ddt_exner_phy(jc, jk, jb))
             END DO
           END DO
         END IF
         IF (istep == 2 .AND. l_child_vertnest) THEN
           DO jc = i_startidx, i_endidx
-            p_nh % diag % w_int(jc, jb, idyn_timestep) = 0.5D0 * (p_nh % prog(nnow) % w(jc, nshift, jb) + p_nh % prog(nnew) % w(jc, nshift, jb))
+            p_nh % diag % w_int(jc, jb, idyn_timestep) = 0.5D0 * (p_nh_prog_nnow % w(jc, nshift, jb) + p_nh_prog_nnew % w(jc, nshift, jb))
             p_nh % diag % theta_v_ic_int(jc, jb, idyn_timestep) = p_nh % diag % theta_v_ic(jc, nshift, jb)
             p_nh % diag % rho_ic_int(jc, jb, idyn_timestep) = p_nh % diag % rho_ic(jc, nshift, jb)
-            p_nh % diag % mflx_ic_int(jc, jb, idyn_timestep) = p_nh % diag % rho_ic(jc, nshift, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, nshift, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % prog(nnew) % w(jc, nshift, jb))
+            p_nh % diag % mflx_ic_int(jc, jb, idyn_timestep) = p_nh % diag % rho_ic(jc, nshift, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, nshift, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh_prog_nnew % w(jc, nshift, jb))
           END DO
         END IF
       END DO
@@ -2502,31 +2506,31 @@ end if
           IF (istep == 1 .AND. my_process_is_mpi_all_seq()) THEN
             DO jk = 1, nlev
               DO jc = i_startidx, i_endidx
-                p_nh % prog(nnew) % rho(jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
-                p_nh % prog(nnew) % theta_v(jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
-                p_nh % prog(nnew) % exner(jc, jk, jb) = EXP(0.4000000000000001D0 * LOG(0.0028704000000000004D0 * p_nh % prog(nnew) % rho(jc, jk, jb) * p_nh % prog(nnew) % theta_v(jc, jk, jb)))
-                p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
+                p_nh_prog_nnew % rho(jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
+                p_nh_prog_nnew % theta_v(jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
+                p_nh_prog_nnew % exner(jc, jk, jb) = EXP(0.4000000000000001D0 * LOG(0.0028704000000000004D0 * p_nh_prog_nnew % rho(jc, jk, jb) * p_nh_prog_nnew % theta_v(jc, jk, jb)))
+                p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
               END DO
             END DO
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, nlevp1, jb) = p_nh % prog(nnow) % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
+              p_nh_prog_nnew % w(jc, nlevp1, jb) = p_nh_prog_nnow % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
             END DO
           ELSE IF (istep == 1) THEN
             DO jk = 1, nlev
               DO jc = i_startidx, i_endidx
-                p_nh % prog(nnew) % rho(jc, jk, jb) = p_nh % prog(nnow) % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
-                p_nh % prog(nnew) % exner(jc, jk, jb) = p_nh % prog(nnow) % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
-                p_nh % prog(nnew) % w(jc, jk, jb) = p_nh % prog(nnow) % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
+                p_nh_prog_nnew % rho(jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) + dtime * p_nh % diag % grf_tend_rho(jc, jk, jb)
+                p_nh_prog_nnew % exner(jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) + dtime * p_nh % diag % grf_tend_thv(jc, jk, jb)
+                p_nh_prog_nnew % w(jc, jk, jb) = p_nh_prog_nnow % w(jc, jk, jb) + dtime * p_nh % diag % grf_tend_w(jc, jk, jb)
               END DO
             END DO
             DO jc = i_startidx, i_endidx
-              p_nh % prog(nnew) % w(jc, nlevp1, jb) = p_nh % prog(nnow) % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
+              p_nh_prog_nnew % w(jc, nlevp1, jb) = p_nh_prog_nnow % w(jc, nlevp1, jb) + dtime * p_nh % diag % grf_tend_w(jc, nlevp1, jb)
             END DO
           END IF
           IF (istep == 1 .AND. divdamp_type >= 3) THEN
             DO jk = kstart_dd3d(jg), nlev
               DO jc = i_startidx, i_endidx
-                z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % prog(nnew) % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
+                z_dwdz_dd(jc, jk, jb) = p_nh % metrics % inv_ddqz_z_full(jc, jk, jb) * ((p_nh_prog_nnew % w(jc, jk, jb) - p_nh_prog_nnew % w(jc, jk + 1, jb)) - (p_nh % diag % w_concorr_c(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk + 1, jb)))
               END DO
             END DO
           END IF
@@ -2536,7 +2540,7 @@ end if
             END IF
             DO jk = 2, nlev
               DO jc = i_startidx, i_endidx
-                prep_adv % mass_flx_ic(jc, jk, jb) = prep_adv % mass_flx_ic(jc, jk, jb) + r_nsubsteps * p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % prog(nnow) % w(jc, jk, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh % prog(nnew) % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
+                prep_adv % mass_flx_ic(jc, jk, jb) = prep_adv % mass_flx_ic(jc, jk, jb) + r_nsubsteps * p_nh % diag % rho_ic(jc, jk, jb) * (p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh_prog_nnow % w(jc, jk, jb) + p_nh % metrics % vwind_impl_wgt(jc, jb) * p_nh_prog_nnew % w(jc, jk, jb) - p_nh % diag % w_concorr_c(jc, jk, jb))
               END DO
             END DO
             IF (l_vert_nested) THEN
@@ -2687,7 +2691,7 @@ end if
     wgt_nnew_rth = 0.5D0 + rhotheta_offctr
     wgt_nnow_rth = 1.0D0 - wgt_nnew_rth
 
-    call solve_nh_predictor_pre(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+    call solve_nh_predictor_pre(p_nh, p_nh % prog(nnow), p_nh % prog(nnew), p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 
     ! IF (istep == 1) THEN
       CALL sync_patch_array_mult(SYNC_E,p_patch,2,p_nh%prog(nnew)%vn,z_rho_e,opt_varname="vn_nnew and z_rho_e")
@@ -2699,7 +2703,7 @@ end if
       CALL timer_start(timer_solve_nh_edgecomp)
     END IF
 
-    call solve_nh_predictor_post(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+    call solve_nh_predictor_post(p_nh, p_nh % prog(nnow), p_nh % prog(nnew), p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 
       IF (timers_level > 5) THEN
         CALL timer_stop(timer_solve_nh_vimpl)
@@ -2726,7 +2730,7 @@ end if
       IF (timers_level > 5) CALL timer_stop(timer_solve_nh_exch)
 
 
-      call solve_nh_corrector_pre(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+      call solve_nh_corrector_pre(p_nh, p_nh % prog(nnow), p_nh % prog(nnew), p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
 
       ! IF (istep == 1) THEN
         ! CALL sync_patch_array_mult(SYNC_E,p_patch,2,p_nh%prog(nnew)%vn,z_rho_e,opt_varname="vn_nnew and z_rho_e")
@@ -2738,7 +2742,7 @@ end if
         CALL timer_start(timer_solve_nh_edgecomp)
       END IF
   
-      call solve_nh_corrector_post(p_nh, p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
+      call solve_nh_corrector_post(p_nh, p_nh % prog(nnow), p_nh % prog(nnew), p_patch, p_int, prep_adv, nnow, nnew, l_init, l_recompute, lsave_mflx, lprep_adv, lclean_mflx, idyn_timestep, jstep, dtime, lacc, jb, jk, jc, je, jks, jg, nlev, nlevp1, i_startblk, i_endblk, i_startidx, i_endidx, ishift, rl_start, rl_end, istep, ntl1, ntl2, nvar, nshift, nshift_total, z_theta_v_fl_e, z_theta_v_e, z_rho_e, z_theta_v_v, z_rho_v, z_th_ddz_exner_c, z_dexner_dz_c, z_vt_ie, z_kin_hor_e, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth, z_w_concorr_me, z_graddiv_vn, z_w_expl, z_vn_avg, z_mflx_top, z_contr_w_fl_l, z_rho_expl, z_exner_expl, z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg, z_alpha, z_beta, z_q, z_graddiv2_vn, z_theta_v_pr_ic, z_exner_ic, z_w_concorr_mc, z_flxdiv_mass, z_flxdiv_theta, z_hydro_corr, z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc, z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr, dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew, z_raylfac, z_ntdistv_bary_1, distv_bary_1, z_ntdistv_bary_2, distv_bary_2, scal_divdamp, bdy_divdamp, enh_divdamp_fac, z_dwdz_dd, z_ddt_vn_dyn, z_ddt_vn_apc, z_ddt_vn_cor, z_ddt_vn_pgr, z_ddt_vn_ray, z_d_vn_dmp, z_d_vn_iau, nproma_gradp, nblks_gradp, npromz_gradp, nlen_gradp, jk_start, lvn_only, lvn_pos, l_vert_nested, l_child_vertnest)
   
         IF (timers_level > 5) THEN
           CALL timer_stop(timer_solve_nh_vimpl)
