@@ -14,6 +14,8 @@
 #define SPAWN_ALL_READERS(prefix, namespc)                                     \
   SPAWN_READERS(prefix, global_data, namespc::global_data_type, namespc)       \
   SPAWN_READERS(prefix, p_nh, namespc::t_nh_state, namespc)                    \
+  SPAWN_READERS(prefix, p_nh_prog_nnow, namespc::t_nh_prog, namespc)           \
+  SPAWN_READERS(prefix, p_nh_prog_nnew, namespc::t_nh_prog, namespc)           \
   SPAWN_READERS(prefix, p_patch, namespc::t_patch, namespc)                    \
   SPAWN_READERS(prefix, p_int, namespc::t_int_state, namespc)                  \
   SPAWN_READERS(prefix, prep_adv, namespc::t_prepare_adv, namespc)             \
@@ -203,6 +205,8 @@
   UNWRAP_DATA_PAIR(nvar)                                                       \
   UNWRAP_DATA_PAIR(p_int)                                                      \
   UNWRAP_DATA_PAIR(p_nh)                                                       \
+  UNWRAP_DATA_PAIR(p_nh_prog_nnow)                                             \
+  UNWRAP_DATA_PAIR(p_nh_prog_nnew)                                             \
   UNWRAP_DATA_PAIR(p_patch)                                                    \
   UNWRAP_DATA_PAIR(prep_adv)                                                   \
   UNWRAP_DATA_PAIR(r_dtimensubsteps)                                           \
@@ -276,6 +280,8 @@
 #define SPAWN_ALL_WRITERS(prefix, namespc)                                     \
   SPAWN_WRITERS(prefix, global_data, namespc::global_data_type, namespc)       \
   SPAWN_WRITERS(prefix, p_nh, namespc::t_nh_state, namespc)                    \
+  SPAWN_WRITERS(prefix, p_nh_prog_nnow, namespc::t_nh_prog, namespc)           \
+  SPAWN_WRITERS(prefix, p_nh_prog_nnew, namespc::t_nh_prog, namespc)           \
   SPAWN_WRITERS(prefix, p_patch, namespc::t_patch, namespc)                    \
   SPAWN_WRITERS(prefix, p_int, namespc::t_int_state, namespc)                  \
   SPAWN_WRITERS(prefix, prep_adv, namespc::t_prepare_adv, namespc)             \

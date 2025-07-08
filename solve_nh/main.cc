@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
       auto *h = __dace_init_solve_nh_predictor_pre(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
       __program_solve_nh_predictor_pre(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
       auto *h = __dace_init_solve_nh_predictor_post(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
       __program_solve_nh_predictor_post(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
 
       auto *h = __dace_init_solve_nh_corrector_pre(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
       __program_solve_nh_corrector_pre(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
 
       auto *h = __dace_init_solve_nh_corrector_post(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
@@ -349,7 +349,7 @@ int main(int argc, char *argv[]) {
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
       __program_solve_nh_corrector_post(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
+          &p_nh_in, &p_nh_prog_nnow_in, &p_nh_prog_nnew_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
           z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
           z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
           z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
