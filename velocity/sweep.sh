@@ -16,6 +16,7 @@ for x_c in $X_COARSENINGS; do
 
         total=$((x_bs * y_bs))
         if [[ " $VALID_PRODUCTS " == *" $total "* ]]; then
+          echo "=== Running for x_c=$x_c, y_c=$y_c, x_bs=$x_bs, y_bs=$y_bs ===" >> tested_params.log
           echo "=== Running for x_c=$x_c, y_c=$y_c, x_bs=$x_bs, y_bs=$y_bs ==="
 
           # Export the current config to be picked up by Python
@@ -32,7 +33,7 @@ for x_c in $X_COARSENINGS; do
           fi
 
           # Run the velocity executable
-          ./velocity_gpu.stage8 7
+          ./velocity_gpu.stage8 7 1>>tile.log
           if [ $? -ne 0 ]; then
             echo "❌ Execution failed for this config"
           fi

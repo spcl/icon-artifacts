@@ -21,12 +21,13 @@ def optimization_action(sdfg):
     sdfg.validate()
     change_reduction_schedule(sdfg)
     sdfg.validate()
-    # Do not perform this semantics-changing transformation.
+    # HACK: Remove cfl clippign rleated kernels assuming it is 0. For now: Do not perform this semantics-changing transformation.
     # sdfg = hacky_cfl_clipping_related_kernel_removal(sdfg)
     sdfg.simplify()
     sdfg.validate()
     prune_unused_inputs_outputs(sdfg) # NestedSDFG gets too many inputs/outputs no transformation exists to remove them
     remove_unused_inconnectors_from_nestedsdfg(sdfg)
+    #Breaks the codegen
     change_array_dtypes(sdfg, array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"}, new_type=dace.uint8)
     return sdfg
 

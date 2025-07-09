@@ -3,11 +3,12 @@ import copy
 from typing import Set
 from dace.properties import CodeBlock
 from dace.codegen.control_flow import ConditionalBlock, ContinueBlock, ControlFlowBlock, ControlFlowRegion
+from dace.sdfg import InterstateEdge
 import dace.sdfg.utils as sdutil
 
 c = 0
 def _add_copy_map(state: dace.SDFGState, src_arr_name:str, src_arr:dace.data.Data, dst_arr_name:str, dst_arr:dace.data.Data,
-                  ):
+                  dtype):
     """
     Add a copy map to the given state in the SDFG.
     """
@@ -31,22 +32,34 @@ def _add_copy_map(state: dace.SDFGState, src_arr_name:str, src_arr:dace.data.Dat
     # Add edges from the map to the access nodes, care about the connector
     state.add_edge(src_access, None, map_entry, f"IN_{src_arr_name}", dace.memlet.Memlet.from_array(src_arr_name, src_arr))
     state.add_edge(map_exit, f"OUT_{dst_arr_name}", dst_access, None, dace.memlet.Memlet.from_array(dst_arr_name, dst_arr))
-    map_entry.add_in_connector(f"IN_{src_arr_name}")
-    map_entry.add_out_connector(f"OUT_{src_arr_name}")
-    map_exit.add_in_connector(f"IN_{dst_arr_name}")
-    map_exit.add_out_connector(f"OUT_{dst_arr_name}")
+    map_entry.add_in_connector(f"IN_{src_arr_name}", dtype=src_arr.dtype)
+    map_entry.add_out_connector(f"OUT_{src_arr_name}", dtype=dtype)
+    map_exit.add_in_connector(f"IN_{dst_arr_name}", dtype=dtype)
+    map_exit.add_out_connector(f"OUT_{dst_arr_name}", dtype=dtype)
 
     # Add a tasklet that perfmorms the type cast
     tasklet = state.add_tasklet(
         name=f"copy_{src_arr_name}_to_{dst_arr_name}",
         inputs={"in"},
         outputs={"out"},
-        code=f"out = static_cast<{dst_arr.dtype.ctype}>(in);",
+        code=f"out = static_cast<{dtype.ctype}>(in);",
         language=dace.Language.CPP)
 
     access_str = f", ".join([str(s) for s in map_ranges.keys()])
     state.add_edge(map_entry, f"OUT_{src_arr_name}", tasklet, "in", dace.Memlet(expr=f"{src_arr_name}[{access_str}]"))
     state.add_edge(tasklet, "out", map_exit, f"IN_{dst_arr_name}", dace.Memlet(expr=f"{dst_arr_name}[{access_str}]"))
+
+def _repl_on_interstate_edges(sdfg: dace.SDFG, repl_dict: dict):
+    for edge, graph in sdfg.all_edges_recursive():
+        # print(type(edge)) -> Should be MulticonnectorEdge or so
+        if edge.data is not None and isinstance(edge.data, InterstateEdge):
+            for key, value in repl_dict.items():
+                if key in edge.data.assignments:
+                    _v = edge.data.assignments[key]
+                    edge.data.assignments[value] = _v
+            for key, value in repl_dict.items():
+                if key in edge.data.assignments.values():
+                    edge.data.assignments[key].replace(key, value)
 
 def _lower_bidth_of_arrays_recursive(sdfg: dace.SDFG, array_names: Set[str], suffix: str, new_dtype: dace.dtypes.typeclass,
                                      ):
@@ -57,6 +70,7 @@ def _lower_bidth_of_arrays_recursive(sdfg: dace.SDFG, array_names: Set[str], suf
             new_name = f"{name}_{suffix}"
             copy_desc = copy.deepcopy(sdfg.arrays[name])
             copy_desc.dtype = new_dtype
+            copy_desc.lifetime = dace.AllocationLifetime.Persistent
             sdfg.remove_data(name, validate=False)
             sdfg.add_datadesc(new_name, copy_desc, find_new_name=False)
             sdfg.replace_dict(repldict=repl_dict)
@@ -92,8 +106,45 @@ def _lower_bidth_of_arrays_recursive(sdfg: dace.SDFG, array_names: Set[str], suf
     for nsdfg in nsdfgs:
         _lower_bidth_of_arrays_recursive(nsdfg, array_names, suffix, new_dtype)
 
-def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], enable_int16: bool = True,
+    # Repl_dict does not work on nested SDFGs
+    _repl_on_interstate_edges(sdfg, repl_dict)
+
+def _fix_nsdfg_connectors(sdfg: dace.SDFG):
+    # A -(edge)-> B where B is nested SDFG
+    # if edge.data is not same as edge.dst_conn (or vice verse for outgoing) then change connector name and them replace stuff in the nsdfg
+    # Recursively go deeper
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                repl_dict = dict()
+                for ie in state.in_edges(node):
+                    if ie.data is not None:
+                        if ie.data.data != ie.dst_conn:
+                            old_dst_conn = ie.dst_conn
+                            ie.dst_conn = ie.data.data
+                            node.remove_in_connector(old_dst_conn)
+                            node.add_in_connector(ie.dst_conn, force=True)
+                            repl_dict[old_dst_conn] = ie.dst_conn
+                for oe in state.out_edges(node):
+                    if oe.data is not None:
+                        if oe.data.data != oe.src_conn:
+                            old_src_conn = oe.src_conn
+                            oe.src_conn = oe.data.data
+                            node.remove_out_connector(old_src_conn)
+                            node.add_out_connector(oe.src_conn, force=True)
+                            repl_dict[old_src_conn] = oe.src_conn
+                node.sdfg.replace_dict(repl_dict)
+                #_repl_on_interstate_edges(node.sdfg, repl_dict)
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                _fix_nsdfg_connectors(node.sdfg)
+
+def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], enable_uint16: bool = True,
                                       enable_int64: bool = False,):
+    _fix_nsdfg_connectors(sdfg)
+    sdfg.validate()
+    global c
     # Not all arrays might be in use, filter the set again
     new_array_names = set()
     for name in array_names:
@@ -121,21 +172,21 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         sdutil.set_nested_sdfg_parent_references(copy_int64)
     copy_int32 = copy.deepcopy(sdfg)
     sdutil.set_nested_sdfg_parent_references(copy_int32)
-    if enable_int16:
-        copy_int16 = copy.deepcopy(sdfg)
-        sdutil.set_nested_sdfg_parent_references(copy_int16)
+    if enable_uint16:
+        copy_uint16 = copy.deepcopy(sdfg)
+        sdutil.set_nested_sdfg_parent_references(copy_uint16)
 
     sdfgs_and_suffixes = [
                         (copy_int32, "int32", dace.dtypes.int32)]
-    if enable_int16:
-        sdfgs_and_suffixes.append((copy_int16, "int16", dace.dtypes.int16))
+    if enable_uint16:
+        sdfgs_and_suffixes.append((copy_uint16, "uint16", dace.dtypes.uint16))
     if enable_int64:
         sdfgs_and_suffixes.append((copy_int64, "int64", dace.dtypes.int64))
     if enable_int64:
         copy_body_int64 = list(copy_int64.bfs_nodes(copy_int64.start_block))[1]
     copy_body_int32 = list(copy_int32.bfs_nodes(copy_int32.start_block))[1]
-    if enable_int16:
-        copy_body_int16 = list(copy_int16.bfs_nodes(copy_int16.start_block))[1]
+    if enable_uint16:
+        copy_body_uint16 = list(copy_uint16.bfs_nodes(copy_uint16.start_block))[1]
 
     # Replace all arrays with the corresponding bitwidth suffix
     for copy_sdfg, suffix, dtype in sdfgs_and_suffixes:
@@ -160,6 +211,32 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     #new_sdfg.add_edge(src=copy_in, dst=copy_out, data=InterstateEdge(assignments=new_edge_data))
     #check_state = new_sdfg.add_state_after(new_sdfg.start_state, "check_bitwidth")
 
+    # Add int16, int32 suffixed version of arrays to the SDFG
+    suffix_and_dtypes = [("int32", dace.dtypes.int32)]
+    if enable_uint16:
+        suffix_and_dtypes.append(("uint16", dace.dtypes.uint16))
+    if enable_int64:
+        suffix_and_dtypes.append(("int64", dace.dtypes.int64))
+    def add_datadesc_rec(sdfg: dace.SDFG, suffix_and_dtypes):
+        for suffix, dtype in suffix_and_dtypes:
+            for name in array_names:
+                new_name = f"{name}_{suffix}"
+                if new_name not in new_sdfg.arrays:
+                    copy_desc = copy.deepcopy(new_sdfg.arrays[name])
+                    copy_desc.dtype = dtype
+                    copy_desc.lifetime = dace.AllocationLifetime.Persistent
+                    print(f"Adding array {new_name} with dtype {copy_desc.dtype} to SDFG.")
+                    new_sdfg.add_datadesc(new_name, copy_desc, find_new_name=False)
+        for state in sdfg.all_states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    # Add the new arrays to the nested SDFG
+                    add_datadesc_rec(node.sdfg, suffix_and_dtypes)
+    add_datadesc_rec(sdfg, suffix_and_dtypes)
+
+
+    #raise Exception("This is a hacky solution, please fix it later.")
+
     # CopyIn -> CheckBitwidth + CopyBitwidth -> AssignBitwidth -> Body -> CopyOut
     # IfCFG to CheckBitwidth
     # new_sdfg.save("s1.sdfgz", compress=True)
@@ -179,14 +256,14 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     check_state = dace.SDFGState(label="extract_state", sdfg=check_if.sdfg)
     check_cfg.add_node(check_state)
     new_sdfg.add_node(check_if)
-    check_if.add_branch(condition=CodeBlock(code="bitwidth_check_done_sym == 1"), branch=check_cfg)
+    check_if.add_branch(condition=CodeBlock(code="bitwidth_check_done_sym == 0"), branch=check_cfg)
 
     # The check pattern to fill is the following:
     """
     #ifndef NDEBUG
-    int32_t check_bounds_on_device(const int64_t* h_input, const int64_t* h_output, int64_t size, const std::string& array_name);
+    int32_t check_bounds_on_device_{c}(const int64_t* h_input, const int64_t* h_output, int64_t size, const std::string& array_name);
     #else
-    int32_t check_bounds_on_device(const int64_t* h_input, const int64_t* h_output, int64_t size);
+    int32_t check_bounds_on_device_{c}(const int64_t* h_input, const int64_t* h_output, int64_t size);
     #endif
     """
 
@@ -194,9 +271,9 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     for (arr_name, arr) in sdfg.arrays.items(){
         if (bitwidth_scalar != 64){
             #ifndef NDEBUG
-            bitwidth_scalar = check_bounds_on_device(<array.name>, <array.shape>, "<array.name>");
+            bitwidth_scalar = check_bounds_on_device_{c}(<array.name>, <array.shape>, "<array.name>");
             #else
-            bitwidth_scalar = check_bounds_on_device(<array.name>, <array.shape>);
+            bitwidth_scalar = check_bounds_on_device_{c}(<array.name>, <array.shape>);
             #endif
         }
     }
@@ -208,9 +285,9 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         tasklet_code += f"""
         if (_internal_bitwidth_scalar != 64){{
             #ifndef NDEBUG
-            _internal_bitwidth_scalar = check_bounds_on_device({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}), "{arr_name}");
+            _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}), "{arr_name}");
             #else
-            _internal_bitwidth_scalar = check_bounds_on_device({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}));
+            _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}));
             #endif
         }}
 
@@ -229,7 +306,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
 #include <stdexcept>
 
 __device__ __inline__ int32_t check_bounds(int32_t val) {{
-    if (val >= INT16_MIN && val <= INT16_MAX) {{
+    if (val >= 0 && val <= UINT16_MAX) {{
         return 16;
     }} else if (val >= INT32_MIN && val <= INT32_MAX) {{
         return 32;
@@ -238,7 +315,7 @@ __device__ __inline__ int32_t check_bounds(int32_t val) {{
     }}
 }}
 
-__global__ void check_bounds_kernel(const int32_t* __restrict__ input, int32_t size, int32_t* __restrict__ result) {{
+__global__ void check_bounds_kernel_{c}(const int32_t* __restrict__ input, int32_t size, int32_t* __restrict__ result) {{
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= size) return;
 
@@ -254,14 +331,18 @@ __global__ void check_bounds_kernel(const int32_t* __restrict__ input, int32_t s
 
 #ifndef NDEBUG
 int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size, const std::string& array_name) {{
-    int32_t* d_input;
-    int32_t* d_result;
-    int32_t h_result[3] = {{0, 0, 0}}; // Initialize results for 16, 32, and 64 bits
+    int32_t* d_input = nullptr;
+    int32_t* d_result = nullptr;
+    int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
+    h_result[0] = -1; // 16 bits
+    h_result[1] = -1; // 32 bits
+    h_result[2] = -1; // 64 bits
     int32_t threads = 256;
     int32_t blocks = (size + threads - 1) / threads;
 
     cudaMalloc((void**)&d_result, sizeof(int32_t) * 3);
-    check_bounds_kernel<<<blocks, threads>>>(d_input, size, d_result);
+    cudaMalloc((void**)&d_input, sizeof(int32_t) * 3);
+    check_bounds_kernel_{c}<<<blocks, threads>>>(d_input, size, d_result);
     cudaMemcpy(h_result, d_result, sizeof(int32_t) * 3, cudaMemcpyDeviceToHost);
 
     int32_t num_bits = 16;
@@ -273,26 +354,31 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size, const s
         num_bits = 16;
     }} else {{
         num_bits = -1;
-        throw std::runtime_error("No valid bounds found for " + array_name + " the input values.");
+        throw std::runtime_error("No valid bounds found for " + array_name + " the input values." + "{{i64,i32,i16}}: " + std::to_string(h_result[2]) + ", " + std::to_string(h_result[1]) + ", " + std::to_string(h_result[0]));
     }}
 
-
-    printf("(DEBUG) Input size: %lld, Required bits: %d\\n", size, num_bits);
-
     cudaFree(d_result);
+    cudaFree(d_input);
+    delete[] h_result;
+
+    printf("Bitwidth for %s: %d bits\\n", array_name.c_str(), num_bits);
 
     return num_bits;
 }}
 #else
 int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
-    int32_t* d_input;
-    int32_t* d_result;
-    int32_t h_result[3] = {{0, 0, 0}}; // Initialize results for 16, 32, and 64 bits
+    int32_t* d_input = nullptr;
+    int32_t* d_result = nullptr;
+    int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
+    h_result[0] = -1; // 16 bits
+    h_result[1] = -1; // 32 bits
+    h_result[2] = -1; // 64 bits
     int32_t threads = 256;
     int32_t blocks = (size + threads - 1) / threads;
 
     cudaMalloc((void**)&d_result, sizeof(int32_t) * 3);
-    check_bounds_kernel<<<blocks, threads>>>(d_input, size, d_result);
+    cudaMalloc((void**)&d_input, sizeof(int32_t) * 3);
+    check_bounds_kernel_{c}<<<blocks, threads>>>(d_input, size, d_result);
     cudaMemcpy(h_result, d_result, sizeof(int32_t) * 3, cudaMemcpyDeviceToHost);
 
     int32_t num_bits = 16;
@@ -304,13 +390,12 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
         num_bits = 16;
     }} else {{
         num_bits = -1;
-        throw std::runtime_error("No valid bounds found for the input values.");
+        throw std::runtime_error("No valid bounds found for " + array_name + " the input values." + "{{i64,i32,i16}}: " + std::to_string(h_result[2]) + ", " + std::to_string(h_result[1]) + ", " + std::to_string(h_result[0]));
     }}
 
-
-    printf("DEBUG Input size: %lld, Required bits: %d\n", size, num_bits);
-
     cudaFree(d_result);
+    cudaFree(d_input);
+    delete[] h_result;
 
     return num_bits;
 }}
@@ -329,27 +414,27 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
 
     # Add a CFG to copy all arrrays to the correct bitwidth
     copy_bit = ConditionalBlock(label="copy_bit", sdfg=check_cfg.sdfg, parent=check_cfg)
-    if enable_int16:
+    if enable_uint16:
         copy_cfg_i16 = ControlFlowRegion(label="copy_bit_cfg_i16", sdfg=copy_bit.sdfg, parent=copy_bit)
     copy_cfg_i32 = ControlFlowRegion(label="copy_bit_cfg_i32", sdfg=copy_bit.sdfg, parent=copy_bit)
     if enable_int64:
         copy_cfg_i64 = ControlFlowRegion(label="copy_bit_cfg_i64", sdfg=copy_bit.sdfg, parent=copy_bit)
     # Copy over only the needed body state
-    if enable_int16:
+    if enable_uint16:
         copy_state_i16 = dace.SDFGState(label="copy_i16", sdfg=copy_bit.sdfg)
     copy_state_i32 = dace.SDFGState(label="copy_i32", sdfg=copy_bit.sdfg)
     if enable_int64:
         copy_state_i64 = dace.SDFGState(label="copy_i64", sdfg=copy_bit.sdfg)
-    if enable_int16:
+    if enable_uint16:
         copy_cfg_i16.add_node(copy_state_i16, is_start_block=True)
     copy_cfg_i32.add_node(copy_state_i32, is_start_block=True)
     if enable_int64:
         copy_cfg_i64.add_node(copy_state_i64, is_start_block=True)
-    if enable_int16 and enable_int64:
+    if enable_uint16 and enable_int64:
         copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=copy_cfg_i16)
         copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32"), branch=copy_cfg_i32)
         copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 64"), branch=copy_cfg_i64)
-    elif enable_int16:
+    elif enable_uint16:
         copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=copy_cfg_i16)
         copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32 or bitwidth_sym == 64"), branch=copy_cfg_i32)
     elif enable_int64:
@@ -360,20 +445,23 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
     check_cfg.add_node(copy_bit, is_start_block=False)
     check_cfg.add_edge(check_state, copy_bit, dace.InterstateEdge(assignments={"bitwidth_sym": "bitwidth_scalar"}))
     # First add the array names for all bitwidthness
-    copy_list = [copy_int32]
-    if enable_int16:
-        copy_list.append(copy_int16)
+    copy_list = [(copy_int32, dace.int32)]
+    if enable_uint16:
+        copy_list.append((copy_uint16, dace.uint16))
     if enable_int64:
-        copy_list.append(copy_int64)
-    for _sdfg in copy_list:
+        copy_list.append((copy_int64, dace.int16))
+    """
+    for _sdfg, _dtype in copy_list:
         for arr_name, arr in _sdfg.arrays.items():
             if arr_name not in new_sdfg.arrays:
-                new_sdfg.add_datadesc(arr_name, copy.deepcopy(arr), find_new_name=False)
-
+                narr = copy.deepcopy(arr)
+                narr.dtype = _dtype
+                new_sdfg.add_datadesc(arr_name, narr, find_new_name=False)
+    """
     # Add copy-in maps for all data
     ll = [(copy_state_i32, dace.dtypes.int32, "int32")]
-    if enable_int16:
-        ll.append((copy_state_i16, dace.dtypes.int16, "int16"))
+    if enable_uint16:
+        ll.append((copy_state_i16, dace.dtypes.uint16, "uint16"))
     if enable_int64:
         ll.append((copy_state_i64, dace.dtypes.int64, "int64"))
     for state, dst_dtype, suffix in ll:
@@ -382,8 +470,9 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
             _add_copy_map(state, src_arr_name=arr_name,
                           src_arr=new_sdfg.arrays[arr_name],
                           dst_arr_name=f"{arr_name}_{suffix}",
-                          dst_arr=new_sdfg.arrays[f"{arr_name}_{suffix}"])
-    if enable_int16:
+                          dst_arr=new_sdfg.arrays[f"{arr_name}_{suffix}"],
+                          dtype=dst_dtype)
+    if enable_uint16:
         copy_state_i16.validate()
     copy_state_i32.validate()
     if enable_int64:
@@ -401,38 +490,38 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
         new_sdfg.add_edge(check_if, copy_out, copy_edata)
         new_sdfg.remove_edge(ie)
     new_sdfg.remove_node(body)
-    #new_sdfg.save("n1.sdfgz", compress=True)
+    # new_sdfg.save("n1.sdfgz", compress=True)
 
     switch_bit = ConditionalBlock(label="switch_bit", sdfg=new_sdfg, parent=new_sdfg)
-    if enable_int16:
+    if enable_uint16:
         switch_cfg_i16 = ControlFlowRegion(label="switch_bit_cfg_i16", sdfg=switch_bit.sdfg, parent=switch_bit)
     switch_cfg_i32 = ControlFlowRegion(label="switch_bit_cfg_i32", sdfg=switch_bit.sdfg, parent=switch_bit)
     if enable_int64:
         switch_cfg_i64 = ControlFlowRegion(label="switch_bit_cfg_i64", sdfg=switch_bit.sdfg, parent=switch_bit)
     # Copy over only the needed body state
-    if enable_int16:
-        switch_state_i16 = copy_body_int16 #dace.SDFGState(label="switch_i16", sdfg=switch_bit.sdfg)
+    if enable_uint16:
+        switch_state_i16 = copy_body_uint16 #dace.SDFGState(label="switch_i16", sdfg=switch_bit.sdfg)
     switch_state_i32 = copy_body_int32 #dace.SDFGState(label="switch_i32", sdfg=switch_bit.sdfg)
     if enable_int64:
         switch_state_i64 = copy_body_int64 #dace.SDFGState(label="switch_i64", sdfg=switch_bit.sdfg)
     # Copy over needed arrays
-    if enable_int16:
+    if enable_uint16:
         switch_state_i16.validate()
     switch_state_i32.validate()
     if enable_int64:
         switch_state_i64.validate()
 
-    if enable_int16:
+    if enable_uint16:
         switch_cfg_i16.add_node(switch_state_i16)
     switch_cfg_i32.add_node(switch_state_i32)
     if enable_int64:
         switch_cfg_i64.add_node(switch_state_i64)
     new_sdfg.add_node(switch_bit)
-    if enable_int16 and enable_int64:
+    if enable_uint16 and enable_int64:
         switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=switch_cfg_i16)
         switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32"), branch=switch_cfg_i32)
         switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 64"), branch=switch_cfg_i64)
-    elif enable_int16:
+    elif enable_uint16:
         switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=switch_cfg_i16)
         switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32 or bitwidth_sym == 64"), branch=switch_cfg_i32)
     elif enable_int64:
@@ -442,14 +531,14 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
         switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym <= 64"), branch=switch_cfg_i32)
     for oe in new_sdfg.out_edges(check_if):
         copy_edata = copy.deepcopy(oe.data)
-        copy_edata.assignments = dict()
+        copy_edata.assignments = {"bitwidth_sym": "bitwidth_scalar"}
         new_sdfg.add_edge(check_if, switch_bit, copy_edata)
     for ie in new_sdfg.in_edges(copy_out):
         copy_edata = copy.deepcopy(ie.data)
         new_sdfg.add_edge(switch_bit, copy_out, copy_edata)
         new_sdfg.remove_edge(ie)
     sdutil.set_nested_sdfg_parent_references(new_sdfg)
-    if enable_int16:
+    if enable_uint16:
         switch_state_i16.validate()
     switch_state_i32.validate()
     if enable_int64:
@@ -465,7 +554,65 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
                 sdutil.set_nested_sdfg_parent_references(node.sdfg)
     """
 
+    new_sdfg.append_init_code(f"__state->__0_bitwidth_check_done = 0;\n")
+    new_sdfg.append_init_code(f"__state->__0_bitwidth_scalar = -1;\n")
+    #new_sdfg.global_code["frame"] += CodeBlock(code="0")
+    #new_sdfg.global_code["frame"] += CodeBlock(code="-1")  # Default to 64 bit
     new_sdfg.save("n2.sdfgz", compress=True)
     new_sdfg.validate()
+
+    def _check_data_desc(sdfg: dace.SDFG):
+        for array_name, array in sdfg.arrays.items():
+            if "uint16" in array_name:
+                if array.dtype != dace.uint16:
+                    array.dtype = dace.uint16
+                assert array.dtype == dace.uint16, f"Array {array_name} has dtype {array.dtype}, expected uint16."
+            elif "int32" in array_name:
+                if array.dtype != dace.int32:
+                    array.dtype = dace.int32
+                assert array.dtype == dace.int32, f"Array {array_name} has dtype {array.dtype}, expected int32."
+            elif "int64" in array_name:
+                if array.dtype != dace.int64:
+                    array.dtype = dace.int64
+                assert array.dtype == dace.int64, f"Array {array_name} has dtype {array.dtype}, expected int64."
+            else:
+                assert array.dtype != dace.uint16, f"Array {array_name} has dtype {array.dtype}, expected not uint16."
+                assert array.dtype != dace.int64, f"Array {array_name} has dtype {array.dtype}, expected not int64."
+        for state in sdfg.all_states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    _check_data_desc(node.sdfg)
+    _check_data_desc(new_sdfg)
+
+    """
+    def _update_connector_types(sdfg: dace.SDFG):
+        for state in sdfg.all_states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    inner_sdfg = node.sdfg
+                    for in_conn, in_type in list(node.in_connectors.items()):
+                        needed_in_type = inner_sdfg.arrays[in_conn].dtype
+                        if in_type != needed_in_type:
+                            print(f"Updating in connector {in_conn} type from {in_type} to {needed_in_type}.")
+                            node.remove_in_connector(in_conn)
+                            o = node.add_in_connector(in_conn, dtype=needed_in_type, force=True)
+                            print(node.in_connectors[in_conn], node.in_connectors[in_conn].type)
+                            assert o
+                            #node.in_connectors[in_conn] = needed_in_type
+                    for out_conn, out_type in list(node.out_connectors.items()):
+                        needed_out_type = inner_sdfg.arrays[out_conn].dtype
+                        if out_type != needed_out_type:
+                            print(f"Updating out connector {out_conn} type from {out_type} to {needed_out_type}.")
+                            node.remove_out_connector(out_conn)
+                            o = node.add_out_connector(out_conn, dtype=needed_out_type, force=True)
+                            print(node.out_connectors[out_conn], node.out_connectors[out_conn].type)
+                            assert o
+                            #node.out_connectors[out_conn] = needed_out_type
+
+                    _update_connector_types(node.sdfg)
+    """
+    #_update_connector_types(new_sdfg)
+
+    c += 1
 
     return new_sdfg

@@ -12,6 +12,7 @@ from utils.pre_gpu_fixes import pre_gpu_fix
 from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 from utils.segmented_reduction import to_segmented_reduction
+from utils.rm_segmented_reduce import rm_segmented_reduce
 STAGE_ID = 6
 
 def optimization_action(sdfg):
@@ -48,7 +49,7 @@ def optimization_action(sdfg):
                 e.data.subset = dace.subsets.Range.from_string("_for_it_35 - 1")
     sdfg.validate()
     # TODO: Make sure this does not break numerical validation
-    # rm_segmented_reduce(sdfg)
+    rm_segmented_reduce(sdfg)
     # Rm segmented reduce results with trivial if conditions
     # propagate_if_cond(sdfg, sdfg, None, None, True)
     remove_unused_inconnectors_from_nestedsdfg(sdfg)

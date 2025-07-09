@@ -22,44 +22,47 @@ import os
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
-    print("Array values that can be lowered:" + "\n".join(
+    print("Array values that can be lowered: {\n" + "\n".join(
         sorted(
             [f'"{array_name}",' for array_name, array in sdfg.arrays.items() if
             ((array.dtype == dace.int32 or array.dtype == dace.int64) and isinstance(array, dace.data.Array) and not isinstance(array, dace.data.View))
             ]
             )
-        )
+        ) + "}\n"
     )
-    sdfg = decrease_bitwidth_of_const_arrays(sdfg,
-                                      array_names={
-                                        "gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask",
-                                        "gpu___CG_p_patch__CG_cells__m_edge_blk",
-                                        "gpu___CG_p_patch__CG_cells__m_edge_idx",
-                                        "gpu___CG_p_patch__CG_cells__m_end_block",
-                                        "gpu___CG_p_patch__CG_cells__m_end_index",
-                                        "gpu___CG_p_patch__CG_cells__m_neighbor_blk",
-                                        "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
-                                        "gpu___CG_p_patch__CG_cells__m_start_block",
-                                        "gpu___CG_p_patch__CG_cells__m_start_index",
-                                        "gpu___CG_p_patch__CG_edges__m_cell_blk",
-                                        "gpu___CG_p_patch__CG_edges__m_cell_idx",
-                                        "gpu___CG_p_patch__CG_edges__m_end_block",
-                                        "gpu___CG_p_patch__CG_edges__m_end_index",
-                                        "gpu___CG_p_patch__CG_edges__m_quad_blk",
-                                        "gpu___CG_p_patch__CG_edges__m_quad_idx",
-                                        "gpu___CG_p_patch__CG_edges__m_start_block",
-                                        "gpu___CG_p_patch__CG_edges__m_start_index",
-                                        "gpu___CG_p_patch__CG_edges__m_vertex_blk",
-                                        "gpu___CG_p_patch__CG_edges__m_vertex_idx",
-                                        "gpu___CG_p_patch__CG_verts__m_cell_blk",
-                                        "gpu___CG_p_patch__CG_verts__m_cell_idx",
-                                        "gpu___CG_p_patch__CG_verts__m_edge_blk",
-                                        "gpu___CG_p_patch__CG_verts__m_edge_idx",
-                                        "gpu___CG_p_patch__CG_verts__m_end_block",
-                                        "gpu___CG_p_patch__CG_verts__m_end_index",
-                                        "gpu___CG_p_patch__CG_verts__m_start_block",
-                                        "gpu___CG_p_patch__CG_verts__m_start_index",
-                                      })
+    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0').lower() in ('1', 'true', 'yes')
+    if do_reduce_bitwidth:
+        sdfg = decrease_bitwidth_of_const_arrays(sdfg,
+                                        array_names={
+                                            "gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask",
+                                            "gpu___CG_p_patch__CG_cells__m_edge_blk",
+                                            "gpu___CG_p_patch__CG_cells__m_edge_idx",
+                                            "gpu___CG_p_patch__CG_cells__m_end_block",
+                                            "gpu___CG_p_patch__CG_cells__m_end_index",
+                                            "gpu___CG_p_patch__CG_cells__m_neighbor_blk",
+                                            "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
+                                            "gpu___CG_p_patch__CG_cells__m_start_block",
+                                            "gpu___CG_p_patch__CG_cells__m_start_index",
+                                            "gpu___CG_p_patch__CG_edges__m_cell_blk",
+                                            "gpu___CG_p_patch__CG_edges__m_cell_idx",
+                                            "gpu___CG_p_patch__CG_edges__m_end_block",
+                                            "gpu___CG_p_patch__CG_edges__m_end_index",
+                                            "gpu___CG_p_patch__CG_edges__m_quad_blk",
+                                            "gpu___CG_p_patch__CG_edges__m_quad_idx",
+                                            "gpu___CG_p_patch__CG_edges__m_start_block",
+                                            "gpu___CG_p_patch__CG_edges__m_start_index",
+                                            "gpu___CG_p_patch__CG_edges__m_vertex_blk",
+                                            "gpu___CG_p_patch__CG_edges__m_vertex_idx",
+                                            "gpu___CG_p_patch__CG_verts__m_cell_blk",
+                                            "gpu___CG_p_patch__CG_verts__m_cell_idx",
+                                            "gpu___CG_p_patch__CG_verts__m_edge_blk",
+                                            "gpu___CG_p_patch__CG_verts__m_edge_idx",
+                                            "gpu___CG_p_patch__CG_verts__m_end_block",
+                                            "gpu___CG_p_patch__CG_verts__m_end_index",
+                                            "gpu___CG_p_patch__CG_verts__m_start_block",
+                                            "gpu___CG_p_patch__CG_verts__m_start_index",
+                                        })
+    int64_to_int32(sdfg)
     # start_index and end_index are between [1, nproma] -> ~20k in our data, ~200k in some other cases int16 is -32768, 32767
     # start_block and end_blocks are between [0, nblks] -> usually 1 or 2 as we pass nblocks_c for the science config
     # Force start and end blks to int8?
