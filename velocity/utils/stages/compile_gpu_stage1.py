@@ -23,7 +23,7 @@ def optimization_action(sdfg):
     # ContinueToCondition + StructToContainerGroups + Simplify + SymbolProp + Simplify + Reduction => OK
     # Need to remove partial view towers (it is illegal and should not happen, but it happens)
     clean_bad_views(sdfg)
-    sdfg.apply_transformations_repeated(ContinueToCondition) # To RM continue blocks - this could made into a nice transformation (living in Main)
+    sdfg.apply_transformations_repeated(ContinueToCondition) # To RM continue blocks
     # Flattening needs to run before everything
     StructToContainerGroups(
         validate=False,
@@ -38,7 +38,7 @@ def optimization_action(sdfg):
         taskloop = False,
     ).apply_pass(sdfg, {}) # Flattening pass
     sdfg.simplify(skip=["ArrayElimination"])
-    SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp TODO: can be made into a proper transformation
+    SymbolPropagation().apply_pass(sdfg, {}) # Like ConstProp
     sdfg.simplify(skip=["ArrayElimination"]) # ArrayElimination breaks the SDFG (might be f2dace related)
     if config.reduction:
         add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
