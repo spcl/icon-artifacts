@@ -28,7 +28,7 @@
   SPAWN_READERS(prefix, lclean_mflx, int, namespc)                             \
   SPAWN_READERS(prefix, idyn_timestep, int, namespc)                           \
   SPAWN_READERS(prefix, jstep, int, namespc)                                   \
-  SPAWN_READERS(prefix, dtime, int, namespc)                                   \
+  SPAWN_READERS(prefix, dtime, double, namespc)                                \
   SPAWN_READERS(prefix, lacc, int, namespc)                                    \
   SPAWN_READERS(prefix, jb, int, namespc)                                      \
   SPAWN_READERS(prefix, jk, int, namespc)                                      \
