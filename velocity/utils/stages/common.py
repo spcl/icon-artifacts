@@ -7,7 +7,7 @@ from utils.reductions import add_all_reductions
 from utils.unique_names import unique_names
 from utils.benchmark_sdfg import instrument_sdfg
 from utils.compile_if_propagated_sdfgs import compile_if_propagated_sdfgs
-from utils.config import release
+import os
 
 dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
 dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
@@ -54,6 +54,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
   dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
   dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   dace.config.Config.set('compiler', 'default_data_types', value='C')
+  release = os.getenv('_RELEASE', '0').lower() in ('1', 'true', 'yes')
   for name, g in sdfgs.items():
       g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
   sdfgs = list(sdfgs.values())

@@ -2,8 +2,6 @@ use_cache = True
 instrument = False
 cleanup = False
 reduction = True
-import os
-release = os.getenv('_RELEASE', '0').lower() in ('1', 'true', 'yes')
 verbose = False
 tile = False
 remainder_loop = False
