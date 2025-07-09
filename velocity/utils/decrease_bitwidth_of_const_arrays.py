@@ -63,6 +63,8 @@ def _repl_on_interstate_edges(sdfg: dace.SDFG, repl_dict: dict):
 
 def _lower_bidth_of_arrays_recursive(sdfg: dace.SDFG, array_names: Set[str], suffix: str, new_dtype: dace.dtypes.typeclass,
                                      ):
+    if suffix == "int32":
+        return
     repl_dict = {array_name: array_name + "_" + suffix for array_name in array_names}
     # Repl datadesc names
     for name in array_names:
@@ -190,7 +192,8 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
 
     # Replace all arrays with the corresponding bitwidth suffix
     for copy_sdfg, suffix, dtype in sdfgs_and_suffixes:
-        _lower_bidth_of_arrays_recursive(copy_sdfg, array_names, suffix, dtype)
+        if suffix != "int32":
+            _lower_bidth_of_arrays_recursive(copy_sdfg, array_names, suffix, dtype)
         #copy_sdfg.save("decreased_bitwidth_" + suffix + ".sdfg")
         copy_sdfg.validate()
 
@@ -219,6 +222,8 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         suffix_and_dtypes.append(("int64", dace.dtypes.int64))
     def add_datadesc_rec(sdfg: dace.SDFG, suffix_and_dtypes):
         for suffix, dtype in suffix_and_dtypes:
+            if suffix == "int32":
+                continue
             for name in array_names:
                 new_name = f"{name}_{suffix}"
                 if new_name not in new_sdfg.arrays:
@@ -465,6 +470,8 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
     if enable_int64:
         ll.append((copy_state_i64, dace.dtypes.int64, "int64"))
     for state, dst_dtype, suffix in ll:
+        if suffix == "int32":
+            continue
         for arr_name in array_names:
             assert new_sdfg.arrays[arr_name].storage == new_sdfg.arrays[f"{arr_name}_{suffix}"].storage
             _add_copy_map(state, src_arr_name=arr_name,

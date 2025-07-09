@@ -73,21 +73,23 @@ def optimization_action(sdfg):
     # Assigning a warp to the column is not a very good idea
     # reshape_kernels(sdfg, True)
     # Must be individualized for each kernel
-    x_coarsening = int(os.environ.get("X_COARSENING", 1))
-    y_coarsening = int(os.environ.get("Y_COARSENING", 1))
-    x_block_size = int(os.environ.get("X_BLOCK_SIZE", 256))
-    y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 1))
-    y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 1))
-    #reshape_kernels(sdfg)
-    reshape_kernels_w_coarsening(sdfg,
-                                 x_coarsening=x_coarsening,
-                                 y_coarsening=y_coarsening,
-                                 x_block_size=x_block_size,
-                                 y_block_size=y_block_size,
-                                 unroll_x=True,
-                                 unroll_x_factor=None,
-                                 unroll_y=True,
-                                 unroll_y_factor=y_unroll_factor,)
+    do_tile = os.getenv('_TILE', '0').lower() in ('1', 'true', 'yes')
+    if do_tile:
+        x_coarsening = int(os.environ.get("X_COARSENING", 1))
+        y_coarsening = int(os.environ.get("Y_COARSENING", 1))
+        x_block_size = int(os.environ.get("X_BLOCK_SIZE", 256))
+        y_block_size = int(os.environ.get("Y_BLOCK_SIZE", 1))
+        y_unroll_factor = int(os.environ.get("Y_UNROLL_FACTOR", 1))
+        #reshape_kernels(sdfg)
+        reshape_kernels_w_coarsening(sdfg,
+                                    x_coarsening=x_coarsening,
+                                    y_coarsening=y_coarsening,
+                                    x_block_size=x_block_size,
+                                    y_block_size=y_block_size,
+                                    unroll_x=True,
+                                    unroll_x_factor=None,
+                                    unroll_y=True,
+                                    unroll_y_factor=y_unroll_factor,)
     #tile_kernels(sdfg)
     #sdfg.simplify()
     sdfg.validate()
