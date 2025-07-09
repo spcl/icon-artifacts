@@ -15,13 +15,14 @@ from utils.change_reduction_schedule import change_reduction_schedule
 from utils.tile import tile_kernels
 from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
 from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
-from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays
+from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays, force_decrease_bitwidth_of_nblk_arrays
 
 STAGE_ID = 8
 import os
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
+    """
     print("Array values that can be lowered: {\n" + "\n".join(
         sorted(
             [f'"{array_name}",' for array_name, array in sdfg.arrays.items() if
@@ -30,38 +31,57 @@ def optimization_action(sdfg):
             )
         ) + "}\n"
     )
-    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0').lower() in ('1', 'true', 'yes')
+    """
+    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '1').lower() in ('1', 'true', 'yes')
     if do_reduce_bitwidth:
+        # nproma dependent ones
         sdfg = decrease_bitwidth_of_const_arrays(sdfg,
                                         array_names={
-                                            "gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask",
-                                            "gpu___CG_p_patch__CG_cells__m_edge_blk",
                                             "gpu___CG_p_patch__CG_cells__m_edge_idx",
-                                            "gpu___CG_p_patch__CG_cells__m_end_block",
                                             "gpu___CG_p_patch__CG_cells__m_end_index",
-                                            "gpu___CG_p_patch__CG_cells__m_neighbor_blk",
                                             "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
-                                            "gpu___CG_p_patch__CG_cells__m_start_block",
                                             "gpu___CG_p_patch__CG_cells__m_start_index",
-                                            "gpu___CG_p_patch__CG_edges__m_cell_blk",
                                             "gpu___CG_p_patch__CG_edges__m_cell_idx",
-                                            "gpu___CG_p_patch__CG_edges__m_end_block",
                                             "gpu___CG_p_patch__CG_edges__m_end_index",
-                                            "gpu___CG_p_patch__CG_edges__m_quad_blk",
                                             "gpu___CG_p_patch__CG_edges__m_quad_idx",
-                                            "gpu___CG_p_patch__CG_edges__m_start_block",
                                             "gpu___CG_p_patch__CG_edges__m_start_index",
-                                            "gpu___CG_p_patch__CG_edges__m_vertex_blk",
                                             "gpu___CG_p_patch__CG_edges__m_vertex_idx",
-                                            "gpu___CG_p_patch__CG_verts__m_cell_blk",
                                             "gpu___CG_p_patch__CG_verts__m_cell_idx",
-                                            "gpu___CG_p_patch__CG_verts__m_edge_blk",
                                             "gpu___CG_p_patch__CG_verts__m_edge_idx",
-                                            "gpu___CG_p_patch__CG_verts__m_end_block",
                                             "gpu___CG_p_patch__CG_verts__m_end_index",
-                                            "gpu___CG_p_patch__CG_verts__m_start_block",
                                             "gpu___CG_p_patch__CG_verts__m_start_index",
-                                        })
+                                        },
+                                        nproma_name="__CG_global_data__m_nproma")
+        # nlock dependent ones
+        sdfg = force_decrease_bitwidth_of_nblk_arrays(sdfg,
+                                        multi_val_array_names={
+                                            #"gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
+                                            "gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
+                                            #"gpu___CG_p_patch__CG_edges__m_cell_blk", #1
+                                            "gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
+                                            "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
+                                            #"gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
+                                            #"gpu___CG_p_patch__CG_verts__m_cell_blk", #1
+                                            "gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
+                                            #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
+                                        },
+                                        single_val_array_names={
+                                            "gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
+                                            #"gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
+                                            "gpu___CG_p_patch__CG_edges__m_cell_blk", #1
+                                            #"gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
+                                            #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
+                                            "gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
+                                            "gpu___CG_p_patch__CG_verts__m_cell_blk", #1
+                                            #"gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
+                                            "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
+                                        },
+                                        )
+
+    # vertex_blk, cell_blk, cell_neighbor_blk, vertex_neighbor_blk are always 1 if nblocks_c is 1
+    # if nblocks_c is 1 then edge_start_block, edge_end_block, edge_blk are 1 or 2 (can do uint8)
+    # Force these variables to have lower bitwidths, always
+
     int64_to_int32(sdfg)
     # start_index and end_index are between [1, nproma] -> ~20k in our data, ~200k in some other cases int16 is -32768, 32767
     # start_block and end_blocks are between [0, nblks] -> usually 1 or 2 as we pass nblocks_c for the science config

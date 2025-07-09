@@ -5,6 +5,7 @@ from dace.properties import CodeBlock
 from dace.codegen.control_flow import ConditionalBlock, ContinueBlock, ControlFlowBlock, ControlFlowRegion
 from dace.sdfg import InterstateEdge
 import dace.sdfg.utils as sdutil
+import re
 
 c = 0
 def _add_copy_map(state: dace.SDFGState, src_arr_name:str, src_arr:dace.data.Data, dst_arr_name:str, dst_arr:dace.data.Data,
@@ -111,6 +112,56 @@ def _lower_bidth_of_arrays_recursive(sdfg: dace.SDFG, array_names: Set[str], suf
     # Repl_dict does not work on nested SDFGs
     _repl_on_interstate_edges(sdfg, repl_dict)
 
+def _insert_lower_bidth_of_arrays_recursive(cfg: ControlFlowRegion, array_names: Set[str], suffix: str, new_dtype: dace.dtypes.typeclass,
+                                     ):
+    if suffix == "int32":
+        return
+    repl_dict = {array_name: array_name + "_" + suffix for array_name in array_names}
+    # Repl datadesc names
+    for name in array_names:
+        if name in cfg.sdfg.arrays:
+            new_name = f"{name}_{suffix}"
+            copy_desc = copy.deepcopy(cfg.sdfg.arrays[name])
+            copy_desc.dtype = new_dtype
+            copy_desc.lifetime = dace.AllocationLifetime.Persistent
+            #sdfg.remove_data(name, validate=False)
+            cfg.sdfg.add_datadesc(new_name, copy_desc, find_new_name=False)
+            cfg.replace_dict(repl=repl_dict)
+    # Repl in and out connectors of NSDFG node
+    nsdfgs = set()
+    for state in cfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                conn_pair = set()
+                for in_conn in node.in_connectors:
+                    if in_conn in array_names:
+                        new_in_conn = f"{in_conn}_{suffix}"
+                        old_in_conn = in_conn
+                        for ie in state.in_edges_by_connector(node, in_conn):
+                            ie.dst_conn = new_in_conn
+                        conn_pair.add((old_in_conn, new_in_conn))
+                for old_in_conn, new_in_conn in conn_pair:
+                    node.remove_in_connector(old_in_conn)
+                    node.add_in_connector(new_in_conn)
+                conn_pair.clear()
+                for out_conn in node.out_connectors:
+                    if out_conn in array_names:
+                        new_out_conn = f"{out_conn}_{suffix}"
+                        old_out_conn = out_conn
+                        for oe in state.out_edges_by_connector(node, out_conn):
+                            oe.src_conn = new_out_conn
+                        conn_pair.add((old_out_conn, new_out_conn))
+                for old_in_conn, new_in_conn in conn_pair:
+                    node.remove_out_connector(old_out_conn)
+                    node.add_out_connector(new_out_conn)
+                nsdfgs.add(node.sdfg)
+    # Now do the same replacedment in the NSDFG
+    for nsdfg in nsdfgs:
+        _lower_bidth_of_arrays_recursive(nsdfg, array_names, suffix, new_dtype)
+
+    # Repl_dict does not work on nested SDFGs
+    _repl_on_interstate_edges(cfg, repl_dict)
+
 def _fix_nsdfg_connectors(sdfg: dace.SDFG):
     # A -(edge)-> B where B is nested SDFG
     # if edge.data is not same as edge.dst_conn (or vice verse for outgoing) then change connector name and them replace stuff in the nsdfg
@@ -143,7 +194,7 @@ def _fix_nsdfg_connectors(sdfg: dace.SDFG):
                 _fix_nsdfg_connectors(node.sdfg)
 
 def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], enable_uint16: bool = True,
-                                      enable_int64: bool = False,):
+                                      enable_int64: bool = False, nproma_name: str = None):
     _fix_nsdfg_connectors(sdfg)
     sdfg.validate()
     global c
@@ -288,7 +339,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         arr = new_sdfg.arrays[arr_name]
         arr.total_size
         tasklet_code += f"""
-        if (_internal_bitwidth_scalar != 64){{
+        if (_internal_bitwidth_scalar != 64){{ // TODO: Replace 64 with 32
             #ifndef NDEBUG
             _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}), "{arr_name}");
             #else
@@ -297,123 +348,201 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         }}
 
 """
-    tasklet_code += "_out_bitwidth_check_done = 1;\n _out_bitwidth_scalar = _internal_bitwidth_scalar;\n"
-    t = check_state.add_tasklet(
-        name="check_bitwidth_tasklet",
-        inputs={"_in_" + array_name for array_name in array_names},
-        outputs={"_out_bitwidth_scalar", "_out_bitwidth_check_done"},
-        code=tasklet_code,
-        language=dace.dtypes.Language.CPP,
-        code_global=f"""
+    runtime_array_check_global_code = f"""
 #include <cuda_runtime.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdexcept>
+#include <limits>
+#ifndef NDEBUG
+#include <thrust/device_ptr.h>
+#include <thrust/extrema.h>
+#include <thrust/execution_policy.h>
+#endif
 
-__device__ __inline__ int32_t check_bounds(int32_t val) {{
-    if (val >= 0 && val <= UINT16_MAX) {{
+template <typename T>
+__device__ __inline__ int32_t check_bounds(T val) {{
+    if (val >= 0 && val <= static_cast<T>(std::numeric_limits<uint16_t>::max())) {{
         return 16;
-    }} else if (val >= INT32_MIN && val <= INT32_MAX) {{
-        return 32;
+    }} else if (val >= static_cast<T>(std::numeric_limits<int16_t>::min()) &&
+                val <= static_cast<T>(std::numeric_limits<int16_t>::max())) {{
+        return 24;
     }} else {{
-        return 64;
+        return 32;
     }}
 }}
 
-__global__ void check_bounds_kernel_{c}(const int32_t* __restrict__ input, int32_t size, int32_t* __restrict__ result) {{
+template <typename T>
+void check_bounds_with_thrust_{c}(const T* d_input, int32_t size, const std::string& array_name) {{
+    thrust::device_ptr<const T> dev_ptr(d_input);
+
+    auto min_it = thrust::min_element(thrust::device, dev_ptr, dev_ptr + size);
+    auto max_it = thrust::max_element(thrust::device, dev_ptr, dev_ptr + size);
+
+    T h_min, h_max;
+    cudaMemcpy(&h_min, min_it.get(), sizeof(T), cudaMemcpyDeviceToHost);
+    cudaMemcpy(&h_max, max_it.get(), sizeof(T), cudaMemcpyDeviceToHost);
+
+    printf("For array %s: (min: %d, max: %d)\\n", array_name.c_str(), static_cast<int32_t>(h_min), static_cast<int32_t>(h_max));
+}}
+
+template <typename T>
+__global__ void check_bounds_kernel_{c}(const T* __restrict__ input, int32_t size, int32_t* __restrict__ result) {{
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= size) return;
 
     int32_t required_bits = check_bounds(input[idx]);
     if (required_bits == 16){{
         result[0] = 1;
-    }} else if (required_bits == 32){{
+    }} else if (required_bits == 24){{
         result[1] = 1;
-    }} else if (required_bits == 64){{
+    }}else if (required_bits == 32){{
         result[2] = 1;
     }}
 }}
 
+
+template <typename T>
+int32_t check_bounds_on_device_{c}(const T* d_input, int32_t size,
 #ifndef NDEBUG
-int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size, const std::string& array_name) {{
-    int32_t* d_result = nullptr;
-    int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
-    h_result[0] = -1; // 16 bits
-    h_result[1] = -1; // 32 bits
-    h_result[2] = -1; // 64 bits
-    int32_t threads = 256;
-    int32_t blocks = (size + threads - 1) / threads;
-
-    cudaMalloc((void**)&d_result, sizeof(int32_t) * 3);
-    cudaMalloc((void**)&d_input, sizeof(int32_t) * 3);
-    check_bounds_kernel_{c}<<<blocks, threads>>>(d_input, size, d_result);
-    cudaMemcpy(h_result, d_result, sizeof(int32_t) * 3, cudaMemcpyDeviceToHost);
-
-    int32_t num_bits = 16;
-    if (h_result[2] == 1) {{
-        num_bits = 64;
-    }} else if (h_result[1] == 1) {{
-        num_bits = 32;
-    }} else if (h_result[0] == 1) {{
-        num_bits = 16;
-    }} else {{
-        num_bits = -1;
-        throw std::runtime_error("No valid bounds found for " + array_name + " the input values." + "{{i64,i32,i16}}: " + std::to_string(h_result[2]) + ", " + std::to_string(h_result[1]) + ", " + std::to_string(h_result[0]));
-    }}
-
-    cudaFree(d_result);
-    delete[] h_result;
-
-    printf("Bitwidth for %s: %d bits\\n", array_name.c_str(), num_bits);
-
-    return num_bits;
-}}
-#else
-int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size) {{
-    int32_t* d_result = nullptr;
-    int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
-    h_result[0] = -1; // 16 bits
-    h_result[1] = -1; // 32 bits
-    h_result[2] = -1; // 64 bits
-    int32_t threads = 256;
-    int32_t blocks = (size + threads - 1) / threads;
-
-    cudaMalloc((void**)&d_result, sizeof(int32_t) * 3);
-    cudaMalloc((void**)&d_input, sizeof(int32_t) * 3);
-    check_bounds_kernel_{c}<<<blocks, threads>>>(d_input, size, d_result);
-    cudaMemcpy(h_result, d_result, sizeof(int32_t) * 3, cudaMemcpyDeviceToHost);
-
-    int32_t num_bits = 16;
-    if (h_result[2] == 1) {{
-        num_bits = 64;
-    }} else if (h_result[1] == 1) {{
-        num_bits = 32;
-    }} else if (h_result[0] == 1) {{
-        num_bits = 16;
-    }} else {{
-        num_bits = -1;
-        throw std::runtime_error("No valid bounds found for " + array_name + " the input values." + "{{i64,i32,i16}}: " + std::to_string(h_result[2]) + ", " + std::to_string(h_result[1]) + ", " + std::to_string(h_result[0]));
-    }}
-
-    cudaFree(d_result);
-    delete[] h_result;
-
-    return num_bits;
-}}
+const std::string& array_name
 #endif
+) {{
+    int32_t* d_result = nullptr;
+    int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
+    h_result[0] = -1; // 16 bits
+    h_result[1] = -1; // 24 bits
+    h_result[2] = -1; // 32 bits
+    int32_t threads = 256;
+    int32_t blocks = (size + threads - 1) / threads;
+
+    // Allocate device memory
+    cudaError_t err = cudaMalloc((void**)&d_result, sizeof(int32_t) * 3);
+    if (err != cudaSuccess) {{
+        printf("cudaMalloc error: %s\\n", cudaGetErrorString(err));
+        delete[] h_result;
+        throw std::runtime_error("Failed to allocate device memory");
+    }}
+
+    // Initialize device memory to zero
+    err = cudaMemset(d_result, 0, sizeof(int32_t) * 3);
+    if (err != cudaSuccess) {{
+        printf("cudaMemset error: %s\\n", cudaGetErrorString(err));
+        cudaFree(d_result);
+        delete[] h_result;
+        throw std::runtime_error("Failed to initialize device memory");
+    }}
+
+    // Launch kernel
+    check_bounds_kernel_{c}<<<blocks, threads>>>(d_input, size, d_result);
+
+    // Check for kernel launch errors
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {{
+        printf("Kernel launch error: %s\\n", cudaGetErrorString(err));
+        cudaFree(d_result);
+        delete[] h_result;
+        throw std::runtime_error("Kernel launch failed");
+    }}
+
+    // Wait for kernel to complete
+    err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {{
+        printf("cudaDeviceSynchronize error: %s\\n", cudaGetErrorString(err));
+        cudaFree(d_result);
+        delete[] h_result;
+        throw std::runtime_error("Kernel execution failed");
+    }}
+
+    // Copy results back
+    err = cudaMemcpy(h_result, d_result, sizeof(int32_t) * 3, cudaMemcpyDeviceToHost);
+    if (err != cudaSuccess) {{
+        printf("cudaMemcpy error: %s\\n", cudaGetErrorString(err));
+        cudaFree(d_result);
+        delete[] h_result;
+        throw std::runtime_error("Failed to copy results from device");
+    }}
+
+    int32_t num_bits = 16;
+    if (h_result[2] == 1) {{
+        num_bits = 32;
+    }} else if (h_result[1] == 1) {{
+        num_bits = 24;
+    }} else if (h_result[0] == 1) {{
+        num_bits = 16;
+    }} else {{
+        num_bits = -1;
+        throw std::runtime_error("No valid bounds found for " +
+        #ifndef NDEBUG
+        array_name +
+        #endif
+        " the input values." + "{{i16,ui16,i32}}: " + ", " + std::to_string(h_result[0]) + ", " + std::to_string(h_result[1]) + ", " + std::to_string(h_result[2]));
+    }}
+
+    #ifndef NDEBUG
+    printf("Bitwidth for %s: %d bits {{%d, %d, %d}}\\n", array_name.c_str(), num_bits, h_result[0], h_result[1], h_result[2]);
+    check_bounds_with_thrust_{c}(d_input, size, array_name);
+    #endif
+
+    cudaFree(d_result);
+    delete[] h_result;
+
+    return num_bits == 24 ? 32 : num_bits; // Return 32 for 24 bits as well;
+}}
 """
+    tasklet_code += "_out_bitwidth_check_done = 1;\n _out_bitwidth_scalar = _internal_bitwidth_scalar;\n"
+    """
+    _t = check_state.add_tasklet(
+        name="check_bitwidth_tasklet",
+        inputs={"_in_" + array_name for array_name in array_names},
+        outputs={"_out_bitwidth_scalar", "_out_bitwidth_check_done"},
+        code=tasklet_code,
+        language=dace.dtypes.Language.CPP,
+        code_global=runtime_array_check_global_code
     )
+    """
+    t = check_state.add_tasklet(
+        name="check_bitwidth_tasklet",
+        inputs={"_in_" + nproma_name},
+        outputs={"_out_bitwidth_scalar", "_out_bitwidth_check_done"},
+        code=f"""
+        if (_in_{nproma_name} <= static_cast<int>(std::numeric_limits<uint16_t>::max())){{
+            _out_bitwidth_scalar = 16;
+        }} else {{
+            _out_bitwidth_scalar = 32;
+        }}
+        _out_bitwidth_check_done = 1;
+        #ifndef NDEBUG
+        printf("Bitwidth for {nproma_name}: %d bits\\n", _out_bitwidth_scalar);
+        #endif
+        """,
+        language=dace.dtypes.Language.CPP,
+        code_global=f"""
+#include <limits>
+#include <stdio.h>
+        """,
+    )
+
     c += 1
     # All connectors for the check. Input: all arrays we use, output: bitwidth_scalar
-    for arr_name in array_names:
-        an = check_state.add_access(arr_name)
-        check_state.add_edge(an, None, t, "_in_" + arr_name, dace.Memlet.from_array(arr_name, new_sdfg.arrays[arr_name]))
+    #for arr_name in array_names:
+    #    an = check_state.add_access(arr_name)
+    #    check_state.add_edge(an, None, t, "_in_" + arr_name, dace.Memlet.from_array(arr_name, new_sdfg.arrays[arr_name]))
+    an_nproma = check_state.add_access(nproma_name)
+    check_state.add_edge(an_nproma, None, t, "_in_" + nproma_name, dace.Memlet.from_array(nproma_name, new_sdfg.arrays[nproma_name]))
     an = check_state.add_access("bitwidth_scalar")
     an2 = check_state.add_access("bitwidth_check_done")
     check_state.add_edge(t, "_out_bitwidth_scalar", an, None, dace.Memlet.from_array("bitwidth_scalar", new_sdfg.arrays["bitwidth_scalar"]))
     check_state.add_edge(t, "_out_bitwidth_check_done", an2, None, dace.Memlet.from_array("bitwidth_check_done", new_sdfg.arrays["bitwidth_check_done"]))
 
     # Add a CFG to copy all arrrays to the correct bitwidth
+    """
+        copy_bit = ConditionalBlock(label="copy_bit", sdfg=check_cfg.sdfg, parent=check_cfg)
+        copy_cfg_i16 = ControlFlowRegion(label="copy_bit_cfg_i16", sdfg=copy_bit.sdfg, parent=copy_bit)
+        copy_state_i16 = dace.SDFGState(label="copy_i16", sdfg=copy_bit.sdfg)
+
+    """
+
     copy_bit = ConditionalBlock(label="copy_bit", sdfg=check_cfg.sdfg, parent=check_cfg)
     if enable_uint16:
         copy_cfg_i16 = ControlFlowRegion(label="copy_bit_cfg_i16", sdfg=copy_bit.sdfg, parent=copy_bit)
@@ -547,6 +676,7 @@ int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size) {{
     if enable_int64:
         switch_state_i64.validate()
 
+    #new_sdfg.save("decreased_bitwidth.sdfgz", compress=True)
     for state in new_sdfg.all_states():
         state.validate()
 
@@ -561,7 +691,7 @@ int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size) {{
     new_sdfg.append_init_code(f"__state->__0_bitwidth_scalar = -1;\n")
     #new_sdfg.global_code["frame"] += CodeBlock(code="0")
     #new_sdfg.global_code["frame"] += CodeBlock(code="-1")  # Default to 64 bit
-    new_sdfg.save("n2.sdfgz", compress=True)
+    #new_sdfg.save("n2.sdfgz", compress=True)
     new_sdfg.validate()
 
     def _check_data_desc(sdfg: dace.SDFG):
@@ -619,3 +749,315 @@ int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size) {{
     c += 1
 
     return new_sdfg
+
+
+def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_names: Set[str],
+                                           single_val_array_names: Set[str]) -> dace.SDFG:
+    new_multi_val_array_names = set()
+    for array_name in multi_val_array_names:
+        if array_name not in sdfg.arrays:
+            print(f"Array {array_name} not found in SDFG, skipping.")
+        else:
+            new_multi_val_array_names.add(array_name)
+    multi_val_array_names = new_multi_val_array_names
+    new_single_val_array_names = set()
+    for array_name in single_val_array_names:
+        if array_name not in sdfg.arrays:
+            print(f"Array {array_name} not found in SDFG, skipping.")
+        else:
+            new_single_val_array_names.add(array_name)
+    single_val_array_names = new_single_val_array_names
+    new_sdfg = copy.deepcopy(sdfg)
+    sdutil.set_nested_sdfg_parent_references(new_sdfg)
+
+    # Right now we have 4 top level nodes
+    # copy-in
+    top_level_nodes = list(new_sdfg.bfs_nodes(new_sdfg.start_block))
+    assert len(top_level_nodes) == 4, f"Expected 4 top level nodes, got {len(top_level_nodes)}: {top_level_nodes}"
+
+    copy_in, lower_index_arrays, body, copy_out = top_level_nodes[:4]
+    # Will add a second lowering block, but in body all occurences of multi-val need to change
+    # All single_val arrays need to be replaced with constants
+    repl_dict = {array_name: array_name + "_uint8" for array_name in multi_val_array_names}
+    _insert_lower_bidth_of_arrays_recursive(body, multi_val_array_names, "uint8", dace.uint8)
+    _fix_nsdfg_connectors(new_sdfg)
+    #body.replace_dict(repl_dict)
+    #_repl_on_interstate_edges(body, repl_dict)
+    # Add the new arrays (array names have changed)
+    #for array_name in multi_val_array_names:
+    #    newdesc = copy.deepcopy(new_sdfg.arrays[array_name])
+    #    newdesc.dtype = dace.uint16
+    #    newdesc.lifetime = dace.AllocationLifetime.Persistent
+    #    new_sdfg.add_datadesc(
+    #        f"{array_name}_uint16",
+    #        newdesc,
+    #        find_new_name=False
+    #    )
+    #    # Update new one for correct dtype and lifetime
+    #    #new_sdfg.arrays[array_name + "_uint16"].dtype = dace.uint16
+    #    #new_sdfg.arrays[array_name + "_uint16"].lifetime = dace.AllocationLifetime.Persistent
+    new_sdfg.validate()
+
+    # Do something similar for single_val_arrays, due to initial copy-in and copy-out can't remove
+    # the arrays, but can replace all occurences with the symbolized version, remove usage of arrays within does nodes
+    # =============================
+    """
+    # Instead of a constant with value 1, just write 1
+    for array_name in single_val_array_names:
+        new_sdfg.add_symbol(
+            name=f"{array_name}_constsym",
+            stype=dace.int32,
+            find_new_name=False,
+        )
+        new_sdfg.add_constant(
+            name=f"{array_name}_constsym",
+            value=1,
+        )
+        for node, graph in body.all_nodes_recursive():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                node.sdfg.add_symbol(
+                    name=f"{array_name}_constsym",
+                    stype=dace.int32,
+                    find_new_name=False,
+                )
+                if graph.parent_graph is not None:
+                    node.symbol_mapping[f"{array_name}_constsym"] = f"{array_name}_constsym"
+    """
+    """
+    for node, graph in body.all_nodes_recursive():
+        if isinstance(node, dace.nodes.NestedSDFG) and graph.parent_graph is not None:
+            try:
+                node.sdfg.validate()
+            except Exception as e:
+                print(f"Validation failed for nested SDFG {node.sdfg.name}: {e}")
+                node.sdfg.save(f"inv.sdfgz", compress=True)
+                raise Exception(e)
+    new_sdfg.validate()
+    """
+
+    for array_name in single_val_array_names:
+        for edge, graph in body.all_edges_recursive():
+            if isinstance(edge.data, dace.InterstateEdge):
+                pass
+            elif isinstance(edge.data, dace.Memlet):
+                if edge.data.data == array_name:
+                    graph.remove_edge(edge)
+                    edge.src.remove_out_connector(edge.src_conn)
+                    edge.dst.remove_in_connector(edge.dst_conn)
+        for node, graph in body.all_nodes_recursive():
+            if isinstance(node, dace.nodes.AccessNode):
+                if node.data == array_name:
+                    graph.remove_node(node)
+            if isinstance(node, dace.nodes.NestedSDFG) and graph.parent_graph is not None:
+                if array_name in node.sdfg.arrays and node.sdfg.arrays[array_name].transient is False:
+                    node.sdfg.remove_data(array_name, False)
+
+    # Now go through all interstate edges if we see a const array
+    # of form <array_name>[...] then replace it with <array_name>_constsym
+
+    for array_name in single_val_array_names:
+        for edge, graph in body.all_edges_recursive():
+            if isinstance(edge.data, dace.InterstateEdge):
+                if array_name in edge.data.assignments:
+                    val = edge.data.assignments[array_name]
+                    if isinstance(val, str):
+                        valstr = val
+                    elif isinstance(val, CodeBlock):
+                        valstr = val.as_string
+                    else:
+                        raise ValueError(f"Unexpected value {val} for assignment {array_name} in edge {edge}.")
+                    valstr = replace_array_with_constsym(valstr, array_name)
+                    edge.data.assignments[array_name] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
+                for key, val in edge.data.assignments.items():
+                    valstr = val if isinstance(val, str) else val.as_string
+                    if array_name in valstr:
+                        valstr = replace_array_with_constsym(valstr, array_name)
+                        edge.data.assignments[key] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
+
+    def reinsert_symbols_to_nsdfg_rec(graph: dace.SDFG):
+        # Why would this happen? This is a workaround for the issue where nested SDFGs do not have their symbols properly assigned.
+        for state in graph.all_states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    child_sdfg = node.sdfg
+                    connectors = node.in_connectors.keys() | node.out_connectors.keys()
+                    symbols = sdfg.free_symbols
+                    #if symbol_mapping is None:
+                    #    symbol_mapping = {s: s for s in symbols}
+                    #    node.symbol_mapping = symbol_mapping
+
+                    # Validate missing symbols
+                    missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
+                    if missing_symbols:
+                        # If symbols are missing, try to get them from the parent SDFG
+                        assert isinstance(state, dace.SDFGState), "State should be an SDFGState."
+                        parent_mapping = {s: s for s in missing_symbols if s in state.symbols_defined_at(node)}
+                        node.symbol_mapping.update(parent_mapping)
+                        missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
+                    #if missing_symbols:
+                    #    raise ValueError('Missing symbols on nested SDFG "%s": %s' % (node.sdfg.name, missing_symbols))
+                    if missing_symbols:
+                        for missing_symbol in missing_symbols:
+                            #child_sdfg.add_symbol(missing_symbol, node.sdfg.symbols[missing_symbol] if missing_symbol in node.sdfg.symbols else dace.int32)
+                            #node.symbol_mapping[missing_symbol] = missing_symbol
+                            #print("Symbols", symbols)
+                            #print("Missing symbols", missing_symbols)
+                            child_sdfg.remove_symbol(missing_symbol, force=True)
+                            #node.symbol_mapping[missing_symbol] = missing_symbol
+                            #node.sdfg.add_symbol(missing_symbol, dace.int32)  # Default to int32, can be changed later
+    reinsert_symbols_to_nsdfg_rec(new_sdfg)
+
+    new_sdfg.save("a.sdfgz", compress=True)
+    for node, graph in body.all_nodes_recursive():
+        if isinstance(node, dace.nodes.NestedSDFG) and graph.parent_graph is not None:
+            try:
+                node.sdfg.validate()
+            except Exception as e:
+                print(f"Validation failed for nested SDFG {node.sdfg.name}: {e}")
+                node.sdfg.save(f"inv.sdfgz", compress=True)
+                raise Exception(e)
+    new_sdfg.validate()
+
+    #raise Exception("This is a hacky solution, please fix it later.")
+
+    # ===============================
+
+    nblks_c = "p_patch->nblks_c"
+    nblks_v = "p_patch->nblks_v"
+    nblks_e = "p_patch->nblks_e"
+    first_block = new_sdfg.start_block
+    assert isinstance(first_block, dace.SDFGState)
+    first_state = first_block
+
+    t = first_state.add_tasklet(
+        name="assert_nblks",
+        inputs=set(),
+        outputs=set(),
+        code="""
+        if (p_patch->nblks_c != 1){
+            throw std::runtime_error("Expected exactly 1 for nblk_c, got " + std::to_string(p_patch->nblks_c));
+        }
+        if (p_patch->nblks_v != 1){
+            throw std::runtime_error("Expected exactly 1 for nblk_v, got " + std::to_string(p_patch->nblks_v));
+        }
+        if (p_patch->nblks_e != 2){
+            throw std::runtime_error("Expected exactly 2 for nblk_e, got " + std::to_string(p_patch->nblks_e));
+        }
+""",
+        language=dace.dtypes.Language.CPP,
+        code_global="""
+#include <stdexcept>
+#include <string>
+""",
+        side_effects=True
+    )
+    an = first_state.add_access("p_patch")
+    first_state.add_edge(an, None, t, None, dace.Memlet(None))
+    first_state.validate()
+
+    # Single val arrays are always 1
+
+    # Multi val arrays are always 1 or 2, we need to copy them over
+    new_sdfg.add_scalar("nblk_lowering_done", dtype=dace.int32,
+                        storage=dace.StorageType.CPU_Heap,
+                        lifetime=dace.AllocationLifetime.Persistent,
+                        transient=True)
+    new_sdfg.add_symbol("nblk_lowering_done_sym", dace.int32)
+    new_sdfg.append_init_code(f"__state->__0_nblk_lowering_done = 0;\n")
+
+    lower_blk_bits_if = ConditionalBlock(label="lower_blk_cond", sdfg=new_sdfg, parent=new_sdfg)
+    lower_blk_bits_cfg = ControlFlowRegion(label="lower_blk_cfg", sdfg=lower_blk_bits_if.sdfg, parent=lower_blk_bits_if)
+    lower_blk_bits_state = dace.SDFGState(label="lower_blk", sdfg=lower_blk_bits_cfg.sdfg)
+    lower_blk_bits_cfg.add_node(lower_blk_bits_state, is_start_block=True)
+    lower_blk_bits_if.add_branch(condition=CodeBlock(code="nblk_lowering_done_sym == 0"), branch=lower_blk_bits_cfg)
+
+    new_sdfg.add_node(lower_blk_bits_if, is_start_block=False)
+    oes = new_sdfg.out_edges(first_state)
+    for oe in new_sdfg.out_edges(first_state):
+        oe_data = copy.deepcopy(oe.data)
+        oe_data.assignments["nblk_lowering_done_sym"] = "nblk_lowering_done"
+        new_sdfg.add_edge(first_state, lower_blk_bits_if, oe_data)
+        new_sdfg.add_edge(lower_blk_bits_if, oe.dst, InterstateEdge())
+    for oe in oes:
+        new_sdfg.remove_edge(oe)
+
+    #sdfg.save("b.sdfgz", compress=True)
+
+
+    for array_name in multi_val_array_names:
+        _add_copy_map(
+            lower_blk_bits_state,
+            src_arr_name=array_name,
+            src_arr=new_sdfg.arrays[array_name],
+            dst_arr_name=f"{array_name}_uint8",
+            dst_arr=new_sdfg.arrays[array_name + "_uint8"],
+            dtype=dace.dtypes.uint8
+        )
+
+    # Write one to check done
+    t2 = lower_blk_bits_state.add_tasklet(
+        name="set_nblk_lowering_done",
+        inputs=set(),
+        outputs={"_out_nblk_lowering_done"},
+        code="_out_nblk_lowering_done = 1;",
+        language=dace.dtypes.Language.CPP,
+        code_global="",
+        side_effects=True
+    )
+    an = lower_blk_bits_state.add_access("nblk_lowering_done")
+    lower_blk_bits_state.add_edge(t2, "_out_nblk_lowering_done", an, None, dace.Memlet.from_array("nblk_lowering_done", new_sdfg.arrays["nblk_lowering_done"]))
+
+    an_counter = {array_name: 0 for array_name in single_val_array_names}
+    for node, graph in new_sdfg.all_nodes_recursive():
+        if isinstance(node, dace.nodes.AccessNode):
+            if node.data in single_val_array_names:
+                an_counter[node.data] += 1
+    #print(an_counter)
+    #raise Exception(an_counter)
+    return new_sdfg
+
+
+def replace_array_with_constsym(text: str, array_name: str) -> str:
+    """
+    Replace array_name[...] with array_name_constsym, properly counting brackets.
+
+    Args:
+        text: The string to process
+        array_name: The array name to replace
+
+    Returns:
+        Modified string with replacements
+    """
+    result = []
+    i = 0
+
+    while i < len(text):
+        # Look for array_name followed by '['
+        if text[i:i+len(array_name)] == array_name and i + len(array_name) < len(text) and text[i + len(array_name)] == '[':
+            # Found array_name[, now find the matching closing bracket
+            start_pos = i
+            bracket_pos = i + len(array_name)  # Position of the opening '['
+            bracket_count = 1
+            j = bracket_pos + 1
+
+            # Count brackets to find the matching closing bracket
+            while j < len(text) and bracket_count > 0:
+                if text[j] == '[':
+                    bracket_count += 1
+                elif text[j] == ']':
+                    bracket_count -= 1
+                j += 1
+
+            if bracket_count == 0:
+                # Found matching closing bracket, replace the entire expression
+                result.append(f"1")
+                i = j  # Skip past the closing bracket
+            else:
+                # No matching closing bracket found, just append the character
+                result.append(text[i])
+                i += 1
+        else:
+            result.append(text[i])
+            i += 1
+
+    return ''.join(result)
