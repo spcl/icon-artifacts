@@ -335,8 +335,7 @@ __global__ void check_bounds_kernel_{c}(const int32_t* __restrict__ input, int32
 }}
 
 #ifndef NDEBUG
-int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size, const std::string& array_name) {{
-    int32_t* d_input = nullptr;
+int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size, const std::string& array_name) {{
     int32_t* d_result = nullptr;
     int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
     h_result[0] = -1; // 16 bits
@@ -363,7 +362,6 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size, const s
     }}
 
     cudaFree(d_result);
-    cudaFree(d_input);
     delete[] h_result;
 
     printf("Bitwidth for %s: %d bits\\n", array_name.c_str(), num_bits);
@@ -371,8 +369,7 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size, const s
     return num_bits;
 }}
 #else
-int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
-    int32_t* d_input = nullptr;
+int32_t check_bounds_on_device_{c}(const int32_t* d_input, int32_t size) {{
     int32_t* d_result = nullptr;
     int32_t* h_result = new int32_t[3]; // Initialize results for 16, 32, and 64 bits
     h_result[0] = -1; // 16 bits
@@ -399,7 +396,6 @@ int32_t check_bounds_on_device_{c}(const int32_t* h_input, int32_t size) {{
     }}
 
     cudaFree(d_result);
-    cudaFree(d_input);
     delete[] h_result;
 
     return num_bits;
