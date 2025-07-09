@@ -19,6 +19,14 @@ python -m dace.frontend.fortran.tools.create_preprocessed_ast \
   -k fake_mo_solve_nonhydro.solve_nh_corrector_pre \
   -k fake_mo_solve_nonhydro.solve_nh_corrector_post
 
+python -m utils.prune_unused_args \
+  -i solve_nh_fake.f90 \
+  -o solve_nh_fake.f90 \
+  -k fake_mo_solve_nonhydro.solve_nh_predictor_pre \
+  -k fake_mo_solve_nonhydro.solve_nh_predictor_post \
+  -k fake_mo_solve_nonhydro.solve_nh_corrector_pre \
+  -k fake_mo_solve_nonhydro.solve_nh_corrector_post
+
 cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
   && sed -E -e 's/[[:space:]]*=>[[:space:]]*null\([[:space:]]*\)//Ig' solve_nh_fake.f90.bak > solve_nh_fake.f90
 rm solve_nh_fake.f90.bak
