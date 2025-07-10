@@ -1,5 +1,7 @@
 ! Content for expanded_prepost_t1.inc
 call serialize(at("prepost.p_nh.t1"), p_nh)
+call serialize(at("prepost.p_nh_prog_nnow.t1"), p_nh_prog_nnow)
+call serialize(at("prepost.p_nh_prog_nnew.t1"), p_nh_prog_nnew)
 call serialize(at("prepost.p_patch.t1"), p_patch)
 call serialize(at("prepost.p_int.t1"), p_int)
 call serialize(at("prepost.prep_adv.t1"), prep_adv)
