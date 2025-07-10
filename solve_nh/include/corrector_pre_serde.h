@@ -230,12 +230,12 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_c_lin_e_d_0_s_54 = m.size[0];
-    x->__f2dace_SA_c_lin_e_d_1_s_55 = m.size[1];
-    x->__f2dace_SA_c_lin_e_d_2_s_56 = m.size[2];
-    x->__f2dace_SOA_c_lin_e_d_0_s_54 = m.lbound[0];
-    x->__f2dace_SOA_c_lin_e_d_1_s_55 = m.lbound[1];
-    x->__f2dace_SOA_c_lin_e_d_2_s_56 = m.lbound[2];
+    x->__f2dace_SA_c_lin_e_d_0_s_71 = m.size[0];
+    x->__f2dace_SA_c_lin_e_d_1_s_72 = m.size[1];
+    x->__f2dace_SA_c_lin_e_d_2_s_73 = m.size[2];
+    x->__f2dace_SOA_c_lin_e_d_0_s_71 = m.lbound[0];
+    x->__f2dace_SOA_c_lin_e_d_1_s_72 = m.lbound[1];
+    x->__f2dace_SOA_c_lin_e_d_2_s_73 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->c_lin_e = m.read<std::remove_pointer<decltype(x->c_lin_e)>::type>(s);
@@ -248,15 +248,33 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_e_bln_c_s_d_0_s_57 = m.size[0];
-    x->__f2dace_SA_e_bln_c_s_d_1_s_58 = m.size[1];
-    x->__f2dace_SA_e_bln_c_s_d_2_s_59 = m.size[2];
-    x->__f2dace_SOA_e_bln_c_s_d_0_s_57 = m.lbound[0];
-    x->__f2dace_SOA_e_bln_c_s_d_1_s_58 = m.lbound[1];
-    x->__f2dace_SOA_e_bln_c_s_d_2_s_59 = m.lbound[2];
+    x->__f2dace_SA_e_bln_c_s_d_0_s_74 = m.size[0];
+    x->__f2dace_SA_e_bln_c_s_d_1_s_75 = m.size[1];
+    x->__f2dace_SA_e_bln_c_s_d_2_s_76 = m.size[2];
+    x->__f2dace_SOA_e_bln_c_s_d_0_s_74 = m.lbound[0];
+    x->__f2dace_SOA_e_bln_c_s_d_1_s_75 = m.lbound[1];
+    x->__f2dace_SOA_e_bln_c_s_d_2_s_76 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->e_bln_c_s = m.read<std::remove_pointer<decltype(x->e_bln_c_s)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# e_flx_avg"}); // Should contain '# e_flx_avg'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_e_flx_avg_d_0_s_77 = m.size[0];
+    x->__f2dace_SA_e_flx_avg_d_1_s_78 = m.size[1];
+    x->__f2dace_SA_e_flx_avg_d_2_s_79 = m.size[2];
+    x->__f2dace_SOA_e_flx_avg_d_0_s_77 = m.lbound[0];
+    x->__f2dace_SOA_e_flx_avg_d_1_s_78 = m.lbound[1];
+    x->__f2dace_SOA_e_flx_avg_d_2_s_79 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->e_flx_avg = m.read<std::remove_pointer<decltype(x->e_flx_avg)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# cells_aw_verts"}); // Should contain '# cells_aw_verts'
@@ -266,16 +284,54 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_cells_aw_verts_d_0_s_60 = m.size[0];
-    x->__f2dace_SA_cells_aw_verts_d_1_s_61 = m.size[1];
-    x->__f2dace_SA_cells_aw_verts_d_2_s_62 = m.size[2];
-    x->__f2dace_SOA_cells_aw_verts_d_0_s_60 = m.lbound[0];
-    x->__f2dace_SOA_cells_aw_verts_d_1_s_61 = m.lbound[1];
-    x->__f2dace_SOA_cells_aw_verts_d_2_s_62 = m.lbound[2];
+    x->__f2dace_SA_cells_aw_verts_d_0_s_80 = m.size[0];
+    x->__f2dace_SA_cells_aw_verts_d_1_s_81 = m.size[1];
+    x->__f2dace_SA_cells_aw_verts_d_2_s_82 = m.size[2];
+    x->__f2dace_SOA_cells_aw_verts_d_0_s_80 = m.lbound[0];
+    x->__f2dace_SOA_cells_aw_verts_d_1_s_81 = m.lbound[1];
+    x->__f2dace_SOA_cells_aw_verts_d_2_s_82 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->cells_aw_verts =
         m.read<std::remove_pointer<decltype(x->cells_aw_verts)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# rbf_vec_coeff_e"}); // Should contain '# rbf_vec_coeff_e'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_rbf_vec_coeff_e_d_0_s_83 = m.size[0];
+    x->__f2dace_SA_rbf_vec_coeff_e_d_1_s_84 = m.size[1];
+    x->__f2dace_SA_rbf_vec_coeff_e_d_2_s_85 = m.size[2];
+    x->__f2dace_SOA_rbf_vec_coeff_e_d_0_s_83 = m.lbound[0];
+    x->__f2dace_SOA_rbf_vec_coeff_e_d_1_s_84 = m.lbound[1];
+    x->__f2dace_SOA_rbf_vec_coeff_e_d_2_s_85 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->rbf_vec_coeff_e =
+        m.read<std::remove_pointer<decltype(x->rbf_vec_coeff_e)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# geofac_div"}); // Should contain '# geofac_div'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_geofac_div_d_0_s_86 = m.size[0];
+    x->__f2dace_SA_geofac_div_d_1_s_87 = m.size[1];
+    x->__f2dace_SA_geofac_div_d_2_s_88 = m.size[2];
+    x->__f2dace_SOA_geofac_div_d_0_s_86 = m.lbound[0];
+    x->__f2dace_SOA_geofac_div_d_1_s_87 = m.lbound[1];
+    x->__f2dace_SOA_geofac_div_d_2_s_88 = m.lbound[2];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->geofac_div =
+        m.read<std::remove_pointer<decltype(x->geofac_div)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# geofac_grdiv"}); // Should contain '# geofac_grdiv'
@@ -285,12 +341,12 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_geofac_grdiv_d_0_s_63 = m.size[0];
-    x->__f2dace_SA_geofac_grdiv_d_1_s_64 = m.size[1];
-    x->__f2dace_SA_geofac_grdiv_d_2_s_65 = m.size[2];
-    x->__f2dace_SOA_geofac_grdiv_d_0_s_63 = m.lbound[0];
-    x->__f2dace_SOA_geofac_grdiv_d_1_s_64 = m.lbound[1];
-    x->__f2dace_SOA_geofac_grdiv_d_2_s_65 = m.lbound[2];
+    x->__f2dace_SA_geofac_grdiv_d_0_s_89 = m.size[0];
+    x->__f2dace_SA_geofac_grdiv_d_1_s_90 = m.size[1];
+    x->__f2dace_SA_geofac_grdiv_d_2_s_91 = m.size[2];
+    x->__f2dace_SOA_geofac_grdiv_d_0_s_89 = m.lbound[0];
+    x->__f2dace_SOA_geofac_grdiv_d_1_s_90 = m.lbound[1];
+    x->__f2dace_SOA_geofac_grdiv_d_2_s_91 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->geofac_grdiv =
@@ -304,12 +360,12 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_geofac_rot_d_0_s_66 = m.size[0];
-    x->__f2dace_SA_geofac_rot_d_1_s_67 = m.size[1];
-    x->__f2dace_SA_geofac_rot_d_2_s_68 = m.size[2];
-    x->__f2dace_SOA_geofac_rot_d_0_s_66 = m.lbound[0];
-    x->__f2dace_SOA_geofac_rot_d_1_s_67 = m.lbound[1];
-    x->__f2dace_SOA_geofac_rot_d_2_s_68 = m.lbound[2];
+    x->__f2dace_SA_geofac_rot_d_0_s_92 = m.size[0];
+    x->__f2dace_SA_geofac_rot_d_1_s_93 = m.size[1];
+    x->__f2dace_SA_geofac_rot_d_2_s_94 = m.size[2];
+    x->__f2dace_SOA_geofac_rot_d_0_s_92 = m.lbound[0];
+    x->__f2dace_SOA_geofac_rot_d_1_s_93 = m.lbound[1];
+    x->__f2dace_SOA_geofac_rot_d_2_s_94 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->geofac_rot =
@@ -323,16 +379,58 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_geofac_n2s_d_0_s_69 = m.size[0];
-    x->__f2dace_SA_geofac_n2s_d_1_s_70 = m.size[1];
-    x->__f2dace_SA_geofac_n2s_d_2_s_71 = m.size[2];
-    x->__f2dace_SOA_geofac_n2s_d_0_s_69 = m.lbound[0];
-    x->__f2dace_SOA_geofac_n2s_d_1_s_70 = m.lbound[1];
-    x->__f2dace_SOA_geofac_n2s_d_2_s_71 = m.lbound[2];
+    x->__f2dace_SA_geofac_n2s_d_0_s_95 = m.size[0];
+    x->__f2dace_SA_geofac_n2s_d_1_s_96 = m.size[1];
+    x->__f2dace_SA_geofac_n2s_d_2_s_97 = m.size[2];
+    x->__f2dace_SOA_geofac_n2s_d_0_s_95 = m.lbound[0];
+    x->__f2dace_SOA_geofac_n2s_d_1_s_96 = m.lbound[1];
+    x->__f2dace_SOA_geofac_n2s_d_2_s_97 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->geofac_n2s =
         m.read<std::remove_pointer<decltype(x->geofac_n2s)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# geofac_grg"}); // Should contain '# geofac_grg'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_geofac_grg_d_0_s_98 = m.size[0];
+    x->__f2dace_SA_geofac_grg_d_1_s_99 = m.size[1];
+    x->__f2dace_SA_geofac_grg_d_2_s_100 = m.size[2];
+    x->__f2dace_SA_geofac_grg_d_3_s_101 = m.size[3];
+    x->__f2dace_SOA_geofac_grg_d_0_s_98 = m.lbound[0];
+    x->__f2dace_SOA_geofac_grg_d_1_s_99 = m.lbound[1];
+    x->__f2dace_SOA_geofac_grg_d_2_s_100 = m.lbound[2];
+    x->__f2dace_SOA_geofac_grg_d_3_s_101 = m.lbound[3];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->geofac_grg =
+        m.read<std::remove_pointer<decltype(x->geofac_grg)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# pos_on_tplane_e"}); // Should contain '# pos_on_tplane_e'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_pos_on_tplane_e_d_0_s_102 = m.size[0];
+    x->__f2dace_SA_pos_on_tplane_e_d_1_s_103 = m.size[1];
+    x->__f2dace_SA_pos_on_tplane_e_d_2_s_104 = m.size[2];
+    x->__f2dace_SA_pos_on_tplane_e_d_3_s_105 = m.size[3];
+    x->__f2dace_SOA_pos_on_tplane_e_d_0_s_102 = m.lbound[0];
+    x->__f2dace_SOA_pos_on_tplane_e_d_1_s_103 = m.lbound[1];
+    x->__f2dace_SOA_pos_on_tplane_e_d_2_s_104 = m.lbound[2];
+    x->__f2dace_SOA_pos_on_tplane_e_d_3_s_105 = m.lbound[3];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->pos_on_tplane_e =
+        m.read<std::remove_pointer<decltype(x->pos_on_tplane_e)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# nudgecoeff_e"}); // Should contain '# nudgecoeff_e'
@@ -342,16 +440,28 @@ void deserialize(t_int_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_nudgecoeff_e_d_0_s_72 = m.size[0];
-    x->__f2dace_SA_nudgecoeff_e_d_1_s_73 = m.size[1];
-    x->__f2dace_SOA_nudgecoeff_e_d_0_s_72 = m.lbound[0];
-    x->__f2dace_SOA_nudgecoeff_e_d_1_s_73 = m.lbound[1];
+    x->__f2dace_SA_nudgecoeff_e_d_0_s_106 = m.size[0];
+    x->__f2dace_SA_nudgecoeff_e_d_1_s_107 = m.size[1];
+    x->__f2dace_SOA_nudgecoeff_e_d_0_s_106 = m.lbound[0];
+    x->__f2dace_SOA_nudgecoeff_e_d_1_s_107 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->nudgecoeff_e =
         m.read<std::remove_pointer<decltype(x->nudgecoeff_e)>::type>(s);
 
   } // CONCLUDING IF
+}
+
+void deserialize(t_tangent_vectors *x, std::istream &s) {
+  bool yep;
+  array_meta m;
+  read_line(s, {"# v1"}); // Should contain '# v1'
+
+  deserialize(&(x->v1), s);
+
+  read_line(s, {"# v2"}); // Should contain '# v2'
+
+  deserialize(&(x->v2), s);
 }
 
 void deserialize(t_grid_cells *x, std::istream &s) {
@@ -364,12 +474,12 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_neighbor_idx_d_0_s_144 = m.size[0];
-    x->__f2dace_SA_neighbor_idx_d_1_s_145 = m.size[1];
-    x->__f2dace_SA_neighbor_idx_d_2_s_146 = m.size[2];
-    x->__f2dace_SOA_neighbor_idx_d_0_s_144 = m.lbound[0];
-    x->__f2dace_SOA_neighbor_idx_d_1_s_145 = m.lbound[1];
-    x->__f2dace_SOA_neighbor_idx_d_2_s_146 = m.lbound[2];
+    x->__f2dace_SA_neighbor_idx_d_0_s_190 = m.size[0];
+    x->__f2dace_SA_neighbor_idx_d_1_s_191 = m.size[1];
+    x->__f2dace_SA_neighbor_idx_d_2_s_192 = m.size[2];
+    x->__f2dace_SOA_neighbor_idx_d_0_s_190 = m.lbound[0];
+    x->__f2dace_SOA_neighbor_idx_d_1_s_191 = m.lbound[1];
+    x->__f2dace_SOA_neighbor_idx_d_2_s_192 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->neighbor_idx =
@@ -383,12 +493,12 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_neighbor_blk_d_0_s_147 = m.size[0];
-    x->__f2dace_SA_neighbor_blk_d_1_s_148 = m.size[1];
-    x->__f2dace_SA_neighbor_blk_d_2_s_149 = m.size[2];
-    x->__f2dace_SOA_neighbor_blk_d_0_s_147 = m.lbound[0];
-    x->__f2dace_SOA_neighbor_blk_d_1_s_148 = m.lbound[1];
-    x->__f2dace_SOA_neighbor_blk_d_2_s_149 = m.lbound[2];
+    x->__f2dace_SA_neighbor_blk_d_0_s_193 = m.size[0];
+    x->__f2dace_SA_neighbor_blk_d_1_s_194 = m.size[1];
+    x->__f2dace_SA_neighbor_blk_d_2_s_195 = m.size[2];
+    x->__f2dace_SOA_neighbor_blk_d_0_s_193 = m.lbound[0];
+    x->__f2dace_SOA_neighbor_blk_d_1_s_194 = m.lbound[1];
+    x->__f2dace_SOA_neighbor_blk_d_2_s_195 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->neighbor_blk =
@@ -402,12 +512,12 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_edge_idx_d_0_s_150 = m.size[0];
-    x->__f2dace_SA_edge_idx_d_1_s_151 = m.size[1];
-    x->__f2dace_SA_edge_idx_d_2_s_152 = m.size[2];
-    x->__f2dace_SOA_edge_idx_d_0_s_150 = m.lbound[0];
-    x->__f2dace_SOA_edge_idx_d_1_s_151 = m.lbound[1];
-    x->__f2dace_SOA_edge_idx_d_2_s_152 = m.lbound[2];
+    x->__f2dace_SA_edge_idx_d_0_s_196 = m.size[0];
+    x->__f2dace_SA_edge_idx_d_1_s_197 = m.size[1];
+    x->__f2dace_SA_edge_idx_d_2_s_198 = m.size[2];
+    x->__f2dace_SOA_edge_idx_d_0_s_196 = m.lbound[0];
+    x->__f2dace_SOA_edge_idx_d_1_s_197 = m.lbound[1];
+    x->__f2dace_SOA_edge_idx_d_2_s_198 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->edge_idx = m.read<std::remove_pointer<decltype(x->edge_idx)>::type>(s);
@@ -420,12 +530,12 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_edge_blk_d_0_s_153 = m.size[0];
-    x->__f2dace_SA_edge_blk_d_1_s_154 = m.size[1];
-    x->__f2dace_SA_edge_blk_d_2_s_155 = m.size[2];
-    x->__f2dace_SOA_edge_blk_d_0_s_153 = m.lbound[0];
-    x->__f2dace_SOA_edge_blk_d_1_s_154 = m.lbound[1];
-    x->__f2dace_SOA_edge_blk_d_2_s_155 = m.lbound[2];
+    x->__f2dace_SA_edge_blk_d_0_s_199 = m.size[0];
+    x->__f2dace_SA_edge_blk_d_1_s_200 = m.size[1];
+    x->__f2dace_SA_edge_blk_d_2_s_201 = m.size[2];
+    x->__f2dace_SOA_edge_blk_d_0_s_199 = m.lbound[0];
+    x->__f2dace_SOA_edge_blk_d_1_s_200 = m.lbound[1];
+    x->__f2dace_SOA_edge_blk_d_2_s_201 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->edge_blk = m.read<std::remove_pointer<decltype(x->edge_blk)>::type>(s);
@@ -439,10 +549,10 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->area)>::type>(s);
-    x->__f2dace_SA_area_d_0_s_156 = m.size.at(0);
-    x->__f2dace_SA_area_d_1_s_157 = m.size.at(1);
-    x->__f2dace_SOA_area_d_0_s_156 = m.lbound.at(0);
-    x->__f2dace_SOA_area_d_1_s_157 = m.lbound.at(1);
+    x->__f2dace_SA_area_d_0_s_202 = m.size.at(0);
+    x->__f2dace_SA_area_d_1_s_203 = m.size.at(1);
+    x->__f2dace_SOA_area_d_0_s_202 = m.lbound.at(0);
+    x->__f2dace_SOA_area_d_1_s_203 = m.lbound.at(1);
     x->area = arr;
   }
 
@@ -453,8 +563,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_start_index_d_0_s_158 = m.size[0];
-    x->__f2dace_SOA_start_index_d_0_s_158 = m.lbound[0];
+    x->__f2dace_SA_start_index_d_0_s_204 = m.size[0];
+    x->__f2dace_SOA_start_index_d_0_s_204 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->start_index =
@@ -468,11 +578,27 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_end_index_d_0_s_159 = m.size[0];
-    x->__f2dace_SOA_end_index_d_0_s_159 = m.lbound[0];
+    x->__f2dace_SA_end_index_d_0_s_205 = m.size[0];
+    x->__f2dace_SOA_end_index_d_0_s_205 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# start_blk"}); // Should contain '# start_blk'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_start_blk_d_0_s_206 = m.size[0];
+    x->__f2dace_SA_start_blk_d_1_s_207 = m.size[1];
+    x->__f2dace_SOA_start_blk_d_0_s_206 = m.lbound[0];
+    x->__f2dace_SOA_start_blk_d_1_s_207 = m.lbound[1];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->start_blk = m.read<std::remove_pointer<decltype(x->start_blk)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# start_block"}); // Should contain '# start_block'
@@ -482,12 +608,28 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_start_block_d_0_s_160 = m.size[0];
-    x->__f2dace_SOA_start_block_d_0_s_160 = m.lbound[0];
+    x->__f2dace_SA_start_block_d_0_s_208 = m.size[0];
+    x->__f2dace_SOA_start_block_d_0_s_208 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->start_block =
         m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# end_blk"}); // Should contain '# end_blk'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_end_blk_d_0_s_209 = m.size[0];
+    x->__f2dace_SA_end_blk_d_1_s_210 = m.size[1];
+    x->__f2dace_SOA_end_blk_d_0_s_209 = m.lbound[0];
+    x->__f2dace_SOA_end_blk_d_1_s_210 = m.lbound[1];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->end_blk = m.read<std::remove_pointer<decltype(x->end_blk)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_block"}); // Should contain '# end_block'
@@ -497,8 +639,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_end_block_d_0_s_161 = m.size[0];
-    x->__f2dace_SOA_end_block_d_0_s_161 = m.lbound[0];
+    x->__f2dace_SA_end_block_d_0_s_211 = m.size[0];
+    x->__f2dace_SOA_end_block_d_0_s_211 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
@@ -520,12 +662,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_cell_idx_d_0_s_162 = m.size[0];
-    x->__f2dace_SA_cell_idx_d_1_s_163 = m.size[1];
-    x->__f2dace_SA_cell_idx_d_2_s_164 = m.size[2];
-    x->__f2dace_SOA_cell_idx_d_0_s_162 = m.lbound[0];
-    x->__f2dace_SOA_cell_idx_d_1_s_163 = m.lbound[1];
-    x->__f2dace_SOA_cell_idx_d_2_s_164 = m.lbound[2];
+    x->__f2dace_SA_cell_idx_d_0_s_212 = m.size[0];
+    x->__f2dace_SA_cell_idx_d_1_s_213 = m.size[1];
+    x->__f2dace_SA_cell_idx_d_2_s_214 = m.size[2];
+    x->__f2dace_SOA_cell_idx_d_0_s_212 = m.lbound[0];
+    x->__f2dace_SOA_cell_idx_d_1_s_213 = m.lbound[1];
+    x->__f2dace_SOA_cell_idx_d_2_s_214 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->cell_idx = m.read<std::remove_pointer<decltype(x->cell_idx)>::type>(s);
@@ -538,12 +680,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_cell_blk_d_0_s_165 = m.size[0];
-    x->__f2dace_SA_cell_blk_d_1_s_166 = m.size[1];
-    x->__f2dace_SA_cell_blk_d_2_s_167 = m.size[2];
-    x->__f2dace_SOA_cell_blk_d_0_s_165 = m.lbound[0];
-    x->__f2dace_SOA_cell_blk_d_1_s_166 = m.lbound[1];
-    x->__f2dace_SOA_cell_blk_d_2_s_167 = m.lbound[2];
+    x->__f2dace_SA_cell_blk_d_0_s_215 = m.size[0];
+    x->__f2dace_SA_cell_blk_d_1_s_216 = m.size[1];
+    x->__f2dace_SA_cell_blk_d_2_s_217 = m.size[2];
+    x->__f2dace_SOA_cell_blk_d_0_s_215 = m.lbound[0];
+    x->__f2dace_SOA_cell_blk_d_1_s_216 = m.lbound[1];
+    x->__f2dace_SOA_cell_blk_d_2_s_217 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->cell_blk = m.read<std::remove_pointer<decltype(x->cell_blk)>::type>(s);
@@ -556,12 +698,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_vertex_idx_d_0_s_168 = m.size[0];
-    x->__f2dace_SA_vertex_idx_d_1_s_169 = m.size[1];
-    x->__f2dace_SA_vertex_idx_d_2_s_170 = m.size[2];
-    x->__f2dace_SOA_vertex_idx_d_0_s_168 = m.lbound[0];
-    x->__f2dace_SOA_vertex_idx_d_1_s_169 = m.lbound[1];
-    x->__f2dace_SOA_vertex_idx_d_2_s_170 = m.lbound[2];
+    x->__f2dace_SA_vertex_idx_d_0_s_218 = m.size[0];
+    x->__f2dace_SA_vertex_idx_d_1_s_219 = m.size[1];
+    x->__f2dace_SA_vertex_idx_d_2_s_220 = m.size[2];
+    x->__f2dace_SOA_vertex_idx_d_0_s_218 = m.lbound[0];
+    x->__f2dace_SOA_vertex_idx_d_1_s_219 = m.lbound[1];
+    x->__f2dace_SOA_vertex_idx_d_2_s_220 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->vertex_idx =
@@ -575,12 +717,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_vertex_blk_d_0_s_171 = m.size[0];
-    x->__f2dace_SA_vertex_blk_d_1_s_172 = m.size[1];
-    x->__f2dace_SA_vertex_blk_d_2_s_173 = m.size[2];
-    x->__f2dace_SOA_vertex_blk_d_0_s_171 = m.lbound[0];
-    x->__f2dace_SOA_vertex_blk_d_1_s_172 = m.lbound[1];
-    x->__f2dace_SOA_vertex_blk_d_2_s_173 = m.lbound[2];
+    x->__f2dace_SA_vertex_blk_d_0_s_221 = m.size[0];
+    x->__f2dace_SA_vertex_blk_d_1_s_222 = m.size[1];
+    x->__f2dace_SA_vertex_blk_d_2_s_223 = m.size[2];
+    x->__f2dace_SOA_vertex_blk_d_0_s_221 = m.lbound[0];
+    x->__f2dace_SOA_vertex_blk_d_1_s_222 = m.lbound[1];
+    x->__f2dace_SOA_vertex_blk_d_2_s_223 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->vertex_blk =
@@ -595,10 +737,10 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_tangent_orientation_d_0_s_174 = m.size[0];
-    x->__f2dace_SA_tangent_orientation_d_1_s_175 = m.size[1];
-    x->__f2dace_SOA_tangent_orientation_d_0_s_174 = m.lbound[0];
-    x->__f2dace_SOA_tangent_orientation_d_1_s_175 = m.lbound[1];
+    x->__f2dace_SA_tangent_orientation_d_0_s_224 = m.size[0];
+    x->__f2dace_SA_tangent_orientation_d_1_s_225 = m.size[1];
+    x->__f2dace_SOA_tangent_orientation_d_0_s_224 = m.lbound[0];
+    x->__f2dace_SOA_tangent_orientation_d_1_s_225 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->tangent_orientation =
@@ -612,12 +754,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_quad_idx_d_0_s_176 = m.size[0];
-    x->__f2dace_SA_quad_idx_d_1_s_177 = m.size[1];
-    x->__f2dace_SA_quad_idx_d_2_s_178 = m.size[2];
-    x->__f2dace_SOA_quad_idx_d_0_s_176 = m.lbound[0];
-    x->__f2dace_SOA_quad_idx_d_1_s_177 = m.lbound[1];
-    x->__f2dace_SOA_quad_idx_d_2_s_178 = m.lbound[2];
+    x->__f2dace_SA_quad_idx_d_0_s_226 = m.size[0];
+    x->__f2dace_SA_quad_idx_d_1_s_227 = m.size[1];
+    x->__f2dace_SA_quad_idx_d_2_s_228 = m.size[2];
+    x->__f2dace_SOA_quad_idx_d_0_s_226 = m.lbound[0];
+    x->__f2dace_SOA_quad_idx_d_1_s_227 = m.lbound[1];
+    x->__f2dace_SOA_quad_idx_d_2_s_228 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->quad_idx = m.read<std::remove_pointer<decltype(x->quad_idx)>::type>(s);
@@ -630,15 +772,56 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_quad_blk_d_0_s_179 = m.size[0];
-    x->__f2dace_SA_quad_blk_d_1_s_180 = m.size[1];
-    x->__f2dace_SA_quad_blk_d_2_s_181 = m.size[2];
-    x->__f2dace_SOA_quad_blk_d_0_s_179 = m.lbound[0];
-    x->__f2dace_SOA_quad_blk_d_1_s_180 = m.lbound[1];
-    x->__f2dace_SOA_quad_blk_d_2_s_181 = m.lbound[2];
+    x->__f2dace_SA_quad_blk_d_0_s_229 = m.size[0];
+    x->__f2dace_SA_quad_blk_d_1_s_230 = m.size[1];
+    x->__f2dace_SA_quad_blk_d_2_s_231 = m.size[2];
+    x->__f2dace_SOA_quad_blk_d_0_s_229 = m.lbound[0];
+    x->__f2dace_SOA_quad_blk_d_1_s_230 = m.lbound[1];
+    x->__f2dace_SOA_quad_blk_d_2_s_231 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->quad_blk = m.read<std::remove_pointer<decltype(x->quad_blk)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s,
+            {"# primal_normal_cell"}); // Should contain '# primal_normal_cell'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_primal_normal_cell_d_0_s_232 = m.size[0];
+    x->__f2dace_SA_primal_normal_cell_d_1_s_233 = m.size[1];
+    x->__f2dace_SA_primal_normal_cell_d_2_s_234 = m.size[2];
+    x->__f2dace_SOA_primal_normal_cell_d_0_s_232 = m.lbound[0];
+    x->__f2dace_SOA_primal_normal_cell_d_1_s_233 = m.lbound[1];
+    x->__f2dace_SOA_primal_normal_cell_d_2_s_234 = m.lbound[2];
+    // TODO: THIS IS POTENTIALLY BUGGY, BECAUSE IT IS NOT REALLY TESTED.
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->primal_normal_cell =
+        m.read<std::remove_pointer<decltype(x->primal_normal_cell)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# dual_normal_cell"}); // Should contain '# dual_normal_cell'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_dual_normal_cell_d_0_s_235 = m.size[0];
+    x->__f2dace_SA_dual_normal_cell_d_1_s_236 = m.size[1];
+    x->__f2dace_SA_dual_normal_cell_d_2_s_237 = m.size[2];
+    x->__f2dace_SOA_dual_normal_cell_d_0_s_235 = m.lbound[0];
+    x->__f2dace_SOA_dual_normal_cell_d_1_s_236 = m.lbound[1];
+    x->__f2dace_SOA_dual_normal_cell_d_2_s_237 = m.lbound[2];
+    // TODO: THIS IS POTENTIALLY BUGGY, BECAUSE IT IS NOT REALLY TESTED.
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->dual_normal_cell =
+        m.read<std::remove_pointer<decltype(x->dual_normal_cell)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# inv_primal_edge_length"}); // Should contain '#
@@ -649,10 +832,10 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_inv_primal_edge_length_d_0_s_182 = m.size[0];
-    x->__f2dace_SA_inv_primal_edge_length_d_1_s_183 = m.size[1];
-    x->__f2dace_SOA_inv_primal_edge_length_d_0_s_182 = m.lbound[0];
-    x->__f2dace_SOA_inv_primal_edge_length_d_1_s_183 = m.lbound[1];
+    x->__f2dace_SA_inv_primal_edge_length_d_0_s_238 = m.size[0];
+    x->__f2dace_SA_inv_primal_edge_length_d_1_s_239 = m.size[1];
+    x->__f2dace_SOA_inv_primal_edge_length_d_0_s_238 = m.lbound[0];
+    x->__f2dace_SOA_inv_primal_edge_length_d_1_s_239 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->inv_primal_edge_length =
@@ -668,10 +851,10 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_inv_dual_edge_length_d_0_s_184 = m.size[0];
-    x->__f2dace_SA_inv_dual_edge_length_d_1_s_185 = m.size[1];
-    x->__f2dace_SOA_inv_dual_edge_length_d_0_s_184 = m.lbound[0];
-    x->__f2dace_SOA_inv_dual_edge_length_d_1_s_185 = m.lbound[1];
+    x->__f2dace_SA_inv_dual_edge_length_d_0_s_240 = m.size[0];
+    x->__f2dace_SA_inv_dual_edge_length_d_1_s_241 = m.size[1];
+    x->__f2dace_SOA_inv_dual_edge_length_d_0_s_240 = m.lbound[0];
+    x->__f2dace_SOA_inv_dual_edge_length_d_1_s_241 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->inv_dual_edge_length =
@@ -685,10 +868,10 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_area_edge_d_0_s_186 = m.size[0];
-    x->__f2dace_SA_area_edge_d_1_s_187 = m.size[1];
-    x->__f2dace_SOA_area_edge_d_0_s_186 = m.lbound[0];
-    x->__f2dace_SOA_area_edge_d_1_s_187 = m.lbound[1];
+    x->__f2dace_SA_area_edge_d_0_s_242 = m.size[0];
+    x->__f2dace_SA_area_edge_d_1_s_243 = m.size[1];
+    x->__f2dace_SOA_area_edge_d_0_s_242 = m.lbound[0];
+    x->__f2dace_SOA_area_edge_d_1_s_243 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->area_edge = m.read<std::remove_pointer<decltype(x->area_edge)>::type>(s);
@@ -701,10 +884,10 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_f_e_d_0_s_188 = m.size[0];
-    x->__f2dace_SA_f_e_d_1_s_189 = m.size[1];
-    x->__f2dace_SOA_f_e_d_0_s_188 = m.lbound[0];
-    x->__f2dace_SOA_f_e_d_1_s_189 = m.lbound[1];
+    x->__f2dace_SA_f_e_d_0_s_244 = m.size[0];
+    x->__f2dace_SA_f_e_d_1_s_245 = m.size[1];
+    x->__f2dace_SOA_f_e_d_0_s_244 = m.lbound[0];
+    x->__f2dace_SOA_f_e_d_1_s_245 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->f_e = m.read<std::remove_pointer<decltype(x->f_e)>::type>(s);
@@ -717,10 +900,10 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_fn_e_d_0_s_190 = m.size[0];
-    x->__f2dace_SA_fn_e_d_1_s_191 = m.size[1];
-    x->__f2dace_SOA_fn_e_d_0_s_190 = m.lbound[0];
-    x->__f2dace_SOA_fn_e_d_1_s_191 = m.lbound[1];
+    x->__f2dace_SA_fn_e_d_0_s_246 = m.size[0];
+    x->__f2dace_SA_fn_e_d_1_s_247 = m.size[1];
+    x->__f2dace_SOA_fn_e_d_0_s_246 = m.lbound[0];
+    x->__f2dace_SOA_fn_e_d_1_s_247 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->fn_e = m.read<std::remove_pointer<decltype(x->fn_e)>::type>(s);
@@ -733,13 +916,30 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_ft_e_d_0_s_192 = m.size[0];
-    x->__f2dace_SA_ft_e_d_1_s_193 = m.size[1];
-    x->__f2dace_SOA_ft_e_d_0_s_192 = m.lbound[0];
-    x->__f2dace_SOA_ft_e_d_1_s_193 = m.lbound[1];
+    x->__f2dace_SA_ft_e_d_0_s_248 = m.size[0];
+    x->__f2dace_SA_ft_e_d_1_s_249 = m.size[1];
+    x->__f2dace_SOA_ft_e_d_0_s_248 = m.lbound[0];
+    x->__f2dace_SOA_ft_e_d_1_s_249 = m.lbound[1];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->ft_e = m.read<std::remove_pointer<decltype(x->ft_e)>::type>(s);
+
+  } // CONCLUDING IF
+  read_line(s, {"# refin_ctrl"}); // Should contain '# refin_ctrl'
+
+  read_line(s, {"# alloc"}); // Should contain '# alloc'
+  deserialize(&yep, s);
+  if (yep) { // BEGINING IF
+
+    m = read_array_meta(s);
+    x->__f2dace_SA_refin_ctrl_d_0_s_250 = m.size[0];
+    x->__f2dace_SA_refin_ctrl_d_1_s_251 = m.size[1];
+    x->__f2dace_SOA_refin_ctrl_d_0_s_250 = m.lbound[0];
+    x->__f2dace_SOA_refin_ctrl_d_1_s_251 = m.lbound[1];
+    // We only need to allocate a volume of contiguous memory, and let DaCe
+    // interpret (assuming it follows the same protocol as us).
+    x->refin_ctrl =
+        m.read<std::remove_pointer<decltype(x->refin_ctrl)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# start_index"}); // Should contain '# start_index'
@@ -749,8 +949,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_start_index_d_0_s_194 = m.size[0];
-    x->__f2dace_SOA_start_index_d_0_s_194 = m.lbound[0];
+    x->__f2dace_SA_start_index_d_0_s_252 = m.size[0];
+    x->__f2dace_SOA_start_index_d_0_s_252 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->start_index =
@@ -764,8 +964,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_end_index_d_0_s_195 = m.size[0];
-    x->__f2dace_SOA_end_index_d_0_s_195 = m.lbound[0];
+    x->__f2dace_SA_end_index_d_0_s_253 = m.size[0];
+    x->__f2dace_SOA_end_index_d_0_s_253 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
@@ -778,8 +978,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_start_block_d_0_s_196 = m.size[0];
-    x->__f2dace_SOA_start_block_d_0_s_196 = m.lbound[0];
+    x->__f2dace_SA_start_block_d_0_s_254 = m.size[0];
+    x->__f2dace_SOA_start_block_d_0_s_254 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->start_block =
@@ -793,8 +993,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_end_block_d_0_s_197 = m.size[0];
-    x->__f2dace_SOA_end_block_d_0_s_197 = m.lbound[0];
+    x->__f2dace_SA_end_block_d_0_s_255 = m.size[0];
+    x->__f2dace_SOA_end_block_d_0_s_255 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
@@ -812,12 +1012,12 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_cell_idx_d_0_s_198 = m.size[0];
-    x->__f2dace_SA_cell_idx_d_1_s_199 = m.size[1];
-    x->__f2dace_SA_cell_idx_d_2_s_200 = m.size[2];
-    x->__f2dace_SOA_cell_idx_d_0_s_198 = m.lbound[0];
-    x->__f2dace_SOA_cell_idx_d_1_s_199 = m.lbound[1];
-    x->__f2dace_SOA_cell_idx_d_2_s_200 = m.lbound[2];
+    x->__f2dace_SA_cell_idx_d_0_s_256 = m.size[0];
+    x->__f2dace_SA_cell_idx_d_1_s_257 = m.size[1];
+    x->__f2dace_SA_cell_idx_d_2_s_258 = m.size[2];
+    x->__f2dace_SOA_cell_idx_d_0_s_256 = m.lbound[0];
+    x->__f2dace_SOA_cell_idx_d_1_s_257 = m.lbound[1];
+    x->__f2dace_SOA_cell_idx_d_2_s_258 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->cell_idx = m.read<std::remove_pointer<decltype(x->cell_idx)>::type>(s);
@@ -830,12 +1030,12 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_cell_blk_d_0_s_201 = m.size[0];
-    x->__f2dace_SA_cell_blk_d_1_s_202 = m.size[1];
-    x->__f2dace_SA_cell_blk_d_2_s_203 = m.size[2];
-    x->__f2dace_SOA_cell_blk_d_0_s_201 = m.lbound[0];
-    x->__f2dace_SOA_cell_blk_d_1_s_202 = m.lbound[1];
-    x->__f2dace_SOA_cell_blk_d_2_s_203 = m.lbound[2];
+    x->__f2dace_SA_cell_blk_d_0_s_259 = m.size[0];
+    x->__f2dace_SA_cell_blk_d_1_s_260 = m.size[1];
+    x->__f2dace_SA_cell_blk_d_2_s_261 = m.size[2];
+    x->__f2dace_SOA_cell_blk_d_0_s_259 = m.lbound[0];
+    x->__f2dace_SOA_cell_blk_d_1_s_260 = m.lbound[1];
+    x->__f2dace_SOA_cell_blk_d_2_s_261 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->cell_blk = m.read<std::remove_pointer<decltype(x->cell_blk)>::type>(s);
@@ -848,12 +1048,12 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_edge_idx_d_0_s_204 = m.size[0];
-    x->__f2dace_SA_edge_idx_d_1_s_205 = m.size[1];
-    x->__f2dace_SA_edge_idx_d_2_s_206 = m.size[2];
-    x->__f2dace_SOA_edge_idx_d_0_s_204 = m.lbound[0];
-    x->__f2dace_SOA_edge_idx_d_1_s_205 = m.lbound[1];
-    x->__f2dace_SOA_edge_idx_d_2_s_206 = m.lbound[2];
+    x->__f2dace_SA_edge_idx_d_0_s_262 = m.size[0];
+    x->__f2dace_SA_edge_idx_d_1_s_263 = m.size[1];
+    x->__f2dace_SA_edge_idx_d_2_s_264 = m.size[2];
+    x->__f2dace_SOA_edge_idx_d_0_s_262 = m.lbound[0];
+    x->__f2dace_SOA_edge_idx_d_1_s_263 = m.lbound[1];
+    x->__f2dace_SOA_edge_idx_d_2_s_264 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->edge_idx = m.read<std::remove_pointer<decltype(x->edge_idx)>::type>(s);
@@ -866,12 +1066,12 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_edge_blk_d_0_s_207 = m.size[0];
-    x->__f2dace_SA_edge_blk_d_1_s_208 = m.size[1];
-    x->__f2dace_SA_edge_blk_d_2_s_209 = m.size[2];
-    x->__f2dace_SOA_edge_blk_d_0_s_207 = m.lbound[0];
-    x->__f2dace_SOA_edge_blk_d_1_s_208 = m.lbound[1];
-    x->__f2dace_SOA_edge_blk_d_2_s_209 = m.lbound[2];
+    x->__f2dace_SA_edge_blk_d_0_s_265 = m.size[0];
+    x->__f2dace_SA_edge_blk_d_1_s_266 = m.size[1];
+    x->__f2dace_SA_edge_blk_d_2_s_267 = m.size[2];
+    x->__f2dace_SOA_edge_blk_d_0_s_265 = m.lbound[0];
+    x->__f2dace_SOA_edge_blk_d_1_s_266 = m.lbound[1];
+    x->__f2dace_SOA_edge_blk_d_2_s_267 = m.lbound[2];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->edge_blk = m.read<std::remove_pointer<decltype(x->edge_blk)>::type>(s);
@@ -884,8 +1084,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_start_index_d_0_s_210 = m.size[0];
-    x->__f2dace_SOA_start_index_d_0_s_210 = m.lbound[0];
+    x->__f2dace_SA_start_index_d_0_s_268 = m.size[0];
+    x->__f2dace_SOA_start_index_d_0_s_268 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->start_index =
@@ -899,8 +1099,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_end_index_d_0_s_211 = m.size[0];
-    x->__f2dace_SOA_end_index_d_0_s_211 = m.lbound[0];
+    x->__f2dace_SA_end_index_d_0_s_269 = m.size[0];
+    x->__f2dace_SOA_end_index_d_0_s_269 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
@@ -913,8 +1113,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_start_block_d_0_s_212 = m.size[0];
-    x->__f2dace_SOA_start_block_d_0_s_212 = m.lbound[0];
+    x->__f2dace_SA_start_block_d_0_s_270 = m.size[0];
+    x->__f2dace_SOA_start_block_d_0_s_270 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->start_block =
@@ -928,8 +1128,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_end_block_d_0_s_213 = m.size[0];
-    x->__f2dace_SOA_end_block_d_0_s_213 = m.lbound[0];
+    x->__f2dace_SA_end_block_d_0_s_271 = m.size[0];
+    x->__f2dace_SOA_end_block_d_0_s_271 = m.lbound[0];
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
@@ -943,6 +1143,10 @@ void deserialize(t_patch *x, std::istream &s) {
   read_line(s, {"# id"}); // Should contain '# id'
 
   deserialize(&(x->id), s);
+
+  read_line(s, {"# n_childdom"}); // Should contain '# n_childdom'
+
+  deserialize(&(x->n_childdom), s);
 
   read_line(s, {"# nblks_c"}); // Should contain '# nblks_c'
 
@@ -994,12 +1198,12 @@ void deserialize(t_nh_prog *x, std::istream &s) {
 
   if (yep) {
     auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w)>::type>(s);
-    x->__f2dace_SA_w_d_0_s_354 = m.size.at(0);
-    x->__f2dace_SA_w_d_1_s_355 = m.size.at(1);
-    x->__f2dace_SA_w_d_2_s_356 = m.size.at(2);
-    x->__f2dace_SOA_w_d_0_s_354 = m.lbound.at(0);
-    x->__f2dace_SOA_w_d_1_s_355 = m.lbound.at(1);
-    x->__f2dace_SOA_w_d_2_s_356 = m.lbound.at(2);
+    x->__f2dace_SA_w_d_0_s_556 = m.size.at(0);
+    x->__f2dace_SA_w_d_1_s_557 = m.size.at(1);
+    x->__f2dace_SA_w_d_2_s_558 = m.size.at(2);
+    x->__f2dace_SOA_w_d_0_s_556 = m.lbound.at(0);
+    x->__f2dace_SOA_w_d_1_s_557 = m.lbound.at(1);
+    x->__f2dace_SOA_w_d_2_s_558 = m.lbound.at(2);
     x->w = arr;
   }
 
@@ -1010,12 +1214,12 @@ void deserialize(t_nh_prog *x, std::istream &s) {
 
   if (yep) {
     auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn)>::type>(s);
-    x->__f2dace_SA_vn_d_0_s_357 = m.size.at(0);
-    x->__f2dace_SA_vn_d_1_s_358 = m.size.at(1);
-    x->__f2dace_SA_vn_d_2_s_359 = m.size.at(2);
-    x->__f2dace_SOA_vn_d_0_s_357 = m.lbound.at(0);
-    x->__f2dace_SOA_vn_d_1_s_358 = m.lbound.at(1);
-    x->__f2dace_SOA_vn_d_2_s_359 = m.lbound.at(2);
+    x->__f2dace_SA_vn_d_0_s_559 = m.size.at(0);
+    x->__f2dace_SA_vn_d_1_s_560 = m.size.at(1);
+    x->__f2dace_SA_vn_d_2_s_561 = m.size.at(2);
+    x->__f2dace_SOA_vn_d_0_s_559 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_d_1_s_560 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_d_2_s_561 = m.lbound.at(2);
     x->vn = arr;
   }
 
@@ -1027,13 +1231,30 @@ void deserialize(t_nh_prog *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->rho)>::type>(s);
-    x->__f2dace_SA_rho_d_0_s_360 = m.size.at(0);
-    x->__f2dace_SA_rho_d_1_s_361 = m.size.at(1);
-    x->__f2dace_SA_rho_d_2_s_362 = m.size.at(2);
-    x->__f2dace_SOA_rho_d_0_s_360 = m.lbound.at(0);
-    x->__f2dace_SOA_rho_d_1_s_361 = m.lbound.at(1);
-    x->__f2dace_SOA_rho_d_2_s_362 = m.lbound.at(2);
+    x->__f2dace_SA_rho_d_0_s_562 = m.size.at(0);
+    x->__f2dace_SA_rho_d_1_s_563 = m.size.at(1);
+    x->__f2dace_SA_rho_d_2_s_564 = m.size.at(2);
+    x->__f2dace_SOA_rho_d_0_s_562 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_d_1_s_563 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_d_2_s_564 = m.lbound.at(2);
     x->rho = arr;
+  }
+
+  read_line(s, {"# exner"}); // Should contain '# exner'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->exner)>::type>(s);
+    x->__f2dace_SA_exner_d_0_s_565 = m.size.at(0);
+    x->__f2dace_SA_exner_d_1_s_566 = m.size.at(1);
+    x->__f2dace_SA_exner_d_2_s_567 = m.size.at(2);
+    x->__f2dace_SOA_exner_d_0_s_565 = m.lbound.at(0);
+    x->__f2dace_SOA_exner_d_1_s_566 = m.lbound.at(1);
+    x->__f2dace_SOA_exner_d_2_s_567 = m.lbound.at(2);
+    x->exner = arr;
   }
 
   read_line(s, {"# theta_v"}); // Should contain '# theta_v'
@@ -1044,12 +1265,12 @@ void deserialize(t_nh_prog *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->theta_v)>::type>(s);
-    x->__f2dace_SA_theta_v_d_0_s_363 = m.size.at(0);
-    x->__f2dace_SA_theta_v_d_1_s_364 = m.size.at(1);
-    x->__f2dace_SA_theta_v_d_2_s_365 = m.size.at(2);
-    x->__f2dace_SOA_theta_v_d_0_s_363 = m.lbound.at(0);
-    x->__f2dace_SOA_theta_v_d_1_s_364 = m.lbound.at(1);
-    x->__f2dace_SOA_theta_v_d_2_s_365 = m.lbound.at(2);
+    x->__f2dace_SA_theta_v_d_0_s_568 = m.size.at(0);
+    x->__f2dace_SA_theta_v_d_1_s_569 = m.size.at(1);
+    x->__f2dace_SA_theta_v_d_2_s_570 = m.size.at(2);
+    x->__f2dace_SOA_theta_v_d_0_s_568 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_v_d_1_s_569 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_v_d_2_s_570 = m.lbound.at(2);
     x->theta_v = arr;
   }
 }
@@ -1065,13 +1286,30 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->exner_pr)>::type>(s);
-    x->__f2dace_SA_exner_pr_d_0_s_366 = m.size.at(0);
-    x->__f2dace_SA_exner_pr_d_1_s_367 = m.size.at(1);
-    x->__f2dace_SA_exner_pr_d_2_s_368 = m.size.at(2);
-    x->__f2dace_SOA_exner_pr_d_0_s_366 = m.lbound.at(0);
-    x->__f2dace_SOA_exner_pr_d_1_s_367 = m.lbound.at(1);
-    x->__f2dace_SOA_exner_pr_d_2_s_368 = m.lbound.at(2);
+    x->__f2dace_SA_exner_pr_d_0_s_571 = m.size.at(0);
+    x->__f2dace_SA_exner_pr_d_1_s_572 = m.size.at(1);
+    x->__f2dace_SA_exner_pr_d_2_s_573 = m.size.at(2);
+    x->__f2dace_SOA_exner_pr_d_0_s_571 = m.lbound.at(0);
+    x->__f2dace_SOA_exner_pr_d_1_s_572 = m.lbound.at(1);
+    x->__f2dace_SOA_exner_pr_d_2_s_573 = m.lbound.at(2);
     x->exner_pr = arr;
+  }
+
+  read_line(s, {"# mass_fl_e"}); // Should contain '# mass_fl_e'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->mass_fl_e)>::type>(s);
+    x->__f2dace_SA_mass_fl_e_d_0_s_574 = m.size.at(0);
+    x->__f2dace_SA_mass_fl_e_d_1_s_575 = m.size.at(1);
+    x->__f2dace_SA_mass_fl_e_d_2_s_576 = m.size.at(2);
+    x->__f2dace_SOA_mass_fl_e_d_0_s_574 = m.lbound.at(0);
+    x->__f2dace_SOA_mass_fl_e_d_1_s_575 = m.lbound.at(1);
+    x->__f2dace_SOA_mass_fl_e_d_2_s_576 = m.lbound.at(2);
+    x->mass_fl_e = arr;
   }
 
   read_line(s, {"# rho_ic"}); // Should contain '# rho_ic'
@@ -1082,12 +1320,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->rho_ic)>::type>(s);
-    x->__f2dace_SA_rho_ic_d_0_s_369 = m.size.at(0);
-    x->__f2dace_SA_rho_ic_d_1_s_370 = m.size.at(1);
-    x->__f2dace_SA_rho_ic_d_2_s_371 = m.size.at(2);
-    x->__f2dace_SOA_rho_ic_d_0_s_369 = m.lbound.at(0);
-    x->__f2dace_SOA_rho_ic_d_1_s_370 = m.lbound.at(1);
-    x->__f2dace_SOA_rho_ic_d_2_s_371 = m.lbound.at(2);
+    x->__f2dace_SA_rho_ic_d_0_s_577 = m.size.at(0);
+    x->__f2dace_SA_rho_ic_d_1_s_578 = m.size.at(1);
+    x->__f2dace_SA_rho_ic_d_2_s_579 = m.size.at(2);
+    x->__f2dace_SOA_rho_ic_d_0_s_577 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_ic_d_1_s_578 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_ic_d_2_s_579 = m.lbound.at(2);
     x->rho_ic = arr;
   }
 
@@ -1099,13 +1337,285 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->theta_v_ic)>::type>(s);
-    x->__f2dace_SA_theta_v_ic_d_0_s_372 = m.size.at(0);
-    x->__f2dace_SA_theta_v_ic_d_1_s_373 = m.size.at(1);
-    x->__f2dace_SA_theta_v_ic_d_2_s_374 = m.size.at(2);
-    x->__f2dace_SOA_theta_v_ic_d_0_s_372 = m.lbound.at(0);
-    x->__f2dace_SOA_theta_v_ic_d_1_s_373 = m.lbound.at(1);
-    x->__f2dace_SOA_theta_v_ic_d_2_s_374 = m.lbound.at(2);
+    x->__f2dace_SA_theta_v_ic_d_0_s_580 = m.size.at(0);
+    x->__f2dace_SA_theta_v_ic_d_1_s_581 = m.size.at(1);
+    x->__f2dace_SA_theta_v_ic_d_2_s_582 = m.size.at(2);
+    x->__f2dace_SOA_theta_v_ic_d_0_s_580 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_v_ic_d_1_s_581 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_v_ic_d_2_s_582 = m.lbound.at(2);
     x->theta_v_ic = arr;
+  }
+
+  read_line(s, {"# grf_tend_vn"}); // Should contain '# grf_tend_vn'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->grf_tend_vn)>::type>(s);
+    x->__f2dace_SA_grf_tend_vn_d_0_s_583 = m.size.at(0);
+    x->__f2dace_SA_grf_tend_vn_d_1_s_584 = m.size.at(1);
+    x->__f2dace_SA_grf_tend_vn_d_2_s_585 = m.size.at(2);
+    x->__f2dace_SOA_grf_tend_vn_d_0_s_583 = m.lbound.at(0);
+    x->__f2dace_SOA_grf_tend_vn_d_1_s_584 = m.lbound.at(1);
+    x->__f2dace_SOA_grf_tend_vn_d_2_s_585 = m.lbound.at(2);
+    x->grf_tend_vn = arr;
+  }
+
+  read_line(s, {"# grf_tend_w"}); // Should contain '# grf_tend_w'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->grf_tend_w)>::type>(s);
+    x->__f2dace_SA_grf_tend_w_d_0_s_586 = m.size.at(0);
+    x->__f2dace_SA_grf_tend_w_d_1_s_587 = m.size.at(1);
+    x->__f2dace_SA_grf_tend_w_d_2_s_588 = m.size.at(2);
+    x->__f2dace_SOA_grf_tend_w_d_0_s_586 = m.lbound.at(0);
+    x->__f2dace_SOA_grf_tend_w_d_1_s_587 = m.lbound.at(1);
+    x->__f2dace_SOA_grf_tend_w_d_2_s_588 = m.lbound.at(2);
+    x->grf_tend_w = arr;
+  }
+
+  read_line(s, {"# grf_tend_rho"}); // Should contain '# grf_tend_rho'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->grf_tend_rho)>::type>(s);
+    x->__f2dace_SA_grf_tend_rho_d_0_s_589 = m.size.at(0);
+    x->__f2dace_SA_grf_tend_rho_d_1_s_590 = m.size.at(1);
+    x->__f2dace_SA_grf_tend_rho_d_2_s_591 = m.size.at(2);
+    x->__f2dace_SOA_grf_tend_rho_d_0_s_589 = m.lbound.at(0);
+    x->__f2dace_SOA_grf_tend_rho_d_1_s_590 = m.lbound.at(1);
+    x->__f2dace_SOA_grf_tend_rho_d_2_s_591 = m.lbound.at(2);
+    x->grf_tend_rho = arr;
+  }
+
+  read_line(s, {"# grf_tend_mflx"}); // Should contain '# grf_tend_mflx'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->grf_tend_mflx)>::type>(s);
+    x->__f2dace_SA_grf_tend_mflx_d_0_s_592 = m.size.at(0);
+    x->__f2dace_SA_grf_tend_mflx_d_1_s_593 = m.size.at(1);
+    x->__f2dace_SA_grf_tend_mflx_d_2_s_594 = m.size.at(2);
+    x->__f2dace_SOA_grf_tend_mflx_d_0_s_592 = m.lbound.at(0);
+    x->__f2dace_SOA_grf_tend_mflx_d_1_s_593 = m.lbound.at(1);
+    x->__f2dace_SOA_grf_tend_mflx_d_2_s_594 = m.lbound.at(2);
+    x->grf_tend_mflx = arr;
+  }
+
+  read_line(s, {"# grf_bdy_mflx"}); // Should contain '# grf_bdy_mflx'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->grf_bdy_mflx)>::type>(s);
+    x->__f2dace_SA_grf_bdy_mflx_d_0_s_595 = m.size.at(0);
+    x->__f2dace_SA_grf_bdy_mflx_d_1_s_596 = m.size.at(1);
+    x->__f2dace_SA_grf_bdy_mflx_d_2_s_597 = m.size.at(2);
+    x->__f2dace_SOA_grf_bdy_mflx_d_0_s_595 = m.lbound.at(0);
+    x->__f2dace_SOA_grf_bdy_mflx_d_1_s_596 = m.lbound.at(1);
+    x->__f2dace_SOA_grf_bdy_mflx_d_2_s_597 = m.lbound.at(2);
+    x->grf_bdy_mflx = arr;
+  }
+
+  read_line(s, {"# grf_tend_thv"}); // Should contain '# grf_tend_thv'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->grf_tend_thv)>::type>(s);
+    x->__f2dace_SA_grf_tend_thv_d_0_s_598 = m.size.at(0);
+    x->__f2dace_SA_grf_tend_thv_d_1_s_599 = m.size.at(1);
+    x->__f2dace_SA_grf_tend_thv_d_2_s_600 = m.size.at(2);
+    x->__f2dace_SOA_grf_tend_thv_d_0_s_598 = m.lbound.at(0);
+    x->__f2dace_SOA_grf_tend_thv_d_1_s_599 = m.lbound.at(1);
+    x->__f2dace_SOA_grf_tend_thv_d_2_s_600 = m.lbound.at(2);
+    x->grf_tend_thv = arr;
+  }
+
+  read_line(s, {"# vn_ie_int"}); // Should contain '# vn_ie_int'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vn_ie_int)>::type>(s);
+    x->__f2dace_SA_vn_ie_int_d_0_s_601 = m.size.at(0);
+    x->__f2dace_SA_vn_ie_int_d_1_s_602 = m.size.at(1);
+    x->__f2dace_SA_vn_ie_int_d_2_s_603 = m.size.at(2);
+    x->__f2dace_SOA_vn_ie_int_d_0_s_601 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_ie_int_d_1_s_602 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_ie_int_d_2_s_603 = m.lbound.at(2);
+    x->vn_ie_int = arr;
+  }
+
+  read_line(s, {"# vn_ie_ubc"}); // Should contain '# vn_ie_ubc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vn_ie_ubc)>::type>(s);
+    x->__f2dace_SA_vn_ie_ubc_d_0_s_604 = m.size.at(0);
+    x->__f2dace_SA_vn_ie_ubc_d_1_s_605 = m.size.at(1);
+    x->__f2dace_SA_vn_ie_ubc_d_2_s_606 = m.size.at(2);
+    x->__f2dace_SOA_vn_ie_ubc_d_0_s_604 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_ie_ubc_d_1_s_605 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_ie_ubc_d_2_s_606 = m.lbound.at(2);
+    x->vn_ie_ubc = arr;
+  }
+
+  read_line(s, {"# w_int"}); // Should contain '# w_int'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->w_int)>::type>(s);
+    x->__f2dace_SA_w_int_d_0_s_607 = m.size.at(0);
+    x->__f2dace_SA_w_int_d_1_s_608 = m.size.at(1);
+    x->__f2dace_SA_w_int_d_2_s_609 = m.size.at(2);
+    x->__f2dace_SOA_w_int_d_0_s_607 = m.lbound.at(0);
+    x->__f2dace_SOA_w_int_d_1_s_608 = m.lbound.at(1);
+    x->__f2dace_SOA_w_int_d_2_s_609 = m.lbound.at(2);
+    x->w_int = arr;
+  }
+
+  read_line(s, {"# w_ubc"}); // Should contain '# w_ubc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->w_ubc)>::type>(s);
+    x->__f2dace_SA_w_ubc_d_0_s_610 = m.size.at(0);
+    x->__f2dace_SA_w_ubc_d_1_s_611 = m.size.at(1);
+    x->__f2dace_SA_w_ubc_d_2_s_612 = m.size.at(2);
+    x->__f2dace_SOA_w_ubc_d_0_s_610 = m.lbound.at(0);
+    x->__f2dace_SOA_w_ubc_d_1_s_611 = m.lbound.at(1);
+    x->__f2dace_SOA_w_ubc_d_2_s_612 = m.lbound.at(2);
+    x->w_ubc = arr;
+  }
+
+  read_line(s, {"# theta_v_ic_int"}); // Should contain '# theta_v_ic_int'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->theta_v_ic_int)>::type>(s);
+    x->__f2dace_SA_theta_v_ic_int_d_0_s_613 = m.size.at(0);
+    x->__f2dace_SA_theta_v_ic_int_d_1_s_614 = m.size.at(1);
+    x->__f2dace_SA_theta_v_ic_int_d_2_s_615 = m.size.at(2);
+    x->__f2dace_SOA_theta_v_ic_int_d_0_s_613 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_v_ic_int_d_1_s_614 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_v_ic_int_d_2_s_615 = m.lbound.at(2);
+    x->theta_v_ic_int = arr;
+  }
+
+  read_line(s, {"# theta_v_ic_ubc"}); // Should contain '# theta_v_ic_ubc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->theta_v_ic_ubc)>::type>(s);
+    x->__f2dace_SA_theta_v_ic_ubc_d_0_s_616 = m.size.at(0);
+    x->__f2dace_SA_theta_v_ic_ubc_d_1_s_617 = m.size.at(1);
+    x->__f2dace_SA_theta_v_ic_ubc_d_2_s_618 = m.size.at(2);
+    x->__f2dace_SOA_theta_v_ic_ubc_d_0_s_616 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_v_ic_ubc_d_1_s_617 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_v_ic_ubc_d_2_s_618 = m.lbound.at(2);
+    x->theta_v_ic_ubc = arr;
+  }
+
+  read_line(s, {"# rho_ic_int"}); // Should contain '# rho_ic_int'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->rho_ic_int)>::type>(s);
+    x->__f2dace_SA_rho_ic_int_d_0_s_619 = m.size.at(0);
+    x->__f2dace_SA_rho_ic_int_d_1_s_620 = m.size.at(1);
+    x->__f2dace_SA_rho_ic_int_d_2_s_621 = m.size.at(2);
+    x->__f2dace_SOA_rho_ic_int_d_0_s_619 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_ic_int_d_1_s_620 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_ic_int_d_2_s_621 = m.lbound.at(2);
+    x->rho_ic_int = arr;
+  }
+
+  read_line(s, {"# rho_ic_ubc"}); // Should contain '# rho_ic_ubc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->rho_ic_ubc)>::type>(s);
+    x->__f2dace_SA_rho_ic_ubc_d_0_s_622 = m.size.at(0);
+    x->__f2dace_SA_rho_ic_ubc_d_1_s_623 = m.size.at(1);
+    x->__f2dace_SA_rho_ic_ubc_d_2_s_624 = m.size.at(2);
+    x->__f2dace_SOA_rho_ic_ubc_d_0_s_622 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_ic_ubc_d_1_s_623 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_ic_ubc_d_2_s_624 = m.lbound.at(2);
+    x->rho_ic_ubc = arr;
+  }
+
+  read_line(s, {"# mflx_ic_int"}); // Should contain '# mflx_ic_int'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->mflx_ic_int)>::type>(s);
+    x->__f2dace_SA_mflx_ic_int_d_0_s_625 = m.size.at(0);
+    x->__f2dace_SA_mflx_ic_int_d_1_s_626 = m.size.at(1);
+    x->__f2dace_SA_mflx_ic_int_d_2_s_627 = m.size.at(2);
+    x->__f2dace_SOA_mflx_ic_int_d_0_s_625 = m.lbound.at(0);
+    x->__f2dace_SOA_mflx_ic_int_d_1_s_626 = m.lbound.at(1);
+    x->__f2dace_SOA_mflx_ic_int_d_2_s_627 = m.lbound.at(2);
+    x->mflx_ic_int = arr;
+  }
+
+  read_line(s, {"# mflx_ic_ubc"}); // Should contain '# mflx_ic_ubc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->mflx_ic_ubc)>::type>(s);
+    x->__f2dace_SA_mflx_ic_ubc_d_0_s_628 = m.size.at(0);
+    x->__f2dace_SA_mflx_ic_ubc_d_1_s_629 = m.size.at(1);
+    x->__f2dace_SA_mflx_ic_ubc_d_2_s_630 = m.size.at(2);
+    x->__f2dace_SOA_mflx_ic_ubc_d_0_s_628 = m.lbound.at(0);
+    x->__f2dace_SOA_mflx_ic_ubc_d_1_s_629 = m.lbound.at(1);
+    x->__f2dace_SOA_mflx_ic_ubc_d_2_s_630 = m.lbound.at(2);
+    x->mflx_ic_ubc = arr;
   }
 
   read_line(s, {"# vn_incr"}); // Should contain '# vn_incr'
@@ -1116,13 +1626,47 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->vn_incr)>::type>(s);
-    x->__f2dace_SA_vn_incr_d_0_s_375 = m.size.at(0);
-    x->__f2dace_SA_vn_incr_d_1_s_376 = m.size.at(1);
-    x->__f2dace_SA_vn_incr_d_2_s_377 = m.size.at(2);
-    x->__f2dace_SOA_vn_incr_d_0_s_375 = m.lbound.at(0);
-    x->__f2dace_SOA_vn_incr_d_1_s_376 = m.lbound.at(1);
-    x->__f2dace_SOA_vn_incr_d_2_s_377 = m.lbound.at(2);
+    x->__f2dace_SA_vn_incr_d_0_s_631 = m.size.at(0);
+    x->__f2dace_SA_vn_incr_d_1_s_632 = m.size.at(1);
+    x->__f2dace_SA_vn_incr_d_2_s_633 = m.size.at(2);
+    x->__f2dace_SOA_vn_incr_d_0_s_631 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_incr_d_1_s_632 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_incr_d_2_s_633 = m.lbound.at(2);
     x->vn_incr = arr;
+  }
+
+  read_line(s, {"# exner_incr"}); // Should contain '# exner_incr'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->exner_incr)>::type>(s);
+    x->__f2dace_SA_exner_incr_d_0_s_634 = m.size.at(0);
+    x->__f2dace_SA_exner_incr_d_1_s_635 = m.size.at(1);
+    x->__f2dace_SA_exner_incr_d_2_s_636 = m.size.at(2);
+    x->__f2dace_SOA_exner_incr_d_0_s_634 = m.lbound.at(0);
+    x->__f2dace_SOA_exner_incr_d_1_s_635 = m.lbound.at(1);
+    x->__f2dace_SOA_exner_incr_d_2_s_636 = m.lbound.at(2);
+    x->exner_incr = arr;
+  }
+
+  read_line(s, {"# rho_incr"}); // Should contain '# rho_incr'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->rho_incr)>::type>(s);
+    x->__f2dace_SA_rho_incr_d_0_s_637 = m.size.at(0);
+    x->__f2dace_SA_rho_incr_d_1_s_638 = m.size.at(1);
+    x->__f2dace_SA_rho_incr_d_2_s_639 = m.size.at(2);
+    x->__f2dace_SOA_rho_incr_d_0_s_637 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_incr_d_1_s_638 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_incr_d_2_s_639 = m.lbound.at(2);
+    x->rho_incr = arr;
   }
 
   read_line(s, {"# vt"}); // Should contain '# vt'
@@ -1132,13 +1676,30 @@ void deserialize(t_nh_diag *x, std::istream &s) {
 
   if (yep) {
     auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vt)>::type>(s);
-    x->__f2dace_SA_vt_d_0_s_378 = m.size.at(0);
-    x->__f2dace_SA_vt_d_1_s_379 = m.size.at(1);
-    x->__f2dace_SA_vt_d_2_s_380 = m.size.at(2);
-    x->__f2dace_SOA_vt_d_0_s_378 = m.lbound.at(0);
-    x->__f2dace_SOA_vt_d_1_s_379 = m.lbound.at(1);
-    x->__f2dace_SOA_vt_d_2_s_380 = m.lbound.at(2);
+    x->__f2dace_SA_vt_d_0_s_640 = m.size.at(0);
+    x->__f2dace_SA_vt_d_1_s_641 = m.size.at(1);
+    x->__f2dace_SA_vt_d_2_s_642 = m.size.at(2);
+    x->__f2dace_SOA_vt_d_0_s_640 = m.lbound.at(0);
+    x->__f2dace_SOA_vt_d_1_s_641 = m.lbound.at(1);
+    x->__f2dace_SOA_vt_d_2_s_642 = m.lbound.at(2);
     x->vt = arr;
+  }
+
+  read_line(s, {"# ddt_exner_phy"}); // Should contain '# ddt_exner_phy'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddt_exner_phy)>::type>(s);
+    x->__f2dace_SA_ddt_exner_phy_d_0_s_643 = m.size.at(0);
+    x->__f2dace_SA_ddt_exner_phy_d_1_s_644 = m.size.at(1);
+    x->__f2dace_SA_ddt_exner_phy_d_2_s_645 = m.size.at(2);
+    x->__f2dace_SOA_ddt_exner_phy_d_0_s_643 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_exner_phy_d_1_s_644 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_exner_phy_d_2_s_645 = m.lbound.at(2);
+    x->ddt_exner_phy = arr;
   }
 
   read_line(s, {"# ddt_vn_phy"}); // Should contain '# ddt_vn_phy'
@@ -1149,13 +1710,30 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_phy)>::type>(s);
-    x->__f2dace_SA_ddt_vn_phy_d_0_s_381 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_phy_d_1_s_382 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_phy_d_2_s_383 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_phy_d_0_s_381 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_phy_d_1_s_382 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_phy_d_2_s_383 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_phy_d_0_s_646 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_phy_d_1_s_647 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_phy_d_2_s_648 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_phy_d_0_s_646 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_phy_d_1_s_647 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_phy_d_2_s_648 = m.lbound.at(2);
     x->ddt_vn_phy = arr;
+  }
+
+  read_line(s, {"# exner_dyn_incr"}); // Should contain '# exner_dyn_incr'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->exner_dyn_incr)>::type>(s);
+    x->__f2dace_SA_exner_dyn_incr_d_0_s_649 = m.size.at(0);
+    x->__f2dace_SA_exner_dyn_incr_d_1_s_650 = m.size.at(1);
+    x->__f2dace_SA_exner_dyn_incr_d_2_s_651 = m.size.at(2);
+    x->__f2dace_SOA_exner_dyn_incr_d_0_s_649 = m.lbound.at(0);
+    x->__f2dace_SOA_exner_dyn_incr_d_1_s_650 = m.lbound.at(1);
+    x->__f2dace_SOA_exner_dyn_incr_d_2_s_651 = m.lbound.at(2);
+    x->exner_dyn_incr = arr;
   }
 
   read_line(s, {"# vn_ie"}); // Should contain '# vn_ie'
@@ -1166,12 +1744,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
-    x->__f2dace_SA_vn_ie_d_0_s_384 = m.size.at(0);
-    x->__f2dace_SA_vn_ie_d_1_s_385 = m.size.at(1);
-    x->__f2dace_SA_vn_ie_d_2_s_386 = m.size.at(2);
-    x->__f2dace_SOA_vn_ie_d_0_s_384 = m.lbound.at(0);
-    x->__f2dace_SOA_vn_ie_d_1_s_385 = m.lbound.at(1);
-    x->__f2dace_SOA_vn_ie_d_2_s_386 = m.lbound.at(2);
+    x->__f2dace_SA_vn_ie_d_0_s_652 = m.size.at(0);
+    x->__f2dace_SA_vn_ie_d_1_s_653 = m.size.at(1);
+    x->__f2dace_SA_vn_ie_d_2_s_654 = m.size.at(2);
+    x->__f2dace_SOA_vn_ie_d_0_s_652 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_ie_d_1_s_653 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_ie_d_2_s_654 = m.lbound.at(2);
     x->vn_ie = arr;
   }
 
@@ -1183,13 +1761,30 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
-    x->__f2dace_SA_w_concorr_c_d_0_s_387 = m.size.at(0);
-    x->__f2dace_SA_w_concorr_c_d_1_s_388 = m.size.at(1);
-    x->__f2dace_SA_w_concorr_c_d_2_s_389 = m.size.at(2);
-    x->__f2dace_SOA_w_concorr_c_d_0_s_387 = m.lbound.at(0);
-    x->__f2dace_SOA_w_concorr_c_d_1_s_388 = m.lbound.at(1);
-    x->__f2dace_SOA_w_concorr_c_d_2_s_389 = m.lbound.at(2);
+    x->__f2dace_SA_w_concorr_c_d_0_s_655 = m.size.at(0);
+    x->__f2dace_SA_w_concorr_c_d_1_s_656 = m.size.at(1);
+    x->__f2dace_SA_w_concorr_c_d_2_s_657 = m.size.at(2);
+    x->__f2dace_SOA_w_concorr_c_d_0_s_655 = m.lbound.at(0);
+    x->__f2dace_SOA_w_concorr_c_d_1_s_656 = m.lbound.at(1);
+    x->__f2dace_SOA_w_concorr_c_d_2_s_657 = m.lbound.at(2);
     x->w_concorr_c = arr;
+  }
+
+  read_line(s, {"# mass_fl_e_sv"}); // Should contain '# mass_fl_e_sv'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->mass_fl_e_sv)>::type>(s);
+    x->__f2dace_SA_mass_fl_e_sv_d_0_s_658 = m.size.at(0);
+    x->__f2dace_SA_mass_fl_e_sv_d_1_s_659 = m.size.at(1);
+    x->__f2dace_SA_mass_fl_e_sv_d_2_s_660 = m.size.at(2);
+    x->__f2dace_SOA_mass_fl_e_sv_d_0_s_658 = m.lbound.at(0);
+    x->__f2dace_SOA_mass_fl_e_sv_d_1_s_659 = m.lbound.at(1);
+    x->__f2dace_SOA_mass_fl_e_sv_d_2_s_660 = m.lbound.at(2);
+    x->mass_fl_e_sv = arr;
   }
 
   read_line(s, {"# ddt_vn_apc_pc"}); // Should contain '# ddt_vn_apc_pc'
@@ -1200,14 +1795,14 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_0_s_390 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_1_s_391 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_2_s_392 = m.size.at(2);
-    x->__f2dace_SA_ddt_vn_apc_pc_d_3_s_393 = m.size.at(3);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_0_s_390 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_1_s_391 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_2_s_392 = m.lbound.at(2);
-    x->__f2dace_SOA_ddt_vn_apc_pc_d_3_s_393 = m.lbound.at(3);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_0_s_661 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_1_s_662 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_2_s_663 = m.size.at(2);
+    x->__f2dace_SA_ddt_vn_apc_pc_d_3_s_664 = m.size.at(3);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_0_s_661 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_1_s_662 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_2_s_663 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_vn_apc_pc_d_3_s_664 = m.lbound.at(3);
     x->ddt_vn_apc_pc = arr;
   }
 
@@ -1219,14 +1814,14 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_cor_pc)>::type>(s);
-    x->__f2dace_SA_ddt_vn_cor_pc_d_0_s_394 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_cor_pc_d_1_s_395 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_cor_pc_d_2_s_396 = m.size.at(2);
-    x->__f2dace_SA_ddt_vn_cor_pc_d_3_s_397 = m.size.at(3);
-    x->__f2dace_SOA_ddt_vn_cor_pc_d_0_s_394 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_cor_pc_d_1_s_395 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_cor_pc_d_2_s_396 = m.lbound.at(2);
-    x->__f2dace_SOA_ddt_vn_cor_pc_d_3_s_397 = m.lbound.at(3);
+    x->__f2dace_SA_ddt_vn_cor_pc_d_0_s_665 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_cor_pc_d_1_s_666 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_cor_pc_d_2_s_667 = m.size.at(2);
+    x->__f2dace_SA_ddt_vn_cor_pc_d_3_s_668 = m.size.at(3);
+    x->__f2dace_SOA_ddt_vn_cor_pc_d_0_s_665 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_cor_pc_d_1_s_666 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_cor_pc_d_2_s_667 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_vn_cor_pc_d_3_s_668 = m.lbound.at(3);
     x->ddt_vn_cor_pc = arr;
   }
 
@@ -1238,14 +1833,14 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
-    x->__f2dace_SA_ddt_w_adv_pc_d_0_s_398 = m.size.at(0);
-    x->__f2dace_SA_ddt_w_adv_pc_d_1_s_399 = m.size.at(1);
-    x->__f2dace_SA_ddt_w_adv_pc_d_2_s_400 = m.size.at(2);
-    x->__f2dace_SA_ddt_w_adv_pc_d_3_s_401 = m.size.at(3);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_0_s_398 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_1_s_399 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_2_s_400 = m.lbound.at(2);
-    x->__f2dace_SOA_ddt_w_adv_pc_d_3_s_401 = m.lbound.at(3);
+    x->__f2dace_SA_ddt_w_adv_pc_d_0_s_669 = m.size.at(0);
+    x->__f2dace_SA_ddt_w_adv_pc_d_1_s_670 = m.size.at(1);
+    x->__f2dace_SA_ddt_w_adv_pc_d_2_s_671 = m.size.at(2);
+    x->__f2dace_SA_ddt_w_adv_pc_d_3_s_672 = m.size.at(3);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_0_s_669 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_1_s_670 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_2_s_671 = m.lbound.at(2);
+    x->__f2dace_SOA_ddt_w_adv_pc_d_3_s_672 = m.lbound.at(3);
     x->ddt_w_adv_pc = arr;
   }
 
@@ -1257,12 +1852,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_dyn)>::type>(s);
-    x->__f2dace_SA_ddt_vn_dyn_d_0_s_402 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_dyn_d_1_s_403 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_dyn_d_2_s_404 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_dyn_d_0_s_402 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_dyn_d_1_s_403 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_dyn_d_2_s_404 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_dyn_d_0_s_673 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_dyn_d_1_s_674 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_dyn_d_2_s_675 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_dyn_d_0_s_673 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_dyn_d_1_s_674 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_dyn_d_2_s_675 = m.lbound.at(2);
     x->ddt_vn_dyn = arr;
   }
 
@@ -1274,12 +1869,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_dmp)>::type>(s);
-    x->__f2dace_SA_ddt_vn_dmp_d_0_s_405 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_dmp_d_1_s_406 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_dmp_d_2_s_407 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_dmp_d_0_s_405 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_dmp_d_1_s_406 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_dmp_d_2_s_407 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_dmp_d_0_s_676 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_dmp_d_1_s_677 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_dmp_d_2_s_678 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_dmp_d_0_s_676 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_dmp_d_1_s_677 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_dmp_d_2_s_678 = m.lbound.at(2);
     x->ddt_vn_dmp = arr;
   }
 
@@ -1291,12 +1886,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_adv)>::type>(s);
-    x->__f2dace_SA_ddt_vn_adv_d_0_s_408 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_adv_d_1_s_409 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_adv_d_2_s_410 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_adv_d_0_s_408 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_adv_d_1_s_409 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_adv_d_2_s_410 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_adv_d_0_s_679 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_adv_d_1_s_680 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_adv_d_2_s_681 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_adv_d_0_s_679 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_adv_d_1_s_680 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_adv_d_2_s_681 = m.lbound.at(2);
     x->ddt_vn_adv = arr;
   }
 
@@ -1308,12 +1903,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_cor)>::type>(s);
-    x->__f2dace_SA_ddt_vn_cor_d_0_s_411 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_cor_d_1_s_412 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_cor_d_2_s_413 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_cor_d_0_s_411 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_cor_d_1_s_412 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_cor_d_2_s_413 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_cor_d_0_s_682 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_cor_d_1_s_683 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_cor_d_2_s_684 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_cor_d_0_s_682 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_cor_d_1_s_683 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_cor_d_2_s_684 = m.lbound.at(2);
     x->ddt_vn_cor = arr;
   }
 
@@ -1325,12 +1920,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_pgr)>::type>(s);
-    x->__f2dace_SA_ddt_vn_pgr_d_0_s_414 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_pgr_d_1_s_415 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_pgr_d_2_s_416 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_pgr_d_0_s_414 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_pgr_d_1_s_415 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_pgr_d_2_s_416 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_pgr_d_0_s_685 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_pgr_d_1_s_686 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_pgr_d_2_s_687 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_pgr_d_0_s_685 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_pgr_d_1_s_686 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_pgr_d_2_s_687 = m.lbound.at(2);
     x->ddt_vn_pgr = arr;
   }
 
@@ -1342,12 +1937,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_phd)>::type>(s);
-    x->__f2dace_SA_ddt_vn_phd_d_0_s_417 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_phd_d_1_s_418 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_phd_d_2_s_419 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_phd_d_0_s_417 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_phd_d_1_s_418 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_phd_d_2_s_419 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_phd_d_0_s_688 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_phd_d_1_s_689 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_phd_d_2_s_690 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_phd_d_0_s_688 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_phd_d_1_s_689 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_phd_d_2_s_690 = m.lbound.at(2);
     x->ddt_vn_phd = arr;
   }
 
@@ -1359,12 +1954,12 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_iau)>::type>(s);
-    x->__f2dace_SA_ddt_vn_iau_d_0_s_420 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_iau_d_1_s_421 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_iau_d_2_s_422 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_iau_d_0_s_420 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_iau_d_1_s_421 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_iau_d_2_s_422 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_iau_d_0_s_691 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_iau_d_1_s_692 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_iau_d_2_s_693 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_iau_d_0_s_691 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_iau_d_1_s_692 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_iau_d_2_s_693 = m.lbound.at(2);
     x->ddt_vn_iau = arr;
   }
 
@@ -1376,13 +1971,30 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddt_vn_ray)>::type>(s);
-    x->__f2dace_SA_ddt_vn_ray_d_0_s_423 = m.size.at(0);
-    x->__f2dace_SA_ddt_vn_ray_d_1_s_424 = m.size.at(1);
-    x->__f2dace_SA_ddt_vn_ray_d_2_s_425 = m.size.at(2);
-    x->__f2dace_SOA_ddt_vn_ray_d_0_s_423 = m.lbound.at(0);
-    x->__f2dace_SOA_ddt_vn_ray_d_1_s_424 = m.lbound.at(1);
-    x->__f2dace_SOA_ddt_vn_ray_d_2_s_425 = m.lbound.at(2);
+    x->__f2dace_SA_ddt_vn_ray_d_0_s_694 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_ray_d_1_s_695 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_ray_d_2_s_696 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_ray_d_0_s_694 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_ray_d_1_s_695 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_ray_d_2_s_696 = m.lbound.at(2);
     x->ddt_vn_ray = arr;
+  }
+
+  read_line(s, {"# ddt_vn_grf"}); // Should contain '# ddt_vn_grf'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddt_vn_grf)>::type>(s);
+    x->__f2dace_SA_ddt_vn_grf_d_0_s_697 = m.size.at(0);
+    x->__f2dace_SA_ddt_vn_grf_d_1_s_698 = m.size.at(1);
+    x->__f2dace_SA_ddt_vn_grf_d_2_s_699 = m.size.at(2);
+    x->__f2dace_SOA_ddt_vn_grf_d_0_s_697 = m.lbound.at(0);
+    x->__f2dace_SOA_ddt_vn_grf_d_1_s_698 = m.lbound.at(1);
+    x->__f2dace_SOA_ddt_vn_grf_d_2_s_699 = m.lbound.at(2);
+    x->ddt_vn_grf = arr;
   }
 
   read_line(s, {"# ddt_vn_dyn_is_associated"}); // Should contain '#
@@ -1425,6 +2037,11 @@ void deserialize(t_nh_diag *x, std::istream &s) {
 
   deserialize(&(x->ddt_vn_ray_is_associated), s);
 
+  read_line(s, {"# ddt_vn_grf_is_associated"}); // Should contain '#
+                                                // ddt_vn_grf_is_associated'
+
+  deserialize(&(x->ddt_vn_grf_is_associated), s);
+
   read_line(s, {"# max_vcfl_dyn"}); // Should contain '# max_vcfl_dyn'
 
   deserialize(&(x->max_vcfl_dyn), s);
@@ -1441,19 +2058,49 @@ void deserialize(t_nh_ref *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->vn_ref)>::type>(s);
-    x->__f2dace_SA_vn_ref_d_0_s_426 = m.size.at(0);
-    x->__f2dace_SA_vn_ref_d_1_s_427 = m.size.at(1);
-    x->__f2dace_SA_vn_ref_d_2_s_428 = m.size.at(2);
-    x->__f2dace_SOA_vn_ref_d_0_s_426 = m.lbound.at(0);
-    x->__f2dace_SOA_vn_ref_d_1_s_427 = m.lbound.at(1);
-    x->__f2dace_SOA_vn_ref_d_2_s_428 = m.lbound.at(2);
+    x->__f2dace_SA_vn_ref_d_0_s_700 = m.size.at(0);
+    x->__f2dace_SA_vn_ref_d_1_s_701 = m.size.at(1);
+    x->__f2dace_SA_vn_ref_d_2_s_702 = m.size.at(2);
+    x->__f2dace_SOA_vn_ref_d_0_s_700 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_ref_d_1_s_701 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_ref_d_2_s_702 = m.lbound.at(2);
     x->vn_ref = arr;
+  }
+
+  read_line(s, {"# w_ref"}); // Should contain '# w_ref'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->w_ref)>::type>(s);
+    x->__f2dace_SA_w_ref_d_0_s_703 = m.size.at(0);
+    x->__f2dace_SA_w_ref_d_1_s_704 = m.size.at(1);
+    x->__f2dace_SA_w_ref_d_2_s_705 = m.size.at(2);
+    x->__f2dace_SOA_w_ref_d_0_s_703 = m.lbound.at(0);
+    x->__f2dace_SOA_w_ref_d_1_s_704 = m.lbound.at(1);
+    x->__f2dace_SOA_w_ref_d_2_s_705 = m.lbound.at(2);
+    x->w_ref = arr;
   }
 }
 
 void deserialize(t_nh_metrics *x, std::istream &s) {
   bool yep;
   array_meta m;
+  read_line(s, {"# rayleigh_w"}); // Should contain '# rayleigh_w'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->rayleigh_w)>::type>(s);
+    x->__f2dace_SA_rayleigh_w_d_0_s_706 = m.size.at(0);
+    x->__f2dace_SOA_rayleigh_w_d_0_s_706 = m.lbound.at(0);
+    x->rayleigh_w = arr;
+  }
+
   read_line(s, {"# rayleigh_vn"}); // Should contain '# rayleigh_vn'
 
   read_line(s, {"# assoc"}); // Should contain '# assoc'
@@ -1462,8 +2109,8 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->rayleigh_vn)>::type>(s);
-    x->__f2dace_SA_rayleigh_vn_d_0_s_429 = m.size.at(0);
-    x->__f2dace_SOA_rayleigh_vn_d_0_s_429 = m.lbound.at(0);
+    x->__f2dace_SA_rayleigh_vn_d_0_s_707 = m.size.at(0);
+    x->__f2dace_SOA_rayleigh_vn_d_0_s_707 = m.lbound.at(0);
     x->rayleigh_vn = arr;
   }
 
@@ -1475,8 +2122,8 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->scalfac_dd3d)>::type>(s);
-    x->__f2dace_SA_scalfac_dd3d_d_0_s_430 = m.size.at(0);
-    x->__f2dace_SOA_scalfac_dd3d_d_0_s_430 = m.lbound.at(0);
+    x->__f2dace_SA_scalfac_dd3d_d_0_s_708 = m.size.at(0);
+    x->__f2dace_SOA_scalfac_dd3d_d_0_s_708 = m.lbound.at(0);
     x->scalfac_dd3d = arr;
   }
 
@@ -1488,10 +2135,10 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->hmask_dd3d)>::type>(s);
-    x->__f2dace_SA_hmask_dd3d_d_0_s_431 = m.size.at(0);
-    x->__f2dace_SA_hmask_dd3d_d_1_s_432 = m.size.at(1);
-    x->__f2dace_SOA_hmask_dd3d_d_0_s_431 = m.lbound.at(0);
-    x->__f2dace_SOA_hmask_dd3d_d_1_s_432 = m.lbound.at(1);
+    x->__f2dace_SA_hmask_dd3d_d_0_s_709 = m.size.at(0);
+    x->__f2dace_SA_hmask_dd3d_d_1_s_710 = m.size.at(1);
+    x->__f2dace_SOA_hmask_dd3d_d_0_s_709 = m.lbound.at(0);
+    x->__f2dace_SOA_hmask_dd3d_d_1_s_710 = m.lbound.at(1);
     x->hmask_dd3d = arr;
   }
 
@@ -1503,11 +2150,60 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->vwind_expl_wgt)>::type>(s);
-    x->__f2dace_SA_vwind_expl_wgt_d_0_s_433 = m.size.at(0);
-    x->__f2dace_SA_vwind_expl_wgt_d_1_s_434 = m.size.at(1);
-    x->__f2dace_SOA_vwind_expl_wgt_d_0_s_433 = m.lbound.at(0);
-    x->__f2dace_SOA_vwind_expl_wgt_d_1_s_434 = m.lbound.at(1);
+    x->__f2dace_SA_vwind_expl_wgt_d_0_s_711 = m.size.at(0);
+    x->__f2dace_SA_vwind_expl_wgt_d_1_s_712 = m.size.at(1);
+    x->__f2dace_SOA_vwind_expl_wgt_d_0_s_711 = m.lbound.at(0);
+    x->__f2dace_SOA_vwind_expl_wgt_d_1_s_712 = m.lbound.at(1);
     x->vwind_expl_wgt = arr;
+  }
+
+  read_line(s, {"# vwind_impl_wgt"}); // Should contain '# vwind_impl_wgt'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vwind_impl_wgt)>::type>(s);
+    x->__f2dace_SA_vwind_impl_wgt_d_0_s_713 = m.size.at(0);
+    x->__f2dace_SA_vwind_impl_wgt_d_1_s_714 = m.size.at(1);
+    x->__f2dace_SOA_vwind_impl_wgt_d_0_s_713 = m.lbound.at(0);
+    x->__f2dace_SOA_vwind_impl_wgt_d_1_s_714 = m.lbound.at(1);
+    x->vwind_impl_wgt = arr;
+  }
+
+  read_line(s, {"# ddxn_z_full"}); // Should contain '# ddxn_z_full'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
+    x->__f2dace_SA_ddxn_z_full_d_0_s_715 = m.size.at(0);
+    x->__f2dace_SA_ddxn_z_full_d_1_s_716 = m.size.at(1);
+    x->__f2dace_SA_ddxn_z_full_d_2_s_717 = m.size.at(2);
+    x->__f2dace_SOA_ddxn_z_full_d_0_s_715 = m.lbound.at(0);
+    x->__f2dace_SOA_ddxn_z_full_d_1_s_716 = m.lbound.at(1);
+    x->__f2dace_SOA_ddxn_z_full_d_2_s_717 = m.lbound.at(2);
+    x->ddxn_z_full = arr;
+  }
+
+  read_line(s, {"# ddxt_z_full"}); // Should contain '# ddxt_z_full'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
+    x->__f2dace_SA_ddxt_z_full_d_0_s_718 = m.size.at(0);
+    x->__f2dace_SA_ddxt_z_full_d_1_s_719 = m.size.at(1);
+    x->__f2dace_SA_ddxt_z_full_d_2_s_720 = m.size.at(2);
+    x->__f2dace_SOA_ddxt_z_full_d_0_s_718 = m.lbound.at(0);
+    x->__f2dace_SOA_ddxt_z_full_d_1_s_719 = m.lbound.at(1);
+    x->__f2dace_SOA_ddxt_z_full_d_2_s_720 = m.lbound.at(2);
+    x->ddxt_z_full = arr;
   }
 
   read_line(s, {"# ddqz_z_full_e"}); // Should contain '# ddqz_z_full_e'
@@ -1518,12 +2214,12 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
-    x->__f2dace_SA_ddqz_z_full_e_d_0_s_435 = m.size.at(0);
-    x->__f2dace_SA_ddqz_z_full_e_d_1_s_436 = m.size.at(1);
-    x->__f2dace_SA_ddqz_z_full_e_d_2_s_437 = m.size.at(2);
-    x->__f2dace_SOA_ddqz_z_full_e_d_0_s_435 = m.lbound.at(0);
-    x->__f2dace_SOA_ddqz_z_full_e_d_1_s_436 = m.lbound.at(1);
-    x->__f2dace_SOA_ddqz_z_full_e_d_2_s_437 = m.lbound.at(2);
+    x->__f2dace_SA_ddqz_z_full_e_d_0_s_721 = m.size.at(0);
+    x->__f2dace_SA_ddqz_z_full_e_d_1_s_722 = m.size.at(1);
+    x->__f2dace_SA_ddqz_z_full_e_d_2_s_723 = m.size.at(2);
+    x->__f2dace_SOA_ddqz_z_full_e_d_0_s_721 = m.lbound.at(0);
+    x->__f2dace_SOA_ddqz_z_full_e_d_1_s_722 = m.lbound.at(1);
+    x->__f2dace_SOA_ddqz_z_full_e_d_2_s_723 = m.lbound.at(2);
     x->ddqz_z_full_e = arr;
   }
 
@@ -1535,13 +2231,31 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
-    x->__f2dace_SA_ddqz_z_half_d_0_s_438 = m.size.at(0);
-    x->__f2dace_SA_ddqz_z_half_d_1_s_439 = m.size.at(1);
-    x->__f2dace_SA_ddqz_z_half_d_2_s_440 = m.size.at(2);
-    x->__f2dace_SOA_ddqz_z_half_d_0_s_438 = m.lbound.at(0);
-    x->__f2dace_SOA_ddqz_z_half_d_1_s_439 = m.lbound.at(1);
-    x->__f2dace_SOA_ddqz_z_half_d_2_s_440 = m.lbound.at(2);
+    x->__f2dace_SA_ddqz_z_half_d_0_s_724 = m.size.at(0);
+    x->__f2dace_SA_ddqz_z_half_d_1_s_725 = m.size.at(1);
+    x->__f2dace_SA_ddqz_z_half_d_2_s_726 = m.size.at(2);
+    x->__f2dace_SOA_ddqz_z_half_d_0_s_724 = m.lbound.at(0);
+    x->__f2dace_SOA_ddqz_z_half_d_1_s_725 = m.lbound.at(1);
+    x->__f2dace_SOA_ddqz_z_half_d_2_s_726 = m.lbound.at(2);
     x->ddqz_z_half = arr;
+  }
+
+  read_line(s, {"# inv_ddqz_z_full"}); // Should contain '# inv_ddqz_z_full'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->inv_ddqz_z_full)>::type>(
+            s);
+    x->__f2dace_SA_inv_ddqz_z_full_d_0_s_727 = m.size.at(0);
+    x->__f2dace_SA_inv_ddqz_z_full_d_1_s_728 = m.size.at(1);
+    x->__f2dace_SA_inv_ddqz_z_full_d_2_s_729 = m.size.at(2);
+    x->__f2dace_SOA_inv_ddqz_z_full_d_0_s_727 = m.lbound.at(0);
+    x->__f2dace_SOA_inv_ddqz_z_full_d_1_s_728 = m.lbound.at(1);
+    x->__f2dace_SOA_inv_ddqz_z_full_d_2_s_729 = m.lbound.at(2);
+    x->inv_ddqz_z_full = arr;
   }
 
   read_line(s, {"# wgtfac_c"}); // Should contain '# wgtfac_c'
@@ -1552,13 +2266,81 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
-    x->__f2dace_SA_wgtfac_c_d_0_s_441 = m.size.at(0);
-    x->__f2dace_SA_wgtfac_c_d_1_s_442 = m.size.at(1);
-    x->__f2dace_SA_wgtfac_c_d_2_s_443 = m.size.at(2);
-    x->__f2dace_SOA_wgtfac_c_d_0_s_441 = m.lbound.at(0);
-    x->__f2dace_SOA_wgtfac_c_d_1_s_442 = m.lbound.at(1);
-    x->__f2dace_SOA_wgtfac_c_d_2_s_443 = m.lbound.at(2);
+    x->__f2dace_SA_wgtfac_c_d_0_s_730 = m.size.at(0);
+    x->__f2dace_SA_wgtfac_c_d_1_s_731 = m.size.at(1);
+    x->__f2dace_SA_wgtfac_c_d_2_s_732 = m.size.at(2);
+    x->__f2dace_SOA_wgtfac_c_d_0_s_730 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfac_c_d_1_s_731 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfac_c_d_2_s_732 = m.lbound.at(2);
     x->wgtfac_c = arr;
+  }
+
+  read_line(s, {"# wgtfac_e"}); // Should contain '# wgtfac_e'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
+    x->__f2dace_SA_wgtfac_e_d_0_s_733 = m.size.at(0);
+    x->__f2dace_SA_wgtfac_e_d_1_s_734 = m.size.at(1);
+    x->__f2dace_SA_wgtfac_e_d_2_s_735 = m.size.at(2);
+    x->__f2dace_SOA_wgtfac_e_d_0_s_733 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfac_e_d_1_s_734 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfac_e_d_2_s_735 = m.lbound.at(2);
+    x->wgtfac_e = arr;
+  }
+
+  read_line(s, {"# wgtfacq_c"}); // Should contain '# wgtfacq_c'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfacq_c)>::type>(s);
+    x->__f2dace_SA_wgtfacq_c_d_0_s_736 = m.size.at(0);
+    x->__f2dace_SA_wgtfacq_c_d_1_s_737 = m.size.at(1);
+    x->__f2dace_SA_wgtfacq_c_d_2_s_738 = m.size.at(2);
+    x->__f2dace_SOA_wgtfacq_c_d_0_s_736 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfacq_c_d_1_s_737 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfacq_c_d_2_s_738 = m.lbound.at(2);
+    x->wgtfacq_c = arr;
+  }
+
+  read_line(s, {"# wgtfacq_e"}); // Should contain '# wgtfacq_e'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
+    x->__f2dace_SA_wgtfacq_e_d_0_s_739 = m.size.at(0);
+    x->__f2dace_SA_wgtfacq_e_d_1_s_740 = m.size.at(1);
+    x->__f2dace_SA_wgtfacq_e_d_2_s_741 = m.size.at(2);
+    x->__f2dace_SOA_wgtfacq_e_d_0_s_739 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfacq_e_d_1_s_740 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfacq_e_d_2_s_741 = m.lbound.at(2);
+    x->wgtfacq_e = arr;
+  }
+
+  read_line(s, {"# wgtfacq1_c"}); // Should contain '# wgtfacq1_c'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->wgtfacq1_c)>::type>(s);
+    x->__f2dace_SA_wgtfacq1_c_d_0_s_742 = m.size.at(0);
+    x->__f2dace_SA_wgtfacq1_c_d_1_s_743 = m.size.at(1);
+    x->__f2dace_SA_wgtfacq1_c_d_2_s_744 = m.size.at(2);
+    x->__f2dace_SOA_wgtfacq1_c_d_0_s_742 = m.lbound.at(0);
+    x->__f2dace_SOA_wgtfacq1_c_d_1_s_743 = m.lbound.at(1);
+    x->__f2dace_SOA_wgtfacq1_c_d_2_s_744 = m.lbound.at(2);
+    x->wgtfacq1_c = arr;
   }
 
   read_line(s, {"# coeff_gradekin"}); // Should contain '# coeff_gradekin'
@@ -1569,12 +2351,12 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
-    x->__f2dace_SA_coeff_gradekin_d_0_s_444 = m.size.at(0);
-    x->__f2dace_SA_coeff_gradekin_d_1_s_445 = m.size.at(1);
-    x->__f2dace_SA_coeff_gradekin_d_2_s_446 = m.size.at(2);
-    x->__f2dace_SOA_coeff_gradekin_d_0_s_444 = m.lbound.at(0);
-    x->__f2dace_SOA_coeff_gradekin_d_1_s_445 = m.lbound.at(1);
-    x->__f2dace_SOA_coeff_gradekin_d_2_s_446 = m.lbound.at(2);
+    x->__f2dace_SA_coeff_gradekin_d_0_s_745 = m.size.at(0);
+    x->__f2dace_SA_coeff_gradekin_d_1_s_746 = m.size.at(1);
+    x->__f2dace_SA_coeff_gradekin_d_2_s_747 = m.size.at(2);
+    x->__f2dace_SOA_coeff_gradekin_d_0_s_745 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff_gradekin_d_1_s_746 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff_gradekin_d_2_s_747 = m.lbound.at(2);
     x->coeff_gradekin = arr;
   }
 
@@ -1586,12 +2368,12 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
-    x->__f2dace_SA_coeff1_dwdz_d_0_s_447 = m.size.at(0);
-    x->__f2dace_SA_coeff1_dwdz_d_1_s_448 = m.size.at(1);
-    x->__f2dace_SA_coeff1_dwdz_d_2_s_449 = m.size.at(2);
-    x->__f2dace_SOA_coeff1_dwdz_d_0_s_447 = m.lbound.at(0);
-    x->__f2dace_SOA_coeff1_dwdz_d_1_s_448 = m.lbound.at(1);
-    x->__f2dace_SOA_coeff1_dwdz_d_2_s_449 = m.lbound.at(2);
+    x->__f2dace_SA_coeff1_dwdz_d_0_s_748 = m.size.at(0);
+    x->__f2dace_SA_coeff1_dwdz_d_1_s_749 = m.size.at(1);
+    x->__f2dace_SA_coeff1_dwdz_d_2_s_750 = m.size.at(2);
+    x->__f2dace_SOA_coeff1_dwdz_d_0_s_748 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff1_dwdz_d_1_s_749 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff1_dwdz_d_2_s_750 = m.lbound.at(2);
     x->coeff1_dwdz = arr;
   }
 
@@ -1603,13 +2385,68 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
-    x->__f2dace_SA_coeff2_dwdz_d_0_s_450 = m.size.at(0);
-    x->__f2dace_SA_coeff2_dwdz_d_1_s_451 = m.size.at(1);
-    x->__f2dace_SA_coeff2_dwdz_d_2_s_452 = m.size.at(2);
-    x->__f2dace_SOA_coeff2_dwdz_d_0_s_450 = m.lbound.at(0);
-    x->__f2dace_SOA_coeff2_dwdz_d_1_s_451 = m.lbound.at(1);
-    x->__f2dace_SOA_coeff2_dwdz_d_2_s_452 = m.lbound.at(2);
+    x->__f2dace_SA_coeff2_dwdz_d_0_s_751 = m.size.at(0);
+    x->__f2dace_SA_coeff2_dwdz_d_1_s_752 = m.size.at(1);
+    x->__f2dace_SA_coeff2_dwdz_d_2_s_753 = m.size.at(2);
+    x->__f2dace_SOA_coeff2_dwdz_d_0_s_751 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff2_dwdz_d_1_s_752 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff2_dwdz_d_2_s_753 = m.lbound.at(2);
     x->coeff2_dwdz = arr;
+  }
+
+  read_line(s, {"# zdiff_gradp"}); // Should contain '# zdiff_gradp'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->zdiff_gradp)>::type>(s);
+    x->__f2dace_SA_zdiff_gradp_d_0_s_754 = m.size.at(0);
+    x->__f2dace_SA_zdiff_gradp_d_1_s_755 = m.size.at(1);
+    x->__f2dace_SA_zdiff_gradp_d_2_s_756 = m.size.at(2);
+    x->__f2dace_SA_zdiff_gradp_d_3_s_757 = m.size.at(3);
+    x->__f2dace_SOA_zdiff_gradp_d_0_s_754 = m.lbound.at(0);
+    x->__f2dace_SOA_zdiff_gradp_d_1_s_755 = m.lbound.at(1);
+    x->__f2dace_SOA_zdiff_gradp_d_2_s_756 = m.lbound.at(2);
+    x->__f2dace_SOA_zdiff_gradp_d_3_s_757 = m.lbound.at(3);
+    x->zdiff_gradp = arr;
+  }
+
+  read_line(s, {"# coeff_gradp"}); // Should contain '# coeff_gradp'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->coeff_gradp)>::type>(s);
+    x->__f2dace_SA_coeff_gradp_d_0_s_758 = m.size.at(0);
+    x->__f2dace_SA_coeff_gradp_d_1_s_759 = m.size.at(1);
+    x->__f2dace_SA_coeff_gradp_d_2_s_760 = m.size.at(2);
+    x->__f2dace_SA_coeff_gradp_d_3_s_761 = m.size.at(3);
+    x->__f2dace_SOA_coeff_gradp_d_0_s_758 = m.lbound.at(0);
+    x->__f2dace_SOA_coeff_gradp_d_1_s_759 = m.lbound.at(1);
+    x->__f2dace_SOA_coeff_gradp_d_2_s_760 = m.lbound.at(2);
+    x->__f2dace_SOA_coeff_gradp_d_3_s_761 = m.lbound.at(3);
+    x->coeff_gradp = arr;
+  }
+
+  read_line(s, {"# exner_exfac"}); // Should contain '# exner_exfac'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->exner_exfac)>::type>(s);
+    x->__f2dace_SA_exner_exfac_d_0_s_762 = m.size.at(0);
+    x->__f2dace_SA_exner_exfac_d_1_s_763 = m.size.at(1);
+    x->__f2dace_SA_exner_exfac_d_2_s_764 = m.size.at(2);
+    x->__f2dace_SOA_exner_exfac_d_0_s_762 = m.lbound.at(0);
+    x->__f2dace_SOA_exner_exfac_d_1_s_763 = m.lbound.at(1);
+    x->__f2dace_SOA_exner_exfac_d_2_s_764 = m.lbound.at(2);
+    x->exner_exfac = arr;
   }
 
   read_line(s, {"# theta_ref_mc"}); // Should contain '# theta_ref_mc'
@@ -1620,13 +2457,98 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->theta_ref_mc)>::type>(s);
-    x->__f2dace_SA_theta_ref_mc_d_0_s_453 = m.size.at(0);
-    x->__f2dace_SA_theta_ref_mc_d_1_s_454 = m.size.at(1);
-    x->__f2dace_SA_theta_ref_mc_d_2_s_455 = m.size.at(2);
-    x->__f2dace_SOA_theta_ref_mc_d_0_s_453 = m.lbound.at(0);
-    x->__f2dace_SOA_theta_ref_mc_d_1_s_454 = m.lbound.at(1);
-    x->__f2dace_SOA_theta_ref_mc_d_2_s_455 = m.lbound.at(2);
+    x->__f2dace_SA_theta_ref_mc_d_0_s_765 = m.size.at(0);
+    x->__f2dace_SA_theta_ref_mc_d_1_s_766 = m.size.at(1);
+    x->__f2dace_SA_theta_ref_mc_d_2_s_767 = m.size.at(2);
+    x->__f2dace_SOA_theta_ref_mc_d_0_s_765 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_ref_mc_d_1_s_766 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_ref_mc_d_2_s_767 = m.lbound.at(2);
     x->theta_ref_mc = arr;
+  }
+
+  read_line(s, {"# theta_ref_me"}); // Should contain '# theta_ref_me'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->theta_ref_me)>::type>(s);
+    x->__f2dace_SA_theta_ref_me_d_0_s_768 = m.size.at(0);
+    x->__f2dace_SA_theta_ref_me_d_1_s_769 = m.size.at(1);
+    x->__f2dace_SA_theta_ref_me_d_2_s_770 = m.size.at(2);
+    x->__f2dace_SOA_theta_ref_me_d_0_s_768 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_ref_me_d_1_s_769 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_ref_me_d_2_s_770 = m.lbound.at(2);
+    x->theta_ref_me = arr;
+  }
+
+  read_line(s, {"# theta_ref_ic"}); // Should contain '# theta_ref_ic'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->theta_ref_ic)>::type>(s);
+    x->__f2dace_SA_theta_ref_ic_d_0_s_771 = m.size.at(0);
+    x->__f2dace_SA_theta_ref_ic_d_1_s_772 = m.size.at(1);
+    x->__f2dace_SA_theta_ref_ic_d_2_s_773 = m.size.at(2);
+    x->__f2dace_SOA_theta_ref_ic_d_0_s_771 = m.lbound.at(0);
+    x->__f2dace_SOA_theta_ref_ic_d_1_s_772 = m.lbound.at(1);
+    x->__f2dace_SOA_theta_ref_ic_d_2_s_773 = m.lbound.at(2);
+    x->theta_ref_ic = arr;
+  }
+
+  read_line(s, {"# exner_ref_mc"}); // Should contain '# exner_ref_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->exner_ref_mc)>::type>(s);
+    x->__f2dace_SA_exner_ref_mc_d_0_s_774 = m.size.at(0);
+    x->__f2dace_SA_exner_ref_mc_d_1_s_775 = m.size.at(1);
+    x->__f2dace_SA_exner_ref_mc_d_2_s_776 = m.size.at(2);
+    x->__f2dace_SOA_exner_ref_mc_d_0_s_774 = m.lbound.at(0);
+    x->__f2dace_SOA_exner_ref_mc_d_1_s_775 = m.lbound.at(1);
+    x->__f2dace_SOA_exner_ref_mc_d_2_s_776 = m.lbound.at(2);
+    x->exner_ref_mc = arr;
+  }
+
+  read_line(s, {"# rho_ref_mc"}); // Should contain '# rho_ref_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->rho_ref_mc)>::type>(s);
+    x->__f2dace_SA_rho_ref_mc_d_0_s_777 = m.size.at(0);
+    x->__f2dace_SA_rho_ref_mc_d_1_s_778 = m.size.at(1);
+    x->__f2dace_SA_rho_ref_mc_d_2_s_779 = m.size.at(2);
+    x->__f2dace_SOA_rho_ref_mc_d_0_s_777 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_ref_mc_d_1_s_778 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_ref_mc_d_2_s_779 = m.lbound.at(2);
+    x->rho_ref_mc = arr;
+  }
+
+  read_line(s, {"# rho_ref_me"}); // Should contain '# rho_ref_me'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->rho_ref_me)>::type>(s);
+    x->__f2dace_SA_rho_ref_me_d_0_s_780 = m.size.at(0);
+    x->__f2dace_SA_rho_ref_me_d_1_s_781 = m.size.at(1);
+    x->__f2dace_SA_rho_ref_me_d_2_s_782 = m.size.at(2);
+    x->__f2dace_SOA_rho_ref_me_d_0_s_780 = m.lbound.at(0);
+    x->__f2dace_SOA_rho_ref_me_d_1_s_781 = m.lbound.at(1);
+    x->__f2dace_SOA_rho_ref_me_d_2_s_782 = m.lbound.at(2);
+    x->rho_ref_me = arr;
   }
 
   read_line(s, {"# d_exner_dz_ref_ic"}); // Should contain '# d_exner_dz_ref_ic'
@@ -1638,13 +2560,146 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->d_exner_dz_ref_ic)>::type>(
             s);
-    x->__f2dace_SA_d_exner_dz_ref_ic_d_0_s_456 = m.size.at(0);
-    x->__f2dace_SA_d_exner_dz_ref_ic_d_1_s_457 = m.size.at(1);
-    x->__f2dace_SA_d_exner_dz_ref_ic_d_2_s_458 = m.size.at(2);
-    x->__f2dace_SOA_d_exner_dz_ref_ic_d_0_s_456 = m.lbound.at(0);
-    x->__f2dace_SOA_d_exner_dz_ref_ic_d_1_s_457 = m.lbound.at(1);
-    x->__f2dace_SOA_d_exner_dz_ref_ic_d_2_s_458 = m.lbound.at(2);
+    x->__f2dace_SA_d_exner_dz_ref_ic_d_0_s_783 = m.size.at(0);
+    x->__f2dace_SA_d_exner_dz_ref_ic_d_1_s_784 = m.size.at(1);
+    x->__f2dace_SA_d_exner_dz_ref_ic_d_2_s_785 = m.size.at(2);
+    x->__f2dace_SOA_d_exner_dz_ref_ic_d_0_s_783 = m.lbound.at(0);
+    x->__f2dace_SOA_d_exner_dz_ref_ic_d_1_s_784 = m.lbound.at(1);
+    x->__f2dace_SOA_d_exner_dz_ref_ic_d_2_s_785 = m.lbound.at(2);
     x->d_exner_dz_ref_ic = arr;
+  }
+
+  read_line(s, {"# d2dexdz2_fac1_mc"}); // Should contain '# d2dexdz2_fac1_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->d2dexdz2_fac1_mc)>::type>(
+            s);
+    x->__f2dace_SA_d2dexdz2_fac1_mc_d_0_s_786 = m.size.at(0);
+    x->__f2dace_SA_d2dexdz2_fac1_mc_d_1_s_787 = m.size.at(1);
+    x->__f2dace_SA_d2dexdz2_fac1_mc_d_2_s_788 = m.size.at(2);
+    x->__f2dace_SOA_d2dexdz2_fac1_mc_d_0_s_786 = m.lbound.at(0);
+    x->__f2dace_SOA_d2dexdz2_fac1_mc_d_1_s_787 = m.lbound.at(1);
+    x->__f2dace_SOA_d2dexdz2_fac1_mc_d_2_s_788 = m.lbound.at(2);
+    x->d2dexdz2_fac1_mc = arr;
+  }
+
+  read_line(s, {"# d2dexdz2_fac2_mc"}); // Should contain '# d2dexdz2_fac2_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->d2dexdz2_fac2_mc)>::type>(
+            s);
+    x->__f2dace_SA_d2dexdz2_fac2_mc_d_0_s_789 = m.size.at(0);
+    x->__f2dace_SA_d2dexdz2_fac2_mc_d_1_s_790 = m.size.at(1);
+    x->__f2dace_SA_d2dexdz2_fac2_mc_d_2_s_791 = m.size.at(2);
+    x->__f2dace_SOA_d2dexdz2_fac2_mc_d_0_s_789 = m.lbound.at(0);
+    x->__f2dace_SOA_d2dexdz2_fac2_mc_d_1_s_790 = m.lbound.at(1);
+    x->__f2dace_SOA_d2dexdz2_fac2_mc_d_2_s_791 = m.lbound.at(2);
+    x->d2dexdz2_fac2_mc = arr;
+  }
+
+  read_line(s, {"# pg_exdist"}); // Should contain '# pg_exdist'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->pg_exdist)>::type>(s);
+    x->__f2dace_SA_pg_exdist_d_0_s_792 = m.size.at(0);
+    x->__f2dace_SOA_pg_exdist_d_0_s_792 = m.lbound.at(0);
+    x->pg_exdist = arr;
+  }
+
+  read_line(s, {"# vertidx_gradp"}); // Should contain '# vertidx_gradp'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vertidx_gradp)>::type>(s);
+    x->__f2dace_SA_vertidx_gradp_d_0_s_793 = m.size.at(0);
+    x->__f2dace_SA_vertidx_gradp_d_1_s_794 = m.size.at(1);
+    x->__f2dace_SA_vertidx_gradp_d_2_s_795 = m.size.at(2);
+    x->__f2dace_SA_vertidx_gradp_d_3_s_796 = m.size.at(3);
+    x->__f2dace_SOA_vertidx_gradp_d_0_s_793 = m.lbound.at(0);
+    x->__f2dace_SOA_vertidx_gradp_d_1_s_794 = m.lbound.at(1);
+    x->__f2dace_SOA_vertidx_gradp_d_2_s_795 = m.lbound.at(2);
+    x->__f2dace_SOA_vertidx_gradp_d_3_s_796 = m.lbound.at(3);
+    x->vertidx_gradp = arr;
+  }
+
+  read_line(s, {"# pg_edgeidx"}); // Should contain '# pg_edgeidx'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->pg_edgeidx)>::type>(s);
+    x->__f2dace_SA_pg_edgeidx_d_0_s_797 = m.size.at(0);
+    x->__f2dace_SOA_pg_edgeidx_d_0_s_797 = m.lbound.at(0);
+    x->pg_edgeidx = arr;
+  }
+
+  read_line(s, {"# pg_edgeblk"}); // Should contain '# pg_edgeblk'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->pg_edgeblk)>::type>(s);
+    x->__f2dace_SA_pg_edgeblk_d_0_s_798 = m.size.at(0);
+    x->__f2dace_SOA_pg_edgeblk_d_0_s_798 = m.lbound.at(0);
+    x->pg_edgeblk = arr;
+  }
+
+  read_line(s, {"# pg_vertidx"}); // Should contain '# pg_vertidx'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->pg_vertidx)>::type>(s);
+    x->__f2dace_SA_pg_vertidx_d_0_s_799 = m.size.at(0);
+    x->__f2dace_SOA_pg_vertidx_d_0_s_799 = m.lbound.at(0);
+    x->pg_vertidx = arr;
+  }
+
+  read_line(s, {"# bdy_mflx_e_idx"}); // Should contain '# bdy_mflx_e_idx'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->bdy_mflx_e_idx)>::type>(s);
+    x->__f2dace_SA_bdy_mflx_e_idx_d_0_s_800 = m.size.at(0);
+    x->__f2dace_SOA_bdy_mflx_e_idx_d_0_s_800 = m.lbound.at(0);
+    x->bdy_mflx_e_idx = arr;
+  }
+
+  read_line(s, {"# bdy_mflx_e_blk"}); // Should contain '# bdy_mflx_e_blk'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->bdy_mflx_e_blk)>::type>(s);
+    x->__f2dace_SA_bdy_mflx_e_blk_d_0_s_801 = m.size.at(0);
+    x->__f2dace_SOA_bdy_mflx_e_blk_d_0_s_801 = m.lbound.at(0);
+    x->bdy_mflx_e_blk = arr;
   }
 
   read_line(s, {"# deepatmo_gradh_mc"}); // Should contain '# deepatmo_gradh_mc'
@@ -1656,9 +2711,23 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(
             s);
-    x->__f2dace_SA_deepatmo_gradh_mc_d_0_s_459 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_gradh_mc_d_0_s_459 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_gradh_mc_d_0_s_802 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_gradh_mc_d_0_s_802 = m.lbound.at(0);
     x->deepatmo_gradh_mc = arr;
+  }
+
+  read_line(s, {"# deepatmo_divh_mc"}); // Should contain '# deepatmo_divh_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->deepatmo_divh_mc)>::type>(
+            s);
+    x->__f2dace_SA_deepatmo_divh_mc_d_0_s_803 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_divh_mc_d_0_s_803 = m.lbound.at(0);
+    x->deepatmo_divh_mc = arr;
   }
 
   read_line(s, {"# deepatmo_invr_mc"}); // Should contain '# deepatmo_invr_mc'
@@ -1670,9 +2739,37 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(
             s);
-    x->__f2dace_SA_deepatmo_invr_mc_d_0_s_460 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_invr_mc_d_0_s_460 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_invr_mc_d_0_s_804 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_invr_mc_d_0_s_804 = m.lbound.at(0);
     x->deepatmo_invr_mc = arr;
+  }
+
+  read_line(s, {"# deepatmo_divzu_mc"}); // Should contain '# deepatmo_divzu_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->deepatmo_divzu_mc)>::type>(
+            s);
+    x->__f2dace_SA_deepatmo_divzu_mc_d_0_s_805 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_divzu_mc_d_0_s_805 = m.lbound.at(0);
+    x->deepatmo_divzu_mc = arr;
+  }
+
+  read_line(s, {"# deepatmo_divzl_mc"}); // Should contain '# deepatmo_divzl_mc'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->deepatmo_divzl_mc)>::type>(
+            s);
+    x->__f2dace_SA_deepatmo_divzl_mc_d_0_s_806 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_divzl_mc_d_0_s_806 = m.lbound.at(0);
+    x->deepatmo_divzl_mc = arr;
   }
 
   read_line(s,
@@ -1684,8 +2781,8 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   if (yep) {
     auto [m, arr] = read_pointer<
         std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(s);
-    x->__f2dace_SA_deepatmo_gradh_ifc_d_0_s_461 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_gradh_ifc_d_0_s_461 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_gradh_ifc_d_0_s_807 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_gradh_ifc_d_0_s_807 = m.lbound.at(0);
     x->deepatmo_gradh_ifc = arr;
   }
 
@@ -1698,10 +2795,18 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
     auto [m, arr] =
         read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(
             s);
-    x->__f2dace_SA_deepatmo_invr_ifc_d_0_s_462 = m.size.at(0);
-    x->__f2dace_SOA_deepatmo_invr_ifc_d_0_s_462 = m.lbound.at(0);
+    x->__f2dace_SA_deepatmo_invr_ifc_d_0_s_808 = m.size.at(0);
+    x->__f2dace_SOA_deepatmo_invr_ifc_d_0_s_808 = m.lbound.at(0);
     x->deepatmo_invr_ifc = arr;
   }
+
+  read_line(s, {"# pg_listdim"}); // Should contain '# pg_listdim'
+
+  deserialize(&(x->pg_listdim), s);
+
+  read_line(s, {"# bdy_mflx_e_dim"}); // Should contain '# bdy_mflx_e_dim'
+
+  deserialize(&(x->bdy_mflx_e_dim), s);
 }
 
 void deserialize(t_nh_state *x, std::istream &s) {
@@ -1714,8 +2819,8 @@ void deserialize(t_nh_state *x, std::istream &s) {
   if (yep) { // BEGINING IF
 
     m = read_array_meta(s);
-    x->__f2dace_SA_prog_d_0_s_463 = m.size[0];
-    x->__f2dace_SOA_prog_d_0_s_463 = m.lbound[0];
+    x->__f2dace_SA_prog_d_0_s_809 = m.size[0];
+    x->__f2dace_SOA_prog_d_0_s_809 = m.lbound[0];
     // TODO: THIS IS POTENTIALLY BUGGY, BECAUSE IT IS NOT REALLY TESTED.
     // We only need to allocate a volume of contiguous memory, and let DaCe
     // interpret (assuming it follows the same protocol as us).
@@ -1741,6 +2846,73 @@ void deserialize(t_nh_state *x, std::istream &s) {
 void deserialize(t_prepare_adv *x, std::istream &s) {
   bool yep;
   array_meta m;
+  read_line(s, {"# mass_flx_me"}); // Should contain '# mass_flx_me'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->mass_flx_me)>::type>(s);
+    x->__f2dace_SA_mass_flx_me_d_0_s_840 = m.size.at(0);
+    x->__f2dace_SA_mass_flx_me_d_1_s_841 = m.size.at(1);
+    x->__f2dace_SA_mass_flx_me_d_2_s_842 = m.size.at(2);
+    x->__f2dace_SOA_mass_flx_me_d_0_s_840 = m.lbound.at(0);
+    x->__f2dace_SOA_mass_flx_me_d_1_s_841 = m.lbound.at(1);
+    x->__f2dace_SOA_mass_flx_me_d_2_s_842 = m.lbound.at(2);
+    x->mass_flx_me = arr;
+  }
+
+  read_line(s, {"# mass_flx_ic"}); // Should contain '# mass_flx_ic'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->mass_flx_ic)>::type>(s);
+    x->__f2dace_SA_mass_flx_ic_d_0_s_843 = m.size.at(0);
+    x->__f2dace_SA_mass_flx_ic_d_1_s_844 = m.size.at(1);
+    x->__f2dace_SA_mass_flx_ic_d_2_s_845 = m.size.at(2);
+    x->__f2dace_SOA_mass_flx_ic_d_0_s_843 = m.lbound.at(0);
+    x->__f2dace_SOA_mass_flx_ic_d_1_s_844 = m.lbound.at(1);
+    x->__f2dace_SOA_mass_flx_ic_d_2_s_845 = m.lbound.at(2);
+    x->mass_flx_ic = arr;
+  }
+
+  read_line(s, {"# vol_flx_ic"}); // Should contain '# vol_flx_ic'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vol_flx_ic)>::type>(s);
+    x->__f2dace_SA_vol_flx_ic_d_0_s_846 = m.size.at(0);
+    x->__f2dace_SA_vol_flx_ic_d_1_s_847 = m.size.at(1);
+    x->__f2dace_SA_vol_flx_ic_d_2_s_848 = m.size.at(2);
+    x->__f2dace_SOA_vol_flx_ic_d_0_s_846 = m.lbound.at(0);
+    x->__f2dace_SOA_vol_flx_ic_d_1_s_847 = m.lbound.at(1);
+    x->__f2dace_SOA_vol_flx_ic_d_2_s_848 = m.lbound.at(2);
+    x->vol_flx_ic = arr;
+  }
+
+  read_line(s, {"# vn_traj"}); // Should contain '# vn_traj'
+
+  read_line(s, {"# assoc"}); // Should contain '# assoc'
+  deserialize(&yep, s);
+
+  if (yep) {
+    auto [m, arr] =
+        read_pointer<std::remove_pointer<decltype(x->vn_traj)>::type>(s);
+    x->__f2dace_SA_vn_traj_d_0_s_849 = m.size.at(0);
+    x->__f2dace_SA_vn_traj_d_1_s_850 = m.size.at(1);
+    x->__f2dace_SA_vn_traj_d_2_s_851 = m.size.at(2);
+    x->__f2dace_SOA_vn_traj_d_0_s_849 = m.lbound.at(0);
+    x->__f2dace_SOA_vn_traj_d_1_s_850 = m.lbound.at(1);
+    x->__f2dace_SOA_vn_traj_d_2_s_851 = m.lbound.at(2);
+    x->vn_traj = arr;
+  }
 }
 
 template <typename T>
@@ -1882,6 +3054,29 @@ std::string serialize(const t_int_state *x) {
     }
 
   } // CONCLUDING IF
+  add_line("# e_flx_avg", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->e_flx_avg != nullptr), s);
+  if (x->e_flx_avg) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->e_flx_avg);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->e_flx_avg[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
   add_line("# cells_aw_verts", s);
 
   add_line("# alloc", s);
@@ -1901,6 +3096,52 @@ std::string serialize(const t_int_state *x) {
       add_line("# entries", s);
       for (int i = 0; i < m.volume(); ++i) {
         add_line(serialize(x->cells_aw_verts[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# rbf_vec_coeff_e", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->rbf_vec_coeff_e != nullptr), s);
+  if (x->rbf_vec_coeff_e) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->rbf_vec_coeff_e);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->rbf_vec_coeff_e[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# geofac_div", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->geofac_div != nullptr), s);
+  if (x->geofac_div) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->geofac_div);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->geofac_div[i]), s);
       }
     }
 
@@ -1974,6 +3215,52 @@ std::string serialize(const t_int_state *x) {
     }
 
   } // CONCLUDING IF
+  add_line("# geofac_grg", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->geofac_grg != nullptr), s);
+  if (x->geofac_grg) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->geofac_grg);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->geofac_grg[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# pos_on_tplane_e", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->pos_on_tplane_e != nullptr), s);
+  if (x->pos_on_tplane_e) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->pos_on_tplane_e);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->pos_on_tplane_e[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
   add_line("# nudgecoeff_e", s);
 
   add_line("# alloc", s);
@@ -1997,6 +3284,18 @@ std::string serialize(const t_int_state *x) {
     }
 
   } // CONCLUDING IF
+  std::string out = s.str();
+  if (out.length() > 0)
+    out.pop_back();
+  return out;
+}
+
+std::string serialize(const t_tangent_vectors *x) {
+  std::stringstream s;
+  add_line("# v1", s);
+  add_line(serialize(x->v1), s);
+  add_line("# v2", s);
+  add_line(serialize(x->v2), s);
   std::string out = s.str();
   if (out.length() > 0)
     out.pop_back();
@@ -2151,6 +3450,29 @@ std::string serialize(const t_grid_cells *x) {
     }
 
   } // CONCLUDING IF
+  add_line("# start_blk", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->start_blk != nullptr), s);
+  if (x->start_blk) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->start_blk);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->start_blk[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
   add_line("# start_block", s);
 
   add_line("# alloc", s);
@@ -2170,6 +3492,29 @@ std::string serialize(const t_grid_cells *x) {
       add_line("# entries", s);
       for (int i = 0; i < m.volume(); ++i) {
         add_line(serialize(x->start_block[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# end_blk", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->end_blk != nullptr), s);
+  if (x->end_blk) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->end_blk);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->end_blk[i]), s);
       }
     }
 
@@ -2368,6 +3713,52 @@ std::string serialize(const t_grid_edges *x) {
     }
 
   } // CONCLUDING IF
+  add_line("# primal_normal_cell", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->primal_normal_cell != nullptr), s);
+  if (x->primal_normal_cell) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->primal_normal_cell);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->primal_normal_cell[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# dual_normal_cell", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->dual_normal_cell != nullptr), s);
+  if (x->dual_normal_cell) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->dual_normal_cell);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->dual_normal_cell[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
   add_line("# inv_primal_edge_length", s);
 
   add_line("# alloc", s);
@@ -2502,6 +3893,29 @@ std::string serialize(const t_grid_edges *x) {
       add_line("# entries", s);
       for (int i = 0; i < m.volume(); ++i) {
         add_line(serialize(x->ft_e[i]), s);
+      }
+    }
+
+  } // CONCLUDING IF
+  add_line("# refin_ctrl", s);
+
+  add_line("# alloc", s);
+  add_line(serialize(x->refin_ctrl != nullptr), s);
+  if (x->refin_ctrl) { // BEGINING IF
+
+    {
+      const array_meta &m = ARRAY_META_DICT_AT(x->refin_ctrl);
+      add_line("# rank", s);
+      add_line(m.rank, s);
+      add_line("# size", s);
+      for (auto i : m.size)
+        add_line(i, s);
+      add_line("# lbound", s);
+      for (auto i : m.lbound)
+        add_line(i, s);
+      add_line("# entries", s);
+      for (int i = 0; i < m.volume(); ++i) {
+        add_line(serialize(x->refin_ctrl[i]), s);
       }
     }
 
@@ -2800,6 +4214,8 @@ std::string serialize(const t_patch *x) {
   std::stringstream s;
   add_line("# id", s);
   add_line(serialize(x->id), s);
+  add_line("# n_childdom", s);
+  add_line(serialize(x->n_childdom), s);
   add_line("# nblks_c", s);
   add_line(serialize(x->nblks_c), s);
   add_line("# nblks_e", s);
@@ -2850,6 +4266,14 @@ std::string serialize(const t_nh_prog *x) {
   if (x->rho)
     add_line(serialize_array(x->rho), s);
 
+  add_line("# exner", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->exner != nullptr), s);
+
+  if (x->exner)
+    add_line(serialize_array(x->exner), s);
+
   add_line("# theta_v", s);
 
   add_line("# assoc", s);
@@ -2874,6 +4298,14 @@ std::string serialize(const t_nh_diag *x) {
   if (x->exner_pr)
     add_line(serialize_array(x->exner_pr), s);
 
+  add_line("# mass_fl_e", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->mass_fl_e != nullptr), s);
+
+  if (x->mass_fl_e)
+    add_line(serialize_array(x->mass_fl_e), s);
+
   add_line("# rho_ic", s);
 
   add_line("# assoc", s);
@@ -2890,6 +4322,134 @@ std::string serialize(const t_nh_diag *x) {
   if (x->theta_v_ic)
     add_line(serialize_array(x->theta_v_ic), s);
 
+  add_line("# grf_tend_vn", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->grf_tend_vn != nullptr), s);
+
+  if (x->grf_tend_vn)
+    add_line(serialize_array(x->grf_tend_vn), s);
+
+  add_line("# grf_tend_w", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->grf_tend_w != nullptr), s);
+
+  if (x->grf_tend_w)
+    add_line(serialize_array(x->grf_tend_w), s);
+
+  add_line("# grf_tend_rho", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->grf_tend_rho != nullptr), s);
+
+  if (x->grf_tend_rho)
+    add_line(serialize_array(x->grf_tend_rho), s);
+
+  add_line("# grf_tend_mflx", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->grf_tend_mflx != nullptr), s);
+
+  if (x->grf_tend_mflx)
+    add_line(serialize_array(x->grf_tend_mflx), s);
+
+  add_line("# grf_bdy_mflx", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->grf_bdy_mflx != nullptr), s);
+
+  if (x->grf_bdy_mflx)
+    add_line(serialize_array(x->grf_bdy_mflx), s);
+
+  add_line("# grf_tend_thv", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->grf_tend_thv != nullptr), s);
+
+  if (x->grf_tend_thv)
+    add_line(serialize_array(x->grf_tend_thv), s);
+
+  add_line("# vn_ie_int", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->vn_ie_int != nullptr), s);
+
+  if (x->vn_ie_int)
+    add_line(serialize_array(x->vn_ie_int), s);
+
+  add_line("# vn_ie_ubc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->vn_ie_ubc != nullptr), s);
+
+  if (x->vn_ie_ubc)
+    add_line(serialize_array(x->vn_ie_ubc), s);
+
+  add_line("# w_int", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->w_int != nullptr), s);
+
+  if (x->w_int)
+    add_line(serialize_array(x->w_int), s);
+
+  add_line("# w_ubc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->w_ubc != nullptr), s);
+
+  if (x->w_ubc)
+    add_line(serialize_array(x->w_ubc), s);
+
+  add_line("# theta_v_ic_int", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->theta_v_ic_int != nullptr), s);
+
+  if (x->theta_v_ic_int)
+    add_line(serialize_array(x->theta_v_ic_int), s);
+
+  add_line("# theta_v_ic_ubc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->theta_v_ic_ubc != nullptr), s);
+
+  if (x->theta_v_ic_ubc)
+    add_line(serialize_array(x->theta_v_ic_ubc), s);
+
+  add_line("# rho_ic_int", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->rho_ic_int != nullptr), s);
+
+  if (x->rho_ic_int)
+    add_line(serialize_array(x->rho_ic_int), s);
+
+  add_line("# rho_ic_ubc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->rho_ic_ubc != nullptr), s);
+
+  if (x->rho_ic_ubc)
+    add_line(serialize_array(x->rho_ic_ubc), s);
+
+  add_line("# mflx_ic_int", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->mflx_ic_int != nullptr), s);
+
+  if (x->mflx_ic_int)
+    add_line(serialize_array(x->mflx_ic_int), s);
+
+  add_line("# mflx_ic_ubc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->mflx_ic_ubc != nullptr), s);
+
+  if (x->mflx_ic_ubc)
+    add_line(serialize_array(x->mflx_ic_ubc), s);
+
   add_line("# vn_incr", s);
 
   add_line("# assoc", s);
@@ -2897,6 +4457,22 @@ std::string serialize(const t_nh_diag *x) {
 
   if (x->vn_incr)
     add_line(serialize_array(x->vn_incr), s);
+
+  add_line("# exner_incr", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->exner_incr != nullptr), s);
+
+  if (x->exner_incr)
+    add_line(serialize_array(x->exner_incr), s);
+
+  add_line("# rho_incr", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->rho_incr != nullptr), s);
+
+  if (x->rho_incr)
+    add_line(serialize_array(x->rho_incr), s);
 
   add_line("# vt", s);
 
@@ -2906,6 +4482,14 @@ std::string serialize(const t_nh_diag *x) {
   if (x->vt)
     add_line(serialize_array(x->vt), s);
 
+  add_line("# ddt_exner_phy", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->ddt_exner_phy != nullptr), s);
+
+  if (x->ddt_exner_phy)
+    add_line(serialize_array(x->ddt_exner_phy), s);
+
   add_line("# ddt_vn_phy", s);
 
   add_line("# assoc", s);
@@ -2913,6 +4497,14 @@ std::string serialize(const t_nh_diag *x) {
 
   if (x->ddt_vn_phy)
     add_line(serialize_array(x->ddt_vn_phy), s);
+
+  add_line("# exner_dyn_incr", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->exner_dyn_incr != nullptr), s);
+
+  if (x->exner_dyn_incr)
+    add_line(serialize_array(x->exner_dyn_incr), s);
 
   add_line("# vn_ie", s);
 
@@ -2929,6 +4521,14 @@ std::string serialize(const t_nh_diag *x) {
 
   if (x->w_concorr_c)
     add_line(serialize_array(x->w_concorr_c), s);
+
+  add_line("# mass_fl_e_sv", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->mass_fl_e_sv != nullptr), s);
+
+  if (x->mass_fl_e_sv)
+    add_line(serialize_array(x->mass_fl_e_sv), s);
 
   add_line("# ddt_vn_apc_pc", s);
 
@@ -3018,6 +4618,14 @@ std::string serialize(const t_nh_diag *x) {
   if (x->ddt_vn_ray)
     add_line(serialize_array(x->ddt_vn_ray), s);
 
+  add_line("# ddt_vn_grf", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->ddt_vn_grf != nullptr), s);
+
+  if (x->ddt_vn_grf)
+    add_line(serialize_array(x->ddt_vn_grf), s);
+
   add_line("# ddt_vn_dyn_is_associated", s);
   add_line(serialize(x->ddt_vn_dyn_is_associated), s);
   add_line("# ddt_vn_dmp_is_associated", s);
@@ -3034,6 +4642,8 @@ std::string serialize(const t_nh_diag *x) {
   add_line(serialize(x->ddt_vn_iau_is_associated), s);
   add_line("# ddt_vn_ray_is_associated", s);
   add_line(serialize(x->ddt_vn_ray_is_associated), s);
+  add_line("# ddt_vn_grf_is_associated", s);
+  add_line(serialize(x->ddt_vn_grf_is_associated), s);
   add_line("# max_vcfl_dyn", s);
   add_line(serialize(x->max_vcfl_dyn), s);
   std::string out = s.str();
@@ -3052,6 +4662,14 @@ std::string serialize(const t_nh_ref *x) {
   if (x->vn_ref)
     add_line(serialize_array(x->vn_ref), s);
 
+  add_line("# w_ref", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->w_ref != nullptr), s);
+
+  if (x->w_ref)
+    add_line(serialize_array(x->w_ref), s);
+
   std::string out = s.str();
   if (out.length() > 0)
     out.pop_back();
@@ -3060,6 +4678,14 @@ std::string serialize(const t_nh_ref *x) {
 
 std::string serialize(const t_nh_metrics *x) {
   std::stringstream s;
+  add_line("# rayleigh_w", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->rayleigh_w != nullptr), s);
+
+  if (x->rayleigh_w)
+    add_line(serialize_array(x->rayleigh_w), s);
+
   add_line("# rayleigh_vn", s);
 
   add_line("# assoc", s);
@@ -3092,6 +4718,30 @@ std::string serialize(const t_nh_metrics *x) {
   if (x->vwind_expl_wgt)
     add_line(serialize_array(x->vwind_expl_wgt), s);
 
+  add_line("# vwind_impl_wgt", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->vwind_impl_wgt != nullptr), s);
+
+  if (x->vwind_impl_wgt)
+    add_line(serialize_array(x->vwind_impl_wgt), s);
+
+  add_line("# ddxn_z_full", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->ddxn_z_full != nullptr), s);
+
+  if (x->ddxn_z_full)
+    add_line(serialize_array(x->ddxn_z_full), s);
+
+  add_line("# ddxt_z_full", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->ddxt_z_full != nullptr), s);
+
+  if (x->ddxt_z_full)
+    add_line(serialize_array(x->ddxt_z_full), s);
+
   add_line("# ddqz_z_full_e", s);
 
   add_line("# assoc", s);
@@ -3108,6 +4758,14 @@ std::string serialize(const t_nh_metrics *x) {
   if (x->ddqz_z_half)
     add_line(serialize_array(x->ddqz_z_half), s);
 
+  add_line("# inv_ddqz_z_full", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->inv_ddqz_z_full != nullptr), s);
+
+  if (x->inv_ddqz_z_full)
+    add_line(serialize_array(x->inv_ddqz_z_full), s);
+
   add_line("# wgtfac_c", s);
 
   add_line("# assoc", s);
@@ -3115,6 +4773,38 @@ std::string serialize(const t_nh_metrics *x) {
 
   if (x->wgtfac_c)
     add_line(serialize_array(x->wgtfac_c), s);
+
+  add_line("# wgtfac_e", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->wgtfac_e != nullptr), s);
+
+  if (x->wgtfac_e)
+    add_line(serialize_array(x->wgtfac_e), s);
+
+  add_line("# wgtfacq_c", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->wgtfacq_c != nullptr), s);
+
+  if (x->wgtfacq_c)
+    add_line(serialize_array(x->wgtfacq_c), s);
+
+  add_line("# wgtfacq_e", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->wgtfacq_e != nullptr), s);
+
+  if (x->wgtfacq_e)
+    add_line(serialize_array(x->wgtfacq_e), s);
+
+  add_line("# wgtfacq1_c", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->wgtfacq1_c != nullptr), s);
+
+  if (x->wgtfacq1_c)
+    add_line(serialize_array(x->wgtfacq1_c), s);
 
   add_line("# coeff_gradekin", s);
 
@@ -3140,6 +4830,30 @@ std::string serialize(const t_nh_metrics *x) {
   if (x->coeff2_dwdz)
     add_line(serialize_array(x->coeff2_dwdz), s);
 
+  add_line("# zdiff_gradp", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->zdiff_gradp != nullptr), s);
+
+  if (x->zdiff_gradp)
+    add_line(serialize_array(x->zdiff_gradp), s);
+
+  add_line("# coeff_gradp", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->coeff_gradp != nullptr), s);
+
+  if (x->coeff_gradp)
+    add_line(serialize_array(x->coeff_gradp), s);
+
+  add_line("# exner_exfac", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->exner_exfac != nullptr), s);
+
+  if (x->exner_exfac)
+    add_line(serialize_array(x->exner_exfac), s);
+
   add_line("# theta_ref_mc", s);
 
   add_line("# assoc", s);
@@ -3147,6 +4861,46 @@ std::string serialize(const t_nh_metrics *x) {
 
   if (x->theta_ref_mc)
     add_line(serialize_array(x->theta_ref_mc), s);
+
+  add_line("# theta_ref_me", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->theta_ref_me != nullptr), s);
+
+  if (x->theta_ref_me)
+    add_line(serialize_array(x->theta_ref_me), s);
+
+  add_line("# theta_ref_ic", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->theta_ref_ic != nullptr), s);
+
+  if (x->theta_ref_ic)
+    add_line(serialize_array(x->theta_ref_ic), s);
+
+  add_line("# exner_ref_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->exner_ref_mc != nullptr), s);
+
+  if (x->exner_ref_mc)
+    add_line(serialize_array(x->exner_ref_mc), s);
+
+  add_line("# rho_ref_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->rho_ref_mc != nullptr), s);
+
+  if (x->rho_ref_mc)
+    add_line(serialize_array(x->rho_ref_mc), s);
+
+  add_line("# rho_ref_me", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->rho_ref_me != nullptr), s);
+
+  if (x->rho_ref_me)
+    add_line(serialize_array(x->rho_ref_me), s);
 
   add_line("# d_exner_dz_ref_ic", s);
 
@@ -3156,6 +4910,78 @@ std::string serialize(const t_nh_metrics *x) {
   if (x->d_exner_dz_ref_ic)
     add_line(serialize_array(x->d_exner_dz_ref_ic), s);
 
+  add_line("# d2dexdz2_fac1_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->d2dexdz2_fac1_mc != nullptr), s);
+
+  if (x->d2dexdz2_fac1_mc)
+    add_line(serialize_array(x->d2dexdz2_fac1_mc), s);
+
+  add_line("# d2dexdz2_fac2_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->d2dexdz2_fac2_mc != nullptr), s);
+
+  if (x->d2dexdz2_fac2_mc)
+    add_line(serialize_array(x->d2dexdz2_fac2_mc), s);
+
+  add_line("# pg_exdist", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->pg_exdist != nullptr), s);
+
+  if (x->pg_exdist)
+    add_line(serialize_array(x->pg_exdist), s);
+
+  add_line("# vertidx_gradp", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->vertidx_gradp != nullptr), s);
+
+  if (x->vertidx_gradp)
+    add_line(serialize_array(x->vertidx_gradp), s);
+
+  add_line("# pg_edgeidx", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->pg_edgeidx != nullptr), s);
+
+  if (x->pg_edgeidx)
+    add_line(serialize_array(x->pg_edgeidx), s);
+
+  add_line("# pg_edgeblk", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->pg_edgeblk != nullptr), s);
+
+  if (x->pg_edgeblk)
+    add_line(serialize_array(x->pg_edgeblk), s);
+
+  add_line("# pg_vertidx", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->pg_vertidx != nullptr), s);
+
+  if (x->pg_vertidx)
+    add_line(serialize_array(x->pg_vertidx), s);
+
+  add_line("# bdy_mflx_e_idx", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->bdy_mflx_e_idx != nullptr), s);
+
+  if (x->bdy_mflx_e_idx)
+    add_line(serialize_array(x->bdy_mflx_e_idx), s);
+
+  add_line("# bdy_mflx_e_blk", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->bdy_mflx_e_blk != nullptr), s);
+
+  if (x->bdy_mflx_e_blk)
+    add_line(serialize_array(x->bdy_mflx_e_blk), s);
+
   add_line("# deepatmo_gradh_mc", s);
 
   add_line("# assoc", s);
@@ -3164,6 +4990,14 @@ std::string serialize(const t_nh_metrics *x) {
   if (x->deepatmo_gradh_mc)
     add_line(serialize_array(x->deepatmo_gradh_mc), s);
 
+  add_line("# deepatmo_divh_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->deepatmo_divh_mc != nullptr), s);
+
+  if (x->deepatmo_divh_mc)
+    add_line(serialize_array(x->deepatmo_divh_mc), s);
+
   add_line("# deepatmo_invr_mc", s);
 
   add_line("# assoc", s);
@@ -3171,6 +5005,22 @@ std::string serialize(const t_nh_metrics *x) {
 
   if (x->deepatmo_invr_mc)
     add_line(serialize_array(x->deepatmo_invr_mc), s);
+
+  add_line("# deepatmo_divzu_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->deepatmo_divzu_mc != nullptr), s);
+
+  if (x->deepatmo_divzu_mc)
+    add_line(serialize_array(x->deepatmo_divzu_mc), s);
+
+  add_line("# deepatmo_divzl_mc", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->deepatmo_divzl_mc != nullptr), s);
+
+  if (x->deepatmo_divzl_mc)
+    add_line(serialize_array(x->deepatmo_divzl_mc), s);
 
   add_line("# deepatmo_gradh_ifc", s);
 
@@ -3188,6 +5038,10 @@ std::string serialize(const t_nh_metrics *x) {
   if (x->deepatmo_invr_ifc)
     add_line(serialize_array(x->deepatmo_invr_ifc), s);
 
+  add_line("# pg_listdim", s);
+  add_line(serialize(x->pg_listdim), s);
+  add_line("# bdy_mflx_e_dim", s);
+  add_line(serialize(x->bdy_mflx_e_dim), s);
   std::string out = s.str();
   if (out.length() > 0)
     out.pop_back();
@@ -3233,6 +5087,37 @@ std::string serialize(const t_nh_state *x) {
 
 std::string serialize(const t_prepare_adv *x) {
   std::stringstream s;
+  add_line("# mass_flx_me", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->mass_flx_me != nullptr), s);
+
+  if (x->mass_flx_me)
+    add_line(serialize_array(x->mass_flx_me), s);
+
+  add_line("# mass_flx_ic", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->mass_flx_ic != nullptr), s);
+
+  if (x->mass_flx_ic)
+    add_line(serialize_array(x->mass_flx_ic), s);
+
+  add_line("# vol_flx_ic", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->vol_flx_ic != nullptr), s);
+
+  if (x->vol_flx_ic)
+    add_line(serialize_array(x->vol_flx_ic), s);
+
+  add_line("# vn_traj", s);
+
+  add_line("# assoc", s);
+  add_line(serialize(x->vn_traj != nullptr), s);
+
+  if (x->vn_traj)
+    add_line(serialize_array(x->vn_traj), s);
 
   std::string out = s.str();
   if (out.length() > 0)
