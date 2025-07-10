@@ -59,6 +59,9 @@ def main():
     for stats in results:
         print(f"Mean: {stats['mean']:.2f} µs, Median: {stats['median']:.2f} µs, (timestep: {stats['step']}, istep: {stats['istep']}, lvn Only: {stats['lvn_only']})")
     print(f"Average of medians: {avg_median:.2f} µs (timestep 1 skipped)")
+    avg_avg = sum(stats['mean'] for stats in results) / len(results)
+    print(f"Average of means: {avg_avg:.2f} µs")
+    return avg_median, avg_avg
 
 
 # Uncomment to test directly within script-enabled environments

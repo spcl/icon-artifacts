@@ -1,0 +1,433 @@
+Running: -1
+Reading from: "data_nproma20480/p_int.1.data"
+Reading from: "data_nproma20480/p_prog.t0.1.data"
+Reading from: "data_nproma20480/global_data.t0.1.data"
+Reading from: "data_nproma20480/global_data.t1.1.data"
+Reading from: "data_nproma20480/p_diag.t1.1.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t1.1.data"
+Reading from: "data_nproma20480/p_metrics.t1.1.data"
+Reading from: "data_nproma20480/z_kin_hor_e.t0.1.data"
+Reading from: "data_nproma20480/p_prog.t1.1.data"
+Reading from: "data_nproma20480/istep.1.data"
+Reading from: "data_nproma20480/ntnd.1.data"
+Reading from: "data_nproma20480/z_vt_ie.t0.1.data"
+Reading from: "data_nproma20480/lvn_only.1.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t0.1.data"
+Reading from: "data_nproma20480/z_w_concorr_me.t1.1.data"
+Reading from: "data_nproma20480/ldeepatmo.1.data"
+Reading from: "data_nproma20480/dtime.1.data"
+Reading from: "data_nproma20480/dt_linintp_ubc.1.data"
+Reading from: "data_nproma20480/p_patch.1.data"
+Reading from: "data_nproma20480/p_diag.t0.1.data"
+Reading from: "data_nproma20480/p_metrics.t0.1.data"
+Reading from: "data_nproma20480/z_vt_ie.t1.1.data"
+Step 1 variables, extra_diffu: 1, istep: 1, lvn_only: 0, ldeepatmo: 0
+Iteration: 0
+Timer Host Based C++ Timer took 4939 us
+Iteration: 1
+Timer Host Based C++ Timer took 453 us
+Iteration: 2
+Timer Host Based C++ Timer took 446 us
+Iteration: 3
+Timer Host Based C++ Timer took 443 us
+Iteration: 4
+Timer Host Based C++ Timer took 447 us
+Iteration: 5
+Timer Host Based C++ Timer took 440 us
+Iteration: 6
+Timer Host Based C++ Timer took 442 us
+Iteration: 7
+Timer Host Based C++ Timer took 442 us
+Iteration: 8
+Timer Host Based C++ Timer took 442 us
+Iteration: 9
+Timer Host Based C++ Timer took 438 us
+Iteration: 10
+Timer Host Based C++ Timer took 441 us
+Iteration: 11
+Timer Host Based C++ Timer took 437 us
+Iteration: 12
+Timer Host Based C++ Timer took 436 us
+Iteration: 13
+Timer Host Based C++ Timer took 435 us
+Iteration: 14
+Timer Host Based C++ Timer took 434 us
+Iteration: 15
+Timer Host Based C++ Timer took 437 us
+Iteration: 16
+Timer Host Based C++ Timer took 433 us
+Iteration: 17
+Timer Host Based C++ Timer took 439 us
+Iteration: 18
+Timer Host Based C++ Timer took 434 us
+Iteration: 19
+Timer Host Based C++ Timer took 444 us
+Iteration: 20
+Timer Host Based C++ Timer took 438 us
+Iteration: 21
+Timer Host Based C++ Timer took 440 us
+Iteration: 22
+Timer Host Based C++ Timer took 434 us
+Iteration: 23
+Timer Host Based C++ Timer took 439 us
+Iteration: 24
+Timer Host Based C++ Timer took 440 us
+Iteration: 25
+Timer Host Based C++ Timer took 439 us
+Iteration: 26
+Timer Host Based C++ Timer took 437 us
+Iteration: 27
+Timer Host Based C++ Timer took 437 us
+Iteration: 28
+Timer Host Based C++ Timer took 438 us
+Iteration: 29
+Timer Host Based C++ Timer took 434 us
+Iteration: 30
+Timer Host Based C++ Timer took 437 us
+Iteration: 31
+Timer Host Based C++ Timer took 435 us
+Iteration: 32
+Timer Host Based C++ Timer took 447 us
+Iteration: 33
+Timer Host Based C++ Timer took 439 us
+Iteration: 34
+Timer Host Based C++ Timer took 434 us
+Iteration: 35
+Timer Host Based C++ Timer took 435 us
+Iteration: 36
+Timer Host Based C++ Timer took 436 us
+Iteration: 37
+Timer Host Based C++ Timer took 437 us
+Iteration: 38
+Timer Host Based C++ Timer took 435 us
+Iteration: 39
+Timer Host Based C++ Timer took 433 us
+Iteration: 40
+Timer Host Based C++ Timer took 434 us
+Iteration: 41
+Timer Host Based C++ Timer took 435 us
+Iteration: 42
+Timer Host Based C++ Timer took 437 us
+Iteration: 43
+Timer Host Based C++ Timer took 435 us
+Iteration: 44
+Timer Host Based C++ Timer took 438 us
+Iteration: 45
+Timer Host Based C++ Timer took 434 us
+Iteration: 46
+Timer Host Based C++ Timer took 438 us
+Iteration: 47
+Timer Host Based C++ Timer took 436 us
+Iteration: 48
+Timer Host Based C++ Timer took 429 us
+Iteration: 49
+Timer Host Based C++ Timer took 437 us
+Iteration: 50
+Timer Host Based C++ Timer took 431 us
+Iteration: 51
+Timer Host Based C++ Timer took 433 us
+Iteration: 52
+Timer Host Based C++ Timer took 437 us
+Iteration: 53
+Timer Host Based C++ Timer took 442 us
+Iteration: 54
+Timer Host Based C++ Timer took 429 us
+Iteration: 55
+Timer Host Based C++ Timer took 432 us
+Iteration: 56
+Timer Host Based C++ Timer took 436 us
+Iteration: 57
+Timer Host Based C++ Timer took 444 us
+Iteration: 58
+Timer Host Based C++ Timer took 439 us
+Iteration: 59
+Timer Host Based C++ Timer took 432 us
+Iteration: 60
+Timer Host Based C++ Timer took 441 us
+Iteration: 61
+Timer Host Based C++ Timer took 437 us
+Iteration: 62
+Timer Host Based C++ Timer took 444 us
+Iteration: 63
+Timer Host Based C++ Timer took 436 us
+Iteration: 64
+Timer Host Based C++ Timer took 436 us
+Iteration: 65
+Timer Host Based C++ Timer took 440 us
+Iteration: 66
+Timer Host Based C++ Timer took 439 us
+Iteration: 67
+Timer Host Based C++ Timer took 442 us
+Iteration: 68
+Timer Host Based C++ Timer took 442 us
+Iteration: 69
+Timer Host Based C++ Timer took 440 us
+Iteration: 70
+Timer Host Based C++ Timer took 438 us
+Iteration: 71
+Timer Host Based C++ Timer took 438 us
+Iteration: 72
+Timer Host Based C++ Timer took 435 us
+Iteration: 73
+Timer Host Based C++ Timer took 439 us
+Iteration: 74
+Timer Host Based C++ Timer took 440 us
+Iteration: 75
+Timer Host Based C++ Timer took 442 us
+Iteration: 76
+Timer Host Based C++ Timer took 447 us
+Iteration: 77
+Timer Host Based C++ Timer took 443 us
+Iteration: 78
+Timer Host Based C++ Timer took 441 us
+Iteration: 79
+Timer Host Based C++ Timer took 438 us
+Iteration: 80
+Timer Host Based C++ Timer took 443 us
+Iteration: 81
+Timer Host Based C++ Timer took 452 us
+Iteration: 82
+Timer Host Based C++ Timer took 450 us
+Iteration: 83
+Timer Host Based C++ Timer took 441 us
+Iteration: 84
+Timer Host Based C++ Timer took 438 us
+Iteration: 85
+Timer Host Based C++ Timer took 447 us
+Iteration: 86
+Timer Host Based C++ Timer took 439 us
+Iteration: 87
+Timer Host Based C++ Timer took 441 us
+Iteration: 88
+Timer Host Based C++ Timer took 445 us
+Iteration: 89
+Timer Host Based C++ Timer took 445 us
+Iteration: 90
+Timer Host Based C++ Timer took 442 us
+Iteration: 91
+Timer Host Based C++ Timer took 444 us
+Iteration: 92
+Timer Host Based C++ Timer took 445 us
+Iteration: 93
+Timer Host Based C++ Timer took 440 us
+Iteration: 94
+Timer Host Based C++ Timer took 442 us
+Iteration: 95
+Timer Host Based C++ Timer took 445 us
+Iteration: 96
+Timer Host Based C++ Timer took 447 us
+Iteration: 97
+Timer Host Based C++ Timer took 445 us
+Iteration: 98
+Timer Host Based C++ Timer took 442 us
+Iteration: 99
+Timer Host Based C++ Timer took 440 us
+Iteration: 100
+Timer Host Based C++ Timer took 437 us
+Iteration: 101
+Timer Host Based C++ Timer took 440 us
+Iteration: 102
+Timer Host Based C++ Timer took 440 us
+Iteration: 103
+Timer Host Based C++ Timer took 442 us
+Iteration: 104
+Timer Host Based C++ Timer took 443 us
+Iteration: 105
+Timer Host Based C++ Timer took 439 us
+Iteration: 106
+Timer Host Based C++ Timer took 448 us
+Iteration: 107
+Timer Host Based C++ Timer took 447 us
+Iteration: 108
+Timer Host Based C++ Timer took 444 us
+Iteration: 109
+Timer Host Based C++ Timer took 438 us
+Iteration: 110
+Timer Host Based C++ Timer took 435 us
+Iteration: 111
+Timer Host Based C++ Timer took 438 us
+Iteration: 112
+Timer Host Based C++ Timer took 442 us
+Iteration: 113
+Timer Host Based C++ Timer took 441 us
+Iteration: 114
+Timer Host Based C++ Timer took 439 us
+Iteration: 115
+Timer Host Based C++ Timer took 437 us
+Iteration: 116
+Timer Host Based C++ Timer took 439 us
+Iteration: 117
+Timer Host Based C++ Timer took 442 us
+Iteration: 118
+Timer Host Based C++ Timer took 439 us
+Iteration: 119
+Timer Host Based C++ Timer took 437 us
+Iteration: 120
+Timer Host Based C++ Timer took 441 us
+Iteration: 121
+Timer Host Based C++ Timer took 431 us
+Iteration: 122
+Timer Host Based C++ Timer took 440 us
+Iteration: 123
+Timer Host Based C++ Timer took 444 us
+Iteration: 124
+Timer Host Based C++ Timer took 433 us
+Iteration: 125
+Timer Host Based C++ Timer took 434 us
+Iteration: 126
+Timer Host Based C++ Timer took 436 us
+Iteration: 127
+Timer Host Based C++ Timer took 440 us
+Iteration: 128
+Timer Host Based C++ Timer took 444 us
+Iteration: 129
+Timer Host Based C++ Timer took 443 us
+Iteration: 130
+Timer Host Based C++ Timer took 459 us
+Iteration: 131
+Timer Host Based C++ Timer took 448 us
+Iteration: 132
+Timer Host Based C++ Timer took 440 us
+Iteration: 133
+Timer Host Based C++ Timer took 442 us
+Iteration: 134
+Timer Host Based C++ Timer took 442 us
+Iteration: 135
+Timer Host Based C++ Timer took 438 us
+Iteration: 136
+Timer Host Based C++ Timer took 456 us
+Iteration: 137
+Timer Host Based C++ Timer took 441 us
+Iteration: 138
+Timer Host Based C++ Timer took 437 us
+Iteration: 139
+Timer Host Based C++ Timer took 436 us
+Iteration: 140
+Timer Host Based C++ Timer took 438 us
+Iteration: 141
+Timer Host Based C++ Timer took 443 us
+Iteration: 142
+Timer Host Based C++ Timer took 440 us
+Iteration: 143
+Timer Host Based C++ Timer took 441 us
+Iteration: 144
+Timer Host Based C++ Timer took 440 us
+Iteration: 145
+Timer Host Based C++ Timer took 438 us
+Iteration: 146
+Timer Host Based C++ Timer took 435 us
+Iteration: 147
+Timer Host Based C++ Timer took 443 us
+Iteration: 148
+Timer Host Based C++ Timer took 438 us
+Iteration: 149
+Timer Host Based C++ Timer took 441 us
+Iteration: 150
+Timer Host Based C++ Timer took 441 us
+Iteration: 151
+Timer Host Based C++ Timer took 460 us
+Iteration: 152
+Timer Host Based C++ Timer took 438 us
+Iteration: 153
+Timer Host Based C++ Timer took 441 us
+Iteration: 154
+Timer Host Based C++ Timer took 444 us
+Iteration: 155
+Timer Host Based C++ Timer took 439 us
+Iteration: 156
+Timer Host Based C++ Timer took 439 us
+Iteration: 157
+Timer Host Based C++ Timer took 427 us
+Iteration: 158
+Timer Host Based C++ Timer took 439 us
+Iteration: 159
+Timer Host Based C++ Timer took 437 us
+Iteration: 160
+Timer Host Based C++ Timer took 446 us
+Iteration: 161
+Timer Host Based C++ Timer took 438 us
+Iteration: 162
+Timer Host Based C++ Timer took 439 us
+Iteration: 163
+Timer Host Based C++ Timer took 435 us
+Iteration: 164
+Timer Host Based C++ Timer took 441 us
+Iteration: 165
+Timer Host Based C++ Timer took 432 us
+Iteration: 166
+Timer Host Based C++ Timer took 439 us
+Iteration: 167
+Timer Host Based C++ Timer took 448 us
+Iteration: 168
+Timer Host Based C++ Timer took 434 us
+Iteration: 169
+Timer Host Based C++ Timer took 442 us
+Iteration: 170
+Timer Host Based C++ Timer took 445 us
+Iteration: 171
+Timer Host Based C++ Timer took 442 us
+Iteration: 172
+Timer Host Based C++ Timer took 430 us
+Iteration: 173
+Timer Host Based C++ Timer took 442 us
+Iteration: 174
+Timer Host Based C++ Timer took 442 us
+Iteration: 175
+Timer Host Based C++ Timer took 437 us
+Iteration: 176
+Timer Host Based C++ Timer took 431 us
+Iteration: 177
+Timer Host Based C++ Timer took 437 us
+Iteration: 178
+Timer Host Based C++ Timer took 434 us
+Iteration: 179
+Timer Host Based C++ Timer took 442 us
+Iteration: 180
+Timer Host Based C++ Timer took 437 us
+Iteration: 181
+Timer Host Based C++ Timer took 433 us
+Iteration: 182
+Timer Host Based C++ Timer took 444 us
+Iteration: 183
+Timer Host Based C++ Timer took 438 us
+Iteration: 184
+Timer Host Based C++ Timer took 436 us
+Iteration: 185
+Timer Host Based C++ Timer took 433 us
+Iteration: 186
+Timer Host Based C++ Timer took 431 us
+Iteration: 187
+Timer Host Based C++ Timer took 438 us
+Iteration: 188
+Timer Host Based C++ Timer took 440 us
+Iteration: 189
+Timer Host Based C++ Timer took 440 us
+Iteration: 190
+Timer Host Based C++ Timer took 435 us
+Iteration: 191
+Timer Host Based C++ Timer took 441 us
+Iteration: 192
+Timer Host Based C++ Timer took 436 us
+Iteration: 193
+Timer Host Based C++ Timer took 442 us
+Iteration: 194
+Timer Host Based C++ Timer took 440 us
+Iteration: 195
+Timer Host Based C++ Timer took 433 us
+Iteration: 196
+Timer Host Based C++ Timer took 433 us
+Iteration: 197
+Timer Host Based C++ Timer took 441 us
+Iteration: 198
+Timer Host Based C++ Timer took 441 us
+Iteration: 199
+Timer Host Based C++ Timer took 442 us
+Iteration: 200
+Timer Host Based C++ Timer took 443 us
+Iteration: 201
+Timer Host Based C++ Timer took 435 us
+Iteration: 202
+Timer Host Based C++ Timer took 440 us
+Iteration: 203
+Timer Host Based C++ Timer took 442 us
+Iteration: 204
