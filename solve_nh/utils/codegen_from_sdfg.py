@@ -58,15 +58,35 @@ def wrap_namespace(name: str, content: str) -> str:
             in_header_guard = False
             rest_lines.append(line)
 
+    fixed_start = "/* DaCe AUTO-GENERATED FILE. DO NOT MODIFY */"
+    pattern_start = re.compile(r"#define\s+__DACE_CODEGEN_SOLVE_NH_[A-Z_]+__")
+    pattern_end = re.compile(r"struct\s+solve_nh_[a-z_]+_state_t\s*")
+    start_idx, end_idx = None, None
+    # Find the start and end indices
+    for i, line in enumerate(rest_lines):
+        if start_idx is None and (fixed_start in line or pattern_start.search(line)):
+            start_idx = i
+        elif start_idx is not None and pattern_end.search(line):
+            end_idx = i
+            break
+    if not (start_idx is not None and end_idx is not None):
+        breakpoint()
+    assert start_idx is not None and end_idx is not None
+    rest_lines = rest_lines[: start_idx + 1] + rest_lines[end_idx:]
+
     # Join the parts
     header_guard = "\n".join(header_guard_lines)
     includes = "\n".join(include_lines)
     main_content = "\n".join(rest_lines).strip()
 
+    symbol_suffix_pattern = re.compile(r"(->__f2dace_[a-zA-Z0-9_]+_d_[0-9]+_s)_[0-9]+")
+    main_content = symbol_suffix_pattern.sub(r"\1", main_content)
+
     # Wrap main content in namespace
     wrapped = f"""
 {header_guard}
 {includes}
+#include "shared_struct_defs.h"
 
 namespace {name} {{
 {main_content}
