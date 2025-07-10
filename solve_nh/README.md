@@ -1,6 +1,19 @@
+# Recipes
+
+## Generateing SDFGs from "fake" DyCore
+
+Assumption: You are in this directory (`icon-artifacts/solve_nh`). Fake DyCore is in `./edited-src/solve_nh_fake.f90`. You want to generate SDFGs for sthe 4 parts of `solve_nh()` routine (`predictor_pre` etc.).
+
+```bash
+# Regenerate all 4 SDFG
+bash regen-sdfgs.sh
+# Regenerate all 4 serialization/deserialization modules
+bash regen-serde.sh
+```
+
 ## Running a Stage
 
-Assumption: You are in this directory (`./solve_nh`) and you want to run `stage_0`.
+Assumption: You are in this directory (`icon-artifacts/solve_nh`). You want to run `stage_0`.
 
 ```bash
 # Run all the actions
@@ -20,7 +33,7 @@ After the standalone compilation action, you should have a binary `./verify_solv
 
 ## Validating Numerically
 
-Assumptions: You have compiled and have the `./verify_solve_nh_parts` binary. You also have the serialized data somewhere (e.g. in `/tmp/dycore-data`). You can download the sample data [here](https://polybox.ethz.ch/index.php/s/FQAN7NfnRzS9kdt).
+Assumptions: You have compiled and have the `./verify_solve_nh_parts` binary. You also have the serialized data somewhere (e.g. in `/tmp/dycore-data`). You can download the [sample data here](https://polybox.ethz.ch/index.php/s/FQAN7NfnRzS9kdt).
 
 ```bash
 # Run the standalone binary, with data from `/tmp/dycore-data` and at timestep `20`.
@@ -29,8 +42,8 @@ Assumptions: You have compiled and have the `./verify_solve_nh_parts` binary. Yo
 
 NOTE: Sometimes it crashes at the very end, when writing the data. You can rerun, and it cleanly exits after a few times. Often you can also just ignore the error (may cause some missing lines, but the remaining information often suffices).
 
-At this point, there should be a `./gotwant` directory with the files to compare. Now you can run the comparison script.
+At this point, there should be a `./gotwant/dycore-data` directory with the files to compare. Now you can run the comparison script.
 
 ```bash
-python -m utils.compare_got_want -r gotwant
+python -m utils.compare_got_want -r gotwant/dycore-data
 ```
