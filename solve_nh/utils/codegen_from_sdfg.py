@@ -61,7 +61,8 @@ def wrap_namespace(name: str, content: str) -> str:
     fixed_start = "/* DaCe AUTO-GENERATED FILE. DO NOT MODIFY */"
     pattern_start = re.compile(r"#define\s+__DACE_CODEGEN_SOLVE_NH_[A-Z_]+__")
     pattern_end = re.compile(r"struct\s+solve_nh_[a-z_]+_state_t\s*")
-    start_idx, end_idx = None, None
+    start_idx: int | None = None
+    end_idx: int | None = None
     # Find the start and end indices
     for i, line in enumerate(rest_lines):
         if start_idx is None and (fixed_start in line or pattern_start.search(line)):
@@ -69,8 +70,6 @@ def wrap_namespace(name: str, content: str) -> str:
         elif start_idx is not None and pattern_end.search(line):
             end_idx = i
             break
-    if not (start_idx is not None and end_idx is not None):
-        breakpoint()
     assert start_idx is not None and end_idx is not None
     rest_lines = rest_lines[: start_idx + 1] + rest_lines[end_idx:]
 
@@ -87,6 +86,7 @@ def wrap_namespace(name: str, content: str) -> str:
 {header_guard}
 {includes}
 #include "shared_struct_defs.h"
+#include "velocity_shim.h"
 
 namespace {name} {{
 {main_content}
@@ -121,6 +121,55 @@ def consolidate_generated_code(
     (store / "solve_nh_parts.h").write_text(combined_header)
     (store / "solve_nh_parts.cpp").write_text(combined_source)
 
+    CLANG_FORMAT_CMD = [
+        "clang-format",
+        "-i",
+        str(store / "solve_nh_parts.h"),
+        str(store / "solve_nh_parts.cpp"),
+    ]
+    subprocess.run(CLANG_FORMAT_CMD, check=True)
+
+    src = (
+        (store / "solve_nh_parts.cpp")
+        .read_text()
+        .replace(
+            "global_data_type *in_global_data = global_data[0];",
+            "global_data_type *in_global_data = global_data;",
+        )
+        .replace(
+            "t_int_state *in_p_int = p_int[0];",
+            "t_int_state *in_p_int = p_int;",
+        )
+        .replace(
+            "t_patch *in_p_patch = p_patch[0];",
+            "t_patch *in_p_patch = p_patch;",
+        )
+        .replace(
+            "t_nh_prog *in_p_prog = p_nh_prog_nnew[0];",
+            "t_nh_prog *in_p_prog = p_nh_prog_nnew;",
+        )
+        .replace(
+            "t_nh_prog *in_p_prog = p_nh_prog_nnow[0];",
+            "t_nh_prog *in_p_prog = p_nh_prog_nnow;",
+        )
+        .replace(
+            "global_data[0] = out_global_data;",
+            "global_data = out_global_data;",
+        )
+        .replace(
+            "p_int[0] = out_p_int;",
+            "p_int = out_p_int;",
+        )
+        .replace(
+            "p_patch[0] = out_p_patch;",
+            "p_patch = out_p_patch;",
+        )
+        .replace(
+            "p_nh_prog_nnew[0] = out_p_prog;",
+            "p_nh_prog_nnew = out_p_prog;",
+        )
+    )
+    (store / "solve_nh_parts.cpp").write_text(src)
     CLANG_FORMAT_CMD = [
         "clang-format",
         "-i",

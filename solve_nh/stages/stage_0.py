@@ -1,5 +1,6 @@
 import dace
 from dace import SDFG
+from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 import argparse
 
@@ -9,6 +10,7 @@ STAGE_ID = 0
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    inject_velocity_shim(g)
     g.simplify()
     return g
 

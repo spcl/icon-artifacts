@@ -1,4 +1,5 @@
 #include "shared_struct_defs.h"
+#include "velocity_shim.h"
 #include <dace/dace.h>
 
 namespace corrector_post {
@@ -86,6 +87,7 @@ DACE_EXPORTED void __program_solve_nh_corrector_post(
 #endif // __DACE_CODEGEN_SOLVE_NH_CORRECTOR_POST__
 } // namespace corrector_post
 #include "shared_struct_defs.h"
+#include "velocity_shim.h"
 #include <dace/dace.h>
 
 namespace corrector_pre {
@@ -173,6 +175,7 @@ DACE_EXPORTED void __program_solve_nh_corrector_pre(
 #endif // __DACE_CODEGEN_SOLVE_NH_CORRECTOR_PRE__
 } // namespace corrector_pre
 #include "shared_struct_defs.h"
+#include "velocity_shim.h"
 #include <dace/dace.h>
 
 namespace predictor_post {
@@ -260,6 +263,7 @@ DACE_EXPORTED void __program_solve_nh_predictor_post(
 #endif // __DACE_CODEGEN_SOLVE_NH_PREDICTOR_POST__
 } // namespace predictor_post
 #include "shared_struct_defs.h"
+#include "velocity_shim.h"
 #include <dace/dace.h>
 
 namespace predictor_pre {
