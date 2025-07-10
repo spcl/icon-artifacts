@@ -157,9 +157,7 @@ MODULE fake_mo_mpi
   IMPLICIT NONE
   CONTAINS
   LOGICAL FUNCTION my_process_is_mpi_all_seq()
-    ! FOLLOWING LINE IS MANUAL EDIT
-    integer, parameter :: process_mpi_all_size = 1
-    my_process_is_mpi_all_seq = (process_mpi_all_size <= 1)
+    my_process_is_mpi_all_seq = .TRUE.
   END FUNCTION my_process_is_mpi_all_seq
 END MODULE fake_mo_mpi
 MODULE fake_mo_parallel_config
