@@ -255,9 +255,7 @@ def compile_generated_code_for(
     COMPILE_COMMAND = [str(x) for x in COMPILE_COMMAND if x]
 
     print(f"Compiling with command: {' '.join(COMPILE_COMMAND)}")
-    output = subprocess.run(
-        COMPILE_COMMAND, capture_output=True, env=os.environ.copy()
-    )
+    output = subprocess.run(COMPILE_COMMAND, capture_output=True, env=os.environ.copy())
     if output.returncode != 0:
         print(f"Compilation failed.")
     else:
