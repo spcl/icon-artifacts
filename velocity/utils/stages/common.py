@@ -121,19 +121,29 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         release=release,
         generate_code=True,
         lib=True,
-        main_name="main.cu",
+        main_name=None,
         stage=stage,
         debuginfo=True,
         allocation_names_to_comment_out=None,
         use_openacc_stream=False,
       )
-  if not lib:
-    binpath = Path('velocity_gpu')
-    assert binpath.exists()
-    binpath = binpath.rename(f"{binpath.name}.stage{stage}")
-    print(f"Binary available: {binpath}")
+  if stage == 1:
+      binpath = Path('velocity_gpu')
+      assert binpath.exists()
+      binpath = binpath.rename(f"{binpath.name}.stage{stage}")
+      print(f"Binary available: {binpath}")
+      libpath = Path('libvelocity_gpu.so')
+      assert libpath.exists()
+      libpath = libpath.rename(f"libvelocity_gpu_stage{stage}.so")
+      print(f"Library available: {libpath}")
   else:
-    libpath = Path('libvelocity_gpu.so')
-    assert libpath.exists()
-    libpath = libpath.rename(f"libvelocity_gpu_stage{stage}.so")
-    print(f"Library available: {libpath}")
+    if not lib:
+      binpath = Path('velocity_gpu')
+      assert binpath.exists()
+      binpath = binpath.rename(f"{binpath.name}.stage{stage}")
+      print(f"Binary available: {binpath}")
+    else:
+      libpath = Path('libvelocity_gpu.so')
+      assert libpath.exists()
+      libpath = libpath.rename(f"libvelocity_gpu_stage{stage}.so")
+      print(f"Library available: {libpath}")

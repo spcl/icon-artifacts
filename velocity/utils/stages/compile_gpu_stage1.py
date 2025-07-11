@@ -12,7 +12,7 @@ import argparse
 from utils.init_transient_zero import init_transient_zero
 from utils.reassign_vars import reassign_vars
 STAGE_ID = 1
-
+from utils.prune_names import prune_names
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
@@ -44,6 +44,7 @@ def optimization_action(sdfg):
         add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
     # It is here to get rid of redundant symbols like `ol_size` (which are not correctly handled in other hacks later).
     ConstantPropagation().apply_pass(sdfg, {})
+    prune_names(sdfg)  # Prune names of structs and containers
     return sdfg
 
 def main():
