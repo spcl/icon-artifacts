@@ -59,3 +59,5 @@ from utils.change_array_dtypes import change_array_dtypes
 
 from utils.reshape_kernels import reshape_kernels
 from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays
+
+from utils.prune_names import prune_names

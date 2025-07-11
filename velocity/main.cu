@@ -6,8 +6,8 @@
 #include <thread>
 #include "flags.h"
 
-#include "serde.h"
-#include "velocity_tendencies.h"
+#include "serde_velocity_no_nproma.h"
+#include "velocity_tendencies_no_nproma.h"
 
 template <std::ostream& CS>
 struct AtomicStream {

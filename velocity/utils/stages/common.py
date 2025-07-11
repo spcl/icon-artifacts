@@ -91,12 +91,36 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         use_openacc_stream=False,
         debuginfo=True
       )
-  else:
+  elif stage > 1:
     compile_if_propagated_sdfgs(
         sdfgs, gpu=True,
         release=release,
         generate_code=True,
         lib=False,
+        main_name="main.cu",
+        stage=stage,
+        debuginfo=True,
+        allocation_names_to_comment_out=None,
+        use_openacc_stream=False,
+      )
+  else:
+    assert stage == 1
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=False,
+        main_name="main.cu",
+        stage=stage,
+        debuginfo=True,
+        allocation_names_to_comment_out=None,
+        use_openacc_stream=False,
+      )
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=True,
         main_name="main.cu",
         stage=stage,
         debuginfo=True,
