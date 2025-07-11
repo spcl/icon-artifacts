@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import dace
 from dace import SDFG
 from utils.unique_names import unique_names
@@ -6,6 +7,7 @@ from utils.codegen_from_sdfg import (
     generate_code_from_sdfg,
     compile_generated_code_for,
     consolidate_generated_code,
+    Mode,
 )
 
 STARTER_SDFG_FILES = [
@@ -75,8 +77,8 @@ def codegen_action(
     )
 
 
-def compile_action(stage: int) -> None:
+def compile_action(stage: int, mode: Mode) -> None:
     SDFG_INCLUDES = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")]
     SDFG_SRCS = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}") / "solve_nh_parts.cpp"]
 
-    compile_generated_code_for(SDFG_INCLUDES, SDFG_SRCS)
+    compile_generated_code_for(SDFG_INCLUDES, SDFG_SRCS, mode)

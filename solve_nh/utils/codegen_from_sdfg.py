@@ -4,8 +4,20 @@ from dace import SDFG
 from pathlib import Path
 from dace.codegen import codegen, compiler
 from dace.sdfg import infer_types
+
 import subprocess
 import re
+from enum import Enum
+import platform
+
+
+class Mode(Enum):
+    STATIC = "static"
+    SHARED = "shared"
+    EXEC = "exec"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 def generate_code_from_sdfg(g: SDFG) -> None:
@@ -184,7 +196,7 @@ def consolidate_generated_code(
 
 
 def compile_generated_code_for(
-    sdfg_includes: list[Path], sdfg_srcs: list[Path]
+    sdfg_includes: list[Path], sdfg_srcs: list[Path], mode: Mode
 ) -> None:
     """
     Compile the generated code for a given SDFG.
@@ -200,9 +212,17 @@ def compile_generated_code_for(
     ]
 
     STANDALONE_SRC = Path("main.cc")
-    SOURCES = [STANDALONE_SRC] + sdfg_srcs
+    if mode == Mode.EXEC:
+        SOURCES = [STANDALONE_SRC] + sdfg_srcs
+    else:
+        SOURCES = sdfg_srcs
 
-    BIN = f"verify_solve_nh_parts"
+    if mode == Mode.STATIC:
+        BIN = f"verify_solve_nh_parts.o"
+    elif mode == Mode.SHARED:
+        BIN = f"libverify_solve_nh_parts.so"
+    elif mode == Mode.EXEC:
+        BIN = f"verify_solve_nh_parts"
 
     ERRLIMIT_FLAG = "-fmax-errors=1" if CC.startswith("g++") else "-ferror-limit=1"
     CLANG_ONLY_DISABLED_WARNINGS = (
@@ -217,6 +237,18 @@ def compile_generated_code_for(
         "-O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer".split(" ")
     )
     STANDARD_FLAGS = "-std=c++23 -fPIC -fopenmp".split(" ")
+    if mode in [Mode.EXEC, Mode.SHARED]:
+        if platform.system() == "Darwin":
+            STANDARD_FLAGS.append("-Wl,-undefined,dynamic_lookup")
+        else:
+            STANDARD_FLAGS.append("-Wl,--unresolved-symbols=ignore-all")
+    if mode == Mode.SHARED:
+        STANDARD_FLAGS.append(
+            "-dynamiclib" if platform.system() == "Darwin" else "-shared"
+        )
+    elif mode == Mode.STATIC:
+        STANDARD_FLAGS.append("-c")
+
     FLAGS = DIAGNOSIS_FLAGS + OPTIMIZATION_FLAGS + STANDARD_FLAGS
 
     COMPILE_COMMAND = list([CC] + SOURCES + INCLUDES + FLAGS + ["-o", BIN])
@@ -227,8 +259,22 @@ def compile_generated_code_for(
     if output.returncode != 0:
         print(f"Compilation failed.")
     else:
-        print(f"Compilation succeeded. Executable created: {BIN}")
+        print(
+            f"Compilation succeeded. {'Executable' if mode == Mode.EXEC else 'Library'} created: {BIN}"
+        )
     print(f"Output: {output.stdout.decode()}")
     print(f"Error: {output.stderr.decode()}")
+
+    if mode == Mode.STATIC:
+        LIB = "libverify_solve_nh_parts.a"
+        ARCHIVE_COMMAND = f"ar rcs {LIB} {BIN}".split(" ")
+        print(f"Archiving with command: {' '.join(ARCHIVE_COMMAND)}")
+        output = subprocess.run(ARCHIVE_COMMAND, capture_output=True)
+        if output.returncode != 0:
+            print(f"Archive failed.")
+        else:
+            print(f"Archive succeeded. Library created: {LIB}")
+        print(f"Output: {output.stdout.decode()}")
+        print(f"Error: {output.stderr.decode()}")
     if output.returncode != 0:
         exit(1)

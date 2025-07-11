@@ -2,6 +2,8 @@ import dace
 from dace import SDFG
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
+from utils.codegen_from_sdfg import Mode
+
 import argparse
 
 
@@ -22,6 +24,14 @@ def main():
     )
     argp.add_argument("--codegen", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument(
+        "--mode",
+        type=Mode,
+        choices=list(Mode),
+        required=False,
+        default=Mode.EXEC,
+        help="Select the mode: static, shared, or exec",
+    )
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True
@@ -56,7 +66,7 @@ def main():
 
     if args.compile:
         print(f"Stage #{STAGE_ID}: Compiling SDFGs")
-        common.compile_action(STAGE_ID)
+        common.compile_action(STAGE_ID, args.mode)
 
 
 if __name__ == "__main__":

@@ -241,7 +241,7 @@ DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
     int __f2dace_OA_z_vt_ie_d_2_s, double dt_linintp_ubc, double dtime,
     int istep, int ldeepatmo, int lvn_only, int ntnd);
 
-DACE_EXPORTED void velocity_tendencies(
+static void velocity_tendencies(
     global_data_type *global_data, t_nh_diag *p_diag, t_int_state *p_int,
     t_nh_metrics *p_metrics, t_patch *p_patch, t_nh_prog *p_prog,
     double *z_kin_hor_e, double *z_vt_ie, double *z_w_concorr_me,
