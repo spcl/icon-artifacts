@@ -14,31 +14,30 @@ git show origin/new_sched:velocity/src/reductions.cpp > velocity_workspace/reduc
 git show origin/new_sched:velocity/src/reductions_kernel.cu > velocity_workspace/reductions_kernel.cc
 git show origin/new_sched:velocity/src/timer.cpp > velocity_workspace/timer.cc
 
-# Detect OS and set appropriate sed options
-if [[ "$(uname)" == "Darwin" ]]; then
-  # macOS (BSD sed)
-  SED_INPLACE_OPT="-i ''"
+# Portable sed -i across Linux and macOS
+if [[ $(uname) == "Darwin" ]]; then
+  SED_INPLACE_OPT=(-i '')
 else
-  # Linux (GNU sed)
-  SED_INPLACE_OPT="-i"
+  SED_INPLACE_OPT=(-i)
 fi
 
-find velocity_workspace/ -name 'velocity_*.cc' -exec sed $SED_INPLACE_OPT 's|"reductions_kernel\.cuh"|"reductions_kernel.h"|g' {} +
-sed $SED_INPLACE_OPT '/#include <cuda_runtime\.h>/d' velocity_workspace/reductions_kernel.h velocity_workspace/reductions_kernel.cc
-sed $SED_INPLACE_OPT '/#include[[:space:]]*<thrust\/.*>/d' velocity_workspace/reductions_kernel.cc
-sed $SED_INPLACE_OPT '/cudaStream_t/d' velocity_workspace/reductions_kernel.h
-sed $SED_INPLACE_OPT 's/\(__global__\)/static/g' velocity_workspace/reductions_kernel.h
-sed $SED_INPLACE_OPT 's/\(__device__\)//g' velocity_workspace/reductions_kernel.cc
-sed $SED_INPLACE_OPT 's/\(__forceinline__\)//g' velocity_workspace/reductions_kernel.cc
-sed $SED_INPLACE_OPT '/#include "\.\.\/\.\.\/include\/hash\.h"/d' velocity_workspace/velocity_*.cc
-sed $SED_INPLACE_OPT '/cudaDeviceSynchronize[[:space:]]*(.*);/d' velocity_workspace/velocity_*.cc
-sed $SED_INPLACE_OPT '/cleanup_reduce_sum_gpu/d' velocity_workspace/velocity_*.cc
-sed $SED_INPLACE_OPT '/cleanup_reduce_maxZ_gpu/d' velocity_workspace/velocity_*.cc
-sed -E $SED_INPLACE_OPT 's/(->__f2dace_.*_d_[0-9]+_s)_[0-9]+/\1/g' velocity_workspace/velocity_*.cc
+find velocity_workspace/ -name 'velocity_*.cc' -exec sed "${SED_INPLACE_OPT[@]}" 's|"reductions_kernel.cuh"|"reductions_kernel.h"|g' {} +
+
+sed "${SED_INPLACE_OPT[@]}" '/#include <cuda_runtime\.h>/d' velocity_workspace/reductions_kernel.h velocity_workspace/reductions_kernel.cc
+sed "${SED_INPLACE_OPT[@]}" '/#include[[:space:]]*<thrust\/.*>/d' velocity_workspace/reductions_kernel.cc
+sed "${SED_INPLACE_OPT[@]}" '/cudaStream_t/d' velocity_workspace/reductions_kernel.h
+sed "${SED_INPLACE_OPT[@]}" 's/\(__global__\)/static/g' velocity_workspace/reductions_kernel.h
+sed "${SED_INPLACE_OPT[@]}" 's/\(__device__\)//g' velocity_workspace/reductions_kernel.cc
+sed "${SED_INPLACE_OPT[@]}" 's/\(__forceinline__\)//g' velocity_workspace/reductions_kernel.cc
+sed "${SED_INPLACE_OPT[@]}" '/#include "\.\.\/\.\.\/include\/hash\.h"/d' velocity_workspace/velocity_*.cc
+sed "${SED_INPLACE_OPT[@]}" '/cudaDeviceSynchronize[[:space:]]*(.*);/d' velocity_workspace/velocity_*.cc
+sed "${SED_INPLACE_OPT[@]}" '/cleanup_reduce_sum_gpu/d' velocity_workspace/velocity_*.cc
+sed "${SED_INPLACE_OPT[@]}" '/cleanup_reduce_maxZ_gpu/d' velocity_workspace/velocity_*.cc
+sed -E "${SED_INPLACE_OPT[@]}" 's/(->__f2dace_.*_d_[0-9]+_s)_[0-9]+/\1/g' velocity_workspace/velocity_*.cc
 
 for f in velocity_workspace/velocity_*.cc; do
   # Prepend includes
-  sed $SED_INPLACE_OPT '1s|^|#include <dace/dace.h>\n#include "shared_struct_defs.h"\n|' "$f"
+  sed "${SED_INPLACE_OPT[@]}" '1s|^|#include <dace/dace.h>\n#include "shared_struct_defs.h"\n|' "$f"
 
   # Filter out content between specific markers
   awk '
