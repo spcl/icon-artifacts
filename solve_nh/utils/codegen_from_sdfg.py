@@ -1,4 +1,4 @@
-from os import name
+import os
 import dace
 from dace import SDFG
 from pathlib import Path
@@ -139,7 +139,7 @@ def consolidate_generated_code(
         str(store / "solve_nh_parts.h"),
         str(store / "solve_nh_parts.cpp"),
     ]
-    subprocess.run(CLANG_FORMAT_CMD, check=True)
+    subprocess.run(CLANG_FORMAT_CMD, check=True, env=os.environ.copy())
 
     src = (
         (store / "solve_nh_parts.cpp")
@@ -255,7 +255,9 @@ def compile_generated_code_for(
     COMPILE_COMMAND = [str(x) for x in COMPILE_COMMAND]
 
     print(f"Compiling with command: {' '.join(COMPILE_COMMAND)}")
-    output = subprocess.run(COMPILE_COMMAND, capture_output=True)
+    output = subprocess.run(
+        COMPILE_COMMAND, capture_output=True, check=True, env=os.environ.copy()
+    )
     if output.returncode != 0:
         print(f"Compilation failed.")
     else:
@@ -269,7 +271,9 @@ def compile_generated_code_for(
         LIB = "libverify_solve_nh_parts.a"
         ARCHIVE_COMMAND = f"ar rcs {LIB} {BIN}".split(" ")
         print(f"Archiving with command: {' '.join(ARCHIVE_COMMAND)}")
-        output = subprocess.run(ARCHIVE_COMMAND, capture_output=True)
+        output = subprocess.run(
+            ARCHIVE_COMMAND, capture_output=True, check=True, env=os.environ.copy()
+        )
         if output.returncode != 0:
             print(f"Archive failed.")
         else:
