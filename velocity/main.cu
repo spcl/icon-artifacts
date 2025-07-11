@@ -262,6 +262,25 @@ int main(int argc, char* argv[]) {
             << ", ldeepatmo: " << ldeepatmo << std::endl;
 
     if (lvn_only == 1 && istep == 1) {
+            std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(2)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2) << std::endl;
       auto* h_1_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
@@ -334,6 +353,26 @@ int main(int argc, char* argv[]) {
           __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(h_1_1);
 
     } else if (lvn_only == 0 && istep == 1) {
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(2)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2) << std::endl;
+
       auto* h_0_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,
@@ -459,6 +498,25 @@ int main(int argc, char* argv[]) {
           __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_2(h_1_2);
 
     } else if (lvn_only == 0 && istep == 2) {
+            std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(0)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(1)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_w_concorr_me).size.at(2)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(0)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(1)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_kin_hor_e).lbound.at(2)
+                << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(0) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(1) << std::endl;
+      std::cout << serde::ARRAY_META_DICT_AT(z_vt_ie).lbound.at(2) << std::endl;
       auto* h_0_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
           &global_data, &p_diag, &p_int, &p_metrics, &p_patch, &p_prog,
           z_kin_hor_e, z_vt_ie, z_w_concorr_me,

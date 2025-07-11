@@ -23,7 +23,7 @@ def parse_timer_log_by_step(file_path):
         end = config_matches[i + 1].start() if i + 1 < len(config_matches) else len(content)
 
         block = content[start:end]
-        durations = [int(m.group(1)) for m in re.finditer(r'Timer Host Based C\+\+ Timer took (\d+) us', block)]
+        durations = [float(m.group(1)) for m in re.finditer(r'Timer Host Based C\+\+ Timer took (\d+) us', block)]
         if len(durations) == 0:
             durations = [float(m.group(1)) for m in re.finditer(r'CUDA Events Based Total time: ([\d.]+) us', block)]
         assert len(durations) > 0, f"No durations found for step {step_info[0]}"
@@ -32,6 +32,8 @@ def parse_timer_log_by_step(file_path):
             print(f"Step {step_info[0]}: {len(durations)} durations found")
             if not (step_info[2] == 1 and step_info[3] == 0):
                 results += durations
+
+    print(len(results), "total durations found across all steps")
 
     return results
 
@@ -43,28 +45,25 @@ def get_median_runtime(path: str):
     mean = np.mean(results)
 
     # Compute 95% confidence interval for the median using scipy
-    median_ci = bootstrap(results, np.median, confidence_level=0.99,
+    median_ci = bootstrap(np.array(results).reshape(1, -1), np.median, confidence_level=0.99,
                           n_resamples=5000, method='percentile').confidence_interval
 
     # 95% CI for the mean
     stddev = np.std(results, ddof=1)
-    mean_ci = bootstrap(results, np.mean, confidence_level=0.99,
+    mean_ci = bootstrap(np.array(results).reshape(1, -1), np.mean, confidence_level=0.99,
                           n_resamples=5000, method='percentile').confidence_interval
 
 
     # Debug print per step
-    for stats in results:
-        print(f"Mean: {stats['mean']:.2f} us, Median: {stats['median']:.2f} us, "
-              f"(timestep: {stats['step']}, istep: {stats['istep']}, lvn Only: {stats['lvn_only']})")
 
     print(f"Median Runtime: {median:.2f} us (timestep 1 skipped)")
-    print(f"Mean Runtime: {mean:.2f} us")
+    print(f"Mean Runtime: {mean:.2f} us (timestep 1 skipped)")
 
     # Convert to milliseconds
     return median, mean, (median_ci.low, median_ci.high), (mean_ci.low, mean_ci.high)
 
 
-CACHE_TYPES = ["l1l2", "l2only", "default"]
+CACHE_TYPES = ["l1l2", "l2only"] #, "default"
 
 # Simulate or run external script here
 def run_external_script():
@@ -74,7 +73,7 @@ def run_external_script():
 cache_to_flag_dict = {
     'l1l2': '"-Xptxas -dlcm=ca"',
     'l2only': '"-Xptxas -dlcm=cg"',
-    'default': '""'
+    #'default': '""'
 }
 
 def main():

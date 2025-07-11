@@ -7,6 +7,7 @@ import re
 
 from dace.sdfg import infer_types
 from utils.config import fix_out_val_0, rm_syncs
+from utils.prune_names import prune_names, compare_structs
 
 use_cuda_events = os.getenv('_USE_CUDA_EVENTS', '0').lower() in ('1', 'true', 'yes')
 
@@ -454,6 +455,8 @@ def compile_if_propagated_sdfgs(
     allocation_names_to_comment_out: set | None,
     use_openacc_stream: bool,
 ):
+    compare_structs(sdfgs)
+
     use_nvhpc = os.getenv('_USE_NVHPC', '0').lower() in ('1', 'true', 'yes')
     dace.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="1")
     sources = set()
@@ -556,15 +559,17 @@ def compile_if_propagated_sdfgs(
             add_reduce_clean_up_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu")
             #This fix is needed for uint8_t
             fix_levelmask_calls(f"{build_loc}/src/cpu/{sdfg_name}.cu", True, stage)
-            fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False, stage)
+            if stage > 5:
+                fix_levelmask_calls(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", False, stage)
 
-            with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
-                main_cu_code = file.read()
-            with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
-                file.write(
-                    '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
-                    + main_cu_code
-                )
+            if stage > 5:
+                with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "r") as file:
+                    main_cu_code = file.read()
+                with open(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "w") as file:
+                    file.write(
+                        '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
+                        + main_cu_code
+                    )
             #if fix_out_val_0:
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")
@@ -573,7 +578,8 @@ def compile_if_propagated_sdfgs(
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_maxvcfl_arr")
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "out_val_0, &gpu_levmask")
-            sources.add(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+            if stage > 5:
+                sources.add(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "r") as file:
                 main_cu_code = file.read()
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cu", "w") as file:

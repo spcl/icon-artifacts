@@ -5,6 +5,8 @@ from typing import Set, Callable
 
 from dace.codegen.control_flow import ConditionalBlock
 from dace.sdfg.sdfg import CodeBlock
+import copy
+import dace.sdfg.utils as sdutil
 
 def _strip_suffix_if_matches(s: str) -> str:
     match = re.search(r'_s_\d+$', s)
@@ -52,32 +54,41 @@ def _container_array_same(a_name1: str, a_name2: str, ca1: dace.data.ContainerAr
 
 def _struct_same(s_name1: str, s_name2: str, struct1: dace.data.Structure, struct2: dace.data.Structure) -> bool:
     if s_name1 != s_name2:
+        print(f"Struct names do not match: {s_name1} != {s_name2}")
         return False
     if struct1.dtype != struct2.dtype:
+        print(f"Struct dtypes do not match: {s_name1}: {struct1.dtype} != {struct2.dtype}")
         return False
     if struct1.shape != struct2.shape:
+        print(f"Struct shapes do not match: {s_name1}: {struct1.shape} != {struct2.shape}")
         return False
     for member_name, member in struct1.members.items():
         if member_name not in struct2.members:
+            print(f"Member {member_name} of {s_name1} not found in struct {s_name2}")
             return False
         member2 = struct2.members[member_name]
         if type(member) != type(member2):
+            print(f"Member types do not match: {member_name} in {s_name1} is {type(member)} but in {s_name2} is {type(member2)}")
             return False
         if isinstance(member, dace.data.Array):
             same = _array_same(member_name, member_name, member, member2)
             if not same:
+                print(f"Array {member_name} in {s_name1} does not match with {s_name2}")
                 return False
         elif isinstance(member, dace.data.Scalar):
             same = _scalar_same(member_name, member_name, member, member2)
             if not same:
+                print(f"Scalar {member_name} in {s_name1} does not match with {s_name2}")
                 return False
         elif isinstance(member, dace.data.Structure):
             same = _struct_same(member_name, member_name, member, member2)
             if not same:
+                print(f"Structure {member_name} in {s_name1} does not match with {s_name2}")
                 return False
         elif isinstance(member, dace.data.ContainerArray):
             same = _container_array_same(member_name, member_name, member, member2)
             if not same:
+                print(f"ContainerArray {member_name} in {s_name1} does not match with {s_name2}")
                 return False
     return True
 
@@ -104,21 +115,34 @@ def _print_names(name: str, struct: dace.data.Structure, depth: int) -> None:
         else:
             print(f"{indent}  Member: {member_name}, Type: {member.dtype}, Transient: {member.transient}, Storage: {member.storage}")
 
-def _repl_struct_names(name: str, struct: dace.data.Structure, depth: int) -> None:
+def _repl_struct_names(sdfg: dace.SDFG, name: str, struct: dace.data.Structure, depth: int) -> None:
     indent = '  ' * depth
     _new_members = dict()
     for member_name, member in struct.members.items():
+        print(f"{indent}Processing member: {member_name}: {member_name} => {_strip_suffix_if_matches(member_name)}")
         new_member_name = _strip_suffix_if_matches(member_name)
         print(f"{indent}Name (From) {member_name} => (TO) {new_member_name}")
         _new_members[new_member_name] = member
     struct.members = _new_members
 
     for member_name, member in struct.members.items():
+        print(member_name, type(member))
         if isinstance(member, dace.data.Structure):
-            _repl_struct_names(member_name, member, depth + 1)
+            _repl_struct_names(sdfg, member_name, member, depth + 1)
         elif isinstance(member, dace.data.ContainerArray):
-            _repl_struct_names(member_name, member.stype, depth + 1)
+            _repl_struct_names(sdfg, member_name, member.stype, depth + 1)
+        else:
+            if not isinstance(member, dace.data.Array) and not isinstance(member, dace.data.Scalar):
+                raise TypeError(f"Unsupported member type {type(member)} in structure {struct.name}")
 
+    #if depth == 0:
+    #    print(struct)
+
+    if depth == 0:
+        #print(struct.members)
+        assert name in sdfg.arrays.keys(), f"Structure (name) {name} not in arrays of SDFG {sdfg.name}"
+        assert struct in sdfg.arrays.values(), f"Structure (desc) {struct.name} not in arrays of SDFG {sdfg.name}"
+        sdfg.arrays[name] = struct
 
 def _rename_on_if_conds(sdfg: dace.SDFG, src: str, dst: str, recursive=False):
     gpu_host_name_map = {src: dst}
@@ -171,32 +195,100 @@ def _rename_symbols(sdfg: dace.SDFG, check_func: Callable) -> None:
             if isinstance(node, dace.nodes.NestedSDFG):
                 _rename_symbols(node.sdfg, check_func)
 
+def _rename_init_and_global_code(sdfg: dace.SDFG, check_func: Callable) -> None:
+
+
     new_global_code = dict()
     new_init_code = dict()
-    for old_s, new_s in new_symbols.items():
-        for k, v in sdfg.global_code.items():
-            new_global_code[k.replace(old_s, new_s)] = CodeBlock(v.as_string.replace(old_s, new_s), language=dace.dtypes.Language.CPP) if isinstance(v, CodeBlock) else CodeBlock(v.replace(old_s, new_s), language=dace.dtypes.Language.CPP)
-        for k, v in sdfg.init_code.items():
-            new_init_code[k.replace(old_s, new_s)] = CodeBlock(v.as_string.replace(old_s, new_s), language=dace.dtypes.Language.CPP) if isinstance(v, CodeBlock) else CodeBlock(v.replace(old_s, new_s), language=dace.dtypes.Language.CPP)
+
+    pattern = r'_s_\d+ '
+    replacement = ' '
+
+    for k, v in sdfg.global_code.items():
+        print(k, v)
+        new_key = re.sub(pattern, replacement, k)
+        if isinstance(v, CodeBlock):
+            new_value = CodeBlock(re.sub(pattern, replacement, v.as_string), language=dace.dtypes.Language.CPP)
+        else:
+            new_value = CodeBlock(re.sub(pattern, replacement, v), language=dace.dtypes.Language.CPP)
+        new_global_code[new_key] = new_value
+        if new_key != k:
+            del new_global_code[k]
+
+    for k, v in sdfg.init_code.items():
+        print(k, v)
+        new_key = re.sub(pattern, replacement, k)
+        if isinstance(v, CodeBlock):
+            new_value = CodeBlock(re.sub(pattern, replacement, v.as_string), language=dace.dtypes.Language.CPP)
+        else:
+            new_value = CodeBlock(re.sub(pattern, replacement, v), language=dace.dtypes.Language.CPP)
+        new_init_code[new_key] = new_value
+        if new_key != k:
+            del new_init_code[k]
 
     sdfg.init_code = new_init_code
     sdfg.global_code = new_global_code
 
 
-def prune_names(sdfg: dace.SDFG) -> None:
+def prune_names(sdfg: dace.SDFG) -> dace.SDFG:
+    new_sdfg = copy.deepcopy(sdfg)
+    sdutil.set_nested_sdfg_parent_references(new_sdfg)
     cname = "p_int"
-    for arr_name, arr in sdfg.arrays.items():
+    for arr_name, arr in new_sdfg.arrays.items():
         if arr_name == cname:
             _print_names(arr_name, arr, 0)
 
         if isinstance(arr, dace.data.Structure):
-            _repl_struct_names(arr_name, arr, 0)
+            print("Repl names for structure:", arr_name)
+            _repl_struct_names(new_sdfg, arr_name, arr, 0)
 
         if arr_name == cname:
             _print_names(arr_name, arr, 0)
 
-    _rename_symbols(sdfg, _strip_suffix_if_matches)
+    _rename_symbols(new_sdfg, _strip_suffix_if_matches)
+    _rename_init_and_global_code(new_sdfg, _strip_suffix_if_matches)
 
-    #sdfg.save("before_prune.sdfgz", compress=True)
-    sdfg.validate()
-    #raise Exception("UWU")
+    # AH fuck it, just replace on the json
+    new_sdfg.save("/tmp/after_prune.sdfg.json", compress=False)
+    with open("/tmp/after_prune.sdfg.json", "r", encoding="utf-8") as f:
+        json_str = f.read()
+
+    # Step 2: Remove all _s_<number> patterns
+    cleaned_str = re.sub(r"_s_\d+", "", json_str)
+
+    # Step 4: Save the cleaned JSON to a new file
+    with open("/tmp/after_prune.sdfg.json", "w", encoding="utf-8") as f:
+        f.write(cleaned_str)
+
+    new_sdfg = dace.SDFG.from_file("/tmp/after_prune.sdfg.json")
+
+    #raise Exception("Pruned names, but not yet tested. Please test this function before removing this exception.")
+    new_sdfg.validate()
+    #return new_sdfg
+    #new_sdfg.save("after_prune.sdfg.json", compress=False)
+    #raise Exception("Pruned names, but not yet tested. Please test this function before removing this exception.")
+    return new_sdfg
+
+def compare_structs_from_paths(sdfgs: list[str]):
+    sdfg0 = dace.SDFG.from_file(sdfgs[0])
+    for i in range(1, len(sdfgs)):
+        sdfg1 = dace.SDFG.from_file(sdfgs[i])
+        for name, arr in sdfg0.arrays.items():
+            if isinstance(arr, dace.data.Structure) and not isinstance(arr, dace.data.View):
+                if name not in sdfg1.arrays:
+                    raise KeyError(f"Array {name} not found in SDFG {sdfgs[i]}")
+                arr1 = sdfg1.arrays[name]
+                if not _struct_same(name, name, arr, arr1):
+                    raise ValueError(f"Arrays {name} do not match between SDFGs {sdfgs[0]} and {sdfgs[i]}")
+
+def compare_structs(sdfgs: list[dace.SDFG]):
+    sdfg0 = sdfgs[0]
+    for i in range(1, len(sdfgs)):
+        sdfg1 = sdfgs[i]
+        for name, arr in sdfg0.arrays.items():
+            if isinstance(arr, dace.data.Structure) and not isinstance(arr, dace.data.View):
+                if name not in sdfg1.arrays:
+                    raise KeyError(f"Array {name} not found in SDFG {sdfgs[i]}")
+                arr1 = sdfg1.arrays[name]
+                if not _struct_same(name, name, arr, arr1):
+                    raise ValueError(f"Arrays {name} do not match between SDFGs {sdfgs[0]} and {sdfgs[i]}")

@@ -44,7 +44,7 @@ def optimization_action(sdfg):
         add_all_reductions(sdfg) # Name matched reductions - major work necessary to have a "detect reduction" pass
     # It is here to get rid of redundant symbols like `ol_size` (which are not correctly handled in other hacks later).
     ConstantPropagation().apply_pass(sdfg, {})
-    prune_names(sdfg)  # Prune names of structs and containers
+    sdfg = prune_names(sdfg)  # Prune names of structs and containers
     return sdfg
 
 def main():
