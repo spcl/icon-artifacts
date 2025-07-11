@@ -1,4 +1,4 @@
-set -x
+set -xe
 
 mkdir -p velocity_workspace
 
@@ -50,25 +50,30 @@ done
 
 clang-format -i velocity_workspace/*.h velocity_workspace/*.cc
 
-clang++ velocity_workspace/velocity_*.cc velocity_workspace/reductions.cc velocity_workspace/timer.cc \
-  -I/Users/pmz/gitspace/dace/dace/runtime/include \
+CC=clang++
+[ "$CC" = "clang++" ] && ERRLIM="-ferror-limit=1" || ERRLIM="-fmax-errors=1"
+DACEROOT=/scratch/pmazumde/gitspace/dace/
+
+
+$CC velocity_workspace/velocity_*.cc velocity_workspace/reductions.cc velocity_workspace/timer.cc \
   -Iinclude \
   -Ivelocity_workspace \
-  -ferror-limit=1 -g -Wall -Wall -Wextra \
+  -I"$DACEROOT/dace/runtime/include" \
+  "$ERRLIM" -g -Wall -Wall -Wextra \
   -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable \
   -Wno-unused-but-set-parameter -Wno-sign-compare -Wno-parentheses-equality -Wno-constant-logical-operand \
   -O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer \
-  -std=c++23 -fPIC -fopenmp -c
+  -std=c++20 -fPIC -fopenmp -c
 ar rcs libvelocity.a velocity_*.o reductions.o timer.o
 
 python -m stages.stage_0 --compile --mode=static
 
-clang++ main.cc libvelocity.a libverify_solve_nh_parts.a \
+$CC main.cc libvelocity.a libverify_solve_nh_parts.a \
   -Iinclude \
   -Icodegen/stage0 \
-  -I/Users/pmz/gitspace/dace/dace/runtime/include \
-  -ferror-limit=1 -g -Wall -Wall -Wextra \
+  -I"$DACEROOT/dace/runtime/include" \
+  "$ERRLIM" -g -Wall -Wall -Wextra \
   -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable \
   -Wno-unused-but-set-parameter -Wno-sign-compare -Wno-parentheses-equality -Wno-constant-logical-operand \
   -O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer \
-  -std=c++23 -fPIC -fopenmp -o verify_solve_nh_parts
+  -std=c++20 -fPIC -fopenmp -o verify_solve_nh_parts

@@ -252,11 +252,11 @@ def compile_generated_code_for(
     FLAGS = DIAGNOSIS_FLAGS + OPTIMIZATION_FLAGS + STANDARD_FLAGS
 
     COMPILE_COMMAND = list([CC] + SOURCES + INCLUDES + FLAGS + ["-o", BIN])
-    COMPILE_COMMAND = [str(x) for x in COMPILE_COMMAND]
+    COMPILE_COMMAND = [str(x) for x in COMPILE_COMMAND if x]
 
     print(f"Compiling with command: {' '.join(COMPILE_COMMAND)}")
     output = subprocess.run(
-        COMPILE_COMMAND, capture_output=True, check=True, env=os.environ.copy()
+        COMPILE_COMMAND, capture_output=True, env=os.environ.copy()
     )
     if output.returncode != 0:
         print(f"Compilation failed.")
@@ -272,7 +272,7 @@ def compile_generated_code_for(
         ARCHIVE_COMMAND = f"ar rcs {LIB} {BIN}".split(" ")
         print(f"Archiving with command: {' '.join(ARCHIVE_COMMAND)}")
         output = subprocess.run(
-            ARCHIVE_COMMAND, capture_output=True, check=True, env=os.environ.copy()
+            ARCHIVE_COMMAND, capture_output=True, env=os.environ.copy()
         )
         if output.returncode != 0:
             print(f"Archive failed.")
