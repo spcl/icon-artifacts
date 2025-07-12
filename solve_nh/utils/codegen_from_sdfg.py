@@ -22,10 +22,15 @@ class Mode(Enum):
 
 def generate_code_from_sdfg(g: SDFG) -> None:
     """
-    Generate code from a given SDFG and save it to the specified root directory.
+    Prepares and generates C++ code from a DaCe SDFG.
 
-    :param sdfg: The SDFG object to generate code from.
-    :param root: The root directory where the generated code will be saved.
+    This function performs several preparation steps on the SDFG, such as
+    filling scope connectors, inferring types, and expanding library nodes.
+    After preparation, it saves a "concrete" version of the SDFG and then
+    generates the C++ source code, saving it into the SDFG's build folder
+    (g.build_folder).
+
+    :param g: The SDFG object to generate code from.
     """
 
     g.fill_scope_connectors()
@@ -107,14 +112,137 @@ namespace {name} {{
     return wrapped.strip()
 
 
+# --- Constants ---
+CC = "clang++" if platform.system() == "Darwin" else "g++"
+OBJ_FILE = "solve_nh_parts.o"
+STATIC_LIB_FILE = "libsolve_nh_parts.a"
+SHARED_LIB_FILE = "libsolve_nh_parts.so"
+EXEC_FILE = "verify_solve_nh_parts"
+CONSOLIDATED_HEADER = "solve_nh_parts.h"
+CONSOLIDATED_SOURCE = "solve_nh_parts.cpp"
+STANDALONE_INCLUDE_DIR = Path("include/")
+STANDALONE_MAIN_SRC = Path("main.cc")
+
+
+def _run_command(command: list[str], env: dict | None = None) -> None:
+    """Runs a command, checks for errors, and prints output."""
+    print(f"Running command: {' '.join(command)}")
+    result = subprocess.run(command, capture_output=True, text=True, env=env)
+    if result.stdout:
+        print(f"Output:\n{result.stdout}")
+    if result.stderr:
+        print(f"Error:\n{result.stderr}")
+    if result.returncode != 0:
+        print(f"Command failed with return code {result.returncode}")
+        exit(1)
+    print("Command succeeded.")
+
+
+class Compiler:
+    def __init__(self, cc: str = CC):
+        self.cc = cc
+        self.diagnosis_flags = self._get_diagnosis_flags()
+        self.optimization_flags = self._get_optimization_flags()
+        self.standard_flags = self._get_standard_flags()
+        self.dace_include = Path(dace.__file__).parent / "runtime/include/"
+
+    def _get_diagnosis_flags(self) -> list[str]:
+        errlimit_flag = (
+            "-fmax-errors=1" if self.cc.startswith("g++") else "-ferror-limit=1"
+        )
+        clang_only_warnings = (
+            "-Wno-parentheses-equality -Wno-constant-logical-operand"
+            if self.cc.startswith("clang")
+            else ""
+        )
+        return (
+            f"{errlimit_flag} -g -Wall -Wextra -Wno-unused-parameter "
+            f"-Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable "
+            f"-Wno-unused-but-set-parameter -Wno-sign-compare {clang_only_warnings}"
+        ).split()
+
+    def _get_optimization_flags(self) -> list[str]:
+        return "-O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer".split()
+
+    def _get_standard_flags(self) -> list[str]:
+        return "-std=c++23 -fPIC -fopenmp".split()
+
+    def get_base_flags(self) -> list[str]:
+        return self.diagnosis_flags + self.optimization_flags + self.standard_flags
+
+    def get_linker_flags(self, mode: Mode) -> list[str]:
+        if mode == Mode.SHARED:
+            dyn_link = "-dynamiclib" if platform.system() == "Darwin" else "-shared"
+            dyn_symbols = (
+                "-Wl,-undefined,dynamic_lookup"
+                if platform.system() == "Darwin"
+                else "-Wl,--unresolved-symbols=ignore-all"
+            )
+            return [dyn_link, dyn_symbols]
+        if mode == Mode.EXEC:
+            return [
+                "-Wl,-undefined,dynamic_lookup"
+                if platform.system() == "Darwin"
+                else "-Wl,--unresolved-symbols=ignore-all"
+            ]
+        return []
+
+    def compile_object(
+        self, sources: list[Path], includes: list[Path], output_name: str
+    ):
+        all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
+        cmd = (
+            [self.cc, "-c"]
+            + [str(s) for s in sources]
+            + [f"-I{i}" for i in all_includes]
+            + self.get_base_flags()
+            + ["-o", output_name]
+        )
+        _run_command([str(c) for c in cmd if c])
+
+    def archive_static_library(self, object_file: str, lib_name: str):
+        cmd = ["ar", "rcs", lib_name, object_file]
+        _run_command(cmd)
+
+    def link_shared_library(self, static_lib: str, lib_name: str):
+        flags = self.get_base_flags() + self.get_linker_flags(Mode.SHARED)
+        cmd = [self.cc, static_lib] + flags + ["-o", lib_name]
+        _run_command([str(c) for c in cmd if c])
+
+    def link_executable(
+        self, main_src: Path, static_lib: str, includes: list[Path], bin_name: str
+    ):
+        all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
+        flags = self.get_base_flags() + self.get_linker_flags(Mode.EXEC)
+        cmd = (
+            [self.cc, str(main_src), static_lib]
+            + [f"-I{i}" for i in all_includes]
+            + flags
+            + ["-o", bin_name]
+        )
+        _run_command([str(c) for c in cmd if c])
+
+
 def consolidate_generated_code(
     sdfg_includes: list[Path], sdfg_srcs: list[Path], store: Path
 ) -> None:
     """
-    Consolidate the generated code for a given SDFG.
+    Consolidates and post-processes generated C++ code.
 
-    :param sdfg_includes: List of include paths for the SDFG.
-    :param sdfg_srcs: List of source files for the SDFG.
+    This function takes the generated header and source files, wraps each
+    in a unique namespace, and combines them into single `solve_nh_parts.h`
+    and `solve_nh_parts.cpp` files in the `store` directory.
+
+    It also performs several post-processing steps:
+    - Removes the `__restrict__` keyword.
+    - Runs `clang-format` to format the code.
+    - Applies specific string replacements to fix pointer dereferencing for
+      certain data structures.
+
+    :param sdfg_includes: A list of paths to directories containing generated
+                          header files.
+    :param sdfg_srcs: A list of paths to generated source files.
+    :param store: The directory where the consolidated files will be stored.
     """
     all_headers = {
         f.stem[len("solve_nh_") :]: f.read_text()
@@ -129,154 +257,84 @@ def consolidate_generated_code(
     combined_source = "\n".join(
         wrap_namespace(name, content).strip() for name, content in all_sources.items()
     ).replace("__restrict__", "")
+
     store.mkdir(parents=True, exist_ok=True)
-    (store / "solve_nh_parts.h").write_text(combined_header)
-    (store / "solve_nh_parts.cpp").write_text(combined_source)
+    header_path = store / CONSOLIDATED_HEADER
+    source_path = store / CONSOLIDATED_SOURCE
+    header_path.write_text(combined_header)
+    source_path.write_text(combined_source)
 
-    CLANG_FORMAT_CMD = [
-        "clang-format",
-        "-i",
-        str(store / "solve_nh_parts.h"),
-        str(store / "solve_nh_parts.cpp"),
-    ]
-    subprocess.run(CLANG_FORMAT_CMD, check=True, env=os.environ.copy())
+    # Format the code once before modifications
+    _run_command(["clang-format", "-i", str(header_path), str(source_path)])
 
-    src = (
-        (store / "solve_nh_parts.cpp")
-        .read_text()
-        .replace(
+    # Apply specific replacements
+    replacements = [
+        (
             "global_data_type *in_global_data = global_data[0];",
             "global_data_type *in_global_data = global_data;",
-        )
-        .replace(
-            "t_int_state *in_p_int = p_int[0];",
-            "t_int_state *in_p_int = p_int;",
-        )
-        .replace(
-            "t_patch *in_p_patch = p_patch[0];",
-            "t_patch *in_p_patch = p_patch;",
-        )
-        .replace(
+        ),
+        ("t_int_state *in_p_int = p_int[0];", "t_int_state *in_p_int = p_int;"),
+        ("t_patch *in_p_patch = p_patch[0];", "t_patch *in_p_patch = p_patch;"),
+        (
             "t_nh_prog *in_p_prog = p_nh_prog_nnew[0];",
             "t_nh_prog *in_p_prog = p_nh_prog_nnew;",
-        )
-        .replace(
+        ),
+        (
             "t_nh_prog *in_p_prog = p_nh_prog_nnow[0];",
             "t_nh_prog *in_p_prog = p_nh_prog_nnow;",
-        )
-        .replace(
-            "global_data[0] = out_global_data;",
-            "global_data = out_global_data;",
-        )
-        .replace(
-            "p_int[0] = out_p_int;",
-            "p_int = out_p_int;",
-        )
-        .replace(
-            "p_patch[0] = out_p_patch;",
-            "p_patch = out_p_patch;",
-        )
-        .replace(
-            "p_nh_prog_nnew[0] = out_p_prog;",
-            "p_nh_prog_nnew = out_p_prog;",
-        )
-    )
-    (store / "solve_nh_parts.cpp").write_text(src)
-    CLANG_FORMAT_CMD = [
-        "clang-format",
-        "-i",
-        str(store / "solve_nh_parts.h"),
-        str(store / "solve_nh_parts.cpp"),
+        ),
+        ("global_data[0] = out_global_data;", "global_data = out_global_data;"),
+        ("p_int[0] = out_p_int;", "p_int = out_p_int;"),
+        ("p_patch[0] = out_p_patch;", "p_patch = out_p_patch;"),
+        ("p_nh_prog_nnew[0] = out_p_prog;", "p_nh_prog_nnew = out_p_prog;"),
+        ("p_nh_prog_nnow[0] = out_p_prog;", "p_nh_prog_nnow = out_p_prog;"),
     ]
-    subprocess.run(CLANG_FORMAT_CMD, check=True)
 
-    print(
-        f"Consolidated generated code into {store / 'solve_nh_parts.h'} and {store / 'solve_nh_parts.cpp'}"
-    )
+    src_content = source_path.read_text()
+    for old, new in replacements:
+        src_content = src_content.replace(old, new)
+    source_path.write_text(src_content)
+
+    # Format again after replacements
+    _run_command(["clang-format", "-i", str(header_path), str(source_path)])
+
+    print(f"Consolidated generated code into {header_path} and {source_path}")
 
 
-def compile_generated_code_for(
+def compile_generated_code(
     sdfg_includes: list[Path], sdfg_srcs: list[Path], mode: Mode
 ) -> None:
     """
-    Compile the generated code for a given SDFG.
+    Compiles the generated C++ code into a static library, shared library, or executable.
 
-    :param g: The SDFG object to compile.
+    This function constructs and executes a compiler command (e.g., `clang++`) to
+    compile the provided source files. The compilation is controlled by the
+    `mode` parameter, which determines the output type:
+    - `Mode.STATIC`: A static library (`.a`).
+    - `Mode.SHARED`: A shared library (`.so` or `.dylib`).
+    - `Mode.EXEC`: An executable.
+
+    It automatically includes necessary DaCe runtime headers and sets
+    various compiler flags for optimization, warnings, and C++ standards.
+
+    :param sdfg_includes: A list of paths to directories containing header files
+                          to be included during compilation.
+    :param sdfg_srcs: A list of paths to the C++ source files to compile.
+    :param mode: The compilation mode, determining the output artifact.
     """
-    CC = "clang++"
+    compiler = Compiler()
 
-    DACE_INCLUDE = Path(dace.__file__).parent / "runtime/include/"
-    STANDALONE_INCLUDE = Path("include/")
-    INCLUDES = [
-        f"-I{include}" for include in sdfg_includes + [DACE_INCLUDE, STANDALONE_INCLUDE]
-    ]
+    if mode == Mode.STATIC or mode == Mode.SHARED or mode == Mode.EXEC:
+        compiler.compile_object(sdfg_srcs, sdfg_includes, OBJ_FILE)
+        compiler.archive_static_library(OBJ_FILE, STATIC_LIB_FILE)
+        print(f"Successfully created static library: {STATIC_LIB_FILE}")
 
-    STANDALONE_SRC = Path("main.cc")
-    if mode == Mode.EXEC:
-        SOURCES = [STANDALONE_SRC] + sdfg_srcs
-    else:
-        SOURCES = sdfg_srcs
-
-    if mode == Mode.STATIC:
-        BIN = f"verify_solve_nh_parts.o"
-    elif mode == Mode.SHARED:
-        BIN = f"libverify_solve_nh_parts.so"
-    elif mode == Mode.EXEC:
-        BIN = f"verify_solve_nh_parts"
-
-    ERRLIMIT_FLAG = "-fmax-errors=1" if CC.startswith("g++") else "-ferror-limit=1"
-    CLANG_ONLY_DISABLED_WARNINGS = (
-        "-Wno-parentheses-equality -Wno-constant-logical-operand"
-        if CC.startswith("clang")
-        else ""
-    )
-    DIAGNOSIS_FLAGS = f"{ERRLIMIT_FLAG} -g -Wall -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare {CLANG_ONLY_DISABLED_WARNINGS}".split(
-        " "
-    )
-    OPTIMIZATION_FLAGS = (
-        "-O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer".split(" ")
-    )
-    STANDARD_FLAGS = "-std=c++23 -fPIC -fopenmp".split(" ")
-    if mode in [Mode.EXEC, Mode.SHARED]:
-        if platform.system() == "Darwin":
-            STANDARD_FLAGS.append("-Wl,-undefined,dynamic_lookup")
-        else:
-            STANDARD_FLAGS.append("-Wl,--unresolved-symbols=ignore-all")
     if mode == Mode.SHARED:
-        STANDARD_FLAGS.append(
-            "-dynamiclib" if platform.system() == "Darwin" else "-shared"
+        compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE)
+        print(f"Successfully created shared library: {SHARED_LIB_FILE}")
+
+    if mode == Mode.EXEC:
+        compiler.link_executable(
+            STANDALONE_MAIN_SRC, STATIC_LIB_FILE, sdfg_includes, EXEC_FILE
         )
-    elif mode == Mode.STATIC:
-        STANDARD_FLAGS.append("-c")
-
-    FLAGS = DIAGNOSIS_FLAGS + OPTIMIZATION_FLAGS + STANDARD_FLAGS
-
-    COMPILE_COMMAND = list([CC] + SOURCES + INCLUDES + FLAGS + ["-o", BIN])
-    COMPILE_COMMAND = [str(x) for x in COMPILE_COMMAND if x]
-
-    print(f"Compiling with command: {' '.join(COMPILE_COMMAND)}")
-    output = subprocess.run(COMPILE_COMMAND, capture_output=True, env=os.environ.copy())
-    if output.returncode != 0:
-        print(f"Compilation failed.")
-    else:
-        print(
-            f"Compilation succeeded. {'Executable' if mode == Mode.EXEC else 'Library'} created: {BIN}"
-        )
-    print(f"Output: {output.stdout.decode()}")
-    print(f"Error: {output.stderr.decode()}")
-
-    if mode == Mode.STATIC:
-        LIB = "libverify_solve_nh_parts.a"
-        ARCHIVE_COMMAND = f"ar rcs {LIB} {BIN}".split(" ")
-        print(f"Archiving with command: {' '.join(ARCHIVE_COMMAND)}")
-        output = subprocess.run(
-            ARCHIVE_COMMAND, capture_output=True, env=os.environ.copy()
-        )
-        if output.returncode != 0:
-            print(f"Archive failed.")
-        else:
-            print(f"Archive succeeded. Library created: {LIB}")
-        print(f"Output: {output.stdout.decode()}")
-        print(f"Error: {output.stderr.decode()}")
-    if output.returncode != 0:
-        exit(1)
+        print(f"Successfully created executable: {EXEC_FILE}")
