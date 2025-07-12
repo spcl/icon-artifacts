@@ -61,7 +61,7 @@ $CC velocity_workspace/velocity_*.cc velocity_workspace/reductions.cc velocity_w
   "$ERRLIM" -g -Wall -Wall -Wextra \
   -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable \
   -Wno-unused-but-set-parameter -Wno-sign-compare -Wno-parentheses-equality -Wno-constant-logical-operand \
-  -O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer \
+  -O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off \
   -std=c++20 -fPIC -fopenmp -c
 ar rcs libvelocity.a velocity_*.o reductions.o timer.o
 
@@ -74,5 +74,5 @@ $CC main.cc libvelocity.a libverify_solve_nh_parts.a \
   "$ERRLIM" -g -Wall -Wall -Wextra \
   -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable \
   -Wno-unused-but-set-parameter -Wno-sign-compare -Wno-parentheses-equality -Wno-constant-logical-operand \
-  -O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer \
+  -O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off \
   -std=c++20 -fPIC -fopenmp -o verify_solve_nh_parts

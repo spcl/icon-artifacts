@@ -162,7 +162,7 @@ class Compiler:
         ).split()
 
     def _get_optimization_flags(self) -> list[str]:
-        return "-O3 -march=native -fno-strict-aliasing -fno-omit-frame-pointer".split()
+        return "-O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off".split()
 
     def _get_standard_flags(self) -> list[str]:
         return "-std=c++23 -fPIC -fopenmp".split()
