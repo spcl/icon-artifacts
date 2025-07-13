@@ -443,6 +443,73 @@ def comment_out_allocs_and_frees(filepath: str, name_set: typing.Set[str]):
     with open(filepath, 'w') as file:
         file.writelines(modified_lines)
 
+def use_solve_nh_struct_definitions(filepath: str):
+    struct_names = {
+        "global_data_type",
+        "t_tangent_vectors",
+        "t_grid_edges",
+        "t_nh_metrics",
+        "t_prepare_adv",
+        "t_nh_ref",
+        "t_nh_prog",
+        "t_nh_diag",
+        "t_nh_state",
+        "t_grid_domain_decomp_info",
+        "t_grid_cells",
+        "t_int_state",
+        "t_grid_vertices",
+        "t_patch",
+    }
+
+    """
+    Script to remove struct definitions and forward declarations for specified struct names.
+    Usage: python struct_cleaner.py <file_path> <struct_name1> <struct_name2> ...
+    """
+
+    def filter_structs(content, struct_names):
+        """Remove struct definitions and forward declarations for specified struct names."""
+        lines = content.split('\n')
+        filtered_lines = []
+        struct_set = set(struct_names)
+
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            stripped = line.strip()
+
+            # Check for forward declaration: struct name;
+            fwd_match = re.match(r'\s*struct\s+(\w+)\s*;', line)
+            if fwd_match and fwd_match.group(1) in struct_set:
+                i += 1
+                continue
+
+            # Check for struct definition: struct name {
+            def_match = re.search(r'\bstruct\s+(\w+)\s*\{', line)
+            if def_match and def_match.group(1) in struct_set:
+                # Skip until we find };
+                i += 1
+                while i < len(lines) and lines[i].strip() != '};':
+                    i += 1
+                i += 1  # Skip the }; line too
+                continue
+
+            filtered_lines.append(line)
+            i += 1
+
+        return '\n'.join(filtered_lines)
+
+
+    with open(filepath, 'r') as f:
+        content = f.read()
+
+    filtered_content = filter_structs(content, struct_names)
+
+    with open(filepath, 'w') as f:
+        f.write('#include "shared_struct_defs.h"\n')
+        f.write(filtered_content)
+
+
+
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
     gpu: bool,
@@ -464,6 +531,8 @@ def compile_if_propagated_sdfgs(
     sources.add("src/timer.cpp")
     if gpu:
         sources.add("src/reductions_kernel.cu")
+
+
 
     headers = set()
     headers.add("-Iinclude")
@@ -596,6 +665,19 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_cpu.h"\n#include "timer.h"\n' + main_cu_code
                 )
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cpp")
+
+        _build_for_integration = os.getenv('_BUILD_LIB_FOR_SOLVE_NH', '0').lower() in ('1', 'true', 'yes')
+        if _build_for_integration:
+            if stage == 1 or stage == 9:
+                if not gpu:
+                    use_solve_nh_struct_definitions(f"{build_loc}/src/cpu/{sdfg_name}.cpp")
+                else:
+                    if stage == 1:
+                        use_solve_nh_struct_definitions(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+                    else:
+                        use_solve_nh_struct_definitions(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+                        use_solve_nh_struct_definitions(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+
 
     if main_name is not None:
         sources.add(f"{main_name}")
