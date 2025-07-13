@@ -28,7 +28,7 @@ else
 fi
 
 # Define compiler flags to avoid repetition and ensure consistency
-ERRLIM=$([ "$CC" = "clang++" ] && echo "-ferror-limit=1" || echo "-fmax-errors=1")
+ERRLIM=$([ "$CC" = "clang++" ] && printf "-ferror-limit=1" || printf "-fmax-errors=1")
 WARNING_FLAGS="-g -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare"
 if [[ "$CC" == "clang++" ]]; then
     # Add clang-specific warning flags
@@ -54,7 +54,7 @@ get_sed_inplace_opt() {
 
 # Stage 1: Fetch source files from Git
 fetch_sources() {
-  echo "--- Stage 1: Fetching source files from Git ---"
+  printf "--- Stage 1: Fetching source files from Git ---"
   mkdir -p "$WORKSPACE_DIR"
 
   # Use two indexed arrays for portability, as associative arrays (`declare -A`) are not supported in older bash versions (e.g., on macOS).
@@ -86,7 +86,7 @@ fetch_sources() {
 
 # Stage 2: Patch fetched files to remove CUDA-specific code
 patch_sources() {
-  echo "\n--- Stage 2: Patching source files ---"
+  printf "\n--- Stage 2: Patching source files ---"
   local sed_inplace_opt
   get_sed_inplace_opt
 
@@ -138,20 +138,18 @@ patch_sources() {
 
 # Stage 3: Compile all parts into a single executable
 compile_all() {
-  echo "\n--- Stage 3: Compiling ---"
+  printf "\n--- Stage 3: Compiling ---"
 
   echo "Compiling velocity library..."
   # Compile patched velocity sources into object files
-  # shellcheck disable=SC2086
   $CC "$WORKSPACE_DIR"/velocity_*.cc "$WORKSPACE_DIR"/reductions.cc "$WORKSPACE_DIR"/timer.cc \
     -Iinclude \
     -I"$WORKSPACE_DIR" \
     -I"$DACEROOT/dace/runtime/include" \
-    $COMPILER_FLAGS -c
+    "$COMPILER_FLAGS" -c
 
   # Archive object files into a static library
   ar rcs libvelocity.a velocity_*.o reductions.o timer.o
-  rm -f velocity_*.o reductions.o timer.o
   echo "libvelocity.a created."
 
   echo "Compiling DaCe/SDFG parts..."
@@ -159,13 +157,14 @@ compile_all() {
 
   echo "Compiling final executable..."
   # Link all parts together into the final executable
-  # shellcheck disable=SC2086
-  $CC main.cc libvelocity.a libsolve_nh_parts.a \
+  $CC main.cc velocity_*.o reductions.o timer.o solve_nh_parts.o \
     -Iinclude \
     -Icodegen/stage0 \
     -I"$DACEROOT/dace/runtime/include" \
-    $COMPILER_FLAGS -o verify_solve_nh_parts
-  echo "Executable verify_solve_nh_parts created."
+    "$COMPILER_FLAGS" -o verify_solve_nh_parts
+  printf "Executable verify_solve_nh_parts created."
+
+  rm -f velocity_*.o reductions.o timer.o solve_nh_parts.o
 }
 
 # --- Execution ---
@@ -173,7 +172,7 @@ main() {
   fetch_sources
   patch_sources
   compile_all
-  echo "\nScript finished successfully."
+  printf "\nScript finished successfully."
 }
 
 main "$@"
