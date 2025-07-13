@@ -5,6 +5,8 @@
 Assumption: You are in this directory (`icon-artifacts/solve_nh`). Fake DyCore is in `./edited-src/solve_nh_fake.f90`. You want to generate SDFGs for sthe 4 parts of `solve_nh()` routine (`predictor_pre` etc.).
 
 ```bash
+# Regenerate the single preprocessed AST
+bash regen-ast.sh
 # Regenerate all 4 SDFG
 bash regen-sdfgs.sh
 # Regenerate all 4 serialization/deserialization modules

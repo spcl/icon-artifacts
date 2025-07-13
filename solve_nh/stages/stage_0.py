@@ -1,14 +1,19 @@
 import dace
 from dace import SDFG
+from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
+from utils.codegen_from_sdfg import Mode
+
 import argparse
 
 
 STAGE_ID = 0
 
 
-def optimization_action(g: SDFG):
+def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    if velicity_shim:
+        inject_velocity_shim(g)
     g.simplify()
     return g
 
@@ -20,6 +25,15 @@ def main():
     )
     argp.add_argument("--codegen", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument(
+        "--mode",
+        type=Mode,
+        choices=list(Mode),
+        required=False,
+        default=Mode.EXEC,
+        help="Select the mode: static, shared, or exec",
+    )
+    argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=False)
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True
@@ -38,7 +52,7 @@ def main():
             g.name = name
             g.validate()
 
-            g = optimization_action(g)
+            g = optimization_action(g, velicity_shim=args.shim)
 
             g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
@@ -54,7 +68,7 @@ def main():
 
     if args.compile:
         print(f"Stage #{STAGE_ID}: Compiling SDFGs")
-        common.compile_action(STAGE_ID)
+        common.compile_action(STAGE_ID, args.mode)
 
 
 if __name__ == "__main__":

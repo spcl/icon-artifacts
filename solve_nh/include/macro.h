@@ -12,13 +12,13 @@
   });
 
 #define SPAWN_ALL_READERS(prefix, namespc)                                     \
-  SPAWN_READERS(prefix, global_data, namespc::global_data_type, namespc)       \
-  SPAWN_READERS(prefix, p_nh, namespc::t_nh_state, namespc)                    \
-  SPAWN_READERS(prefix, p_nh_prog_nnow, namespc::t_nh_prog, namespc)           \
-  SPAWN_READERS(prefix, p_nh_prog_nnew, namespc::t_nh_prog, namespc)           \
-  SPAWN_READERS(prefix, p_patch, namespc::t_patch, namespc)                    \
-  SPAWN_READERS(prefix, p_int, namespc::t_int_state, namespc)                  \
-  SPAWN_READERS(prefix, prep_adv, namespc::t_prepare_adv, namespc)             \
+  SPAWN_READERS(prefix, global_data, global_data_type, namespc)                \
+  SPAWN_READERS(prefix, p_nh, t_nh_state, namespc)                             \
+  SPAWN_READERS(prefix, p_nh_prog_nnow, t_nh_prog, namespc)                    \
+  SPAWN_READERS(prefix, p_nh_prog_nnew, t_nh_prog, namespc)                    \
+  SPAWN_READERS(prefix, p_patch, t_patch, namespc)                             \
+  SPAWN_READERS(prefix, p_int, t_int_state, namespc)                           \
+  SPAWN_READERS(prefix, prep_adv, t_prepare_adv, namespc)                      \
   SPAWN_READERS(prefix, nnow, int, namespc)                                    \
   SPAWN_READERS(prefix, nnew, int, namespc)                                    \
   SPAWN_READERS(prefix, l_init, int, namespc)                                  \
@@ -278,13 +278,13 @@
   UNWRAP_DATA_PAIR(zf)
 
 #define SPAWN_ALL_WRITERS(prefix, namespc)                                     \
-  SPAWN_WRITERS(prefix, global_data, namespc::global_data_type, namespc)       \
-  SPAWN_WRITERS(prefix, p_nh, namespc::t_nh_state, namespc)                    \
-  SPAWN_WRITERS(prefix, p_nh_prog_nnow, namespc::t_nh_prog, namespc)           \
-  SPAWN_WRITERS(prefix, p_nh_prog_nnew, namespc::t_nh_prog, namespc)           \
-  SPAWN_WRITERS(prefix, p_patch, namespc::t_patch, namespc)                    \
-  SPAWN_WRITERS(prefix, p_int, namespc::t_int_state, namespc)                  \
-  SPAWN_WRITERS(prefix, prep_adv, namespc::t_prepare_adv, namespc)             \
+  SPAWN_WRITERS(prefix, global_data, global_data_type, namespc)                \
+  SPAWN_WRITERS(prefix, p_nh, t_nh_state, namespc)                             \
+  SPAWN_WRITERS(prefix, p_nh_prog_nnow, t_nh_prog, namespc)                    \
+  SPAWN_WRITERS(prefix, p_nh_prog_nnew, t_nh_prog, namespc)                    \
+  SPAWN_WRITERS(prefix, p_patch, t_patch, namespc)                             \
+  SPAWN_WRITERS(prefix, p_int, t_int_state, namespc)                           \
+  SPAWN_WRITERS(prefix, prep_adv, t_prepare_adv, namespc)                      \
   SPAWN_WRITERS(prefix, nnow, int, namespc)                                    \
   SPAWN_WRITERS(prefix, nnew, int, namespc)                                    \
   SPAWN_WRITERS(prefix, l_init, int, namespc)                                  \
@@ -296,7 +296,7 @@
   SPAWN_WRITERS(prefix, jstep, int, namespc)                                   \
   SPAWN_WRITERS(prefix, dtime, double, namespc)                                \
   SPAWN_WRITERS(prefix, lacc, int, namespc)                                    \
-  /*SPAWN_WRITERS(prefix, jb, int, namespc)*/                                      \
+  /*SPAWN_WRITERS(prefix, jb, int, namespc)*/                                  \
   SPAWN_WRITERS(prefix, jk, int, namespc)                                      \
   SPAWN_WRITERS(prefix, jc, int, namespc)                                      \
   SPAWN_WRITERS(prefix, je, int, namespc)                                      \
@@ -305,12 +305,12 @@
   SPAWN_WRITERS(prefix, nlev, int, namespc)                                    \
   SPAWN_WRITERS(prefix, nlevp1, int, namespc)                                  \
   SPAWN_WRITERS(prefix, i_startblk, int, namespc)                              \
-  /*SPAWN_WRITERS(prefix, i_endblk, int, namespc)*/                                \
+  /*SPAWN_WRITERS(prefix, i_endblk, int, namespc)*/                            \
   SPAWN_WRITERS(prefix, i_startidx, int, namespc)                              \
-  /*SPAWN_WRITERS(prefix, i_endidx, int, namespc)*/                                \
+  /*SPAWN_WRITERS(prefix, i_endidx, int, namespc)*/                            \
   SPAWN_WRITERS(prefix, ishift, int, namespc)                                  \
-  /*SPAWN_WRITERS(prefix, rl_start, int, namespc)*/                                \
-  /*SPAWN_WRITERS(prefix, rl_end, int, namespc)*/                                  \
+  /*SPAWN_WRITERS(prefix, rl_start, int, namespc)*/                            \
+  /*SPAWN_WRITERS(prefix, rl_end, int, namespc)*/                              \
   SPAWN_WRITERS(prefix, istep, int, namespc)                                   \
   SPAWN_WRITERS(prefix, ntl1, int, namespc)                                    \
   SPAWN_WRITERS(prefix, ntl2, int, namespc)                                    \
@@ -352,11 +352,11 @@
   SPAWN_WRITERS(prefix, z_flxdiv_mass, double *, namespc)                      \
   SPAWN_WRITERS(prefix, z_flxdiv_theta, double *, namespc)                     \
   SPAWN_WRITERS(prefix, z_hydro_corr, double *, namespc)                       \
-  /*SPAWN_WRITERS(prefix, z_a, double, namespc)*/                                  \
-  /*SPAWN_WRITERS(prefix, z_b, double, namespc)*/                                  \
+  /*SPAWN_WRITERS(prefix, z_a, double, namespc)*/                              \
+  /*SPAWN_WRITERS(prefix, z_b, double, namespc)*/                              \
   SPAWN_WRITERS(prefix, z_c, double, namespc)                                  \
-  /*SPAWN_WRITERS(prefix, z_g, double, namespc)*/                                  \
-  /*SPAWN_WRITERS(prefix, z_gamma, double, namespc)*/                              \
+  /*SPAWN_WRITERS(prefix, z_g, double, namespc)*/                              \
+  /*SPAWN_WRITERS(prefix, z_gamma, double, namespc)*/                          \
   SPAWN_WRITERS(prefix, z_w_backtraj, double, namespc)                         \
   SPAWN_WRITERS(prefix, z_theta_v_pr_mc_m1, double, namespc)                   \
   SPAWN_WRITERS(prefix, z_theta_v_pr_mc, double, namespc)                      \
@@ -374,7 +374,7 @@
   SPAWN_WRITERS(prefix, alin, double, namespc)                                 \
   SPAWN_WRITERS(prefix, dz32, double, namespc)                                 \
   SPAWN_WRITERS(prefix, df32, double, namespc)                                 \
-  /*SPAWN_WRITERS(prefix, dz42, double, namespc)*/                                 \
+  /*SPAWN_WRITERS(prefix, dz42, double, namespc)*/                             \
   SPAWN_WRITERS(prefix, df42, double, namespc)                                 \
   SPAWN_WRITERS(prefix, bqdr, double, namespc)                                 \
   SPAWN_WRITERS(prefix, aqdr, double, namespc)                                 \
@@ -404,7 +404,7 @@
   SPAWN_WRITERS(prefix, nblks_gradp, int, namespc)                             \
   SPAWN_WRITERS(prefix, npromz_gradp, int, namespc)                            \
   SPAWN_WRITERS(prefix, nlen_gradp, int, namespc)                              \
-  /*SPAWN_WRITERS(prefix, jk_start, int, namespc)*/                                \
+  /*SPAWN_WRITERS(prefix, jk_start, int, namespc)*/                            \
   SPAWN_WRITERS(prefix, lvn_only, int, namespc)                                \
   SPAWN_WRITERS(prefix, lvn_pos, int, namespc)                                 \
   SPAWN_WRITERS(prefix, l_vert_nested, int, namespc)                           \

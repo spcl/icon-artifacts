@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 
+#include "shared_struct_defs.h"
 #include "solve_nh_parts.h"
 
 #include "corrector_post_serde.h"
@@ -68,15 +69,16 @@ int main(int argc, char *argv[]) {
 
       acerr() << "All data read..." << std::endl;
 
-      auto *h = __dace_init_solve_nh_predictor_pre(
+      auto *h = predictor_pre::__dace_init_solve_nh_predictor_pre(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -98,15 +100,16 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      __program_solve_nh_predictor_pre(
+      predictor_pre::__program_solve_nh_predictor_pre(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -128,7 +131,7 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      int err = __dace_exit_solve_nh_predictor_pre(h);
+      int err = predictor_pre::__dace_exit_solve_nh_predictor_pre(h);
       if (err != 0) {
         acerr() << "Error in __dace_exit_solve_nh_predictor_pre: " << err
                 << std::endl;
@@ -151,15 +154,16 @@ int main(int argc, char *argv[]) {
 
       acerr() << "All data read..." << std::endl;
 
-      auto *h = __dace_init_solve_nh_predictor_post(
+      auto *h = predictor_post::__dace_init_solve_nh_predictor_post(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -181,15 +185,16 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      __program_solve_nh_predictor_post(
+      predictor_post::__program_solve_nh_predictor_post(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -211,7 +216,7 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      int err = __dace_exit_solve_nh_predictor_post(h);
+      int err = predictor_post::__dace_exit_solve_nh_predictor_post(h);
       if (err != 0) {
         acerr() << "Error in __dace_exit_solve_nh_predictor_post: " << err
                 << std::endl;
@@ -234,15 +239,16 @@ int main(int argc, char *argv[]) {
 
       acerr() << "All data read..." << std::endl;
 
-      auto *h = __dace_init_solve_nh_corrector_pre(
+      auto *h = corrector_pre::__dace_init_solve_nh_corrector_pre(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -264,15 +270,16 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      __program_solve_nh_corrector_pre(
+      corrector_pre::__program_solve_nh_corrector_pre(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -294,7 +301,7 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      int err = __dace_exit_solve_nh_corrector_pre(h);
+      int err = corrector_pre::__dace_exit_solve_nh_corrector_pre(h);
       if (err != 0) {
         acerr() << "Error in __dace_exit_solve_nh_corrector_pre: " << err
                 << std::endl;
@@ -317,15 +324,16 @@ int main(int argc, char *argv[]) {
 
       acerr() << "All data read..." << std::endl;
 
-      auto *h = __dace_init_solve_nh_corrector_post(
+      auto *h = corrector_post::__dace_init_solve_nh_corrector_post(
           bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -347,15 +355,16 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      __program_solve_nh_corrector_post(
+      corrector_post::__program_solve_nh_corrector_post(
           h, bdy_divdamp_in, enh_divdamp_fac_in, &global_data_in, &p_int_in,
-          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in, &prep_adv_in, scal_divdamp_in, z_alpha_in,
-          z_beta_in, z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in,
-          z_exner_ex_pr_in, z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in,
-          z_flxdiv_theta_in, z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in,
-          z_gradh_exner_in, z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in,
-          z_q_in, z_raylfac_in, z_rho_e_in, z_rho_expl_in, z_rho_v_in,
-          z_rth_pr_in, z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
+          &p_nh_in, &p_nh_prog_nnew_in, &p_nh_prog_nnow_in, &p_patch_in,
+          &prep_adv_in, scal_divdamp_in, z_alpha_in, z_beta_in,
+          z_contr_w_fl_l_in, z_dexner_dz_c_in, z_dwdz_dd_in, z_exner_ex_pr_in,
+          z_exner_expl_in, z_exner_ic_in, z_flxdiv_mass_in, z_flxdiv_theta_in,
+          z_grad_rth_in, z_graddiv2_vn_in, z_graddiv_vn_in, z_gradh_exner_in,
+          z_hydro_corr_in, z_kin_hor_e_in, z_mflx_top_in, z_q_in, z_raylfac_in,
+          z_rho_e_in, z_rho_expl_in, z_rho_v_in, z_rth_pr_in,
+          z_th_ddz_exner_c_in, z_theta_v_e_in, z_theta_v_fl_e_in,
           z_theta_v_pr_ic_in, z_theta_v_v_in, z_vn_avg_in, z_vt_ie_in,
           z_w_concorr_mc_in, z_w_concorr_me_in, z_w_expl_in,
           true /*__f2dace_OPTIONAL_lacc*/, alin_in, aqdr_in, bqdr_in, df32_in,
@@ -377,7 +386,7 @@ int main(int argc, char *argv[]) {
           z_ntdistv_bary_2_in, z_rho_tavg_in, z_rho_tavg_m1_in, z_theta1_in,
           z_theta2_in, z_theta_tavg_in, z_theta_tavg_m1_in, z_theta_v_pr_mc_in,
           z_theta_v_pr_mc_m1_in, z_w_backtraj_in, zf_in);
-      int err = __dace_exit_solve_nh_corrector_post(h);
+      int err = corrector_post::__dace_exit_solve_nh_corrector_post(h);
       if (err != 0) {
         acerr() << "Error in __dace_exit_solve_nh_corrector_post: " << err
                 << std::endl;
