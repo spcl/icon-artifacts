@@ -2,7 +2,7 @@
 RELEASE_MODES=(FALSE TRUE)
 
 for _R in "${RELEASE_MODES[@]}"; do
-    for _BL in {0, 1}; do
+    for _BL in {0,1}; do
         export _USE_CUDA_EVENTS=0
         export _RELEASE=${_R}
         export RELEASE=${_R}
