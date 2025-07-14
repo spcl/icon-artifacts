@@ -15,7 +15,18 @@
 #include <string_view>
 #include <vector>
 
+#include <cxxabi.h>
+
 namespace corrector_pre {
+template <typename T> std::string type_name() {
+  int status = 0;
+  std::unique_ptr<char, void (*)(void *)> res{
+      abi::__cxa_demangle(typeid(T).name(), NULL, NULL, &status), std::free};
+  if (status != 0)
+    throw status; // stub
+  return res.get();
+}
+
 std::vector<std::string_view> split(std::string_view s, char delim) {
   std::vector<std::string_view> parts;
   for (int start_pos = 0, next_pos; start_pos < s.length();
@@ -42,8 +53,10 @@ std::string scroll_space(std::istream &s) {
 
 std::string read_line(std::istream &s,
                       const std::optional<std::string> &should_contain = {}) {
-  if (s.eof())
-    return "<eof>";
+  if (s.eof()) {
+    std::cerr << "Got unexpected EOF" << std::endl;
+    exit(EXIT_FAILURE);
+  }
   scroll_space(s);
   char bin[101];
   s.getline(bin, 100);
@@ -57,6 +70,20 @@ std::string read_line(std::istream &s,
     }
   }
   return {bin};
+}
+
+std::string read_until(std::istream &s, const std::string &should_contain) {
+  while (!s.eof()) {
+    scroll_space(s);
+    char bin[101];
+    s.getline(bin, 100);
+    assert(s.good());
+    bool ok = (std::string(bin).find(should_contain) != std::string::npos);
+    if (ok)
+      return {bin};
+  }
+  std::cerr << "Expected: '" << should_contain << "'; got EOF" << std::endl;
+  exit(EXIT_FAILURE);
 }
 
 struct array_meta;
@@ -81,22 +108,26 @@ ARRAY_META_DICT() {
   return std::make_pair(M, std::move(lock));
 }
 template <typename T> const array_meta &ARRAY_META_DICT_AT(T *a) {
-  if constexpr (std::is_pointer_v<T>) {
-    return ARRAY_META_DICT_AT(*a);
-  } else {
-    auto [M, lock] = ARRAY_META_DICT();
-    return M->at(a);
+  auto [M, lock] = ARRAY_META_DICT();
+  if (M->find(a) == M->end()) {
+    std::cerr << "Array meta not found for: " << type_name<T>() << std::endl;
+    exit(EXIT_FAILURE);
   }
+  return M->at(a);
 }
 
 void read_scalar(long double &x, std::istream &s) {
-  if (s.eof())
-    return;
+  if (s.eof()) {
+    std::cerr << "Got unexpected EOF" << std::endl;
+    exit(EXIT_FAILURE);
+  }
   scroll_space(s);
 
   std::string line;
   assert(std::getline(s, line));
   assert(!line.empty());
+  if (line == "NaN")
+    return;
 
   // Find the position to insert 'E' if needed (looking for exponent sign from
   // right)
@@ -120,8 +151,10 @@ void read_scalar(long double &x, std::istream &s) {
   // Parse the (potentially modified) string
   std::istringstream iss(line);
   iss >> x;
-  if (iss.fail())
-    x = 0;
+  if (iss.fail()) {
+    std::cerr << "Could not read long double: " << line << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 void read_scalar(float &x, std::istream &s) {
@@ -137,8 +170,10 @@ void read_scalar(double &x, std::istream &s) {
 }
 
 template <typename T> void read_scalar(T &x, std::istream &s) {
-  if (s.eof())
-    return;
+  if (s.eof()) {
+    std::cerr << "Got unexpected EOF" << std::endl;
+    exit(EXIT_FAILURE);
+  }
   scroll_space(s);
   s >> x;
 }
