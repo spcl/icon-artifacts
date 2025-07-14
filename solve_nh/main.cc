@@ -64,7 +64,6 @@ int main(int argc, char *argv[]) {
 
       std::vector<std::jthread> pool;
       SPAWN_ALL_READERS(prepre, predictor_pre);
-      pool.clear();
       UNWRAP_ALL_DATA_PAIRS();
 
       acerr() << "All data read..." << std::endl;
@@ -140,7 +139,6 @@ int main(int argc, char *argv[]) {
       acout() << "Step " << n << " done." << std::endl;
 
       SPAWN_ALL_WRITERS(prepre, predictor_pre);
-      pool.clear();
     }
 
     // PREDICTOR POST
@@ -149,7 +147,6 @@ int main(int argc, char *argv[]) {
 
       std::vector<std::jthread> pool;
       SPAWN_ALL_READERS(prepost, predictor_post);
-      pool.clear();
       UNWRAP_ALL_DATA_PAIRS();
 
       acerr() << "All data read..." << std::endl;
@@ -225,7 +222,6 @@ int main(int argc, char *argv[]) {
       acout() << "Step " << n << " done." << std::endl;
 
       SPAWN_ALL_WRITERS(prepost, predictor_post);
-      pool.clear();
     }
 
     // CORRECTOR PRE
@@ -234,7 +230,6 @@ int main(int argc, char *argv[]) {
 
       std::vector<std::jthread> pool;
       SPAWN_ALL_READERS(corpre, corrector_pre);
-      pool.clear();
       UNWRAP_ALL_DATA_PAIRS();
 
       acerr() << "All data read..." << std::endl;
@@ -310,7 +305,6 @@ int main(int argc, char *argv[]) {
       acout() << "Step " << n << " done." << std::endl;
 
       SPAWN_ALL_WRITERS(corpre, corrector_pre);
-      pool.clear();
     }
 
     // CORRECTOR POST
@@ -319,7 +313,6 @@ int main(int argc, char *argv[]) {
 
       std::vector<std::jthread> pool;
       SPAWN_ALL_READERS(corpost, corrector_post);
-      pool.clear();
       UNWRAP_ALL_DATA_PAIRS();
 
       acerr() << "All data read..." << std::endl;
@@ -395,7 +388,6 @@ int main(int argc, char *argv[]) {
       acout() << "Step " << n << " done." << std::endl;
 
       SPAWN_ALL_WRITERS(corpost, corrector_post);
-      pool.clear();
     }
   }
   return EXIT_SUCCESS;
