@@ -1,8 +1,9 @@
+from copy import deepcopy
 from itertools import chain
 import re
 
 from dace import SDFG
-from dace.sdfg.nodes import MapEntry, NestedSDFG, Tasklet
+from dace.sdfg.nodes import MapEntry, NestedSDFG, Tasklet, AccessNode
 from dace.sdfg.state import SDFGState
 from dace.sdfg.graph import MultiConnectorEdge
 from dace.frontend.fortran.ast_utils import singular, atmost_one
@@ -78,8 +79,44 @@ def inject_velocity_shim(g: SDFG) -> None:
     else:
         in_istep = f"2"
 
+    # Add and remove certain in and out connectors.
+    # 1.
+    assert t.add_in_connector("in_p_nh")
+    in_p_diag = singular(vtst.in_edges_by_connector(t, "in_p_diag")).src
+    in_p_nh_ed = singular(e for e in vtst.in_edges(in_p_diag))
+    assert isinstance(in_p_nh_ed.src, AccessNode)
+    vtst.add_edge(
+        in_p_nh_ed.src, in_p_nh_ed.src_conn, t, f"in_p_nh", deepcopy(in_p_nh_ed.data)
+    )
+    # 2.
+    assert t.add_out_connector("out_p_nh")
+    out_p_diag = singular(vtst.out_edges_by_connector(t, "out_p_diag")).dst
+    out_p_nh_ed = singular(e for e in vtst.out_edges(out_p_diag))
+    assert isinstance(out_p_nh_ed.dst, AccessNode)
+    vtst.add_edge(
+        t,
+        f"out_p_nh",
+        out_p_nh_ed.dst,
+        out_p_nh_ed.dst_conn,
+        deepcopy(out_p_nh_ed.data),
+    )
+    # 3.
+    for c in ["in_p_diag", "in_p_metrics", "in_ldeepatmo"]:
+        assert c in t.in_connectors
+        ed = singular(vtst.in_edges_by_connector(t, c))
+        vtst.remove_node(ed.src)
+        t.remove_in_connector(c)
+    for c in ["out_p_diag"]:
+        assert c in t.out_connectors
+        ed = singular(vtst.out_edges_by_connector(t, c))
+        vtst.remove_node(ed.dst)
+        t.remove_out_connector(c)
+
     t.code = CodeBlock(
         f"""
+auto* in_p_diag = in_p_nh -> diag;
+auto* in_p_metrics = in_p_nh -> metrics;
+auto in_ldeepatmo = in_global_data -> ldeepatmo;
 velocity_tendencies(in_global_data, in_p_diag, in_p_int, in_p_metrics, in_p_patch, in_p_prog, in_z_kin_hor_e, in_z_vt_ie, in_z_w_concorr_me,
   tmp_struct_symbol_24 /* = __f2dace_A_z_kin_hor_e_d_0_s*/,
   tmp_struct_symbol_25 /* = __f2dace_A_z_kin_hor_e_d_1_s*/,
@@ -102,7 +139,7 @@ velocity_tendencies(in_global_data, in_p_diag, in_p_int, in_p_metrics, in_p_patc
   {in_lvn_only} /* = in_lvn_only*/,
   in_ntnd);
 out_global_data = in_global_data;
-out_p_diag = in_p_diag;
+out_p_nh = in_p_nh;
 out_p_int = in_p_int;
 out_p_patch = in_p_patch;
 out_p_prog = in_p_prog;
