@@ -142,7 +142,8 @@
   SPAWN_READERS(prefix, lvn_only, int, namespc)                                \
   SPAWN_READERS(prefix, lvn_pos, int, namespc)                                 \
   SPAWN_READERS(prefix, l_vert_nested, int, namespc)                           \
-  SPAWN_READERS(prefix, l_child_vertnest, int, namespc)
+  SPAWN_READERS(prefix, l_child_vertnest, int, namespc)                        \
+  pool.clear();
 
 #define UNWRAP_ALL_DATA_PAIRS()                                                \
   UNWRAP_DATA_PAIR(alin)                                                       \
@@ -412,5 +413,6 @@
   SPAWN_WRITERS(prefix, lvn_pos, int, namespc)                                 \
   SPAWN_WRITERS(prefix, l_vert_nested, int, namespc)                           \
   SPAWN_WRITERS(prefix, l_child_vertnest, int, namespc)                        \
+  pool.clear();                                                                \
   p_nh_in.prog[0] = p_nh_in_prog_bk[0];                                        \
   p_nh_in.prog[1] = p_nh_in_prog_bk[1];
