@@ -11,9 +11,9 @@ set -xeuo pipefail
 
 # --- Configuration ---
 # Source git branch for velocity kernels
-GIT_SOURCE_BRANCH="origin/new_sched"
+GIT_SOURCE_BRANCH="origin/new_sched_solve_nh"
 # Base path for the velocity kernel source files within the git repository
-VELOCITY_SRC_BASE_PATH="velocity/codegen/stage5"
+VELOCITY_SRC_BASE_PATH="velocity/codegen/stage1"
 # Workspace directory to store fetched and patched files
 WORKSPACE_DIR="velocity_workspace"
 # Root of the DaCe installation. Can be overridden by setting the environment variable.
@@ -141,6 +141,9 @@ patch_sources() {
     # Prepend includes. The `i` command with a backslash and literal newline
     # is the portable way to insert lines across different versions of sed.
     sed "${sed_inplace_opt[@]}" '1s|^|#include <dace/dace.h>\n#include "shared_struct_defs.h"\n|' "$f"
+
+    # Remove `__restrict__` keywords.
+    sed "${sed_inplace_opt[@]}" 's/__restrict__ //g' "$f"
 
     # Filter out the DaCe state structure definition, which is not needed in the final binary
     awk '
