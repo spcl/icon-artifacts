@@ -1,5 +1,6 @@
 import dace
 from dace import SDFG
+from dace.transformation.dataflow import MapCollapse
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import Mode
@@ -11,7 +12,9 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-
+    g.apply_transformations_repeated(
+        MapCollapse
+    )
     return g
 
 

@@ -15,6 +15,7 @@ from dace.transformation.passes import (
 
 from utils.count import count_loops
 from utils.clean_partial_view_towers import clean_partial_view_towers
+from utils.add_missing_symbols import add_missing_symbols_to_nsdfgs
 
 STAGE_ID = 1
 
@@ -35,14 +36,23 @@ def optimization_action(g: SDFG):
         shallow_copy_to_gpu=False,
         taskloop=False,
     ).apply_pass(g, {})
-    g.simplify(skip=["ArrayElimination"])
+    # Simplify results with NestedSDFGs having missing symbols
+    g.simplify(skip=["ArrayElimination"], validate=False)
+    # Add missing symbols to NSDFGs to make it valid
+    add_missing_symbols_to_nsdfgs(g)
+    g.validate()
     SymbolPropagation().apply_pass(g, {})
-    g.simplify(skip=["ArrayElimination"])
+    add_missing_symbols_to_nsdfgs(g)
+    g.validate()
+    g.simplify(skip=["ArrayElimination"], validate=False)
+    add_missing_symbols_to_nsdfgs(g)
+    g.validate()
     ConstantPropagation().apply_pass(g, {})
-
     g.apply_transformations_repeated(
         LoopToMap, permissive=True, options={"ballin": True}
     )
+    add_missing_symbols_to_nsdfgs(g)
+    g.validate()
     count_loops(g, verbose=False, use_assert=True)
     return g
 
