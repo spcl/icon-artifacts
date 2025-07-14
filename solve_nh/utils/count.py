@@ -109,3 +109,30 @@ def count_symbols_use_defs(
         warnings.warn(
             f"Symbols defined in nested SDFGs and used outside: {count}"
         )
+
+def count_map_dimensions(g: dace.SDFG):
+    map_dict_dim = dict()
+    # Collect maps in a dictionary by:
+    # key: dimensionality of the map
+    # value: dictionary of ranges, where key is the range and value is the count of maps with that range
+    # ---- key: str-range
+    # ---- value: count of maps with that range
+    for node, _ in g.all_nodes_recursive():
+        if isinstance(node, dace.nodes.MapEntry):
+            map_dim = len(node.map.range)
+            if map_dim not in map_dict_dim:
+                map_dict_dim[map_dim] = dict()
+            if str(node.map.range) not in map_dict_dim[map_dim]:
+                map_dict_dim[map_dim][str(node.map.range)] = 0
+            map_dict_dim[map_dim][str(node.map.range)] += 1
+    for dim, ranges in map_dict_dim.items():
+        print(f"Map with {dim} dimension(s)")
+        for r, count in ranges.items():
+            print(f"  Range: {r}, Count: {count}")
+
+    print(f"Total number of maps: {sum([sum(r.values()) for r in map_dict_dim.values()])}")
+    print(f"Found dimensions: {map_dict_dim.keys()}")
+
+    for dim, ranges in map_dict_dim.items():
+        print(f"Maps that have {dim} dimensions, has {len(ranges)} unique ranges and {sum(ranges.values())} maps in total")
+

@@ -40,8 +40,10 @@ def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
                         range_expr.append(expr_str)
                 new_range_list.append(range_expr)
             # If need to change range do it
-            if change_range:
-                node.map.range = dace.subsets.Range(new_range_list)
+            if not change_range:
+                continue
+
+            node.map.range = dace.subsets.Range(new_range_list)
             # If this state has no incoming edges, add an empty state to parent graph and connect to this set
             if len(state.parent_graph.in_edges(state)) == 0:
                 var_assign_state = dace.SDFGState(
