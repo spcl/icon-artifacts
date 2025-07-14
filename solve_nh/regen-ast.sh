@@ -1,4 +1,15 @@
 sed -E '/^[[:space:]]*include[[:space:]]+('\''[^'\'']+'\''|"[^"]+")[[:space:]]*$/Id' edited-src/solve_nh_fake.f90 > solve_nh_fake.f90
+cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
+  && sed -E -e 's/use serde_base, only: generation, at//Ig' solve_nh_fake.f90.bak > solve_nh_fake.f90
+cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
+  && awk '!/serialize/' solve_nh_fake.f90.bak > solve_nh_fake.f90
+cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
+  && awk '
+    BEGIN {skip=0}
+    /if *\(generation == 20\) *then/ {skip=1; next}
+    skip && /end *if/ {skip=0; next}
+    !skip {print}
+  ' solve_nh_fake.f90.bak > solve_nh_fake.f90
 
 python -m dace.frontend.fortran.tools.create_preprocessed_ast \
   -i solve_nh_fake.f90 \
@@ -23,13 +34,6 @@ cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
   && sed -E -e 's/[[:space:]]*=>[[:space:]]*null\([[:space:]]*\)//Ig' solve_nh_fake.f90.bak > solve_nh_fake.f90
 cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
   && sed -E -e 's/\(process_mpi_all_size <= 1\)/.TRUE./Ig' solve_nh_fake.f90.bak > solve_nh_fake.f90
-cp solve_nh_fake.f90 solve_nh_fake.f90.bak \
-  && awk '
-    BEGIN {skip=0}
-    /IF *\(generation == 20\) *THEN/ {skip=1; next}
-    skip && /END *IF/ {skip=0; next}
-    !skip {print}
-  ' solve_nh_fake.f90.bak > solve_nh_fake.f90
 rm solve_nh_fake.f90.bak
 
 #python -m utils.prune_unused_args \
