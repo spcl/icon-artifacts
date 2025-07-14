@@ -283,11 +283,16 @@ def consolidate_generated_code(
             "t_nh_prog *in_p_prog = p_nh_prog_nnow[0];",
             "t_nh_prog *in_p_prog = p_nh_prog_nnow;",
         ),
+        (
+            "t_nh_state *in_p_nh = p_nh[0];",
+            "t_nh_state *in_p_nh = p_nh;",
+        ),
         ("global_data[0] = out_global_data;", "global_data = out_global_data;"),
         ("p_int[0] = out_p_int;", "p_int = out_p_int;"),
         ("p_patch[0] = out_p_patch;", "p_patch = out_p_patch;"),
         ("p_nh_prog_nnew[0] = out_p_prog;", "p_nh_prog_nnew = out_p_prog;"),
         ("p_nh_prog_nnow[0] = out_p_prog;", "p_nh_prog_nnow = out_p_prog;"),
+        ("p_nh[0] = out_p_nh;", "p_nh = out_p_nh;"),
     ]
 
     src_content = source_path.read_text()

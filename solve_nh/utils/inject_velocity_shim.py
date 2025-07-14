@@ -2,7 +2,7 @@ from copy import deepcopy
 from itertools import chain
 import re
 
-from dace import SDFG
+from dace import SDFG, Memlet
 from dace.sdfg.nodes import MapEntry, NestedSDFG, Tasklet, AccessNode
 from dace.sdfg.state import SDFGState
 from dace.sdfg.graph import MultiConnectorEdge
@@ -86,7 +86,7 @@ def inject_velocity_shim(g: SDFG) -> None:
     in_p_nh_ed = singular(e for e in vtst.in_edges(in_p_diag))
     assert isinstance(in_p_nh_ed.src, AccessNode)
     vtst.add_edge(
-        in_p_nh_ed.src, in_p_nh_ed.src_conn, t, f"in_p_nh", deepcopy(in_p_nh_ed.data)
+        in_p_nh_ed.src, in_p_nh_ed.src_conn, t, f"in_p_nh", Memlet(f"p_nh[0]")
     )
     # 2.
     assert t.add_out_connector("out_p_nh")
@@ -94,11 +94,7 @@ def inject_velocity_shim(g: SDFG) -> None:
     out_p_nh_ed = singular(e for e in vtst.out_edges(out_p_diag))
     assert isinstance(out_p_nh_ed.dst, AccessNode)
     vtst.add_edge(
-        t,
-        f"out_p_nh",
-        out_p_nh_ed.dst,
-        out_p_nh_ed.dst_conn,
-        deepcopy(out_p_nh_ed.data),
+        t, f"out_p_nh", out_p_nh_ed.dst, out_p_nh_ed.dst_conn, Memlet(f"p_nh[0]")
     )
     # 3.
     for c in ["in_p_diag", "in_p_metrics", "in_ldeepatmo"]:
