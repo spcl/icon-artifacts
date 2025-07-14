@@ -1,49 +1,15 @@
 import dace
 from dace import SDFG
-from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import Mode
 
 import argparse
 
-from dace.transformation.interstate import ContinueToCondition, LoopToMap
-from dace.transformation.passes import (
-    StructToContainerGroups,
-    SymbolPropagation,
-    ConstantPropagation,
-)
 
-from utils.count import count_loops
-from utils.clean_partial_view_towers import clean_partial_view_towers
+STAGE_ID = 3
 
-STAGE_ID = 1
-
-
-def optimization_action(g: SDFG):
+def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    g.apply_transformations_repeated(ContinueToCondition)
-    clean_partial_view_towers(g)
-    StructToContainerGroups(
-        validate=False,
-        save_steps=False,
-        verbose=False,
-        simplify=False,
-        interface_with_struct_copy=True,
-        interface_to_gpu=False,
-        clean_trivial_views=True,
-        shallow_copy=False,
-        shallow_copy_to_gpu=False,
-        taskloop=False,
-    ).apply_pass(g, {})
-    g.simplify(skip=["ArrayElimination"])
-    SymbolPropagation().apply_pass(g, {})
-    g.simplify(skip=["ArrayElimination"])
-    ConstantPropagation().apply_pass(g, {})
-
-    g.apply_transformations_repeated(
-        LoopToMap, permissive=True, options={"ballin": True}
-    )
-    count_loops(g, verbose=False, use_assert=True)
     return g
 
 
@@ -62,6 +28,7 @@ def main():
         default=Mode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
+    argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=False)
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True
@@ -80,7 +47,7 @@ def main():
             g.name = name
             g.validate()
 
-            g = optimization_action(g)
+            g = optimization_action(g, velicity_shim=args.shim)
 
             g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
