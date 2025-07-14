@@ -4,6 +4,7 @@ from dace.transformation.dataflow import MapCollapse
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import Mode
+from dace.transformation.interstate import InlineSDFG
 
 import argparse
 
@@ -12,9 +13,13 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    g.apply_transformations_repeated(
-        MapCollapse
-    )
+    for _ in range(2):
+        g.apply_transformations_repeated(
+            InlineSDFG
+        )
+        g.apply_transformations_repeated(
+            MapCollapse
+        )
     return g
 
 

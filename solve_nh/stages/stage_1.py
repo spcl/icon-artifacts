@@ -16,6 +16,9 @@ from dace.transformation.passes import (
 from utils.count import count_loops
 from utils.clean_partial_view_towers import clean_partial_view_towers
 from utils.add_missing_symbols import add_missing_symbols_to_nsdfgs
+from utils.promote_function_access_in_map_range_to_symbol import (
+    promote_function_access_in_map_range_to_symbol,
+)
 
 STAGE_ID = 1
 
@@ -39,18 +42,22 @@ def optimization_action(g: SDFG):
     # Simplify results with NestedSDFGs having missing symbols
     g.simplify(skip=["ArrayElimination"], validate=False)
     # Add missing symbols to NSDFGs to make it valid
-    add_missing_symbols_to_nsdfgs(g)
     g.validate()
     SymbolPropagation().apply_pass(g, {})
-    add_missing_symbols_to_nsdfgs(g)
+    #add_missing_symbols_to_nsdfgs(g)
     g.validate()
     g.simplify(skip=["ArrayElimination"], validate=False)
-    add_missing_symbols_to_nsdfgs(g)
     g.validate()
     ConstantPropagation().apply_pass(g, {})
     g.apply_transformations_repeated(
         LoopToMap, permissive=True, options={"ballin": True}
     )
+    # Map ranges have expressions such nflatlev(jg - 1) as Sympy expresses array accesses as functions
+    # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
+    # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
+    promote_function_access_in_map_range_to_symbol(g)
+    # Do not add missing symbols to NSDFGs before promiting nflatlev access to
+    # data access, otherwise nflatlev will be registered as a symbol already
     add_missing_symbols_to_nsdfgs(g)
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
