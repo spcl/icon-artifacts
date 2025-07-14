@@ -27,16 +27,35 @@ else
   CC="g++"
 fi
 
-# Define compiler flags to avoid repetition and ensure consistency
-ERRLIM=$([ "$CC" = "clang++" ] && printf "-ferror-limit=1" || printf "-fmax-errors=1")
-WARNING_FLAGS="-g -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare"
+# Compiler-specific error limit flag
+ERRLIM=()
 if [[ "$CC" == "clang++" ]]; then
-    # Add clang-specific warning flags
-    WARNING_FLAGS+=" -Wno-parentheses-equality -Wno-constant-logical-operand"
+  ERRLIM+=(-ferror-limit=1)
+else
+  ERRLIM+=(-fmax-errors=1)
 fi
-OPTIMIZATION_FLAGS="-O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off"
-STANDARD_FLAGS="-std=c++20 -fPIC -fopenmp"
-COMPILER_FLAGS="$ERRLIM $WARNING_FLAGS $OPTIMIZATION_FLAGS $STANDARD_FLAGS"
+
+# Warning flags
+WARNING_FLAGS=(
+  -g -Wall -Wextra
+  -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function
+  -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare
+)
+[[ "$CC" == "clang++" ]] && WARNING_FLAGS+=(
+  -Wno-parentheses-equality -Wno-constant-logical-operand
+)
+
+# Optimization and standard flags
+OPTIMIZATION_FLAGS=(-O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off)
+STANDARD_FLAGS=(-std=c++20 -fPIC -fopenmp)
+
+# Combine all
+COMPILER_FLAGS=(
+  "${ERRLIM[@]}"
+  "${WARNING_FLAGS[@]}"
+  "${OPTIMIZATION_FLAGS[@]}"
+  "${STANDARD_FLAGS[@]}"
+)
 
 # --- Helper Functions ---
 
@@ -54,7 +73,7 @@ get_sed_inplace_opt() {
 
 # Stage 1: Fetch source files from Git
 fetch_sources() {
-  printf "--- Stage 1: Fetching source files from Git ---"
+  printf "%s" "--- Stage 1: Fetching source files from Git ---"
   mkdir -p "$WORKSPACE_DIR"
 
   # Use two indexed arrays for portability, as associative arrays (`declare -A`) are not supported in older bash versions (e.g., on macOS).
@@ -86,7 +105,7 @@ fetch_sources() {
 
 # Stage 2: Patch fetched files to remove CUDA-specific code
 patch_sources() {
-  printf "\n--- Stage 2: Patching source files ---"
+  printf "%s" "\n--- Stage 2: Patching source files ---"
   local sed_inplace_opt
   get_sed_inplace_opt
 
@@ -138,7 +157,7 @@ patch_sources() {
 
 # Stage 3: Compile all parts into a single executable
 compile_all() {
-  printf "\n--- Stage 3: Compiling ---"
+  printf "%s" "\n--- Stage 3: Compiling ---"
 
   echo "Compiling velocity library..."
   # Compile patched velocity sources into object files
@@ -146,7 +165,7 @@ compile_all() {
     -Iinclude \
     -I"$WORKSPACE_DIR" \
     -I"$DACEROOT/dace/runtime/include" \
-    "$COMPILER_FLAGS" -c
+    "${COMPILER_FLAGS[@]}" -c
 
   # Archive object files into a static library
   ar rcs libvelocity.a velocity_*.o reductions.o timer.o
@@ -161,8 +180,8 @@ compile_all() {
     -Iinclude \
     -Icodegen/stage0 \
     -I"$DACEROOT/dace/runtime/include" \
-    "$COMPILER_FLAGS" -o verify_solve_nh_parts
-  printf "Executable verify_solve_nh_parts created."
+    "${COMPILER_FLAGS[@]}" -o verify_solve_nh_parts
+  printf "%s" "Executable verify_solve_nh_parts created."
 
   rm -f velocity_*.o reductions.o timer.o solve_nh_parts.o
 }
@@ -172,7 +191,7 @@ main() {
   fetch_sources
   patch_sources
   compile_all
-  printf "\nScript finished successfully."
+  printf "%s" "\nScript finished successfully."
 }
 
 main "$@"
