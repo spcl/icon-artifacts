@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <type_traits>
+
 #include "shared_struct_defs.h"
 #include "solve_nh_parts.h"
 
