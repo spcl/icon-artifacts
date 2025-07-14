@@ -77,12 +77,16 @@ fetch_sources() {
   mkdir -p "$WORKSPACE_DIR"
 
   # Use two indexed arrays for portability, as associative arrays (`declare -A`) are not supported in older bash versions (e.g., on macOS).
-  local dest_files=("velocity_1.cc" "velocity_2.cc" "velocity_3.cc" "velocity_4.cc")
+  local dest_files=("velocity_1.cc" "velocity_2.cc" "velocity_3.cc" "velocity_4.cc" "velocity_1.h" "velocity_2.h" "velocity_3.h" "velocity_4.h")
   local src_paths=(
     "velocity_no_nproma_if_prop_lvn_only_0_istep_1/src/cpu/velocity_no_nproma_if_prop_lvn_only_0_istep_1.cu"
     "velocity_no_nproma_if_prop_lvn_only_1_istep_1/src/cpu/velocity_no_nproma_if_prop_lvn_only_1_istep_1.cu"
     "velocity_no_nproma_if_prop_lvn_only_0_istep_2/src/cpu/velocity_no_nproma_if_prop_lvn_only_0_istep_2.cu"
     "velocity_no_nproma_if_prop_lvn_only_1_istep_2/src/cpu/velocity_no_nproma_if_prop_lvn_only_1_istep_2.cu"
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_1/include/velocity_no_nproma_if_prop_lvn_only_0_istep_1.h"
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_1/include/velocity_no_nproma_if_prop_lvn_only_1_istep_1.h"
+    "velocity_no_nproma_if_prop_lvn_only_0_istep_2/include/velocity_no_nproma_if_prop_lvn_only_0_istep_2.h"
+    "velocity_no_nproma_if_prop_lvn_only_1_istep_2/include/velocity_no_nproma_if_prop_lvn_only_1_istep_2.h"
   )
 
   for i in "${!dest_files[@]}"; do
@@ -137,7 +141,7 @@ patch_sources() {
   # Normalize DaCe-generated symbols
   sed -E "${sed_inplace_opt[@]}" 's/(->__f2dace_.*_d_[0-9]+_s)_[0-9]+/\1/g' "$WORKSPACE_DIR"/velocity_*.cc
 
-  for f in "$WORKSPACE_DIR"/velocity_*.cc; do
+  for f in "$WORKSPACE_DIR"/velocity_*.*; do
     # Prepend includes. The `i` command with a backslash and literal newline
     # is the portable way to insert lines across different versions of sed.
     sed "${sed_inplace_opt[@]}" '1s|^|#include <dace/dace.h>\n#include "shared_struct_defs.h"\n|' "$f"
@@ -151,10 +155,21 @@ patch_sources() {
     /struct velocity_no_nproma_.*_state_t \{/ { skip=0; print; next }
     !skip
     ' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+
+    # Filter out the DaCe state structure definition, which is not needed in the final binary
+    awk '
+    /^#define __DACE_CODEGEN_VELOCITY_NO_NPROMA_IF_PROP_LVN_ONLY_[01]_ISTEP_[12]__/ { skip=1; next }
+    /struct velocity_no_nproma_.*_state_t/ { skip=0; print; next }
+    !skip
+    ' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
   done
 
   echo "Formatting code with clang-format..."
   clang-format -i "$WORKSPACE_DIR"/*.h "$WORKSPACE_DIR"/*.cc
+
+  cat "$WORKSPACE_DIR"/velocity_*.h > include/velocity.h
+  rm "$WORKSPACE_DIR"/velocity_*.h
+
   echo "Done patching files."
 }
 
@@ -182,6 +197,7 @@ compile_all() {
   $CC main.cc velocity_*.o reductions.o timer.o solve_nh_parts.o \
     -Iinclude \
     -Icodegen/stage0 \
+    -I"$WORKSPACE_DIR" \
     -I"$DACEROOT/dace/runtime/include" \
     "${COMPILER_FLAGS[@]}" -o verify_solve_nh_parts
   printf "%s" "Executable verify_solve_nh_parts created."
