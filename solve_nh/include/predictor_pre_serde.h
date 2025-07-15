@@ -20,8 +20,7 @@
 namespace predictor_pre {
 template <typename T> std::string type_name() {
   int status = 0;
-  std::unique_ptr<char, void (*)(void *)> res{
-      abi::__cxa_demangle(typeid(T).name(), NULL, NULL, &status), std::free};
+  std::unique_ptr<char, void (*)(void *)> res{abi::__cxa_demangle(typeid(T).name(), NULL, NULL, &status), std::free};
   if (status != 0)
     throw status; // stub
   return res.get();
@@ -29,15 +28,13 @@ template <typename T> std::string type_name() {
 
 std::vector<std::string_view> split(std::string_view s, char delim) {
   std::vector<std::string_view> parts;
-  for (int start_pos = 0, next_pos; start_pos < s.length();
-       start_pos = next_pos + 1) {
+  for (int start_pos = 0, next_pos; start_pos < s.length(); start_pos = next_pos + 1) {
     next_pos = s.find(delim, start_pos);
     if (next_pos == s.npos) {
       parts.push_back({s.begin() + start_pos, s.length() - start_pos});
       break;
     }
-    parts.push_back(
-        {s.begin() + start_pos, static_cast<size_t>(next_pos - start_pos)});
+    parts.push_back({s.begin() + start_pos, static_cast<size_t>(next_pos - start_pos)});
   }
   return parts;
 }
@@ -51,8 +48,7 @@ std::string scroll_space(std::istream &s) {
   return out;
 }
 
-std::string read_line(std::istream &s,
-                      const std::optional<std::string> &should_contain = {}) {
+std::string read_line(std::istream &s, const std::optional<std::string> &should_contain = {}) {
   if (s.eof()) {
     std::cerr << "Got unexpected EOF" << std::endl;
     exit(EXIT_FAILURE);
@@ -64,8 +60,7 @@ std::string read_line(std::istream &s,
   if (should_contain) {
     bool ok = (std::string(bin).find(*should_contain) != std::string::npos);
     if (!ok) {
-      std::cerr << "Expected: '" << *should_contain << "'; got: '" << bin << "'"
-                << std::endl;
+      std::cerr << "Expected: '" << *should_contain << "'; got: '" << bin << "'" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -87,21 +82,17 @@ std::string read_until(std::istream &s, const std::string &should_contain) {
 }
 
 struct array_meta;
-std::pair<std::map<void *, array_meta> *, std::unique_lock<std::mutex>>
-ARRAY_META_DICT();
+std::pair<std::map<void *, array_meta> *, std::unique_lock<std::mutex>> ARRAY_META_DICT();
 
 struct array_meta {
   int rank = 0;
   std::vector<int> size, lbound;
 
-  int volume() const {
-    return std::reduce(size.begin(), size.end(), 1, std::multiplies<int>());
-  }
+  int volume() const { return std::reduce(size.begin(), size.end(), 1, std::multiplies<int>()); }
 
   template <typename T> T *read(std::istream &s) const;
 };
-std::pair<std::map<void *, array_meta> *, std::unique_lock<std::mutex>>
-ARRAY_META_DICT() {
+std::pair<std::map<void *, array_meta> *, std::unique_lock<std::mutex>> ARRAY_META_DICT() {
   static auto *M = new std::map<void *, array_meta>();
   static std::mutex mu;
   std::unique_lock<std::mutex> lock(mu);
@@ -136,13 +127,11 @@ void read_scalar(long double &x, std::istream &s) {
     if (current_char == '+' || current_char == '-') {
       // Found a potential exponent sign. Check preceding character.
       if (i > 0 && (std::isdigit(line[i - 1]) || line[i - 1] == '.') &&
-          !(line[i - 1] == 'E' || line[i - 1] == 'e' || line[i - 1] == 'D' ||
-            line[i - 1] == 'd')) {
+          !(line[i - 1] == 'E' || line[i - 1] == 'e' || line[i - 1] == 'D' || line[i - 1] == 'd')) {
         line.insert(i, "E"); // Insert 'E' and break
         break;
       }
-    } else if (current_char == 'E' || current_char == 'e' ||
-               current_char == 'D' || current_char == 'd') {
+    } else if (current_char == 'E' || current_char == 'e' || current_char == 'D' || current_char == 'd') {
       // Already standard scientific notation, no insertion needed.
       break; // Exit loop
     }
@@ -247,10 +236,9 @@ void deserialize(t_grid_domain_decomp_info *x, std::istream &s) {
     x->__f2dace_SA_owner_mask_d_1_s = m.size[1];
     x->__f2dace_SOA_owner_mask_d_0_s = m.lbound[0];
     x->__f2dace_SOA_owner_mask_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->owner_mask =
-        m.read<std::remove_pointer<decltype(x->owner_mask)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->owner_mask = m.read<std::remove_pointer<decltype(x->owner_mask)>::type>(s);
 
   } // CONCLUDING IF
 }
@@ -271,8 +259,8 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_c_lin_e_d_0_s = m.lbound[0];
     x->__f2dace_SOA_c_lin_e_d_1_s = m.lbound[1];
     x->__f2dace_SOA_c_lin_e_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->c_lin_e = m.read<std::remove_pointer<decltype(x->c_lin_e)>::type>(s);
 
   } // CONCLUDING IF
@@ -289,8 +277,8 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_e_bln_c_s_d_0_s = m.lbound[0];
     x->__f2dace_SOA_e_bln_c_s_d_1_s = m.lbound[1];
     x->__f2dace_SOA_e_bln_c_s_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->e_bln_c_s = m.read<std::remove_pointer<decltype(x->e_bln_c_s)>::type>(s);
 
   } // CONCLUDING IF
@@ -307,8 +295,8 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_e_flx_avg_d_0_s = m.lbound[0];
     x->__f2dace_SOA_e_flx_avg_d_1_s = m.lbound[1];
     x->__f2dace_SOA_e_flx_avg_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->e_flx_avg = m.read<std::remove_pointer<decltype(x->e_flx_avg)>::type>(s);
 
   } // CONCLUDING IF
@@ -325,10 +313,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_cells_aw_verts_d_0_s = m.lbound[0];
     x->__f2dace_SOA_cells_aw_verts_d_1_s = m.lbound[1];
     x->__f2dace_SOA_cells_aw_verts_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->cells_aw_verts =
-        m.read<std::remove_pointer<decltype(x->cells_aw_verts)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->cells_aw_verts = m.read<std::remove_pointer<decltype(x->cells_aw_verts)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# rbf_vec_coeff_e"}); // Should contain '# rbf_vec_coeff_e'
@@ -344,10 +331,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_rbf_vec_coeff_e_d_0_s = m.lbound[0];
     x->__f2dace_SOA_rbf_vec_coeff_e_d_1_s = m.lbound[1];
     x->__f2dace_SOA_rbf_vec_coeff_e_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->rbf_vec_coeff_e =
-        m.read<std::remove_pointer<decltype(x->rbf_vec_coeff_e)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->rbf_vec_coeff_e = m.read<std::remove_pointer<decltype(x->rbf_vec_coeff_e)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# geofac_div"}); // Should contain '# geofac_div'
@@ -363,10 +349,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_geofac_div_d_0_s = m.lbound[0];
     x->__f2dace_SOA_geofac_div_d_1_s = m.lbound[1];
     x->__f2dace_SOA_geofac_div_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->geofac_div =
-        m.read<std::remove_pointer<decltype(x->geofac_div)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->geofac_div = m.read<std::remove_pointer<decltype(x->geofac_div)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# geofac_grdiv"}); // Should contain '# geofac_grdiv'
@@ -382,10 +367,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_geofac_grdiv_d_0_s = m.lbound[0];
     x->__f2dace_SOA_geofac_grdiv_d_1_s = m.lbound[1];
     x->__f2dace_SOA_geofac_grdiv_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->geofac_grdiv =
-        m.read<std::remove_pointer<decltype(x->geofac_grdiv)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->geofac_grdiv = m.read<std::remove_pointer<decltype(x->geofac_grdiv)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# geofac_rot"}); // Should contain '# geofac_rot'
@@ -401,10 +385,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_geofac_rot_d_0_s = m.lbound[0];
     x->__f2dace_SOA_geofac_rot_d_1_s = m.lbound[1];
     x->__f2dace_SOA_geofac_rot_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->geofac_rot =
-        m.read<std::remove_pointer<decltype(x->geofac_rot)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->geofac_rot = m.read<std::remove_pointer<decltype(x->geofac_rot)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# geofac_n2s"}); // Should contain '# geofac_n2s'
@@ -420,10 +403,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_geofac_n2s_d_0_s = m.lbound[0];
     x->__f2dace_SOA_geofac_n2s_d_1_s = m.lbound[1];
     x->__f2dace_SOA_geofac_n2s_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->geofac_n2s =
-        m.read<std::remove_pointer<decltype(x->geofac_n2s)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->geofac_n2s = m.read<std::remove_pointer<decltype(x->geofac_n2s)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# geofac_grg"}); // Should contain '# geofac_grg'
@@ -441,10 +423,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_geofac_grg_d_1_s = m.lbound[1];
     x->__f2dace_SOA_geofac_grg_d_2_s = m.lbound[2];
     x->__f2dace_SOA_geofac_grg_d_3_s = m.lbound[3];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->geofac_grg =
-        m.read<std::remove_pointer<decltype(x->geofac_grg)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->geofac_grg = m.read<std::remove_pointer<decltype(x->geofac_grg)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# pos_on_tplane_e"}); // Should contain '# pos_on_tplane_e'
@@ -462,10 +443,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SOA_pos_on_tplane_e_d_1_s = m.lbound[1];
     x->__f2dace_SOA_pos_on_tplane_e_d_2_s = m.lbound[2];
     x->__f2dace_SOA_pos_on_tplane_e_d_3_s = m.lbound[3];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->pos_on_tplane_e =
-        m.read<std::remove_pointer<decltype(x->pos_on_tplane_e)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->pos_on_tplane_e = m.read<std::remove_pointer<decltype(x->pos_on_tplane_e)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# nudgecoeff_e"}); // Should contain '# nudgecoeff_e'
@@ -479,10 +459,9 @@ void deserialize(t_int_state *x, std::istream &s) {
     x->__f2dace_SA_nudgecoeff_e_d_1_s = m.size[1];
     x->__f2dace_SOA_nudgecoeff_e_d_0_s = m.lbound[0];
     x->__f2dace_SOA_nudgecoeff_e_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->nudgecoeff_e =
-        m.read<std::remove_pointer<decltype(x->nudgecoeff_e)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->nudgecoeff_e = m.read<std::remove_pointer<decltype(x->nudgecoeff_e)>::type>(s);
 
   } // CONCLUDING IF
 }
@@ -515,10 +494,9 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     x->__f2dace_SOA_neighbor_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_neighbor_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_neighbor_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->neighbor_idx =
-        m.read<std::remove_pointer<decltype(x->neighbor_idx)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->neighbor_idx = m.read<std::remove_pointer<decltype(x->neighbor_idx)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# neighbor_blk"}); // Should contain '# neighbor_blk'
@@ -534,10 +512,9 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     x->__f2dace_SOA_neighbor_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_neighbor_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_neighbor_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->neighbor_blk =
-        m.read<std::remove_pointer<decltype(x->neighbor_blk)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->neighbor_blk = m.read<std::remove_pointer<decltype(x->neighbor_blk)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# edge_idx"}); // Should contain '# edge_idx'
@@ -553,8 +530,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     x->__f2dace_SOA_edge_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_edge_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_edge_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->edge_idx = m.read<std::remove_pointer<decltype(x->edge_idx)>::type>(s);
 
   } // CONCLUDING IF
@@ -571,8 +548,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     x->__f2dace_SOA_edge_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_edge_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_edge_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->edge_blk = m.read<std::remove_pointer<decltype(x->edge_blk)>::type>(s);
 
   } // CONCLUDING IF
@@ -582,8 +559,7 @@ void deserialize(t_grid_cells *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->area)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->area)>::type>(s);
     x->__f2dace_SA_area_d_0_s = m.size.at(0);
     x->__f2dace_SA_area_d_1_s = m.size.at(1);
     x->__f2dace_SOA_area_d_0_s = m.lbound.at(0);
@@ -600,10 +576,9 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_start_index_d_0_s = m.size[0];
     x->__f2dace_SOA_start_index_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->start_index =
-        m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->start_index = m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_index"}); // Should contain '# end_index'
@@ -615,8 +590,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_index_d_0_s = m.size[0];
     x->__f2dace_SOA_end_index_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
 
   } // CONCLUDING IF
@@ -631,8 +606,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     x->__f2dace_SA_start_blk_d_1_s = m.size[1];
     x->__f2dace_SOA_start_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_start_blk_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->start_blk = m.read<std::remove_pointer<decltype(x->start_blk)>::type>(s);
 
   } // CONCLUDING IF
@@ -645,10 +620,9 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_start_block_d_0_s = m.size[0];
     x->__f2dace_SOA_start_block_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->start_block =
-        m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->start_block = m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_blk"}); // Should contain '# end_blk'
@@ -662,8 +636,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     x->__f2dace_SA_end_blk_d_1_s = m.size[1];
     x->__f2dace_SOA_end_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_end_blk_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_blk = m.read<std::remove_pointer<decltype(x->end_blk)>::type>(s);
 
   } // CONCLUDING IF
@@ -676,8 +650,8 @@ void deserialize(t_grid_cells *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_block_d_0_s = m.size[0];
     x->__f2dace_SOA_end_block_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
 
   } // CONCLUDING IF
@@ -703,8 +677,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_cell_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_cell_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_cell_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->cell_idx = m.read<std::remove_pointer<decltype(x->cell_idx)>::type>(s);
 
   } // CONCLUDING IF
@@ -721,8 +695,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_cell_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_cell_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_cell_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->cell_blk = m.read<std::remove_pointer<decltype(x->cell_blk)>::type>(s);
 
   } // CONCLUDING IF
@@ -739,10 +713,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_vertex_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_vertex_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_vertex_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->vertex_idx =
-        m.read<std::remove_pointer<decltype(x->vertex_idx)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->vertex_idx = m.read<std::remove_pointer<decltype(x->vertex_idx)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# vertex_blk"}); // Should contain '# vertex_blk'
@@ -758,14 +731,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_vertex_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_vertex_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_vertex_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->vertex_blk =
-        m.read<std::remove_pointer<decltype(x->vertex_blk)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->vertex_blk = m.read<std::remove_pointer<decltype(x->vertex_blk)>::type>(s);
 
   } // CONCLUDING IF
-  read_line(
-      s, {"# tangent_orientation"}); // Should contain '# tangent_orientation'
+  read_line(s, {"# tangent_orientation"}); // Should contain '# tangent_orientation'
 
   read_line(s, {"# alloc"}); // Should contain '# alloc'
   deserialize(&yep, s);
@@ -776,10 +747,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_tangent_orientation_d_1_s = m.size[1];
     x->__f2dace_SOA_tangent_orientation_d_0_s = m.lbound[0];
     x->__f2dace_SOA_tangent_orientation_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->tangent_orientation =
-        m.read<std::remove_pointer<decltype(x->tangent_orientation)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->tangent_orientation = m.read<std::remove_pointer<decltype(x->tangent_orientation)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# quad_idx"}); // Should contain '# quad_idx'
@@ -795,8 +765,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_quad_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_quad_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_quad_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->quad_idx = m.read<std::remove_pointer<decltype(x->quad_idx)>::type>(s);
 
   } // CONCLUDING IF
@@ -813,13 +783,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_quad_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_quad_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_quad_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->quad_blk = m.read<std::remove_pointer<decltype(x->quad_blk)>::type>(s);
 
   } // CONCLUDING IF
-  read_line(s,
-            {"# primal_normal_cell"}); // Should contain '# primal_normal_cell'
+  read_line(s, {"# primal_normal_cell"}); // Should contain '# primal_normal_cell'
 
   read_line(s, {"# alloc"}); // Should contain '# alloc'
   deserialize(&yep, s);
@@ -833,10 +802,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_primal_normal_cell_d_1_s = m.lbound[1];
     x->__f2dace_SOA_primal_normal_cell_d_2_s = m.lbound[2];
     // TODO: THIS IS POTENTIALLY BUGGY, BECAUSE IT IS NOT REALLY TESTED.
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->primal_normal_cell =
-        m.read<std::remove_pointer<decltype(x->primal_normal_cell)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->primal_normal_cell = m.read<std::remove_pointer<decltype(x->primal_normal_cell)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# dual_normal_cell"}); // Should contain '# dual_normal_cell'
@@ -853,14 +821,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SOA_dual_normal_cell_d_1_s = m.lbound[1];
     x->__f2dace_SOA_dual_normal_cell_d_2_s = m.lbound[2];
     // TODO: THIS IS POTENTIALLY BUGGY, BECAUSE IT IS NOT REALLY TESTED.
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->dual_normal_cell =
-        m.read<std::remove_pointer<decltype(x->dual_normal_cell)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->dual_normal_cell = m.read<std::remove_pointer<decltype(x->dual_normal_cell)>::type>(s);
 
   } // CONCLUDING IF
-  read_line(s, {"# inv_primal_edge_length"}); // Should contain '#
-                                              // inv_primal_edge_length'
+  read_line(s, {"# inv_primal_edge_length"}); // Should contain '# inv_primal_edge_length'
 
   read_line(s, {"# alloc"}); // Should contain '# alloc'
   deserialize(&yep, s);
@@ -871,15 +837,12 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_inv_primal_edge_length_d_1_s = m.size[1];
     x->__f2dace_SOA_inv_primal_edge_length_d_0_s = m.lbound[0];
     x->__f2dace_SOA_inv_primal_edge_length_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->inv_primal_edge_length =
-        m.read<std::remove_pointer<decltype(x->inv_primal_edge_length)>::type>(
-            s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->inv_primal_edge_length = m.read<std::remove_pointer<decltype(x->inv_primal_edge_length)>::type>(s);
 
   } // CONCLUDING IF
-  read_line(
-      s, {"# inv_dual_edge_length"}); // Should contain '# inv_dual_edge_length'
+  read_line(s, {"# inv_dual_edge_length"}); // Should contain '# inv_dual_edge_length'
 
   read_line(s, {"# alloc"}); // Should contain '# alloc'
   deserialize(&yep, s);
@@ -890,10 +853,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_inv_dual_edge_length_d_1_s = m.size[1];
     x->__f2dace_SOA_inv_dual_edge_length_d_0_s = m.lbound[0];
     x->__f2dace_SOA_inv_dual_edge_length_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->inv_dual_edge_length =
-        m.read<std::remove_pointer<decltype(x->inv_dual_edge_length)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->inv_dual_edge_length = m.read<std::remove_pointer<decltype(x->inv_dual_edge_length)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# area_edge"}); // Should contain '# area_edge'
@@ -907,8 +869,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_area_edge_d_1_s = m.size[1];
     x->__f2dace_SOA_area_edge_d_0_s = m.lbound[0];
     x->__f2dace_SOA_area_edge_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->area_edge = m.read<std::remove_pointer<decltype(x->area_edge)>::type>(s);
 
   } // CONCLUDING IF
@@ -923,8 +885,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_f_e_d_1_s = m.size[1];
     x->__f2dace_SOA_f_e_d_0_s = m.lbound[0];
     x->__f2dace_SOA_f_e_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->f_e = m.read<std::remove_pointer<decltype(x->f_e)>::type>(s);
 
   } // CONCLUDING IF
@@ -939,8 +901,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_fn_e_d_1_s = m.size[1];
     x->__f2dace_SOA_fn_e_d_0_s = m.lbound[0];
     x->__f2dace_SOA_fn_e_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->fn_e = m.read<std::remove_pointer<decltype(x->fn_e)>::type>(s);
 
   } // CONCLUDING IF
@@ -955,8 +917,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_ft_e_d_1_s = m.size[1];
     x->__f2dace_SOA_ft_e_d_0_s = m.lbound[0];
     x->__f2dace_SOA_ft_e_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->ft_e = m.read<std::remove_pointer<decltype(x->ft_e)>::type>(s);
 
   } // CONCLUDING IF
@@ -971,10 +933,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     x->__f2dace_SA_refin_ctrl_d_1_s = m.size[1];
     x->__f2dace_SOA_refin_ctrl_d_0_s = m.lbound[0];
     x->__f2dace_SOA_refin_ctrl_d_1_s = m.lbound[1];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->refin_ctrl =
-        m.read<std::remove_pointer<decltype(x->refin_ctrl)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->refin_ctrl = m.read<std::remove_pointer<decltype(x->refin_ctrl)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# start_index"}); // Should contain '# start_index'
@@ -986,10 +947,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_start_index_d_0_s = m.size[0];
     x->__f2dace_SOA_start_index_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->start_index =
-        m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->start_index = m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_index"}); // Should contain '# end_index'
@@ -1001,8 +961,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_index_d_0_s = m.size[0];
     x->__f2dace_SOA_end_index_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
 
   } // CONCLUDING IF
@@ -1015,10 +975,9 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_start_block_d_0_s = m.size[0];
     x->__f2dace_SOA_start_block_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->start_block =
-        m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->start_block = m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_block"}); // Should contain '# end_block'
@@ -1030,8 +989,8 @@ void deserialize(t_grid_edges *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_block_d_0_s = m.size[0];
     x->__f2dace_SOA_end_block_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
 
   } // CONCLUDING IF
@@ -1053,8 +1012,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     x->__f2dace_SOA_cell_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_cell_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_cell_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->cell_idx = m.read<std::remove_pointer<decltype(x->cell_idx)>::type>(s);
 
   } // CONCLUDING IF
@@ -1071,8 +1030,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     x->__f2dace_SOA_cell_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_cell_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_cell_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->cell_blk = m.read<std::remove_pointer<decltype(x->cell_blk)>::type>(s);
 
   } // CONCLUDING IF
@@ -1089,8 +1048,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     x->__f2dace_SOA_edge_idx_d_0_s = m.lbound[0];
     x->__f2dace_SOA_edge_idx_d_1_s = m.lbound[1];
     x->__f2dace_SOA_edge_idx_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->edge_idx = m.read<std::remove_pointer<decltype(x->edge_idx)>::type>(s);
 
   } // CONCLUDING IF
@@ -1107,8 +1066,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     x->__f2dace_SOA_edge_blk_d_0_s = m.lbound[0];
     x->__f2dace_SOA_edge_blk_d_1_s = m.lbound[1];
     x->__f2dace_SOA_edge_blk_d_2_s = m.lbound[2];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->edge_blk = m.read<std::remove_pointer<decltype(x->edge_blk)>::type>(s);
 
   } // CONCLUDING IF
@@ -1121,10 +1080,9 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_start_index_d_0_s = m.size[0];
     x->__f2dace_SOA_start_index_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->start_index =
-        m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->start_index = m.read<std::remove_pointer<decltype(x->start_index)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_index"}); // Should contain '# end_index'
@@ -1136,8 +1094,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_index_d_0_s = m.size[0];
     x->__f2dace_SOA_end_index_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_index = m.read<std::remove_pointer<decltype(x->end_index)>::type>(s);
 
   } // CONCLUDING IF
@@ -1150,10 +1108,9 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_start_block_d_0_s = m.size[0];
     x->__f2dace_SOA_start_block_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->start_block =
-        m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
+    x->start_block = m.read<std::remove_pointer<decltype(x->start_block)>::type>(s);
 
   } // CONCLUDING IF
   read_line(s, {"# end_block"}); // Should contain '# end_block'
@@ -1165,8 +1122,8 @@ void deserialize(t_grid_vertices *x, std::istream &s) {
     m = read_array_meta(s);
     x->__f2dace_SA_end_block_d_0_s = m.size[0];
     x->__f2dace_SOA_end_block_d_0_s = m.lbound[0];
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
+    // We only need to allocate a volume of contiguous memory, and let DaCe interpret (assuming it follows the same protocol
+    // as us).
     x->end_block = m.read<std::remove_pointer<decltype(x->end_block)>::type>(s);
 
   } // CONCLUDING IF
@@ -1264,8 +1221,7 @@ void deserialize(t_nh_prog *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho)>::type>(s);
     x->__f2dace_SA_rho_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_d_2_s = m.size.at(2);
@@ -1281,8 +1237,7 @@ void deserialize(t_nh_prog *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->exner)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->exner)>::type>(s);
     x->__f2dace_SA_exner_d_0_s = m.size.at(0);
     x->__f2dace_SA_exner_d_1_s = m.size.at(1);
     x->__f2dace_SA_exner_d_2_s = m.size.at(2);
@@ -1298,8 +1253,7 @@ void deserialize(t_nh_prog *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_v)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_v)>::type>(s);
     x->__f2dace_SA_theta_v_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_v_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_v_d_2_s = m.size.at(2);
@@ -1319,8 +1273,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->exner_pr)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->exner_pr)>::type>(s);
     x->__f2dace_SA_exner_pr_d_0_s = m.size.at(0);
     x->__f2dace_SA_exner_pr_d_1_s = m.size.at(1);
     x->__f2dace_SA_exner_pr_d_2_s = m.size.at(2);
@@ -1336,8 +1289,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->mass_fl_e)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->mass_fl_e)>::type>(s);
     x->__f2dace_SA_mass_fl_e_d_0_s = m.size.at(0);
     x->__f2dace_SA_mass_fl_e_d_1_s = m.size.at(1);
     x->__f2dace_SA_mass_fl_e_d_2_s = m.size.at(2);
@@ -1353,8 +1305,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho_ic)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho_ic)>::type>(s);
     x->__f2dace_SA_rho_ic_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_ic_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_ic_d_2_s = m.size.at(2);
@@ -1370,8 +1321,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_v_ic)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_v_ic)>::type>(s);
     x->__f2dace_SA_theta_v_ic_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_v_ic_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_v_ic_d_2_s = m.size.at(2);
@@ -1387,8 +1337,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->grf_tend_vn)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->grf_tend_vn)>::type>(s);
     x->__f2dace_SA_grf_tend_vn_d_0_s = m.size.at(0);
     x->__f2dace_SA_grf_tend_vn_d_1_s = m.size.at(1);
     x->__f2dace_SA_grf_tend_vn_d_2_s = m.size.at(2);
@@ -1404,8 +1353,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->grf_tend_w)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->grf_tend_w)>::type>(s);
     x->__f2dace_SA_grf_tend_w_d_0_s = m.size.at(0);
     x->__f2dace_SA_grf_tend_w_d_1_s = m.size.at(1);
     x->__f2dace_SA_grf_tend_w_d_2_s = m.size.at(2);
@@ -1421,8 +1369,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->grf_tend_rho)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->grf_tend_rho)>::type>(s);
     x->__f2dace_SA_grf_tend_rho_d_0_s = m.size.at(0);
     x->__f2dace_SA_grf_tend_rho_d_1_s = m.size.at(1);
     x->__f2dace_SA_grf_tend_rho_d_2_s = m.size.at(2);
@@ -1438,8 +1385,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->grf_tend_mflx)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->grf_tend_mflx)>::type>(s);
     x->__f2dace_SA_grf_tend_mflx_d_0_s = m.size.at(0);
     x->__f2dace_SA_grf_tend_mflx_d_1_s = m.size.at(1);
     x->__f2dace_SA_grf_tend_mflx_d_2_s = m.size.at(2);
@@ -1455,8 +1401,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->grf_bdy_mflx)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->grf_bdy_mflx)>::type>(s);
     x->__f2dace_SA_grf_bdy_mflx_d_0_s = m.size.at(0);
     x->__f2dace_SA_grf_bdy_mflx_d_1_s = m.size.at(1);
     x->__f2dace_SA_grf_bdy_mflx_d_2_s = m.size.at(2);
@@ -1472,8 +1417,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->grf_tend_thv)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->grf_tend_thv)>::type>(s);
     x->__f2dace_SA_grf_tend_thv_d_0_s = m.size.at(0);
     x->__f2dace_SA_grf_tend_thv_d_1_s = m.size.at(1);
     x->__f2dace_SA_grf_tend_thv_d_2_s = m.size.at(2);
@@ -1489,8 +1433,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vn_ie_int)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn_ie_int)>::type>(s);
     x->__f2dace_SA_vn_ie_int_d_0_s = m.size.at(0);
     x->__f2dace_SA_vn_ie_int_d_1_s = m.size.at(1);
     x->__f2dace_SA_vn_ie_int_d_2_s = m.size.at(2);
@@ -1506,8 +1449,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vn_ie_ubc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn_ie_ubc)>::type>(s);
     x->__f2dace_SA_vn_ie_ubc_d_0_s = m.size.at(0);
     x->__f2dace_SA_vn_ie_ubc_d_1_s = m.size.at(1);
     x->__f2dace_SA_vn_ie_ubc_d_2_s = m.size.at(2);
@@ -1523,8 +1465,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->w_int)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w_int)>::type>(s);
     x->__f2dace_SA_w_int_d_0_s = m.size.at(0);
     x->__f2dace_SA_w_int_d_1_s = m.size.at(1);
     x->__f2dace_SA_w_int_d_2_s = m.size.at(2);
@@ -1540,8 +1481,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->w_ubc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w_ubc)>::type>(s);
     x->__f2dace_SA_w_ubc_d_0_s = m.size.at(0);
     x->__f2dace_SA_w_ubc_d_1_s = m.size.at(1);
     x->__f2dace_SA_w_ubc_d_2_s = m.size.at(2);
@@ -1557,8 +1497,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_v_ic_int)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_v_ic_int)>::type>(s);
     x->__f2dace_SA_theta_v_ic_int_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_v_ic_int_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_v_ic_int_d_2_s = m.size.at(2);
@@ -1574,8 +1513,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_v_ic_ubc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_v_ic_ubc)>::type>(s);
     x->__f2dace_SA_theta_v_ic_ubc_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_v_ic_ubc_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_v_ic_ubc_d_2_s = m.size.at(2);
@@ -1591,8 +1529,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho_ic_int)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho_ic_int)>::type>(s);
     x->__f2dace_SA_rho_ic_int_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_ic_int_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_ic_int_d_2_s = m.size.at(2);
@@ -1608,8 +1545,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho_ic_ubc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho_ic_ubc)>::type>(s);
     x->__f2dace_SA_rho_ic_ubc_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_ic_ubc_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_ic_ubc_d_2_s = m.size.at(2);
@@ -1625,8 +1561,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->mflx_ic_int)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->mflx_ic_int)>::type>(s);
     x->__f2dace_SA_mflx_ic_int_d_0_s = m.size.at(0);
     x->__f2dace_SA_mflx_ic_int_d_1_s = m.size.at(1);
     x->__f2dace_SA_mflx_ic_int_d_2_s = m.size.at(2);
@@ -1642,8 +1577,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->mflx_ic_ubc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->mflx_ic_ubc)>::type>(s);
     x->__f2dace_SA_mflx_ic_ubc_d_0_s = m.size.at(0);
     x->__f2dace_SA_mflx_ic_ubc_d_1_s = m.size.at(1);
     x->__f2dace_SA_mflx_ic_ubc_d_2_s = m.size.at(2);
@@ -1659,8 +1593,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vn_incr)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn_incr)>::type>(s);
     x->__f2dace_SA_vn_incr_d_0_s = m.size.at(0);
     x->__f2dace_SA_vn_incr_d_1_s = m.size.at(1);
     x->__f2dace_SA_vn_incr_d_2_s = m.size.at(2);
@@ -1676,8 +1609,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->exner_incr)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->exner_incr)>::type>(s);
     x->__f2dace_SA_exner_incr_d_0_s = m.size.at(0);
     x->__f2dace_SA_exner_incr_d_1_s = m.size.at(1);
     x->__f2dace_SA_exner_incr_d_2_s = m.size.at(2);
@@ -1693,8 +1625,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho_incr)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho_incr)>::type>(s);
     x->__f2dace_SA_rho_incr_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_incr_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_incr_d_2_s = m.size.at(2);
@@ -1726,8 +1657,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_exner_phy)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_exner_phy)>::type>(s);
     x->__f2dace_SA_ddt_exner_phy_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_exner_phy_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_exner_phy_d_2_s = m.size.at(2);
@@ -1743,8 +1673,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_phy)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_phy)>::type>(s);
     x->__f2dace_SA_ddt_vn_phy_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_phy_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_phy_d_2_s = m.size.at(2);
@@ -1760,8 +1689,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->exner_dyn_incr)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->exner_dyn_incr)>::type>(s);
     x->__f2dace_SA_exner_dyn_incr_d_0_s = m.size.at(0);
     x->__f2dace_SA_exner_dyn_incr_d_1_s = m.size.at(1);
     x->__f2dace_SA_exner_dyn_incr_d_2_s = m.size.at(2);
@@ -1777,8 +1705,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn_ie)>::type>(s);
     x->__f2dace_SA_vn_ie_d_0_s = m.size.at(0);
     x->__f2dace_SA_vn_ie_d_1_s = m.size.at(1);
     x->__f2dace_SA_vn_ie_d_2_s = m.size.at(2);
@@ -1794,8 +1721,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w_concorr_c)>::type>(s);
     x->__f2dace_SA_w_concorr_c_d_0_s = m.size.at(0);
     x->__f2dace_SA_w_concorr_c_d_1_s = m.size.at(1);
     x->__f2dace_SA_w_concorr_c_d_2_s = m.size.at(2);
@@ -1811,8 +1737,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->mass_fl_e_sv)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->mass_fl_e_sv)>::type>(s);
     x->__f2dace_SA_mass_fl_e_sv_d_0_s = m.size.at(0);
     x->__f2dace_SA_mass_fl_e_sv_d_1_s = m.size.at(1);
     x->__f2dace_SA_mass_fl_e_sv_d_2_s = m.size.at(2);
@@ -1828,8 +1753,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_apc_pc)>::type>(s);
     x->__f2dace_SA_ddt_vn_apc_pc_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_apc_pc_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_apc_pc_d_2_s = m.size.at(2);
@@ -1847,8 +1771,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_cor_pc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_cor_pc)>::type>(s);
     x->__f2dace_SA_ddt_vn_cor_pc_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_cor_pc_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_cor_pc_d_2_s = m.size.at(2);
@@ -1866,8 +1789,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_w_adv_pc)>::type>(s);
     x->__f2dace_SA_ddt_w_adv_pc_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_w_adv_pc_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_w_adv_pc_d_2_s = m.size.at(2);
@@ -1885,8 +1807,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_dyn)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_dyn)>::type>(s);
     x->__f2dace_SA_ddt_vn_dyn_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_dyn_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_dyn_d_2_s = m.size.at(2);
@@ -1902,8 +1823,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_dmp)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_dmp)>::type>(s);
     x->__f2dace_SA_ddt_vn_dmp_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_dmp_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_dmp_d_2_s = m.size.at(2);
@@ -1919,8 +1839,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_adv)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_adv)>::type>(s);
     x->__f2dace_SA_ddt_vn_adv_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_adv_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_adv_d_2_s = m.size.at(2);
@@ -1936,8 +1855,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_cor)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_cor)>::type>(s);
     x->__f2dace_SA_ddt_vn_cor_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_cor_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_cor_d_2_s = m.size.at(2);
@@ -1953,8 +1871,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_pgr)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_pgr)>::type>(s);
     x->__f2dace_SA_ddt_vn_pgr_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_pgr_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_pgr_d_2_s = m.size.at(2);
@@ -1970,8 +1887,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_phd)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_phd)>::type>(s);
     x->__f2dace_SA_ddt_vn_phd_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_phd_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_phd_d_2_s = m.size.at(2);
@@ -1987,8 +1903,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_iau)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_iau)>::type>(s);
     x->__f2dace_SA_ddt_vn_iau_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_iau_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_iau_d_2_s = m.size.at(2);
@@ -2004,8 +1919,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_ray)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_ray)>::type>(s);
     x->__f2dace_SA_ddt_vn_ray_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_ray_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_ray_d_2_s = m.size.at(2);
@@ -2021,8 +1935,7 @@ void deserialize(t_nh_diag *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddt_vn_grf)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddt_vn_grf)>::type>(s);
     x->__f2dace_SA_ddt_vn_grf_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddt_vn_grf_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddt_vn_grf_d_2_s = m.size.at(2);
@@ -2032,48 +1945,39 @@ void deserialize(t_nh_diag *x, std::istream &s) {
     x->ddt_vn_grf = arr;
   }
 
-  read_line(s, {"# ddt_vn_dyn_is_associated"}); // Should contain '#
-                                                // ddt_vn_dyn_is_associated'
+  read_line(s, {"# ddt_vn_dyn_is_associated"}); // Should contain '# ddt_vn_dyn_is_associated'
 
   deserialize(&(x->ddt_vn_dyn_is_associated), s);
 
-  read_line(s, {"# ddt_vn_dmp_is_associated"}); // Should contain '#
-                                                // ddt_vn_dmp_is_associated'
+  read_line(s, {"# ddt_vn_dmp_is_associated"}); // Should contain '# ddt_vn_dmp_is_associated'
 
   deserialize(&(x->ddt_vn_dmp_is_associated), s);
 
-  read_line(s, {"# ddt_vn_adv_is_associated"}); // Should contain '#
-                                                // ddt_vn_adv_is_associated'
+  read_line(s, {"# ddt_vn_adv_is_associated"}); // Should contain '# ddt_vn_adv_is_associated'
 
   deserialize(&(x->ddt_vn_adv_is_associated), s);
 
-  read_line(s, {"# ddt_vn_cor_is_associated"}); // Should contain '#
-                                                // ddt_vn_cor_is_associated'
+  read_line(s, {"# ddt_vn_cor_is_associated"}); // Should contain '# ddt_vn_cor_is_associated'
 
   deserialize(&(x->ddt_vn_cor_is_associated), s);
 
-  read_line(s, {"# ddt_vn_pgr_is_associated"}); // Should contain '#
-                                                // ddt_vn_pgr_is_associated'
+  read_line(s, {"# ddt_vn_pgr_is_associated"}); // Should contain '# ddt_vn_pgr_is_associated'
 
   deserialize(&(x->ddt_vn_pgr_is_associated), s);
 
-  read_line(s, {"# ddt_vn_phd_is_associated"}); // Should contain '#
-                                                // ddt_vn_phd_is_associated'
+  read_line(s, {"# ddt_vn_phd_is_associated"}); // Should contain '# ddt_vn_phd_is_associated'
 
   deserialize(&(x->ddt_vn_phd_is_associated), s);
 
-  read_line(s, {"# ddt_vn_iau_is_associated"}); // Should contain '#
-                                                // ddt_vn_iau_is_associated'
+  read_line(s, {"# ddt_vn_iau_is_associated"}); // Should contain '# ddt_vn_iau_is_associated'
 
   deserialize(&(x->ddt_vn_iau_is_associated), s);
 
-  read_line(s, {"# ddt_vn_ray_is_associated"}); // Should contain '#
-                                                // ddt_vn_ray_is_associated'
+  read_line(s, {"# ddt_vn_ray_is_associated"}); // Should contain '# ddt_vn_ray_is_associated'
 
   deserialize(&(x->ddt_vn_ray_is_associated), s);
 
-  read_line(s, {"# ddt_vn_grf_is_associated"}); // Should contain '#
-                                                // ddt_vn_grf_is_associated'
+  read_line(s, {"# ddt_vn_grf_is_associated"}); // Should contain '# ddt_vn_grf_is_associated'
 
   deserialize(&(x->ddt_vn_grf_is_associated), s);
 
@@ -2091,8 +1995,7 @@ void deserialize(t_nh_ref *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vn_ref)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn_ref)>::type>(s);
     x->__f2dace_SA_vn_ref_d_0_s = m.size.at(0);
     x->__f2dace_SA_vn_ref_d_1_s = m.size.at(1);
     x->__f2dace_SA_vn_ref_d_2_s = m.size.at(2);
@@ -2108,8 +2011,7 @@ void deserialize(t_nh_ref *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->w_ref)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->w_ref)>::type>(s);
     x->__f2dace_SA_w_ref_d_0_s = m.size.at(0);
     x->__f2dace_SA_w_ref_d_1_s = m.size.at(1);
     x->__f2dace_SA_w_ref_d_2_s = m.size.at(2);
@@ -2129,8 +2031,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rayleigh_w)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rayleigh_w)>::type>(s);
     x->__f2dace_SA_rayleigh_w_d_0_s = m.size.at(0);
     x->__f2dace_SOA_rayleigh_w_d_0_s = m.lbound.at(0);
     x->rayleigh_w = arr;
@@ -2142,8 +2043,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rayleigh_vn)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rayleigh_vn)>::type>(s);
     x->__f2dace_SA_rayleigh_vn_d_0_s = m.size.at(0);
     x->__f2dace_SOA_rayleigh_vn_d_0_s = m.lbound.at(0);
     x->rayleigh_vn = arr;
@@ -2155,8 +2055,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->scalfac_dd3d)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->scalfac_dd3d)>::type>(s);
     x->__f2dace_SA_scalfac_dd3d_d_0_s = m.size.at(0);
     x->__f2dace_SOA_scalfac_dd3d_d_0_s = m.lbound.at(0);
     x->scalfac_dd3d = arr;
@@ -2168,8 +2067,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->hmask_dd3d)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->hmask_dd3d)>::type>(s);
     x->__f2dace_SA_hmask_dd3d_d_0_s = m.size.at(0);
     x->__f2dace_SA_hmask_dd3d_d_1_s = m.size.at(1);
     x->__f2dace_SOA_hmask_dd3d_d_0_s = m.lbound.at(0);
@@ -2183,8 +2081,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vwind_expl_wgt)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vwind_expl_wgt)>::type>(s);
     x->__f2dace_SA_vwind_expl_wgt_d_0_s = m.size.at(0);
     x->__f2dace_SA_vwind_expl_wgt_d_1_s = m.size.at(1);
     x->__f2dace_SOA_vwind_expl_wgt_d_0_s = m.lbound.at(0);
@@ -2198,8 +2095,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vwind_impl_wgt)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vwind_impl_wgt)>::type>(s);
     x->__f2dace_SA_vwind_impl_wgt_d_0_s = m.size.at(0);
     x->__f2dace_SA_vwind_impl_wgt_d_1_s = m.size.at(1);
     x->__f2dace_SOA_vwind_impl_wgt_d_0_s = m.lbound.at(0);
@@ -2213,8 +2109,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddxn_z_full)>::type>(s);
     x->__f2dace_SA_ddxn_z_full_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddxn_z_full_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddxn_z_full_d_2_s = m.size.at(2);
@@ -2230,8 +2125,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddxt_z_full)>::type>(s);
     x->__f2dace_SA_ddxt_z_full_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddxt_z_full_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddxt_z_full_d_2_s = m.size.at(2);
@@ -2247,8 +2141,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddqz_z_full_e)>::type>(s);
     x->__f2dace_SA_ddqz_z_full_e_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddqz_z_full_e_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddqz_z_full_e_d_2_s = m.size.at(2);
@@ -2264,8 +2157,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->ddqz_z_half)>::type>(s);
     x->__f2dace_SA_ddqz_z_half_d_0_s = m.size.at(0);
     x->__f2dace_SA_ddqz_z_half_d_1_s = m.size.at(1);
     x->__f2dace_SA_ddqz_z_half_d_2_s = m.size.at(2);
@@ -2281,9 +2173,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->inv_ddqz_z_full)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->inv_ddqz_z_full)>::type>(s);
     x->__f2dace_SA_inv_ddqz_z_full_d_0_s = m.size.at(0);
     x->__f2dace_SA_inv_ddqz_z_full_d_1_s = m.size.at(1);
     x->__f2dace_SA_inv_ddqz_z_full_d_2_s = m.size.at(2);
@@ -2299,8 +2189,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->wgtfac_c)>::type>(s);
     x->__f2dace_SA_wgtfac_c_d_0_s = m.size.at(0);
     x->__f2dace_SA_wgtfac_c_d_1_s = m.size.at(1);
     x->__f2dace_SA_wgtfac_c_d_2_s = m.size.at(2);
@@ -2316,8 +2205,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->wgtfac_e)>::type>(s);
     x->__f2dace_SA_wgtfac_e_d_0_s = m.size.at(0);
     x->__f2dace_SA_wgtfac_e_d_1_s = m.size.at(1);
     x->__f2dace_SA_wgtfac_e_d_2_s = m.size.at(2);
@@ -2333,8 +2221,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->wgtfacq_c)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->wgtfacq_c)>::type>(s);
     x->__f2dace_SA_wgtfacq_c_d_0_s = m.size.at(0);
     x->__f2dace_SA_wgtfacq_c_d_1_s = m.size.at(1);
     x->__f2dace_SA_wgtfacq_c_d_2_s = m.size.at(2);
@@ -2350,8 +2237,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->wgtfacq_e)>::type>(s);
     x->__f2dace_SA_wgtfacq_e_d_0_s = m.size.at(0);
     x->__f2dace_SA_wgtfacq_e_d_1_s = m.size.at(1);
     x->__f2dace_SA_wgtfacq_e_d_2_s = m.size.at(2);
@@ -2367,8 +2253,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->wgtfacq1_c)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->wgtfacq1_c)>::type>(s);
     x->__f2dace_SA_wgtfacq1_c_d_0_s = m.size.at(0);
     x->__f2dace_SA_wgtfacq1_c_d_1_s = m.size.at(1);
     x->__f2dace_SA_wgtfacq1_c_d_2_s = m.size.at(2);
@@ -2384,8 +2269,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->coeff_gradekin)>::type>(s);
     x->__f2dace_SA_coeff_gradekin_d_0_s = m.size.at(0);
     x->__f2dace_SA_coeff_gradekin_d_1_s = m.size.at(1);
     x->__f2dace_SA_coeff_gradekin_d_2_s = m.size.at(2);
@@ -2401,8 +2285,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->coeff1_dwdz)>::type>(s);
     x->__f2dace_SA_coeff1_dwdz_d_0_s = m.size.at(0);
     x->__f2dace_SA_coeff1_dwdz_d_1_s = m.size.at(1);
     x->__f2dace_SA_coeff1_dwdz_d_2_s = m.size.at(2);
@@ -2418,8 +2301,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->coeff2_dwdz)>::type>(s);
     x->__f2dace_SA_coeff2_dwdz_d_0_s = m.size.at(0);
     x->__f2dace_SA_coeff2_dwdz_d_1_s = m.size.at(1);
     x->__f2dace_SA_coeff2_dwdz_d_2_s = m.size.at(2);
@@ -2435,8 +2317,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->zdiff_gradp)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->zdiff_gradp)>::type>(s);
     x->__f2dace_SA_zdiff_gradp_d_0_s = m.size.at(0);
     x->__f2dace_SA_zdiff_gradp_d_1_s = m.size.at(1);
     x->__f2dace_SA_zdiff_gradp_d_2_s = m.size.at(2);
@@ -2454,8 +2335,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->coeff_gradp)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->coeff_gradp)>::type>(s);
     x->__f2dace_SA_coeff_gradp_d_0_s = m.size.at(0);
     x->__f2dace_SA_coeff_gradp_d_1_s = m.size.at(1);
     x->__f2dace_SA_coeff_gradp_d_2_s = m.size.at(2);
@@ -2473,8 +2353,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->exner_exfac)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->exner_exfac)>::type>(s);
     x->__f2dace_SA_exner_exfac_d_0_s = m.size.at(0);
     x->__f2dace_SA_exner_exfac_d_1_s = m.size.at(1);
     x->__f2dace_SA_exner_exfac_d_2_s = m.size.at(2);
@@ -2490,8 +2369,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_ref_mc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_ref_mc)>::type>(s);
     x->__f2dace_SA_theta_ref_mc_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_ref_mc_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_ref_mc_d_2_s = m.size.at(2);
@@ -2507,8 +2385,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_ref_me)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_ref_me)>::type>(s);
     x->__f2dace_SA_theta_ref_me_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_ref_me_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_ref_me_d_2_s = m.size.at(2);
@@ -2524,8 +2401,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->theta_ref_ic)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->theta_ref_ic)>::type>(s);
     x->__f2dace_SA_theta_ref_ic_d_0_s = m.size.at(0);
     x->__f2dace_SA_theta_ref_ic_d_1_s = m.size.at(1);
     x->__f2dace_SA_theta_ref_ic_d_2_s = m.size.at(2);
@@ -2541,8 +2417,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->exner_ref_mc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->exner_ref_mc)>::type>(s);
     x->__f2dace_SA_exner_ref_mc_d_0_s = m.size.at(0);
     x->__f2dace_SA_exner_ref_mc_d_1_s = m.size.at(1);
     x->__f2dace_SA_exner_ref_mc_d_2_s = m.size.at(2);
@@ -2558,8 +2433,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho_ref_mc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho_ref_mc)>::type>(s);
     x->__f2dace_SA_rho_ref_mc_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_ref_mc_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_ref_mc_d_2_s = m.size.at(2);
@@ -2575,8 +2449,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->rho_ref_me)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->rho_ref_me)>::type>(s);
     x->__f2dace_SA_rho_ref_me_d_0_s = m.size.at(0);
     x->__f2dace_SA_rho_ref_me_d_1_s = m.size.at(1);
     x->__f2dace_SA_rho_ref_me_d_2_s = m.size.at(2);
@@ -2592,9 +2465,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->d_exner_dz_ref_ic)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->d_exner_dz_ref_ic)>::type>(s);
     x->__f2dace_SA_d_exner_dz_ref_ic_d_0_s = m.size.at(0);
     x->__f2dace_SA_d_exner_dz_ref_ic_d_1_s = m.size.at(1);
     x->__f2dace_SA_d_exner_dz_ref_ic_d_2_s = m.size.at(2);
@@ -2610,9 +2481,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->d2dexdz2_fac1_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->d2dexdz2_fac1_mc)>::type>(s);
     x->__f2dace_SA_d2dexdz2_fac1_mc_d_0_s = m.size.at(0);
     x->__f2dace_SA_d2dexdz2_fac1_mc_d_1_s = m.size.at(1);
     x->__f2dace_SA_d2dexdz2_fac1_mc_d_2_s = m.size.at(2);
@@ -2628,9 +2497,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->d2dexdz2_fac2_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->d2dexdz2_fac2_mc)>::type>(s);
     x->__f2dace_SA_d2dexdz2_fac2_mc_d_0_s = m.size.at(0);
     x->__f2dace_SA_d2dexdz2_fac2_mc_d_1_s = m.size.at(1);
     x->__f2dace_SA_d2dexdz2_fac2_mc_d_2_s = m.size.at(2);
@@ -2646,8 +2513,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->pg_exdist)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->pg_exdist)>::type>(s);
     x->__f2dace_SA_pg_exdist_d_0_s = m.size.at(0);
     x->__f2dace_SOA_pg_exdist_d_0_s = m.lbound.at(0);
     x->pg_exdist = arr;
@@ -2659,8 +2525,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vertidx_gradp)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vertidx_gradp)>::type>(s);
     x->__f2dace_SA_vertidx_gradp_d_0_s = m.size.at(0);
     x->__f2dace_SA_vertidx_gradp_d_1_s = m.size.at(1);
     x->__f2dace_SA_vertidx_gradp_d_2_s = m.size.at(2);
@@ -2678,8 +2543,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->pg_edgeidx)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->pg_edgeidx)>::type>(s);
     x->__f2dace_SA_pg_edgeidx_d_0_s = m.size.at(0);
     x->__f2dace_SOA_pg_edgeidx_d_0_s = m.lbound.at(0);
     x->pg_edgeidx = arr;
@@ -2691,8 +2555,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->pg_edgeblk)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->pg_edgeblk)>::type>(s);
     x->__f2dace_SA_pg_edgeblk_d_0_s = m.size.at(0);
     x->__f2dace_SOA_pg_edgeblk_d_0_s = m.lbound.at(0);
     x->pg_edgeblk = arr;
@@ -2704,8 +2567,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->pg_vertidx)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->pg_vertidx)>::type>(s);
     x->__f2dace_SA_pg_vertidx_d_0_s = m.size.at(0);
     x->__f2dace_SOA_pg_vertidx_d_0_s = m.lbound.at(0);
     x->pg_vertidx = arr;
@@ -2717,8 +2579,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->bdy_mflx_e_idx)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->bdy_mflx_e_idx)>::type>(s);
     x->__f2dace_SA_bdy_mflx_e_idx_d_0_s = m.size.at(0);
     x->__f2dace_SOA_bdy_mflx_e_idx_d_0_s = m.lbound.at(0);
     x->bdy_mflx_e_idx = arr;
@@ -2730,8 +2591,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->bdy_mflx_e_blk)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->bdy_mflx_e_blk)>::type>(s);
     x->__f2dace_SA_bdy_mflx_e_blk_d_0_s = m.size.at(0);
     x->__f2dace_SOA_bdy_mflx_e_blk_d_0_s = m.lbound.at(0);
     x->bdy_mflx_e_blk = arr;
@@ -2743,9 +2603,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_mc)>::type>(s);
     x->__f2dace_SA_deepatmo_gradh_mc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_gradh_mc_d_0_s = m.lbound.at(0);
     x->deepatmo_gradh_mc = arr;
@@ -2757,9 +2615,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->deepatmo_divh_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_divh_mc)>::type>(s);
     x->__f2dace_SA_deepatmo_divh_mc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_divh_mc_d_0_s = m.lbound.at(0);
     x->deepatmo_divh_mc = arr;
@@ -2771,9 +2627,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_mc)>::type>(s);
     x->__f2dace_SA_deepatmo_invr_mc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_invr_mc_d_0_s = m.lbound.at(0);
     x->deepatmo_invr_mc = arr;
@@ -2785,9 +2639,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->deepatmo_divzu_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_divzu_mc)>::type>(s);
     x->__f2dace_SA_deepatmo_divzu_mc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_divzu_mc_d_0_s = m.lbound.at(0);
     x->deepatmo_divzu_mc = arr;
@@ -2799,23 +2651,19 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->deepatmo_divzl_mc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_divzl_mc)>::type>(s);
     x->__f2dace_SA_deepatmo_divzl_mc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_divzl_mc_d_0_s = m.lbound.at(0);
     x->deepatmo_divzl_mc = arr;
   }
 
-  read_line(s,
-            {"# deepatmo_gradh_ifc"}); // Should contain '# deepatmo_gradh_ifc'
+  read_line(s, {"# deepatmo_gradh_ifc"}); // Should contain '# deepatmo_gradh_ifc'
 
   read_line(s, {"# assoc"}); // Should contain '# assoc'
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] = read_pointer<
-        std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_gradh_ifc)>::type>(s);
     x->__f2dace_SA_deepatmo_gradh_ifc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_gradh_ifc_d_0_s = m.lbound.at(0);
     x->deepatmo_gradh_ifc = arr;
@@ -2827,9 +2675,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(
-            s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->deepatmo_invr_ifc)>::type>(s);
     x->__f2dace_SA_deepatmo_invr_ifc_d_0_s = m.size.at(0);
     x->__f2dace_SOA_deepatmo_invr_ifc_d_0_s = m.lbound.at(0);
     x->deepatmo_invr_ifc = arr;
@@ -2847,21 +2693,6 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
 void deserialize(t_nh_state *x, std::istream &s) {
   bool yep;
   array_meta m;
-  read_line(s, {"# prog"}); // Should contain '# prog'
-
-  read_line(s, {"# alloc"}); // Should contain '# alloc'
-  deserialize(&yep, s);
-  if (yep) { // BEGINING IF
-
-    m = read_array_meta(s);
-    x->__f2dace_SA_prog_d_0_s = m.size[0];
-    x->__f2dace_SOA_prog_d_0_s = m.lbound[0];
-    // TODO: THIS IS POTENTIALLY BUGGY, BECAUSE IT IS NOT REALLY TESTED.
-    // We only need to allocate a volume of contiguous memory, and let DaCe
-    // interpret (assuming it follows the same protocol as us).
-    x->prog = m.read<std::remove_pointer<decltype(x->prog)>::type>(s);
-
-  } // CONCLUDING IF
   read_line(s, {"# diag"}); // Should contain '# diag'
 
   x->diag = new std::remove_pointer<decltype(x->diag)>::type;
@@ -2887,8 +2718,7 @@ void deserialize(t_prepare_adv *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->mass_flx_me)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->mass_flx_me)>::type>(s);
     x->__f2dace_SA_mass_flx_me_d_0_s = m.size.at(0);
     x->__f2dace_SA_mass_flx_me_d_1_s = m.size.at(1);
     x->__f2dace_SA_mass_flx_me_d_2_s = m.size.at(2);
@@ -2904,8 +2734,7 @@ void deserialize(t_prepare_adv *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->mass_flx_ic)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->mass_flx_ic)>::type>(s);
     x->__f2dace_SA_mass_flx_ic_d_0_s = m.size.at(0);
     x->__f2dace_SA_mass_flx_ic_d_1_s = m.size.at(1);
     x->__f2dace_SA_mass_flx_ic_d_2_s = m.size.at(2);
@@ -2921,8 +2750,7 @@ void deserialize(t_prepare_adv *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vol_flx_ic)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vol_flx_ic)>::type>(s);
     x->__f2dace_SA_vol_flx_ic_d_0_s = m.size.at(0);
     x->__f2dace_SA_vol_flx_ic_d_1_s = m.size.at(1);
     x->__f2dace_SA_vol_flx_ic_d_2_s = m.size.at(2);
@@ -2938,8 +2766,7 @@ void deserialize(t_prepare_adv *x, std::istream &s) {
   deserialize(&yep, s);
 
   if (yep) {
-    auto [m, arr] =
-        read_pointer<std::remove_pointer<decltype(x->vn_traj)>::type>(s);
+    auto [m, arr] = read_pointer<std::remove_pointer<decltype(x->vn_traj)>::type>(s);
     x->__f2dace_SA_vn_traj_d_0_s = m.size.at(0);
     x->__f2dace_SA_vn_traj_d_1_s = m.size.at(1);
     x->__f2dace_SA_vn_traj_d_2_s = m.size.at(2);
@@ -2950,8 +2777,7 @@ void deserialize(t_prepare_adv *x, std::istream &s) {
   }
 }
 
-template <typename T>
-void add_line(const T &x, std::ostream &s, bool trailing_newline = true) {
+template <typename T> void add_line(const T &x, std::ostream &s, bool trailing_newline = true) {
   s << x;
   if (trailing_newline)
     s << std::endl;
@@ -2966,9 +2792,7 @@ void add_line(long double x, std::ostream &s, bool trailing_newline = true) {
   if (trailing_newline)
     s << std::endl;
 }
-void add_line(bool x, std::ostream &s, bool trailing_newline = true) {
-  add_line(int(x), s, trailing_newline);
-}
+void add_line(bool x, std::ostream &s, bool trailing_newline = true) { add_line(int(x), s, trailing_newline); }
 template <typename T> std::string serialize(const T *x) {
   if constexpr (std::is_pointer_v<T>) {
     return serialize(*x);
@@ -5085,29 +4909,6 @@ std::string serialize(const t_nh_metrics *x) {
 
 std::string serialize(const t_nh_state *x) {
   std::stringstream s;
-  add_line("# prog", s);
-
-  add_line("# alloc", s);
-  add_line(serialize(x->prog != nullptr), s);
-  if (x->prog) { // BEGINING IF
-
-    {
-      const array_meta &m = ARRAY_META_DICT_AT(x->prog);
-      add_line("# rank", s);
-      add_line(m.rank, s);
-      add_line("# size", s);
-      for (auto i : m.size)
-        add_line(i, s);
-      add_line("# lbound", s);
-      for (auto i : m.lbound)
-        add_line(i, s);
-      add_line("# entries", s);
-      for (int i = 0; i < m.volume(); ++i) {
-        add_line(serialize(x->prog[i]), s);
-      }
-    }
-
-  } // CONCLUDING IF
   add_line("# diag", s);
   add_line(serialize(x->diag), s);
   add_line("# ref", s);
@@ -5328,9 +5129,7 @@ std::string serialize_global_data(const global_data_type *g) {
 
 enum class SerializationType { INVALID, PLAIN, CONST_INJECTION, F90_MODULE };
 
-std::string serialize_consistent_global_data(
-    std::vector<const global_data_type *> &gs,
-    SerializationType serialization_type = SerializationType::INVALID) {
+std::string serialize_consistent_global_data(std::vector<const global_data_type *> &gs, SerializationType serialization_type = SerializationType::INVALID) {
   assert(serialization_type != SerializationType::INVALID);
   if (gs.empty())
     return "";
@@ -5338,54 +5137,39 @@ std::string serialize_consistent_global_data(
   std::map<std::string, std::set<std::string>> consistent;
   for (const auto *g : gs) {
 
-    consistent["mo_dynamics_config.ldeepatmo"].insert(
-        (g->ldeepatmo ? ".true." : ".false."));
+    consistent["mo_dynamics_config.ldeepatmo"].insert((g->ldeepatmo ? ".true." : ".false."));
 
-    consistent["mo_grid_config.l_limited_area"].insert(
-        (g->l_limited_area ? ".true." : ".false."));
+    consistent["mo_grid_config.l_limited_area"].insert((g->l_limited_area ? ".true." : ".false."));
 
-    consistent["mo_gridref_config.grf_intmethod_e"].insert(
-        serialize(g->grf_intmethod_e));
+    consistent["mo_gridref_config.grf_intmethod_e"].insert(serialize(g->grf_intmethod_e));
 
-    consistent["mo_initicon_config.is_iau_active"].insert(
-        (g->is_iau_active ? ".true." : ".false."));
+    consistent["mo_initicon_config.is_iau_active"].insert((g->is_iau_active ? ".true." : ".false."));
 
-    consistent["mo_initicon_config.iau_wgt_dyn"].insert(
-        serialize(g->iau_wgt_dyn));
+    consistent["mo_initicon_config.iau_wgt_dyn"].insert(serialize(g->iau_wgt_dyn));
 
-    consistent["mo_mpi.i_am_accel_node"].insert(
-        (g->i_am_accel_node ? ".true." : ".false."));
+    consistent["mo_mpi.i_am_accel_node"].insert((g->i_am_accel_node ? ".true." : ".false."));
 
-    consistent["mo_nonhydrostatic_config.itime_scheme"].insert(
-        serialize(g->itime_scheme));
+    consistent["mo_nonhydrostatic_config.itime_scheme"].insert(serialize(g->itime_scheme));
 
-    consistent["mo_nonhydrostatic_config.lextra_diffu"].insert(
-        (g->lextra_diffu ? ".true." : ".false."));
+    consistent["mo_nonhydrostatic_config.lextra_diffu"].insert((g->lextra_diffu ? ".true." : ".false."));
 
-    consistent["mo_nonhydrostatic_config.rayleigh_type"].insert(
-        serialize(g->rayleigh_type));
+    consistent["mo_nonhydrostatic_config.rayleigh_type"].insert(serialize(g->rayleigh_type));
 
-    consistent["mo_nonhydrostatic_config.iadv_rhotheta"].insert(
-        serialize(g->iadv_rhotheta));
+    consistent["mo_nonhydrostatic_config.iadv_rhotheta"].insert(serialize(g->iadv_rhotheta));
 
-    consistent["mo_nonhydrostatic_config.igradp_method"].insert(
-        serialize(g->igradp_method));
+    consistent["mo_nonhydrostatic_config.igradp_method"].insert(serialize(g->igradp_method));
 
     consistent["mo_parallel_config.nproma"].insert(serialize(g->nproma));
 
-    consistent["mo_run_config.lvert_nest"].insert(
-        (g->lvert_nest ? ".true." : ".false."));
+    consistent["mo_run_config.lvert_nest"].insert((g->lvert_nest ? ".true." : ".false."));
 
     consistent["mo_run_config.timers_level"].insert(serialize(g->timers_level));
 
-    consistent["mo_timer.timer_solve_nh_veltend"].insert(
-        serialize(g->timer_solve_nh_veltend));
+    consistent["mo_timer.timer_solve_nh_veltend"].insert(serialize(g->timer_solve_nh_veltend));
 
-    consistent["mo_timer.timer_solve_nh_cellcomp"].insert(
-        serialize(g->timer_solve_nh_cellcomp));
+    consistent["mo_timer.timer_solve_nh_cellcomp"].insert(serialize(g->timer_solve_nh_cellcomp));
 
-    consistent["mo_timer.timer_solve_nh_vnupd"].insert(
-        serialize(g->timer_solve_nh_vnupd));
+    consistent["mo_timer.timer_solve_nh_vnupd"].insert(serialize(g->timer_solve_nh_vnupd));
 
     consistent["mo_timer.timer_intp"].insert(serialize(g->timer_intp));
   }
@@ -5414,20 +5198,16 @@ implicit none
     if (serialization_type == SerializationType::PLAIN) {
       s << k << " = " << v << std::endl;
     } else if (serialization_type == SerializationType::CONST_INJECTION) {
-      const std::string vval =
-          (v == ".true." ? "1" : (v == ".false." ? "0" : v));
+      const std::string vval = (v == ".true." ? "1" : (v == ".false." ? "0" : v));
       s << R"({ "type": "ConstInstanceInjection", "scope": null, )";
-      s << R"("root": ")" << k << R"(", "component": null, "value": ")" << vval
-        << R"(" })" << std::endl;
+      s << R"("root": ")" << k << R"(", "component": null, "value": ")" << vval << R"(" })" << std::endl;
     } else if (serialization_type == SerializationType::F90_MODULE) {
       std::vector<std::string_view> parts = split(k, '.');
       assert(parts.size() == 2);
       const auto vname = std::string_view(parts[1]);
-      const auto neqop =
-          (v == ".true." || v == ".false.") ? " .neqv. " : " .ne. ";
+      const auto neqop = (v == ".true." || v == ".false.") ? " .neqv. " : " .ne. ";
       s << "if (" << vname << neqop << v << ") then" << std::endl;
-      s << R"(	print *, "mismatched )" << vname << "; want " << v
-        << R"(, got: ", )" << vname << std::endl;
+      s << R"(	print *, "mismatched )" << vname << "; want " << v << R"(, got: ", )" << vname << std::endl;
       s << "	call abort" << std::endl << "endif" << std::endl;
     }
   }

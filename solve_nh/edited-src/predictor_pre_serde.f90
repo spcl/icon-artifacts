@@ -2,7 +2,7 @@ MODULE predictor_pre
   IMPLICIT NONE
   INTERFACE serialize
     MODULE PROCEDURE :: W_string
-    MODULE PROCEDURE W_t_grid_domain_decomp_info, W_t_int_state, W_t_tangent_vectors, W_t_grid_cells, W_t_grid_edges, W_t_grid_vertices, W_t_patch, W_t_nh_prog, W_t_nh_diag, W_t_nh_ref, W_t_nh_metrics, W_t_nh_state, W_t_prepare_adv, W_logical_R_1, W_integer__1_R_1, W_integer__2_R_1, W_integer__4_R_1, W_integer__8_R_1, W_real__4_R_1, W_real__8_R_1, W_logical_R_2, W_integer__1_R_2, W_integer__2_R_2, W_integer__4_R_2, W_integer__8_R_2, W_real__4_R_2, W_real__8_R_2, W_logical_R_3, W_integer__1_R_3, W_integer__2_R_3, W_integer__4_R_3, W_integer__8_R_3, W_real__4_R_3, W_real__8_R_3, W_logical_R_4, W_integer__1_R_4, W_integer__2_R_4, W_integer__4_R_4, W_integer__8_R_4, W_real__4_R_4, W_real__8_R_4, W_dt_t_tangent_vectors_R_3, W_dt_t_nh_prog_R_1, W_logical, W_integer1, W_integer2, W_integer4, W_integer8, W_real4, W_real8
+    MODULE PROCEDURE W_t_grid_domain_decomp_info, W_t_int_state, W_t_tangent_vectors, W_t_grid_cells, W_t_grid_edges, W_t_grid_vertices, W_t_patch, W_t_nh_prog, W_t_nh_diag, W_t_nh_ref, W_t_nh_metrics, W_t_nh_state, W_t_prepare_adv, W_logical_R_1, W_integer__1_R_1, W_integer__2_R_1, W_integer__4_R_1, W_integer__8_R_1, W_real__4_R_1, W_real__8_R_1, W_logical_R_2, W_integer__1_R_2, W_integer__2_R_2, W_integer__4_R_2, W_integer__8_R_2, W_real__4_R_2, W_real__8_R_2, W_logical_R_3, W_integer__1_R_3, W_integer__2_R_3, W_integer__4_R_3, W_integer__8_R_3, W_real__4_R_3, W_real__8_R_3, W_logical_R_4, W_integer__1_R_4, W_integer__2_R_4, W_integer__4_R_4, W_integer__8_R_4, W_real__4_R_4, W_real__8_R_4, W_dt_t_tangent_vectors_R_3, W_logical, W_integer1, W_integer2, W_integer4, W_integer8, W_real4, W_real8
   END INTERFACE serialize
   INTEGER :: generation = 0
   CONTAINS
@@ -1939,22 +1939,6 @@ MODULE predictor_pre
     nline_local = .TRUE.
     IF (PRESENT(cleanup)) cleanup_local = cleanup
     IF (PRESENT(nline)) nline_local = nline
-    CALL serialize(io, '# prog', cleanup = .FALSE.)
-    CALL serialize(io, '# alloc', cleanup = .FALSE.)
-    CALL serialize(io, ALLOCATED(x % prog), cleanup = .FALSE.)
-    IF (ALLOCATED(x % prog)) THEN
-      CALL serialize(io, "# rank", cleanup = .FALSE.)
-      CALL serialize(io, 1, cleanup = .FALSE.)
-      CALL serialize(io, "# size", cleanup = .FALSE.)
-      DO kmeta = 1, 1
-        CALL serialize(io, SIZE(x % prog, kmeta), cleanup = .FALSE.)
-      END DO
-      CALL serialize(io, "# lbound", cleanup = .FALSE.)
-      DO kmeta = 1, 1
-        CALL serialize(io, LBOUND(x % prog, kmeta), cleanup = .FALSE.)
-      END DO
-      CALL serialize(io, x % prog, cleanup = .FALSE., nline = .TRUE., meta = .FALSE.)
-    END IF
     CALL serialize(io, '# diag', cleanup = .FALSE.)
     CALL serialize(io, x % diag, cleanup = .FALSE.)
     CALL serialize(io, '# ref', cleanup = .FALSE.)
@@ -2973,37 +2957,6 @@ MODULE predictor_pre
     END DO
     IF (cleanup_local) CLOSE(UNIT = io)
   END SUBROUTINE W_dt_t_tangent_vectors_R_3
-  SUBROUTINE W_dt_t_nh_prog_R_1(io, x, cleanup, nline, meta)
-    USE mo_nonhydro_types, ONLY: t_nh_prog
-    INTEGER :: io
-    TYPE(t_nh_prog), INTENT(IN) :: x(:)
-    INTEGER :: k, kmeta, k1
-    LOGICAL, OPTIONAL, INTENT(IN) :: cleanup, nline, meta
-    LOGICAL :: cleanup_local, nline_local, meta_local
-    cleanup_local = .TRUE.
-    nline_local = .TRUE.
-    meta_local = .TRUE.
-    IF (PRESENT(cleanup)) cleanup_local = cleanup
-    IF (PRESENT(nline)) nline_local = nline
-    IF (PRESENT(meta)) meta_local = meta
-    IF (meta_local) THEN
-      CALL serialize(io, "# rank", cleanup = .FALSE.)
-      CALL serialize(io, 1, cleanup = .FALSE.)
-      CALL serialize(io, "# size", cleanup = .FALSE.)
-      DO kmeta = 1, 1
-        CALL serialize(io, SIZE(x, kmeta), cleanup = .FALSE.)
-      END DO
-      CALL serialize(io, "# lbound", cleanup = .FALSE.)
-      DO kmeta = 1, 1
-        CALL serialize(io, LBOUND(x, kmeta), cleanup = .FALSE.)
-      END DO
-    END IF
-    CALL serialize(io, "# entries", cleanup = .FALSE.)
-    DO k1 = LBOUND(x, 1), UBOUND(x, 1)
-      CALL serialize(io, x(k1), cleanup = .FALSE.)
-    END DO
-    IF (cleanup_local) CLOSE(UNIT = io)
-  END SUBROUTINE W_dt_t_nh_prog_R_1
   SUBROUTINE W_logical(io, x, cleanup, nline)
     CHARACTER(LEN = 50) :: buf
     INTEGER :: io

@@ -1590,7 +1590,10 @@ MODULE fake_mo_solve_nonhydro
       CALL timer_start(timer_solve_nh_vnupd)
     END IF
     IF (.TRUE. .AND. divdamp_type >= 3) THEN
+      rl_start = 7
       rl_end = (- 10)
+      i_startblk = p_patch % edges % start_block(7)
+      i_endblk = p_patch % edges % end_block(- 10)
       DO jb = i_startblk, i_endblk
         CALL get_indices_e(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 7, - 10)
         DO jk = kstart_dd3d(jg), nlev
