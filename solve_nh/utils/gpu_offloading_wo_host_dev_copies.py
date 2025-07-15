@@ -559,7 +559,8 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
         print()
 
     parent_map_counts = dict()
-    print("Finding parent maps for each map entry node in the SDFG:")
+    if verbose:
+        print("Finding parent maps for each map entry node in the SDFG:")
     for node, graph in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.MapEntry):
             num_parent_maps = _get_num_parent_map_scopes(sdfg, node, graph)

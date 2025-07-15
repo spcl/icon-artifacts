@@ -61,7 +61,7 @@ def codegen_action(
     stage: int,
     sdfgs: dict[str, SDFG],
 ) -> None:
-    dace.config.Config.set("compiler", "cuda", "max_concurrent_streams", value="10")
+    dace.config.Config.set("compiler", "cuda", "max_concurrent_streams", value="1")
     dace.config.Config.set("compiler", "cuda", "default_block_size", value="256,1,1")
     dace.config.Config.set("compiler", "default_data_types", value="C")
 
