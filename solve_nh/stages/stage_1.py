@@ -23,6 +23,7 @@ from utils.promote_function_access_in_map_range_to_symbol import (
     promote_function_access_in_map_range_to_symbol,
 )
 from utils.loop_locality import make_array_loop_local
+from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 
 STAGE_ID = 1
 
@@ -44,14 +45,15 @@ def optimization_action(g: SDFG):
         taskloop=False,
     ).apply_pass(g, {})
     # Simplify results with NestedSDFGs having missing symbols
-    g.simplify(skip=["ArrayElimination"], validate=False)
+    g.simplify(skip=["ArrayElimination", "StateFusion"], validate=False)
     # Add missing symbols and data to NSDFGs to make it valid
     add_missing_data_and_symbols_to_all_nsdfgs(g)
     g.validate()
     SymbolPropagation().apply_pass(g, {})
     # add_missing_symbols_to_nsdfgs(g)
     g.validate()
-    g.simplify(skip=["ArrayElimination"], validate=False)
+    g.simplify(skip=["ArrayElimination", "StateFusion"], validate=False)
+    state_fusion_without_copyin_and_copyout(g)
     g.validate()
     ConstantPropagation().apply_pass(g, {})
 
@@ -75,7 +77,7 @@ def optimization_action(g: SDFG):
     #add_missing_symbols_to_nsdfgs(g)
     g.validate()
     # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
-    g.simplify(skip=["ArrayElimination"], validate=False)
+    g.simplify(skip=["ArrayElimination", "StateFusion"], validate=False)
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
     return g

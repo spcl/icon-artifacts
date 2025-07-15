@@ -1,6 +1,6 @@
 import dace
+import os
 from typing import Dict, Set, Tuple
-
 from dace.codegen.common import CodeBlock
 from dace.sdfg.state import MultiConnectorEdge
 
@@ -64,13 +64,14 @@ def gpu_offloading_wo_host_dev_copies(sdfg: dace.SDFG):
     names_gpu = {n.strip() for n in data_names_gpu.replace("\n", "").strip().split(",") if n != "," and n != ""}
     names_both = {n.strip() for n in data_names_both.replace("\n", "").strip().split(",") if n != "," and n != ""}
     parent_map_count = 1
+    verbose = os.getenv("VERBOSE", "0").lower().strip() in ("1", "true", "yes", "on")
 
     _gpu_offloading_wo_host_dev_copies_impl(
         sdfg=sdfg,
         gpu_only_arrays=names_gpu,
         duplicated_arrays=names_both,
         parent_map_count=parent_map_count,
-        verbose=True
+        verbose=verbose
     )
 
 def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str], verbose: bool):
@@ -104,7 +105,7 @@ def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str], verbose: 
 import dace
 import copy
 
-def _add_gpu_copies_to_flattener(sdfg: dace.SDFG):
+def _add_gpu_copies_to_flattener(sdfg: dace.SDFG, gpu_arrays: Set[str]):
     flattener_lib_node, flattener_state = None, None
     deflattener_lib_node, deflattener_state = None, None
     added_gpu_arrays = set()
@@ -124,6 +125,7 @@ def _add_gpu_copies_to_flattener(sdfg: dace.SDFG):
     for oe in flattener_state.out_edges(flattener_lib_node):
         assert oe.src == flattener_lib_node, "Output edge source is not the flattener library node."
         dst_node = oe.dst
+        out_degree = flattener_state.out_degree(dst_node)
         edges_to_add = set()
         if (
             isinstance(dst_node, dace.sdfg.nodes.AccessNode) and
@@ -131,16 +133,22 @@ def _add_gpu_copies_to_flattener(sdfg: dace.SDFG):
             isinstance(sdfg.arrays[dst_node.data], dace.data.Array) and
             not isinstance(sdfg.arrays[dst_node.data], dace.data.View) and
             not isinstance(sdfg.arrays[dst_node.data], dace.data.Scalar) and
-            not isinstance(sdfg.arrays[dst_node.data], dace.data.Structure)
+            not isinstance(sdfg.arrays[dst_node.data], dace.data.Structure) and
+            dst_node.data in gpu_arrays
         ):
             arr = sdfg.arrays[dst_node.data]
             if arr.storage != dace.dtypes.StorageType.GPU_Global:
-                copy_arr = copy.deepcopy(arr)
-                copy_arr.storage = dace.dtypes.StorageType.GPU_Global
-                sdfg.add_datadesc("gpu_" + dst_node.data, copy_arr)
-                an = flattener_state.add_access("gpu_" + dst_node.data)
-                edges_to_add.add((dst_node, None, an, None, dace.memlet.Memlet.from_array(dst_node.data, arr)))
-                added_gpu_arrays.add("gpu_" + dst_node.data)
+                if "gpu_" + dst_node.data not in sdfg.arrays:
+                    copy_arr = copy.deepcopy(arr)
+                    copy_arr.storage = dace.dtypes.StorageType.GPU_Global
+                    sdfg.add_datadesc("gpu_" + dst_node.data, copy_arr)
+
+                if out_degree > 0:
+                    pass
+                else:
+                    an = flattener_state.add_access("gpu_" + dst_node.data)
+                    edges_to_add.add((dst_node, None, an, None, dace.memlet.Memlet.from_array(dst_node.data, arr)))
+                    added_gpu_arrays.add("gpu_" + dst_node.data)
 
         for e_data in edges_to_add:
             flattener_state.add_edge(*e_data)
@@ -148,6 +156,7 @@ def _add_gpu_copies_to_flattener(sdfg: dace.SDFG):
     for ie in deflattener_state.in_edges(deflattener_lib_node):
         assert ie.dst == deflattener_lib_node, "Output edge source is not the flattener library node."
         src_node = ie.src
+        in_degree = deflattener_state.in_degree(src_node)
         edges_to_add = set()
         if (
             isinstance(src_node, dace.sdfg.nodes.AccessNode) and
@@ -155,16 +164,28 @@ def _add_gpu_copies_to_flattener(sdfg: dace.SDFG):
             isinstance(sdfg.arrays[src_node.data], dace.data.Array) and
             not isinstance(sdfg.arrays[src_node.data], dace.data.View) and
             not isinstance(sdfg.arrays[src_node.data], dace.data.Scalar) and
-            not isinstance(sdfg.arrays[src_node.data], dace.data.Structure)
+            not isinstance(sdfg.arrays[src_node.data], dace.data.Structure) and
+            src_node.data in gpu_arrays
         ):
             arr = sdfg.arrays[src_node.data]
             if arr.storage != dace.dtypes.StorageType.GPU_Global:
-                copy_arr = copy.deepcopy(arr)
-                copy_arr.storage = dace.dtypes.StorageType.GPU_Global
-                assert "gpu_" + src_node.data in sdfg.arrays
-                #sdfg.add_datadesc("gpu_" + src_node.data, copy_arr)
-                an = deflattener_state.add_access("gpu_" + src_node.data)
-                edges_to_add.add((an, None, src_node, None, dace.memlet.Memlet.from_array("gpu_" + src_node.data, copy_arr)))
+                if "gpu_" + src_node.data not in sdfg.arrays:
+                    copy_arr = copy.deepcopy(arr)
+                    copy_arr.storage = dace.dtypes.StorageType.GPU_Global
+                    sdfg.add_datadesc("gpu_" + src_node.data, copy_arr)
+                    assert "gpu_" + src_node.data in sdfg.arrays
+
+                # If in_degree > 0 need an intermediate access node and edge
+                if in_degree > 0:
+                    pass
+                    #for ie_d in deflattener_state.in_edges(src_node):
+                    #    assert ie_d.dst_conn is None
+                    #    edges_to_add.add((ie_d.src, ie_d.src_conn, an, None, copy.deepcopy(ie_d.data)))
+                    #    deflattener_state.remove_edge(ie_d)
+                    #edges_to_add.add((an, None, src_node, None, dace.memlet.Memlet.from_array("gpu_" + src_node.data, copy_arr)))
+                else:
+                    an = deflattener_state.add_access("gpu_" + src_node.data)
+                    edges_to_add.add((an, None, src_node, None, dace.memlet.Memlet.from_array("gpu_" + src_node.data, arr)))
                 assert "gpu_" + src_node.data in added_gpu_arrays
 
         for e_data in edges_to_add:
@@ -203,13 +224,16 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
     prev_last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
     assert len(prev_last_blocks) == 1, "Expected only one last state in the SDFG."
     prev_last_block = prev_last_blocks[0]
-    last_state = sdfg.add_state(label="copy_out_nontransient", is_end_block=True)
+    last_state = sdfg.add_state(label="copy_out_nontransient")
     sdfg.add_edge(prev_last_block, last_state, dace.sdfg.InterstateEdge())
 
     for src_name, dst_name in name_dict.items():
         if dst_name is None:
             continue
+        if dst_name in sdfg.arrays and sdfg.arrays[dst_name].transient:
+            continue  # Skip transient arrays
         dst_gpu_name = "gpu_" + dst_name
+
         if dst_gpu_name not in sdfg.arrays:
             if isinstance(sdfg.arrays[dst_name], dace.data.Scalar):
                 if verbose:
@@ -221,31 +245,26 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
             gpu_datadesc.storage = dace.dtypes.StorageType.GPU_Global
             sdfg.add_datadesc(dst_gpu_name, gpu_datadesc)
 
-            # Add copy-ins in the flattening state
-            assert isinstance(first_state, dace.SDFGState), "Expected the first state to be an SDFGState."
-            has_access_node = {n for n in first_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
-            if not has_access_node:
-                an = first_state.add_access(dst_name)
-            else:
-                assert len(has_access_node) == 1, f"Expected only one access node for {dst_name}, found: {has_access_node}"
-                an = has_access_node.pop()
-            gpu_an = first_state.add_access(dst_gpu_name)
-            first_state.add_edge(
-                an, None, gpu_an, None,
-                dace.memlet.Memlet.from_array(dst_name, gpu_datadesc)
-            )
+        # Add copy-ins in the flattening state
+        assert isinstance(first_state, dace.SDFGState), "Expected the first state to be an SDFGState."
+        has_access_node = {n for n in first_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
+        assert not has_access_node
+        an = first_state.add_access(dst_name)
+        gpu_an = first_state.add_access(dst_gpu_name)
+        first_state.add_edge(
+            an, None, gpu_an, None,
+            dace.memlet.Memlet.from_array(dst_name, gpu_datadesc)
+        )
 
-            assert isinstance(last_state, dace.SDFGState), "Expected the last state to be an SDFGState."
-            has_access_node = {n for n in last_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
-            if not has_access_node:
-                ret_an = last_state.add_access(dst_gpu_name)
-            else:
-                ret_an = has_access_node.pop()
-            an = last_state.add_access(dst_name)
-            last_state.add_edge(
-                ret_an, None, an, None,
-                dace.memlet.Memlet.from_array(dst_gpu_name, gpu_datadesc)
-            )
+        assert isinstance(last_state, dace.SDFGState), "Expected the last state to be an SDFGState."
+        has_access_node = {n for n in last_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
+        assert not has_access_node, f"Expected no access node for {dst_name} in the last state."
+        ret_an = last_state.add_access(dst_gpu_name)
+        an = last_state.add_access(dst_name)
+        last_state.add_edge(
+            ret_an, None, an, None,
+            dace.memlet.Memlet.from_array(dst_gpu_name, gpu_datadesc)
+        )
 
         if verbose:
             print(f"    Copied non-transient array {dst_name} to GPU as {dst_gpu_name} in the first state of the SDFG.")
@@ -523,15 +542,11 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     writes_to_arrays = _check_arrays_are_constant(sdfg, duplicated_arrays, verbose)
     constant_arrays = {n for n, w in writes_to_arrays.items() if w <= 0}
     sdfg.validate()
-    arrays_added_to_flattener = _add_gpu_copies_to_flattener(sdfg)
-    if verbose:
-        print(f"Arrays added as copies to flattener/deflattener nodes: {arrays_added_to_flattener}")
-        print()
-        print()
-    sdfg.validate()
 
     all_gpu_array_names = gpu_only_arrays.union(duplicated_arrays)
     name_dict = _find_flattened_names(sdfg, all_gpu_array_names)
+
+
 
     _copy_nontransient_arrays_to_gpu(sdfg, name_dict, verbose)
     sdfg.validate()
@@ -600,6 +615,14 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
             gpu_arrays |= used_data
     if verbose:
         print(f"GPU arrays used by maps with >={parent_map_count} parent maps: {gpu_arrays}")
+
+    # Only copy-in GPU arrays
+    arrays_added_to_flattener = _add_gpu_copies_to_flattener(sdfg, gpu_arrays)
+    if verbose:
+        print(f"Arrays added as copies to flattener/deflattener nodes: {arrays_added_to_flattener}")
+        print()
+        print()
+    sdfg.validate()
 
     # Replace all arrays used by GPU maps with their GPU counterparts
     _set_gpu_schedule(parent_map_counts, parent_map_count)

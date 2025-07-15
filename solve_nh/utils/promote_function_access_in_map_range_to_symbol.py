@@ -30,8 +30,8 @@ def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
                         # Get the base for the variable name, use global offset to avoid conflicts
                         var_name = match_0.split('(')[0].strip()
                         assert var_name.startswith("__CG_")
-                        #var_name = var_name[6:]  # Remove "__CG_" prefix
-                        sym_name = f"{var_name[6:]}_sym_{sym_id}"
+                        #var_name = var_name[5:]  # Remove "__CG_" prefix
+                        sym_name = f"{var_name[5:]}_sym_{sym_id}"
                         data_accesses.add(var_name)
                         # Create the access name (array[i] instead of array(i))
                         access_name = match_0.replace('(', '[').replace(')', ']')
