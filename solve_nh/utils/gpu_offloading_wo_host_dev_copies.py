@@ -242,7 +242,7 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
                 ret_an = has_access_node.pop()
             an = last_state.add_access(dst_name)
             last_state.add_edge(
-                an, None, ret_an, None,
+                ret_an, None, an, None,
                 dace.memlet.Memlet.from_array(dst_gpu_name, gpu_datadesc)
             )
 
