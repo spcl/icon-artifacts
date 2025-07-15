@@ -19,6 +19,7 @@ from utils.add_missing_symbols import add_missing_symbols_to_nsdfgs
 from utils.promote_function_access_in_map_range_to_symbol import (
     promote_function_access_in_map_range_to_symbol,
 )
+from utils.loop_locality import make_array_loop_local
 
 STAGE_ID = 1
 
@@ -44,11 +45,19 @@ def optimization_action(g: SDFG):
     # Add missing symbols to NSDFGs to make it valid
     g.validate()
     SymbolPropagation().apply_pass(g, {})
-    #add_missing_symbols_to_nsdfgs(g)
+    # add_missing_symbols_to_nsdfgs(g)
     g.validate()
     g.simplify(skip=["ArrayElimination"], validate=False)
     g.validate()
     ConstantPropagation().apply_pass(g, {})
+
+    # Ensure loop locality for ballin LoopToMap
+    if g.name == "solve_nh_predictor_pre":
+        make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1156_c_1156")
+    elif g.name == "solve_nh_corrector_pre":
+        make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1712_c_1712")
+
+    # BALLIN
     g.apply_transformations_repeated(
         LoopToMap, permissive=True, options={"ballin": True}
     )
