@@ -5,6 +5,7 @@ from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import Mode
 from dace.transformation.interstate import InlineSDFG
+from utils.count import count_uncollapsed_maps
 
 import argparse
 
@@ -20,6 +21,7 @@ def optimization_action(g: SDFG, velicity_shim: bool):
         g.apply_transformations_repeated(
             MapCollapse
         )
+        count_uncollapsed_maps(g, verbose=False, use_assert=True)
     return g
 
 
