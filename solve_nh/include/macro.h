@@ -276,10 +276,7 @@
   UNWRAP_DATA_PAIR(z_w_concorr_mc)                                             \
   UNWRAP_DATA_PAIR(z_w_concorr_me)                                             \
   UNWRAP_DATA_PAIR(z_w_expl)                                                   \
-  UNWRAP_DATA_PAIR(zf)                                                         \
-  t_nh_prog *const p_nh_in_prog_bk[2] = {p_nh_in.prog[0], p_nh_in.prog[1]};    \
-  p_nh_in.prog[nnew_in - 1] = &p_nh_prog_nnew_in;                              \
-  p_nh_in.prog[nnow_in - 1] = &p_nh_prog_nnow_in;
+  UNWRAP_DATA_PAIR(zf)
 
 #define SPAWN_ALL_WRITERS(prefix, namespc)                                     \
   SPAWN_WRITERS(prefix, global_data, global_data_type, namespc)                \
@@ -394,6 +391,4 @@
   /*SPAWN_WRITERS(prefix, lvn_only, int, namespc)*/                            \
   /*SPAWN_WRITERS(prefix, l_vert_nested, int, namespc)*/                       \
   /*SPAWN_WRITERS(prefix, l_child_vertnest, int, namespc)*/                    \
-  pool.clear();                                                                \
-  p_nh_in.prog[0] = p_nh_in_prog_bk[0];                                        \
-  p_nh_in.prog[1] = p_nh_in_prog_bk[1];
+  pool.clear();

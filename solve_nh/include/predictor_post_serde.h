@@ -2693,7 +2693,7 @@ void deserialize(t_nh_metrics *x, std::istream &s) {
 void deserialize(t_nh_state *x, std::istream &s) {
   bool yep;
   array_meta m;
-  read_line(s, {"# diag"}); // Should contain '# diag'
+  read_until(s, {"# diag"}); // Should contain '# diag'
 
   x->diag = new std::remove_pointer<decltype(x->diag)>::type;
   deserialize(x->diag, s);
