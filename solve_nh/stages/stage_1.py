@@ -15,7 +15,10 @@ from dace.transformation.passes import (
 
 from utils.count import count_loops
 from utils.clean_partial_view_towers import clean_partial_view_towers
-from utils.add_missing_symbols import add_missing_symbols_to_nsdfgs
+from utils.add_missing_symbols import (
+    add_missing_symbols_to_nsdfgs,
+    add_missing_data_and_symbols_to_all_nsdfgs
+)
 from utils.promote_function_access_in_map_range_to_symbol import (
     promote_function_access_in_map_range_to_symbol,
 )
@@ -41,7 +44,8 @@ def optimization_action(g: SDFG):
     ).apply_pass(g, {})
     # Simplify results with NestedSDFGs having missing symbols
     g.simplify(skip=["ArrayElimination"], validate=False)
-    # Add missing symbols to NSDFGs to make it valid
+    # Add missing symbols and data to NSDFGs to make it valid
+    add_missing_data_and_symbols_to_all_nsdfgs(g)
     g.validate()
     SymbolPropagation().apply_pass(g, {})
     #add_missing_symbols_to_nsdfgs(g)
@@ -58,7 +62,11 @@ def optimization_action(g: SDFG):
     promote_function_access_in_map_range_to_symbol(g)
     # Do not add missing symbols to NSDFGs before promiting nflatlev access to
     # data access, otherwise nflatlev will be registered as a symbol already
-    add_missing_symbols_to_nsdfgs(g)
+    add_missing_data_and_symbols_to_all_nsdfgs(g)
+    #add_missing_symbols_to_nsdfgs(g)
+    g.validate()
+    # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
+    g.simplify(skip=["ArrayElimination"], validate=False)
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
     return g

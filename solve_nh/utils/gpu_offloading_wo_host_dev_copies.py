@@ -1,14 +1,17 @@
 import dace
-from typing import Set
+from typing import Dict, Set, Tuple
+
+from dace.codegen.common import CodeBlock
+from dace.sdfg.state import MultiConnectorEdge
 
 openacc_data_names = """
-   !$ACC DATA CREATE(z_kin_hor_e, z_vt_ie, z_w_concorr_me, z_theta_v_fl_e) &
-    !$ACC   CREATE(z_dexner_dz_c, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth) &
-    !$ACC   CREATE(z_theta_v_pr_ic, z_th_ddz_exner_c, z_w_concorr_mc) &
-    !$ACC   CREATE(z_vn_avg, z_rho_e, z_theta_v_e, z_dwdz_dd, z_mflx_top) &
-    !$ACC   CREATE(z_exner_ic, z_alpha, z_beta, z_q, z_contr_w_fl_l, z_exner_expl) &
-    !$ACC   CREATE(z_flxdiv_mass, z_flxdiv_theta, z_rho_expl, z_w_expl) &
-    !$ACC   CREATE(z_rho_v, z_theta_v_v, z_graddiv_vn, z_hydro_corr, z_graddiv2_vn) &
+   !$ACC DATA CREATE(z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e) &
+    !$ACC   CREATE(z_dexner_dz_c,z_exner_ex_pr,z_gradh_exner,z_rth_pr,z_grad_rth) &
+    !$ACC   CREATE(z_theta_v_pr_ic,z_th_ddz_exner_c,z_w_concorr_mc) &
+    !$ACC   CREATE(z_vn_avg,z_rho_e,z_theta_v_e,z_dwdz_dd,z_mflx_top) &
+    !$ACC   CREATE(z_exner_ic,z_alpha,z_beta,z_q,z_contr_w_fl_l,z_exner_expl) &
+    !$ACC   CREATE(z_flxdiv_mass,z_flxdiv_theta,z_rho_expl,z_w_expl) &
+    !$ACC   CREATE(z_rho_v,z_theta_v_v,z_graddiv_vn,z_hydro_corr,z_graddiv2_vn) &
     !$ACC   COPYIN(nflatlev, nflat_gradp, kstart_dd3d, kstart_moist, nrdmax) &
     !$ACC   COPYIN(z_raylfac, ndyn_substeps_var, scal_divdamp, bdy_divdamp) &
     !$ACC   PRESENT(prep_adv, p_int, p_patch, p_nh) &
@@ -43,32 +46,37 @@ ptr_assignments = """
 """
 
 data_names_gpu = """
-   z_kin_hor_e, z_vt_ie, z_w_concorr_me, z_theta_v_fl_e,
-   z_dexner_dz_c, z_exner_ex_pr, z_gradh_exner, z_rth_pr, z_grad_rth,
-   z_theta_v_pr_ic, z_th_ddz_exner_c, z_w_concorr_mc,
-    z_vn_avg, z_rho_e, z_theta_v_e, z_dwdz_dd, z_mflx_top,
-    z_exner_ic, z_alpha, z_beta, z_q, z_contr_w_fl_l, z_exner_expl,
-    z_flxdiv_mass, z_flxdiv_theta, z_rho_expl, z_w_expl,
-    z_rho_v, z_theta_v_v, z_graddiv_vn, z_hydro_corr, z_graddiv2_vn,
+z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e,
+z_dexner_dz_c,z_exner_ex_pr,z_gradh_exner,z_rth_pr,z_grad_rth,
+z_theta_v_pr_ic,z_th_ddz_exner_c,z_w_concorr_mc,
+z_vn_avg,z_rho_e,z_theta_v_e,z_dwdz_dd,z_mflx_top,
+z_exner_ic,z_alpha,z_beta,z_q,z_contr_w_fl_l,z_exner_expl,
+z_flxdiv_mass,z_flxdiv_theta,z_rho_expl,z_w_expl,
+z_rho_v,z_theta_v_v,z_graddiv_vn,z_hydro_corr,z_graddiv2_vn,
 """
 
 data_names_both = """
-    nflatlev, nflat_gradp, kstart_dd3d, kstart_moist, nrdmax,
-    z_raylfac, ndyn_substeps_var, scal_divdamp, bdy_divdamp,
+nflatlev,nflat_gradp,kstart_dd3d,kstart_moist,nrdmax,
+z_raylfac,ndyn_substeps_var, scal_divdamp,bdy_divdamp,
 """
 
-def gpu_offloading_wo_host_dev_copiesl():
-    names_gpu = set(data_names_gpu.replace("\n", "").strip().split(", "))
-    names_both = set(data_names_both.replace("\n", "").strip().split(", "))
-    parent_map_count = 0
+def gpu_offloading_wo_host_dev_copies(sdfg: dace.SDFG):
+    names_gpu = {n.strip() for n in data_names_gpu.replace("\n", "").strip().split(",") if n != "," and n != ""}
+    names_both = {n.strip() for n in data_names_both.replace("\n", "").strip().split(",") if n != "," and n != ""}
+    parent_map_count = 1
 
     _gpu_offloading_wo_host_dev_copies_impl(
+        sdfg=sdfg,
         gpu_only_arrays=names_gpu,
         duplicated_arrays=names_both,
-        parent_map_count=parent_map_count
+        parent_map_count=parent_map_count,
+        verbose=True
     )
 
-def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str]):
+def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str], verbose: bool):
+    if verbose:
+        print(f"Checking if arrays: {array_names} are constant.")
+
     writes_to_access_nodes = dict()
     for graph in sdfg.all_states():
         for node in graph.nodes():
@@ -82,16 +90,518 @@ def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str]):
                     writes_to_access_nodes[node.data] += 1
     for array_name in array_names:
         assert writes_to_access_nodes.get(array_name, 0) <= 1
+    for array_name in array_names:
+        if array_name not in writes_to_access_nodes:
+            writes_to_access_nodes[array_name] = 0
+    if verbose:
+        print(
+            f"Writes to arrays: {writes_to_access_nodes}"
+        )
+        print()
+        print()
+    return writes_to_access_nodes
+
+import dace
+import copy
+
+def _add_gpu_copies_to_flattener(sdfg: dace.SDFG):
+    flattener_lib_node, flattener_state = None, None
+    deflattener_lib_node, deflattener_state = None, None
+    added_gpu_arrays = set()
+
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if node.label == "flatten" and isinstance(node, dace.sdfg.nodes.LibraryNode):
+                flattener_lib_node = node
+                flattener_state = state
+            elif node.label == "deflatten" and isinstance(node, dace.sdfg.nodes.LibraryNode):
+                deflattener_lib_node = node
+                deflattener_state = state
+
+    assert flattener_lib_node is not None, "Flattener library node not found in the SDFG."
+    assert deflattener_lib_node is not None, "Deflatten library node not found in the SDFG."
+
+    for oe in flattener_state.out_edges(flattener_lib_node):
+        assert oe.src == flattener_lib_node, "Output edge source is not the flattener library node."
+        dst_node = oe.dst
+        edges_to_add = set()
+        if (
+            isinstance(dst_node, dace.sdfg.nodes.AccessNode) and
+            dst_node.data in sdfg.arrays and
+            isinstance(sdfg.arrays[dst_node.data], dace.data.Array) and
+            not isinstance(sdfg.arrays[dst_node.data], dace.data.View) and
+            not isinstance(sdfg.arrays[dst_node.data], dace.data.Scalar) and
+            not isinstance(sdfg.arrays[dst_node.data], dace.data.Structure)
+        ):
+            arr = sdfg.arrays[dst_node.data]
+            if arr.storage != dace.dtypes.StorageType.GPU_Global:
+                copy_arr = copy.deepcopy(arr)
+                copy_arr.storage = dace.dtypes.StorageType.GPU_Global
+                sdfg.add_datadesc("gpu_" + dst_node.data, copy_arr)
+                an = flattener_state.add_access("gpu_" + dst_node.data)
+                edges_to_add.add((dst_node, None, an, None, dace.memlet.Memlet.from_array(dst_node.data, arr)))
+                added_gpu_arrays.add("gpu_" + dst_node.data)
+
+        for e_data in edges_to_add:
+            flattener_state.add_edge(*e_data)
+
+    for ie in deflattener_state.in_edges(deflattener_lib_node):
+        assert ie.dst == deflattener_lib_node, "Output edge source is not the flattener library node."
+        src_node = ie.src
+        edges_to_add = set()
+        if (
+            isinstance(src_node, dace.sdfg.nodes.AccessNode) and
+            src_node.data in sdfg.arrays and
+            isinstance(sdfg.arrays[src_node.data], dace.data.Array) and
+            not isinstance(sdfg.arrays[src_node.data], dace.data.View) and
+            not isinstance(sdfg.arrays[src_node.data], dace.data.Scalar) and
+            not isinstance(sdfg.arrays[src_node.data], dace.data.Structure)
+        ):
+            arr = sdfg.arrays[src_node.data]
+            if arr.storage != dace.dtypes.StorageType.GPU_Global:
+                copy_arr = copy.deepcopy(arr)
+                copy_arr.storage = dace.dtypes.StorageType.GPU_Global
+                assert "gpu_" + src_node.data in sdfg.arrays
+                #sdfg.add_datadesc("gpu_" + src_node.data, copy_arr)
+                an = deflattener_state.add_access("gpu_" + src_node.data)
+                edges_to_add.add((an, None, src_node, None, dace.memlet.Memlet.from_array("gpu_" + src_node.data, copy_arr)))
+                assert "gpu_" + src_node.data in added_gpu_arrays
+
+        for e_data in edges_to_add:
+            deflattener_state.add_edge(*e_data)
+
+    return added_gpu_arrays
+
+def _find_flattened_names(sdfg: dace.SDFG, names_to_check: Set[str]):
+    name_dict = dict()
+    for name_to_check in names_to_check:
+        name_candidates = set()
+        for name, desc in sdfg.arrays.items():
+            if "gpu_" in name:
+                continue
+            if name_to_check in name and not isinstance(desc, dace.data.View):
+                name_candidates.add(name)
+        # If candidates > 1 then one of the name matches
+        if len(name_candidates) > 1:
+            assert name_to_check in name_candidates, f"Expected only one candidate for {name_to_check}, found: {name_candidates}"
+            name_dict[name_to_check] = name_to_check
+        elif len(name_candidates) == 1:
+            name_dict[name_to_check] = name_candidates.pop()
+        else:
+            name_dict[name_to_check] = None
+            assert name_to_check not in sdfg.arrays, f"Expected no array {name_to_check} in the SDFG."
+    return name_dict
+
+
+def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: bool):
+    if verbose:
+        print("Copying non-transient arrays to GPU:")
+    prev_start_block = sdfg.start_block
+    first_state = sdfg.add_state(label="copy_in_nontransient", is_start_block=True)
+    # Add copy-outs in the last state
+    prev_last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
+    assert len(prev_last_blocks) == 1, "Expected only one last state in the SDFG."
+    prev_last_block = prev_last_blocks[0]
+    last_state = sdfg.add_state()
+    for src_name, dst_name in name_dict.items():
+        if dst_name is None:
+            continue
+        dst_gpu_name = "gpu_" + dst_name
+        if dst_gpu_name not in sdfg.arrays:
+            if isinstance(sdfg.arrays[dst_name], dace.data.Scalar):
+                if verbose:
+                    print(f"    Skipping scalar {dst_name}.")
+                continue
+            assert dst_name in sdfg.arrays, f"Expected {dst_name} to be in the SDFG arrays."
+            gpu_datadesc = copy.deepcopy(sdfg.arrays[dst_name])
+            gpu_datadesc.transient = True
+            gpu_datadesc.storage = dace.dtypes.StorageType.GPU_Global
+            sdfg.add_datadesc(dst_gpu_name, gpu_datadesc)
+
+            # Add copy-ins in the flattening state
+            sdfg.add_edge(first_state, prev_start_block, dace.sdfg.InterstateEdge())
+            assert isinstance(first_state, dace.SDFGState), "Expected the first state to be an SDFGState."
+            has_access_node = {n for n in first_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
+            if not has_access_node:
+                an = first_state.add_access(dst_name)
+            else:
+                assert len(has_access_node) == 1, f"Expected only one access node for {dst_name}, found: {has_access_node}"
+                an = has_access_node.pop()
+            gpu_an = first_state.add_access(dst_gpu_name)
+            first_state.add_edge(
+                an, None, gpu_an, None,
+                dace.memlet.Memlet.from_array(dst_name, gpu_datadesc)
+            )
+
+            sdfg.add_edge(prev_last_block, last_state, dace.sdfg.InterstateEdge())
+            assert isinstance(last_state, dace.SDFGState), "Expected the last state to be an SDFGState."
+            has_access_node = {n for n in last_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
+            if not has_access_node:
+                ret_an = last_state.add_access(dst_gpu_name)
+            else:
+                ret_an = has_access_node.pop()
+            an = last_state.add_access(dst_name)
+            last_state.add_edge(
+                an, None, ret_an, None,
+                dace.memlet.Memlet.from_array(dst_gpu_name, gpu_datadesc)
+            )
+
+        if verbose:
+            print(f"    Copied non-transient array {dst_name} to GPU as {dst_gpu_name} in the first state of the SDFG.")
+            print(f"    Copied back transient array {dst_gpu_name} from GPU to {dst_name} in the last state of the SDFG.")
+    if verbose:
+        print()
+        print()
+
+def _find_parent_state(root_sdfg: dace.SDFG, node: dace.nodes.NestedSDFG):
+    if node is not None:
+        # Find parent state of that node
+        for n, g in root_sdfg.all_nodes_recursive():
+            if n == node:
+                parent_state = g
+                return parent_state
+    return None
+
+def _get_num_parent_map_scopes(root_sdfg: dace.SDFG, node: dace.nodes.MapEntry,
+                                parent_state: dace.SDFGState):
+    scope_dict = parent_state.scope_dict()
+    num_parent_maps = 0
+    cur_node = node
+    while scope_dict[cur_node] is not None:
+        if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
+            num_parent_maps += 1
+        cur_node = scope_dict[cur_node]
+
+    # Check parent nsdfg
+    parent_nsdfg_node = parent_state.sdfg.parent_nsdfg_node
+    parent_nsdfg_parent_state = _find_parent_state(root_sdfg, parent_nsdfg_node)
+
+    while parent_nsdfg_node is not None:
+        scope_dict = parent_nsdfg_parent_state.scope_dict()
+        cur_node = parent_nsdfg_node
+        while scope_dict[cur_node] is not None:
+            if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
+                num_parent_maps += 1
+            cur_node = scope_dict[cur_node]
+        parent_nsdfg_node = parent_nsdfg_parent_state.sdfg.parent_nsdfg_node
+        parent_nsdfg_parent_state = _find_parent_state(root_sdfg, parent_nsdfg_node)
+
+    return num_parent_maps
+
+def _get_data_used_by_map(map_entry: dace.nodes.MapEntry, state: dace.SDFGState):
+    """
+    Returns a set of data names used by the map entry node.
+    """
+    data_used = set()
+    for edge in state.in_edges(map_entry):
+        if edge.data is not None:
+            datadesc = state.sdfg.arrays[edge.data.data]
+            if isinstance(datadesc, dace.data.Array):
+                data_used.add(edge.data.data)
+    for edge in state.out_edges(state.exit_node(map_entry)):
+        if edge.data is not None:
+            datadesc = state.sdfg.arrays[edge.data.data]
+            if isinstance(datadesc, dace.data.Array):
+                data_used.add(edge.data.data)
+    return data_used
+
+
+def _set_gpu_schedule(parent_map_counts: Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], int],
+                      parent_map_count: int):
+    """
+    Sets the GPU schedule for maps with more than parent_map_count parent maps.
+    """
+    for (map_node, map_state), num_parent_maps in parent_map_counts.items():
+        if num_parent_maps == parent_map_count:
+            map_node.map.schedule = dace.ScheduleType.GPU_Device
+        elif num_parent_maps > parent_map_count:
+            map_node.map.schedule = dace.ScheduleType.Sequential
+        else:
+            map_node.map.schedule = dace.ScheduleType.Default
+
+def _replace_edge_data_with_gpu_data(
+        root_sdfg: dace.SDFG,
+        state: dace.SDFGState,
+        edges: Set[MultiConnectorEdge],
+        gpu_arrays: Set[str]
+    ):
+        for edge in edges:
+            if edge.data is not None:
+                if edge.data.data is not None:
+                    no_gpu_data_name = edge.data.data[4:] if edge.data.data.startswith("gpu_") else edge.data.data
+                    gpu_data_name = "gpu_" + no_gpu_data_name
+                    if no_gpu_data_name in gpu_arrays:
+                        if no_gpu_data_name not in state.sdfg.arrays:
+                            assert "gpu_" + no_gpu_data_name in state.sdfg.arrays
+                            desc = state.sdfg.arrays[gpu_data_name]
+                            if isinstance(desc, dace.data.Array):
+                                edge.data.data = gpu_data_name
+                        else:
+                            desc = state.sdfg.arrays[no_gpu_data_name]
+                            if isinstance(desc, dace.data.Array):
+                                if gpu_data_name not in state.sdfg.arrays:
+                                    gpu_desc = copy.deepcopy(desc)
+                                    gpu_desc.storage = dace.dtypes.StorageType.GPU_Global
+                                    state.sdfg.add_datadesc(gpu_data_name, gpu_desc)
+                                edge.data.data = gpu_data_name
+
+
+def _replace_connectors_and_nsdfg_desc(
+    state: dace.SDFGState,
+    edges: Set[MultiConnectorEdge],
+    prefix: str,
+    gpu_arrays: Set[str]
+):
+    for edge in edges:
+        if edge.data is not None:
+            if edge.data.data is not None:
+                data_name = edge.data.data
+                no_gpu_data_name = data_name[4:] if data_name.startswith("gpu_") else data_name
+                if no_gpu_data_name in gpu_arrays:
+                    desc = state.sdfg.arrays[data_name]
+                    if isinstance(desc, dace.data.Array) and desc.storage == dace.dtypes.StorageType.GPU_Global:
+                        # If src_conn starts with "OUT_" (src is MapEntry or Exit)
+                        if isinstance(edge.src, (dace.nodes.MapExit, dace.nodes.MapEntry)):
+                            if edge.src_conn is not None and edge.src_conn.startswith("OUT_"):
+                                rmed = edge.src.remove_out_connector(edge.src_conn)
+                                assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
+                                edge.src_conn = "OUT_" + prefix + no_gpu_data_name
+                                edge.src.add_out_connector(edge.src_conn, force=True)
+                        # If src is NestedSDFG
+                        elif isinstance(edge.src, dace.nodes.NestedSDFG):
+                            assert edge.src_conn is not None, "Expected src_conn to be set for NestedSDFG."
+                            if edge.src_conn != data_name:
+                                edge.src.sdfg.remove_data(edge.src_conn, validate=False)
+                                if data_name not in edge.src.sdfg.arrays:
+                                    copydesc = copy.deepcopy(desc)
+                                    copydesc.storage = dace.dtypes.StorageType.GPU_Global
+                                    copydesc.transient = False
+                                    edge.src.sdfg.add_datadesc(data_name, copydesc)
+                            rmed = edge.src.remove_out_connector(edge.src_conn)
+                            assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
+                            edge.src_conn = data_name
+                            edge.src.add_out_connector(data_name, force=True)
+                        elif isinstance(edge.src, dace.nodes.AccessNode):
+                            edge.src.data = data_name
+                        else:
+                            # Keep the src conn as is
+                            pass
+
+                        # If dst is NestedSDFG
+                        if isinstance(edge.dst, (dace.nodes.MapExit, dace.nodes.MapEntry)):
+                            # If dst_conn starts with "IN_" (dst is MapExit or Entry)
+                            if edge.dst_conn is not None and edge.dst_conn.startswith("IN_"):
+                                rmed = edge.dst.remove_in_connector(edge.dst_conn)
+                                assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
+                                edge.dst_conn = "IN_" + prefix + no_gpu_data_name
+                                edge.dst.add_in_connector("IN_" + prefix + no_gpu_data_name, force=True)
+                        elif isinstance(edge.dst, dace.nodes.NestedSDFG):
+                            assert edge.dst_conn is not None, "Expected dst_conn to be set for NestedSDFG."
+                            if edge.dst_conn != data_name:
+                                edge.dst.sdfg.remove_data(edge.dst_conn, validate=False)
+                                if data_name not in edge.dst.sdfg.arrays:
+                                    copydesc = copy.deepcopy(desc)
+                                    copydesc.storage = dace.dtypes.StorageType.GPU_Global
+                                    copydesc.transient = False
+                                    edge.dst.sdfg.add_datadesc(data_name, copydesc)
+                            rmed =  edge.dst.remove_in_connector(edge.dst_conn)
+                            assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
+                            edge.dst_conn = data_name
+                            edge.dst.add_in_connector(data_name, force=True)
+                        elif isinstance(edge.dst, dace.nodes.AccessNode):
+                            edge.dst.data = data_name
+                        else:
+                            # Keep the dst conn as is
+                            pass
+
+
+def _replace_names_in_string(text, name_mapping):
+    """
+    Replace names in a string based on a dictionary mapping.
+
+    Args:
+        text (str): The input string containing names to replace
+        name_mapping (dict): Dictionary where keys are original names and values are replacement names
+
+    Returns:
+        str: String with names replaced according to the mapping
+    """
+    result = text
+
+    # Sort keys by length (descending) to handle longer names first
+    # This prevents partial replacements of longer names
+    sorted_names = sorted(name_mapping.keys(), key=len, reverse=True)
+
+    for original_name in sorted_names:
+        replacement_name = name_mapping[original_name]
+        result = result.replace(original_name, replacement_name)
+
+    return result
+
+def _replace_gpu_data_on_interstate_edges(sdfg: dace.SDFG, names_to_replace: Set[str]):
+    name_dict = {n: "gpu_" + n for n in names_to_replace}
+    for edge in sdfg.all_interstate_edges():
+        if edge.data is not None:
+            if isinstance(edge.data, dace.InterstateEdge):
+                new_assignments = {}
+                for k, v in edge.data.assignments.items():
+                    assert isinstance(k, str)
+                    assert isinstance(v, (str, CodeBlock))
+                    v_str = v.as_string if isinstance(v, CodeBlock) else v
+                    new_k = _replace_names_in_string(k, name_dict)
+                    new_v_str = _replace_names_in_string(v_str, name_dict)
+                    new_assignments[new_k] = CodeBlock(new_v_str) if isinstance(v, CodeBlock) else new_v_str
+                edge.data.assignments = new_assignments
+                assert edge.data.condition is None or edge.data.condition.as_string == "1",  f"Expected no condition in interstate edge {edge}: {edge.data.condition.as_string}."
+
+
+def _replace_gpu_data_with_gpu_versions(
+    sdfg: dace.SDFG,
+    gpu_arrays: Set[str],
+    within_gpu_map: bool = False,
+):
+    inner_sdfgs = set()
+    if not within_gpu_map:
+        for state in sdfg.all_states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.MapEntry) and state.scope_dict()[node] is None:
+                    # Replace all data flow with GPU version:
+                    # 1. If src to mapentry is access node and not GPU, replace it with GPU version
+                    # 2. If dst from mapexit is access node and not GPU, replace it with GPU version
+                    # 3. If gpu version of data is not in SDFG, copy it over from root SDFG
+                    # 4. If in connector refers to "IN_<oldname>", "OUT_<oldname>" or "<oldname>" (nsdfg) then update connector names
+                    # 4.1. Update (add/rm) connectors accordingly
+                    # 5. If nsdfg, then update data descriptors to match the in connetor
+                    # (Do it for all edges between map_entry and its exit node)
+                    map_exit = state.exit_node(node)
+                    all_nodes_between = set(state.all_nodes_between(node, map_exit)).union({node, map_exit})
+                    all_edges_between = set(state.all_edges(*(all_nodes_between.union({node, map_exit}))))
+
+                    # Replaces all edge data with GPU version of the same array
+                    _replace_edge_data_with_gpu_data(sdfg, state, all_edges_between, gpu_arrays)
+                    # Updates connectors to match the GPU data, also updates NSDFG descriptors and access nodes
+                    _replace_connectors_and_nsdfg_desc(
+                        state, all_edges_between, "gpu_", gpu_arrays
+                    )
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    # If node is NestedSDFG, then we need to replace all data descriptors in the inner SDFG
+                    inner_sdfgs.add(node.sdfg)
+    else:
+        for state in sdfg.all_states():
+            all_nodes_between = set(state.nodes())
+            all_edges_between = set(state.edges())
+
+            # Replaces all edge data with GPU version of the same array
+            _replace_edge_data_with_gpu_data(sdfg, state, all_edges_between, gpu_arrays)
+            # Updates connectors to match the GPU data, also updates NSDFG descriptors and access nodes
+            _replace_connectors_and_nsdfg_desc(
+                state, all_edges_between, "gpu_", gpu_arrays
+            )
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    # If node is NestedSDFG, then we need to replace all data descriptors in the inner SDFG
+                    inner_sdfgs.add(node.sdfg)
+
+    if within_gpu_map:
+        _replace_gpu_data_on_interstate_edges(sdfg, gpu_arrays)
+
+    for inner_sdfg in inner_sdfgs:
+        _replace_gpu_data_with_gpu_versions(inner_sdfg, gpu_arrays, True)
+
+
 
 def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
                                             gpu_only_arrays: Set[str],
                                             duplicated_arrays: Set[str],
-                                            parent_map_count: int):
+                                            parent_map_count: int,
+                                            verbose: bool):
     """
     Offloads data to GPU, depending on transient / non-transient data it is copied over to GPU in the beginning
     or allocated directly on the GPU. Offloads only maps with N-parent maps and does not copy data back to host.
     """
-    _check_arrays_are_constant(sdfg, duplicated_arrays)
+    writes_to_arrays = _check_arrays_are_constant(sdfg, duplicated_arrays, verbose)
+    constant_arrays = {n for n, w in writes_to_arrays.items() if w <= 0}
+    sdfg.validate()
+    arrays_added_to_flattener = _add_gpu_copies_to_flattener(sdfg)
+    if verbose:
+        print(f"Arrays added as copies to flattener/deflattener nodes: {arrays_added_to_flattener}")
+        print()
+        print()
+    sdfg.validate()
 
+    all_gpu_array_names = gpu_only_arrays.union(duplicated_arrays)
+    name_dict = _find_flattened_names(sdfg, all_gpu_array_names)
 
-    pass
+    _copy_nontransient_arrays_to_gpu(sdfg, name_dict, verbose)
+    sdfg.validate()
+
+    if verbose:
+        print(f"Found corresponding flattened names for the OpenACC GPU data section:")
+        for src_name, dst_name in name_dict.items():
+            print(f"    {src_name} -> {dst_name}")
+        print()
+        print()
+
+    parent_map_counts = dict()
+    print("Finding parent maps for each map entry node in the SDFG:")
+    for node, graph in sdfg.all_nodes_recursive():
+        if isinstance(node, dace.nodes.MapEntry):
+            num_parent_maps = _get_num_parent_map_scopes(sdfg, node, graph)
+            parent_map_counts[(node, graph)] = num_parent_maps
+            if verbose:
+                print(f"    Map {node.label} [{node.map.range}] ({graph.label}) has {num_parent_maps} parent maps.")
+
+    # Create a set of arrays needed on the GPU (used by GPU maps)
+    # And create a set of arrays that are needed on the host (used by CPU maps)
+    # The intersection of this two set needs to be in the constant arrays that are duplicated both on the GPU and CPU
+    gpu_arrays = set()
+    host_arrays = set()
+    constant_arrays = constant_arrays
+
+    # Can't do the analysis reasonably as changes to lower SDFGs are not propagated to the parent SDFG
+    # We will just assume anything used by a map with depth >= parent_map_count can be replaced with their GPU counterpart
+    # We just need to make it flow to bottom
+    """
+    for (map_node, map_state), num_parent_maps in parent_map_counts.items():
+        # If > parent_map_count then it is seq. map inside GPU
+        if num_parent_maps >= parent_map_count:
+            used_data = _get_data_used_by_map(map_entry=map_node, state=map_state)
+            gpu_arrays |= used_data
+        else:
+            used_data = _get_data_used_by_map(map_entry=map_node, state=map_state)
+            host_arrays |= used_data
+
+    if verbose:
+        print(f"GPU arrays used by maps with {parent_map_count} parent maps: {gpu_arrays}")
+        print(f"Host arrays used by maps with {parent_map_count} parent maps: {host_arrays}")
+        print()
+
+    host_dev_arrays = gpu_arrays.intersection(host_arrays)
+    is_subset = host_dev_arrays.issubset(constant_arrays)
+
+    if verbose:
+        print(f"Host-device arrays (intersection of GPU and host arrays): {host_dev_arrays}")
+        print(f"Is the intersection a subset of constant arrays? {is_subset}")
+        print()
+        print()
+
+    if not is_subset:
+        raise Exception(
+            f"GPU offloading without host-device copies is not possible for the SDFG {sdfg.name}.\n"
+            f"Host-device arrays: {host_dev_arrays} are not a subset of constant arrays: {constant_arrays}.\n"
+            f"The arrays that can't be duplicated are: {host_dev_arrays - constant_arrays}."
+        )
+    """
+    for (map_node, map_state), num_parent_maps in parent_map_counts.items():
+        # If > parent_map_count then it is seq. map inside GPU
+        if num_parent_maps >= parent_map_count:
+            used_data = _get_data_used_by_map(map_entry=map_node, state=map_state)
+            gpu_arrays |= used_data
+    if verbose:
+        print(f"GPU arrays used by maps with >={parent_map_count} parent maps: {gpu_arrays}")
+
+    # Replace all arrays used by GPU maps with their GPU counterparts
+    _set_gpu_schedule(parent_map_counts, parent_map_count)
+    _replace_gpu_data_with_gpu_versions(sdfg, gpu_arrays)
+
+    sdfg.validate()

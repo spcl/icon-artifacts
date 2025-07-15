@@ -2,7 +2,9 @@ import dace
 from dace import SDFG
 from stages import common
 from utils.codegen_from_sdfg import Mode
-
+from utils.gpu_offloading_wo_host_dev_copies import (
+    gpu_offloading_wo_host_dev_copies,
+)
 import argparse
 
 
@@ -10,6 +12,8 @@ STAGE_ID = 3
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    gpu_offloading_wo_host_dev_copies(g)
+    g.validate()
     return g
 
 
