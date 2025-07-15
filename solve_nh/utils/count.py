@@ -136,3 +136,24 @@ def count_map_dimensions(g: dace.SDFG):
     for dim, ranges in map_dict_dim.items():
         print(f"Maps that have {dim} dimensions, has {len(ranges)} unique ranges and {sum(ranges.values())} maps in total")
 
+
+def count_uncollapsed_maps(g: dace.SDFG, verbose: bool = False, use_assert: bool = False):
+    """
+    Counts uncollapsed maps in the SDFG.
+    """
+    uncollapsed_maps = 0
+    for node, parent in g.all_nodes_recursive():
+        if isinstance(node, dace.nodes.MapEntry):
+            for succ in parent.successors(node):
+                if isinstance(succ, dace.nodes.MapEntry):
+                        uncollapsed_maps += 1
+
+                        if verbose:
+                            print(f"Uncollapsed map: {node.label} in state {parent.label}")
+
+    if verbose:
+        print(f"Uncollapsed maps: {uncollapsed_maps}")
+    
+    if use_assert and uncollapsed_maps > 0:
+        import warnings
+        warnings.warn(f"Uncollapsed maps: {uncollapsed_maps}")

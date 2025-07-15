@@ -6,6 +6,7 @@ from stages import common
 from utils.codegen_from_sdfg import Mode
 from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
+from utils.count import count_uncollapsed_maps
 
 import argparse
 
@@ -22,6 +23,7 @@ def optimization_action(g: SDFG, velicity_shim: bool):
             MapCollapse
         )
     count_map_dimensions(g)
+    count_uncollapsed_maps(g, verbose=False, use_assert=True)
     return g
 
 
