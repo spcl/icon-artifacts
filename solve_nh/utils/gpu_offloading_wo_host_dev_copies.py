@@ -198,11 +198,14 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
         print("Copying non-transient arrays to GPU:")
     prev_start_block = sdfg.start_block
     first_state = sdfg.add_state(label="copy_in_nontransient", is_start_block=True)
+    sdfg.add_edge(first_state, prev_start_block, dace.sdfg.InterstateEdge())
     # Add copy-outs in the last state
     prev_last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
     assert len(prev_last_blocks) == 1, "Expected only one last state in the SDFG."
     prev_last_block = prev_last_blocks[0]
-    last_state = sdfg.add_state()
+    last_state = sdfg.add_state(label="copy_out_nontransient", is_end_block=True)
+    sdfg.add_edge(prev_last_block, last_state, dace.sdfg.InterstateEdge())
+
     for src_name, dst_name in name_dict.items():
         if dst_name is None:
             continue
@@ -219,7 +222,6 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
             sdfg.add_datadesc(dst_gpu_name, gpu_datadesc)
 
             # Add copy-ins in the flattening state
-            sdfg.add_edge(first_state, prev_start_block, dace.sdfg.InterstateEdge())
             assert isinstance(first_state, dace.SDFGState), "Expected the first state to be an SDFGState."
             has_access_node = {n for n in first_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
             if not has_access_node:
@@ -233,7 +235,6 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
                 dace.memlet.Memlet.from_array(dst_name, gpu_datadesc)
             )
 
-            sdfg.add_edge(prev_last_block, last_state, dace.sdfg.InterstateEdge())
             assert isinstance(last_state, dace.SDFGState), "Expected the last state to be an SDFGState."
             has_access_node = {n for n in last_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
             if not has_access_node:
