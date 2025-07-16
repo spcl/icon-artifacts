@@ -46,7 +46,7 @@ WARNING_FLAGS=(
 )
 
 # Optimization and standard flags
-OPTIMIZATION_FLAGS=(-O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off)
+OPTIMIZATION_FLAGS=(-O0 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off)
 STANDARD_FLAGS=(-std=c++20 -fPIC -fopenmp)
 
 # Combine all
