@@ -179,12 +179,10 @@ class Compiler:
                 else "-Wl,--unresolved-symbols=ignore-all"
             )
             return [dyn_link, dyn_symbols]
-        if mode == Mode.EXEC:
-            return [
-                "-Wl,-undefined,dynamic_lookup"
-                if platform.system() == "Darwin"
-                else "-Wl,--unresolved-symbols=ignore-all"
-            ]
+        elif mode == Mode.EXEC:
+            # Try to see if `velocity` library is available
+            if any(Path(f).exists() for f in ["libvelocity.so", "libvelocity.dylib", "libvelocity.a"]):
+                return ["-L.", "-lvelocity"]
         return []
 
     def compile_object(
