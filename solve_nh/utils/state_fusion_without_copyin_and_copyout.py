@@ -25,8 +25,6 @@ def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG):
                         sf.setup_match(cfg, cfg.cfg_id, -1, candidate, 0, override=True)
                         if sf.can_be_applied(cfg, 0, sd):
                             sf.apply(cfg, sd)
-                            applied += 1
-                            counter += 1
                             skip_nodes.add(u)
                             skip_nodes.add(v)
                     else:

@@ -1,7 +1,8 @@
 import dace
 import os
-from typing import Dict, Set, Tuple
+from typing import Callable, Dict, Set, Tuple
 from dace.codegen.common import CodeBlock
+from dace.sdfg import is_devicelevel_gpu
 from dace.sdfg.state import MultiConnectorEdge
 
 openacc_data_names = """
@@ -323,11 +324,20 @@ def _get_data_used_by_map(map_entry: dace.nodes.MapEntry, state: dace.SDFGState)
             datadesc = state.sdfg.arrays[edge.data.data]
             if isinstance(datadesc, dace.data.Array):
                 data_used.add(edge.data.data)
+    # All access nodes within the map entry that is not scalar
+    nodes = state.all_nodes_between(map_entry, state.exit_node(map_entry))
+    for node in nodes:
+        if isinstance(node, dace.nodes.AccessNode):
+            if node.data in state.sdfg.arrays:
+                datadesc = state.sdfg.arrays[node.data]
+                if isinstance(datadesc, dace.data.Array) and not isinstance(datadesc, dace.data.Scalar):
+                    data_used.add(node.data)
     return data_used
 
 
 def _set_gpu_schedule(parent_map_counts: Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], int],
-                      parent_map_count: int):
+                      parent_map_count: int,
+                      additional_condition: Callable):
     """
     Sets the GPU schedule for maps with more than parent_map_count parent maps.
     """
@@ -337,7 +347,32 @@ def _set_gpu_schedule(parent_map_counts: Dict[Tuple[dace.nodes.MapEntry, dace.SD
         elif num_parent_maps > parent_map_count:
             map_node.map.schedule = dace.ScheduleType.Sequential
         else:
-            map_node.map.schedule = dace.ScheduleType.Default
+            assert num_parent_maps < parent_map_count
+            map_node.map.schedule = dace.ScheduleType.Sequential
+        if additional_condition(map_node, map_state):
+            map_node.map.schedule = dace.ScheduleType.GPU_Device
+
+def _is_blk_map(map_node: dace.nodes.MapEntry, map_state: dace.SDFGState) -> bool:
+    """
+    Checks if the map node is a block map.
+    """
+    _ranges = map_node.map.range
+    range_list = list()
+    for (b,e,s) in _ranges:
+        range_list.append(str(b))
+        range_list.append(str(e))
+        range_list.append(str(s))
+    has_startblk = any("startblk" in expr_str for expr_str in range_list)
+    has_endblk = any("endblk" in expr_str for expr_str in range_list)
+    has_bdy_mflx_e_dim = any("bdy_mflx_e_dim" in expr_str for expr_str in range_list)
+    # All seq. blk maps have only i_startblk and i_endblk as free params
+    if (has_startblk and has_endblk and len(map_node.map.range.free_symbols) == 2) or has_bdy_mflx_e_dim:
+        return True
+    return False
+
+def _additional_offload_condition(map_node: dace.nodes.MapEntry, map_state: dace.SDFGState) -> bool:
+    return not _is_blk_map(map_node, map_state)
+
 
 def _replace_edge_data_with_gpu_data(
         root_sdfg: dace.SDFG,
@@ -528,6 +563,177 @@ def _replace_gpu_data_with_gpu_versions(
     for inner_sdfg in inner_sdfgs:
         _replace_gpu_data_with_gpu_versions(inner_sdfg, gpu_arrays, True)
 
+from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes
+
+def _repl(s: str, repldict):
+    for k,v in repldict.items():
+        s = s.replace(k, v)
+    return s
+
+def _state_in_gpu_scope(root_sdfg: dace.SDFG, state: dace.SDFGState):
+    if state.sdfg.parent_nsdfg_node is None:
+        return False
+
+    parent_nsdfg_node = state.sdfg.parent_nsdfg_node
+    parent_graph = None
+    for n, g in root_sdfg.all_nodes_recursive():
+        if n == parent_nsdfg_node:
+            parent_graph = g
+            break
+    assert parent_graph is not None, "Expected to find parent graph for the state."
+    assert isinstance(parent_graph, dace.SDFGState), "Expected parent graph to be an SDFGState."
+    parent_state : dace.SDFGState = parent_graph
+    scope_dict = parent_state.scope_dict()
+
+    cur_node = parent_nsdfg_node
+    parent_map_schedules = set()
+    while scope_dict[cur_node] is not None:
+        if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
+            parent_map_schedules.add(scope_dict[cur_node].map.schedule)
+        cur_node = scope_dict[cur_node]
+
+    if dace.ScheduleType.GPU_Device in parent_map_schedules:
+        return True
+    return False
+
+def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Set[str]):
+    for edge in sdfg.all_interstate_edges():
+        src: dace.ControlFlowRegion = edge.src
+        dst: dace.ControlFlowRegion = edge.dst
+        assert src.sdfg == dst.sdfg, "Expected interstate edge to be within the same SDFG."
+        parent_nsdfg_node = src.sdfg.parent_nsdfg_node
+        state = next(iter(src.sdfg.all_states()))
+        is_gpu_code = _state_in_gpu_scope(root_sdfg=root_sdfg, state=state)
+
+        if parent_nsdfg_node is None:
+            continue
+
+        parent_nsdfg_node_state = None
+        parent_nsdfg_node_sdfg = None
+        for n, g in root_sdfg.all_nodes_recursive():
+            if n == parent_nsdfg_node:
+                parent_nsdfg_node_state = g
+                parent_nsdfg_node_sdfg = g.sdfg
+                break
+        assert parent_nsdfg_node_state is not None, "Expected to find parent NSDFG node state."
+        assert isinstance(parent_nsdfg_node_state, dace.SDFGState), "Expected parent NSDFG node state to be an SDFGState."
+        assert parent_nsdfg_node_sdfg is not None, "Expected to find parent NSDFG node SDFG."
+
+        if edge.data is not None:
+            free_syms = edge.data.free_symbols
+
+            if any(("gpu_" in free_sym) for free_sym in free_syms):
+                #print(free_syms)
+                if not is_gpu_code:
+                    replacements = dict()
+                    # Create replacements
+                    for free_sym in free_syms:
+                        if "gpu_" in free_sym:
+                            replacements[free_sym] = free_sym.replace("gpu_", "")
+                            assert free_sym.replace('gpu_', '').split("_m_")[-1] in const_arrays, \
+                                f"Expected {free_sym.replace('gpu_', '').split("_m_")[-1]} to be in constant arrays\nConst arrays: {const_arrays}."
+                            # replace this in the interstate edge
+                            _insert_missing_data_through_parent_scopes(
+                                {free_sym.replace("gpu_", "")}, parent_nsdfg_node, parent_nsdfg_node_state, parent_nsdfg_node_sdfg
+                            )
+
+                    if replacements != dict():
+                        print(f"Found GPU access on interstate edge: replacing {replacements} in interstate edge {edge} ({src.sdfg.label}).")
+                        print(f"Arrays are constant and can be duplicated on the Host and the GPU")
+
+                    new_assignments = dict()
+                    for k, v in edge.data.assignments.items():
+                        assert isinstance(k, str)
+                        assert isinstance(v, (str, CodeBlock))
+                        if isinstance(v, CodeBlock):
+                            new_assignments[_repl(k, replacements)] = CodeBlock(_repl(v.as_string, replacements))
+                        else:
+                            new_assignments[_repl(k, replacements)] = _repl(v, replacements)
+                    edge.data.assignments = new_assignments
+
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                _add_interstate_data(root_sdfg, node.sdfg, const_arrays)
+
+def _transify_kernel_scalars(sdfg: dace.SDFG):
+    kernel_id = 0
+    for node, graph in sdfg.all_nodes_recursive():
+        if isinstance(node, dace.nodes.MapEntry):
+            # If the map is a kernel map, then we need to transify the scalars
+            if node.map.schedule == dace.ScheduleType.GPU_Device:
+                out_data = {e.data.data for e in graph.out_edges(node) if e.data is not None and e.data.data is not None}
+                inner_nodes = graph.all_nodes_between(node, graph.exit_node(node))
+                transifies = any(isinstance(inner_node, dace.nodes.AccessNode) and inner_node.data not in out_data and not graph.sdfg.arrays[inner_node.data].transient and isinstance(graph.sdfg.arrays[inner_node.data], dace.data.Scalar) for inner_node in inner_nodes)
+                if transifies:
+                    kernel_id += 1
+                name_mapping = dict()
+                for inner_node in inner_nodes:
+                    if (isinstance(inner_node, dace.nodes.AccessNode) and
+                         inner_node.data not in out_data and
+                         not graph.sdfg.arrays[inner_node.data].transient and
+                         isinstance(graph.sdfg.arrays[inner_node.data], dace.data.Scalar)):
+                            # If the access node is an output of the map, then we need to transify it
+                            new_scalar_desc = copy.deepcopy(graph.sdfg.arrays[inner_node.data])
+                            new_scalar_desc.transient = True
+                            new_scalar_desc.storage = dace.dtypes.StorageType.Register
+                            graph.sdfg.add_datadesc(f"{inner_node.data}_{kernel_id}", new_scalar_desc)
+                            name_mapping[inner_node.data] = f"{inner_node.data}_{kernel_id}"
+                for inner_node in inner_nodes:
+                    if isinstance(inner_node, dace.nodes.AccessNode) and inner_node.data in name_mapping:
+                        inner_node.data = name_mapping[inner_node.data]
+                for edge in graph.all_edges(*inner_nodes):
+                    if edge.data is not None and edge.data.data is not None:
+                        if edge.data.data in name_mapping:
+                            edge.data.data = name_mapping[edge.data.data]
+
+def _clean_redundant_pass_through_access_node(sdfg: dace.SDFG):
+    tmp_id = 0
+    for node, graph in sdfg.all_nodes_recursive():
+        if isinstance(node, dace.nodes.AccessNode):
+            assert node in graph.nodes()
+            assert isinstance(graph, dace.SDFGState), "Expected graph to be an SDFGState."
+            if graph.in_degree(node) == 1 and graph.out_degree(node) == 1:
+                ie = graph.in_edges(node)[0]
+                oe = graph.out_edges(node)[0]
+                entry = graph.scope_dict()[node]
+                if entry is None or not isinstance(entry, dace.nodes.MapEntry):
+                    continue
+                if (ie.data is not None and oe.data is not None and
+                    ie.data.subset == oe.data.subset and oe.data.data == ie.data.data and
+                    isinstance(graph.sdfg.arrays[node.data], dace.data.Array) and
+                    not graph.sdfg.arrays[node.data].transient and
+                    not isinstance(graph.sdfg.arrays[node.data], dace.data.Scalar)):
+                    assign_tasklet = graph.add_tasklet(
+                        f"assign_{node.data}",
+                        {"_in"},
+                        {"_out"},
+                        f"_out = _in;",
+                        language=dace.dtypes.Language.CPP
+                    )
+                    #raise Exception(ie, oe)
+                    scalar_name, scalar = graph.sdfg.add_scalar(
+                        f"tmp_{tmp_id}",
+                        graph.sdfg.arrays[node.data].dtype,
+                        transient=True,
+                        storage=dace.dtypes.StorageType.Register
+                    )
+                    old_arr_name = node.data
+                    # Use scalar for internal tasklet
+                    node.data = f"tmp_{tmp_id}"
+                    old_memlet_data = copy.deepcopy(oe.data)
+                    oe.data = dace.Memlet.from_array(node.data, scalar)
+                    ie.data = dace.Memlet.from_array(node.data, scalar)
+                    graph.add_edge(node, None, assign_tasklet, "_in", dace.Memlet.from_array(node.data, scalar))
+                    map_entry = graph.scope_dict()[node]
+                    assert isinstance(map_entry, dace.nodes.MapEntry), f"Expected map entry node {map_entry}."
+                    map_exit = graph.exit_node(map_entry)
+                    graph.add_edge(assign_tasklet, "_out", map_exit, "IN_" + old_arr_name, copy.deepcopy(old_memlet_data))
+                    an = graph.add_access(old_arr_name)
+                    graph.add_edge(map_exit, "OUT_" + old_arr_name, an, None, dace.Memlet.from_array(old_arr_name, graph.sdfg.arrays[old_arr_name]))
+                    map_exit.add_in_connector("IN_" + old_arr_name)
+                    map_exit.add_out_connector("OUT_" + old_arr_name)
+                    tmp_id += 1
 
 
 def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
@@ -545,8 +751,6 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
 
     all_gpu_array_names = gpu_only_arrays.union(duplicated_arrays)
     name_dict = _find_flattened_names(sdfg, all_gpu_array_names)
-
-
 
     _copy_nontransient_arrays_to_gpu(sdfg, name_dict, verbose)
     sdfg.validate()
@@ -626,7 +830,19 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     sdfg.validate()
 
     # Replace all arrays used by GPU maps with their GPU counterparts
-    _set_gpu_schedule(parent_map_counts, parent_map_count)
-    _replace_gpu_data_with_gpu_versions(sdfg, gpu_arrays)
+    _set_gpu_schedule(parent_map_counts, parent_map_count, _additional_offload_condition)
+    _replace_gpu_data_with_gpu_versions(sdfg, gpu_arrays, False)
+
+    # If we have GPU access on interstate edge on CPU scope, then convert to the CPU version, add the array, ensure it is constant data
+    _add_interstate_data(sdfg, sdfg, constant_arrays)
+
+    # Writing to non-transient scalar within a kernel is not allowed, try to fix that
+    _transify_kernel_scalars(sdfg)
+    # If subset1 -> non-transient-an -> subset2 where subset1 == subset2 and of size 1
+    # then remove the access node and replace it with an assignment tasklet and transient scalar
+    # to avoid writing to data within the kernel
+    _clean_redundant_pass_through_access_node(sdfg)
+
+    # gpu___CG_p_nh_prog_nnew__m_w access has a dependency where layer n+1 depends on n
 
     sdfg.validate()
