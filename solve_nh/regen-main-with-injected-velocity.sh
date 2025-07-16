@@ -175,6 +175,9 @@ patch_sources() {
 
 # Stage 3: Compile all parts into a single executable
 compile_all() {
+  # The stage id is passed as the first argument to this function
+  local stage_id="$1"
+
   printf "%s" "\n--- Stage 3: Compiling ---"
 
   echo "Compiling velocity library..."
@@ -189,14 +192,14 @@ compile_all() {
   ar rcs libvelocity.a velocity_*.o reductions.o timer.o
   echo "libvelocity.a created."
 
-  echo "Compiling DaCe/SDFG parts..."
-  python -m stages.stage_0 --compile --mode=static
+  echo "Compiling DaCe/SDFG parts (using stage: ${stage_id})..."
+  python -m "stages.stage_${stage_id}" --compile --mode=static
 
   echo "Compiling final executable..."
   # Link all parts together into the final executable
   $CC main.cc velocity_*.o reductions.o timer.o solve_nh_parts.o \
     -Iinclude \
-    -Icodegen/stage0 \
+    -I"codegen/stage${stage_id}" \
     -I"$WORKSPACE_DIR" \
     -I"$DACEROOT/dace/runtime/include" \
     "${COMPILER_FLAGS[@]}" -o verify_solve_nh_parts
@@ -207,9 +210,12 @@ compile_all() {
 
 # --- Execution ---
 main() {
+  # Use the first command-line argument as the stage id, defaulting to "0".
+  local stage_to_run=${1:-0}
+
   fetch_sources
   patch_sources
-  compile_all
+  compile_all "$stage_to_run"
   printf "%s" "\nScript finished successfully."
 }
 
