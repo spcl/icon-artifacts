@@ -353,7 +353,7 @@ class Compiler:
             + gen_sources
             + [f"-I{i}" for i in all_includes]
             + self.get_cuda_base_flags()
-            + self._get_cpp_standard_flags(stage)
+            + self._get_cpp_standard_flags()
             + self.get_gpu_executable_linker_flags()
             + ["-o", gpu_output_name]
         )
