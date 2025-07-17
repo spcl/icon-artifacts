@@ -275,6 +275,14 @@ class Compiler:
     def _get_cuda_src_file_flag(self) -> str:
         return "-x=cu"
 
+    def get_velocity_linker_flags(self, stage: int) -> list[str]:
+        # Search for existence of velocity library files intended for this stage
+        if any(Path(f).exists() for f in [
+            f"libvelocity_{stage}.so", f"libvelocity_{stage}.dylib", f"libvelocity_{stage}.a"]):
+            return ["-L.", f"-lvelocity_{stage}", "-Wl,-rpath,."]
+        else:
+            return []
+
     def get_linker_flags(self, mode: Mode) -> list[str]:
         if mode == Mode.SHARED:
             dyn_link = "-dynamiclib" if platform.system() == "Darwin" else "-shared"
@@ -284,14 +292,10 @@ class Compiler:
                 else "-Wl,--unresolved-symbols=ignore-all"
             )
             return [dyn_link, dyn_symbols]
-        elif mode == Mode.EXEC:
-            # Try to see if `velocity` library is available
-            if any(Path(f).exists() for f in ["libvelocity.so", "libvelocity.dylib", "libvelocity.a"]):
-                return ["-L.", "-lvelocity"]
         return []
 
     def get_gpu_executable_linker_flags(self) -> list[str]:
-        return ["-shared", "-L.", "-lvelocity"]
+        return ["-shared"]
 
     def compile_object(
         self, sources: list[Path], includes: list[Path], stage = 0,
@@ -316,6 +320,7 @@ class Compiler:
     def link_shared_library(self, static_lib: str, lib_name: str, stage: int):
         flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
         flags.extend(self.get_linker_flags(Mode.SHARED))
+        flags.extend(self.get_velocity_linker_flags(stage))
         cmd = ([self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, static_lib]
                + flags
                + self._get_cpp_standard_flags()
@@ -329,6 +334,7 @@ class Compiler:
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
         flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
         flags.extend(self.get_linker_flags(Mode.EXEC))
+        flags.extend(self.get_velocity_linker_flags(stage))
         cmd = (
             [self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, str(main_src), static_lib]
             + [f"-I{i}" for i in all_includes]
@@ -343,7 +349,7 @@ class Compiler:
     ):
         # sdfg_srcs, sdfg_cuda_srcs, sdfg_includes, EXEC_FILE, stage
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
-        assert stage >= 3
+        assert stage >= GPU_STAGE_BEGINS, f"GPU stage compilation requires stage >= {GPU_STAGE_BEGINS}"
         gen_sources = []
         for s in [main_src] + host_sources:
             gen_sources.append(self._get_cuda_src_file_flag())
@@ -355,6 +361,7 @@ class Compiler:
             + self.get_cuda_base_flags()
             + self._get_cpp_standard_flags()
             + self.get_gpu_executable_linker_flags()
+            + self.get_velocity_linker_flags(stage)
             + ["-o", gpu_output_name]
         )
         _run_command([str(c) for c in cmd if c])
@@ -437,7 +444,7 @@ def consolidate_generated_code(
     source_path.write_text(combined_source)
 
     # Needs to be run before formatting
-    if stage >= 3:
+    if stage >= GPU_STAGE_BEGINS:
         all_cuda_sources = {f.stem[len("solve_nh_") :]: f.read_text() for f in sdfg_cuda_srcs}
 
         combined_cuda_source = "\n".join(
@@ -539,7 +546,7 @@ def compile_generated_code(
 
     if mode == Mode.STATIC or mode == Mode.SHARED or mode == Mode.EXEC:
         if stage >= GPU_STAGE_BEGINS:
-            print("Skipping static library compilation for CUDA stage 3 and above")
+            print(f"Skipping static library compilation for CUDA stage {GPU_STAGE_BEGINS} and above")
         else:
             compiler.compile_object(sdfg_srcs, sdfg_includes, stage)
             # Derive the object file names from the source files
@@ -549,7 +556,7 @@ def compile_generated_code(
 
     if mode == Mode.SHARED:
         if stage >= GPU_STAGE_BEGINS:
-            print("Skipping static library compilation for CUDA stage 3 and above")
+            print(f"Skipping static library compilation for CUDA stage {GPU_STAGE_BEGINS} and above")
         else:
             compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE, stage)
             print(f"Successfully created shared library: {SHARED_LIB_FILE}")
