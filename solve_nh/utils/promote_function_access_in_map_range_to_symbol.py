@@ -59,6 +59,9 @@ def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
                 )
                 sym_id += 1
 
+            # Avoid adding symbols to an edge that already has assignments
+            state.parent_graph.add_state_before(state)
+
             # Get first edge. Since we have added an iedge, #(incoming edges) must be > 0
             assert len(state.parent_graph.in_edges(state)) > 0
             iedge = state.parent_graph.in_edges(state)[0]
