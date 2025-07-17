@@ -5030,7 +5030,7 @@ void __program_solve_nh_corrector_post_internal(
   }
 }
 
-DACE_EXPORTED void __program_solve_nh_corrector_post(
+ void __program_solve_nh_corrector_post(
   solve_nh_corrector_post_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -5060,7 +5060,7 @@ DACE_EXPORTED void __program_solve_nh_corrector_post(
     z_rho_tavg_m1, z_theta1, z_theta2, z_theta_tavg, z_theta_tavg_m1, z_theta_v_pr_mc, z_theta_v_pr_mc_m1, z_w_backtraj, zf);
 }
 
-DACE_EXPORTED solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_post(
+ solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_post(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -5976,7 +5976,7 @@ DACE_EXPORTED solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_po
   return __state;
 }
 
-DACE_EXPORTED int __dace_exit_solve_nh_corrector_post(solve_nh_corrector_post_state_t *__state) {
+ int __dace_exit_solve_nh_corrector_post(solve_nh_corrector_post_state_t *__state) {
   int __err = 0;
   delete __state;
   return __err;
@@ -9172,7 +9172,7 @@ void __program_solve_nh_corrector_pre_internal(
   }
 }
 
-DACE_EXPORTED void __program_solve_nh_corrector_pre(
+ void __program_solve_nh_corrector_pre(
   solve_nh_corrector_pre_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -9202,7 +9202,7 @@ DACE_EXPORTED void __program_solve_nh_corrector_pre(
     z_rho_tavg_m1, z_theta1, z_theta2, z_theta_tavg, z_theta_tavg_m1, z_theta_v_pr_mc, z_theta_v_pr_mc_m1, z_w_backtraj, zf);
 }
 
-DACE_EXPORTED solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre(
+ solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -10118,7 +10118,7 @@ DACE_EXPORTED solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre
   return __state;
 }
 
-DACE_EXPORTED int __dace_exit_solve_nh_corrector_pre(solve_nh_corrector_pre_state_t *__state) {
+ int __dace_exit_solve_nh_corrector_pre(solve_nh_corrector_pre_state_t *__state) {
   int __err = 0;
   delete __state;
   return __err;
@@ -15205,7 +15205,7 @@ void __program_solve_nh_predictor_post_internal(
   }
 }
 
-DACE_EXPORTED void __program_solve_nh_predictor_post(
+ void __program_solve_nh_predictor_post(
   solve_nh_predictor_post_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -15235,7 +15235,7 @@ DACE_EXPORTED void __program_solve_nh_predictor_post(
     z_rho_tavg_m1, z_theta1, z_theta2, z_theta_tavg, z_theta_tavg_m1, z_theta_v_pr_mc, z_theta_v_pr_mc_m1, z_w_backtraj, zf);
 }
 
-DACE_EXPORTED solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(
+ solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -16151,7 +16151,7 @@ DACE_EXPORTED solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_po
   return __state;
 }
 
-DACE_EXPORTED int __dace_exit_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state) {
+ int __dace_exit_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state) {
   int __err = 0;
   delete __state;
   return __err;
@@ -23675,7 +23675,7 @@ void __program_solve_nh_predictor_pre_internal(
   }
 }
 
-DACE_EXPORTED void __program_solve_nh_predictor_pre(
+ void __program_solve_nh_predictor_pre(
   solve_nh_predictor_pre_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -23705,7 +23705,7 @@ DACE_EXPORTED void __program_solve_nh_predictor_pre(
     z_rho_tavg_m1, z_theta1, z_theta2, z_theta_tavg, z_theta_tavg_m1, z_theta_v_pr_mc, z_theta_v_pr_mc_m1, z_w_backtraj, zf);
 }
 
-DACE_EXPORTED solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre(
+ solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -24621,7 +24621,7 @@ DACE_EXPORTED solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre
   return __state;
 }
 
-DACE_EXPORTED int __dace_exit_solve_nh_predictor_pre(solve_nh_predictor_pre_state_t *__state) {
+ int __dace_exit_solve_nh_predictor_pre(solve_nh_predictor_pre_state_t *__state) {
   int __err = 0;
   delete __state;
   return __err;

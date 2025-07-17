@@ -252,7 +252,7 @@ class Compiler:
         return (
             f"{errlimit_flag} -Xcompiler=-g -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter "
             f"-Xcompiler=-Wno-unused-variable -Xcompiler=-Wno-unused-function -Xcompiler=-Wno-unused-but-set-variable "
-            f"-Xcompiler=-Wno-unused-but-set-parameter -Xcompiler=-Wno-sign-compare {clang_only_warnings}"
+            f"-Xcompiler=-Wno-unused-but-set-parameter -Xcompiler=-Wno-sign-compare -Wno-deprecated-declarations {clang_only_warnings}"
         ).split()
 
     def _get_optimization_flags(self) -> list[str]:
@@ -265,7 +265,7 @@ class Compiler:
         return "-fPIC -fopenmp".split()
 
     def _get_cuda_standard_flags(self) -> list[str]:
-        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr".split()
+        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC'".split()
 
     def _get_cpp_standard_flags(self, stage: int) -> list[str]:
         return ["-std=c++23"] if stage < 3 else ["-std=c++20"]
@@ -276,7 +276,7 @@ class Compiler:
     def get_cuda_base_flags(self) -> list[str]:
         return self.cuda_diagnosis_flags + self.cuda_optimization_flags + self.cuda_standard_flags
 
-    def _get_cuda_src_file_flags(self) -> str:
+    def _get_cuda_src_file_flag(self) -> str:
         return "-x=cu"
 
     def get_linker_flags(self, mode: Mode) -> list[str]:
@@ -301,21 +301,23 @@ class Compiler:
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
         if stage >= 3:
             cmd = (
-                [self.nvcc, self._get_cuda_src_file_flags()]
-                + [str(s) for s in sources]
+                [self.nvcc, "-c"]
+                + [self._get_cuda_src_file_flag() + " " + str(s) for s in sources]
                 + [f"-I{i}" for i in all_includes]
                 + self.get_cuda_base_flags()
                 + self._get_cpp_standard_flags(stage)
                 + ["-o", output_name]
             )
+            _run_command([str(c) for c in cmd if c])
             cmd = (
-                [self.nvcc, self._get_cuda_src_file_flags()]
-                + [str(s) for s in gpu_sources]
+                [self.nvcc, "-c"]
+                + [self._get_cuda_src_file_flag() + " " + str(s) for s in gpu_sources]
                 + [f"-I{i}" for i in all_includes]
                 + self.get_cuda_base_flags()
                 + self._get_cpp_standard_flags(stage)
                 + ["-o", gpu_output_name]
             )
+            _run_command([str(c) for c in cmd if c])
         else:
             cmd = (
                 [self.cc, "-c"]
@@ -325,10 +327,12 @@ class Compiler:
                 + self._get_cpp_standard_flags(stage)
                 + ["-o", output_name]
             )
-        _run_command([str(c) for c in cmd if c])
+            _run_command([str(c) for c in cmd if c])
 
-    def archive_static_library(self, object_file: str, lib_name: str):
+    def archive_static_library(self, object_file: str, lib_name: str, cuda_object_file: str | None = None):
         cmd = ["ar", "rcs", lib_name, object_file]
+        if cuda_object_file:
+            cmd.append(cuda_object_file)
         _run_command(cmd)
 
     def link_shared_library(self, static_lib: str, lib_name: str, stage: int):
@@ -429,24 +433,30 @@ def consolidate_generated_code(
         ("DACE_EXPORTED", ""),
     ]
 
+    # Format again after replacements
+    _run_command(["clang-format", "-i", str(header_path), str(source_path)])
+    print(f"Consolidated generated code into {header_path} and {source_path}")
+
     src_content = source_path.read_text()
     for old, new in replacements:
         src_content = src_content.replace(old, new)
     source_path.write_text(src_content)
 
-    # Format again after replacements
-    _run_command(["clang-format", "-i", str(header_path), str(source_path)])
+    header_content = header_path.read_text()
+    for old, new in replacements:
+        header_content = header_content.replace(old, new)
+    header_path.write_text(header_content)
 
     if stage >= 3:
-        all_headers = {
+        all_cuda_headers = {
             f.stem[len("solve_nh_") :]: f.read_text()
             for p in sdfg_includes
             for f in p.glob("solve_nh_*.h")
         }
         all_cuda_sources = {f.stem[len("solve_nh_") :]: f.read_text() for f in sdfg_cuda_srcs}
 
-        combined_header = "\n".join(
-            wrap_gpu_namespace(name, content).strip() for name, content in all_headers.items()
+        combined_cuda_header = "\n".join(
+            wrap_gpu_namespace(name, content).strip() for name, content in all_cuda_headers.items()
         ).replace("__restrict__", "")
         combined_cuda_source = "\n".join(
             wrap_gpu_namespace(name, content).strip() for name, content in all_cuda_sources.items()
@@ -455,11 +465,11 @@ def consolidate_generated_code(
         store.mkdir(parents=True, exist_ok=True)
         cuda_header_path = store / CONSOLIDATED_CUDA_HEADER
         cuda_source_path = store / CONSOLIDATED_CUDA_SOURCE
-        cuda_header_path.write_text(combined_header)
+        cuda_header_path.write_text(combined_cuda_header)
         cuda_source_path.write_text(combined_cuda_source)
 
         # Format the code once before modifications
-        _run_command(["clang-format", "-i", str(header_path), str(cuda_source_path)])
+        _run_command(["clang-format", "-i", str(cuda_header_path), str(cuda_source_path)])
 
         # Apply specific replacements
         replacements = [
@@ -490,15 +500,19 @@ def consolidate_generated_code(
             ("DACE_EXPORTED", ""),
         ]
 
+        # Format again after replacements
+        _run_command(["clang-format", "-i", str(cuda_header_path), str(cuda_source_path)])
+
+        cuda_header_content = cuda_header_path.read_text()
+        for old, new in replacements:
+            cuda_header_content = cuda_header_content.replace(old, new)
+        cuda_header_path.write_text(cuda_header_content)
+
         cuda_src_content = cuda_source_path.read_text()
         for old, new in replacements:
             cuda_src_content = cuda_src_content.replace(old, new)
         cuda_source_path.write_text(cuda_src_content)
 
-        # Format again after replacements
-        _run_command(["clang-format", "-i", str(cuda_header_path), str(cuda_source_path)])
-
-    print(f"Consolidated generated code into {cuda_header_path} and {source_path}")
 
 def compile_generated_code(
     sdfg_includes: list[Path], sdfg_srcs: list[Path], mode: Mode,
@@ -537,10 +551,10 @@ def compile_generated_code(
         if stage >= 3:
             # TODO: write the CUDA main file
             compiler.link_executable(
-                STANDALONE_CUDA_MAIN_SRC, STATIC_LIB_FILE, sdfg_includes, EXEC_FILE
+                STANDALONE_CUDA_MAIN_SRC, " ".join([OBJ_FILE, CUDA_OBJ_FILE]), sdfg_includes, EXEC_FILE, stage
             )
         else:
             compiler.link_executable(
-                STANDALONE_MAIN_SRC, STATIC_LIB_FILE, sdfg_includes, EXEC_FILE
+                STANDALONE_MAIN_SRC, STATIC_LIB_FILE, sdfg_includes, EXEC_FILE, stage
             )
         print(f"Successfully created executable: {EXEC_FILE}")
