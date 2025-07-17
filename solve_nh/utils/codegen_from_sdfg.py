@@ -195,7 +195,7 @@ CONSOLIDATED_CUDA_HEADER = "solve_nh_parts.cuh"
 CONSOLIDATED_CUDA_SOURCE = "solve_nh_parts.cu"
 STANDALONE_INCLUDE_DIR = Path("include/")
 STANDALONE_MAIN_SRC = Path("main.cc")
-STANDALONE_CUDA_MAIN_SRC = Path("main.cu")
+STANDALONE_CUDA_MAIN_SRC = Path("main.cc")
 
 
 
@@ -301,8 +301,9 @@ class Compiler:
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
         if stage >= 3:
             cmd = (
-                [self.nvcc, "-c"]
+                [self.nvcc,]
                 + [self._get_cuda_src_file_flag() + " " + str(s) for s in sources]
+                + ["-c"]
                 + [f"-I{i}" for i in all_includes]
                 + self.get_cuda_base_flags()
                 + self._get_cpp_standard_flags(stage)
@@ -310,8 +311,9 @@ class Compiler:
             )
             _run_command([str(c) for c in cmd if c])
             cmd = (
-                [self.nvcc, "-c"]
+                [self.nvcc]
                 + [self._get_cuda_src_file_flag() + " " + str(s) for s in gpu_sources]
+                + ["-c"]
                 + [f"-I{i}" for i in all_includes]
                 + self.get_cuda_base_flags()
                 + self._get_cpp_standard_flags(stage)
