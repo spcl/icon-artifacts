@@ -2533,8 +2533,7 @@ END MODULE f90_glue_corrector_post
 MODULE corrector_post
   IMPLICIT NONE
   INTERFACE serialize
-    MODULE PROCEDURE :: W_string
-    MODULE PROCEDURE W_t_grid_domain_decomp_info, W_t_int_state, W_t_tangent_vectors, W_t_grid_cells, W_t_grid_edges, W_t_grid_vertices, W_t_patch, W_t_nh_prog, W_t_nh_diag, W_t_nh_ref, W_t_nh_metrics, W_t_nh_state, W_t_prepare_adv, W_logical_R_1, W_integer__1_R_1, W_integer__2_R_1, W_integer__4_R_1, W_integer__8_R_1, W_real__4_R_1, W_real__8_R_1, W_logical_R_2, W_integer__1_R_2, W_integer__2_R_2, W_integer__4_R_2, W_integer__8_R_2, W_real__4_R_2, W_real__8_R_2, W_logical_R_3, W_integer__1_R_3, W_integer__2_R_3, W_integer__4_R_3, W_integer__8_R_3, W_real__4_R_3, W_real__8_R_3, W_logical_R_4, W_integer__1_R_4, W_integer__2_R_4, W_integer__4_R_4, W_integer__8_R_4, W_real__4_R_4, W_real__8_R_4, W_dt_t_tangent_vectors_R_3, W_logical, W_integer1, W_integer2, W_integer4, W_integer8, W_real4, W_real8
+    MODULE PROCEDURE W_dt_t_tangent_vectors_R_3, W_integer1, W_integer2, W_integer4, W_integer8, W_integer__1_R_1, W_integer__1_R_2, W_integer__1_R_3, W_integer__1_R_4, W_integer__2_R_1, W_integer__2_R_2, W_integer__2_R_3, W_integer__2_R_4, W_integer__4_R_1, W_integer__4_R_2, W_integer__4_R_3, W_integer__4_R_4, W_integer__8_R_1, W_integer__8_R_2, W_integer__8_R_3, W_integer__8_R_4, W_logical, W_logical_R_1, W_logical_R_2, W_logical_R_3, W_logical_R_4, W_real4, W_real8, W_real__4_R_1, W_real__4_R_2, W_real__4_R_3, W_real__4_R_4, W_real__8_R_1, W_real__8_R_2, W_real__8_R_3, W_real__8_R_4, W_string, W_t_grid_cells, W_t_grid_domain_decomp_info, W_t_grid_edges, W_t_grid_vertices, W_t_int_state, W_t_nh_diag, W_t_nh_metrics, W_t_nh_prog, W_t_nh_ref, W_t_nh_state, W_t_patch, W_t_prepare_adv, W_t_tangent_vectors
   END INTERFACE serialize
   INTEGER :: generation = 0
   CONTAINS
