@@ -79,6 +79,29 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         allocation_names_to_comment_out=allocation_names_to_comment_out,
         use_openacc_stream=False,
       )
+  elif stage == 8:
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=False,
+        main_name="main_gpu.cu",
+        stage=stage,
+        debuginfo=False,
+        allocation_names_to_comment_out=allocation_names_to_comment_out,
+        use_openacc_stream=False,
+      )
+    compile_if_propagated_sdfgs(
+        sdfgs, gpu=True,
+        release=release,
+        generate_code=True,
+        lib=True,
+        main_name=None,
+        stage=stage,
+        debuginfo=False,
+        allocation_names_to_comment_out=allocation_names_to_comment_out,
+        use_openacc_stream=False,
+      )
   elif stage > 5:
     compile_if_propagated_sdfgs(
         sdfgs, gpu=True,
@@ -130,7 +153,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
   opt_suffix = '_release' if release else '_debug'
   _build_for_integration = os.getenv('_BUILD_LIB_FOR_SOLVE_NH', '0').lower() in ('1', 'true', 'yes')
   integration_suffix = '_solve_nh_integration' if _build_for_integration else '_standalone'
-  if stage == 1:
+  if stage == 1 or stage == 8:
       binpath = Path('velocity_gpu')
       assert binpath.exists()
       binpath = binpath.rename(f"{binpath.name}.stage{stage}{integration_suffix}{opt_suffix}")
