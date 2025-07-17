@@ -27,6 +27,7 @@ from utils.promote_function_access_in_map_range_to_symbol import (
 )
 from utils.loop_locality import make_array_loop_local
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
+from utils.post_stage1_fixes import post_stage1_fixes
 
 STAGE_ID = 1
 
@@ -72,22 +73,30 @@ def optimization_action(g: SDFG):
     g.apply_transformations_repeated(
         LoopToMap, permissive=True, options={"ballin": True}
     )
+
     # Map ranges have expressions such nflatlev(jg - 1) as Sympy expresses array accesses as functions
     # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
     # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
     promote_function_access_in_map_range_to_symbol(g)
+
     # Do not add missing symbols to NSDFGs before promiting nflatlev access to
     # data access, otherwise nflatlev will be registered as a symbol already
     add_missing_data_and_symbols_to_all_nsdfgs(g)
+
     #add_missing_symbols_to_nsdfgs(g)
     g.validate()
     # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
     g.simplify(skip=["ArrayElimination", "FuseStates"], validate=False)
+
     # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with the rest of the maps make
     # offloading much harder)
     state_fusion_without_copyin_and_copyout(g)
+
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
+
+    post_stage1_fixes(g)
+
     return g
 
 
