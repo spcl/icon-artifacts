@@ -563,7 +563,7 @@ def _replace_gpu_data_with_gpu_versions(
     for inner_sdfg in inner_sdfgs:
         _replace_gpu_data_with_gpu_versions(inner_sdfg, gpu_arrays, True)
 
-from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes
+from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes, add_missing_data_and_symbols_to_all_nsdfgs
 
 def _repl(s: str, repldict):
     for k,v in repldict.items():
@@ -630,8 +630,9 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
                     for free_sym in free_syms:
                         if "gpu_" in free_sym:
                             replacements[free_sym] = free_sym.replace("gpu_", "")
-                            assert free_sym.replace('gpu_', '').split("_m_")[-1] in const_arrays, \
-                                f"Expected {free_sym.replace('gpu_', '').split("_m_")[-1]} to be in constant arrays\nConst arrays: {const_arrays}."
+                            if free_sym in root_sdfg.arrays and not isinstance(root_sdfg.arrays[free_sym], dace.data.Scalar):
+                                assert free_sym.replace('gpu_', '').split("_m_")[-1] in const_arrays, \
+                                    f"Expected {free_sym.replace('gpu_', '').split("_m_")[-1]} to be in constant arrays\nConst arrays: {const_arrays}."
                             # replace this in the interstate edge
                             _insert_missing_data_through_parent_scopes(
                                 {free_sym.replace("gpu_", "")}, parent_nsdfg_node, parent_nsdfg_node_state, parent_nsdfg_node_sdfg
@@ -734,6 +735,48 @@ def _clean_redundant_pass_through_access_node(sdfg: dace.SDFG):
                     map_exit.add_in_connector("IN_" + old_arr_name)
                     map_exit.add_out_connector("OUT_" + old_arr_name)
                     tmp_id += 1
+
+def _move_scalar_access_to_original_name(sdfg: dace.SDFG):
+    nsdfgs = set()
+    for edge in sdfg.all_interstate_edges():
+        src = edge.src
+        dst = edge.dst
+        iedge = edge.data
+        free_syms = iedge.free_symbols
+        gpu_named_scalars = set()
+        for free_sym in free_syms:
+            if "gpu_" in free_sym:
+                desc = sdfg.arrays.get(free_sym, None)
+                if desc is None and free_sym.replace("gpu_", "") in sdfg.arrays:
+                    if isinstance(sdfg.arrays[free_sym.replace("gpu_", "")], dace.data.Scalar):
+                        desc = sdfg.arrays[free_sym.replace("gpu_", "")]
+                        gpu_named_scalars.add(free_sym)
+
+        def _repl_gpu_to_no_gpu(s: str, gpu_named_scalars: Set[str]) -> str:
+            """
+            Replace 'gpu_' with '' in the string s for all gpu_named_scalars.
+            """
+            for gpu_scalar in gpu_named_scalars:
+                s = s.replace(gpu_scalar, gpu_scalar.replace("gpu_", ""))
+            return s
+
+        new_assignments = dict()
+        for k, v in iedge.assignments.items():
+            assert isinstance(k, str)
+            assert isinstance(v, (str, CodeBlock))
+            if isinstance(v, CodeBlock):
+                new_assignments[_repl_gpu_to_no_gpu(k, gpu_named_scalars)] = CodeBlock(_repl_gpu_to_no_gpu(v.as_string, gpu_named_scalars))
+            else:
+                new_assignments[_repl_gpu_to_no_gpu(k, gpu_named_scalars)] = _repl_gpu_to_no_gpu(v, gpu_named_scalars)
+        iedge.assignments = new_assignments
+
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                # If node is NestedSDFG, then we need to replace all data descriptors in the inner SDFG
+                nsdfgs.add(node.sdfg)
+    for _inner_sdfg in nsdfgs:
+        _move_scalar_access_to_original_name(_inner_sdfg)
 
 
 def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
@@ -844,5 +887,9 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     _clean_redundant_pass_through_access_node(sdfg)
 
     # gpu___CG_p_nh_prog_nnew__m_w access has a dependency where layer n+1 depends on n
+
+    # Add missing symbols
+    _move_scalar_access_to_original_name(sdfg)
+    add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
 
     sdfg.validate()

@@ -291,7 +291,7 @@ class Compiler:
         return []
 
     def get_gpu_executable_linker_flags(self) -> list[str]:
-        return ["-shared", "-L.", "-llibvelocity"]
+        return ["-shared", "-L.", "-lvelocity"]
 
     def compile_object(
         self, sources: list[Path], includes: list[Path], stage = 0,

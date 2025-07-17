@@ -7,7 +7,7 @@ namespace corrector_post {
 #define __DACE_CODEGEN_SOLVE_NH_CORRECTOR_POST__
 struct solve_nh_corrector_post_state_t; // Forward declaration.
 
-DACE_EXPORTED solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_post(
+ solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_post(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -24,8 +24,8 @@ DACE_EXPORTED solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_po
   double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
   double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
   double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
-DACE_EXPORTED int __dace_exit_solve_nh_corrector_post(solve_nh_corrector_post_state_t *__state);
-DACE_EXPORTED void __program_solve_nh_corrector_post(
+ int __dace_exit_solve_nh_corrector_post(solve_nh_corrector_post_state_t *__state);
+ void __program_solve_nh_corrector_post(
   solve_nh_corrector_post_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -54,7 +54,7 @@ namespace corrector_pre {
 #define __DACE_CODEGEN_SOLVE_NH_CORRECTOR_PRE__
 struct solve_nh_corrector_pre_state_t; // Forward declaration.
 
-DACE_EXPORTED solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre(
+ solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -71,8 +71,8 @@ DACE_EXPORTED solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre
   double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
   double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
   double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
-DACE_EXPORTED int __dace_exit_solve_nh_corrector_pre(solve_nh_corrector_pre_state_t *__state);
-DACE_EXPORTED void __program_solve_nh_corrector_pre(
+ int __dace_exit_solve_nh_corrector_pre(solve_nh_corrector_pre_state_t *__state);
+ void __program_solve_nh_corrector_pre(
   solve_nh_corrector_pre_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -101,7 +101,7 @@ namespace predictor_post {
 #define __DACE_CODEGEN_SOLVE_NH_PREDICTOR_POST__
 struct solve_nh_predictor_post_state_t; // Forward declaration.
 
-DACE_EXPORTED solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(
+ solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -118,8 +118,8 @@ DACE_EXPORTED solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_po
   double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
   double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
   double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
-DACE_EXPORTED int __dace_exit_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state);
-DACE_EXPORTED void __program_solve_nh_predictor_post(
+ int __dace_exit_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state);
+ void __program_solve_nh_predictor_post(
   solve_nh_predictor_post_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
@@ -148,7 +148,7 @@ namespace predictor_pre {
 #define __DACE_CODEGEN_SOLVE_NH_PREDICTOR_PRE__
 struct solve_nh_predictor_pre_state_t; // Forward declaration.
 
-DACE_EXPORTED solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre(
+ solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre(
   double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
   t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
   double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
@@ -165,8 +165,8 @@ DACE_EXPORTED solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre
   double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
   double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
   double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
-DACE_EXPORTED int __dace_exit_solve_nh_predictor_pre(solve_nh_predictor_pre_state_t *__state);
-DACE_EXPORTED void __program_solve_nh_predictor_pre(
+ int __dace_exit_solve_nh_predictor_pre(solve_nh_predictor_pre_state_t *__state);
+ void __program_solve_nh_predictor_pre(
   solve_nh_predictor_pre_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
   t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
   double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
