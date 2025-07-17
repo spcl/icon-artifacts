@@ -13,9 +13,49 @@ set -xeuo pipefail
 # Source git branch for velocity kernels
 GIT_SOURCE_BRANCH="origin/new_sched_solve_nh"
 # Base path for the velocity kernel source files within the git repository
-VELOCITY_SRC_BASE_PATH="velocity/codegen/stage1"
+VELOCITY_SRC_BASE_PATH="velocity/codegen"
 # Workspace directory to store fetched and patched files
 WORKSPACE_DIR="velocity_workspace"
+# Root of the DaCe installation. Can be overridden by setting the environment variable.
+DACEROOT=${DACEROOT:-/Users/pmz/gitspace/dace/}
+
+# --- Compiler Setup ---
+# Select compiler based on the operating system
+if [[ "$(uname)" == "Darwin" ]]; then
+  CC="clang++"
+else
+  CC="g++"
+fi
+
+# Compiler-specific error limit flag
+ERRLIM=()
+if [[ "$CC" == "clang++" ]]; then
+  ERRLIM+=(-ferror-limit=1)
+else
+  ERRLIM+=(-fmax-errors=1)
+fi
+
+# Warning flags
+WARNING_FLAGS=(
+  -g -Wall -Wextra
+  -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function
+  -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-sign-compare
+)
+[[ "$CC" == "clang++" ]] && WARNING_FLAGS+=(
+  -Wno-parentheses-equality -Wno-constant-logical-operand
+)
+
+# Optimization and standard flags
+OPTIMIZATION_FLAGS=(-O0 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off)
+STANDARD_FLAGS=(-std=c++20 -fPIC -fopenmp)
+
+# Combine all
+COMPILER_FLAGS=(
+  "${ERRLIM[@]}"
+  "${WARNING_FLAGS[@]}"
+  "${OPTIMIZATION_FLAGS[@]}"
+  "${STANDARD_FLAGS[@]}"
+)
 
 # --- Helper Functions ---
 
@@ -33,6 +73,9 @@ get_sed_inplace_opt() {
 
 # Stage 1: Fetch source files from Git
 fetch_sources() {
+  # The stage id is passed as the first argument to this function
+  local stage_id="$1"
+
   printf "%s" "--- Stage 1: Fetching source files from Git ---"
   mkdir -p "$WORKSPACE_DIR"
 
@@ -53,7 +96,7 @@ fetch_sources() {
     local dest_file="${dest_files[$i]}"
     local src_path="${src_paths[$i]}"
     echo "Fetching $src_path..."
-    git show "$GIT_SOURCE_BRANCH:$VELOCITY_SRC_BASE_PATH/$src_path" > "$WORKSPACE_DIR/$dest_file"
+    git show "$GIT_SOURCE_BRANCH:$VELOCITY_SRC_BASE_PATH/stage${stage_id}/${src_path}" > "$WORKSPACE_DIR/$dest_file"
   done
 
   # Fetch other necessary files
@@ -153,7 +196,10 @@ compile_velocity() {
 
 # --- Execution ---
 main() {
-  fetch_sources
+  # Use the first command-line argument as the stage id, defaulting to "1".
+  local stage_to_fetch=${1:-1}
+
+  fetch_sources "${stage_to_fetch}"
   patch_sources
   compile_velocity
   printf "%s" "\nScript finished successfully."

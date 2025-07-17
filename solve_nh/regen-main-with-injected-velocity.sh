@@ -10,10 +10,6 @@ set -xeuo pipefail
 #
 
 # --- Configuration ---
-# Source git branch for velocity kernels
-GIT_SOURCE_BRANCH="origin/new_sched_solve_nh"
-# Base path for the velocity kernel source files within the git repository
-VELOCITY_SRC_BASE_PATH="velocity/codegen/stage1"
 # Workspace directory to store fetched and patched files
 WORKSPACE_DIR="velocity_workspace"
 # Root of the DaCe installation. Can be overridden by setting the environment variable.
@@ -85,7 +81,7 @@ main() {
   # Use the first command-line argument as the stage id, defaulting to "0".
   local stage_to_run=${1:-0}
 
-  compile_all "$stage_to_run"
+  compile_all "${stage_to_run}"
   printf "%s" "\nScript finished successfully."
 }
 
