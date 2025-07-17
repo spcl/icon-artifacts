@@ -265,7 +265,7 @@ class Compiler:
         return "-fPIC -fopenmp".split()
 
     def _get_cuda_standard_flags(self) -> list[str]:
-        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp".split()
+        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr".split()
 
     def _get_cpp_standard_flags(self, stage: int) -> list[str]:
         return ["-std=c++23"] if stage < 3 else ["-std=c++20"]

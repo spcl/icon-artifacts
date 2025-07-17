@@ -14,7 +14,10 @@ from dace.transformation.passes import (
 )
 
 from utils.count import count_loops
-from utils.clean_partial_view_towers import clean_partial_view_towers
+from utils.clean_partial_view_towers import (
+    clean_partial_view_towers,
+    clean_trivial_view_pattern,
+)
 from utils.add_missing_symbols import (
     add_missing_symbols_to_nsdfgs,
     add_missing_data_and_symbols_to_all_nsdfgs
@@ -44,10 +47,9 @@ def optimization_action(g: SDFG):
         shallow_copy_to_gpu=False,
         taskloop=False,
     ).apply_pass(g, {})
-    g.save("b.sdfgz", compress=True)
+    clean_trivial_view_pattern(g)
     # Simplify results with NestedSDFGs having missing symbols
     g.simplify(skip=["ArrayElimination", "StateFusion"], validate=False)
-    g.save("c.sdfgz", compress=True)
     # Add missing symbols and data to NSDFGs to make it valid
     add_missing_data_and_symbols_to_all_nsdfgs(g)
     g.validate()
@@ -79,13 +81,11 @@ def optimization_action(g: SDFG):
     add_missing_data_and_symbols_to_all_nsdfgs(g)
     #add_missing_symbols_to_nsdfgs(g)
     g.validate()
-    g.save("d.sdfgz", compress=True)
     # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
     g.simplify(skip=["ArrayElimination", "FuseStates"], validate=False)
     # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with the rest of the maps make
     # offloading much harder)
     state_fusion_without_copyin_and_copyout(g)
-    g.save("e.sdfgz", compress=True)
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
     return g

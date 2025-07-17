@@ -72,13 +72,19 @@ def codegen_action(
     SDFG_SRCS = [
         Path(g.build_folder) / "src/cpu" / f"{g.name}.cpp" for _, g in sdfgs.items()
     ]
+    SDFG_CUDA_SRCS = [
+        Path(g.build_folder) / "src/cuda" / f"{g.name}_cuda.cu" for _, g in sdfgs.items()
+    ]
     consolidate_generated_code(
-        SDFG_INCLUDES, SDFG_SRCS, Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")
+        SDFG_INCLUDES, SDFG_SRCS, Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}"), stage,
+        SDFG_CUDA_SRCS
     )
 
 
 def compile_action(stage: int, mode: Mode) -> None:
     SDFG_INCLUDES = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")]
     SDFG_SRCS = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}") / "solve_nh_parts.cpp"]
-
-    compile_generated_code(SDFG_INCLUDES, SDFG_SRCS, mode)
+    SDFG_CUDA_SRCS = [
+        Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}") / "solve_nh_parts.cu"
+    ]
+    compile_generated_code(SDFG_INCLUDES, SDFG_SRCS, mode, stage, SDFG_CUDA_SRCS)
