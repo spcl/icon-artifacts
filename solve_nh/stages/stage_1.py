@@ -95,8 +95,6 @@ def optimization_action(g: SDFG):
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
 
-    post_stage1_fixes(g)
-
     return g
 
 
