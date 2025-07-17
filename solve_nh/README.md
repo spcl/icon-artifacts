@@ -1,6 +1,6 @@
 # Recipes
 
-## Generateing SDFGs from "fake" DyCore
+## Generateing SDFGs from "fake" DyCore & Building a precompiled VT library
 
 Assumption: You are in this directory (`icon-artifacts/solve_nh`). Fake DyCore is in `./edited-src/solve_nh_fake.f90`. You want to generate SDFGs for sthe 4 parts of `solve_nh()` routine (`predictor_pre` etc.).
 
@@ -11,11 +11,16 @@ bash regen-ast.sh
 bash regen-sdfgs.sh
 # Regenerate all 4 serialization/deserialization modules
 bash regen-serde.sh
+
+# Fetch VT from the other branch and build it into one library
+bash regen-velocity-lib.sh
+# One can also fetch from a particular stage (default is 1).
+bash regen-velocity-lib.sh 4
 ```
 
 ## Running a Stage
 
-Assumption: You are in this directory (`icon-artifacts/solve_nh`). You want to run `stage_0`.
+Assumption: You are in this directory (`icon-artifacts/solve_nh`). You want to run `stage_0`, for example.
 
 ```bash
 # Run all the actions
@@ -23,6 +28,8 @@ python -m stages.stage_0
 
 # Run only the SDFG optimization action
 python -m stages.stage_0 --optimize
+# Only on stage #0: You can also pass a `--shim` flag to inject the VT-calling library node.
+python -m stages.stage_0 --optimize --shim
 
 # Run only the code-generation action
 python -m stages.stage_0 --codegen

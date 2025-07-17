@@ -256,7 +256,7 @@ class Compiler:
         ).split()
 
     def _get_optimization_flags(self) -> list[str]:
-        return "-O1 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off".split()
+        return "-O0 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off".split()
 
     def _get_cuda_optimization_flags(self) -> list[str]:
         return "-O3 -Xcompiler=-march=native -Xcompiler=-fno-strict-aliasing -Xcompiler=-fno-omit-frame-pointer -Xcompiler=-fno-fast-math -Xcompiler=-ffp-contract=off".split()
@@ -288,12 +288,10 @@ class Compiler:
                 else "-Wl,--unresolved-symbols=ignore-all"
             )
             return [dyn_link, dyn_symbols]
-        if mode == Mode.EXEC:
-            return [
-                "-Wl,-undefined,dynamic_lookup"
-                if platform.system() == "Darwin"
-                else "-Wl,--unresolved-symbols=ignore-all"
-            ]
+        elif mode == Mode.EXEC:
+            # Try to see if `velocity` library is available
+            if any(Path(f).exists() for f in ["libvelocity.so", "libvelocity.dylib", "libvelocity.a"]):
+                return ["-L.", "-lvelocity"]
         return []
 
     def compile_object(
