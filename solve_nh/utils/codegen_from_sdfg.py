@@ -1,3 +1,4 @@
+from itertools import chain
 import os
 import dace
 from dace import SDFG
@@ -9,6 +10,9 @@ import subprocess
 import re
 from enum import Enum
 import platform
+
+
+GPU_STAGE_BEGINS = 3
 
 
 class Mode(Enum):
@@ -267,8 +271,8 @@ class Compiler:
     def _get_cuda_standard_flags(self) -> list[str]:
         return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC'".split()
 
-    def _get_cpp_standard_flags(self, stage: int) -> list[str]:
-        return ["-std=c++23"] if stage < 3 else ["-std=c++20"]
+    def _get_cpp_standard_flags(self) -> list[str]:
+        return ["-std=c++20"]
 
     def get_base_flags(self) -> list[str]:
         return self.diagnosis_flags + self.optimization_flags + self.standard_flags
@@ -295,29 +299,17 @@ class Compiler:
         return []
 
     def compile_object(
-        self, sources: list[Path], includes: list[Path], output_name: str, stage = 0,
-        gpu_sources: list[Path] | None = None, gpu_output_name: str | None = None
+        self, sources: list[Path], includes: list[Path], stage = 0,
     ):
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
-        if stage >= 3:
+        if stage >= GPU_STAGE_BEGINS:
+            cuda_sources = list(chain.from_iterable([self._get_cuda_src_file_flag(), str(s)] for s in sources))
             cmd = (
-                [self.nvcc,]
-                + [self._get_cuda_src_file_flag() + " " + str(s) for s in sources]
-                + ["-c"]
+                [self.nvcc, "-c"]
+                + cuda_sources
                 + [f"-I{i}" for i in all_includes]
                 + self.get_cuda_base_flags()
-                + self._get_cpp_standard_flags(stage)
-                + ["-o", output_name]
-            )
-            _run_command([str(c) for c in cmd if c])
-            cmd = (
-                [self.nvcc]
-                + [self._get_cuda_src_file_flag() + " " + str(s) for s in gpu_sources]
-                + ["-c"]
-                + [f"-I{i}" for i in all_includes]
-                + self.get_cuda_base_flags()
-                + self._get_cpp_standard_flags(stage)
-                + ["-o", gpu_output_name]
+                + self._get_cpp_standard_flags()
             )
             _run_command([str(c) for c in cmd if c])
         else:
@@ -326,22 +318,20 @@ class Compiler:
                 + [str(s) for s in sources]
                 + [f"-I{i}" for i in all_includes]
                 + self.get_base_flags()
-                + self._get_cpp_standard_flags(stage)
-                + ["-o", output_name]
+                + self._get_cpp_standard_flags()
             )
             _run_command([str(c) for c in cmd if c])
 
-    def archive_static_library(self, object_file: str, lib_name: str, cuda_object_file: str | None = None):
-        cmd = ["ar", "rcs", lib_name, object_file]
-        if cuda_object_file:
-            cmd.append(cuda_object_file)
+    def archive_static_library(self, obj_files: list[str], lib_name: str):
+        cmd = ["ar", "rcs", lib_name] + obj_files
         _run_command(cmd)
 
     def link_shared_library(self, static_lib: str, lib_name: str, stage: int):
-        flags = (self.get_base_flags() if stage < 3 else self.get_cuda_base_flags()) + self.get_linker_flags(Mode.SHARED)
-        cmd = ([self.cc if stage < 3 else self.nvcc, static_lib]
+        flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
+        flags.extend(self.get_linker_flags(Mode.SHARED))
+        cmd = ([self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, static_lib]
                + flags
-               + self._get_cpp_standard_flags(stage)
+               + self._get_cpp_standard_flags()
                + ["-o", lib_name]
         )
         _run_command([str(c) for c in cmd if c])
@@ -350,20 +340,20 @@ class Compiler:
         self, main_src: Path, static_lib: str, includes: list[Path], bin_name: str, stage: int
     ):
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
-        flags = (self.get_base_flags() if stage < 3 else self.get_cuda_base_flags()) + self.get_linker_flags(Mode.EXEC)
+        flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
+        flags.extend(self.get_linker_flags(Mode.EXEC))
         cmd = (
-            [self.cc if stage < 3 else self.nvcc, str(main_src), static_lib]
+            [self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, str(main_src), static_lib]
             + [f"-I{i}" for i in all_includes]
             + flags
-            + self._get_cpp_standard_flags(stage)
+            + self._get_cpp_standard_flags()
             + ["-o", bin_name]
         )
         _run_command([str(c) for c in cmd if c])
 
 
 def consolidate_generated_code(
-    sdfg_includes: list[Path], sdfg_srcs: list[Path], store: Path,
-    stage: int, sdfg_cuda_srcs: list[Path] | None = None
+    sdfg_includes: list[Path], sdfg_srcs: list[Path], sdfg_cuda_srcs: list[Path], store: Path, stage: int
 ) -> None:
     """
     Consolidates and post-processes generated C++ code.
@@ -449,7 +439,7 @@ def consolidate_generated_code(
         header_content = header_content.replace(old, new)
     header_path.write_text(header_content)
 
-    if stage >= 3:
+    if stage >= GPU_STAGE_BEGINS:
         all_cuda_headers = {
             f.stem[len("solve_nh_") :]: f.read_text()
             for p in sdfg_includes
@@ -517,8 +507,7 @@ def consolidate_generated_code(
 
 
 def compile_generated_code(
-    sdfg_includes: list[Path], sdfg_srcs: list[Path], mode: Mode,
-    stage: int, sdfg_cuda_srcs: list[Path] | None = None
+    sdfg_includes: list[Path], sdfg_srcs: list[Path], mode: Mode, stage: int,
 ) -> None:
     """
     Compiles the generated C++ code into a static library, shared library, or executable.
@@ -541,16 +530,18 @@ def compile_generated_code(
     compiler = Compiler()
 
     if mode == Mode.STATIC or mode == Mode.SHARED or mode == Mode.EXEC:
-        compiler.compile_object(sdfg_srcs, sdfg_includes, OBJ_FILE, stage, sdfg_cuda_srcs, CUDA_OBJ_FILE)
-        compiler.archive_static_library(OBJ_FILE, STATIC_LIB_FILE, CUDA_OBJ_FILE)
+        compiler.compile_object(sdfg_srcs, sdfg_includes, stage)
+        # Derive the object file names from the source files
+        obj_files = [str(src.with_suffix(".o").name) for src in sdfg_srcs]
+        compiler.archive_static_library(obj_files, STATIC_LIB_FILE)
         print(f"Successfully created static library: {STATIC_LIB_FILE}")
 
     if mode == Mode.SHARED:
-        compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE)
+        compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE, stage)
         print(f"Successfully created shared library: {SHARED_LIB_FILE}")
 
     if mode == Mode.EXEC:
-        if stage >= 3:
+        if stage >= GPU_STAGE_BEGINS:
             # TODO: write the CUDA main file
             compiler.link_executable(
                 STANDALONE_CUDA_MAIN_SRC, " ".join([OBJ_FILE, CUDA_OBJ_FILE]), sdfg_includes, EXEC_FILE, stage
