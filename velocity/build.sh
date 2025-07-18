@@ -10,7 +10,7 @@ for _R in "${RELEASE_MODES[@]}"; do
         export _REDUCE_BITWIDTH_TRANSFORMATION=1
         export _BUILD_LIB_FOR_SOLVE_NH=${BL}
         python -m utils.stages.compile_gpu_stage1 --compile
-        python -m utils.stages.compile_gpu_stage8 --compile
-        python -m utils.stages.compile_gpu_stage9 --compile
+        #python -m utils.stages.compile_gpu_stage8 --compile
+        #python -m utils.stages.compile_gpu_stage9 --compile
     done
 done
