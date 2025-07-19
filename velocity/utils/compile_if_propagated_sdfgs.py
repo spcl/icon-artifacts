@@ -509,6 +509,30 @@ def use_solve_nh_struct_definitions(filepath: str):
         f.write(filtered_content)
 
 
+pass_by_copy_to_pass_by_ref_tuples = [
+    ("double", "__CG_p_diag__m_max_vcfl_dyn"),
+]
+
+def _replace_pass_by_copy_to_pass_by_ref_impl(path, type_name_tuples):
+    with open(path, 'r') as f:
+        content = f.read()
+
+    for type_name, name in type_name_tuples:
+        pattern = rf' {re.escape(type_name)} {re.escape(name)},'
+        content = re.sub(pattern, rf'{type_name}& {name},', content)
+    for type_name, name in type_name_tuples:
+        pattern = rf' {re.escape(type_name)} {re.escape(name)}[)]'
+        content = re.sub(pattern, rf'{type_name}& {name})', content)
+
+    with open(path, 'w') as f:
+        f.write(content)
+
+def replace_pass_by_copy_to_pass_by_ref(path: str):
+    """
+    Replace pass-by-copy parameters with pass-by-reference in the given file.
+    This is used to avoid unnecessary copies of large data structures.
+    """
+    _replace_pass_by_copy_to_pass_by_ref_impl(path, pass_by_copy_to_pass_by_ref_tuples)
 
 def compile_if_propagated_sdfgs(
     sdfgs: typing.List[dace.SDFG],
@@ -531,8 +555,6 @@ def compile_if_propagated_sdfgs(
     sources.add("src/timer.cpp")
     if gpu:
         sources.add("src/reductions_kernel.cu")
-
-
 
     headers = set()
     headers.add("-Iinclude")
@@ -677,6 +699,12 @@ def compile_if_propagated_sdfgs(
                     else:
                         use_solve_nh_struct_definitions(f"{build_loc}/src/cpu/{sdfg_name}.cu")
                         use_solve_nh_struct_definitions(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+            if not gpu:
+                replace_pass_by_copy_to_pass_by_ref(f"{build_loc}/src/cpu/{sdfg_name}.cpp")
+                replace_pass_by_copy_to_pass_by_ref(f"{build_loc}/include/{sdfg_name}.h")
+            else:
+                replace_pass_by_copy_to_pass_by_ref(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+                replace_pass_by_copy_to_pass_by_ref(f"{build_loc}/include/{sdfg_name}.h")
 
 
     if main_name is not None:

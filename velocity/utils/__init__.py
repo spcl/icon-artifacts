@@ -61,3 +61,5 @@ from utils.reshape_kernels import reshape_kernels
 from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays
 
 from utils.prune_names import prune_names
+
+from utils.make_flattened_data_to_input import make_flattened_data_to_non_transient_cpu_input, make_flattened_data_to_non_transient_gpu_input

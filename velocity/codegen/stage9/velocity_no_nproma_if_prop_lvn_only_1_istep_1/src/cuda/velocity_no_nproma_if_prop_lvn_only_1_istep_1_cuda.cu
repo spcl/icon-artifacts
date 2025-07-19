@@ -1,3 +1,4 @@
+#include "shared_struct_defs.h"
 #include "reductions_device.cuh"
 #define __REDUCE_DEVICE__
 
@@ -5,414 +6,15 @@
 #include <dace/dace.h>
 
 
-struct t_grid_domain_decomp_info {
-    int __f2dace_SA_owner_mask_d_0_s = {};
-    int __f2dace_SA_owner_mask_d_1_s = {};
-    int __f2dace_SOA_owner_mask_d_0_s = {};
-    int __f2dace_SOA_owner_mask_d_1_s = {};
-    int* owner_mask = {};
-};
 
-struct t_grid_cells {
-    int __f2dace_SA_area_d_0_s = {};
-    int __f2dace_SA_area_d_1_s = {};
-    int __f2dace_SA_edge_blk_d_0_s = {};
-    int __f2dace_SA_edge_blk_d_1_s = {};
-    int __f2dace_SA_edge_blk_d_2_s = {};
-    int __f2dace_SA_edge_idx_d_0_s = {};
-    int __f2dace_SA_edge_idx_d_1_s = {};
-    int __f2dace_SA_edge_idx_d_2_s = {};
-    int __f2dace_SA_end_block_d_0_s = {};
-    int __f2dace_SA_end_index_d_0_s = {};
-    int __f2dace_SA_neighbor_blk_d_0_s = {};
-    int __f2dace_SA_neighbor_blk_d_1_s = {};
-    int __f2dace_SA_neighbor_blk_d_2_s = {};
-    int __f2dace_SA_neighbor_idx_d_0_s = {};
-    int __f2dace_SA_neighbor_idx_d_1_s = {};
-    int __f2dace_SA_neighbor_idx_d_2_s = {};
-    int __f2dace_SA_start_block_d_0_s = {};
-    int __f2dace_SA_start_index_d_0_s = {};
-    int __f2dace_SOA_area_d_0_s = {};
-    int __f2dace_SOA_area_d_1_s = {};
-    int __f2dace_SOA_edge_blk_d_0_s = {};
-    int __f2dace_SOA_edge_blk_d_1_s = {};
-    int __f2dace_SOA_edge_blk_d_2_s = {};
-    int __f2dace_SOA_edge_idx_d_0_s = {};
-    int __f2dace_SOA_edge_idx_d_1_s = {};
-    int __f2dace_SOA_edge_idx_d_2_s = {};
-    int __f2dace_SOA_end_block_d_0_s = {};
-    int __f2dace_SOA_end_index_d_0_s = {};
-    int __f2dace_SOA_neighbor_blk_d_0_s = {};
-    int __f2dace_SOA_neighbor_blk_d_1_s = {};
-    int __f2dace_SOA_neighbor_blk_d_2_s = {};
-    int __f2dace_SOA_neighbor_idx_d_0_s = {};
-    int __f2dace_SOA_neighbor_idx_d_1_s = {};
-    int __f2dace_SOA_neighbor_idx_d_2_s = {};
-    int __f2dace_SOA_start_block_d_0_s = {};
-    int __f2dace_SOA_start_index_d_0_s = {};
-    double* area = {};
-    t_grid_domain_decomp_info* decomp_info = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* neighbor_blk = {};
-    int* neighbor_idx = {};
-    int* start_block = {};
-    int* start_index = {};
-};
 
-struct t_grid_edges {
-    int __f2dace_SA_area_edge_d_0_s = {};
-    int __f2dace_SA_area_edge_d_1_s = {};
-    int __f2dace_SA_cell_blk_d_0_s = {};
-    int __f2dace_SA_cell_blk_d_1_s = {};
-    int __f2dace_SA_cell_blk_d_2_s = {};
-    int __f2dace_SA_cell_idx_d_0_s = {};
-    int __f2dace_SA_cell_idx_d_1_s = {};
-    int __f2dace_SA_cell_idx_d_2_s = {};
-    int __f2dace_SA_end_block_d_0_s = {};
-    int __f2dace_SA_end_index_d_0_s = {};
-    int __f2dace_SA_f_e_d_0_s = {};
-    int __f2dace_SA_f_e_d_1_s = {};
-    int __f2dace_SA_fn_e_d_0_s = {};
-    int __f2dace_SA_fn_e_d_1_s = {};
-    int __f2dace_SA_ft_e_d_0_s = {};
-    int __f2dace_SA_ft_e_d_1_s = {};
-    int __f2dace_SA_inv_dual_edge_length_d_0_s = {};
-    int __f2dace_SA_inv_dual_edge_length_d_1_s = {};
-    int __f2dace_SA_inv_primal_edge_length_d_0_s = {};
-    int __f2dace_SA_inv_primal_edge_length_d_1_s = {};
-    int __f2dace_SA_quad_blk_d_0_s = {};
-    int __f2dace_SA_quad_blk_d_1_s = {};
-    int __f2dace_SA_quad_blk_d_2_s = {};
-    int __f2dace_SA_quad_idx_d_0_s = {};
-    int __f2dace_SA_quad_idx_d_1_s = {};
-    int __f2dace_SA_quad_idx_d_2_s = {};
-    int __f2dace_SA_start_block_d_0_s = {};
-    int __f2dace_SA_start_index_d_0_s = {};
-    int __f2dace_SA_tangent_orientation_d_0_s = {};
-    int __f2dace_SA_tangent_orientation_d_1_s = {};
-    int __f2dace_SA_vertex_blk_d_0_s = {};
-    int __f2dace_SA_vertex_blk_d_1_s = {};
-    int __f2dace_SA_vertex_blk_d_2_s = {};
-    int __f2dace_SA_vertex_idx_d_0_s = {};
-    int __f2dace_SA_vertex_idx_d_1_s = {};
-    int __f2dace_SA_vertex_idx_d_2_s = {};
-    int __f2dace_SOA_area_edge_d_0_s = {};
-    int __f2dace_SOA_area_edge_d_1_s = {};
-    int __f2dace_SOA_cell_blk_d_0_s = {};
-    int __f2dace_SOA_cell_blk_d_1_s = {};
-    int __f2dace_SOA_cell_blk_d_2_s = {};
-    int __f2dace_SOA_cell_idx_d_0_s = {};
-    int __f2dace_SOA_cell_idx_d_1_s = {};
-    int __f2dace_SOA_cell_idx_d_2_s = {};
-    int __f2dace_SOA_end_block_d_0_s = {};
-    int __f2dace_SOA_end_index_d_0_s = {};
-    int __f2dace_SOA_f_e_d_0_s = {};
-    int __f2dace_SOA_f_e_d_1_s = {};
-    int __f2dace_SOA_fn_e_d_0_s = {};
-    int __f2dace_SOA_fn_e_d_1_s = {};
-    int __f2dace_SOA_ft_e_d_0_s = {};
-    int __f2dace_SOA_ft_e_d_1_s = {};
-    int __f2dace_SOA_inv_dual_edge_length_d_0_s = {};
-    int __f2dace_SOA_inv_dual_edge_length_d_1_s = {};
-    int __f2dace_SOA_inv_primal_edge_length_d_0_s = {};
-    int __f2dace_SOA_inv_primal_edge_length_d_1_s = {};
-    int __f2dace_SOA_quad_blk_d_0_s = {};
-    int __f2dace_SOA_quad_blk_d_1_s = {};
-    int __f2dace_SOA_quad_blk_d_2_s = {};
-    int __f2dace_SOA_quad_idx_d_0_s = {};
-    int __f2dace_SOA_quad_idx_d_1_s = {};
-    int __f2dace_SOA_quad_idx_d_2_s = {};
-    int __f2dace_SOA_start_block_d_0_s = {};
-    int __f2dace_SOA_start_index_d_0_s = {};
-    int __f2dace_SOA_tangent_orientation_d_0_s = {};
-    int __f2dace_SOA_tangent_orientation_d_1_s = {};
-    int __f2dace_SOA_vertex_blk_d_0_s = {};
-    int __f2dace_SOA_vertex_blk_d_1_s = {};
-    int __f2dace_SOA_vertex_blk_d_2_s = {};
-    int __f2dace_SOA_vertex_idx_d_0_s = {};
-    int __f2dace_SOA_vertex_idx_d_1_s = {};
-    int __f2dace_SOA_vertex_idx_d_2_s = {};
-    double* area_edge = {};
-    int* cell_blk = {};
-    int* cell_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    double* f_e = {};
-    double* fn_e = {};
-    double* ft_e = {};
-    double* inv_dual_edge_length = {};
-    double* inv_primal_edge_length = {};
-    int* quad_blk = {};
-    int* quad_idx = {};
-    int* start_block = {};
-    int* start_index = {};
-    double* tangent_orientation = {};
-    int* vertex_blk = {};
-    int* vertex_idx = {};
-};
 
-struct t_grid_vertices {
-    int __f2dace_SA_cell_blk_d_0_s = {};
-    int __f2dace_SA_cell_blk_d_1_s = {};
-    int __f2dace_SA_cell_blk_d_2_s = {};
-    int __f2dace_SA_cell_idx_d_0_s = {};
-    int __f2dace_SA_cell_idx_d_1_s = {};
-    int __f2dace_SA_cell_idx_d_2_s = {};
-    int __f2dace_SA_edge_blk_d_0_s = {};
-    int __f2dace_SA_edge_blk_d_1_s = {};
-    int __f2dace_SA_edge_blk_d_2_s = {};
-    int __f2dace_SA_edge_idx_d_0_s = {};
-    int __f2dace_SA_edge_idx_d_1_s = {};
-    int __f2dace_SA_edge_idx_d_2_s = {};
-    int __f2dace_SA_end_block_d_0_s = {};
-    int __f2dace_SA_end_index_d_0_s = {};
-    int __f2dace_SA_start_block_d_0_s = {};
-    int __f2dace_SA_start_index_d_0_s = {};
-    int __f2dace_SOA_cell_blk_d_0_s = {};
-    int __f2dace_SOA_cell_blk_d_1_s = {};
-    int __f2dace_SOA_cell_blk_d_2_s = {};
-    int __f2dace_SOA_cell_idx_d_0_s = {};
-    int __f2dace_SOA_cell_idx_d_1_s = {};
-    int __f2dace_SOA_cell_idx_d_2_s = {};
-    int __f2dace_SOA_edge_blk_d_0_s = {};
-    int __f2dace_SOA_edge_blk_d_1_s = {};
-    int __f2dace_SOA_edge_blk_d_2_s = {};
-    int __f2dace_SOA_edge_idx_d_0_s = {};
-    int __f2dace_SOA_edge_idx_d_1_s = {};
-    int __f2dace_SOA_edge_idx_d_2_s = {};
-    int __f2dace_SOA_end_block_d_0_s = {};
-    int __f2dace_SOA_end_index_d_0_s = {};
-    int __f2dace_SOA_start_block_d_0_s = {};
-    int __f2dace_SOA_start_index_d_0_s = {};
-    int* cell_blk = {};
-    int* cell_idx = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* start_block = {};
-    int* start_index = {};
-};
 
-struct t_patch {
-    t_grid_cells* cells = {};
-    t_grid_edges* edges = {};
-    int nblks_c = {};
-    int nblks_e = {};
-    int nblks_v = {};
-    t_grid_vertices* verts = {};
-};
 
-struct t_nh_diag {
-    int __f2dace_SA_ddt_vn_apc_pc_d_0_s = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_1_s = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_2_s = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_3_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_0_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_1_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_2_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_3_s = {};
-    int __f2dace_SA_vn_ie_d_0_s = {};
-    int __f2dace_SA_vn_ie_d_1_s = {};
-    int __f2dace_SA_vn_ie_d_2_s = {};
-    int __f2dace_SA_vt_d_0_s = {};
-    int __f2dace_SA_vt_d_1_s = {};
-    int __f2dace_SA_vt_d_2_s = {};
-    int __f2dace_SA_w_concorr_c_d_0_s = {};
-    int __f2dace_SA_w_concorr_c_d_1_s = {};
-    int __f2dace_SA_w_concorr_c_d_2_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_0_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_1_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_2_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_3_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_0_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_1_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_2_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_3_s = {};
-    int __f2dace_SOA_vn_ie_d_0_s = {};
-    int __f2dace_SOA_vn_ie_d_1_s = {};
-    int __f2dace_SOA_vn_ie_d_2_s = {};
-    int __f2dace_SOA_vt_d_0_s = {};
-    int __f2dace_SOA_vt_d_1_s = {};
-    int __f2dace_SOA_vt_d_2_s = {};
-    int __f2dace_SOA_w_concorr_c_d_0_s = {};
-    int __f2dace_SOA_w_concorr_c_d_1_s = {};
-    int __f2dace_SOA_w_concorr_c_d_2_s = {};
-    double* ddt_vn_apc_pc = {};
-    double* ddt_w_adv_pc = {};
-    double max_vcfl_dyn = {};
-    double* vn_ie = {};
-    double* vt = {};
-    double* w_concorr_c = {};
-};
 
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s = {};
-    int __f2dace_SA_c_lin_e_d_1_s = {};
-    int __f2dace_SA_c_lin_e_d_2_s = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s = {};
-    int __f2dace_SA_geofac_n2s_d_0_s = {};
-    int __f2dace_SA_geofac_n2s_d_1_s = {};
-    int __f2dace_SA_geofac_n2s_d_2_s = {};
-    int __f2dace_SA_geofac_rot_d_0_s = {};
-    int __f2dace_SA_geofac_rot_d_1_s = {};
-    int __f2dace_SA_geofac_rot_d_2_s = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s = {};
-    int __f2dace_SOA_c_lin_e_d_0_s = {};
-    int __f2dace_SOA_c_lin_e_d_1_s = {};
-    int __f2dace_SOA_c_lin_e_d_2_s = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s = {};
-    int __f2dace_SOA_geofac_rot_d_0_s = {};
-    int __f2dace_SOA_geofac_rot_d_1_s = {};
-    int __f2dace_SOA_geofac_rot_d_2_s = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* geofac_grdiv = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* rbf_vec_coeff_e = {};
-};
 
-struct t_nh_metrics {
-    int __f2dace_SA_coeff1_dwdz_d_0_s = {};
-    int __f2dace_SA_coeff1_dwdz_d_1_s = {};
-    int __f2dace_SA_coeff1_dwdz_d_2_s = {};
-    int __f2dace_SA_coeff2_dwdz_d_0_s = {};
-    int __f2dace_SA_coeff2_dwdz_d_1_s = {};
-    int __f2dace_SA_coeff2_dwdz_d_2_s = {};
-    int __f2dace_SA_coeff_gradekin_d_0_s = {};
-    int __f2dace_SA_coeff_gradekin_d_1_s = {};
-    int __f2dace_SA_coeff_gradekin_d_2_s = {};
-    int __f2dace_SA_ddqz_z_full_e_d_0_s = {};
-    int __f2dace_SA_ddqz_z_full_e_d_1_s = {};
-    int __f2dace_SA_ddqz_z_full_e_d_2_s = {};
-    int __f2dace_SA_ddqz_z_half_d_0_s = {};
-    int __f2dace_SA_ddqz_z_half_d_1_s = {};
-    int __f2dace_SA_ddqz_z_half_d_2_s = {};
-    int __f2dace_SA_ddxn_z_full_d_0_s = {};
-    int __f2dace_SA_ddxn_z_full_d_1_s = {};
-    int __f2dace_SA_ddxn_z_full_d_2_s = {};
-    int __f2dace_SA_ddxt_z_full_d_0_s = {};
-    int __f2dace_SA_ddxt_z_full_d_1_s = {};
-    int __f2dace_SA_ddxt_z_full_d_2_s = {};
-    int __f2dace_SA_deepatmo_gradh_ifc_d_0_s = {};
-    int __f2dace_SA_deepatmo_gradh_mc_d_0_s = {};
-    int __f2dace_SA_deepatmo_invr_ifc_d_0_s = {};
-    int __f2dace_SA_deepatmo_invr_mc_d_0_s = {};
-    int __f2dace_SA_wgtfac_c_d_0_s = {};
-    int __f2dace_SA_wgtfac_c_d_1_s = {};
-    int __f2dace_SA_wgtfac_c_d_2_s = {};
-    int __f2dace_SA_wgtfac_e_d_0_s = {};
-    int __f2dace_SA_wgtfac_e_d_1_s = {};
-    int __f2dace_SA_wgtfac_e_d_2_s = {};
-    int __f2dace_SA_wgtfacq_e_d_0_s = {};
-    int __f2dace_SA_wgtfacq_e_d_1_s = {};
-    int __f2dace_SA_wgtfacq_e_d_2_s = {};
-    int __f2dace_SOA_coeff1_dwdz_d_0_s = {};
-    int __f2dace_SOA_coeff1_dwdz_d_1_s = {};
-    int __f2dace_SOA_coeff1_dwdz_d_2_s = {};
-    int __f2dace_SOA_coeff2_dwdz_d_0_s = {};
-    int __f2dace_SOA_coeff2_dwdz_d_1_s = {};
-    int __f2dace_SOA_coeff2_dwdz_d_2_s = {};
-    int __f2dace_SOA_coeff_gradekin_d_0_s = {};
-    int __f2dace_SOA_coeff_gradekin_d_1_s = {};
-    int __f2dace_SOA_coeff_gradekin_d_2_s = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_0_s = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_1_s = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_2_s = {};
-    int __f2dace_SOA_ddqz_z_half_d_0_s = {};
-    int __f2dace_SOA_ddqz_z_half_d_1_s = {};
-    int __f2dace_SOA_ddqz_z_half_d_2_s = {};
-    int __f2dace_SOA_ddxn_z_full_d_0_s = {};
-    int __f2dace_SOA_ddxn_z_full_d_1_s = {};
-    int __f2dace_SOA_ddxn_z_full_d_2_s = {};
-    int __f2dace_SOA_ddxt_z_full_d_0_s = {};
-    int __f2dace_SOA_ddxt_z_full_d_1_s = {};
-    int __f2dace_SOA_ddxt_z_full_d_2_s = {};
-    int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s = {};
-    int __f2dace_SOA_deepatmo_gradh_mc_d_0_s = {};
-    int __f2dace_SOA_deepatmo_invr_ifc_d_0_s = {};
-    int __f2dace_SOA_deepatmo_invr_mc_d_0_s = {};
-    int __f2dace_SOA_wgtfac_c_d_0_s = {};
-    int __f2dace_SOA_wgtfac_c_d_1_s = {};
-    int __f2dace_SOA_wgtfac_c_d_2_s = {};
-    int __f2dace_SOA_wgtfac_e_d_0_s = {};
-    int __f2dace_SOA_wgtfac_e_d_1_s = {};
-    int __f2dace_SOA_wgtfac_e_d_2_s = {};
-    int __f2dace_SOA_wgtfacq_e_d_0_s = {};
-    int __f2dace_SOA_wgtfacq_e_d_1_s = {};
-    int __f2dace_SOA_wgtfacq_e_d_2_s = {};
-    double* coeff1_dwdz = {};
-    double* coeff2_dwdz = {};
-    double* coeff_gradekin = {};
-    double* ddqz_z_full_e = {};
-    double* ddqz_z_half = {};
-    double* ddxn_z_full = {};
-    double* ddxt_z_full = {};
-    double* deepatmo_gradh_ifc = {};
-    double* deepatmo_gradh_mc = {};
-    double* deepatmo_invr_ifc = {};
-    double* deepatmo_invr_mc = {};
-    double* wgtfac_c = {};
-    double* wgtfac_e = {};
-    double* wgtfacq_e = {};
-};
 
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s = {};
-    int __f2dace_SA_vn_d_1_s = {};
-    int __f2dace_SA_vn_d_2_s = {};
-    int __f2dace_SA_w_d_0_s = {};
-    int __f2dace_SA_w_d_1_s = {};
-    int __f2dace_SA_w_d_2_s = {};
-    int __f2dace_SOA_vn_d_0_s = {};
-    int __f2dace_SOA_vn_d_1_s = {};
-    int __f2dace_SOA_vn_d_2_s = {};
-    int __f2dace_SOA_w_d_0_s = {};
-    int __f2dace_SOA_w_d_1_s = {};
-    int __f2dace_SOA_w_d_2_s = {};
-    double* vn = {};
-    double* w = {};
-};
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
 
 struct velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t {
     dace::cuda::Context *gpu_context;
@@ -448,10 +50,10 @@ struct velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t {
 
 
 
-DACE_EXPORTED int __dace_init_cuda_2(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_A_z_kin_hor_e_d_2_s, int __f2dace_A_z_vt_ie_d_0_s, int __f2dace_A_z_vt_ie_d_1_s, int __f2dace_A_z_vt_ie_d_2_s, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_A_z_w_concorr_me_d_2_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_OA_z_vt_ie_d_0_s, int __f2dace_OA_z_vt_ie_d_1_s, int __f2dace_OA_z_vt_ie_d_2_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_c_lin_e_d_2_s_p_int_6, int __f2dace_SA_cell_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_cells_aw_verts_d_0_s_p_int_6, int __f2dace_SA_cells_aw_verts_d_1_s_p_int_6, int __f2dace_SA_coeff1_dwdz_d_0_s_p_metrics_8, int __f2dace_SA_coeff2_dwdz_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SA_ddxn_z_full_d_2_s_p_metrics_8, int __f2dace_SA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SA_ddxt_z_full_d_2_s_p_metrics_8, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SA_end_block_d_0_s_cells_p_patch_2, int __f2dace_SA_end_block_d_0_s_edges_p_patch_4, int __f2dace_SA_end_block_d_0_s_verts_p_patch_5, int __f2dace_SA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SA_fn_e_d_0_s_edges_p_patch_4, int __f2dace_SA_ft_e_d_0_s_edges_p_patch_4, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_geofac_rot_d_2_s_p_int_6, int __f2dace_SA_inv_dual_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SA_neighbor_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SA_start_block_d_0_s_cells_p_patch_2, int __f2dace_SA_start_block_d_0_s_edges_p_patch_4, int __f2dace_SA_start_block_d_0_s_verts_p_patch_5, int __f2dace_SA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vn_d_2_s_p_prog_7, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vn_ie_d_2_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SA_vt_d_2_s_p_diag_9, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SA_w_concorr_c_d_2_s_p_diag_9, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SA_w_d_2_s_p_prog_7, int __f2dace_SA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SA_wgtfac_c_d_2_s_p_metrics_8, int __f2dace_SA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfac_e_d_2_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_2_s_p_metrics_8, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_end_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_start_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int __f2dace_SOA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_2_s_p_metrics_8, int tmp_struct_symbol_0, int tmp_struct_symbol_1, int tmp_struct_symbol_10, int tmp_struct_symbol_11, int tmp_struct_symbol_12, int tmp_struct_symbol_13, int tmp_struct_symbol_14, int tmp_struct_symbol_2, int tmp_struct_symbol_3, int tmp_struct_symbol_4, int tmp_struct_symbol_8, int tmp_struct_symbol_9);
+DACE_EXPORTED int __dace_init_cuda_2(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_A_z_kin_hor_e_d_2_s, int __f2dace_A_z_vt_ie_d_0_s, int __f2dace_A_z_vt_ie_d_1_s, int __f2dace_A_z_vt_ie_d_2_s, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_A_z_w_concorr_me_d_2_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_OA_z_vt_ie_d_0_s, int __f2dace_OA_z_vt_ie_d_1_s, int __f2dace_OA_z_vt_ie_d_2_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_fn_e_d_0_s_edges_p_patch_4, int __f2dace_SA_ft_e_d_0_s_edges_p_patch_4, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_inv_dual_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_neighbor_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_end_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_start_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int __f2dace_SOA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_2_s_p_metrics_8, int tmp_struct_symbol_0, int tmp_struct_symbol_1, int tmp_struct_symbol_10, int tmp_struct_symbol_11, int tmp_struct_symbol_12, int tmp_struct_symbol_13, int tmp_struct_symbol_14, int tmp_struct_symbol_2, int tmp_struct_symbol_3, int tmp_struct_symbol_4, int tmp_struct_symbol_8, int tmp_struct_symbol_9);
 DACE_EXPORTED int __dace_exit_cuda_2(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state);
 
-DACE_DFI void loop_body_8_2_5(const double * __restrict__ gpu___CG_p_int__m_geofac_rot, const uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_vn, double * __restrict__ gpu_zeta, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_3_0, int _for_it_4_0, int _for_it_5_0, int tmp_struct_symbol_8) {
+DACE_DFI void loop_body_8_2_5(const double* __restrict__ gpu___CG_p_int__m_geofac_rot, const uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, const double* __restrict__ gpu___CG_p_prog__m_vn, double * __restrict__ gpu_zeta, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_3_0, int _for_it_4_0, int _for_it_5_0, int tmp_struct_symbol_8) {
     int tmp_index_92_0;
     int tmp_index_94_0;
     int tmp_index_104_0;
@@ -509,7 +111,7 @@ DACE_DFI void loop_body_8_2_5(const double * __restrict__ gpu___CG_p_int__m_geof
 
 }
 
-DACE_DFI void loop_body_16_2_3(const double * __restrict__ gpu___CG_p_int__m_rbf_vec_coeff_e, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_vn, double * __restrict__ gpu___CG_p_diag__m_vt, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_6, int _for_it_7, int _for_it_8) {
+DACE_DFI void loop_body_16_2_3(const double* __restrict__ gpu___CG_p_int__m_rbf_vec_coeff_e, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, const double* __restrict__ gpu___CG_p_prog__m_vn, double* __restrict__ gpu___CG_p_diag__m_vt, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_6, int _for_it_7, int _for_it_8) {
     int tmp_index_178;
     int tmp_index_180;
     int tmp_index_190;
@@ -555,7 +157,7 @@ DACE_DFI void loop_body_16_2_3(const double * __restrict__ gpu___CG_p_int__m_rbf
 
 }
 
-DACE_DFI void loop_body_23_2_5(const double * __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, const double* __restrict__ z_kin_hor_e, double * __restrict__ gpu_z_ekinh, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_23, int _for_it_24, int tmp_struct_symbol_10) {
+DACE_DFI void loop_body_23_2_5(const double* __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, const double* __restrict__ z_kin_hor_e, double * __restrict__ gpu_z_ekinh, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_23, int _for_it_24, int tmp_struct_symbol_10) {
     int tmp_index_407;
     int tmp_index_409;
     int tmp_index_419;
@@ -595,7 +197,7 @@ DACE_DFI void loop_body_23_2_5(const double * __restrict__ gpu___CG_p_int__m_e_b
 
 }
 
-DACE_DFI void loop_body_23_2_7(const double * __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, const double* __restrict__ z_w_concorr_me, double * __restrict__ gpu_z_w_concorr_mc, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_25, int _for_it_26, int tmp_struct_symbol_0) {
+DACE_DFI void loop_body_23_2_7(const double* __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, const double* __restrict__ z_w_concorr_me, double * __restrict__ gpu_z_w_concorr_mc, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_25, int _for_it_26, int tmp_struct_symbol_0) {
     int tmp_index_445;
     int tmp_index_447;
     int tmp_index_457;
@@ -681,7 +283,7 @@ DACE_DFI void loop_body_23_4_0(const uint8_t * __restrict__ gpu_cfl_clipping, ui
 
 }
 
-DACE_DFI void loop_body_23_4_10(const const double&  dtime, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const uint8_t * __restrict__ gpu_cfl_clipping, double * __restrict__ gpu_maxvcfl_arr, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, int _for_it_35, int _for_it_37, int tmp_struct_symbol_1, int tmp_struct_symbol_14, int tmp_struct_symbol_4) {
+DACE_DFI void loop_body_23_4_10(const const double&  dtime, const double* __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const uint8_t * __restrict__ gpu_cfl_clipping, double * __restrict__ gpu_maxvcfl_arr, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, int _for_it_35, int _for_it_37, int tmp_struct_symbol_1, int tmp_struct_symbol_14, int tmp_struct_symbol_4) {
     uint8_t _if_cond_18;
     double vcfl;
 
@@ -757,7 +359,7 @@ DACE_DFI void loop_body_23_4_10(const const double&  dtime, const double * __res
 
 }
 
-DACE_DFI void loop_body_41_2_6(const double * __restrict__ gpu___CG_p_diag__m_vn_ie, const double * __restrict__ gpu___CG_p_diag__m_vt, const double * __restrict__ gpu___CG_p_int__m_c_lin_e, const double * __restrict__ gpu___CG_p_metrics__m_coeff_gradekin, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_f_e, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, const double * __restrict__ gpu_z_ekinh, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const double* __restrict__ z_kin_hor_e, double * __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_47, int _for_it_48, int _for_it_49, int ntnd, int tmp_struct_symbol_10, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
+DACE_DFI void loop_body_41_2_6(const double* __restrict__ gpu___CG_p_diag__m_vn_ie, const double* __restrict__ gpu___CG_p_diag__m_vt, const double* __restrict__ gpu___CG_p_int__m_c_lin_e, const double* __restrict__ gpu___CG_p_metrics__m_coeff_gradekin, const double* __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_f_e, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, const double * __restrict__ gpu_z_ekinh, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const double* __restrict__ z_kin_hor_e, double* __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_47, int _for_it_48, int _for_it_49, int ntnd, int tmp_struct_symbol_10, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
     int tmp_index_698;
     int tmp_index_700;
     int tmp_index_710;
@@ -821,7 +423,7 @@ DACE_DFI void loop_body_41_2_6(const double * __restrict__ gpu___CG_p_diag__m_vn
 
 }
 
-DACE_DFI void loop_body_41_2_28(const const double&  cfl_w_limit, const const double&  dtime, const double * __restrict__ gpu___CG_p_int__m_c_lin_e, const double * __restrict__ gpu___CG_p_int__m_geofac_grdiv, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_area_edge, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_tangent_orientation, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_vn, const uint8_t * __restrict__ gpu_levelmask, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const const double&  scalfac_exdiff, double * __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_47, int _for_it_52, int _for_it_53, int ntnd, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
+DACE_DFI void loop_body_41_2_28(const const double&  cfl_w_limit, const const double&  dtime, const double* __restrict__ gpu___CG_p_int__m_c_lin_e, const double* __restrict__ gpu___CG_p_int__m_geofac_grdiv, const double* __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_area_edge, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_tangent_orientation, const uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, const double* __restrict__ gpu___CG_p_prog__m_vn, const uint8_t * __restrict__ gpu_levelmask, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const const double&  scalfac_exdiff, double* __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_47, int _for_it_52, int _for_it_53, int ntnd, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
     double w_con_e;
     double tmp_call_17;
     double _if_cond_29;
@@ -1013,7 +615,7 @@ DACE_DFI void loop_body_41_2_28(const const double&  cfl_w_limit, const const do
 
 }
 
-DACE_DFI void loop_body_52_2_5(const double * __restrict__ gpu___CG_p_int__m_geofac_rot, const uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, const double * __restrict__ gpu___CG_p_prog__m_vn, double * __restrict__ gpu_zeta, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_3_0, int _for_it_4_0, int _for_it_5_0, int tmp_struct_symbol_8) {
+DACE_DFI void loop_body_52_2_5(const double* __restrict__ gpu___CG_p_int__m_geofac_rot, const uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, const int* __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, const double* __restrict__ gpu___CG_p_prog__m_vn, double * __restrict__ gpu_zeta, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_3_0, int _for_it_4_0, int _for_it_5_0, int tmp_struct_symbol_8) {
     int tmp_index_92_0;
     int tmp_index_94_0;
     int tmp_index_104_0;
@@ -1071,7 +673,7 @@ DACE_DFI void loop_body_52_2_5(const double * __restrict__ gpu___CG_p_int__m_geo
 
 }
 
-DACE_DFI void loop_body_60_2_3(const double * __restrict__ gpu___CG_p_int__m_rbf_vec_coeff_e, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, const double * __restrict__ gpu___CG_p_prog__m_vn, double * __restrict__ gpu___CG_p_diag__m_vt, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_6, int _for_it_7, int _for_it_8) {
+DACE_DFI void loop_body_60_2_3(const double* __restrict__ gpu___CG_p_int__m_rbf_vec_coeff_e, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const int* __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, const double* __restrict__ gpu___CG_p_prog__m_vn, double* __restrict__ gpu___CG_p_diag__m_vt, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_6, int _for_it_7, int _for_it_8) {
     int tmp_index_178;
     int tmp_index_180;
     int tmp_index_190;
@@ -1117,7 +719,7 @@ DACE_DFI void loop_body_60_2_3(const double * __restrict__ gpu___CG_p_int__m_rbf
 
 }
 
-DACE_DFI void loop_body_67_2_5(const double * __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, const double* __restrict__ z_kin_hor_e, double * __restrict__ gpu_z_ekinh, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_23, int _for_it_24, int tmp_struct_symbol_10) {
+DACE_DFI void loop_body_67_2_5(const double* __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const int* __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, const double* __restrict__ z_kin_hor_e, double * __restrict__ gpu_z_ekinh, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_23, int _for_it_24, int tmp_struct_symbol_10) {
     int tmp_index_407;
     int tmp_index_409;
     int tmp_index_419;
@@ -1157,7 +759,7 @@ DACE_DFI void loop_body_67_2_5(const double * __restrict__ gpu___CG_p_int__m_e_b
 
 }
 
-DACE_DFI void loop_body_67_2_7(const double * __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, const double* __restrict__ z_w_concorr_me, double * __restrict__ gpu_z_w_concorr_mc, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_25, int _for_it_26, int tmp_struct_symbol_0) {
+DACE_DFI void loop_body_67_2_7(const double* __restrict__ gpu___CG_p_int__m_e_bln_c_s, const uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, const int* __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, const double* __restrict__ z_w_concorr_me, double * __restrict__ gpu_z_w_concorr_mc, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int _for_it_22, int _for_it_25, int _for_it_26, int tmp_struct_symbol_0) {
     int tmp_index_445;
     int tmp_index_447;
     int tmp_index_457;
@@ -1197,7 +799,7 @@ DACE_DFI void loop_body_67_2_7(const double * __restrict__ gpu___CG_p_int__m_e_b
 
 }
 
-DACE_DFI void loop_body_85_2_6(const double * __restrict__ gpu___CG_p_diag__m_vn_ie, const double * __restrict__ gpu___CG_p_diag__m_vt, const double * __restrict__ gpu___CG_p_int__m_c_lin_e, const double * __restrict__ gpu___CG_p_metrics__m_coeff_gradekin, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_f_e, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, const double * __restrict__ gpu_z_ekinh, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const double* __restrict__ z_kin_hor_e, double * __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_47, int _for_it_48, int _for_it_49, int ntnd, int tmp_struct_symbol_10, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
+DACE_DFI void loop_body_85_2_6(const double* __restrict__ gpu___CG_p_diag__m_vn_ie, const double* __restrict__ gpu___CG_p_diag__m_vt, const double* __restrict__ gpu___CG_p_int__m_c_lin_e, const double* __restrict__ gpu___CG_p_metrics__m_coeff_gradekin, const double* __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const int* __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_f_e, const int* __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, const double * __restrict__ gpu_z_ekinh, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const double* __restrict__ z_kin_hor_e, double* __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int _for_it_47, int _for_it_48, int _for_it_49, int ntnd, int tmp_struct_symbol_10, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
     int tmp_index_698;
     int tmp_index_700;
     int tmp_index_710;
@@ -1261,7 +863,7 @@ DACE_DFI void loop_body_85_2_6(const double * __restrict__ gpu___CG_p_diag__m_vn
 
 }
 
-DACE_DFI void loop_body_85_2_28(const const double&  cfl_w_limit, const const double&  dtime, const double * __restrict__ gpu___CG_p_int__m_c_lin_e, const double * __restrict__ gpu___CG_p_int__m_geofac_grdiv, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_area_edge, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, const double * __restrict__ gpu___CG_p_patch__CG_edges__m_tangent_orientation, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, const double * __restrict__ gpu___CG_p_prog__m_vn, const uint8_t * __restrict__ gpu_levelmask, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const const double&  scalfac_exdiff, double * __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_47, int _for_it_52, int _for_it_53, int ntnd, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
+DACE_DFI void loop_body_85_2_28(const const double&  cfl_w_limit, const const double&  dtime, const double* __restrict__ gpu___CG_p_int__m_c_lin_e, const double* __restrict__ gpu___CG_p_int__m_geofac_grdiv, const double* __restrict__ gpu___CG_p_metrics__m_ddqz_z_full_e, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_area_edge, const int* __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length, const uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, const int* __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, const double* __restrict__ gpu___CG_p_patch__CG_edges__m_tangent_orientation, const int* __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, const double* __restrict__ gpu___CG_p_prog__m_vn, const uint8_t * __restrict__ gpu_levelmask, const double * __restrict__ gpu_z_w_con_c_full, const double * __restrict__ gpu_zeta, const const double&  scalfac_exdiff, double* __restrict__ gpu___CG_p_diag__m_ddt_vn_apc_pc, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int _for_it_47, int _for_it_52, int _for_it_53, int ntnd, int tmp_struct_symbol_2, int tmp_struct_symbol_8) {
     double w_con_e;
     double tmp_call_17;
     double _if_cond_29;
@@ -1455,7 +1057,7 @@ DACE_DFI void loop_body_85_2_28(const const double&  cfl_w_limit, const const do
 
 
 
-DACE_EXPORTED int __dace_init_cuda_2(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_A_z_kin_hor_e_d_2_s, int __f2dace_A_z_vt_ie_d_0_s, int __f2dace_A_z_vt_ie_d_1_s, int __f2dace_A_z_vt_ie_d_2_s, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_A_z_w_concorr_me_d_2_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_OA_z_vt_ie_d_0_s, int __f2dace_OA_z_vt_ie_d_1_s, int __f2dace_OA_z_vt_ie_d_2_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_c_lin_e_d_2_s_p_int_6, int __f2dace_SA_cell_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_cells_aw_verts_d_0_s_p_int_6, int __f2dace_SA_cells_aw_verts_d_1_s_p_int_6, int __f2dace_SA_coeff1_dwdz_d_0_s_p_metrics_8, int __f2dace_SA_coeff2_dwdz_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SA_ddxn_z_full_d_2_s_p_metrics_8, int __f2dace_SA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SA_ddxt_z_full_d_2_s_p_metrics_8, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SA_end_block_d_0_s_cells_p_patch_2, int __f2dace_SA_end_block_d_0_s_edges_p_patch_4, int __f2dace_SA_end_block_d_0_s_verts_p_patch_5, int __f2dace_SA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SA_fn_e_d_0_s_edges_p_patch_4, int __f2dace_SA_ft_e_d_0_s_edges_p_patch_4, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_geofac_rot_d_2_s_p_int_6, int __f2dace_SA_inv_dual_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SA_neighbor_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SA_start_block_d_0_s_cells_p_patch_2, int __f2dace_SA_start_block_d_0_s_edges_p_patch_4, int __f2dace_SA_start_block_d_0_s_verts_p_patch_5, int __f2dace_SA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vn_d_2_s_p_prog_7, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vn_ie_d_2_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SA_vt_d_2_s_p_diag_9, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SA_w_concorr_c_d_2_s_p_diag_9, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SA_w_d_2_s_p_prog_7, int __f2dace_SA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SA_wgtfac_c_d_2_s_p_metrics_8, int __f2dace_SA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfac_e_d_2_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_2_s_p_metrics_8, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_end_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_start_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int __f2dace_SOA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_2_s_p_metrics_8, int tmp_struct_symbol_0, int tmp_struct_symbol_1, int tmp_struct_symbol_10, int tmp_struct_symbol_11, int tmp_struct_symbol_12, int tmp_struct_symbol_13, int tmp_struct_symbol_14, int tmp_struct_symbol_2, int tmp_struct_symbol_3, int tmp_struct_symbol_4, int tmp_struct_symbol_8, int tmp_struct_symbol_9) {
+DACE_EXPORTED int __dace_init_cuda_2(velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state, int __f2dace_A_z_kin_hor_e_d_0_s, int __f2dace_A_z_kin_hor_e_d_1_s, int __f2dace_A_z_kin_hor_e_d_2_s, int __f2dace_A_z_vt_ie_d_0_s, int __f2dace_A_z_vt_ie_d_1_s, int __f2dace_A_z_vt_ie_d_2_s, int __f2dace_A_z_w_concorr_me_d_0_s, int __f2dace_A_z_w_concorr_me_d_1_s, int __f2dace_A_z_w_concorr_me_d_2_s, int __f2dace_OA_z_kin_hor_e_d_0_s, int __f2dace_OA_z_kin_hor_e_d_1_s, int __f2dace_OA_z_kin_hor_e_d_2_s, int __f2dace_OA_z_vt_ie_d_0_s, int __f2dace_OA_z_vt_ie_d_1_s, int __f2dace_OA_z_vt_ie_d_2_s, int __f2dace_OA_z_w_concorr_me_d_0_s, int __f2dace_OA_z_w_concorr_me_d_1_s, int __f2dace_OA_z_w_concorr_me_d_2_s, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SA_c_lin_e_d_0_s_p_int_6, int __f2dace_SA_c_lin_e_d_1_s_p_int_6, int __f2dace_SA_cell_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SA_fn_e_d_0_s_edges_p_patch_4, int __f2dace_SA_ft_e_d_0_s_edges_p_patch_4, int __f2dace_SA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SA_geofac_rot_d_0_s_p_int_6, int __f2dace_SA_geofac_rot_d_1_s_p_int_6, int __f2dace_SA_inv_dual_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SA_neighbor_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SA_vn_d_0_s_p_prog_7, int __f2dace_SA_vn_ie_d_0_s_p_diag_9, int __f2dace_SA_vt_d_0_s_p_diag_9, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SOA_area_edge_d_0_s_edges_p_patch_4, int __f2dace_SOA_area_edge_d_1_s_edges_p_patch_4, int __f2dace_SOA_c_lin_e_d_0_s_p_int_6, int __f2dace_SOA_c_lin_e_d_1_s_p_int_6, int __f2dace_SOA_c_lin_e_d_2_s_p_int_6, int __f2dace_SOA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_cell_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_coeff_gradekin_d_0_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_1_s_p_metrics_8, int __f2dace_SOA_coeff_gradekin_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_full_e_d_2_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_vn_apc_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_vn_apc_pc_d_3_s_p_diag_9, int __f2dace_SOA_ddxn_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxn_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_0_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_1_s_p_metrics_8, int __f2dace_SOA_ddxt_z_full_d_2_s_p_metrics_8, int __f2dace_SOA_e_bln_c_s_d_0_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_1_s_p_int_6, int __f2dace_SOA_e_bln_c_s_d_2_s_p_int_6, int __f2dace_SOA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_blk_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_blk_d_2_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_edge_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_edge_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_end_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_end_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_end_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_end_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_f_e_d_0_s_edges_p_patch_4, int __f2dace_SOA_f_e_d_1_s_edges_p_patch_4, int __f2dace_SOA_geofac_grdiv_d_0_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_1_s_p_int_6, int __f2dace_SOA_geofac_grdiv_d_2_s_p_int_6, int __f2dace_SOA_geofac_rot_d_0_s_p_int_6, int __f2dace_SOA_geofac_rot_d_1_s_p_int_6, int __f2dace_SOA_geofac_rot_d_2_s_p_int_6, int __f2dace_SOA_inv_primal_edge_length_d_0_s_edges_p_patch_4, int __f2dace_SOA_inv_primal_edge_length_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_blk_d_2_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_quad_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_p_int_6, int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_p_int_6, int __f2dace_SOA_start_block_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_block_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_block_d_0_s_verts_p_patch_5, int __f2dace_SOA_start_index_d_0_s_cells_p_patch_2, int __f2dace_SOA_start_index_d_0_s_edges_p_patch_4, int __f2dace_SOA_start_index_d_0_s_verts_p_patch_5, int __f2dace_SOA_tangent_orientation_d_0_s_edges_p_patch_4, int __f2dace_SOA_tangent_orientation_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SOA_vertex_idx_d_2_s_edges_p_patch_4, int __f2dace_SOA_vn_d_0_s_p_prog_7, int __f2dace_SOA_vn_d_1_s_p_prog_7, int __f2dace_SOA_vn_d_2_s_p_prog_7, int __f2dace_SOA_vn_ie_d_0_s_p_diag_9, int __f2dace_SOA_vn_ie_d_1_s_p_diag_9, int __f2dace_SOA_vn_ie_d_2_s_p_diag_9, int __f2dace_SOA_vt_d_0_s_p_diag_9, int __f2dace_SOA_vt_d_1_s_p_diag_9, int __f2dace_SOA_vt_d_2_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int __f2dace_SOA_wgtfac_c_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_c_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfac_e_d_2_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_0_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_1_s_p_metrics_8, int __f2dace_SOA_wgtfacq_e_d_2_s_p_metrics_8, int tmp_struct_symbol_0, int tmp_struct_symbol_1, int tmp_struct_symbol_10, int tmp_struct_symbol_11, int tmp_struct_symbol_12, int tmp_struct_symbol_13, int tmp_struct_symbol_14, int tmp_struct_symbol_2, int tmp_struct_symbol_3, int tmp_struct_symbol_4, int tmp_struct_symbol_8, int tmp_struct_symbol_9) {
     int count;
 
     // Check that we are able to run cuda code
