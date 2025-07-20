@@ -1,0 +1,235 @@
+import dace
+import copy
+
+from dace.sdfg.nodes import CodeBlock
+
+
+# Same order as the call
+velocity_name_mapping = {
+  '__CG_global_data__m_nflatlev': 'in___CG_global_data__m_nflatlev',
+  '__CG_global_data__m_nrdmax': 'in___CG_global_data__m_nrdmax',
+  '__CG_p_diag__m_ddt_vn_apc_pc': 'in___CG_p_nh__CG_diag__m_ddt_vn_apc_pc',
+  '__CG_p_diag__m_ddt_w_adv_pc': 'in___CG_p_nh__CG_diag__m_ddt_w_adv_pc',
+  '__CG_p_diag__m_vn_ie': 'in___CG_p_nh__CG_diag__m_vn_ie',
+  '__CG_p_diag__m_vt': 'in___CG_p_nh__CG_diag__m_vt',
+  '__CG_p_diag__m_w_concorr_c': 'in___CG_p_nh__CG_diag__m_w_concorr_c',
+  '__CG_p_int__m_c_lin_e': 'in___CG_p_int__m_c_lin_e',
+  '__CG_p_int__m_cells_aw_verts': 'in___CG_p_int__m_cells_aw_verts',
+  '__CG_p_int__m_e_bln_c_s': 'in___CG_p_int__m_e_bln_c_s',
+  '__CG_p_int__m_geofac_grdiv': 'in___CG_p_int__m_geofac_grdiv',
+  '__CG_p_int__m_geofac_n2s': 'in___CG_p_int__m_geofac_n2s',
+  '__CG_p_int__m_geofac_rot': 'in___CG_p_int__m_geofac_rot',
+  '__CG_p_int__m_rbf_vec_coeff_e': 'in___CG_p_int__m_rbf_vec_coeff_e',
+  '__CG_p_metrics__m_coeff1_dwdz': 'in___CG_p_nh__CG_metrics__m_coeff1_dwdz',
+  '__CG_p_metrics__m_coeff2_dwdz': 'in___CG_p_nh__CG_metrics__m_coeff2_dwdz',
+  '__CG_p_metrics__m_coeff_gradekin': 'in___CG_p_nh__CG_metrics__m_coeff_gradekin',
+  '__CG_p_metrics__m_ddqz_z_full_e': 'in___CG_p_nh__CG_metrics__m_ddqz_z_full_e',
+  '__CG_p_metrics__m_ddqz_z_half': 'in___CG_p_nh__CG_metrics__m_ddqz_z_half',
+  '__CG_p_metrics__m_ddxn_z_full': 'in___CG_p_nh__CG_metrics__m_ddxn_z_full',
+  '__CG_p_metrics__m_ddxt_z_full': 'in___CG_p_nh__CG_metrics__m_ddxt_z_full',
+  '__CG_p_metrics__m_wgtfac_c': 'in___CG_p_nh__CG_metrics__m_wgtfac_c',
+  '__CG_p_metrics__m_wgtfac_e': 'in___CG_p_nh__CG_metrics__m_wgtfac_e',
+  '__CG_p_metrics__m_wgtfacq_e': 'in___CG_p_nh__CG_metrics__m_wgtfacq_e',
+  '__CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask': 'in___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask',
+  '__CG_p_patch__CG_cells__m_area': 'in___CG_p_patch__CG_cells__m_area',
+  '__CG_p_patch__CG_cells__m_edge_blk': 'in___CG_p_patch__CG_cells__m_edge_blk',
+  '__CG_p_patch__CG_cells__m_edge_idx': 'in___CG_p_patch__CG_cells__m_edge_idx',
+  '__CG_p_patch__CG_cells__m_end_block': 'in___CG_p_patch__CG_cells__m_end_block',
+  '__CG_p_patch__CG_cells__m_end_index': 'in___CG_p_patch__CG_cells__m_end_index',
+  '__CG_p_patch__CG_cells__m_neighbor_blk': 'in___CG_p_patch__CG_cells__m_neighbor_blk',
+  '__CG_p_patch__CG_cells__m_neighbor_idx': 'in___CG_p_patch__CG_cells__m_neighbor_idx',
+  '__CG_p_patch__CG_cells__m_start_block': 'in___CG_p_patch__CG_cells__m_start_block',
+  '__CG_p_patch__CG_cells__m_start_index': 'in___CG_p_patch__CG_cells__m_start_index',
+  '__CG_p_patch__CG_edges__m_area_edge': 'in___CG_p_patch__CG_edges__m_area_edge',
+  '__CG_p_patch__CG_edges__m_cell_blk': 'in___CG_p_patch__CG_edges__m_cell_blk',
+  '__CG_p_patch__CG_edges__m_cell_idx': 'in___CG_p_patch__CG_edges__m_cell_idx',
+  '__CG_p_patch__CG_edges__m_end_block': 'in___CG_p_patch__CG_edges__m_end_block',
+  '__CG_p_patch__CG_edges__m_end_index': 'in___CG_p_patch__CG_edges__m_end_index',
+  '__CG_p_patch__CG_edges__m_f_e': 'in___CG_p_patch__CG_edges__m_f_e',
+  '__CG_p_patch__CG_edges__m_inv_dual_edge_length': 'in___CG_p_patch__CG_edges__m_inv_dual_edge_length',
+  '__CG_p_patch__CG_edges__m_inv_primal_edge_length': 'in___CG_p_patch__CG_edges__m_inv_primal_edge_length',
+  '__CG_p_patch__CG_edges__m_quad_blk': 'in___CG_p_patch__CG_edges__m_quad_blk',
+  '__CG_p_patch__CG_edges__m_quad_idx': 'in___CG_p_patch__CG_edges__m_quad_idx',
+  '__CG_p_patch__CG_edges__m_start_block': 'in___CG_p_patch__CG_edges__m_start_block',
+  '__CG_p_patch__CG_edges__m_start_index': 'in___CG_p_patch__CG_edges__m_start_index',
+  '__CG_p_patch__CG_edges__m_tangent_orientation': 'in___CG_p_patch__CG_edges__m_tangent_orientation',
+  '__CG_p_patch__CG_edges__m_vertex_blk': 'in___CG_p_patch__CG_edges__m_vertex_blk',
+  '__CG_p_patch__CG_edges__m_vertex_idx': 'in___CG_p_patch__CG_edges__m_vertex_idx',
+  '__CG_p_patch__CG_verts__m_cell_blk': 'in___CG_p_patch__CG_verts__m_cell_blk',
+  '__CG_p_patch__CG_verts__m_cell_idx': 'in___CG_p_patch__CG_verts__m_cell_idx',
+  '__CG_p_patch__CG_verts__m_edge_blk': 'in___CG_p_patch__CG_verts__m_edge_blk',
+  '__CG_p_patch__CG_verts__m_edge_idx': 'in___CG_p_patch__CG_verts__m_edge_idx',
+  '__CG_p_patch__CG_verts__m_end_block': 'in___CG_p_patch__CG_verts__m_end_block',
+  '__CG_p_patch__CG_verts__m_end_index': 'in___CG_p_patch__CG_verts__m_end_index',
+  '__CG_p_patch__CG_verts__m_start_block': 'in___CG_p_patch__CG_verts__m_start_block',
+  '__CG_p_patch__CG_verts__m_start_index': 'in___CG_p_patch__CG_verts__m_start_index',
+  '__CG_p_prog__m_vn': 'in___CG_p_nh_prog_nnew__m_vn',
+  '__CG_p_prog__m_w': 'in___CG_p_nh_prog_nnew__m_w',
+  'global_data': 'in_global_data',
+  'p_diag': 'in_p_nh->diag',
+  'p_int': 'in_p_int',
+  'p_metrics': 'in_p_nh->metrics',
+  'p_patch': 'in_p_patch',
+  'p_prog': 'in_p_nh_prog_nnew',
+  'z_kin_hor_e': 'in_z_kin_hor_e',
+  'z_vt_ie': 'in_z_vt_ie',
+  'z_w_concorr_me': 'in_z_w_concorr_me',
+  '__CG_global_data__m_nproma': 'in___CG_global_data__m_nproma',
+  '__CG_p_diag__m_max_vcfl_dyn': 'in___CG_p_nh__CG_diag__m_max_vcfl_dyn',
+  '__f2dace_A_z_kin_hor_e_d_0_s': 'in_global_data->nproma',
+  '__f2dace_A_z_kin_hor_e_d_1_s': 'in_p_patch->nlev',
+  '__f2dace_A_z_vt_ie_d_0_s': 'in_global_data->nproma',
+  '__f2dace_A_z_vt_ie_d_1_s': 'in_p_patch->nlev',
+  '__f2dace_A_z_w_concorr_me_d_0_s': 'global_data->nproma',
+  '__f2dace_A_z_w_concorr_me_d_1_s': 'in_p_patch->nlev',
+  '__f2dace_OA_z_kin_hor_e_d_0_s': '1',
+  '__f2dace_OA_z_kin_hor_e_d_1_s': '1',
+  '__f2dace_OA_z_kin_hor_e_d_2_s': '1',
+  '__f2dace_OA_z_vt_ie_d_0_s': '1',
+  '__f2dace_OA_z_vt_ie_d_1_s': '1',
+  '__f2dace_OA_z_vt_ie_d_2_s': '1',
+  '__f2dace_OA_z_w_concorr_me_d_0_s': '1',
+  '__f2dace_OA_z_w_concorr_me_d_1_s': '1',
+  '__f2dace_OA_z_w_concorr_me_d_2_s': '1',
+  'dt_linintp_ubc': 'in_dt_linintp_ubc',
+  'dtime': 'in_dtime',
+  'istep': 'in_istep',
+  'ldeepatmo': 'in_global_data->ldeepatmo',
+  'lvn_only': '??',
+  'ntnd': 'in_ntnd',
+}
+
+non_const_data = {
+    "__CG_p_prog__m_w",
+    "__CG_p_prog__m_vn",
+    "__CG_p_diag__m_max_vcfl_dyn",
+    "__CG_p_metrics__m_ddqz_z_full_e",
+    "__CG_p_metrics__m_ddqz_z_half",
+    "__CG_p_metrics__m_coeff_gradekin",
+    "__CG_p_int__m_geofac_grdiv",
+    "__CG_p_int__m_e_bln_c_s",
+    "__CG_p_int__m_c_lin_e",
+    "__CG_p_diag__m_w_concorr_c",
+    "__CG_p_diag__m_vn_ie",
+    "__CG_p_diag__m_vt",
+    "__CG_p_diag__m_ddt_vn_apc_pc",
+}
+
+non_const_scalar_data = {
+    "__CG_p_diag__m_max_vcfl_dyn",
+}
+
+
+code_template = """
+auto* in_p_diag = in_p_nh -> diag;
+auto* in_p_metrics = in_p_nh -> metrics;
+auto in_ldeepatmo = in_global_data -> ldeepatmo;
+velocity_tendencies(
+    {input_args}
+);
+out_global_data = in_global_data;
+out_p_nh = in_p_nh;
+out_p_int = in_p_int;
+out_p_patch = in_p_patch;
+out_p_prog = in_p_prog;
+{output_assignments}
+"""
+
+def reinject_velocity_shim(
+    sdfg: dace.SDFG
+):
+    velocity_tasklet = None
+    velocity_state = None
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.Tasklet) and ("velocity_tendencies" in node.name or "velocity_tendencies" in node.label):
+                velocity_tasklet = node
+                velocity_state = state
+                break
+        if velocity_tasklet is not None:
+            break
+
+    if velocity_tasklet is None:
+        return
+
+    if "predictor" in sdfg.name:
+        in_istep = f"1"
+    else:
+        in_istep = f"2"
+    if "in_lvn_only" in velocity_tasklet.in_connectors:
+        in_lvn_only = f"in_lvn_only"
+    else:
+        in_lvn_only = f"0"
+
+    velocity_name_mapping_local = copy.deepcopy(velocity_name_mapping)
+    velocity_name_mapping_local["istep"] = in_istep
+    velocity_name_mapping_local["lvn_only"] = in_lvn_only
+
+    required_in_conns = set()
+    for name in velocity_name_mapping_local.values():
+        if "->" in name:
+            lname = name.split("->")[0].strip()
+        else:
+            lname = name
+        if lname.startswith("in_"):
+            required_in_conns.add(lname)
+
+    # Add all missing in connectors (full range)
+    new_in_conns = required_in_conns - set(velocity_tasklet.in_connectors)
+    for new_in_conn in new_in_conns:
+        data_name = new_in_conn[3:]  # Remove 'in_' prefix
+        if (new_in_conn not in velocity_tasklet.in_connectors and
+            data_name in state.sdfg.arrays):
+            velocity_tasklet.add_in_connector(new_in_conn)
+            dataaccess = state.add_access(data_name)
+            state.add_edge(
+                dataaccess,
+                None,
+                velocity_tasklet,
+                new_in_conn,
+                dace.memlet.Memlet.from_array(
+                    data_name,
+                    state.sdfg.arrays[data_name]
+                )
+            )
+
+    input_args_str_list = []
+    for key, val in velocity_name_mapping_local.items():
+        input_args_str_list.append(f"{val} /* = {key} */")
+    input_args_str = ",\n    ".join(input_args_str_list)
+
+    # Add all missing out connectors (full range), for non const data
+    for key in non_const_data:
+        out_name = "out_" + velocity_name_mapping_local[key][3:]  # Remove 'in_' prefix
+        if out_name not in velocity_tasklet.out_connectors:
+            velocity_tasklet.add_out_connector(out_name)
+            data_name = out_name[4:]
+            dataaccess = state.add_access(data_name)
+            state.add_edge(
+                velocity_tasklet,
+                out_name,
+                dataaccess,
+                None,
+                dace.memlet.Memlet.from_array(
+                    data_name,
+                    state.sdfg.arrays[data_name]
+                )
+            )
+
+    output_assignments_list = []
+    for key in non_const_scalar_data:
+        in_name = velocity_name_mapping_local[key]
+        out_name = "out_" + in_name[3:]
+        output_assignments_list.append(f"{out_name} = {in_name};")
+    for key in non_const_data:
+        in_name = velocity_name_mapping_local[key]
+        out_name = "out_" + in_name[3:]
+        output_assignments_list.append(f"{out_name} = {in_name};")
+    output_assignments_str = "\n    ".join(output_assignments_list)
+
+    code_str = code_template.format(
+        input_args=input_args_str,
+        output_assignments=output_assignments_str
+    )
+
+    velocity_tasklet.code = CodeBlock(code_str, language=dace.dtypes.Language.CPP)

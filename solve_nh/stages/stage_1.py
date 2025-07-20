@@ -28,7 +28,7 @@ from utils.promote_function_access_in_map_range_to_symbol import (
 from utils.loop_locality import make_array_loop_local
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 from utils.post_stage1_fixes import post_stage1_fixes
-
+from utils.reinject_velocity_tasklet import reinject_velocity_shim
 STAGE_ID = 1
 
 
@@ -47,8 +47,11 @@ def optimization_action(g: SDFG):
         shallow_copy=False,
         shallow_copy_to_gpu=False,
         taskloop=False,
+        dont_prune_unused_containers=True,
     ).apply_pass(g, {})
     clean_trivial_view_pattern(g)
+    reinject_velocity_shim(g)
+    g.validate()
     # Simplify results with NestedSDFGs having missing symbols
     g.simplify(skip=["ArrayElimination", "StateFusion"], validate=False)
     # Add missing symbols and data to NSDFGs to make it valid

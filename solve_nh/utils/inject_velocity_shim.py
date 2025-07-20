@@ -9,7 +9,7 @@ from dace.sdfg.graph import MultiConnectorEdge
 from dace.frontend.fortran.ast_utils import singular, atmost_one
 from dace.properties import CodeBlock
 from dace import dtypes
-
+import dace
 
 def drop_numerical_suffix_from_connectors(
     st: SDFGState, ng: NestedSDFG | Tasklet

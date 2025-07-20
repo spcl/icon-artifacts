@@ -489,6 +489,8 @@ def consolidate_generated_code(
         ("p_nh[0] = out_p_nh;", "p_nh = out_p_nh;"),
         ("DACE_EXPORTED", ""),
         ("const const", "const"),
+        ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];",
+         "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;")
     ]
 
     # Format again after replacements
