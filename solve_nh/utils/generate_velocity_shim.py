@@ -368,7 +368,7 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
                 key, val = _key, _val
                 break
         assert key is not None and val is not None, f"Function {fun_name} not found in results"
-        call_str = ",\n            ".join(v[1] for v in val)
+        call_str = ",\n            ".join(v[1] for v in val if "_state" not in v[1])
         call_args_ll.append(call_str)
 
     sstr = velocity_shim_template.format(

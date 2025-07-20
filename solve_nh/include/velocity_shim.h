@@ -119,8 +119,7 @@ static void velocity_tendencies(
     if (lvn_only == 1 && istep == 1) {
         if (lvn_only_1_istep_1_call_id == 0) {
             state_lvn_only_1_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-                __state,
-            __CG_global_data__m_nflatlev,
+                __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
             __CG_p_diag__m_vn_ie,
@@ -204,7 +203,6 @@ static void velocity_tendencies(
         lvn_only_1_istep_1_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
             state_lvn_only_1_istep_1,
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
@@ -288,7 +286,6 @@ static void velocity_tendencies(
     } else if (lvn_only == 1 && istep == 2) {
         if (lvn_only_1_istep_2_call_id == 0) {
             state_lvn_only_1_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
@@ -357,7 +354,6 @@ static void velocity_tendencies(
         lvn_only_1_istep_2_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
             state_lvn_only_1_istep_2,
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
@@ -425,7 +421,6 @@ static void velocity_tendencies(
     } else if (lvn_only == 0 && istep == 1) {
         if (lvn_only_0_istep_1_call_id == 0) {
             state_lvn_only_0_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
@@ -522,7 +517,6 @@ static void velocity_tendencies(
         lvn_only_0_istep_1_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
             state_lvn_only_0_istep_1,
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
@@ -618,7 +612,6 @@ static void velocity_tendencies(
     } else if (lvn_only == 0 && istep == 2) {
         if (lvn_only_0_istep_2_call_id == 0) {
             state_lvn_only_0_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
@@ -704,7 +697,6 @@ static void velocity_tendencies(
         lvn_only_0_istep_2_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
             state_lvn_only_0_istep_2,
-            __state,
             __CG_global_data__m_nflatlev,
             __CG_global_data__m_nrdmax,
             __CG_p_diag__m_ddt_vn_apc_pc,
