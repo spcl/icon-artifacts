@@ -249,7 +249,7 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
         "__f2dace_A_z_vt_ie_d_0_s" : "in_global_data->nproma",
         "__f2dace_A_z_vt_ie_d_1_s" : "in_p_patch->nlev",
         "__f2dace_A_z_vt_ie_d_2_s" : "in_p_patch->nblks_e",
-        "__f2dace_A_z_w_concorr_me_d_0_s" : "global_data->nproma",
+        "__f2dace_A_z_w_concorr_me_d_0_s" : "in_global_data->nproma",
         "__f2dace_A_z_w_concorr_me_d_1_s" : "in_p_patch->nlev",
         "__f2dace_A_z_w_concorr_me_d_2_s" : "in_p_patch->nblks_e",
         "__f2dace_OA_z_kin_hor_e_d_0_s" : "1",
@@ -364,7 +364,7 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
                      "lvn_only_0_istep_2"]:
         key, val = None, None
         for _key, _val in result.items():
-            if fun_name in _key:
+            if fun_name in _key and "_program" in _key:
                 key, val = _key, _val
                 break
         assert key is not None and val is not None, f"Function {fun_name} not found in results"

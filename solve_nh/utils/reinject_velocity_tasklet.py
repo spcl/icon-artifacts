@@ -80,7 +80,7 @@ velocity_name_mapping = {
   '__f2dace_A_z_kin_hor_e_d_1_s': 'in_p_patch->nlev',
   '__f2dace_A_z_vt_ie_d_0_s': 'in_global_data->nproma',
   '__f2dace_A_z_vt_ie_d_1_s': 'in_p_patch->nlev',
-  '__f2dace_A_z_w_concorr_me_d_0_s': 'global_data->nproma',
+  '__f2dace_A_z_w_concorr_me_d_0_s': 'in_global_data->nproma',
   '__f2dace_A_z_w_concorr_me_d_1_s': 'in_p_patch->nlev',
   '__f2dace_OA_z_kin_hor_e_d_0_s': '1',
   '__f2dace_OA_z_kin_hor_e_d_1_s': '1',
