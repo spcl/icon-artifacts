@@ -559,7 +559,7 @@ def compile_generated_code(
 
     if mode == Mode.SHARED:
         if stage >= GPU_STAGE_BEGINS:
-            print(f"Skipping static library compilation for CUDA stage {GPU_STAGE_BEGINS} and above")
+            print(f"Skipping shared library compilation for CUDA stage {GPU_STAGE_BEGINS} and above. Shared library feature needs to be implemented for CUDA stage 4.")
         else:
             compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE, stage)
             print(f"Successfully created shared library: {SHARED_LIB_FILE}")
