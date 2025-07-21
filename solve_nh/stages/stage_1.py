@@ -34,6 +34,7 @@ STAGE_ID = 1
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    # === Sub-Phase 1: Flattening ===
     g.apply_transformations_repeated(ContinueToCondition)
     clean_partial_view_towers(g)
     StructToContainerGroups(
@@ -52,31 +53,47 @@ def optimization_action(g: SDFG):
     clean_trivial_view_pattern(g)
     reinject_velocity_shim(g)
     g.validate()
+    # Until this point we numerically validate
+    # === Sub-Phase 1: Flattening ===
+
+    # === Sub-Phase 2: Simplify and Patch ===
     # Simplify results with NestedSDFGs having missing symbols
-    g.simplify(skip=["ArrayElimination", "StateFusion"], validate=False)
+    g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
     # Add missing symbols and data to NSDFGs to make it valid
     add_missing_data_and_symbols_to_all_nsdfgs(g)
     g.validate()
+    # === Sub-Phase 2: Simplify and Patch ===
+
+    # === Sub-Phase 3: SymbolPropagation + Simplify + FuseState Without CopyIn/CopyOut ===
+    # Until this point we numerically validate
     SymbolPropagation().apply_pass(g, {})
     g.validate()
-    g.simplify(skip=["ArrayElimination", "FuseState"], validate=False)
+    # Until this point we numerically validate
+    g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
     # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with the rest of the maps make
     # offloading much harder)
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
-    ConstantPropagation().apply_pass(g, {})
+    # === Sub-Phase 3: SymbolPropagation + Simplify + FuseState Without CopyIn/CopyOut ===
 
+    # === Sub-Phase 4: ConstantPropagation ===
+    ConstantPropagation().apply_pass(g, {})
+    g.validate()
+    # === Sub-Phase 4: ConstantPropagation ===
+
+    # === Sub-Phase 5: Loop Preprocessing ===
     # Ensure loop locality for ballin LoopToMap
     if g.name == "solve_nh_predictor_pre":
         make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1156_c_1156")
     elif g.name == "solve_nh_corrector_pre":
         make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1712_c_1712")
+    g.validate()
+    # === Sub-Phase 5: Loop Preprocessing ===
 
-    # BALLIN
+    # === Sub-Phase 6: LoopToMap + LoopToMap-Patches ===
     g.apply_transformations_repeated(
         LoopToMap, permissive=True, options={"ballin": True}
     )
-
     # Map ranges have expressions such nflatlev(jg - 1) as Sympy expresses array accesses as functions
     # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
     # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
@@ -88,8 +105,12 @@ def optimization_action(g: SDFG):
 
     #add_missing_symbols_to_nsdfgs(g)
     g.validate()
+    # === Sub-Phase 6: LoopToMap + LoopToMap-Patches ===
+
+
+    # === Sub-Phase 7: Last Simplify + StateFusion ===
     # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
-    g.simplify(skip=["ArrayElimination", "FuseStates"], validate=False)
+    g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
 
     # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with the rest of the maps make
     # offloading much harder)
@@ -97,6 +118,7 @@ def optimization_action(g: SDFG):
 
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
+    # === Sub-Phase 7: Last Simplify + StateFusion ===
 
     return g
 
