@@ -24,11 +24,14 @@ from utils.add_missing_symbols import (
 )
 from utils.promote_function_access_in_map_range_to_symbol import (
     promote_function_access_in_map_range_to_symbol,
+    promote_function_access_in_loop_range_to_symbol
 )
 from utils.loop_locality import make_array_loop_local
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 from utils.post_stage1_fixes import post_stage1_fixes
 from utils.reinject_velocity_tasklet import reinject_velocity_shim
+
+from utils.transify_kernel_scalars import transify_kernel_scalars
 STAGE_ID = 1
 
 
@@ -90,22 +93,33 @@ def optimization_action(g: SDFG):
     g.validate()
     # === Sub-Phase 5: Loop Preprocessing ===
 
-    # === Sub-Phase 6: LoopToMap + LoopToMap-Patches ===
+    # === Sub-Phase 6: Loop Preprocessing ===
+    # Map ranges have expressions such nflatlev(jg - 1) as Sympy expresses array accesses as functions
+    # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
+    # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
+    promote_function_access_in_loop_range_to_symbol(g, g)
+    # === Sub-Phase 6: Loop Preprocessing ===
+
+    # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
     g.apply_transformations_repeated(
-        LoopToMap, permissive=True, options={"ballin": True}
+        LoopToMap, permissive=True, options={"ballin": False, "permissive": False}
     )
     # Map ranges have expressions such nflatlev(jg - 1) as Sympy expresses array accesses as functions
     # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
     # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
-    promote_function_access_in_map_range_to_symbol(g)
+    # promote_function_access_in_map_range_to_symbol(g)
 
     # Do not add missing symbols to NSDFGs before promiting nflatlev access to
     # data access, otherwise nflatlev will be registered as a symbol already
-    add_missing_data_and_symbols_to_all_nsdfgs(g)
+    # add_missing_data_and_symbols_to_all_nsdfgs(g)
 
     #add_missing_symbols_to_nsdfgs(g)
     g.validate()
-    # === Sub-Phase 6: LoopToMap + LoopToMap-Patches ===
+
+    # Make scalars within kernels as transient as possible
+    # transify_kernel_scalars(g, dace.dtypes.ScheduleType.Default)
+    return g
+    # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
 
     # === Sub-Phase 7: Last Simplify + StateFusion ===
