@@ -17,6 +17,8 @@ def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
                 b_str = str(b)
                 e_str = str(e)
                 s_str = str(s)
+                #print(b,", ",e,", ",s)
+                #print(b_str,", ",e_str,", ",s_str)
                 range_expr = []
                 for expr_str in [b_str, e_str, s_str]:
                     matches = re.findall(r'\b\w+\s*\(.*?\)', expr_str)
@@ -32,21 +34,29 @@ def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
                         assert var_name.startswith("__CG_")
                         #var_name = var_name[5:]  # Remove "__CG_" prefix
                         sym_name = f"{var_name[5:]}_sym_{sym_id}"
+                        expr_expr = dace.symbolic.SymExpr(expr_str)
+                        updated_expr = expr_str.replace(match_0, sym_name)
+                        if expr_expr == updated_expr:
+                            raise Exception("Replace must not fail if we detect the pattern:", updated_expr, var_name, sym_name)
                         data_accesses.add(var_name)
                         # Create the access name (array[i] instead of array(i))
                         access_name = match_0.replace('(', '[').replace(')', ']')
                         # Add to the list of assignments to be added to the state edge leading to state
                         # where the map is in
-                        new_symbol_assignments.append((sym_name,access_name ))
-                        range_expr.append(dace.symbolic.SymExpr(sym_name))
+                        new_symbol_assignments.append((sym_name, access_name))
+                        range_expr.append(dace.symbolic.SymExpr(updated_expr))
                     else:
-                        range_expr.append(expr_str)
+                        range_expr.append(dace.symbolic.SymExpr(expr_str))
                 new_range_list.append(range_expr)
+                range_expr = []
             # If need to change range do it
             if not change_range:
                 continue
 
             node.map.range = dace.subsets.Range(new_range_list)
+            #print(node.map.range)
+            #print([(b,e,s) for (b,e,s) in node.map.range])
+            #print()
             # If this state has no incoming edges, add an empty state to parent graph and connect to this set
             if len(state.parent_graph.in_edges(state)) == 0:
                 var_assign_state = dace.SDFGState(
