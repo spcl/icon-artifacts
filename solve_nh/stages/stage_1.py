@@ -1,5 +1,6 @@
 import dace
 from dace import SDFG
+from dace.sdfg.state import LoopRegion
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import Mode
@@ -31,7 +32,7 @@ from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_c
 from utils.post_stage1_fixes import post_stage1_fixes
 from utils.reinject_velocity_tasklet import reinject_velocity_shim
 
-from utils.transify_kernel_scalars import transify_kernel_scalars
+from utils.transify_kernel_scalars import transify_kernel_scalars, transify_targeted_scalar
 STAGE_ID = 1
 
 
@@ -98,26 +99,51 @@ def optimization_action(g: SDFG):
     # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
     # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
     promote_function_access_in_loop_range_to_symbol(g, g)
+    # Replace non-transient scalars that could be transients with transient thread-local scalars to enable more loops to become maps
+    # Might need to extend this
+    thread_local_scalars = {
+        "z_a", "z_b", "z_c",
+        "z_d_vn_dmp", "z_d_vn_iau",
+        "z_ddt_vn_apc", "z_ddt_vn_cor",
+        "z_ddt_vn_dyn", "z_ddt_vn_pgr",
+        "z_ddt_vn_ray", "z_g", "zf",
+        "z_theta1", "z_theta2",
+        "z_ntdistv_bary_1", "z_ntdistv_bary_2",
+        "distv_bary_2", "distv_bary_1",
+    }
+
+    transify_targeted_scalar(g, thread_local_scalars)
+    # Try state fusion again for kernels that have 2 states
+    state_fusion_without_copyin_and_copyout(g)
     # === Sub-Phase 6: Loop Preprocessing ===
 
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
     g.apply_transformations_repeated(
-        LoopToMap, permissive=True, options={"ballin": False, "permissive": False}
+        LoopToMap, permissive=False, options={"ballin": False}
     )
-    # Map ranges have expressions such nflatlev(jg - 1) as Sympy expresses array accesses as functions
-    # This function promotes this to nflatlev_sym_0 = nflatlev[jg - 1] in the previous interstate (or
-    # creates it), adds to NestedSDFG through an inconnector and updates map range to use nflatlev_sym_0
-    # promote_function_access_in_map_range_to_symbol(g)
 
     # Do not add missing symbols to NSDFGs before promiting nflatlev access to
     # data access, otherwise nflatlev will be registered as a symbol already
     # add_missing_data_and_symbols_to_all_nsdfgs(g)
+    # add_missing_symbols_to_nsdfgs(g)
 
-    #add_missing_symbols_to_nsdfgs(g)
+    # Manually checked loops that can become maps:
+    # SDFG Name | Loop Variable | Loop Label
+    # TODO: Probably no nproma map should be left.
+    manual_loop_to_map = {
+        ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),
+        ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"),
+        ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116")
+    }
+    for sdfg_name, loop_var, loop_label in manual_loop_to_map:
+        if g.name == sdfg_name:
+            for node, graph in g.all_nodes_recursive():
+                if isinstance(node, LoopRegion) and node.loop_variable == loop_var:
+                    assert node.label == loop_label
+                    LoopToMap.apply_to(graph, loop=node, permissive=True)
     g.validate()
 
-    # Make scalars within kernels as transient as possible
-    # transify_kernel_scalars(g, dace.dtypes.ScheduleType.Default)
+    count_loops(g, verbose=True, use_assert=False)
     return g
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
@@ -133,6 +159,11 @@ def optimization_action(g: SDFG):
     g.validate()
     count_loops(g, verbose=False, use_assert=True)
     # === Sub-Phase 7: Last Simplify + StateFusion ===
+
+    # === Sub-Phase 8: LoopToSequentialMap ===
+    # For simplicity of implementation, convert remaining loops to sequential maps?
+    # === Sub-Phase 8: LoopToSequentialMap ===
+
 
     return g
 

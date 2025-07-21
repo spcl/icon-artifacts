@@ -8,7 +8,7 @@ def count_loops(sdfg: dace.SDFG, verbose: bool = False, use_assert: bool = False
     for node, state in sdfg.all_nodes_recursive():
         if isinstance(node, LoopRegion):
             if verbose:
-                print(f"Loop: {node.label}")
+                print(f"Loop: {node.label}: for({node.init_statement.as_string}; {node.loop_condition.as_string}; {node.update_statement.as_string})")
             loops_post += 1
 
     if verbose:
@@ -153,7 +153,7 @@ def count_uncollapsed_maps(g: dace.SDFG, verbose: bool = False, use_assert: bool
 
     if verbose:
         print(f"Uncollapsed maps: {uncollapsed_maps}")
-    
+
     if use_assert and uncollapsed_maps > 0:
         import warnings
         warnings.warn(f"Uncollapsed maps: {uncollapsed_maps}")
