@@ -130,13 +130,14 @@ def optimization_action(g: SDFG):
     # Manually checked loops that can become maps:
     # SDFG Name | Loop Variable | Loop Label
     # TODO: Probably no nproma map should be left.
+    # TODO: Verify these 3 are OK
     manual_loop_to_map = {
         ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),
         ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"),
         ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116")
     }
     for sdfg_name, loop_var, loop_label in manual_loop_to_map:
-        if g.name == sdfg_name:
+        if sdfg_name in g.name:
             for node, graph in g.all_nodes_recursive():
                 if isinstance(node, LoopRegion) and node.loop_variable == loop_var:
                     assert node.label == loop_label
