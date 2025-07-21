@@ -279,7 +279,7 @@ class Compiler:
         # Search for existence of velocity library files intended for this stage
         if any(Path(f).exists() for f in [
             f"libvelocity_{stage}.so", f"libvelocity_{stage}.dylib", f"libvelocity_{stage}.a"]):
-            rpath_flag = '-Xcompiler="-Wl,-rpath,."' if stage >= GPU_STAGE_BEGINS else "-Wl,-rpath,"
+            rpath_flag = '-Xcompiler="-Wl,-rpath,."' if stage >= GPU_STAGE_BEGINS else "-Wl,-rpath,."
             return ["-L.", f"-lvelocity_{stage}", rpath_flag]
         else:
             return []
