@@ -34,7 +34,6 @@ def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG):
                         if bf.can_be_applied(cfg, 0, sd):
                             bf.apply(cfg, sd)
                             applied += 1
-                            counter += 1
                             skip_nodes.add(u)
                             skip_nodes.add(v)
                 if applied == 0:
