@@ -38,3 +38,8 @@ def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG):
                             skip_nodes.add(v)
                 if applied == 0:
                     break
+
+    for s in sdfg.all_states():
+        for n in s.nodes():
+            if isinstance(n, dace.nodes.NestedSDFG):
+                state_fusion_without_copyin_and_copyout(n.sdfg)

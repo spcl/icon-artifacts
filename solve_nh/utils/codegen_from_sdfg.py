@@ -233,7 +233,7 @@ class Compiler:
         return (
             f"{errlimit_flag} -g -Wall -Wextra -Wno-unused-parameter "
             f"-Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable "
-            f"-Wno-unused-but-set-parameter -Wno-sign-compare {clang_only_warnings} -fsanitize=address"
+            f"-Wno-unused-but-set-parameter -Wno-sign-compare {clang_only_warnings}"
         ).split()
 
     def _get_cuda_diagnosis_flags(self) -> list[str]:

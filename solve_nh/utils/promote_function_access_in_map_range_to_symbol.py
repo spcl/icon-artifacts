@@ -2,6 +2,9 @@ import dace
 import re
 import copy
 
+from dace.sdfg.state import CodeBlock, LoopRegion
+from utils.add_missing_symbols import add_missing_data_and_symbols_to_all_nsdfgs
+
 def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
     sym_id = 0
     for node, parent_graph in sdfg.all_nodes_recursive():
@@ -165,6 +168,82 @@ def promote_function_access_in_map_range_to_symbol(sdfg: dace.SDFG):
                 )
                 dst.add_in_connector(data_access if isinstance(dst, dace.nodes.NestedSDFG) else f"IN_{data_access}")
 
+def promote_function_access_in_loop_range_to_symbol(root: dace.SDFG, sdfg: dace.SDFG):
+    sym_id = 0
+    for node, parent_graph in sdfg.all_nodes_recursive():
+        if isinstance(node, LoopRegion):
+            cond = node.loop_condition
+            var = node.loop_variable
+            init = node.init_statement
+            update = node.update_statement
+            assert isinstance(cond, CodeBlock) and isinstance(var, str) and isinstance(init, CodeBlock) and isinstance(update, CodeBlock), \
+                f"LoopRegion must have string loop_condition, loop_variable, init_statement and update_statement {type(cond)}, {type(var)}, {type(init)}, {type(update)}"
+
+            for c, attr_name in [(cond, "loop_condition"), (init, "init_statement"), (update, "update_statement")]:
+                 matches = re.findall(r'\b\w+\s*\[.*?\]', c.as_string)
+                 if matches:
+                    assert len(matches) == 1, f"Multiple array accesses found in loop expression: {matches}"
+                    # Update loop range
+                    # Get the match
+                    match_0 = matches[0]
+                    # Get the base for the variable name, use global offset to avoid conflicts
+                    var_name = match_0.split('[')[0].strip()
+                    assert var_name.startswith("__CG_")
+                    #var_name = var_name[5:]  # Remove "__CG_" prefix
+                    sym_name = f"{var_name[5:]}_sym_{sym_id}"
+                    setattr(node, attr_name, CodeBlock(c.as_string.replace(match_0, sym_name)))
+                    #print(node.loop_variable, node.loop_condition.as_string, node.init_statement.as_string, node.update_statement.as_string)
+
+                    data_access = match_0
+
+                    # Add the symbol to the SDFG
+                    # If var name in symbols, remove add is add data
+                    if var_name in parent_graph.sdfg.symbols:
+                        parent_graph.sdfg.remove_symbol(var_name)
+
+                    if var_name not in parent_graph.sdfg.arrays:
+                        desc = copy.deepcopy(root.arrays[var_name])
+                        desc.transient = False
+
+                        parent_graph.sdfg.add_datadesc(
+                            name=var_name,
+                            datadesc=desc
+                        )
+                    else:
+                        assert var_name in parent_graph.sdfg.arrays, \
+                            f"Data {var_name} not found in parent graph's SDFG arrays"
+                        if parent_graph.sdfg == root:
+                            assert parent_graph.sdfg.arrays[var_name].transient is True, \
+                                f"Data {var_name} in root graph's SDFG arrays is transient, expected non-transient"
+                        else:
+                            assert parent_graph.sdfg.arrays[var_name].transient is False, \
+                                f"Data {var_name} in parent graph's SDFG arrays is transient, expected non-transient"
+
+
+                    if sym_name not in parent_graph.sdfg.symbols:
+                        parent_graph.sdfg.add_symbol(sym_name, dace.dtypes.int32)
+                    assert sym_name in parent_graph.sdfg.symbols, \
+                        f"Symbol {sym_name} already exists in SDFG symbols"
+
+                    if len(parent_graph.in_edges(node)) == 0:
+                        var_assign_state = dace.SDFGState(
+                            label="sym_assign",
+                            sdfg=node.sdfg,
+                        )
+                        parent_graph.add_node(var_assign_state)
+                        parent_graph.add_edge(
+                            var_assign_state, node, dace.InterstateEdge()
+                        )
+                        sym_id += 1
+
+                    # Avoid adding symbols to an edge that already has assignments
+                    parent_graph.add_state_before(node,
+                                                  assignments={
+                                                      sym_name: data_access
+                                                  })
+
+
+    add_missing_data_and_symbols_to_all_nsdfgs(root)
 
 
 

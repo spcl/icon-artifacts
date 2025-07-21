@@ -4,6 +4,8 @@ from typing import Callable, Dict, Set, Tuple
 from dace.codegen.common import CodeBlock
 from dace.sdfg import is_devicelevel_gpu
 from dace.sdfg.state import MultiConnectorEdge
+from .transify_kernel_scalars import transify_kernel_scalars
+from .get_num_parent_map_scopes import get_num_parent_map_scopes
 
 openacc_data_names = """
    !$ACC DATA CREATE(z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e) &
@@ -274,40 +276,6 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
         print()
         print()
 
-def _find_parent_state(root_sdfg: dace.SDFG, node: dace.nodes.NestedSDFG):
-    if node is not None:
-        # Find parent state of that node
-        for n, g in root_sdfg.all_nodes_recursive():
-            if n == node:
-                parent_state = g
-                return parent_state
-    return None
-
-def _get_num_parent_map_scopes(root_sdfg: dace.SDFG, node: dace.nodes.MapEntry,
-                                parent_state: dace.SDFGState):
-    scope_dict = parent_state.scope_dict()
-    num_parent_maps = 0
-    cur_node = node
-    while scope_dict[cur_node] is not None:
-        if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
-            num_parent_maps += 1
-        cur_node = scope_dict[cur_node]
-
-    # Check parent nsdfg
-    parent_nsdfg_node = parent_state.sdfg.parent_nsdfg_node
-    parent_nsdfg_parent_state = _find_parent_state(root_sdfg, parent_nsdfg_node)
-
-    while parent_nsdfg_node is not None:
-        scope_dict = parent_nsdfg_parent_state.scope_dict()
-        cur_node = parent_nsdfg_node
-        while scope_dict[cur_node] is not None:
-            if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
-                num_parent_maps += 1
-            cur_node = scope_dict[cur_node]
-        parent_nsdfg_node = parent_nsdfg_parent_state.sdfg.parent_nsdfg_node
-        parent_nsdfg_parent_state = _find_parent_state(root_sdfg, parent_nsdfg_node)
-
-    return num_parent_maps
 
 def _get_data_used_by_map(map_entry: dace.nodes.MapEntry, state: dace.SDFGState):
     """
@@ -657,37 +625,6 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
             if isinstance(node, dace.nodes.NestedSDFG):
                 _add_interstate_data(root_sdfg, node.sdfg, const_arrays)
 
-def _transify_kernel_scalars(sdfg: dace.SDFG):
-    kernel_id = 0
-    for node, graph in sdfg.all_nodes_recursive():
-        if isinstance(node, dace.nodes.MapEntry):
-            # If the map is a kernel map, then we need to transify the scalars
-            if node.map.schedule == dace.ScheduleType.GPU_Device:
-                out_data = {e.data.data for e in graph.out_edges(node) if e.data is not None and e.data.data is not None}
-                inner_nodes = graph.all_nodes_between(node, graph.exit_node(node))
-                transifies = any(isinstance(inner_node, dace.nodes.AccessNode) and inner_node.data not in out_data and not graph.sdfg.arrays[inner_node.data].transient and isinstance(graph.sdfg.arrays[inner_node.data], dace.data.Scalar) for inner_node in inner_nodes)
-                if transifies:
-                    kernel_id += 1
-                name_mapping = dict()
-                for inner_node in inner_nodes:
-                    if (isinstance(inner_node, dace.nodes.AccessNode) and
-                         inner_node.data not in out_data and
-                         not graph.sdfg.arrays[inner_node.data].transient and
-                         isinstance(graph.sdfg.arrays[inner_node.data], dace.data.Scalar)):
-                            # If the access node is an output of the map, then we need to transify it
-                            new_scalar_desc = copy.deepcopy(graph.sdfg.arrays[inner_node.data])
-                            new_scalar_desc.transient = True
-                            new_scalar_desc.storage = dace.dtypes.StorageType.Register
-                            graph.sdfg.add_datadesc(f"{inner_node.data}_{kernel_id}", new_scalar_desc)
-                            name_mapping[inner_node.data] = f"{inner_node.data}_{kernel_id}"
-                for inner_node in inner_nodes:
-                    if isinstance(inner_node, dace.nodes.AccessNode) and inner_node.data in name_mapping:
-                        inner_node.data = name_mapping[inner_node.data]
-                for edge in graph.all_edges(*inner_nodes):
-                    if edge.data is not None and edge.data.data is not None:
-                        if edge.data.data in name_mapping:
-                            edge.data.data = name_mapping[edge.data.data]
-
 def _clean_redundant_pass_through_access_node(sdfg: dace.SDFG):
     tmp_id = 0
     for node, graph in sdfg.all_nodes_recursive():
@@ -810,7 +747,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
         print("Finding parent maps for each map entry node in the SDFG:")
     for node, graph in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.MapEntry):
-            num_parent_maps = _get_num_parent_map_scopes(sdfg, node, graph)
+            num_parent_maps = get_num_parent_map_scopes(sdfg, node, graph)
             parent_map_counts[(node, graph)] = num_parent_maps
             if verbose:
                 print(f"    Map {node.label} [{node.map.range}] ({graph.label}) has {num_parent_maps} parent maps.")
@@ -880,7 +817,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     _add_interstate_data(sdfg, sdfg, constant_arrays)
 
     # Writing to non-transient scalar within a kernel is not allowed, try to fix that
-    _transify_kernel_scalars(sdfg)
+    transify_kernel_scalars(sdfg)
     # If subset1 -> non-transient-an -> subset2 where subset1 == subset2 and of size 1
     # then remove the access node and replace it with an assignment tasklet and transient scalar
     # to avoid writing to data within the kernel
