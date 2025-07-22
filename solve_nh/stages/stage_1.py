@@ -32,7 +32,11 @@ from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_c
 from utils.post_stage1_fixes import post_stage1_fixes
 from utils.reinject_velocity_tasklet import reinject_velocity_shim
 
-from utils.transify_kernel_scalars import transify_kernel_scalars, transify_targeted_scalar
+from utils.transify_kernel_scalars import (
+    transify_kernel_scalars,
+    transify_targeted_scalar,
+
+)
 STAGE_ID = 1
 
 
@@ -101,20 +105,58 @@ def optimization_action(g: SDFG):
     promote_function_access_in_loop_range_to_symbol(g, g)
     # Replace non-transient scalars that could be transients with transient thread-local scalars to enable more loops to become maps
     # Might need to extend this
-    thread_local_scalars = {
-        "z_a", "z_b", "z_c",
-        "z_d_vn_dmp", "z_d_vn_iau",
-        "z_ddt_vn_apc", "z_ddt_vn_cor",
-        "z_ddt_vn_dyn", "z_ddt_vn_pgr",
-        "z_ddt_vn_ray", "z_g", "zf",
-        "z_theta1", "z_theta2",
-        "z_ntdistv_bary_1", "z_ntdistv_bary_2",
-        "distv_bary_2", "distv_bary_1",
+    thread_local_scalar_candidates = {
+        "lvn_pos",
+        "z_ddt_vn_apc",
+        "z_b",
+        "z_w_expl",
+        "z_c",
+        "z_theta_v_pr_ic",
+        "zf",
+        "z_ddt_vn_ray",
+        "z_q",
+        "ikp1",
+        "ilc0",
+        "ishift",
+        "z_ntdistv_bary_2",
+        "z_exner_ic",
+        "z_w_concorr_mc_m0",
+        "z_ddt_vn_pgr",
+        "z_d_vn_dmp",
+        "ibc0",
+        "nlen_gradp",
+        "distv_bary_2",
+        "z_gamma",
+        "z_theta_tavg",
+        "z_w_concorr_mc_m2",
+        "z_flxdiv_mass",
+        "z_theta2",
+        "z_ntdistv_bary_1",
+        "z_theta_v_pr_mc",
+        "z_w_concorr_mc_m1",
+        "z_a",
+        "ic",
+        "z_d_vn_iau",
+        "z_g",
+        "z_rho_tavg",
+        "z_rho_tavg_m1",
+        "ikp2",
+        "z_w_backtraj",
+        "z_theta1",
+        "z_ddt_vn_cor",
+        "z_theta_tavg_m1",
+        "distv_bary_1",
+        "z_ddt_vn_dyn",
+        "z_theta_v_pr_mc_m2",
+        "z_contr_w_fl_l",
+        "z_graddiv2_vn",
+        "z_theta_v_pr_mc_m1",
     }
-
-    transify_targeted_scalar(g, thread_local_scalars)
-    # Try state fusion again for kernels that have 2 states
+    # First fuse as much as possible, as the heuristic to detect a scalar as transient
+    # is based on the number of accesses to it, and if the states are not fused, it might have
+    # in-degree = 0 in state 1 but only written to state 0
     state_fusion_without_copyin_and_copyout(g)
+    transify_targeted_scalar(g, thread_local_scalar_candidates)
     # === Sub-Phase 6: Loop Preprocessing ===
 
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
@@ -130,22 +172,20 @@ def optimization_action(g: SDFG):
     # Manually checked loops that can become maps:
     # SDFG Name | Loop Variable | Loop Label
     # TODO: Probably no nproma map should be left.
-    # TODO: Verify these 3 are OK
     manual_loop_to_map = {
-        ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),
-        ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"),
-        ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116")
+        #("corrector_post",  "_for_it_44", "FOR_l_1963_c_1963"),
+        #("predictor_pre" ,  "_for_it_99", "FOR_l_1110_c_1110"),
+        #("predictor_pre" , "_for_it_100", "FOR_l_1116_c_1116"),
     }
     for sdfg_name, loop_var, loop_label in manual_loop_to_map:
         if sdfg_name in g.name:
             for node, graph in g.all_nodes_recursive():
                 if isinstance(node, LoopRegion) and node.loop_variable == loop_var:
                     assert node.label == loop_label
-                    LoopToMap.apply_to(graph, loop=node, permissive=True)
+                    LoopToMap.apply_to(sdfg=graph.sdfg, loop=node, permissive=True)
     g.validate()
 
     count_loops(g, verbose=True, use_assert=False)
-    return g
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
 
@@ -162,7 +202,7 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 7: Last Simplify + StateFusion ===
 
     # === Sub-Phase 8: LoopToSequentialMap ===
-    # For simplicity of implementation, convert remaining loops to sequential maps?
+    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
     # === Sub-Phase 8: LoopToSequentialMap ===
 
 
