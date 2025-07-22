@@ -1,4 +1,5 @@
 import dace
+from dace.sdfg.utils import set_nested_sdfg_parent_references
 from dace.sdfg import InterstateEdge
 from dace.sdfg.state import ConditionalBlock, ControlFlowRegion
 from dace.sdfg.nodes import MapEntry, MapExit, NestedSDFG
@@ -47,7 +48,7 @@ def swap_map_condition(sdfg: dace.SDFG, cond_block_name):
 
     # Make sure that the condition symbol is not overwritten in the branch
     cond_syms = set(branch_cond.get_free_symbols())
-    for iedge in branch.all_interstate_edges():
+    for iedge in branch.all_interstate_edges(recursive=True):
         for k in iedge.data.assignments.keys():
             if str(k) in cond_syms:
                 raise ValueError(
@@ -87,7 +88,11 @@ def swap_map_condition(sdfg: dace.SDFG, cond_block_name):
             new_cond_block.add_branch(branch_cond, new_cond_branch)
 
             nsdfg.sdfg.remove_nodes_from(nsdfg.sdfg.all_control_flow_blocks())
-            nsdfg.sdfg.add_node(new_cond_block)
+            nsdfg.sdfg.add_node(new_cond_block, ensure_unique_name=True)
+
+            # Pass the symbols used in the condition
+            for sym in cond_syms:
+              nsdfg.symbol_mapping[sym] = sym
 
     # Move all states in the branch before the conditional block
     src_state = sdfg.add_state_before(cond_block)
@@ -95,7 +100,7 @@ def swap_map_condition(sdfg: dace.SDFG, cond_block_name):
     copy_mapping = {}
     for state in branch.all_states():
         new_state = copy.deepcopy(state)
-        sdfg.add_node(new_state)
+        sdfg.add_node(new_state, ensure_unique_name=True)
         copy_mapping[state] = new_state
 
     for state in branch.all_states():
@@ -110,3 +115,6 @@ def swap_map_condition(sdfg: dace.SDFG, cond_block_name):
 
     # Remove the conditional block
     sdfg.remove_node(cond_block)
+
+    # Set the parent references of nested SDFGs
+    set_nested_sdfg_parent_references(sdfg)
