@@ -12,9 +12,11 @@ def swap_map_condition(sdfg: dace.SDFG, cond_block_name):
     """
     # Find the conditional block
     cond_block: ConditionalBlock = None
-    for node, _ in sdfg.all_nodes_recursive():
+    psdfg: dace.SDFG = None
+    for node, p in sdfg.all_nodes_recursive():
         if node.label == cond_block_name:
             cond_block = node
+            psdfg = p.sdfg
             break
     assert (
         cond_block is not None
@@ -95,26 +97,26 @@ def swap_map_condition(sdfg: dace.SDFG, cond_block_name):
               nsdfg.symbol_mapping[sym] = sym
 
     # Move all states in the branch before the conditional block
-    src_state = sdfg.add_state_before(cond_block)
-    dst_state = sdfg.add_state_after(cond_block)
+    src_state = psdfg.add_state_before(cond_block)
+    dst_state = psdfg.add_state_after(cond_block)
     copy_mapping = {}
     for state in branch.all_states():
         new_state = copy.deepcopy(state)
-        sdfg.add_node(new_state, ensure_unique_name=True)
+        psdfg.add_node(new_state, ensure_unique_name=True)
         copy_mapping[state] = new_state
 
     for state in branch.all_states():
         for edge in branch.in_edges(state):
-            sdfg.add_edge(
+            psdfg.add_edge(
                 copy_mapping[edge.src], copy_mapping[state], copy.deepcopy(edge.data)
             )
 
-    sdfg.add_edge(src_state, copy_mapping[branch.start_block], InterstateEdge())
+    psdfg.add_edge(src_state, copy_mapping[branch.start_block], InterstateEdge())
     for sink in branch.sink_nodes():
-        sdfg.add_edge(copy_mapping[sink], dst_state, InterstateEdge())
+        psdfg.add_edge(copy_mapping[sink], dst_state, InterstateEdge())
 
     # Remove the conditional block
-    sdfg.remove_node(cond_block)
+    psdfg.remove_node(cond_block)
 
     # Set the parent references of nested SDFGs
-    set_nested_sdfg_parent_references(sdfg)
+    set_nested_sdfg_parent_references(psdfg)
