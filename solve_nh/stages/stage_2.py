@@ -15,7 +15,7 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    for _ in range(2):
+    for _ in range(3):
         g.apply_transformations_repeated(
             InlineSDFG
         )

@@ -2,6 +2,73 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
+struct t_grid_domain_decomp_info {
+    int __f2dace_SA_owner_mask_d_0_s_62 = {};
+    int __f2dace_SA_owner_mask_d_1_s_63 = {};
+    int __f2dace_SOA_owner_mask_d_0_s_62 = {};
+    int __f2dace_SOA_owner_mask_d_1_s_63 = {};
+    int* owner_mask = {};
+};
+
+struct t_grid_cells {
+    int __f2dace_SA_area_d_0_s_232 = {};
+    int __f2dace_SA_area_d_1_s_233 = {};
+    int __f2dace_SA_edge_blk_d_0_s_229 = {};
+    int __f2dace_SA_edge_blk_d_1_s_230 = {};
+    int __f2dace_SA_edge_blk_d_2_s_231 = {};
+    int __f2dace_SA_edge_idx_d_0_s_226 = {};
+    int __f2dace_SA_edge_idx_d_1_s_227 = {};
+    int __f2dace_SA_edge_idx_d_2_s_228 = {};
+    int __f2dace_SA_end_blk_d_0_s_239 = {};
+    int __f2dace_SA_end_blk_d_1_s_240 = {};
+    int __f2dace_SA_end_block_d_0_s_241 = {};
+    int __f2dace_SA_end_index_d_0_s_235 = {};
+    int __f2dace_SA_neighbor_blk_d_0_s_223 = {};
+    int __f2dace_SA_neighbor_blk_d_1_s_224 = {};
+    int __f2dace_SA_neighbor_blk_d_2_s_225 = {};
+    int __f2dace_SA_neighbor_idx_d_0_s_220 = {};
+    int __f2dace_SA_neighbor_idx_d_1_s_221 = {};
+    int __f2dace_SA_neighbor_idx_d_2_s_222 = {};
+    int __f2dace_SA_start_blk_d_0_s_236 = {};
+    int __f2dace_SA_start_blk_d_1_s_237 = {};
+    int __f2dace_SA_start_block_d_0_s_238 = {};
+    int __f2dace_SA_start_index_d_0_s_234 = {};
+    int __f2dace_SOA_area_d_0_s_232 = {};
+    int __f2dace_SOA_area_d_1_s_233 = {};
+    int __f2dace_SOA_edge_blk_d_0_s_229 = {};
+    int __f2dace_SOA_edge_blk_d_1_s_230 = {};
+    int __f2dace_SOA_edge_blk_d_2_s_231 = {};
+    int __f2dace_SOA_edge_idx_d_0_s_226 = {};
+    int __f2dace_SOA_edge_idx_d_1_s_227 = {};
+    int __f2dace_SOA_edge_idx_d_2_s_228 = {};
+    int __f2dace_SOA_end_blk_d_0_s_239 = {};
+    int __f2dace_SOA_end_blk_d_1_s_240 = {};
+    int __f2dace_SOA_end_block_d_0_s_241 = {};
+    int __f2dace_SOA_end_index_d_0_s_235 = {};
+    int __f2dace_SOA_neighbor_blk_d_0_s_223 = {};
+    int __f2dace_SOA_neighbor_blk_d_1_s_224 = {};
+    int __f2dace_SOA_neighbor_blk_d_2_s_225 = {};
+    int __f2dace_SOA_neighbor_idx_d_0_s_220 = {};
+    int __f2dace_SOA_neighbor_idx_d_1_s_221 = {};
+    int __f2dace_SOA_neighbor_idx_d_2_s_222 = {};
+    int __f2dace_SOA_start_blk_d_0_s_236 = {};
+    int __f2dace_SOA_start_blk_d_1_s_237 = {};
+    int __f2dace_SOA_start_block_d_0_s_238 = {};
+    int __f2dace_SOA_start_index_d_0_s_234 = {};
+    double* area = {};
+    t_grid_domain_decomp_info* decomp_info = {};
+    int* edge_blk = {};
+    int* edge_idx = {};
+    int* end_blk = {};
+    int* end_block = {};
+    int* end_index = {};
+    int* neighbor_blk = {};
+    int* neighbor_idx = {};
+    int* start_blk = {};
+    int* start_block = {};
+    int* start_index = {};
+};
+
 struct t_nh_metrics {
     int __f2dace_SA_bdy_mflx_e_blk_d_0_s_864 = {};
     int __f2dace_SA_bdy_mflx_e_idx_d_0_s_863 = {};
@@ -256,95 +323,6 @@ struct t_nh_metrics {
     double* wgtfacq_c = {};
     double* wgtfacq_e = {};
     double* zdiff_gradp = {};
-};
-
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_101 = {};
-    int __f2dace_SA_c_lin_e_d_1_s_102 = {};
-    int __f2dace_SA_c_lin_e_d_2_s_103 = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s_110 = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s_111 = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s_112 = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s_104 = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s_105 = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s_106 = {};
-    int __f2dace_SA_e_flx_avg_d_0_s_107 = {};
-    int __f2dace_SA_e_flx_avg_d_1_s_108 = {};
-    int __f2dace_SA_e_flx_avg_d_2_s_109 = {};
-    int __f2dace_SA_geofac_div_d_0_s_116 = {};
-    int __f2dace_SA_geofac_div_d_1_s_117 = {};
-    int __f2dace_SA_geofac_div_d_2_s_118 = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s_119 = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s_120 = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s_121 = {};
-    int __f2dace_SA_geofac_grg_d_0_s_128 = {};
-    int __f2dace_SA_geofac_grg_d_1_s_129 = {};
-    int __f2dace_SA_geofac_grg_d_2_s_130 = {};
-    int __f2dace_SA_geofac_grg_d_3_s_131 = {};
-    int __f2dace_SA_geofac_n2s_d_0_s_125 = {};
-    int __f2dace_SA_geofac_n2s_d_1_s_126 = {};
-    int __f2dace_SA_geofac_n2s_d_2_s_127 = {};
-    int __f2dace_SA_geofac_rot_d_0_s_122 = {};
-    int __f2dace_SA_geofac_rot_d_1_s_123 = {};
-    int __f2dace_SA_geofac_rot_d_2_s_124 = {};
-    int __f2dace_SA_nudgecoeff_e_d_0_s_136 = {};
-    int __f2dace_SA_nudgecoeff_e_d_1_s_137 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_0_s_132 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_1_s_133 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_2_s_134 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_3_s_135 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_113 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_114 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_115 = {};
-    int __f2dace_SOA_c_lin_e_d_0_s_101 = {};
-    int __f2dace_SOA_c_lin_e_d_1_s_102 = {};
-    int __f2dace_SOA_c_lin_e_d_2_s_103 = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s_110 = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s_111 = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s_112 = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s_104 = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s_105 = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s_106 = {};
-    int __f2dace_SOA_e_flx_avg_d_0_s_107 = {};
-    int __f2dace_SOA_e_flx_avg_d_1_s_108 = {};
-    int __f2dace_SOA_e_flx_avg_d_2_s_109 = {};
-    int __f2dace_SOA_geofac_div_d_0_s_116 = {};
-    int __f2dace_SOA_geofac_div_d_1_s_117 = {};
-    int __f2dace_SOA_geofac_div_d_2_s_118 = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s_119 = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s_120 = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s_121 = {};
-    int __f2dace_SOA_geofac_grg_d_0_s_128 = {};
-    int __f2dace_SOA_geofac_grg_d_1_s_129 = {};
-    int __f2dace_SOA_geofac_grg_d_2_s_130 = {};
-    int __f2dace_SOA_geofac_grg_d_3_s_131 = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s_125 = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s_126 = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s_127 = {};
-    int __f2dace_SOA_geofac_rot_d_0_s_122 = {};
-    int __f2dace_SOA_geofac_rot_d_1_s_123 = {};
-    int __f2dace_SOA_geofac_rot_d_2_s_124 = {};
-    int __f2dace_SOA_nudgecoeff_e_d_0_s_136 = {};
-    int __f2dace_SOA_nudgecoeff_e_d_1_s_137 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_0_s_132 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_1_s_133 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_2_s_134 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_3_s_135 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_113 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_114 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_115 = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* e_flx_avg = {};
-    double* geofac_div = {};
-    double* geofac_grdiv = {};
-    double* geofac_grg = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* nudgecoeff_e = {};
-    double* pos_on_tplane_e = {};
-    double* rbf_vec_coeff_e = {};
 };
 
 struct t_nh_diag {
@@ -683,139 +661,124 @@ struct t_nh_state {
     t_nh_ref* ref = {};
 };
 
-struct t_grid_vertices {
-    int __f2dace_SA_cell_blk_d_0_s_289 = {};
-    int __f2dace_SA_cell_blk_d_1_s_290 = {};
-    int __f2dace_SA_cell_blk_d_2_s_291 = {};
-    int __f2dace_SA_cell_idx_d_0_s_286 = {};
-    int __f2dace_SA_cell_idx_d_1_s_287 = {};
-    int __f2dace_SA_cell_idx_d_2_s_288 = {};
-    int __f2dace_SA_edge_blk_d_0_s_295 = {};
-    int __f2dace_SA_edge_blk_d_1_s_296 = {};
-    int __f2dace_SA_edge_blk_d_2_s_297 = {};
-    int __f2dace_SA_edge_idx_d_0_s_292 = {};
-    int __f2dace_SA_edge_idx_d_1_s_293 = {};
-    int __f2dace_SA_edge_idx_d_2_s_294 = {};
-    int __f2dace_SA_end_block_d_0_s_301 = {};
-    int __f2dace_SA_end_index_d_0_s_299 = {};
-    int __f2dace_SA_start_block_d_0_s_300 = {};
-    int __f2dace_SA_start_index_d_0_s_298 = {};
-    int __f2dace_SOA_cell_blk_d_0_s_289 = {};
-    int __f2dace_SOA_cell_blk_d_1_s_290 = {};
-    int __f2dace_SOA_cell_blk_d_2_s_291 = {};
-    int __f2dace_SOA_cell_idx_d_0_s_286 = {};
-    int __f2dace_SOA_cell_idx_d_1_s_287 = {};
-    int __f2dace_SOA_cell_idx_d_2_s_288 = {};
-    int __f2dace_SOA_edge_blk_d_0_s_295 = {};
-    int __f2dace_SOA_edge_blk_d_1_s_296 = {};
-    int __f2dace_SOA_edge_blk_d_2_s_297 = {};
-    int __f2dace_SOA_edge_idx_d_0_s_292 = {};
-    int __f2dace_SOA_edge_idx_d_1_s_293 = {};
-    int __f2dace_SOA_edge_idx_d_2_s_294 = {};
-    int __f2dace_SOA_end_block_d_0_s_301 = {};
-    int __f2dace_SOA_end_index_d_0_s_299 = {};
-    int __f2dace_SOA_start_block_d_0_s_300 = {};
-    int __f2dace_SOA_start_index_d_0_s_298 = {};
-    int* cell_blk = {};
-    int* cell_idx = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* start_block = {};
-    int* start_index = {};
+struct t_prepare_adv {
+    int __f2dace_SA_mass_flx_ic_d_0_s_905 = {};
+    int __f2dace_SA_mass_flx_ic_d_1_s_906 = {};
+    int __f2dace_SA_mass_flx_ic_d_2_s_907 = {};
+    int __f2dace_SA_mass_flx_me_d_0_s_902 = {};
+    int __f2dace_SA_mass_flx_me_d_1_s_903 = {};
+    int __f2dace_SA_mass_flx_me_d_2_s_904 = {};
+    int __f2dace_SA_vn_traj_d_0_s_911 = {};
+    int __f2dace_SA_vn_traj_d_1_s_912 = {};
+    int __f2dace_SA_vn_traj_d_2_s_913 = {};
+    int __f2dace_SA_vol_flx_ic_d_0_s_908 = {};
+    int __f2dace_SA_vol_flx_ic_d_1_s_909 = {};
+    int __f2dace_SA_vol_flx_ic_d_2_s_910 = {};
+    int __f2dace_SOA_mass_flx_ic_d_0_s_905 = {};
+    int __f2dace_SOA_mass_flx_ic_d_1_s_906 = {};
+    int __f2dace_SOA_mass_flx_ic_d_2_s_907 = {};
+    int __f2dace_SOA_mass_flx_me_d_0_s_902 = {};
+    int __f2dace_SOA_mass_flx_me_d_1_s_903 = {};
+    int __f2dace_SOA_mass_flx_me_d_2_s_904 = {};
+    int __f2dace_SOA_vn_traj_d_0_s_911 = {};
+    int __f2dace_SOA_vn_traj_d_1_s_912 = {};
+    int __f2dace_SOA_vn_traj_d_2_s_913 = {};
+    int __f2dace_SOA_vol_flx_ic_d_0_s_908 = {};
+    int __f2dace_SOA_vol_flx_ic_d_1_s_909 = {};
+    int __f2dace_SOA_vol_flx_ic_d_2_s_910 = {};
+    double* mass_flx_ic = {};
+    double* mass_flx_me = {};
+    double* vn_traj = {};
+    double* vol_flx_ic = {};
 };
 
-struct global_data_type {
-    int grf_intmethod_e = {};
-    int i_am_accel_node = {};
-    int iadv_rhotheta = {};
-    double iau_wgt_dyn = {};
-    int igradp_method = {};
-    int is_iau_active = {};
-    int itime_scheme = {};
-    int* kstart_dd3d = {};
-    int l_limited_area = {};
-    int ldeepatmo = {};
-    int lextra_diffu = {};
-    int lvert_nest = {};
-    int* nflat_gradp = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int rayleigh_type = {};
-    int timer_intp = {};
-    int timer_solve_nh_cellcomp = {};
-    int timer_solve_nh_veltend = {};
-    int timer_solve_nh_vnupd = {};
-    int timers_level = {};
-};
-
-struct t_grid_domain_decomp_info {
-    int __f2dace_SA_owner_mask_d_0_s_62 = {};
-    int __f2dace_SA_owner_mask_d_1_s_63 = {};
-    int __f2dace_SOA_owner_mask_d_0_s_62 = {};
-    int __f2dace_SOA_owner_mask_d_1_s_63 = {};
-    int* owner_mask = {};
-};
-
-struct t_grid_cells {
-    int __f2dace_SA_area_d_0_s_232 = {};
-    int __f2dace_SA_area_d_1_s_233 = {};
-    int __f2dace_SA_edge_blk_d_0_s_229 = {};
-    int __f2dace_SA_edge_blk_d_1_s_230 = {};
-    int __f2dace_SA_edge_blk_d_2_s_231 = {};
-    int __f2dace_SA_edge_idx_d_0_s_226 = {};
-    int __f2dace_SA_edge_idx_d_1_s_227 = {};
-    int __f2dace_SA_edge_idx_d_2_s_228 = {};
-    int __f2dace_SA_end_blk_d_0_s_239 = {};
-    int __f2dace_SA_end_blk_d_1_s_240 = {};
-    int __f2dace_SA_end_block_d_0_s_241 = {};
-    int __f2dace_SA_end_index_d_0_s_235 = {};
-    int __f2dace_SA_neighbor_blk_d_0_s_223 = {};
-    int __f2dace_SA_neighbor_blk_d_1_s_224 = {};
-    int __f2dace_SA_neighbor_blk_d_2_s_225 = {};
-    int __f2dace_SA_neighbor_idx_d_0_s_220 = {};
-    int __f2dace_SA_neighbor_idx_d_1_s_221 = {};
-    int __f2dace_SA_neighbor_idx_d_2_s_222 = {};
-    int __f2dace_SA_start_blk_d_0_s_236 = {};
-    int __f2dace_SA_start_blk_d_1_s_237 = {};
-    int __f2dace_SA_start_block_d_0_s_238 = {};
-    int __f2dace_SA_start_index_d_0_s_234 = {};
-    int __f2dace_SOA_area_d_0_s_232 = {};
-    int __f2dace_SOA_area_d_1_s_233 = {};
-    int __f2dace_SOA_edge_blk_d_0_s_229 = {};
-    int __f2dace_SOA_edge_blk_d_1_s_230 = {};
-    int __f2dace_SOA_edge_blk_d_2_s_231 = {};
-    int __f2dace_SOA_edge_idx_d_0_s_226 = {};
-    int __f2dace_SOA_edge_idx_d_1_s_227 = {};
-    int __f2dace_SOA_edge_idx_d_2_s_228 = {};
-    int __f2dace_SOA_end_blk_d_0_s_239 = {};
-    int __f2dace_SOA_end_blk_d_1_s_240 = {};
-    int __f2dace_SOA_end_block_d_0_s_241 = {};
-    int __f2dace_SOA_end_index_d_0_s_235 = {};
-    int __f2dace_SOA_neighbor_blk_d_0_s_223 = {};
-    int __f2dace_SOA_neighbor_blk_d_1_s_224 = {};
-    int __f2dace_SOA_neighbor_blk_d_2_s_225 = {};
-    int __f2dace_SOA_neighbor_idx_d_0_s_220 = {};
-    int __f2dace_SOA_neighbor_idx_d_1_s_221 = {};
-    int __f2dace_SOA_neighbor_idx_d_2_s_222 = {};
-    int __f2dace_SOA_start_blk_d_0_s_236 = {};
-    int __f2dace_SOA_start_blk_d_1_s_237 = {};
-    int __f2dace_SOA_start_block_d_0_s_238 = {};
-    int __f2dace_SOA_start_index_d_0_s_234 = {};
-    double* area = {};
-    t_grid_domain_decomp_info* decomp_info = {};
-    int* edge_blk = {};
-    int* edge_idx = {};
-    int* end_blk = {};
-    int* end_block = {};
-    int* end_index = {};
-    int* neighbor_blk = {};
-    int* neighbor_idx = {};
-    int* start_blk = {};
-    int* start_block = {};
-    int* start_index = {};
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_101 = {};
+    int __f2dace_SA_c_lin_e_d_1_s_102 = {};
+    int __f2dace_SA_c_lin_e_d_2_s_103 = {};
+    int __f2dace_SA_cells_aw_verts_d_0_s_110 = {};
+    int __f2dace_SA_cells_aw_verts_d_1_s_111 = {};
+    int __f2dace_SA_cells_aw_verts_d_2_s_112 = {};
+    int __f2dace_SA_e_bln_c_s_d_0_s_104 = {};
+    int __f2dace_SA_e_bln_c_s_d_1_s_105 = {};
+    int __f2dace_SA_e_bln_c_s_d_2_s_106 = {};
+    int __f2dace_SA_e_flx_avg_d_0_s_107 = {};
+    int __f2dace_SA_e_flx_avg_d_1_s_108 = {};
+    int __f2dace_SA_e_flx_avg_d_2_s_109 = {};
+    int __f2dace_SA_geofac_div_d_0_s_116 = {};
+    int __f2dace_SA_geofac_div_d_1_s_117 = {};
+    int __f2dace_SA_geofac_div_d_2_s_118 = {};
+    int __f2dace_SA_geofac_grdiv_d_0_s_119 = {};
+    int __f2dace_SA_geofac_grdiv_d_1_s_120 = {};
+    int __f2dace_SA_geofac_grdiv_d_2_s_121 = {};
+    int __f2dace_SA_geofac_grg_d_0_s_128 = {};
+    int __f2dace_SA_geofac_grg_d_1_s_129 = {};
+    int __f2dace_SA_geofac_grg_d_2_s_130 = {};
+    int __f2dace_SA_geofac_grg_d_3_s_131 = {};
+    int __f2dace_SA_geofac_n2s_d_0_s_125 = {};
+    int __f2dace_SA_geofac_n2s_d_1_s_126 = {};
+    int __f2dace_SA_geofac_n2s_d_2_s_127 = {};
+    int __f2dace_SA_geofac_rot_d_0_s_122 = {};
+    int __f2dace_SA_geofac_rot_d_1_s_123 = {};
+    int __f2dace_SA_geofac_rot_d_2_s_124 = {};
+    int __f2dace_SA_nudgecoeff_e_d_0_s_136 = {};
+    int __f2dace_SA_nudgecoeff_e_d_1_s_137 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_0_s_132 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_1_s_133 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_2_s_134 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_3_s_135 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_113 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_114 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_115 = {};
+    int __f2dace_SOA_c_lin_e_d_0_s_101 = {};
+    int __f2dace_SOA_c_lin_e_d_1_s_102 = {};
+    int __f2dace_SOA_c_lin_e_d_2_s_103 = {};
+    int __f2dace_SOA_cells_aw_verts_d_0_s_110 = {};
+    int __f2dace_SOA_cells_aw_verts_d_1_s_111 = {};
+    int __f2dace_SOA_cells_aw_verts_d_2_s_112 = {};
+    int __f2dace_SOA_e_bln_c_s_d_0_s_104 = {};
+    int __f2dace_SOA_e_bln_c_s_d_1_s_105 = {};
+    int __f2dace_SOA_e_bln_c_s_d_2_s_106 = {};
+    int __f2dace_SOA_e_flx_avg_d_0_s_107 = {};
+    int __f2dace_SOA_e_flx_avg_d_1_s_108 = {};
+    int __f2dace_SOA_e_flx_avg_d_2_s_109 = {};
+    int __f2dace_SOA_geofac_div_d_0_s_116 = {};
+    int __f2dace_SOA_geofac_div_d_1_s_117 = {};
+    int __f2dace_SOA_geofac_div_d_2_s_118 = {};
+    int __f2dace_SOA_geofac_grdiv_d_0_s_119 = {};
+    int __f2dace_SOA_geofac_grdiv_d_1_s_120 = {};
+    int __f2dace_SOA_geofac_grdiv_d_2_s_121 = {};
+    int __f2dace_SOA_geofac_grg_d_0_s_128 = {};
+    int __f2dace_SOA_geofac_grg_d_1_s_129 = {};
+    int __f2dace_SOA_geofac_grg_d_2_s_130 = {};
+    int __f2dace_SOA_geofac_grg_d_3_s_131 = {};
+    int __f2dace_SOA_geofac_n2s_d_0_s_125 = {};
+    int __f2dace_SOA_geofac_n2s_d_1_s_126 = {};
+    int __f2dace_SOA_geofac_n2s_d_2_s_127 = {};
+    int __f2dace_SOA_geofac_rot_d_0_s_122 = {};
+    int __f2dace_SOA_geofac_rot_d_1_s_123 = {};
+    int __f2dace_SOA_geofac_rot_d_2_s_124 = {};
+    int __f2dace_SOA_nudgecoeff_e_d_0_s_136 = {};
+    int __f2dace_SOA_nudgecoeff_e_d_1_s_137 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_0_s_132 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_1_s_133 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_2_s_134 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_3_s_135 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_113 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_114 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_115 = {};
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* e_flx_avg = {};
+    double* geofac_div = {};
+    double* geofac_grdiv = {};
+    double* geofac_grg = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* nudgecoeff_e = {};
+    double* pos_on_tplane_e = {};
+    double* rbf_vec_coeff_e = {};
 };
 
 struct t_tangent_vectors {
@@ -934,18 +897,29 @@ struct t_grid_edges {
     int* vertex_idx = {};
 };
 
-struct t_patch {
-    t_grid_cells* cells = {};
-    t_grid_edges* edges = {};
-    int id = {};
-    int n_childdom = {};
-    int nblks_c = {};
-    int nblks_e = {};
-    int nblks_v = {};
-    int nlev = {};
-    int nlevp1 = {};
-    int nshift = {};
-    t_grid_vertices* verts = {};
+struct global_data_type {
+    int grf_intmethod_e = {};
+    int i_am_accel_node = {};
+    int iadv_rhotheta = {};
+    double iau_wgt_dyn = {};
+    int igradp_method = {};
+    int is_iau_active = {};
+    int itime_scheme = {};
+    int* kstart_dd3d = {};
+    int l_limited_area = {};
+    int ldeepatmo = {};
+    int lextra_diffu = {};
+    int lvert_nest = {};
+    int* nflat_gradp = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int rayleigh_type = {};
+    int timer_intp = {};
+    int timer_solve_nh_cellcomp = {};
+    int timer_solve_nh_veltend = {};
+    int timer_solve_nh_vnupd = {};
+    int timers_level = {};
 };
 
 struct t_nh_prog {
@@ -986,35 +960,61 @@ struct t_nh_prog {
     double* w = {};
 };
 
-struct t_prepare_adv {
-    int __f2dace_SA_mass_flx_ic_d_0_s_905 = {};
-    int __f2dace_SA_mass_flx_ic_d_1_s_906 = {};
-    int __f2dace_SA_mass_flx_ic_d_2_s_907 = {};
-    int __f2dace_SA_mass_flx_me_d_0_s_902 = {};
-    int __f2dace_SA_mass_flx_me_d_1_s_903 = {};
-    int __f2dace_SA_mass_flx_me_d_2_s_904 = {};
-    int __f2dace_SA_vn_traj_d_0_s_911 = {};
-    int __f2dace_SA_vn_traj_d_1_s_912 = {};
-    int __f2dace_SA_vn_traj_d_2_s_913 = {};
-    int __f2dace_SA_vol_flx_ic_d_0_s_908 = {};
-    int __f2dace_SA_vol_flx_ic_d_1_s_909 = {};
-    int __f2dace_SA_vol_flx_ic_d_2_s_910 = {};
-    int __f2dace_SOA_mass_flx_ic_d_0_s_905 = {};
-    int __f2dace_SOA_mass_flx_ic_d_1_s_906 = {};
-    int __f2dace_SOA_mass_flx_ic_d_2_s_907 = {};
-    int __f2dace_SOA_mass_flx_me_d_0_s_902 = {};
-    int __f2dace_SOA_mass_flx_me_d_1_s_903 = {};
-    int __f2dace_SOA_mass_flx_me_d_2_s_904 = {};
-    int __f2dace_SOA_vn_traj_d_0_s_911 = {};
-    int __f2dace_SOA_vn_traj_d_1_s_912 = {};
-    int __f2dace_SOA_vn_traj_d_2_s_913 = {};
-    int __f2dace_SOA_vol_flx_ic_d_0_s_908 = {};
-    int __f2dace_SOA_vol_flx_ic_d_1_s_909 = {};
-    int __f2dace_SOA_vol_flx_ic_d_2_s_910 = {};
-    double* mass_flx_ic = {};
-    double* mass_flx_me = {};
-    double* vn_traj = {};
-    double* vol_flx_ic = {};
+struct t_grid_vertices {
+    int __f2dace_SA_cell_blk_d_0_s_289 = {};
+    int __f2dace_SA_cell_blk_d_1_s_290 = {};
+    int __f2dace_SA_cell_blk_d_2_s_291 = {};
+    int __f2dace_SA_cell_idx_d_0_s_286 = {};
+    int __f2dace_SA_cell_idx_d_1_s_287 = {};
+    int __f2dace_SA_cell_idx_d_2_s_288 = {};
+    int __f2dace_SA_edge_blk_d_0_s_295 = {};
+    int __f2dace_SA_edge_blk_d_1_s_296 = {};
+    int __f2dace_SA_edge_blk_d_2_s_297 = {};
+    int __f2dace_SA_edge_idx_d_0_s_292 = {};
+    int __f2dace_SA_edge_idx_d_1_s_293 = {};
+    int __f2dace_SA_edge_idx_d_2_s_294 = {};
+    int __f2dace_SA_end_block_d_0_s_301 = {};
+    int __f2dace_SA_end_index_d_0_s_299 = {};
+    int __f2dace_SA_start_block_d_0_s_300 = {};
+    int __f2dace_SA_start_index_d_0_s_298 = {};
+    int __f2dace_SOA_cell_blk_d_0_s_289 = {};
+    int __f2dace_SOA_cell_blk_d_1_s_290 = {};
+    int __f2dace_SOA_cell_blk_d_2_s_291 = {};
+    int __f2dace_SOA_cell_idx_d_0_s_286 = {};
+    int __f2dace_SOA_cell_idx_d_1_s_287 = {};
+    int __f2dace_SOA_cell_idx_d_2_s_288 = {};
+    int __f2dace_SOA_edge_blk_d_0_s_295 = {};
+    int __f2dace_SOA_edge_blk_d_1_s_296 = {};
+    int __f2dace_SOA_edge_blk_d_2_s_297 = {};
+    int __f2dace_SOA_edge_idx_d_0_s_292 = {};
+    int __f2dace_SOA_edge_idx_d_1_s_293 = {};
+    int __f2dace_SOA_edge_idx_d_2_s_294 = {};
+    int __f2dace_SOA_end_block_d_0_s_301 = {};
+    int __f2dace_SOA_end_index_d_0_s_299 = {};
+    int __f2dace_SOA_start_block_d_0_s_300 = {};
+    int __f2dace_SOA_start_index_d_0_s_298 = {};
+    int* cell_blk = {};
+    int* cell_idx = {};
+    int* edge_blk = {};
+    int* edge_idx = {};
+    int* end_block = {};
+    int* end_index = {};
+    int* start_block = {};
+    int* start_index = {};
+};
+
+struct t_patch {
+    t_grid_cells* cells = {};
+    t_grid_edges* edges = {};
+    int id = {};
+    int n_childdom = {};
+    int nblks_c = {};
+    int nblks_e = {};
+    int nblks_v = {};
+    int nlev = {};
+    int nlevp1 = {};
+    int nshift = {};
+    t_grid_vertices* verts = {};
 };
 
 struct solve_nh_predictor_pre_state_t {
@@ -2957,16 +2957,16 @@ inline void loop_body_98_1_0(solve_nh_predictor_pre_state_t *__state, double* __
 }
 
 inline void loop_body_104_0_0(solve_nh_predictor_pre_state_t *__state, double* __restrict__ __CG_p_int__m_pos_on_tplane_e, double* __restrict__ __CG_p_nh__CG_diag__m_vt, double* __restrict__ __CG_p_nh__CG_metrics__m_deepatmo_gradh_mc, double* __restrict__ __CG_p_nh__CG_metrics__m_rho_ref_me, double* __restrict__ __CG_p_nh__CG_metrics__m_theta_ref_me, double* __restrict__ __CG_p_nh_prog_nnow__m_vn, double* __restrict__ __CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v1, double* __restrict__ __CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v2, double* __restrict__ __CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v1, double* __restrict__ __CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v2, int* __restrict__ __CG_p_patch__CG_edges__m_cell_blk, int* __restrict__ __CG_p_patch__CG_edges__m_cell_idx, const double&  dthalf, double* __restrict__ z_grad_rth, double* __restrict__ z_rth_pr, double* __restrict__ z_rho_e, double* __restrict__ z_theta_v_e, int _for_it_84, int _for_it_85, int64_t _for_it_86, int tmp_struct_symbol_3, int tmp_struct_symbol_33, int tmp_struct_symbol_34, int tmp_struct_symbol_36, int tmp_struct_symbol_37, int tmp_struct_symbol_4, int tmp_struct_symbol_6, int tmp_struct_symbol_7) {
-    double z_ntdistv_bary_2_local;
-    double z_ntdistv_bary_1_local;
-    double tmp_call_25;
     double tmp_call_27;
-    double tmp_call_24;
-    double distv_bary_1_local;
-    int lvn_pos_local;
+    double tmp_call_25;
     double tmp_call_28;
-    double tmp_call_26;
+    double z_ntdistv_bary_1_local;
+    double distv_bary_1_local;
+    double z_ntdistv_bary_2_local;
     double tmp_call_23;
+    double tmp_call_26;
+    int lvn_pos_local;
+    double tmp_call_24;
     int ilc0;
     int ibc0;
 
@@ -3269,9 +3269,9 @@ inline void loop_body_104_0_0(solve_nh_predictor_pre_state_t *__state, double* _
     }
 
     {
-        double tmp_call_29;
         double distv_bary_2_local;
         double tmp_call_30;
+        double tmp_call_29;
 
         {
             double tmp_call_27_0_in = tmp_call_27;
@@ -3837,6 +3837,372 @@ inline void loop_body_151_2_0(solve_nh_predictor_pre_state_t *__state, double* _
             for (auto _for_it_98 = i_startidx_local; _for_it_98 < (i_endidx_local + 1); _for_it_98 += 1) {
                 loop_body_152_0_0(__state, &__CG_p_nh__CG_metrics__m_coeff_gradp[0], &__CG_p_nh__CG_metrics__m_deepatmo_gradh_mc[0], &__CG_p_nh__CG_metrics__m_vertidx_gradp[0], &__CG_p_patch__CG_edges__m_cell_blk[0], &__CG_p_patch__CG_edges__m_cell_idx[0], &__CG_p_patch__CG_edges__m_inv_dual_edge_length[0], &z_exner_ex_pr[0], &z_gradh_exner[0], _for_it_89, _for_it_97, _for_it_98, tmp_struct_symbol_27, tmp_struct_symbol_28, tmp_struct_symbol_30, tmp_struct_symbol_31);
             }
+        }
+
+    }
+
+}
+
+inline void loop_body_155_0_0(solve_nh_predictor_pre_state_t *__state, double* __restrict__ __CG_p_nh__CG_diag__m_theta_v_ic, double* __restrict__ __CG_p_nh__CG_metrics__m_inv_ddqz_z_full, int* __restrict__ __CG_p_nh__CG_metrics__m_vertidx_gradp, double* __restrict__ __CG_p_nh__CG_metrics__m_zdiff_gradp, double* __restrict__ __CG_p_nh_prog_nnow__m_theta_v, int* __restrict__ __CG_p_patch__CG_edges__m_cell_blk, int* __restrict__ __CG_p_patch__CG_edges__m_cell_idx, double* __restrict__ __CG_p_patch__CG_edges__m_inv_dual_edge_length, const int&  nlev, double* __restrict__ z_hydro_corr, int _for_it_89, int _for_it_99, int tmp_struct_symbol_75) {
+    double z_theta1_local;
+    int tmp_index_2287;
+    int tmp_index_2292;
+    int tmp_index_2297;
+    int tmp_index_2293;
+    int tmp_index_2294;
+    int tmp_index_2304;
+    int tmp_index_2309;
+    int tmp_index_2317;
+    int tmp_index_2310;
+    int tmp_index_2311;
+    int tmp_index_2322;
+    int tmp_index_2330;
+    int tmp_index_2323;
+    int tmp_index_2324;
+    int tmp_index_2335;
+    int tmp_index_2336;
+    int tmp_index_2337;
+    int tmp_index_2343;
+    int tmp_index_2348;
+    int tmp_index_2353;
+    int tmp_index_2349;
+    int tmp_index_2350;
+    int tmp_index_2360;
+    int tmp_index_2365;
+    int tmp_index_2373;
+    int tmp_index_2366;
+    int tmp_index_2367;
+    int tmp_index_2378;
+    int tmp_index_2386;
+    int tmp_index_2379;
+    int tmp_index_2380;
+    int tmp_index_2391;
+    int tmp_index_2392;
+    int tmp_index_2393;
+
+
+
+    tmp_index_2287 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+    tmp_index_2292 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2297 = (nlev - __f2dace_SOA_zdiff_gradp_d_2_s_819_metrics_p_nh_4);
+
+
+    tmp_index_2293 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2287)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2294 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2304 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_index_2309 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
+    tmp_index_2317 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+    tmp_index_2310 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2304)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
+    tmp_index_2311 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
+    tmp_index_2322 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
+    tmp_index_2330 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_index_2323 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2317)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] + 1) - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
+    tmp_index_2324 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
+    tmp_index_2335 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4);
+    tmp_index_2336 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2330)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4);
+
+
+    tmp_index_2337 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_2_s_792_metrics_p_nh_4);
+    tmp_index_2343 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_index_2348 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2353 = (nlev - __f2dace_SOA_zdiff_gradp_d_2_s_819_metrics_p_nh_4);
+    tmp_index_2349 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2343)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2350 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2360 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+    {
+
+        {
+            double p_nh_0_in_metrics_zdiff_gradp_0 = __CG_p_nh__CG_metrics__m_zdiff_gradp[(((((((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * __f2dace_SA_zdiff_gradp_d_2_s_819_metrics_p_nh_4) * ((- __f2dace_SOA_zdiff_gradp_d_3_s_820_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * tmp_index_2297)) + (__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * ((- __f2dace_SOA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_zdiff_gradp_d_0_s_817_metrics_p_nh_4) + 1)];
+            double p_nh_1_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2311) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2310)) + tmp_index_2309)];
+            double p_nh_2_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2324) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2323)) + tmp_index_2322)];
+            double p_nh_3_in_metrics_inv_ddqz_z_full_0 = __CG_p_nh__CG_metrics__m_inv_ddqz_z_full[((((__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * __f2dace_SA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4) * tmp_index_2337) + (__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * tmp_index_2336)) + tmp_index_2335)];
+            double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2294) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2293)) + tmp_index_2292)];
+            double z_theta1_out;
+
+            ///////////////////
+            // Tasklet code (T_l1111_c1111)
+            z_theta1_out = (p_nh_prog_nnow_0_in_theta_v_0 + ((p_nh_0_in_metrics_zdiff_gradp_0 * (p_nh_1_in_diag_theta_v_ic_0 - p_nh_2_in_diag_theta_v_ic_0)) * p_nh_3_in_metrics_inv_ddqz_z_full_0));
+            ///////////////////
+
+            z_theta1_local = z_theta1_out;
+        }
+
+    }
+    tmp_index_2365 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
+    tmp_index_2373 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+    tmp_index_2366 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2360)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
+    tmp_index_2367 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
+    tmp_index_2378 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
+    tmp_index_2386 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_index_2379 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2373)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] + 1) - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
+    tmp_index_2380 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
+    tmp_index_2391 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4);
+    tmp_index_2392 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2386)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4);
+
+
+    tmp_index_2393 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_2_s_792_metrics_p_nh_4);
+
+    {
+        double z_theta2_local;
+        double tmp_arg_35;
+        double tmp_call_31;
+
+        {
+            double p_nh_0_in_metrics_zdiff_gradp_0 = __CG_p_nh__CG_metrics__m_zdiff_gradp[(((((((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * __f2dace_SA_zdiff_gradp_d_2_s_819_metrics_p_nh_4) * ((- __f2dace_SOA_zdiff_gradp_d_3_s_820_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * tmp_index_2353)) + (__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * ((- __f2dace_SOA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_zdiff_gradp_d_0_s_817_metrics_p_nh_4) + 2)];
+            double p_nh_1_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2367) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2366)) + tmp_index_2365)];
+            double p_nh_2_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2380) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2379)) + tmp_index_2378)];
+            double p_nh_3_in_metrics_inv_ddqz_z_full_0 = __CG_p_nh__CG_metrics__m_inv_ddqz_z_full[((((__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * __f2dace_SA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4) * tmp_index_2393) + (__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * tmp_index_2392)) + tmp_index_2391)];
+            double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2350) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2349)) + tmp_index_2348)];
+            double z_theta2_out;
+
+            ///////////////////
+            // Tasklet code (T_l1112_c1112)
+            z_theta2_out = (p_nh_prog_nnow_0_in_theta_v_0 + ((p_nh_0_in_metrics_zdiff_gradp_0 * (p_nh_1_in_diag_theta_v_ic_0 - p_nh_2_in_diag_theta_v_ic_0)) * p_nh_3_in_metrics_inv_ddqz_z_full_0));
+            ///////////////////
+
+            z_theta2_local = z_theta2_out;
+        }
+        {
+            double z_theta1_0_in = z_theta1_local;
+            double z_theta2_0_in = z_theta2_local;
+            double tmp_arg_35_out;
+
+            ///////////////////
+            // Tasklet code (T_l1113_c1113)
+            tmp_arg_35_out = (z_theta1_0_in + z_theta2_0_in);
+            ///////////////////
+
+            tmp_arg_35 = tmp_arg_35_out;
+        }
+        {
+            double tmp_arg_35_0_in = tmp_arg_35;
+            double tmp_call_31_out;
+
+            ///////////////////
+            // Tasklet code (T_l1113_c1113)
+            tmp_call_31_out = (dace::math::ipow(tmp_arg_35_0_in, 2));
+            ///////////////////
+
+            tmp_call_31 = tmp_call_31_out;
+        }
+        {
+            double p_patch_0_in_edges_inv_dual_edge_length_0 = __CG_p_patch__CG_edges__m_inv_dual_edge_length[(((__f2dace_SA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9 * ((- __f2dace_SOA_inv_dual_edge_length_d_1_s_271_edges_p_patch_9) + _for_it_89)) - __f2dace_SOA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9) + _for_it_99)];
+            double tmp_call_31_0_in = tmp_call_31;
+            double z_theta1_0_in = z_theta1_local;
+            double z_theta2_0_in = z_theta2_local;
+            double z_hydro_corr_out_0;
+
+            ///////////////////
+            // Tasklet code (T_l1113_c1113)
+            z_hydro_corr_out_0 = ((((0.00976135730211817 * p_patch_0_in_edges_inv_dual_edge_length_0) * (z_theta2_0_in - z_theta1_0_in)) * 4.0) / tmp_call_31_0_in);
+            ///////////////////
+
+            z_hydro_corr[((_for_it_99 + (tmp_struct_symbol_75 * (_for_it_89 - 1))) - 1)] = z_hydro_corr_out_0;
+        }
+
+    }
+
+}
+
+inline void loop_body_159_0_0(solve_nh_predictor_pre_state_t *__state, double* __restrict__ __CG_p_nh__CG_metrics__m_coeff_gradp, int* __restrict__ __CG_p_nh__CG_metrics__m_vertidx_gradp, double* __restrict__ __CG_p_nh_prog_nnow__m_theta_v, int* __restrict__ __CG_p_patch__CG_edges__m_cell_blk, int* __restrict__ __CG_p_patch__CG_edges__m_cell_idx, double* __restrict__ __CG_p_patch__CG_edges__m_inv_dual_edge_length, const int&  nlev, double* __restrict__ z_hydro_corr, int _for_it_100, int _for_it_89, int tmp_struct_symbol_75) {
+    double z_theta1_local;
+    int tmp_index_2400;
+    int tmp_arg_36;
+    int ikp1;
+    int tmp_index_2404;
+    int tmp_arg_37;
+    int ikp2;
+    int tmp_index_2411;
+    int tmp_index_2416;
+    int tmp_index_2421;
+    int tmp_index_2417;
+    int tmp_index_2418;
+    int tmp_index_2428;
+    int tmp_index_2433;
+    int tmp_index_2438;
+    int tmp_index_2434;
+    int tmp_index_2435;
+    int tmp_index_2445;
+    int tmp_index_2450;
+    int tmp_index_2455;
+    int tmp_index_2451;
+    int tmp_index_2452;
+    int tmp_index_2463;
+    int tmp_index_2468;
+    int tmp_index_2465;
+    int tmp_index_2475;
+    int tmp_index_2480;
+    int tmp_index_2485;
+    int tmp_index_2481;
+    int tmp_index_2482;
+    int tmp_index_2492;
+    int tmp_index_2497;
+    int tmp_index_2502;
+    int tmp_index_2498;
+    int tmp_index_2499;
+    int tmp_index_2509;
+    int tmp_index_2514;
+    int tmp_index_2519;
+    int tmp_index_2515;
+    int tmp_index_2516;
+    int tmp_index_2527;
+    int tmp_index_2532;
+    int tmp_index_2529;
+
+
+
+    tmp_index_2400 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_arg_36 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2400)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] + 2);
+
+
+    ikp1 = min(nlev, tmp_arg_36);
+    tmp_index_2404 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_arg_37 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2404)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] + 2);
+
+
+    ikp2 = min(nlev, tmp_arg_37);
+    tmp_index_2411 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+    tmp_index_2416 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2421 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+
+
+    tmp_index_2417 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2411)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2418 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2428 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_index_2433 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2438 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+    tmp_index_2434 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2428)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2435 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2445 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+    tmp_index_2450 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2455 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+
+
+    tmp_index_2451 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2445)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] + 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2452 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2463 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2468 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+    tmp_index_2465 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2475 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+
+    tmp_index_2480 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2485 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+    tmp_index_2481 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2475)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2482 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2492 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+
+    {
+
+        {
+            double p_nh_0_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2421)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 1)];
+            double p_nh_1_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2438)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 2)];
+            double p_nh_2_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2455)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 3)];
+            double p_nh_3_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2468)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 4)];
+            double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2418) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2417)) + tmp_index_2416)];
+            double p_nh_prog_nnow_1_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2435) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2434)) + tmp_index_2433)];
+            double p_nh_prog_nnow_2_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2452) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2451)) + tmp_index_2450)];
+            double p_nh_prog_nnow_3_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2465) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * ((- __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15) + ikp1))) + tmp_index_2463)];
+            double z_theta1_out;
+
+            ///////////////////
+            // Tasklet code (T_l1119_c1119)
+            z_theta1_out = ((((p_nh_prog_nnow_0_in_theta_v_0 * p_nh_0_in_metrics_coeff_gradp_0) + (p_nh_prog_nnow_1_in_theta_v_0 * p_nh_1_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_2_in_theta_v_0 * p_nh_2_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_3_in_theta_v_0 * p_nh_3_in_metrics_coeff_gradp_0));
+            ///////////////////
+
+            z_theta1_local = z_theta1_out;
+        }
+
+    }
+    tmp_index_2497 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2502 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+    tmp_index_2498 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2492)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2499 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2509 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
+    tmp_index_2514 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2519 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+
+
+    tmp_index_2515 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2509)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] + 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
+    tmp_index_2516 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+    tmp_index_2527 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
+    tmp_index_2532 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
+    tmp_index_2529 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
+
+    {
+        double z_theta2_local;
+        double tmp_arg_38;
+        double tmp_call_32;
+
+        {
+            double p_nh_0_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2485)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 5)];
+            double p_nh_1_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2502)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 6)];
+            double p_nh_2_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2519)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 7)];
+            double p_nh_3_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2532)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 8)];
+            double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2482) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2481)) + tmp_index_2480)];
+            double p_nh_prog_nnow_1_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2499) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2498)) + tmp_index_2497)];
+            double p_nh_prog_nnow_2_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2516) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2515)) + tmp_index_2514)];
+            double p_nh_prog_nnow_3_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2529) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * ((- __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15) + ikp2))) + tmp_index_2527)];
+            double z_theta2_out;
+
+            ///////////////////
+            // Tasklet code (T_l1120_c1120)
+            z_theta2_out = ((((p_nh_prog_nnow_0_in_theta_v_0 * p_nh_0_in_metrics_coeff_gradp_0) + (p_nh_prog_nnow_1_in_theta_v_0 * p_nh_1_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_2_in_theta_v_0 * p_nh_2_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_3_in_theta_v_0 * p_nh_3_in_metrics_coeff_gradp_0));
+            ///////////////////
+
+            z_theta2_local = z_theta2_out;
+        }
+        {
+            double z_theta1_0_in = z_theta1_local;
+            double z_theta2_0_in = z_theta2_local;
+            double tmp_arg_38_out;
+
+            ///////////////////
+            // Tasklet code (T_l1121_c1121)
+            tmp_arg_38_out = (z_theta1_0_in + z_theta2_0_in);
+            ///////////////////
+
+            tmp_arg_38 = tmp_arg_38_out;
+        }
+        {
+            double tmp_arg_38_0_in = tmp_arg_38;
+            double tmp_call_32_out;
+
+            ///////////////////
+            // Tasklet code (T_l1121_c1121)
+            tmp_call_32_out = (dace::math::ipow(tmp_arg_38_0_in, 2));
+            ///////////////////
+
+            tmp_call_32 = tmp_call_32_out;
+        }
+        {
+            double p_patch_0_in_edges_inv_dual_edge_length_0 = __CG_p_patch__CG_edges__m_inv_dual_edge_length[(((__f2dace_SA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9 * ((- __f2dace_SOA_inv_dual_edge_length_d_1_s_271_edges_p_patch_9) + _for_it_89)) - __f2dace_SOA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9) + _for_it_100)];
+            double tmp_call_32_0_in = tmp_call_32;
+            double z_theta1_0_in = z_theta1_local;
+            double z_theta2_0_in = z_theta2_local;
+            double z_hydro_corr_out_0;
+
+            ///////////////////
+            // Tasklet code (T_l1121_c1121)
+            z_hydro_corr_out_0 = ((((0.00976135730211817 * p_patch_0_in_edges_inv_dual_edge_length_0) * (z_theta2_0_in - z_theta1_0_in)) * 4.0) / tmp_call_32_0_in);
+            ///////////////////
+
+            z_hydro_corr[((_for_it_100 + (tmp_struct_symbol_75 * (_for_it_89 - 1))) - 1)] = z_hydro_corr_out_0;
         }
 
     }
@@ -4524,10 +4890,8 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
     int __CG_p_patch__m_nshift;
     int i_endidx_local;
     int i_startidx_local;
-    double z_theta2_local;
-    double z_theta1_local;
-    int ishift_local;
     int nlen_gradp_local;
+    int ishift_local;
     int _if_cond_36;
     int _if_cond_38;
     int _if_cond_41;
@@ -4603,85 +4967,7 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
     int tmp_index_2034;
     int _if_cond_53;
     int tmp_index_2139;
-    int tmp_index_2287;
-    int tmp_index_2292;
-    int tmp_index_2297;
-    int tmp_index_2293;
-    int tmp_index_2294;
-    int tmp_index_2304;
-    int tmp_index_2309;
-    int tmp_index_2317;
-    int tmp_index_2310;
-    int tmp_index_2311;
-    int tmp_index_2322;
-    int tmp_index_2330;
-    int tmp_index_2323;
-    int tmp_index_2324;
-    int tmp_index_2335;
-    int tmp_index_2336;
-    int tmp_index_2337;
-    int tmp_index_2343;
-    int tmp_index_2348;
-    int tmp_index_2353;
-    int tmp_index_2349;
-    int tmp_index_2350;
-    int tmp_index_2360;
-    int tmp_index_2365;
-    int tmp_index_2373;
-    int tmp_index_2366;
-    int tmp_index_2367;
-    int tmp_index_2378;
-    int tmp_index_2386;
-    int tmp_index_2379;
-    int tmp_index_2380;
-    int tmp_index_2391;
-    int tmp_index_2392;
-    int tmp_index_2393;
-    int _for_it_99;
     int _if_cond_55;
-    int tmp_index_2400;
-    int tmp_arg_36;
-    int ikp1;
-    int tmp_index_2404;
-    int tmp_arg_37;
-    int ikp2;
-    int tmp_index_2411;
-    int tmp_index_2416;
-    int tmp_index_2421;
-    int tmp_index_2417;
-    int tmp_index_2418;
-    int tmp_index_2428;
-    int tmp_index_2433;
-    int tmp_index_2438;
-    int tmp_index_2434;
-    int tmp_index_2435;
-    int tmp_index_2445;
-    int tmp_index_2450;
-    int tmp_index_2455;
-    int tmp_index_2451;
-    int tmp_index_2452;
-    int tmp_index_2463;
-    int tmp_index_2468;
-    int tmp_index_2465;
-    int tmp_index_2475;
-    int tmp_index_2480;
-    int tmp_index_2485;
-    int tmp_index_2481;
-    int tmp_index_2482;
-    int tmp_index_2492;
-    int tmp_index_2497;
-    int tmp_index_2502;
-    int tmp_index_2498;
-    int tmp_index_2499;
-    int tmp_index_2509;
-    int tmp_index_2514;
-    int tmp_index_2519;
-    int tmp_index_2515;
-    int tmp_index_2516;
-    int tmp_index_2527;
-    int tmp_index_2532;
-    int tmp_index_2529;
-    int _for_it_100;
     int _if_cond_57;
     int _for_it_101;
     int ie_var_254;
@@ -6741,19 +7027,19 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
                 out_p_patch = in_p_patch;
                 out_p_prog = in_p_prog;
                 out___CG_p_nh__CG_diag__m_max_vcfl_dyn = in___CG_p_nh__CG_diag__m_max_vcfl_dyn;
-                out___CG_p_nh_prog_nnew__m_vn = in___CG_p_nh_prog_nnew__m_vn;
-                out___CG_p_int__m_c_lin_e = in___CG_p_int__m_c_lin_e;
-                out___CG_p_int__m_e_bln_c_s = in___CG_p_int__m_e_bln_c_s;
-                out___CG_p_nh__CG_diag__m_vn_ie = in___CG_p_nh__CG_diag__m_vn_ie;
-                out___CG_p_int__m_geofac_grdiv = in___CG_p_int__m_geofac_grdiv;
-                out___CG_p_nh__CG_diag__m_w_concorr_c = in___CG_p_nh__CG_diag__m_w_concorr_c;
-                out___CG_p_nh__CG_metrics__m_ddqz_z_full_e = in___CG_p_nh__CG_metrics__m_ddqz_z_full_e;
                 out___CG_p_nh_prog_nnew__m_w = in___CG_p_nh_prog_nnew__m_w;
-                out___CG_p_nh__CG_metrics__m_ddqz_z_half = in___CG_p_nh__CG_metrics__m_ddqz_z_half;
                 out___CG_p_nh__CG_diag__m_vt = in___CG_p_nh__CG_diag__m_vt;
-                out___CG_p_nh__CG_diag__m_max_vcfl_dyn = in___CG_p_nh__CG_diag__m_max_vcfl_dyn;
+                out___CG_p_int__m_c_lin_e = in___CG_p_int__m_c_lin_e;
+                out___CG_p_nh__CG_metrics__m_ddqz_z_half = in___CG_p_nh__CG_metrics__m_ddqz_z_half;
                 out___CG_p_nh__CG_diag__m_ddt_vn_apc_pc = in___CG_p_nh__CG_diag__m_ddt_vn_apc_pc;
+                out___CG_p_nh__CG_diag__m_vn_ie = in___CG_p_nh__CG_diag__m_vn_ie;
                 out___CG_p_nh__CG_metrics__m_coeff_gradekin = in___CG_p_nh__CG_metrics__m_coeff_gradekin;
+                out___CG_p_nh__CG_diag__m_max_vcfl_dyn = in___CG_p_nh__CG_diag__m_max_vcfl_dyn;
+                out___CG_p_int__m_e_bln_c_s = in___CG_p_int__m_e_bln_c_s;
+                out___CG_p_nh__CG_diag__m_w_concorr_c = in___CG_p_nh__CG_diag__m_w_concorr_c;
+                out___CG_p_nh_prog_nnew__m_vn = in___CG_p_nh_prog_nnew__m_vn;
+                out___CG_p_nh__CG_metrics__m_ddqz_z_full_e = in___CG_p_nh__CG_metrics__m_ddqz_z_full_e;
+                out___CG_p_int__m_geofac_grdiv = in___CG_p_int__m_geofac_grdiv;
                 ///////////////////
 
                 __CG_p_nh__CG_diag__m_max_vcfl_dyn = out___CG_p_nh__CG_diag__m_max_vcfl_dyn;
@@ -7795,125 +8081,13 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
         }
         _if_cond_54 = (__CG_global_data__m_igradp_method == 3);
         if ((_if_cond_54 == 1)) {
-            for (_for_it_99 = i_startidx_local; (_for_it_99 <= i_endidx_local); _for_it_99 = (_for_it_99 + 1)) {
+            {
 
-                tmp_index_2287 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-                tmp_index_2292 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                tmp_index_2297 = (nlev - __f2dace_SOA_zdiff_gradp_d_2_s_819_metrics_p_nh_4);
-
-                tmp_index_2293 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2287)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                tmp_index_2294 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                tmp_index_2304 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                tmp_index_2309 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
-                tmp_index_2317 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-                tmp_index_2310 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2304)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
-                tmp_index_2311 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
-                tmp_index_2322 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
-                tmp_index_2330 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                tmp_index_2323 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2317)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] + 1) - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
-                tmp_index_2324 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
-                tmp_index_2335 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4);
-                tmp_index_2336 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2330)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4);
-
-                tmp_index_2337 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_2_s_792_metrics_p_nh_4);
-                tmp_index_2343 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                tmp_index_2348 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                tmp_index_2353 = (nlev - __f2dace_SOA_zdiff_gradp_d_2_s_819_metrics_p_nh_4);
-                tmp_index_2349 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2343)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                tmp_index_2350 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                tmp_index_2360 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
                 {
-
-                    {
-                        double p_nh_0_in_metrics_zdiff_gradp_0 = __CG_p_nh__CG_metrics__m_zdiff_gradp[(((((((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * __f2dace_SA_zdiff_gradp_d_2_s_819_metrics_p_nh_4) * ((- __f2dace_SOA_zdiff_gradp_d_3_s_820_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * tmp_index_2297)) + (__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * ((- __f2dace_SOA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_zdiff_gradp_d_0_s_817_metrics_p_nh_4) + 1)];
-                        double p_nh_1_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2311) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2310)) + tmp_index_2309)];
-                        double p_nh_2_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2324) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2323)) + tmp_index_2322)];
-                        double p_nh_3_in_metrics_inv_ddqz_z_full_0 = __CG_p_nh__CG_metrics__m_inv_ddqz_z_full[((((__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * __f2dace_SA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4) * tmp_index_2337) + (__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * tmp_index_2336)) + tmp_index_2335)];
-                        double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2294) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2293)) + tmp_index_2292)];
-                        double z_theta1_out;
-
-                        ///////////////////
-                        // Tasklet code (T_l1111_c1111)
-                        z_theta1_out = (p_nh_prog_nnow_0_in_theta_v_0 + ((p_nh_0_in_metrics_zdiff_gradp_0 * (p_nh_1_in_diag_theta_v_ic_0 - p_nh_2_in_diag_theta_v_ic_0)) * p_nh_3_in_metrics_inv_ddqz_z_full_0));
-                        ///////////////////
-
-                        z_theta1_local = z_theta1_out;
+                    #pragma omp parallel for
+                    for (auto _for_it_99 = i_startidx_local; _for_it_99 < (i_endidx_local + 1); _for_it_99 += 1) {
+                        loop_body_155_0_0(__state, &__CG_p_nh__CG_diag__m_theta_v_ic[0], &__CG_p_nh__CG_metrics__m_inv_ddqz_z_full[0], &__CG_p_nh__CG_metrics__m_vertidx_gradp[0], &__CG_p_nh__CG_metrics__m_zdiff_gradp[0], &__CG_p_nh_prog_nnow__m_theta_v[0], &__CG_p_patch__CG_edges__m_cell_blk[0], &__CG_p_patch__CG_edges__m_cell_idx[0], &__CG_p_patch__CG_edges__m_inv_dual_edge_length[0], nlev, &z_hydro_corr[0], _for_it_89, _for_it_99, tmp_struct_symbol_75);
                     }
-
-                }
-                tmp_index_2365 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
-                tmp_index_2373 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-                tmp_index_2366 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2360)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
-                tmp_index_2367 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
-                tmp_index_2378 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_0_s_643_diag_p_nh_2);
-                tmp_index_2386 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                tmp_index_2379 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2373)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] + 1) - __f2dace_SOA_theta_v_ic_d_1_s_644_diag_p_nh_2);
-                tmp_index_2380 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_theta_v_ic_d_2_s_645_diag_p_nh_2);
-                tmp_index_2391 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4);
-                tmp_index_2392 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2386)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4);
-
-                tmp_index_2393 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_99)] - __f2dace_SOA_inv_ddqz_z_full_d_2_s_792_metrics_p_nh_4);
-                {
-                    double tmp_call_31;
-                    double tmp_arg_35;
-
-                    {
-                        double p_nh_0_in_metrics_zdiff_gradp_0 = __CG_p_nh__CG_metrics__m_zdiff_gradp[(((((((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * __f2dace_SA_zdiff_gradp_d_2_s_819_metrics_p_nh_4) * ((- __f2dace_SOA_zdiff_gradp_d_3_s_820_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * __f2dace_SA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) * tmp_index_2353)) + (__f2dace_SA_zdiff_gradp_d_0_s_817_metrics_p_nh_4 * ((- __f2dace_SOA_zdiff_gradp_d_1_s_818_metrics_p_nh_4) + _for_it_99))) - __f2dace_SOA_zdiff_gradp_d_0_s_817_metrics_p_nh_4) + 2)];
-                        double p_nh_1_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2367) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2366)) + tmp_index_2365)];
-                        double p_nh_2_in_diag_theta_v_ic_0 = __CG_p_nh__CG_diag__m_theta_v_ic[((((__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * __f2dace_SA_theta_v_ic_d_1_s_644_diag_p_nh_2) * tmp_index_2380) + (__f2dace_SA_theta_v_ic_d_0_s_643_diag_p_nh_2 * tmp_index_2379)) + tmp_index_2378)];
-                        double p_nh_3_in_metrics_inv_ddqz_z_full_0 = __CG_p_nh__CG_metrics__m_inv_ddqz_z_full[((((__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * __f2dace_SA_inv_ddqz_z_full_d_1_s_791_metrics_p_nh_4) * tmp_index_2393) + (__f2dace_SA_inv_ddqz_z_full_d_0_s_790_metrics_p_nh_4 * tmp_index_2392)) + tmp_index_2391)];
-                        double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2350) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2349)) + tmp_index_2348)];
-                        double z_theta2_out;
-
-                        ///////////////////
-                        // Tasklet code (T_l1112_c1112)
-                        z_theta2_out = (p_nh_prog_nnow_0_in_theta_v_0 + ((p_nh_0_in_metrics_zdiff_gradp_0 * (p_nh_1_in_diag_theta_v_ic_0 - p_nh_2_in_diag_theta_v_ic_0)) * p_nh_3_in_metrics_inv_ddqz_z_full_0));
-                        ///////////////////
-
-                        z_theta2_local = z_theta2_out;
-                    }
-                    {
-                        double z_theta1_0_in = z_theta1_local;
-                        double z_theta2_0_in = z_theta2_local;
-                        double tmp_arg_35_out;
-
-                        ///////////////////
-                        // Tasklet code (T_l1113_c1113)
-                        tmp_arg_35_out = (z_theta1_0_in + z_theta2_0_in);
-                        ///////////////////
-
-                        tmp_arg_35 = tmp_arg_35_out;
-                    }
-                    {
-                        double tmp_arg_35_0_in = tmp_arg_35;
-                        double tmp_call_31_out;
-
-                        ///////////////////
-                        // Tasklet code (T_l1113_c1113)
-                        tmp_call_31_out = (dace::math::ipow(tmp_arg_35_0_in, 2));
-                        ///////////////////
-
-                        tmp_call_31 = tmp_call_31_out;
-                    }
-                    {
-                        double p_patch_0_in_edges_inv_dual_edge_length_0 = __CG_p_patch__CG_edges__m_inv_dual_edge_length[(((__f2dace_SA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9 * ((- __f2dace_SOA_inv_dual_edge_length_d_1_s_271_edges_p_patch_9) + _for_it_89)) - __f2dace_SOA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9) + _for_it_99)];
-                        double tmp_call_31_0_in = tmp_call_31;
-                        double z_theta1_0_in = z_theta1_local;
-                        double z_theta2_0_in = z_theta2_local;
-                        double z_hydro_corr_out_0;
-
-                        ///////////////////
-                        // Tasklet code (T_l1113_c1113)
-                        z_hydro_corr_out_0 = ((((0.00976135730211817 * p_patch_0_in_edges_inv_dual_edge_length_0) * (z_theta2_0_in - z_theta1_0_in)) * 4.0) / tmp_call_31_0_in);
-                        ///////////////////
-
-                        z_hydro_corr[((_for_it_99 + (tmp_struct_symbol_75 * (_for_it_89 - 1))) - 1)] = z_hydro_corr_out_0;
-                    }
-
                 }
 
             }
@@ -7921,141 +8095,13 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
 
             _if_cond_55 = (__CG_global_data__m_igradp_method == 5);
             if ((_if_cond_55 == 1)) {
-                for (_for_it_100 = i_startidx_local; (_for_it_100 <= i_endidx_local); _for_it_100 = (_for_it_100 + 1)) {
+                {
 
-                    tmp_index_2400 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                    tmp_arg_36 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2400)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] + 2);
-
-                    ikp1 = min(nlev, tmp_arg_36);
-                    tmp_index_2404 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                    tmp_arg_37 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2404)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] + 2);
-
-                    ikp2 = min(nlev, tmp_arg_37);
-                    tmp_index_2411 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-                    tmp_index_2416 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2421 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-
-                    tmp_index_2417 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2411)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                    tmp_index_2418 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2428 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                    tmp_index_2433 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2438 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-                    tmp_index_2434 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2428)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                    tmp_index_2435 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2445 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-                    tmp_index_2450 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2455 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-
-                    tmp_index_2451 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2445)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 1)] + 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                    tmp_index_2452 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2463 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (1 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2468 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-                    tmp_index_2465 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (1 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2475 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-
-                    tmp_index_2480 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2485 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-                    tmp_index_2481 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2475)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                    tmp_index_2482 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2492 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
                     {
-
-                        {
-                            double p_nh_0_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2421)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 1)];
-                            double p_nh_1_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2438)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 2)];
-                            double p_nh_2_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2455)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 3)];
-                            double p_nh_3_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2468)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 4)];
-                            double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2418) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2417)) + tmp_index_2416)];
-                            double p_nh_prog_nnow_1_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2435) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2434)) + tmp_index_2433)];
-                            double p_nh_prog_nnow_2_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2452) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2451)) + tmp_index_2450)];
-                            double p_nh_prog_nnow_3_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2465) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * ((- __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15) + ikp1))) + tmp_index_2463)];
-                            double z_theta1_out;
-
-                            ///////////////////
-                            // Tasklet code (T_l1119_c1119)
-                            z_theta1_out = ((((p_nh_prog_nnow_0_in_theta_v_0 * p_nh_0_in_metrics_coeff_gradp_0) + (p_nh_prog_nnow_1_in_theta_v_0 * p_nh_1_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_2_in_theta_v_0 * p_nh_2_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_3_in_theta_v_0 * p_nh_3_in_metrics_coeff_gradp_0));
-                            ///////////////////
-
-                            z_theta1_local = z_theta1_out;
+                        #pragma omp parallel for
+                        for (auto _for_it_100 = i_startidx_local; _for_it_100 < (i_endidx_local + 1); _for_it_100 += 1) {
+                            loop_body_159_0_0(__state, &__CG_p_nh__CG_metrics__m_coeff_gradp[0], &__CG_p_nh__CG_metrics__m_vertidx_gradp[0], &__CG_p_nh_prog_nnow__m_theta_v[0], &__CG_p_patch__CG_edges__m_cell_blk[0], &__CG_p_patch__CG_edges__m_cell_idx[0], &__CG_p_patch__CG_edges__m_inv_dual_edge_length[0], nlev, &z_hydro_corr[0], _for_it_100, _for_it_89, tmp_struct_symbol_75);
                         }
-
-                    }
-                    tmp_index_2497 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2502 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-                    tmp_index_2498 = (__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2492)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                    tmp_index_2499 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2509 = (nlev - __f2dace_SOA_vertidx_gradp_d_2_s_858_metrics_p_nh_4);
-                    tmp_index_2514 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2519 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-
-                    tmp_index_2515 = ((__CG_p_nh__CG_metrics__m_vertidx_gradp[(((((((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * __f2dace_SA_vertidx_gradp_d_2_s_858_metrics_p_nh_4) * ((- __f2dace_SOA_vertidx_gradp_d_3_s_859_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * __f2dace_SA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) * tmp_index_2509)) + (__f2dace_SA_vertidx_gradp_d_0_s_856_metrics_p_nh_4 * ((- __f2dace_SOA_vertidx_gradp_d_1_s_857_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_vertidx_gradp_d_0_s_856_metrics_p_nh_4) + 2)] + 1) - __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15);
-                    tmp_index_2516 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    tmp_index_2527 = (__CG_p_patch__CG_edges__m_cell_idx[(((((__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * __f2dace_SA_cell_idx_d_1_s_243_edges_p_patch_9) * (2 - __f2dace_SOA_cell_idx_d_2_s_244_edges_p_patch_9)) + (__f2dace_SA_cell_idx_d_0_s_242_edges_p_patch_9 * ((- __f2dace_SOA_cell_idx_d_1_s_243_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_idx_d_0_s_242_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_0_s_631_p_nh_prog_nnew_15);
-                    tmp_index_2532 = (nlev - __f2dace_SOA_coeff_gradp_d_2_s_823_metrics_p_nh_4);
-                    tmp_index_2529 = (__CG_p_patch__CG_edges__m_cell_blk[(((((__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * __f2dace_SA_cell_blk_d_1_s_246_edges_p_patch_9) * (2 - __f2dace_SOA_cell_blk_d_2_s_247_edges_p_patch_9)) + (__f2dace_SA_cell_blk_d_0_s_245_edges_p_patch_9 * ((- __f2dace_SOA_cell_blk_d_1_s_246_edges_p_patch_9) + _for_it_89))) - __f2dace_SOA_cell_blk_d_0_s_245_edges_p_patch_9) + _for_it_100)] - __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15);
-                    {
-                        double tmp_call_32;
-                        double tmp_arg_38;
-
-                        {
-                            double p_nh_0_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2485)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 5)];
-                            double p_nh_1_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2502)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 6)];
-                            double p_nh_2_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2519)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 7)];
-                            double p_nh_3_in_metrics_coeff_gradp_0 = __CG_p_nh__CG_metrics__m_coeff_gradp[(((((((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * __f2dace_SA_coeff_gradp_d_2_s_823_metrics_p_nh_4) * ((- __f2dace_SOA_coeff_gradp_d_3_s_824_metrics_p_nh_4) + _for_it_89)) + ((__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * __f2dace_SA_coeff_gradp_d_1_s_822_metrics_p_nh_4) * tmp_index_2532)) + (__f2dace_SA_coeff_gradp_d_0_s_821_metrics_p_nh_4 * ((- __f2dace_SOA_coeff_gradp_d_1_s_822_metrics_p_nh_4) + _for_it_100))) - __f2dace_SOA_coeff_gradp_d_0_s_821_metrics_p_nh_4) + 8)];
-                            double p_nh_prog_nnow_0_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2482) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2481)) + tmp_index_2480)];
-                            double p_nh_prog_nnow_1_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2499) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2498)) + tmp_index_2497)];
-                            double p_nh_prog_nnow_2_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2516) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * tmp_index_2515)) + tmp_index_2514)];
-                            double p_nh_prog_nnow_3_in_theta_v_0 = __CG_p_nh_prog_nnow__m_theta_v[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14) * tmp_index_2529) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnow_14 * ((- __f2dace_SOA_theta_v_d_1_s_632_p_nh_prog_nnew_15) + ikp2))) + tmp_index_2527)];
-                            double z_theta2_out;
-
-                            ///////////////////
-                            // Tasklet code (T_l1120_c1120)
-                            z_theta2_out = ((((p_nh_prog_nnow_0_in_theta_v_0 * p_nh_0_in_metrics_coeff_gradp_0) + (p_nh_prog_nnow_1_in_theta_v_0 * p_nh_1_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_2_in_theta_v_0 * p_nh_2_in_metrics_coeff_gradp_0)) + (p_nh_prog_nnow_3_in_theta_v_0 * p_nh_3_in_metrics_coeff_gradp_0));
-                            ///////////////////
-
-                            z_theta2_local = z_theta2_out;
-                        }
-                        {
-                            double z_theta1_0_in = z_theta1_local;
-                            double z_theta2_0_in = z_theta2_local;
-                            double tmp_arg_38_out;
-
-                            ///////////////////
-                            // Tasklet code (T_l1121_c1121)
-                            tmp_arg_38_out = (z_theta1_0_in + z_theta2_0_in);
-                            ///////////////////
-
-                            tmp_arg_38 = tmp_arg_38_out;
-                        }
-                        {
-                            double tmp_arg_38_0_in = tmp_arg_38;
-                            double tmp_call_32_out;
-
-                            ///////////////////
-                            // Tasklet code (T_l1121_c1121)
-                            tmp_call_32_out = (dace::math::ipow(tmp_arg_38_0_in, 2));
-                            ///////////////////
-
-                            tmp_call_32 = tmp_call_32_out;
-                        }
-                        {
-                            double p_patch_0_in_edges_inv_dual_edge_length_0 = __CG_p_patch__CG_edges__m_inv_dual_edge_length[(((__f2dace_SA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9 * ((- __f2dace_SOA_inv_dual_edge_length_d_1_s_271_edges_p_patch_9) + _for_it_89)) - __f2dace_SOA_inv_dual_edge_length_d_0_s_270_edges_p_patch_9) + _for_it_100)];
-                            double tmp_call_32_0_in = tmp_call_32;
-                            double z_theta1_0_in = z_theta1_local;
-                            double z_theta2_0_in = z_theta2_local;
-                            double z_hydro_corr_out_0;
-
-                            ///////////////////
-                            // Tasklet code (T_l1121_c1121)
-                            z_hydro_corr_out_0 = ((((0.00976135730211817 * p_patch_0_in_edges_inv_dual_edge_length_0) * (z_theta2_0_in - z_theta1_0_in)) * 4.0) / tmp_call_32_0_in);
-                            ///////////////////
-
-                            z_hydro_corr[((_for_it_100 + (tmp_struct_symbol_75 * (_for_it_89 - 1))) - 1)] = z_hydro_corr_out_0;
-                        }
-
                     }
 
                 }

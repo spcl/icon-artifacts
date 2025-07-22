@@ -51,20 +51,20 @@ def rm_connection_of_desc_to_nsdfg_node(nsdfg_node: dace.nodes.NestedSDFG, state
 
     # Get in-edges in to the parent SDFG node
     if desc_name in nsdfg_node.in_connectors:
-        cur_edge = state.in_edges_by_connector(nsdfg_node, desc_name)[0]
+        cur_edge = next(iter(state.in_edges_by_connector(nsdfg_node, desc_name)))
         assert len(list(state.in_edges_by_connector(nsdfg_node, desc_name))) == 1, f"Multiple edges found for {nsdfg_node} with connector {desc_name}."
         while not isinstance(cur_edge.src, dace.nodes.AccessNode):
             input_path.append(cur_edge)
-            cur_edge = state.in_edges_by_connector(cur_edge.src, cur_edge.src_conn.replace("OUT_", "IN_"))[0]
+            cur_edge = next(iter(state.in_edges_by_connector(cur_edge.src, cur_edge.src_conn.replace("OUT_", "IN_"))))
         input_path.append(cur_edge)
 
     # Get out-edges out from the parent SDFG node
     if desc_name in nsdfg_node.out_connectors:
-        cur_edge = state.out_edges_by_connector(nsdfg_node, desc_name)[0]
+        cur_edge = next(iter(state.out_edges_by_connector(nsdfg_node, desc_name)))
         assert len(list(state.out_edges_by_connector(nsdfg_node, desc_name))) == 1, f"Multiple edges found for {nsdfg_node} with connector {desc_name}."
         while not isinstance(cur_edge.dst, dace.nodes.AccessNode):
             output_path.append(cur_edge)
-            cur_edge = state.out_edges_by_connector(cur_edge.dst, cur_edge.dst_conn.replace("IN_", "OUT_"))[0]
+            cur_edge = next(iter(state.out_edges_by_connector(cur_edge.dst, cur_edge.dst_conn.replace("IN_", "OUT_"))))
         output_path.append(cur_edge)
 
     # Remove all edges in the input and output paths
@@ -229,8 +229,34 @@ def transify_targeted_scalar(sdfg: dace.SDFG, desc_candidate_names: typing.Set[s
                     # Add the name to the replacement dictionary
                     replace_dict[desc_name] = name
 
-                # Replace the scalars in the SDFG
-                cfg.replace_dict(repl=replace_dict)
-                for src, dst in replace_dict.items():
-                    rename_on_if(cfg, src, dst)
-                    # rename_on_for(cfg, src, dst) # This is OK, no need to call again as the current f2dace commit replaces for loops
+            # Replace the scalars in the SDFG
+            cfg.replace_dict(repl=replace_dict)
+            for src, dst in replace_dict.items():
+                rename_on_if(cfg, src, dst)
+                # rename_on_for(cfg, src, dst) # This is OK, no need to call again as the current f2dace commit replaces for loops
+                # Repl-name might make the the transient local accesses to be-non transient due to name change on the data container
+                if dst in snode.sdfg.arrays:
+                    desc = snode.sdfg.arrays[dst]
+                    assert isinstance(desc, dace.data.Scalar), f"Expected {dst} to be a scalar, got {type(desc)}."
+                    if desc.transient is False:
+                        desc.transient = True
+                        desc.storage = dace.dtypes.StorageType.Register
+
+def retransify_scalar_with_local_prefix(root: dace.SDFG, sdfg: dace.SDFG):
+    for arr_name, arr_desc in sdfg.arrays.items():
+        if (arr_name.endswith("_local") and isinstance(arr_desc, dace.data.Scalar) and
+            not arr_name.startswith("i_startidx") and not arr_name.startswith("i_endidx") and
+            not arr_name.startswith("je_") and not arr_name.startswith("jb_")):
+            if arr_desc.transient is False:
+                arr_desc.transient = True
+                arr_desc.storage = dace.dtypes.StorageType.Register
+            # Remove in and out connectors
+            parent_nsdfg_node = sdfg.parent_nsdfg_node
+            if parent_nsdfg_node is not None:
+                parent_state = _find_parent_graph(root, parent_nsdfg_node)
+                rm_connection_of_desc_to_nsdfg_node(parent_nsdfg_node, parent_state, arr_name)
+
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                retransify_scalar_with_local_prefix(root, node.sdfg)
