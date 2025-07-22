@@ -1,7 +1,7 @@
 import dace
 from dace import SDFG
 from dace.sdfg.state import LoopRegion
-from utils.inject_velocity_shim import inject_velocity_shim
+from dace.transformation.passes.scalar_to_symbol import ScalarToSymbolPromotion
 from stages import common
 from utils.codegen_from_sdfg import Mode
 
@@ -37,6 +37,8 @@ from utils.transify_kernel_scalars import (
     transify_targeted_scalar,
     retransify_scalar_with_local_prefix,
 )
+
+from utils.add_data_preserver_tasklets import add_data_preserver_tasklets
 STAGE_ID = 1
 
 
@@ -250,26 +252,45 @@ def optimization_action(g: SDFG):
 
     count_loops(g, verbose=True, use_assert=False)
     print(f"Stage #{STAGE_ID}: Manually transformed {manually_transformed_count} loops to maps for {g.name}")
-    return g
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
 
     # === Sub-Phase 7: Last Simplify + StateFusion ===
-    # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
-    g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
-
-    # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with the rest of the maps make
-    # offloading much harder)
-    state_fusion_without_copyin_and_copyout(g)
-
+    # Simplify removes input scalars that are accessed only on interstate edges `je_local`, `jb_local` completely,
+    # Adding a tasklet that reads these scalars to an useless tasklet can prevent their removal
+    # In an SDFG (that has a parent nsdfg node), for all non-transient scalars that are not accessed through an access node -> add a preserver tasklet
+    # Try to just skip in ScalarToSymbolPromotion using a skip list
+    # add_data_preserver_tasklets(g)
     g.validate()
+
+    # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
+    # Even with side-effects on tasklet ScalarToSymbolPromotion removes "je_local" and then their parent array.
+    # Call that separately
+    g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination", "ScalarToSymbolPromotion"], validate=False)
+    ScalarToSymbolPromotion().apply_pass(g, {
+        "transients_only": True,
+        "ignore": {
+            "je_local",
+            "jb_local",
+            "i_startidx_local",
+            "i_endidx_local",
+            "je",
+            "jb",
+            "i_startidx",
+            "i_endidx",
+        }
+    })
+    # Simplify results in missing symbols in NestedSDFGs
+    # add_missing_data_and_symbols_to_all_nsdfgs(g)
+    g.validate()
+
+    # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with
+    # the rest of the maps, as it makes offloading much harder)
+    state_fusion_without_copyin_and_copyout(g)
+    g.validate()
+
     count_loops(g, verbose=False, use_assert=True)
     # === Sub-Phase 7: Last Simplify + StateFusion ===
-
-    # === Sub-Phase 8: LoopToSequentialMap ===
-    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
-    # === Sub-Phase 8: LoopToSequentialMap ===
-
 
     return g
 

@@ -39,7 +39,7 @@ def main():
             g.name = name
             g.validate()
 
-            g = optimization_action(g, velicity_shim=args.shim)
+            g = optimization_action(g)
 
             g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")

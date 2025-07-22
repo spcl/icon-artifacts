@@ -10,7 +10,7 @@ import argparse
 
 STAGE_ID = 3
 
-def optimization_action(g: SDFG, velicity_shim: bool):
+def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
     gpu_offloading_wo_host_dev_copies(g)
     g.validate()
@@ -32,7 +32,6 @@ def main():
         default=Mode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
-    argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=False)
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True
@@ -51,7 +50,7 @@ def main():
             g.name = name
             g.validate()
 
-            g = optimization_action(g, velicity_shim=args.shim)
+            g = optimization_action(g)
 
             g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")

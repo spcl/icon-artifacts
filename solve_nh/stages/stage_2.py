@@ -1,7 +1,6 @@
 import dace
 from dace import SDFG
 from dace.transformation.dataflow import MapCollapse
-from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import Mode
 from dace.transformation.interstate import InlineSDFG
@@ -13,8 +12,9 @@ import argparse
 
 STAGE_ID = 2
 
-def optimization_action(g: SDFG, velicity_shim: bool):
+def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    # === Sub-Phase 1: InlineSDFG + MapCollapse For GPU Offloading ===
     for _ in range(3):
         g.apply_transformations_repeated(
             InlineSDFG
@@ -24,6 +24,14 @@ def optimization_action(g: SDFG, velicity_shim: bool):
         )
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
+    # === Sub-Phase 1: InlineSDFG + MapCollapse For GPU Offloading  ===
+
+
+    # === Sub-Phase 2: RemainingLoopsToSequentialMaps ===
+    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
+    # === Sub-Phase 2: RemainingLoopsToSequentialMaps ===
+
+
     return g
 
 
@@ -42,7 +50,6 @@ def main():
         default=Mode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
-    argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=False)
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True
@@ -61,7 +68,7 @@ def main():
             g.name = name
             g.validate()
 
-            g = optimization_action(g, velicity_shim=args.shim)
+            g = optimization_action(g)
 
             g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
