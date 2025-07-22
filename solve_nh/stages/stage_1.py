@@ -151,6 +151,11 @@ def optimization_action(g: SDFG):
         "z_contr_w_fl_l",
         "z_graddiv2_vn",
         "z_theta_v_pr_mc_m1",
+        "je",
+        "jb",
+        "jc",
+        "i_startidx",
+        "i_endidx",
     }
     # First fuse as much as possible, as the heuristic to detect a scalar as transient
     # is based on the number of accesses to it, and if the states are not fused, it might have
@@ -198,6 +203,7 @@ def optimization_action(g: SDFG):
     g.validate()
 
     count_loops(g, verbose=True, use_assert=False)
+    return g
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
 
