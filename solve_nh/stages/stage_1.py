@@ -173,9 +173,21 @@ def optimization_action(g: SDFG):
     # SDFG Name | Loop Variable | Loop Label
     # TODO: Probably no nproma map should be left.
     manual_loop_to_map = {
-        #("corrector_post",  "_for_it_44", "FOR_l_1963_c_1963"),
-        #("predictor_pre" ,  "_for_it_99", "FOR_l_1110_c_1110"),
-        #("predictor_pre" , "_for_it_100", "FOR_l_1116_c_1116"),
+        # ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),
+        # ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"), # OK
+        # ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116"), # OK
+        # ("predictor_pre", "_for_it_66", "FOR_l_956_c_956"), # Can't
+        # ("predictor_pre", "_for_it_76", "FOR_l_990_c_990"), # Can't
+        # ("predictor_pre", "_for_it_81", "FOR_l_1017_c_1017"), # OK, if i_endidx, i_startidx transient
+        # ("predictor_pre", "_for_it_84", "FOR_l_1050_c_1050"), # OK, if lvn_pos, i_endidx, i_startidx transient
+        # ("predictor_pre", "_for_it_85", "FOR_l_1053_c_1053"), # OK, if lvn_pos transient
+        # ("predictor_pre", "_for_it_86", "FOR_l_1054_c_1054"), # OK, if lvn_pos transient
+        # ("predictor_pre", "_for_it_89", "FOR_l_1079_c_1079"), # OK, if i_endidx, i_startidx transient
+        # ("predictor_pre", "_for_it_101", "FOR_l_1126_c_1126"), # Can't
+        # ("predictor_pre", "_for_it_102", "FOR_l_1133_c_1133"), # Can't
+        # ("predictor_pre", "_for_it_103", "FOR_l_1139_c_1139"), # OK, if i_endidx, i_startidx transient
+        # ("predictor_pre", "_for_it_110", "FOR_l_1168_c_1168"),  # OK, if i_endidx, i_startidx transient
+        # ("predictor_pre", "_for_it_113", "FOR_l_1184_c_1184"), # OK, if je and jb transient
     }
     for sdfg_name, loop_var, loop_label in manual_loop_to_map:
         if sdfg_name in g.name:
