@@ -51,6 +51,16 @@ def optimization_action(g: SDFG):
         move_range_if_inside(g, "_for_it_101")
     # === Sub-Phase 4: Move to Range If Inside ===
 
+    # === Sub-Phase 5: Re-collapse After Manual Improvements ===
+    g.apply_transformations_repeated(
+        InlineSDFG
+    )
+    g.apply_transformations_repeated(
+        MapCollapse
+    )
+    count_map_dimensions(g)
+    count_uncollapsed_maps(g, verbose=False, use_assert=True)
+    # === Sub-Phase 5: Re-collapse After Manual Improvements ===
 
     return g
 
