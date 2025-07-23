@@ -71,9 +71,7 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
 
   if lib:
     assert stage == 9
-    if _build_for_integration:
-      for sdfg in sdfgs:
-        make_flattened_data_to_non_transient_gpu_input(sdfg)
+
     compile_if_propagated_sdfgs(
         sdfgs, gpu=True,
         release=release,

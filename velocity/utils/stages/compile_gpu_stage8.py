@@ -38,18 +38,18 @@ def optimization_action(sdfg):
         sdfg = decrease_bitwidth_of_const_arrays(sdfg,
                                         array_names={
                                             "gpu___CG_p_patch__CG_cells__m_edge_idx",
-                                            "gpu___CG_p_patch__CG_cells__m_end_index",
+                                            #"gpu___CG_p_patch__CG_cells__m_end_index", #CPU Only
                                             "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
-                                            "gpu___CG_p_patch__CG_cells__m_start_index",
+                                            #"gpu___CG_p_patch__CG_cells__m_start_index", #CPU Only
                                             "gpu___CG_p_patch__CG_edges__m_cell_idx",
-                                            "gpu___CG_p_patch__CG_edges__m_end_index",
+                                            #"gpu___CG_p_patch__CG_edges__m_end_index", #CPU Only
                                             "gpu___CG_p_patch__CG_edges__m_quad_idx",
-                                            "gpu___CG_p_patch__CG_edges__m_start_index",
+                                            #"gpu___CG_p_patch__CG_edges__m_start_index", #CPU Only
                                             "gpu___CG_p_patch__CG_edges__m_vertex_idx",
                                             "gpu___CG_p_patch__CG_verts__m_cell_idx",
                                             "gpu___CG_p_patch__CG_verts__m_edge_idx",
-                                            "gpu___CG_p_patch__CG_verts__m_end_index",
-                                            "gpu___CG_p_patch__CG_verts__m_start_index",
+                                            #"gpu___CG_p_patch__CG_verts__m_end_index", #CPU Only
+                                            #"gpu___CG_p_patch__CG_verts__m_start_index", #CPU Only
                                         },
                                         nproma_name="__CG_global_data__m_nproma")
         # nlock dependent ones

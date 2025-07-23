@@ -1,9 +1,12 @@
+import os
 import dace
 import argparse
 import utils.stages.common as common
 from utils.change_flatten_lib_to_shallow_copy import change_flatten_lib_to_shallow_copy
 from utils.input_to_gpu import input_to_gpu
 from utils.add_set_zero import add_set_zero
+from utils.make_flattened_data_to_input import make_flattened_data_to_non_transient_cpu_input, make_flattened_data_to_non_transient_gpu_input
+
 STAGE_ID = 9
 
 _allocation_names_to_comment_out = set()
@@ -17,6 +20,7 @@ def optimization_action(sdfg):
     shallow_copy_used_structs = ["p_prog", "p_int", "p_metrics", "p_patch", "p_diag"]
     deflatten_used_structs = ["p_diag"]
     _allocation_names_to_comment_out =  change_flatten_lib_to_shallow_copy(sdfg, shallow_copy_used_structs, deflatten_used_structs)
+
     sdfg.validate()
     #add_set_zero(sdfg, "gpu_maxvcfl_arr")
     sdfg.validate()
@@ -24,6 +28,13 @@ def optimization_action(sdfg):
     input_to_gpu(sdfg, "z_kin_hor_e")
     input_to_gpu(sdfg, "z_vt_ie")
     sdfg.validate()
+
+    _build_for_integration = os.getenv('_BUILD_LIB_FOR_SOLVE_NH', '0').lower() in ('1', 'true', 'yes')
+    assert _build_for_integration is True, "This stage is only for building the library for SolveNH integration."
+    if _build_for_integration:
+        make_flattened_data_to_non_transient_gpu_input(sdfg)
+        sdfg.validate()
+
     return sdfg
 
 def main():
@@ -56,8 +67,14 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        assert _allocation_names_to_comment_out is not None and _allocation_names_to_comment_out != set()
-        common.compile_action(STAGE_ID, sdfgs, True, _allocation_names_to_comment_out, True)
+        #assert _allocation_names_to_comment_out is not None and _allocation_names_to_comment_out != set()
+        common.compile_action(
+            stage=STAGE_ID,
+            sdfgs=sdfgs,
+            lib=True,
+            allocation_names_to_comment_out=_allocation_names_to_comment_out,
+            use_openacc_stream=False
+        )
 
 if __name__ == "__main__":
     main()
