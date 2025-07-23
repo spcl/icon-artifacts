@@ -383,7 +383,11 @@ def reinject_velocity_shim_gpu(
     # Add all missing in connectors (full range)
     new_in_conns = required_in_conns - set(velocity_tasklet.in_connectors)
     for new_in_conn in new_in_conns:
-        data_name = new_in_conn[3:]  # Remove 'in_' prefix
+        data_name = new_in_conn[3:]
+        # If not a container group data
+        if not data_name.startswith("gpu___CG") and not data_name.startswith("__CG"):
+            if data_name.startswith("z_"):
+                data_name = "gpu_" + data_name
         if (new_in_conn not in velocity_tasklet.in_connectors and
             data_name in state.sdfg.arrays):
             velocity_tasklet.add_in_connector(new_in_conn)
@@ -419,7 +423,7 @@ def reinject_velocity_shim_gpu(
         out_name = "out_" + velocity_gpu_name_mapping_local["gpu_" + key][3:]  # Remove 'in_' prefix
         if out_name not in velocity_tasklet.out_connectors:
             velocity_tasklet.add_out_connector(out_name)
-            data_name = out_name[4:]
+            data_name = "gpu_" + out_name[4:] if not out_name[4:].startswith("gpu_") else out_name[4:]  # Remove 'out_' prefix
             dataaccess = state.add_access(data_name)
             state.add_edge(
                 velocity_tasklet,
