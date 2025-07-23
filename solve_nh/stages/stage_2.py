@@ -11,6 +11,7 @@ from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
     clean_unused_symbols_from_nsdfg,
 )
+from utils.manual_fixes import move_range_if_inside
 import argparse
 
 
@@ -41,6 +42,14 @@ def optimization_action(g: SDFG):
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
     # === Sub-Phase 3: Clean Again ===
+
+    # === Sub-Phase 4: Move to Range If Inside ===
+    # If pattern is Map -> NSDFG -> IF -> State (Map)
+    # and inside'maps range depend on the if above
+    # (that either of the value is the range of the inner map, then move in the if)
+    if "predictor_pre" in g.name:
+        move_range_if_inside(g, "_for_it_101")
+    # === Sub-Phase 4: Move to Range If Inside ===
 
 
     return g
