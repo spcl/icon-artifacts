@@ -1,0 +1,188 @@
+#include "shared_struct_defs.h"
+#include "velocity_shim.h"
+#include <dace/dace.h>
+
+namespace corrector_post {
+#ifndef __DACE_CODEGEN_SOLVE_NH_CORRECTOR_POST__
+#define __DACE_CODEGEN_SOLVE_NH_CORRECTOR_POST__
+struct solve_nh_corrector_post_state_t; // Forward declaration.
+
+ solve_nh_corrector_post_state_t *__dace_init_solve_nh_corrector_post(
+  double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
+  t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
+  double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
+  double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e, double *z_mflx_top,
+  double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c, double *z_theta_v_e,
+  double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc, double *z_w_concorr_me,
+  double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2,
+  double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42,
+  double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je,
+  int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+ int __dace_exit_solve_nh_corrector_post(solve_nh_corrector_post_state_t *__state);
+ void __program_solve_nh_corrector_post(
+  solve_nh_corrector_post_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
+  t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
+  double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
+  double *z_flxdiv_theta, double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e,
+  double *z_mflx_top, double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c,
+  double *z_theta_v_e, double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc,
+  double *z_w_concorr_me, double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1,
+  double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32,
+  double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc,
+  int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+
+#endif // __DACE_CODEGEN_SOLVE_NH_CORRECTOR_POST__
+} // namespace corrector_post
+#include "shared_struct_defs.h"
+#include "velocity_shim.h"
+#include <dace/dace.h>
+
+namespace corrector_pre {
+#ifndef __DACE_CODEGEN_SOLVE_NH_CORRECTOR_PRE__
+#define __DACE_CODEGEN_SOLVE_NH_CORRECTOR_PRE__
+struct solve_nh_corrector_pre_state_t; // Forward declaration.
+
+ solve_nh_corrector_pre_state_t *__dace_init_solve_nh_corrector_pre(
+  double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
+  t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
+  double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
+  double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e, double *z_mflx_top,
+  double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c, double *z_theta_v_e,
+  double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc, double *z_w_concorr_me,
+  double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2,
+  double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42,
+  double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je,
+  int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+ int __dace_exit_solve_nh_corrector_pre(solve_nh_corrector_pre_state_t *__state);
+ void __program_solve_nh_corrector_pre(
+  solve_nh_corrector_pre_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
+  t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
+  double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
+  double *z_flxdiv_theta, double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e,
+  double *z_mflx_top, double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c,
+  double *z_theta_v_e, double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc,
+  double *z_w_concorr_me, double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1,
+  double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32,
+  double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc,
+  int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+
+#endif // __DACE_CODEGEN_SOLVE_NH_CORRECTOR_PRE__
+} // namespace corrector_pre
+#include "shared_struct_defs.h"
+#include "velocity_shim.h"
+#include <dace/dace.h>
+
+namespace predictor_post {
+#ifndef __DACE_CODEGEN_SOLVE_NH_PREDICTOR_POST__
+#define __DACE_CODEGEN_SOLVE_NH_PREDICTOR_POST__
+struct solve_nh_predictor_post_state_t; // Forward declaration.
+
+ solve_nh_predictor_post_state_t *__dace_init_solve_nh_predictor_post(
+  double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
+  t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
+  double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
+  double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e, double *z_mflx_top,
+  double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c, double *z_theta_v_e,
+  double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc, double *z_w_concorr_me,
+  double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2,
+  double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42,
+  double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je,
+  int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+ int __dace_exit_solve_nh_predictor_post(solve_nh_predictor_post_state_t *__state);
+ void __program_solve_nh_predictor_post(
+  solve_nh_predictor_post_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
+  t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
+  double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
+  double *z_flxdiv_theta, double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e,
+  double *z_mflx_top, double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c,
+  double *z_theta_v_e, double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc,
+  double *z_w_concorr_me, double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1,
+  double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32,
+  double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc,
+  int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+
+#endif // __DACE_CODEGEN_SOLVE_NH_PREDICTOR_POST__
+} // namespace predictor_post
+#include "shared_struct_defs.h"
+#include "velocity_shim.h"
+#include <dace/dace.h>
+
+namespace predictor_pre {
+#ifndef __DACE_CODEGEN_SOLVE_NH_PREDICTOR_PRE__
+#define __DACE_CODEGEN_SOLVE_NH_PREDICTOR_PRE__
+struct solve_nh_predictor_pre_state_t; // Forward declaration.
+
+ solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre(
+  double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh, t_nh_prog *p_nh_prog_nnew,
+  t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta, double *z_contr_w_fl_l,
+  double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass, double *z_flxdiv_theta,
+  double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e, double *z_mflx_top,
+  double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c, double *z_theta_v_e,
+  double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc, double *z_w_concorr_me,
+  double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1, double distv_bary_2,
+  double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32, double dz42,
+  double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc, int je,
+  int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+ int __dace_exit_solve_nh_predictor_pre(solve_nh_predictor_pre_state_t *__state);
+ void __program_solve_nh_predictor_pre(
+  solve_nh_predictor_pre_state_t *__state, double *bdy_divdamp, double *enh_divdamp_fac, global_data_type *global_data, t_int_state *p_int, t_nh_state *p_nh,
+  t_nh_prog *p_nh_prog_nnew, t_nh_prog *p_nh_prog_nnow, t_patch *p_patch, t_prepare_adv *prep_adv, double *scal_divdamp, double *z_alpha, double *z_beta,
+  double *z_contr_w_fl_l, double *z_dexner_dz_c, double *z_dwdz_dd, double *z_exner_ex_pr, double *z_exner_expl, double *z_exner_ic, double *z_flxdiv_mass,
+  double *z_flxdiv_theta, double *z_grad_rth, double *z_graddiv2_vn, double *z_graddiv_vn, double *z_gradh_exner, double *z_hydro_corr, double *z_kin_hor_e,
+  double *z_mflx_top, double *z_q, double *z_raylfac, double *z_rho_e, double *z_rho_expl, double *z_rho_v, double *z_rth_pr, double *z_th_ddz_exner_c,
+  double *z_theta_v_e, double *z_theta_v_fl_e, double *z_theta_v_pr_ic, double *z_theta_v_v, double *z_vn_avg, double *z_vt_ie, double *z_w_concorr_mc,
+  double *z_w_concorr_me, double *z_w_expl, int __f2dace_OPTIONAL_lacc, double alin, double aqdr, double bqdr, double df32, double df42, double distv_bary_1,
+  double distv_bary_2, double dt_linintp_ubc, double dt_linintp_ubc_nnew, double dt_linintp_ubc_nnow, double dt_shift, double dthalf, double dtime, double dz32,
+  double dz42, double dzlin, double dzqdr, int i_endblk, int i_endidx, int i_startblk, int i_startidx, int idyn_timestep, int ishift, int istep, int jb, int jc,
+  int je, int jg, int jk, int jk_start, int jks, int jstep, int l_child_vertnest, int l_init, int l_recompute, int l_vert_nested, int lacc, int lclean_mflx,
+  int lprep_adv, int lsave_mflx, int lvn_only, int lvn_pos, int nblks_gradp, int nlen_gradp, int nlev, int nlevp1, int nnew, int nnow, int nproma_gradp,
+  int npromz_gradp, int nshift, int nshift_total, int ntl1, int ntl2, int nvar, double r_dtimensubsteps, double r_nsubsteps, int rl_end, int rl_start,
+  double scal_divdamp_o2, double wgt_nnew_rth, double wgt_nnew_vel, double wgt_nnow_rth, double wgt_nnow_vel, double z_a, double z_b, double z_c,
+  double z_d_vn_dmp, double z_d_vn_iau, double z_ddt_vn_apc, double z_ddt_vn_cor, double z_ddt_vn_dyn, double z_ddt_vn_pgr, double z_ddt_vn_ray, double z_g,
+  double z_gamma, double z_ntdistv_bary_1, double z_ntdistv_bary_2, double z_rho_tavg, double z_rho_tavg_m1, double z_theta1, double z_theta2,
+  double z_theta_tavg, double z_theta_tavg_m1, double z_theta_v_pr_mc, double z_theta_v_pr_mc_m1, double z_w_backtraj, double zf);
+
+#endif // __DACE_CODEGEN_SOLVE_NH_PREDICTOR_PRE__
+} // namespace predictor_pre

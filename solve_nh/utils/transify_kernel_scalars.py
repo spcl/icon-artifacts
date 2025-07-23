@@ -1,6 +1,6 @@
 import dace
 from dace.sdfg.state import ControlFlowRegion, ConditionalBlock, LoopRegion
-from .get_num_parent_map_scopes import get_num_parent_map_scopes
+from .get_num_parent_map_and_loop_scopes import get_num_parent_map_scopes
 import copy
 import typing
 from utils.rename import rename_on_if, rename_on_for

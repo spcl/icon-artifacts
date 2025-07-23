@@ -1,6 +1,8 @@
 import dace
 from dace import SDFG
+from dace.sdfg.state import LoopRegion
 from dace.transformation.dataflow import MapCollapse
+from dace.transformation.interstate.loop_to_map import LoopToMap
 from stages import common
 from utils.codegen_from_sdfg import Mode
 from dace.transformation.interstate import InlineSDFG
@@ -61,6 +63,35 @@ def optimization_action(g: SDFG):
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     # === Sub-Phase 5: Re-collapse After Manual Improvements ===
+
+    # === Sub-Phase 6: Remaining Loops To Sequential Maps ===
+    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
+    # Breaks validation: TODO make GPU offloading work with parent loops
+    #iterator_names = set()
+    #for node, graph in g.all_nodes_recursive():
+    #    if isinstance(node, LoopRegion):
+    #        it_var = node.loop_variable
+    #        iterator_names.add(it_var)
+    #        LoopToMap.apply_to(sdfg=graph.sdfg, loop=node, permissive=True, options={"ballin": True})
+    #
+    #for n, graph in g.all_nodes_recursive():
+    #    if isinstance(n, dace.sdfg.nodes.MapEntry):
+    #        if len(n.map.params) == 1 and n.map.params[0] in iterator_names:
+    #            n.map.schedule = dace.dtypes.ScheduleType.Sequential
+    #            n.map.unroll = False
+    #
+    #for n, graph in g.all_nodes_recursive():
+    #    if isinstance(n, dace.sdfg.nodes.MapEntry):
+    #        params = n.map.params
+    #        has_loop_it_names = any([(p in iterator_names) for p in params])
+    #        if has_loop_it_names:
+    #            assert len(params) == 1, (
+    #                f"Expected only one loop iterator name in map {n.map.name}, got {params}"
+    #            )
+    #            assert n.map.schedule == dace.dtypes.ScheduleType.Sequential, (
+    #                f"Expected map {n.map.name} to be sequential, got {n.map.schedule}"
+    #            )
+    # === Sub-Phase 6: Remaining Loops To Sequential Maps ===
 
     return g
 

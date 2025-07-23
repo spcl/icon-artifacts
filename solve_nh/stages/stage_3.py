@@ -1,9 +1,15 @@
 import dace
 from dace import SDFG
+from dace.sdfg.state import LoopRegion
+from dace.transformation.interstate.loop_to_map import LoopToMap
 from stages import common
 from utils.codegen_from_sdfg import Mode
 from utils.gpu_offloading_wo_host_dev_copies import (
     gpu_offloading_wo_host_dev_copies,
+    replace_cpu_velocity_call_with_gpu_velocity_call,
+)
+from utils.flattener_modifications import (
+    add_gpu_copies_to_flattener,
 )
 import argparse
 
@@ -13,13 +19,13 @@ STAGE_ID = 3
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
 
-    # === Sub-Phase 1: RemainingLoopsToSequentialMaps ===
-    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
-    # === Sub-Phase 1: RemainingLoopsToSequentialMaps ===
-
-
     # === Sub-Phase 2: Offloading ===
+    # Add GPU copy-in and copy-out to the flattener/copy-in and deflattener/copy-out states
+    # add_gpu_copies_to_flattener(g)
+    # Perform the offloading with the assumption that all kernels purely run on the GPU
     gpu_offloading_wo_host_dev_copies(g)
+    # Replace the call to CPU velocity with the GPU call
+    replace_cpu_velocity_call_with_gpu_velocity_call(g)
     g.validate()
     # === Sub-Phase 2: Offloading ===
 

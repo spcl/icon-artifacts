@@ -5,7 +5,7 @@ from dace.codegen.common import CodeBlock
 from dace.sdfg import is_devicelevel_gpu
 from dace.sdfg.state import MultiConnectorEdge
 from .transify_kernel_scalars import transify_kernel_scalars
-from .get_num_parent_map_scopes import get_num_parent_map_scopes
+from .get_num_parent_map_and_loop_scopes import get_num_parent_map_and_loop_scopes
 
 openacc_data_names = """
    !$ACC DATA CREATE(z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e) &
@@ -744,13 +744,13 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
 
     parent_map_counts = dict()
     if verbose:
-        print("Finding parent maps for each map entry node in the SDFG:")
+        print("Finding parent maps and loops for each map entry node in the SDFG:")
     for node, graph in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.MapEntry):
-            num_parent_maps = get_num_parent_map_scopes(sdfg, node, graph)
+            num_parent_maps = get_num_parent_map_and_loop_scopes(sdfg, node, graph)
             parent_map_counts[(node, graph)] = num_parent_maps
             if verbose:
-                print(f"    Map {node.label} [{node.map.range}] ({graph.label}) has {num_parent_maps} parent maps.")
+                print(f"    Map {node.label} [{node.map.range}] ({graph.label}) has {num_parent_maps} parent maps and loops.")
 
     # Create a set of arrays needed on the GPU (used by GPU maps)
     # And create a set of arrays that are needed on the host (used by CPU maps)
@@ -830,3 +830,6 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
 
     sdfg.validate()
+
+def replace_cpu_velocity_call_with_gpu_velocity_call(sdfg: dace.SDFG):
+    pass
