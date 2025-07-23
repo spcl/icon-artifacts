@@ -261,7 +261,8 @@ class Compiler:
         return "-fPIC -fopenmp".split()
 
     def _get_cuda_standard_flags(self) -> list[str]:
-        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC' -DGPU".split()
+        CUDA_ARCH = os.getenv("CUDA_ARCH", "native")
+        return f"-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch={CUDA_ARCH} --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC' -DGPU".split()
 
     def _get_cpp_standard_flags(self) -> list[str]:
         return ["-std=c++20"]
