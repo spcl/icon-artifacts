@@ -6,6 +6,7 @@ from dace.sdfg import is_devicelevel_gpu
 from dace.sdfg.state import MultiConnectorEdge
 from .transify_kernel_scalars import transify_kernel_scalars
 from .get_num_parent_map_and_loop_scopes import get_num_parent_map_and_loop_scopes
+from .reinject_velocity_tasklet import reinject_velocity_shim_gpu
 
 openacc_data_names = """
    !$ACC DATA CREATE(z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e) &
@@ -798,6 +799,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
         if num_parent_maps >= parent_map_count:
             used_data = _get_data_used_by_map(map_entry=map_node, state=map_state)
             gpu_arrays |= used_data
+    gpu_arrays |= _get_data_used_by_velocity(sdfg)
     if verbose:
         print(f"GPU arrays used by maps with >={parent_map_count} parent maps: {gpu_arrays}")
 
@@ -829,7 +831,56 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     _move_scalar_access_to_original_name(sdfg)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
 
+    reinject_velocity_shim_gpu(sdfg)
+
     sdfg.validate()
 
-def replace_cpu_velocity_call_with_gpu_velocity_call(sdfg: dace.SDFG):
-    pass
+def _get_data_used_by_velocity(sdfg: dace.SDFG) -> Set[str]:
+    velocity_tasklet = None,
+    velocity_state = None
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.Tasklet) and "velocity" in n.label:
+            velocity_tasklet = n
+            velocity_state = g
+            break
+
+    # Not all SDFGs have velocity tendencies
+    if velocity_tasklet is None or velocity_state is None:
+        return set()
+
+    host_data_suffixes = {
+        "m_nflatlev",
+        "m_nrdmax",
+        "m_end_block",
+        "m_end_index",
+        "m_start_block",
+        "m_start_index",
+        "m_end_block",
+        "m_end_index",
+        "m_start_block",
+        "m_start_index",
+        "m_end_block",
+        "m_end_index",
+        "m_start_block",
+        "m_start_index",
+        "m_end_block",
+        "m_end_index",
+        "m_start_block",
+    }
+    def _is_host_data(name: str) -> bool:
+        """
+        Check if the data name is a host data name.
+        """
+        return any(name.endswith(suffix) for suffix in host_data_suffixes)
+
+    access_set = {ie.src.data for ie in velocity_state.in_edges(velocity_tasklet) if isinstance(ie.src, dace.nodes.AccessNode)} | {ie.dst.data for ie in velocity_state.out_edges(velocity_tasklet) if isinstance(ie.dst, dace.nodes.AccessNode)}
+
+    gpu_data_set = set()
+    for data_name in access_set:
+        if not _is_host_data(data_name) and sdfg.arrays.get(data_name, None) is not None and isinstance(sdfg.arrays[data_name], dace.data.Array):
+            gpu_data_set.add(data_name)
+
+    return gpu_data_set
+
+
+

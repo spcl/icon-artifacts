@@ -8,11 +8,6 @@ struct velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t;
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t;
 struct velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t;
 
-#if defined(__GPU__)
-
-#error "TODO GPU Implementation"
-
-#else
 
 DACE_EXPORTED velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *
 __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
@@ -671,5 +666,3 @@ DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
   int ldeepatmo,
   int lvn_only,
   int ntnd);
-
-#endif
