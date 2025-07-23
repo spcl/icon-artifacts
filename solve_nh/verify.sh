@@ -20,20 +20,20 @@ fi
 
 # Optimize stages
 if $OPT_ALL; then
-  for ((i=0; i<=STAGE_NUM; i++)); do
+  for ((i=0; i<STAGE_NUM; i++)); do
     echo "Optimizing stage $i..."
     if [[ $i -eq 0 ]]; then
-      python -m stages.stage_0 --optimize --shim 1>opt_stage0.out 2>opt_stage0.err
+      python -m stages.stage_0 --shim --optimize --codegen 1>opt_stage0.out 2>opt_stage0.err
     else
-      python -m stages.stage_$i --optimize 1>opt_stage$i.out 2>opt_stage$i.err
+      python -m stages.stage_$i --optimize --codegen --compile 1>opt_stage$i.out 2>opt_stage$i.err
     fi
   done
 else
   echo "Optimizing stage $STAGE_NUM..."
   if [[ $STAGE_NUM -eq 0 ]]; then
-    python -m stages.stage_0 --optimize --shim 1>opt_stage0.out 2>opt_stage0.err
+    python -m stages.stage_0 --shim --optimize --codegen 1>opt_stage0.out 2>opt_stage0.err
   else
-    python -m stages.stage_$STAGE_NUM --optimize 1>opt_stage$STAGE_NUM.out 2>opt_stage$STAGE_NUM.err
+    python -m stages.stage_$STAGE_NUM --optimize --codegen --compile 1>opt_stage$STAGE_NUM.out 2>opt_stage$STAGE_NUM.err
   fi
 fi
 
