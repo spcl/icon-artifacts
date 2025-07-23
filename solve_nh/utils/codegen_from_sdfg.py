@@ -261,7 +261,7 @@ class Compiler:
         return "-fPIC -fopenmp".split()
 
     def _get_cuda_standard_flags(self) -> list[str]:
-        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC'".split()
+        return "-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch=native --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC' -DGPU".split()
 
     def _get_cpp_standard_flags(self) -> list[str]:
         return ["-std=c++20"]
@@ -296,6 +296,9 @@ class Compiler:
         return []
 
     def get_gpu_executable_linker_flags(self) -> list[str]:
+        return []
+
+    def get_gpu_library_linker_flags(self) -> list[str]:
         return ["-shared"]
 
     def compile_object(
