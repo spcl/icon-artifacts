@@ -15,4 +15,4 @@ BUILD_MODE="debug" # Options: debug, release
 git show "${GIT_SOURCE_BRANCH}:${VELOCITY_SHARED_LIB_ROOT}/${MACHINE}/${LIB_MODE}/${BUILD_MODE}/1/libvelocity.so" > "libvelocity_0.so"
 git show "${GIT_SOURCE_BRANCH}:${VELOCITY_SHARED_LIB_ROOT}/${MACHINE}/${LIB_MODE}/${BUILD_MODE}/1/libvelocity.so" > "libvelocity_1.so"
 git show "${GIT_SOURCE_BRANCH}:${VELOCITY_SHARED_LIB_ROOT}/${MACHINE}/${LIB_MODE}/${BUILD_MODE}/1/libvelocity.so" > "libvelocity_2.so"
-git show "${GIT_SOURCE_BRANCH}:${VELOCITY_SHARED_LIB_ROOT}/${MACHINE}/${LIB_MODE}/${BUILD_MODE}/1/libvelocity.so" > "libvelocity_3.so"
+git show "${GIT_SOURCE_BRANCH}:${VELOCITY_SHARED_LIB_ROOT}/${MACHINE}/${LIB_MODE}/${BUILD_MODE}/9/libvelocity.so" > "libvelocity_3.so"
