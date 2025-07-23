@@ -12,8 +12,17 @@ STAGE_ID = 3
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+
+    # === Sub-Phase 1: RemainingLoopsToSequentialMaps ===
+    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
+    # === Sub-Phase 1: RemainingLoopsToSequentialMaps ===
+
+
+    # === Sub-Phase 2: Offloading ===
     gpu_offloading_wo_host_dev_copies(g)
     g.validate()
+    # === Sub-Phase 2: Offloading ===
+
     return g
 
 

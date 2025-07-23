@@ -26,12 +26,6 @@ def optimization_action(g: SDFG):
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     # === Sub-Phase 1: InlineSDFG + MapCollapse For GPU Offloading  ===
 
-
-    # === Sub-Phase 2: RemainingLoopsToSequentialMaps ===
-    # For simplicity of implementation in later stages, convert remaining loops to sequential maps
-    # === Sub-Phase 2: RemainingLoopsToSequentialMaps ===
-
-
     return g
 
 

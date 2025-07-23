@@ -39,6 +39,11 @@ from utils.transify_kernel_scalars import (
 )
 
 from utils.add_data_preserver_tasklets import add_data_preserver_tasklets
+
+from utils.manual_fixes import (
+    connect_ishift_to_map,
+)
+
 STAGE_ID = 1
 
 
@@ -183,15 +188,15 @@ def optimization_action(g: SDFG):
     manual_loop_to_map = {
         # solve_nh_corrector_post - Stage #1
         # ("corrector_post", "_for_it_0", "FOR_l_1784_c_1784"),    # Can't
-        # ("corrector_post", "_for_it_15", "FOR_l_1840_c_1840"),   # Can't
+        ("corrector_post", "_for_it_15", "FOR_l_1840_c_1840"),     # OK - no-read-write conflict
         # ("corrector_post", "_for_it_19", "FOR_l_1866_c_1866"),   # Can't
         # ("corrector_post", "_for_it_25", "FOR_l_1896_c_1896"),   # Can't
         # ("corrector_post", "_for_it_43", "FOR_l_1962_c_1962"),   # Can't
-        ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),     # OK (scalar)
+        ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),     # OK - scalar
         # ("corrector_post", "_for_it_45", "FOR_l_1974_c_1974"),   # Can't
         ("corrector_post", "_for_it_47", "FOR_l_1980_c_1980"),     # OK
-        ("corrector_post", "_for_it_56", "FOR_l_2015_c_2015"),     # OK (scalar)
-        ("corrector_post", "_for_it_57", "FOR_l_2016_c_2016"),     # OK (scalar)
+        ("corrector_post", "_for_it_56", "FOR_l_2015_c_2015"),     # OK - scalar
+        ("corrector_post", "_for_it_57", "FOR_l_2016_c_2016"),     # OK - scalar
         # ("corrector_post", "_for_it_62", "FOR_l_2050_c_2050"),   # Can't - BLK
 
         # solve_nh_corrector_pre - Stage #1
@@ -200,12 +205,12 @@ def optimization_action(g: SDFG):
         # ("corrector_pre", "_for_it_46", "FOR_l_1573_c_1573"),    # Can't - BLK
         # ("corrector_pre", "_for_it_47", "FOR_l_1597_c_1597"),    # Can't - BLK
         # ("corrector_pre", "_for_it_50", "FOR_l_1610_c_1610"),    # Can't - BLK
-        ("corrector_pre", "_for_it_57", "FOR_l_1654_c_1654"),      # OK (scalar)
-        ("corrector_pre", "_for_it_58", "FOR_l_1655_c_1655"),      # OK (scalar)
-        ("corrector_pre", "_for_it_59", "FOR_l_1669_c_1669"),      # OK (scalar)
-        ("corrector_pre", "_for_it_60", "FOR_l_1670_c_1670"),      # OK (scalar)
-        ("corrector_pre", "_for_it_61", "FOR_l_1682_c_1682"),      # OK (scalar)
-        ("corrector_pre", "_for_it_62", "FOR_l_1683_c_1683"),      # OK (scalar)
+        ("corrector_pre", "_for_it_57", "FOR_l_1654_c_1654"),      # OK - scalar
+        ("corrector_pre", "_for_it_58", "FOR_l_1655_c_1655"),      # OK - scalar
+        ("corrector_pre", "_for_it_59", "FOR_l_1669_c_1669"),      # OK - scalar
+        ("corrector_pre", "_for_it_60", "FOR_l_1670_c_1670"),      # OK - scalar
+        ("corrector_pre", "_for_it_61", "FOR_l_1682_c_1682"),      # OK - scalar
+        ("corrector_pre", "_for_it_62", "FOR_l_1683_c_1683"),      # OK - scalar
 
         # solve_nh_predictor_post - Stage #1
         # ("predictor_post", "_for_it_0", "FOR_l_1253_c_1253"),    # Can't
@@ -213,7 +218,7 @@ def optimization_action(g: SDFG):
         # ("predictor_post", "_for_it_13", "FOR_l_1310_c_1310"),   # Can't
         # ("predictor_post", "_for_it_19", "FOR_l_1339_c_1339"),   # Can't
         # ("predictor_post", "_for_it_36", "FOR_l_1403_c_1403"),   # Can't
-        # ("predictor_post", "_for_it_37", "FOR_l_1404_c_1404"),   # OK (Is Already A Map)
+        # ("predictor_post", "_for_it_37", "FOR_l_1404_c_1404"),   # OK - Is Already A Map
         # ("predictor_post", "_for_it_38", "FOR_l_1415_c_1415"),   # Can't
         ("predictor_post", "_for_it_40", "FOR_l_1421_c_1421"),     # OK
         ("predictor_post", "_for_it_47", "FOR_l_1448_c_1448"),     # OK
@@ -228,10 +233,10 @@ def optimization_action(g: SDFG):
         # ("predictor_pre", "_for_it_85", "FOR_l_1053_c_1053"),    # Can't - BLK
         # ("predictor_pre", "_for_it_86", "FOR_l_1054_c_1054"),    # Can't - BLK
         # ("predictor_pre", "_for_it_89", "FOR_l_1079_c_1079"),    # Can't - BLK
-        ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"),      # OK (scalar)
-        ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116"),     # OK (scalar)
-        # ("predictor_pre", "_for_it_101", "FOR_l_1126_c_1126"),   # Can't
-        # ("predictor_pre", "_for_it_102", "FOR_l_1133_c_1133"),   # Can't
+        ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"),      # OK - scalar
+        ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116"),     # OK - scalar
+        ("predictor_pre", "_for_it_101", "FOR_l_1126_c_1126"),     # OK - Parent map of _for_it102
+        ("predictor_pre", "_for_it_102", "FOR_l_1133_c_1133"),     # OK - Read-write subsets the same
         # ("predictor_pre", "_for_it_103", "FOR_l_1139_c_1139"),   # Can't - BLK
         # ("predictor_pre", "_for_it_110", "FOR_l_1168_c_1168"),   # Can't - BLK
         # ("predictor_pre", "_for_it_113", "FOR_l_1184_c_1184"),   # Can't
@@ -291,6 +296,11 @@ def optimization_action(g: SDFG):
 
     count_loops(g, verbose=False, use_assert=True)
     # === Sub-Phase 7: Last Simplify + StateFusion ===
+
+    # === Sub-Phase 8: Post Simplify Manual Fixes ===
+    if "predictor_pre" in g.name:
+        connect_ishift_to_map(g, "_state_l1132_c1132")
+    # === Sub-Phase 8: Post Simplify Manual Fixes ===
 
     return g
 
