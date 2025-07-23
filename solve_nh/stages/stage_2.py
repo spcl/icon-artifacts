@@ -7,6 +7,10 @@ from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
 
+from utils.clean_unused_data_from_nsdfg_connectors import (
+    clean_unused_data_from_nsdfg,
+    clean_unused_symbols_from_nsdfg,
+)
 import argparse
 
 
@@ -14,8 +18,14 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    # === Sub-Phase 1: InlineSDFG + MapCollapse For GPU Offloading ===
-    for _ in range(3):
+    # === Sub-Phase 1: Clean Unused Data and Symbols From NSDFGs ===
+    clean_unused_data_from_nsdfg(g)
+    clean_unused_symbols_from_nsdfg(g)
+    g.validate()
+    # === Sub-Phase 1: Clean Unused Data and Symbols From NSDFGs ===
+
+    # === Sub-Phase 2: InlineSDFG + MapCollapse For GPU Offloading ===
+    for _ in range(3): # TODO: Maybe 2 is enough
         g.apply_transformations_repeated(
             InlineSDFG
         )
@@ -24,7 +34,14 @@ def optimization_action(g: SDFG):
         )
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
-    # === Sub-Phase 1: InlineSDFG + MapCollapse For GPU Offloading  ===
+    # === Sub-Phase 2: InlineSDFG + MapCollapse For GPU Offloading  ===
+
+    # === Sub-Phase 3: Clean Again ===
+    clean_unused_data_from_nsdfg(g)
+    clean_unused_symbols_from_nsdfg(g)
+    g.validate()
+    # === Sub-Phase 3: Clean Again ===
+
 
     return g
 
