@@ -12,7 +12,7 @@ static velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *state_lvn_only_1_i
 static velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *state_lvn_only_0_istep_1 = nullptr;
 static velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *state_lvn_only_0_istep_2 = nullptr;
 
-void velocity_tendencies(
+static void velocity_tendencies(
     int * __CG_global_data__m_nflatlev,
         int * __CG_global_data__m_nrdmax,
         double * __CG_p_diag__m_ddt_vn_apc_pc,
@@ -766,7 +766,7 @@ void velocity_tendencies(
     }
 }
 
-void exit_velocity_tendencies() {
+static void exit_velocity_tendencies() {
     if (state_lvn_only_1_istep_1 != nullptr) {
         __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(state_lvn_only_1_istep_1);
         state_lvn_only_1_istep_1 = nullptr;
