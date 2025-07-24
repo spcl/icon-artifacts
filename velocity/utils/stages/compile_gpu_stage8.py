@@ -17,6 +17,7 @@ from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
 from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
 from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays, force_decrease_bitwidth_of_nblk_arrays
 
+from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling
 STAGE_ID = 8
 import os
 
@@ -112,6 +113,8 @@ def optimization_action(sdfg):
                                     unroll_y_factor=y_unroll_factor,)
     #tile_kernels(sdfg)
     #sdfg.simplify()
+    insert_timers_for_profiling(sdfg)
+    insert_synchronization_for_profiling(sdfg)
     sdfg.validate()
     return sdfg
 
