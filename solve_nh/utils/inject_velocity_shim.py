@@ -143,6 +143,12 @@ out_p_prog = in_p_prog;
         language=dtypes.Language.CPP,
     )
 
+    has_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in g.exit_code.items()])
+    if not has_exit_call:
+        g.append_exit_code(
+            cpp_code="exit_velocity_tendencies();",
+        )
+
 
 #     t.code = CodeBlock(
 #         f"""

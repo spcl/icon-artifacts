@@ -333,6 +333,12 @@ def reinject_velocity_shim(
 
     velocity_tasklet.code = CodeBlock(code_str, language=dace.dtypes.Language.CPP)
 
+    has_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.items()])
+    if not has_exit_call:
+        sdfg.append_exit_code(
+            cpp_code="exit_velocity_tendencies();",
+        )
+
 def reinject_velocity_shim_gpu(
     sdfg: dace.SDFG
 ):
@@ -456,3 +462,9 @@ def reinject_velocity_shim_gpu(
     )
 
     velocity_tasklet.code = CodeBlock(code_str, language=dace.dtypes.Language.CPP)
+
+    has_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.items()])
+    if not has_exit_call:
+        sdfg.append_exit_code(
+            cpp_code="exit_velocity_tendencies();",
+        )
