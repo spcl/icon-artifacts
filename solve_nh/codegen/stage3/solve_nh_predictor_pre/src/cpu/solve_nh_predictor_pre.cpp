@@ -2,6 +2,120 @@
 #include <dace/dace.h>
 #include "../../include/hash.h"
 
+struct global_data_type {
+    int grf_intmethod_e = {};
+    int i_am_accel_node = {};
+    int iadv_rhotheta = {};
+    double iau_wgt_dyn = {};
+    int igradp_method = {};
+    int is_iau_active = {};
+    int itime_scheme = {};
+    int* kstart_dd3d = {};
+    int l_limited_area = {};
+    int ldeepatmo = {};
+    int lextra_diffu = {};
+    int lvert_nest = {};
+    int* nflat_gradp = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int rayleigh_type = {};
+    int timer_intp = {};
+    int timer_solve_nh_cellcomp = {};
+    int timer_solve_nh_veltend = {};
+    int timer_solve_nh_vnupd = {};
+    int timers_level = {};
+};
+
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s_101 = {};
+    int __f2dace_SA_c_lin_e_d_1_s_102 = {};
+    int __f2dace_SA_c_lin_e_d_2_s_103 = {};
+    int __f2dace_SA_cells_aw_verts_d_0_s_110 = {};
+    int __f2dace_SA_cells_aw_verts_d_1_s_111 = {};
+    int __f2dace_SA_cells_aw_verts_d_2_s_112 = {};
+    int __f2dace_SA_e_bln_c_s_d_0_s_104 = {};
+    int __f2dace_SA_e_bln_c_s_d_1_s_105 = {};
+    int __f2dace_SA_e_bln_c_s_d_2_s_106 = {};
+    int __f2dace_SA_e_flx_avg_d_0_s_107 = {};
+    int __f2dace_SA_e_flx_avg_d_1_s_108 = {};
+    int __f2dace_SA_e_flx_avg_d_2_s_109 = {};
+    int __f2dace_SA_geofac_div_d_0_s_116 = {};
+    int __f2dace_SA_geofac_div_d_1_s_117 = {};
+    int __f2dace_SA_geofac_div_d_2_s_118 = {};
+    int __f2dace_SA_geofac_grdiv_d_0_s_119 = {};
+    int __f2dace_SA_geofac_grdiv_d_1_s_120 = {};
+    int __f2dace_SA_geofac_grdiv_d_2_s_121 = {};
+    int __f2dace_SA_geofac_grg_d_0_s_128 = {};
+    int __f2dace_SA_geofac_grg_d_1_s_129 = {};
+    int __f2dace_SA_geofac_grg_d_2_s_130 = {};
+    int __f2dace_SA_geofac_grg_d_3_s_131 = {};
+    int __f2dace_SA_geofac_n2s_d_0_s_125 = {};
+    int __f2dace_SA_geofac_n2s_d_1_s_126 = {};
+    int __f2dace_SA_geofac_n2s_d_2_s_127 = {};
+    int __f2dace_SA_geofac_rot_d_0_s_122 = {};
+    int __f2dace_SA_geofac_rot_d_1_s_123 = {};
+    int __f2dace_SA_geofac_rot_d_2_s_124 = {};
+    int __f2dace_SA_nudgecoeff_e_d_0_s_136 = {};
+    int __f2dace_SA_nudgecoeff_e_d_1_s_137 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_0_s_132 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_1_s_133 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_2_s_134 = {};
+    int __f2dace_SA_pos_on_tplane_e_d_3_s_135 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_113 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_114 = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_115 = {};
+    int __f2dace_SOA_c_lin_e_d_0_s_101 = {};
+    int __f2dace_SOA_c_lin_e_d_1_s_102 = {};
+    int __f2dace_SOA_c_lin_e_d_2_s_103 = {};
+    int __f2dace_SOA_cells_aw_verts_d_0_s_110 = {};
+    int __f2dace_SOA_cells_aw_verts_d_1_s_111 = {};
+    int __f2dace_SOA_cells_aw_verts_d_2_s_112 = {};
+    int __f2dace_SOA_e_bln_c_s_d_0_s_104 = {};
+    int __f2dace_SOA_e_bln_c_s_d_1_s_105 = {};
+    int __f2dace_SOA_e_bln_c_s_d_2_s_106 = {};
+    int __f2dace_SOA_e_flx_avg_d_0_s_107 = {};
+    int __f2dace_SOA_e_flx_avg_d_1_s_108 = {};
+    int __f2dace_SOA_e_flx_avg_d_2_s_109 = {};
+    int __f2dace_SOA_geofac_div_d_0_s_116 = {};
+    int __f2dace_SOA_geofac_div_d_1_s_117 = {};
+    int __f2dace_SOA_geofac_div_d_2_s_118 = {};
+    int __f2dace_SOA_geofac_grdiv_d_0_s_119 = {};
+    int __f2dace_SOA_geofac_grdiv_d_1_s_120 = {};
+    int __f2dace_SOA_geofac_grdiv_d_2_s_121 = {};
+    int __f2dace_SOA_geofac_grg_d_0_s_128 = {};
+    int __f2dace_SOA_geofac_grg_d_1_s_129 = {};
+    int __f2dace_SOA_geofac_grg_d_2_s_130 = {};
+    int __f2dace_SOA_geofac_grg_d_3_s_131 = {};
+    int __f2dace_SOA_geofac_n2s_d_0_s_125 = {};
+    int __f2dace_SOA_geofac_n2s_d_1_s_126 = {};
+    int __f2dace_SOA_geofac_n2s_d_2_s_127 = {};
+    int __f2dace_SOA_geofac_rot_d_0_s_122 = {};
+    int __f2dace_SOA_geofac_rot_d_1_s_123 = {};
+    int __f2dace_SOA_geofac_rot_d_2_s_124 = {};
+    int __f2dace_SOA_nudgecoeff_e_d_0_s_136 = {};
+    int __f2dace_SOA_nudgecoeff_e_d_1_s_137 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_0_s_132 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_1_s_133 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_2_s_134 = {};
+    int __f2dace_SOA_pos_on_tplane_e_d_3_s_135 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_113 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_114 = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_115 = {};
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* e_flx_avg = {};
+    double* geofac_div = {};
+    double* geofac_grdiv = {};
+    double* geofac_grg = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* nudgecoeff_e = {};
+    double* pos_on_tplane_e = {};
+    double* rbf_vec_coeff_e = {};
+};
+
 struct t_grid_domain_decomp_info {
     int __f2dace_SA_owner_mask_d_0_s_62 = {};
     int __f2dace_SA_owner_mask_d_1_s_63 = {};
@@ -865,95 +979,6 @@ struct t_nh_state {
     t_nh_ref* ref = {};
 };
 
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s_101 = {};
-    int __f2dace_SA_c_lin_e_d_1_s_102 = {};
-    int __f2dace_SA_c_lin_e_d_2_s_103 = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s_110 = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s_111 = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s_112 = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s_104 = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s_105 = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s_106 = {};
-    int __f2dace_SA_e_flx_avg_d_0_s_107 = {};
-    int __f2dace_SA_e_flx_avg_d_1_s_108 = {};
-    int __f2dace_SA_e_flx_avg_d_2_s_109 = {};
-    int __f2dace_SA_geofac_div_d_0_s_116 = {};
-    int __f2dace_SA_geofac_div_d_1_s_117 = {};
-    int __f2dace_SA_geofac_div_d_2_s_118 = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s_119 = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s_120 = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s_121 = {};
-    int __f2dace_SA_geofac_grg_d_0_s_128 = {};
-    int __f2dace_SA_geofac_grg_d_1_s_129 = {};
-    int __f2dace_SA_geofac_grg_d_2_s_130 = {};
-    int __f2dace_SA_geofac_grg_d_3_s_131 = {};
-    int __f2dace_SA_geofac_n2s_d_0_s_125 = {};
-    int __f2dace_SA_geofac_n2s_d_1_s_126 = {};
-    int __f2dace_SA_geofac_n2s_d_2_s_127 = {};
-    int __f2dace_SA_geofac_rot_d_0_s_122 = {};
-    int __f2dace_SA_geofac_rot_d_1_s_123 = {};
-    int __f2dace_SA_geofac_rot_d_2_s_124 = {};
-    int __f2dace_SA_nudgecoeff_e_d_0_s_136 = {};
-    int __f2dace_SA_nudgecoeff_e_d_1_s_137 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_0_s_132 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_1_s_133 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_2_s_134 = {};
-    int __f2dace_SA_pos_on_tplane_e_d_3_s_135 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s_113 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s_114 = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s_115 = {};
-    int __f2dace_SOA_c_lin_e_d_0_s_101 = {};
-    int __f2dace_SOA_c_lin_e_d_1_s_102 = {};
-    int __f2dace_SOA_c_lin_e_d_2_s_103 = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s_110 = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s_111 = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s_112 = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s_104 = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s_105 = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s_106 = {};
-    int __f2dace_SOA_e_flx_avg_d_0_s_107 = {};
-    int __f2dace_SOA_e_flx_avg_d_1_s_108 = {};
-    int __f2dace_SOA_e_flx_avg_d_2_s_109 = {};
-    int __f2dace_SOA_geofac_div_d_0_s_116 = {};
-    int __f2dace_SOA_geofac_div_d_1_s_117 = {};
-    int __f2dace_SOA_geofac_div_d_2_s_118 = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s_119 = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s_120 = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s_121 = {};
-    int __f2dace_SOA_geofac_grg_d_0_s_128 = {};
-    int __f2dace_SOA_geofac_grg_d_1_s_129 = {};
-    int __f2dace_SOA_geofac_grg_d_2_s_130 = {};
-    int __f2dace_SOA_geofac_grg_d_3_s_131 = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s_125 = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s_126 = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s_127 = {};
-    int __f2dace_SOA_geofac_rot_d_0_s_122 = {};
-    int __f2dace_SOA_geofac_rot_d_1_s_123 = {};
-    int __f2dace_SOA_geofac_rot_d_2_s_124 = {};
-    int __f2dace_SOA_nudgecoeff_e_d_0_s_136 = {};
-    int __f2dace_SOA_nudgecoeff_e_d_1_s_137 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_0_s_132 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_1_s_133 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_2_s_134 = {};
-    int __f2dace_SOA_pos_on_tplane_e_d_3_s_135 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s_113 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s_114 = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s_115 = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* e_flx_avg = {};
-    double* geofac_div = {};
-    double* geofac_grdiv = {};
-    double* geofac_grg = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* nudgecoeff_e = {};
-    double* pos_on_tplane_e = {};
-    double* rbf_vec_coeff_e = {};
-};
-
 struct t_nh_prog {
     int __f2dace_SA_exner_d_0_s_628 = {};
     int __f2dace_SA_exner_d_1_s_629 = {};
@@ -990,31 +1015,6 @@ struct t_nh_prog {
     double* theta_v = {};
     double* vn = {};
     double* w = {};
-};
-
-struct global_data_type {
-    int grf_intmethod_e = {};
-    int i_am_accel_node = {};
-    int iadv_rhotheta = {};
-    double iau_wgt_dyn = {};
-    int igradp_method = {};
-    int is_iau_active = {};
-    int itime_scheme = {};
-    int* kstart_dd3d = {};
-    int l_limited_area = {};
-    int ldeepatmo = {};
-    int lextra_diffu = {};
-    int lvert_nest = {};
-    int* nflat_gradp = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int rayleigh_type = {};
-    int timer_intp = {};
-    int timer_solve_nh_cellcomp = {};
-    int timer_solve_nh_veltend = {};
-    int timer_solve_nh_vnupd = {};
-    int timers_level = {};
 };
 
 struct solve_nh_predictor_pre_state_t {
@@ -1180,41 +1180,41 @@ struct solve_nh_predictor_pre_state_t {
     double * __restrict__ __0___CG_p_nh_prog_nnew__m_rho;
     double * __restrict__ __0___CG_p_nh_prog_nnew__m_exner;
     double * __restrict__ __0___CG_p_nh_prog_nnew__m_theta_v;
-    double * __restrict__ __0_gpu_z_alpha;
-    double * __restrict__ __0_gpu_z_exner_ex_pr;
-    double * __restrict__ __0_gpu_z_graddiv_vn;
-    double * __restrict__ __0_gpu_z_graddiv2_vn;
-    double * __restrict__ __0_gpu_z_rho_v;
-    double * __restrict__ __0_gpu_z_vn_avg;
-    double * __restrict__ __0_gpu_z_w_concorr_mc;
-    double * __restrict__ __0_gpu_z_flxdiv_mass;
-    double * __restrict__ __0_gpu_z_q;
-    double * __restrict__ __0_gpu_z_hydro_corr;
-    double * __restrict__ __0_gpu_z_theta_v_pr_ic;
-    double * __restrict__ __0_gpu_z_exner_ic;
-    double * __restrict__ __0_gpu_z_w_expl;
-    double * __restrict__ __0_gpu_z_mflx_top;
-    double * __restrict__ __0_gpu_z_th_ddz_exner_c;
-    double * __restrict__ __0_gpu_z_beta;
-    double * __restrict__ __0_gpu_z_w_concorr_me;
-    double * __restrict__ __0_gpu_scal_divdamp;
-    double * __restrict__ __0_gpu_bdy_divdamp;
-    double * __restrict__ __0_gpu_z_rth_pr;
-    double * __restrict__ __0_gpu_z_kin_hor_e;
-    double * __restrict__ __0_gpu_z_exner_expl;
-    double * __restrict__ __0_gpu_z_theta_v_e;
-    double * __restrict__ __0_gpu_z_dexner_dz_c;
-    double * __restrict__ __0_gpu_z_dwdz_dd;
-    double * __restrict__ __0_gpu_z_gradh_exner;
-    double * __restrict__ __0_gpu_z_flxdiv_theta;
-    double * __restrict__ __0_gpu_z_vt_ie;
-    double * __restrict__ __0_gpu_z_theta_v_fl_e;
     double * __restrict__ __0_gpu_z_rho_e;
-    double * __restrict__ __0_gpu_z_raylfac;
+    double * __restrict__ __0_gpu_z_exner_expl;
     double * __restrict__ __0_gpu_z_grad_rth;
+    double * __restrict__ __0_gpu_z_theta_v_fl_e;
+    double * __restrict__ __0_gpu_z_theta_v_e;
     double * __restrict__ __0_gpu_z_rho_expl;
-    double * __restrict__ __0_gpu_z_contr_w_fl_l;
+    double * __restrict__ __0_gpu_z_vn_avg;
+    double * __restrict__ __0_gpu_z_dexner_dz_c;
+    double * __restrict__ __0_gpu_z_w_concorr_me;
+    double * __restrict__ __0_gpu_z_graddiv2_vn;
+    double * __restrict__ __0_gpu_z_flxdiv_theta;
+    double * __restrict__ __0_gpu_z_graddiv_vn;
+    double * __restrict__ __0_gpu_bdy_divdamp;
+    double * __restrict__ __0_gpu_z_w_concorr_mc;
+    double * __restrict__ __0_gpu_z_beta;
+    double * __restrict__ __0_gpu_z_rho_v;
+    double * __restrict__ __0_gpu_z_th_ddz_exner_c;
+    double * __restrict__ __0_gpu_scal_divdamp;
+    double * __restrict__ __0_gpu_z_hydro_corr;
     double * __restrict__ __0_gpu_z_theta_v_v;
+    double * __restrict__ __0_gpu_z_raylfac;
+    double * __restrict__ __0_gpu_z_contr_w_fl_l;
+    double * __restrict__ __0_gpu_z_kin_hor_e;
+    double * __restrict__ __0_gpu_z_alpha;
+    double * __restrict__ __0_gpu_z_flxdiv_mass;
+    double * __restrict__ __0_gpu_z_exner_ic;
+    double * __restrict__ __0_gpu_z_theta_v_pr_ic;
+    double * __restrict__ __0_gpu_z_exner_ex_pr;
+    double * __restrict__ __0_gpu_z_mflx_top;
+    double * __restrict__ __0_gpu_z_dwdz_dd;
+    double * __restrict__ __0_gpu_z_w_expl;
+    double * __restrict__ __0_gpu_z_vt_ie;
+    double * __restrict__ __0_gpu_z_gradh_exner;
+    double * __restrict__ __0_gpu_z_rth_pr;
+    double * __restrict__ __0_gpu_z_q;
     double * __restrict__ __0_gpu___CG_p_int__m_c_lin_e;
     double * __restrict__ __0_gpu___CG_p_int__m_cells_aw_verts;
     double * __restrict__ __0_gpu___CG_p_int__m_e_bln_c_s;
@@ -2192,6 +2192,8 @@ int __f2dace_SOA_theta_v_d_2_s_633_p_nh_prog_nnew_15;
 int __f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnew_15;
 int __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnew_15;
 int __f2dace_SA_theta_v_d_2_s_633_p_nh_prog_nnew_15;
+#include "dace_wait_device.h"
+
 #include "dace_measure_time.h"
 
 DACE_EXPORTED void __dace_runkernel_single_state_body_map_12_1_1(solve_nh_predictor_pre_state_t *__state, double * __restrict__ gpu_z_rth_pr, int tmp_arg_22, int tmp_struct_symbol_33, int tmp_struct_symbol_34, int tmp_struct_symbol_35);
@@ -2466,18 +2468,6 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
         {
 
             ///////////////////
-            dace_measure_time("solve_nh_predictor_pre");
-            ///////////////////
-
-        }
-
-    }
-
-    {
-
-        {
-
-            ///////////////////
             dace_wait_device();
             ///////////////////
 
@@ -2487,41 +2477,41 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
 
     {
 
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_alpha, z_alpha, (tmp_struct_symbol_57 * tmp_struct_symbol_58) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_exner_ex_pr, z_exner_ex_pr, ((tmp_struct_symbol_27 * tmp_struct_symbol_28) * tmp_struct_symbol_29) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_graddiv_vn, z_graddiv_vn, ((tmp_struct_symbol_42 * tmp_struct_symbol_43) * tmp_struct_symbol_44) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_graddiv2_vn, z_graddiv2_vn, (tmp_struct_symbol_63 * tmp_struct_symbol_64) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_rho_v, z_rho_v, ((tmp_struct_symbol_12 * tmp_struct_symbol_13) * tmp_struct_symbol_14) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_vn_avg, z_vn_avg, (tmp_struct_symbol_47 * tmp_struct_symbol_48) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_w_concorr_mc, z_w_concorr_mc, (tmp_struct_symbol_69 * tmp_struct_symbol_70) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_flxdiv_mass, z_flxdiv_mass, (tmp_struct_symbol_71 * tmp_struct_symbol_72) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_q, z_q, (tmp_struct_symbol_61 * tmp_struct_symbol_62) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_hydro_corr, z_hydro_corr, (tmp_struct_symbol_75 * tmp_struct_symbol_76) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_pr_ic, z_theta_v_pr_ic, (tmp_struct_symbol_65 * tmp_struct_symbol_66) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_exner_ic, z_exner_ic, (tmp_struct_symbol_67 * tmp_struct_symbol_68) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_w_expl, z_w_expl, (tmp_struct_symbol_45 * tmp_struct_symbol_46) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_mflx_top, z_mflx_top, (tmp_struct_symbol_49 * tmp_struct_symbol_50) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_th_ddz_exner_c, z_th_ddz_exner_c, ((tmp_struct_symbol_15 * tmp_struct_symbol_16) * tmp_struct_symbol_17) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_beta, z_beta, (tmp_struct_symbol_59 * tmp_struct_symbol_60) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_w_concorr_me, z_w_concorr_me, ((tmp_struct_symbol_39 * tmp_struct_symbol_40) * tmp_struct_symbol_41) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_scal_divdamp, scal_divdamp, tmp_struct_symbol_78 * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_bdy_divdamp, bdy_divdamp, tmp_struct_symbol_79 * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_rth_pr, z_rth_pr, (((2 * tmp_struct_symbol_33) * tmp_struct_symbol_34) * tmp_struct_symbol_35) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_kin_hor_e, z_kin_hor_e, ((tmp_struct_symbol_24 * tmp_struct_symbol_25) * tmp_struct_symbol_26) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_exner_expl, z_exner_expl, (tmp_struct_symbol_55 * tmp_struct_symbol_56) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_e, z_theta_v_e, ((tmp_struct_symbol_3 * tmp_struct_symbol_4) * tmp_struct_symbol_5) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_dexner_dz_c, z_dexner_dz_c, (((2 * tmp_struct_symbol_18) * tmp_struct_symbol_19) * tmp_struct_symbol_20) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_dwdz_dd, z_dwdz_dd, ((tmp_struct_symbol_81 * tmp_struct_symbol_82) * tmp_struct_symbol_83) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_gradh_exner, z_gradh_exner, ((tmp_struct_symbol_30 * tmp_struct_symbol_31) * tmp_struct_symbol_32) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_flxdiv_theta, z_flxdiv_theta, (tmp_struct_symbol_73 * tmp_struct_symbol_74) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_vt_ie, z_vt_ie, ((tmp_struct_symbol_21 * tmp_struct_symbol_22) * tmp_struct_symbol_23) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_fl_e, z_theta_v_fl_e, ((tmp_struct_symbol_0 * tmp_struct_symbol_1) * tmp_struct_symbol_2) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_rho_e, z_rho_e, ((tmp_struct_symbol_6 * tmp_struct_symbol_7) * tmp_struct_symbol_8) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_raylfac, z_raylfac, tmp_struct_symbol_77 * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_exner_expl, z_exner_expl, (tmp_struct_symbol_55 * tmp_struct_symbol_56) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_grad_rth, z_grad_rth, (((4 * tmp_struct_symbol_36) * tmp_struct_symbol_37) * tmp_struct_symbol_38) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_fl_e, z_theta_v_fl_e, ((tmp_struct_symbol_0 * tmp_struct_symbol_1) * tmp_struct_symbol_2) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_e, z_theta_v_e, ((tmp_struct_symbol_3 * tmp_struct_symbol_4) * tmp_struct_symbol_5) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_rho_expl, z_rho_expl, (tmp_struct_symbol_53 * tmp_struct_symbol_54) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_contr_w_fl_l, z_contr_w_fl_l, (tmp_struct_symbol_51 * tmp_struct_symbol_52) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_vn_avg, z_vn_avg, (tmp_struct_symbol_47 * tmp_struct_symbol_48) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_dexner_dz_c, z_dexner_dz_c, (((2 * tmp_struct_symbol_18) * tmp_struct_symbol_19) * tmp_struct_symbol_20) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_w_concorr_me, z_w_concorr_me, ((tmp_struct_symbol_39 * tmp_struct_symbol_40) * tmp_struct_symbol_41) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_graddiv2_vn, z_graddiv2_vn, (tmp_struct_symbol_63 * tmp_struct_symbol_64) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_flxdiv_theta, z_flxdiv_theta, (tmp_struct_symbol_73 * tmp_struct_symbol_74) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_graddiv_vn, z_graddiv_vn, ((tmp_struct_symbol_42 * tmp_struct_symbol_43) * tmp_struct_symbol_44) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_bdy_divdamp, bdy_divdamp, tmp_struct_symbol_79 * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_w_concorr_mc, z_w_concorr_mc, (tmp_struct_symbol_69 * tmp_struct_symbol_70) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_beta, z_beta, (tmp_struct_symbol_59 * tmp_struct_symbol_60) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_rho_v, z_rho_v, ((tmp_struct_symbol_12 * tmp_struct_symbol_13) * tmp_struct_symbol_14) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_th_ddz_exner_c, z_th_ddz_exner_c, ((tmp_struct_symbol_15 * tmp_struct_symbol_16) * tmp_struct_symbol_17) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_scal_divdamp, scal_divdamp, tmp_struct_symbol_78 * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_hydro_corr, z_hydro_corr, (tmp_struct_symbol_75 * tmp_struct_symbol_76) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_v, z_theta_v_v, ((tmp_struct_symbol_10 * tmp_struct_symbol_11) * tmp_struct_symbol_9) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_raylfac, z_raylfac, tmp_struct_symbol_77 * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_contr_w_fl_l, z_contr_w_fl_l, (tmp_struct_symbol_51 * tmp_struct_symbol_52) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_kin_hor_e, z_kin_hor_e, ((tmp_struct_symbol_24 * tmp_struct_symbol_25) * tmp_struct_symbol_26) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_alpha, z_alpha, (tmp_struct_symbol_57 * tmp_struct_symbol_58) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_flxdiv_mass, z_flxdiv_mass, (tmp_struct_symbol_71 * tmp_struct_symbol_72) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_exner_ic, z_exner_ic, (tmp_struct_symbol_67 * tmp_struct_symbol_68) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_theta_v_pr_ic, z_theta_v_pr_ic, (tmp_struct_symbol_65 * tmp_struct_symbol_66) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_exner_ex_pr, z_exner_ex_pr, ((tmp_struct_symbol_27 * tmp_struct_symbol_28) * tmp_struct_symbol_29) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_mflx_top, z_mflx_top, (tmp_struct_symbol_49 * tmp_struct_symbol_50) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_dwdz_dd, z_dwdz_dd, ((tmp_struct_symbol_81 * tmp_struct_symbol_82) * tmp_struct_symbol_83) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_w_expl, z_w_expl, (tmp_struct_symbol_45 * tmp_struct_symbol_46) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_vt_ie, z_vt_ie, ((tmp_struct_symbol_21 * tmp_struct_symbol_22) * tmp_struct_symbol_23) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_gradh_exner, z_gradh_exner, ((tmp_struct_symbol_30 * tmp_struct_symbol_31) * tmp_struct_symbol_32) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_rth_pr, z_rth_pr, (((2 * tmp_struct_symbol_33) * tmp_struct_symbol_34) * tmp_struct_symbol_35) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(__state->__0_gpu_z_q, z_q, (tmp_struct_symbol_61 * tmp_struct_symbol_62) * sizeof(double), cudaMemcpyHostToDevice, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
 
 
@@ -4393,6 +4383,30 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
 
 
     }
+
+    {
+
+        {
+
+            ///////////////////
+            dace_wait_device();
+            ///////////////////
+
+        }
+
+    }
+
+    {
+
+        {
+
+            ///////////////////
+            dace_measure_time("solve_nh_predictor_pre");
+            ///////////////////
+
+        }
+
+    }
     _if_cond_36 = (((__CG_global_data__m_itime_scheme >= 6) || l_init) || l_recompute);
 
     {
@@ -4649,18 +4663,18 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
                 out_p_patch = in_p_patch;
                 out_p_prog = in_p_prog;
                 out___CG_p_nh__CG_diag__m_max_vcfl_dyn = in___CG_p_nh__CG_diag__m_max_vcfl_dyn;
-                out_gpu___CG_p_nh__CG_metrics__m_ddqz_z_half = in_gpu___CG_p_nh__CG_metrics__m_ddqz_z_half;
                 out_gpu___CG_p_nh__CG_diag__m_vn_ie = in_gpu___CG_p_nh__CG_diag__m_vn_ie;
-                out_gpu___CG_p_int__m_e_bln_c_s = in_gpu___CG_p_int__m_e_bln_c_s;
-                out_gpu___CG_p_nh__CG_metrics__m_coeff_gradekin = in_gpu___CG_p_nh__CG_metrics__m_coeff_gradekin;
-                out_gpu___CG_p_nh_prog_nnew__m_vn = in_gpu___CG_p_nh_prog_nnew__m_vn;
-                out_gpu___CG_p_int__m_c_lin_e = in_gpu___CG_p_int__m_c_lin_e;
                 out_gpu___CG_p_nh__CG_diag__m_w_concorr_c = in_gpu___CG_p_nh__CG_diag__m_w_concorr_c;
-                out_gpu___CG_p_nh__CG_diag__m_vt = in_gpu___CG_p_nh__CG_diag__m_vt;
-                out_gpu___CG_p_nh__CG_diag__m_ddt_vn_apc_pc = in_gpu___CG_p_nh__CG_diag__m_ddt_vn_apc_pc;
                 out_gpu___CG_p_int__m_geofac_grdiv = in_gpu___CG_p_int__m_geofac_grdiv;
                 out_gpu___CG_p_nh__CG_metrics__m_ddqz_z_full_e = in_gpu___CG_p_nh__CG_metrics__m_ddqz_z_full_e;
+                out_gpu___CG_p_nh__CG_diag__m_vt = in_gpu___CG_p_nh__CG_diag__m_vt;
+                out_gpu___CG_p_nh__CG_diag__m_ddt_vn_apc_pc = in_gpu___CG_p_nh__CG_diag__m_ddt_vn_apc_pc;
+                out_gpu___CG_p_nh__CG_metrics__m_coeff_gradekin = in_gpu___CG_p_nh__CG_metrics__m_coeff_gradekin;
+                out_gpu___CG_p_int__m_e_bln_c_s = in_gpu___CG_p_int__m_e_bln_c_s;
                 out_gpu___CG_p_nh_prog_nnew__m_w = in_gpu___CG_p_nh_prog_nnew__m_w;
+                out_gpu___CG_p_int__m_c_lin_e = in_gpu___CG_p_int__m_c_lin_e;
+                out_gpu___CG_p_nh__CG_metrics__m_ddqz_z_half = in_gpu___CG_p_nh__CG_metrics__m_ddqz_z_half;
+                out_gpu___CG_p_nh_prog_nnew__m_vn = in_gpu___CG_p_nh_prog_nnew__m_vn;
                 ///////////////////
 
                 __CG_p_nh__CG_diag__m_max_vcfl_dyn = out___CG_p_nh__CG_diag__m_max_vcfl_dyn;
@@ -5653,6 +5667,18 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
 
             ///////////////////
             dace_wait_device();
+            ///////////////////
+
+        }
+
+    }
+
+    {
+
+        {
+
+            ///////////////////
+            dace_measure_time("solve_nh_predictor_pre");
             ///////////////////
 
         }
@@ -7576,41 +7602,41 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
 
     {
 
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_alpha, __state->__0_gpu_z_alpha, (tmp_struct_symbol_57 * tmp_struct_symbol_58) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_exner_ex_pr, __state->__0_gpu_z_exner_ex_pr, ((tmp_struct_symbol_27 * tmp_struct_symbol_28) * tmp_struct_symbol_29) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_graddiv_vn, __state->__0_gpu_z_graddiv_vn, ((tmp_struct_symbol_42 * tmp_struct_symbol_43) * tmp_struct_symbol_44) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_graddiv2_vn, __state->__0_gpu_z_graddiv2_vn, (tmp_struct_symbol_63 * tmp_struct_symbol_64) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_rho_v, __state->__0_gpu_z_rho_v, ((tmp_struct_symbol_12 * tmp_struct_symbol_13) * tmp_struct_symbol_14) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_vn_avg, __state->__0_gpu_z_vn_avg, (tmp_struct_symbol_47 * tmp_struct_symbol_48) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_w_concorr_mc, __state->__0_gpu_z_w_concorr_mc, (tmp_struct_symbol_69 * tmp_struct_symbol_70) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_flxdiv_mass, __state->__0_gpu_z_flxdiv_mass, (tmp_struct_symbol_71 * tmp_struct_symbol_72) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_q, __state->__0_gpu_z_q, (tmp_struct_symbol_61 * tmp_struct_symbol_62) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_hydro_corr, __state->__0_gpu_z_hydro_corr, (tmp_struct_symbol_75 * tmp_struct_symbol_76) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_pr_ic, __state->__0_gpu_z_theta_v_pr_ic, (tmp_struct_symbol_65 * tmp_struct_symbol_66) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_exner_ic, __state->__0_gpu_z_exner_ic, (tmp_struct_symbol_67 * tmp_struct_symbol_68) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_w_expl, __state->__0_gpu_z_w_expl, (tmp_struct_symbol_45 * tmp_struct_symbol_46) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_mflx_top, __state->__0_gpu_z_mflx_top, (tmp_struct_symbol_49 * tmp_struct_symbol_50) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_th_ddz_exner_c, __state->__0_gpu_z_th_ddz_exner_c, ((tmp_struct_symbol_15 * tmp_struct_symbol_16) * tmp_struct_symbol_17) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_beta, __state->__0_gpu_z_beta, (tmp_struct_symbol_59 * tmp_struct_symbol_60) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_w_concorr_me, __state->__0_gpu_z_w_concorr_me, ((tmp_struct_symbol_39 * tmp_struct_symbol_40) * tmp_struct_symbol_41) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(scal_divdamp, __state->__0_gpu_scal_divdamp, tmp_struct_symbol_78 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(bdy_divdamp, __state->__0_gpu_bdy_divdamp, tmp_struct_symbol_79 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_rth_pr, __state->__0_gpu_z_rth_pr, (((2 * tmp_struct_symbol_33) * tmp_struct_symbol_34) * tmp_struct_symbol_35) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_kin_hor_e, __state->__0_gpu_z_kin_hor_e, ((tmp_struct_symbol_24 * tmp_struct_symbol_25) * tmp_struct_symbol_26) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_exner_expl, __state->__0_gpu_z_exner_expl, (tmp_struct_symbol_55 * tmp_struct_symbol_56) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_e, __state->__0_gpu_z_theta_v_e, ((tmp_struct_symbol_3 * tmp_struct_symbol_4) * tmp_struct_symbol_5) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_dexner_dz_c, __state->__0_gpu_z_dexner_dz_c, (((2 * tmp_struct_symbol_18) * tmp_struct_symbol_19) * tmp_struct_symbol_20) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_dwdz_dd, __state->__0_gpu_z_dwdz_dd, ((tmp_struct_symbol_81 * tmp_struct_symbol_82) * tmp_struct_symbol_83) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_gradh_exner, __state->__0_gpu_z_gradh_exner, ((tmp_struct_symbol_30 * tmp_struct_symbol_31) * tmp_struct_symbol_32) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_flxdiv_theta, __state->__0_gpu_z_flxdiv_theta, (tmp_struct_symbol_73 * tmp_struct_symbol_74) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_vt_ie, __state->__0_gpu_z_vt_ie, ((tmp_struct_symbol_21 * tmp_struct_symbol_22) * tmp_struct_symbol_23) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_fl_e, __state->__0_gpu_z_theta_v_fl_e, ((tmp_struct_symbol_0 * tmp_struct_symbol_1) * tmp_struct_symbol_2) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(z_rho_e, __state->__0_gpu_z_rho_e, ((tmp_struct_symbol_6 * tmp_struct_symbol_7) * tmp_struct_symbol_8) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_raylfac, __state->__0_gpu_z_raylfac, tmp_struct_symbol_77 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_exner_expl, __state->__0_gpu_z_exner_expl, (tmp_struct_symbol_55 * tmp_struct_symbol_56) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(z_grad_rth, __state->__0_gpu_z_grad_rth, (((4 * tmp_struct_symbol_36) * tmp_struct_symbol_37) * tmp_struct_symbol_38) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_fl_e, __state->__0_gpu_z_theta_v_fl_e, ((tmp_struct_symbol_0 * tmp_struct_symbol_1) * tmp_struct_symbol_2) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_e, __state->__0_gpu_z_theta_v_e, ((tmp_struct_symbol_3 * tmp_struct_symbol_4) * tmp_struct_symbol_5) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(z_rho_expl, __state->__0_gpu_z_rho_expl, (tmp_struct_symbol_53 * tmp_struct_symbol_54) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
-        DACE_GPU_CHECK(cudaMemcpyAsync(z_contr_w_fl_l, __state->__0_gpu_z_contr_w_fl_l, (tmp_struct_symbol_51 * tmp_struct_symbol_52) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_vn_avg, __state->__0_gpu_z_vn_avg, (tmp_struct_symbol_47 * tmp_struct_symbol_48) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_dexner_dz_c, __state->__0_gpu_z_dexner_dz_c, (((2 * tmp_struct_symbol_18) * tmp_struct_symbol_19) * tmp_struct_symbol_20) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_w_concorr_me, __state->__0_gpu_z_w_concorr_me, ((tmp_struct_symbol_39 * tmp_struct_symbol_40) * tmp_struct_symbol_41) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_graddiv2_vn, __state->__0_gpu_z_graddiv2_vn, (tmp_struct_symbol_63 * tmp_struct_symbol_64) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_flxdiv_theta, __state->__0_gpu_z_flxdiv_theta, (tmp_struct_symbol_73 * tmp_struct_symbol_74) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_graddiv_vn, __state->__0_gpu_z_graddiv_vn, ((tmp_struct_symbol_42 * tmp_struct_symbol_43) * tmp_struct_symbol_44) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(bdy_divdamp, __state->__0_gpu_bdy_divdamp, tmp_struct_symbol_79 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_w_concorr_mc, __state->__0_gpu_z_w_concorr_mc, (tmp_struct_symbol_69 * tmp_struct_symbol_70) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_beta, __state->__0_gpu_z_beta, (tmp_struct_symbol_59 * tmp_struct_symbol_60) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_rho_v, __state->__0_gpu_z_rho_v, ((tmp_struct_symbol_12 * tmp_struct_symbol_13) * tmp_struct_symbol_14) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_th_ddz_exner_c, __state->__0_gpu_z_th_ddz_exner_c, ((tmp_struct_symbol_15 * tmp_struct_symbol_16) * tmp_struct_symbol_17) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(scal_divdamp, __state->__0_gpu_scal_divdamp, tmp_struct_symbol_78 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_hydro_corr, __state->__0_gpu_z_hydro_corr, (tmp_struct_symbol_75 * tmp_struct_symbol_76) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_v, __state->__0_gpu_z_theta_v_v, ((tmp_struct_symbol_10 * tmp_struct_symbol_11) * tmp_struct_symbol_9) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_raylfac, __state->__0_gpu_z_raylfac, tmp_struct_symbol_77 * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_contr_w_fl_l, __state->__0_gpu_z_contr_w_fl_l, (tmp_struct_symbol_51 * tmp_struct_symbol_52) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_kin_hor_e, __state->__0_gpu_z_kin_hor_e, ((tmp_struct_symbol_24 * tmp_struct_symbol_25) * tmp_struct_symbol_26) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_alpha, __state->__0_gpu_z_alpha, (tmp_struct_symbol_57 * tmp_struct_symbol_58) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_flxdiv_mass, __state->__0_gpu_z_flxdiv_mass, (tmp_struct_symbol_71 * tmp_struct_symbol_72) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_exner_ic, __state->__0_gpu_z_exner_ic, (tmp_struct_symbol_67 * tmp_struct_symbol_68) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_theta_v_pr_ic, __state->__0_gpu_z_theta_v_pr_ic, (tmp_struct_symbol_65 * tmp_struct_symbol_66) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_exner_ex_pr, __state->__0_gpu_z_exner_ex_pr, ((tmp_struct_symbol_27 * tmp_struct_symbol_28) * tmp_struct_symbol_29) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_mflx_top, __state->__0_gpu_z_mflx_top, (tmp_struct_symbol_49 * tmp_struct_symbol_50) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_dwdz_dd, __state->__0_gpu_z_dwdz_dd, ((tmp_struct_symbol_81 * tmp_struct_symbol_82) * tmp_struct_symbol_83) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_w_expl, __state->__0_gpu_z_w_expl, (tmp_struct_symbol_45 * tmp_struct_symbol_46) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_vt_ie, __state->__0_gpu_z_vt_ie, ((tmp_struct_symbol_21 * tmp_struct_symbol_22) * tmp_struct_symbol_23) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_gradh_exner, __state->__0_gpu_z_gradh_exner, ((tmp_struct_symbol_30 * tmp_struct_symbol_31) * tmp_struct_symbol_32) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_rth_pr, __state->__0_gpu_z_rth_pr, (((2 * tmp_struct_symbol_33) * tmp_struct_symbol_34) * tmp_struct_symbol_35) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
+        DACE_GPU_CHECK(cudaMemcpyAsync(z_q, __state->__0_gpu_z_q, (tmp_struct_symbol_61 * tmp_struct_symbol_62) * sizeof(double), cudaMemcpyDeviceToHost, __state->gpu_context->streams[0]));
         DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));
 
 
@@ -7622,18 +7648,6 @@ void __program_solve_nh_predictor_pre_internal(solve_nh_predictor_pre_state_t*__
 
             ///////////////////
             dace_wait_device();
-            ///////////////////
-
-        }
-
-    }
-
-    {
-
-        {
-
-            ///////////////////
-            dace_measure_time("solve_nh_predictor_pre");
             ///////////////////
 
         }
@@ -8705,41 +8719,41 @@ DACE_EXPORTED solve_nh_predictor_pre_state_t *__dace_init_solve_nh_predictor_pre
     __state->__0___CG_p_nh_prog_nnew__m_rho = new double DACE_ALIGN(64)[((((__f2dace_SA_rho_d_0_s_625_p_nh_prog_nnew_15 * __f2dace_SA_rho_d_1_s_626_p_nh_prog_nnew_15) * (__f2dace_SA_rho_d_2_s_627_p_nh_prog_nnew_15 - 1)) + (__f2dace_SA_rho_d_0_s_625_p_nh_prog_nnew_15 * (__f2dace_SA_rho_d_1_s_626_p_nh_prog_nnew_15 - 1))) + __f2dace_SA_rho_d_0_s_625_p_nh_prog_nnew_15)];
     __state->__0___CG_p_nh_prog_nnew__m_exner = new double DACE_ALIGN(64)[((((__f2dace_SA_exner_d_0_s_628_p_nh_prog_nnew_15 * __f2dace_SA_exner_d_1_s_629_p_nh_prog_nnew_15) * (__f2dace_SA_exner_d_2_s_630_p_nh_prog_nnew_15 - 1)) + (__f2dace_SA_exner_d_0_s_628_p_nh_prog_nnew_15 * (__f2dace_SA_exner_d_1_s_629_p_nh_prog_nnew_15 - 1))) + __f2dace_SA_exner_d_0_s_628_p_nh_prog_nnew_15)];
     __state->__0___CG_p_nh_prog_nnew__m_theta_v = new double DACE_ALIGN(64)[((((__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnew_15 * __f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnew_15) * (__f2dace_SA_theta_v_d_2_s_633_p_nh_prog_nnew_15 - 1)) + (__f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnew_15 * (__f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnew_15 - 1))) + __f2dace_SA_theta_v_d_0_s_631_p_nh_prog_nnew_15)];
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_alpha, ((tmp_struct_symbol_57 * (tmp_struct_symbol_58 - 1)) + tmp_struct_symbol_57) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_exner_ex_pr, ((((tmp_struct_symbol_27 * tmp_struct_symbol_28) * (tmp_struct_symbol_29 - 1)) + (tmp_struct_symbol_27 * (tmp_struct_symbol_28 - 1))) + tmp_struct_symbol_27) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_graddiv_vn, ((((tmp_struct_symbol_42 * tmp_struct_symbol_43) * (tmp_struct_symbol_44 - 1)) + (tmp_struct_symbol_42 * (tmp_struct_symbol_43 - 1))) + tmp_struct_symbol_42) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_graddiv2_vn, ((tmp_struct_symbol_63 * (tmp_struct_symbol_64 - 1)) + tmp_struct_symbol_63) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_rho_v, ((((tmp_struct_symbol_12 * tmp_struct_symbol_13) * (tmp_struct_symbol_14 - 1)) + (tmp_struct_symbol_12 * (tmp_struct_symbol_13 - 1))) + tmp_struct_symbol_12) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_vn_avg, ((tmp_struct_symbol_47 * (tmp_struct_symbol_48 - 1)) + tmp_struct_symbol_47) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_w_concorr_mc, ((tmp_struct_symbol_69 * (tmp_struct_symbol_70 - 1)) + tmp_struct_symbol_69) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_flxdiv_mass, ((tmp_struct_symbol_71 * (tmp_struct_symbol_72 - 1)) + tmp_struct_symbol_71) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_q, ((tmp_struct_symbol_61 * (tmp_struct_symbol_62 - 1)) + tmp_struct_symbol_61) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_hydro_corr, ((tmp_struct_symbol_75 * (tmp_struct_symbol_76 - 1)) + tmp_struct_symbol_75) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_pr_ic, ((tmp_struct_symbol_65 * (tmp_struct_symbol_66 - 1)) + tmp_struct_symbol_65) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_exner_ic, ((tmp_struct_symbol_67 * (tmp_struct_symbol_68 - 1)) + tmp_struct_symbol_67) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_w_expl, ((tmp_struct_symbol_45 * (tmp_struct_symbol_46 - 1)) + tmp_struct_symbol_45) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_mflx_top, ((tmp_struct_symbol_49 * (tmp_struct_symbol_50 - 1)) + tmp_struct_symbol_49) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_th_ddz_exner_c, ((((tmp_struct_symbol_15 * tmp_struct_symbol_16) * (tmp_struct_symbol_17 - 1)) + (tmp_struct_symbol_15 * (tmp_struct_symbol_16 - 1))) + tmp_struct_symbol_15) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_beta, ((tmp_struct_symbol_59 * (tmp_struct_symbol_60 - 1)) + tmp_struct_symbol_59) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_w_concorr_me, ((((tmp_struct_symbol_39 * tmp_struct_symbol_40) * (tmp_struct_symbol_41 - 1)) + (tmp_struct_symbol_39 * (tmp_struct_symbol_40 - 1))) + tmp_struct_symbol_39) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_scal_divdamp, tmp_struct_symbol_78 * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_bdy_divdamp, tmp_struct_symbol_79 * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_rth_pr, (((((2 * tmp_struct_symbol_33) * tmp_struct_symbol_34) * (tmp_struct_symbol_35 - 1)) + ((2 * tmp_struct_symbol_33) * (tmp_struct_symbol_34 - 1))) + (2 * tmp_struct_symbol_33)) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_kin_hor_e, ((((tmp_struct_symbol_24 * tmp_struct_symbol_25) * (tmp_struct_symbol_26 - 1)) + (tmp_struct_symbol_24 * (tmp_struct_symbol_25 - 1))) + tmp_struct_symbol_24) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_exner_expl, ((tmp_struct_symbol_55 * (tmp_struct_symbol_56 - 1)) + tmp_struct_symbol_55) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_e, ((((tmp_struct_symbol_3 * tmp_struct_symbol_4) * (tmp_struct_symbol_5 - 1)) + (tmp_struct_symbol_3 * (tmp_struct_symbol_4 - 1))) + tmp_struct_symbol_3) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_dexner_dz_c, (((((2 * tmp_struct_symbol_18) * tmp_struct_symbol_19) * (tmp_struct_symbol_20 - 1)) + ((2 * tmp_struct_symbol_18) * (tmp_struct_symbol_19 - 1))) + (2 * tmp_struct_symbol_18)) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_dwdz_dd, ((((tmp_struct_symbol_81 * tmp_struct_symbol_82) * (tmp_struct_symbol_83 - 1)) + (tmp_struct_symbol_81 * (tmp_struct_symbol_82 - 1))) + tmp_struct_symbol_81) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_gradh_exner, ((((tmp_struct_symbol_30 * tmp_struct_symbol_31) * (tmp_struct_symbol_32 - 1)) + (tmp_struct_symbol_30 * (tmp_struct_symbol_31 - 1))) + tmp_struct_symbol_30) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_flxdiv_theta, ((tmp_struct_symbol_73 * (tmp_struct_symbol_74 - 1)) + tmp_struct_symbol_73) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_vt_ie, ((((tmp_struct_symbol_21 * tmp_struct_symbol_22) * (tmp_struct_symbol_23 - 1)) + (tmp_struct_symbol_21 * (tmp_struct_symbol_22 - 1))) + tmp_struct_symbol_21) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_fl_e, ((((tmp_struct_symbol_0 * tmp_struct_symbol_1) * (tmp_struct_symbol_2 - 1)) + (tmp_struct_symbol_0 * (tmp_struct_symbol_1 - 1))) + tmp_struct_symbol_0) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_rho_e, ((((tmp_struct_symbol_6 * tmp_struct_symbol_7) * (tmp_struct_symbol_8 - 1)) + (tmp_struct_symbol_6 * (tmp_struct_symbol_7 - 1))) + tmp_struct_symbol_6) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_raylfac, tmp_struct_symbol_77 * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_exner_expl, ((tmp_struct_symbol_55 * (tmp_struct_symbol_56 - 1)) + tmp_struct_symbol_55) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_grad_rth, (((((4 * tmp_struct_symbol_36) * tmp_struct_symbol_37) * (tmp_struct_symbol_38 - 1)) + ((4 * tmp_struct_symbol_36) * (tmp_struct_symbol_37 - 1))) + (4 * tmp_struct_symbol_36)) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_fl_e, ((((tmp_struct_symbol_0 * tmp_struct_symbol_1) * (tmp_struct_symbol_2 - 1)) + (tmp_struct_symbol_0 * (tmp_struct_symbol_1 - 1))) + tmp_struct_symbol_0) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_e, ((((tmp_struct_symbol_3 * tmp_struct_symbol_4) * (tmp_struct_symbol_5 - 1)) + (tmp_struct_symbol_3 * (tmp_struct_symbol_4 - 1))) + tmp_struct_symbol_3) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_rho_expl, ((tmp_struct_symbol_53 * (tmp_struct_symbol_54 - 1)) + tmp_struct_symbol_53) * sizeof(double)));
-    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_contr_w_fl_l, ((tmp_struct_symbol_51 * (tmp_struct_symbol_52 - 1)) + tmp_struct_symbol_51) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_vn_avg, ((tmp_struct_symbol_47 * (tmp_struct_symbol_48 - 1)) + tmp_struct_symbol_47) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_dexner_dz_c, (((((2 * tmp_struct_symbol_18) * tmp_struct_symbol_19) * (tmp_struct_symbol_20 - 1)) + ((2 * tmp_struct_symbol_18) * (tmp_struct_symbol_19 - 1))) + (2 * tmp_struct_symbol_18)) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_w_concorr_me, ((((tmp_struct_symbol_39 * tmp_struct_symbol_40) * (tmp_struct_symbol_41 - 1)) + (tmp_struct_symbol_39 * (tmp_struct_symbol_40 - 1))) + tmp_struct_symbol_39) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_graddiv2_vn, ((tmp_struct_symbol_63 * (tmp_struct_symbol_64 - 1)) + tmp_struct_symbol_63) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_flxdiv_theta, ((tmp_struct_symbol_73 * (tmp_struct_symbol_74 - 1)) + tmp_struct_symbol_73) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_graddiv_vn, ((((tmp_struct_symbol_42 * tmp_struct_symbol_43) * (tmp_struct_symbol_44 - 1)) + (tmp_struct_symbol_42 * (tmp_struct_symbol_43 - 1))) + tmp_struct_symbol_42) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_bdy_divdamp, tmp_struct_symbol_79 * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_w_concorr_mc, ((tmp_struct_symbol_69 * (tmp_struct_symbol_70 - 1)) + tmp_struct_symbol_69) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_beta, ((tmp_struct_symbol_59 * (tmp_struct_symbol_60 - 1)) + tmp_struct_symbol_59) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_rho_v, ((((tmp_struct_symbol_12 * tmp_struct_symbol_13) * (tmp_struct_symbol_14 - 1)) + (tmp_struct_symbol_12 * (tmp_struct_symbol_13 - 1))) + tmp_struct_symbol_12) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_th_ddz_exner_c, ((((tmp_struct_symbol_15 * tmp_struct_symbol_16) * (tmp_struct_symbol_17 - 1)) + (tmp_struct_symbol_15 * (tmp_struct_symbol_16 - 1))) + tmp_struct_symbol_15) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_scal_divdamp, tmp_struct_symbol_78 * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_hydro_corr, ((tmp_struct_symbol_75 * (tmp_struct_symbol_76 - 1)) + tmp_struct_symbol_75) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_v, ((((tmp_struct_symbol_10 * tmp_struct_symbol_9) * (tmp_struct_symbol_11 - 1)) + (tmp_struct_symbol_9 * (tmp_struct_symbol_10 - 1))) + tmp_struct_symbol_9) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_raylfac, tmp_struct_symbol_77 * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_contr_w_fl_l, ((tmp_struct_symbol_51 * (tmp_struct_symbol_52 - 1)) + tmp_struct_symbol_51) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_kin_hor_e, ((((tmp_struct_symbol_24 * tmp_struct_symbol_25) * (tmp_struct_symbol_26 - 1)) + (tmp_struct_symbol_24 * (tmp_struct_symbol_25 - 1))) + tmp_struct_symbol_24) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_alpha, ((tmp_struct_symbol_57 * (tmp_struct_symbol_58 - 1)) + tmp_struct_symbol_57) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_flxdiv_mass, ((tmp_struct_symbol_71 * (tmp_struct_symbol_72 - 1)) + tmp_struct_symbol_71) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_exner_ic, ((tmp_struct_symbol_67 * (tmp_struct_symbol_68 - 1)) + tmp_struct_symbol_67) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_theta_v_pr_ic, ((tmp_struct_symbol_65 * (tmp_struct_symbol_66 - 1)) + tmp_struct_symbol_65) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_exner_ex_pr, ((((tmp_struct_symbol_27 * tmp_struct_symbol_28) * (tmp_struct_symbol_29 - 1)) + (tmp_struct_symbol_27 * (tmp_struct_symbol_28 - 1))) + tmp_struct_symbol_27) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_mflx_top, ((tmp_struct_symbol_49 * (tmp_struct_symbol_50 - 1)) + tmp_struct_symbol_49) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_dwdz_dd, ((((tmp_struct_symbol_81 * tmp_struct_symbol_82) * (tmp_struct_symbol_83 - 1)) + (tmp_struct_symbol_81 * (tmp_struct_symbol_82 - 1))) + tmp_struct_symbol_81) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_w_expl, ((tmp_struct_symbol_45 * (tmp_struct_symbol_46 - 1)) + tmp_struct_symbol_45) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_vt_ie, ((((tmp_struct_symbol_21 * tmp_struct_symbol_22) * (tmp_struct_symbol_23 - 1)) + (tmp_struct_symbol_21 * (tmp_struct_symbol_22 - 1))) + tmp_struct_symbol_21) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_gradh_exner, ((((tmp_struct_symbol_30 * tmp_struct_symbol_31) * (tmp_struct_symbol_32 - 1)) + (tmp_struct_symbol_30 * (tmp_struct_symbol_31 - 1))) + tmp_struct_symbol_30) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_rth_pr, (((((2 * tmp_struct_symbol_33) * tmp_struct_symbol_34) * (tmp_struct_symbol_35 - 1)) + ((2 * tmp_struct_symbol_33) * (tmp_struct_symbol_34 - 1))) + (2 * tmp_struct_symbol_33)) * sizeof(double)));
+    DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu_z_q, ((tmp_struct_symbol_61 * (tmp_struct_symbol_62 - 1)) + tmp_struct_symbol_61) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu___CG_p_int__m_c_lin_e, ((((__f2dace_SA_c_lin_e_d_0_s_101_p_int_5 * __f2dace_SA_c_lin_e_d_1_s_102_p_int_5) * (__f2dace_SA_c_lin_e_d_2_s_103_p_int_5 - 1)) + (__f2dace_SA_c_lin_e_d_0_s_101_p_int_5 * (__f2dace_SA_c_lin_e_d_1_s_102_p_int_5 - 1))) + __f2dace_SA_c_lin_e_d_0_s_101_p_int_5) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu___CG_p_int__m_cells_aw_verts, ((((__f2dace_SA_cells_aw_verts_d_0_s_110_p_int_5 * __f2dace_SA_cells_aw_verts_d_1_s_111_p_int_5) * (__f2dace_SA_cells_aw_verts_d_2_s_112_p_int_5 - 1)) + (__f2dace_SA_cells_aw_verts_d_0_s_110_p_int_5 * (__f2dace_SA_cells_aw_verts_d_1_s_111_p_int_5 - 1))) + __f2dace_SA_cells_aw_verts_d_0_s_110_p_int_5) * sizeof(double)));
     DACE_GPU_CHECK(cudaMalloc((void**)&__state->__0_gpu___CG_p_int__m_e_bln_c_s, ((((__f2dace_SA_e_bln_c_s_d_0_s_104_p_int_5 * __f2dace_SA_e_bln_c_s_d_1_s_105_p_int_5) * (__f2dace_SA_e_bln_c_s_d_2_s_106_p_int_5 - 1)) + (__f2dace_SA_e_bln_c_s_d_0_s_104_p_int_5 * (__f2dace_SA_e_bln_c_s_d_1_s_105_p_int_5 - 1))) + __f2dace_SA_e_bln_c_s_d_0_s_104_p_int_5) * sizeof(double)));
@@ -8999,41 +9013,41 @@ DACE_EXPORTED int __dace_exit_solve_nh_predictor_pre(solve_nh_predictor_pre_stat
     delete[] __state->__0___CG_p_nh_prog_nnew__m_rho;
     delete[] __state->__0___CG_p_nh_prog_nnew__m_exner;
     delete[] __state->__0___CG_p_nh_prog_nnew__m_theta_v;
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_alpha));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_exner_ex_pr));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_graddiv_vn));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_graddiv2_vn));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_rho_v));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_vn_avg));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_w_concorr_mc));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_flxdiv_mass));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_q));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_hydro_corr));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_pr_ic));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_exner_ic));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_w_expl));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_mflx_top));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_th_ddz_exner_c));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_beta));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_w_concorr_me));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_scal_divdamp));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_bdy_divdamp));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_rth_pr));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_kin_hor_e));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_exner_expl));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_e));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_dexner_dz_c));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_dwdz_dd));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_gradh_exner));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_flxdiv_theta));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_vt_ie));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_fl_e));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_rho_e));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_raylfac));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_exner_expl));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_grad_rth));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_fl_e));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_e));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_rho_expl));
-    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_contr_w_fl_l));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_vn_avg));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_dexner_dz_c));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_w_concorr_me));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_graddiv2_vn));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_flxdiv_theta));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_graddiv_vn));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_bdy_divdamp));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_w_concorr_mc));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_beta));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_rho_v));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_th_ddz_exner_c));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_scal_divdamp));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_hydro_corr));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_v));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_raylfac));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_contr_w_fl_l));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_kin_hor_e));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_alpha));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_flxdiv_mass));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_exner_ic));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_theta_v_pr_ic));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_exner_ex_pr));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_mflx_top));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_dwdz_dd));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_w_expl));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_vt_ie));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_gradh_exner));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_rth_pr));
+    DACE_GPU_CHECK(cudaFree(__state->__0_gpu_z_q));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu___CG_p_int__m_c_lin_e));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu___CG_p_int__m_cells_aw_verts));
     DACE_GPU_CHECK(cudaFree(__state->__0_gpu___CG_p_int__m_e_bln_c_s));
