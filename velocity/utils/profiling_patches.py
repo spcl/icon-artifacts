@@ -168,3 +168,36 @@ def insert_program_entry_exit_syncs(sdfg: dace.SDFG):
         language=dace.dtypes.Language.CPP,
         # code_global='#include "dace_wait_device.h"', # skip include
     )
+
+def insert_pre_reduction_sync(sdfg: dace.SDFG):
+    last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
+    assert len(last_blocks) == 1, "Expected exactly one last block in the SDFG"
+    last_block = last_blocks[0]
+    sync_state2 = sdfg.add_state_before(state=last_block, label="pre_reduce_sync")
+    sync_node2 = sync_state2.add_tasklet(
+        name="sync0",
+        code="dace_wait_device();",
+        inputs={},
+        outputs={},
+        language=dace.dtypes.Language.CPP,
+        code_global='#include "dace_wait_device.h"',
+    )
+
+def rm_reduntant_copies(sdfg: dace.SDFG):
+    for state in sdfg.all_states():
+        for edge in state.edges():
+            if edge not in state.edges():
+                continue
+            if (isinstance(edge.src, dace.nodes.AccessNode) and
+                isinstance(edge.dst, dace.nodes.AccessNode) and
+                edge.src.data == edge.dst.data
+                ):
+                state.remove_edge(edge)
+                state.remove_node(edge.src)
+                state.remove_node(edge.dst)
+
+
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                rm_reduntant_copies(node.sdfg)
