@@ -7,4 +7,6 @@
 #SBATCH --output=logs/sweep_%j.out
 #SBATCH --error=logs/sweep_%j.err
 
+uenv start --view=default icon/25.2:v1@santis
+
 python sweep.py

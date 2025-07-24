@@ -9,7 +9,8 @@ y_block_sizes = [1, 2]
 valid_products = [256]
 y_unroll_factors = [1, 2]
 
-tested_log = "tested_params.log"
+tested_log = "logs/tested_params.log"
+compare_log = "logs/compare.log"
 
 # Read previously tested configs
 if os.path.exists(tested_log):
@@ -32,6 +33,8 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
 
     with open(tested_log, "a") as logf:
         print(f"=== Running for {label} ===", file=logf)
+    with open(compare_log, "a") as comparef:
+        print(f"=== Running for {label} ===", file=comparef)
     print(f"=== Running for {label} ===")
 
     env = os.environ.copy()
@@ -49,7 +52,7 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
 
     try:
         subprocess.run(
-            ["python", "-m", "utils.stages.compile_gpu_stage8", "--optimize", "--compile"],
+            ["python", "-m", "utils.stages.compile_gpu_stage8", "--compile"],
             check=True,
             env=env
         )
@@ -66,6 +69,7 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
     try:
         subprocess.run(
             ["python", "utils/compare_got_and_want.py", "--root=gotwant/data_nproma20480"],
+            stdout=comparef,
             check=True,
             env=env
         )
@@ -74,7 +78,7 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
         return
 
     try:
-        with open("tile.log", "a") as logf:
+        with open("logs/tile.log", "a") as logf:
             print(f"=== Running for {label} ===", file=logf)
             logf.flush()
             env["REPS"] = "50"
