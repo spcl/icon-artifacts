@@ -216,7 +216,7 @@ class Compiler:
         self.optimization_flags = self._get_optimization_flags()
         self.standard_flags = self._get_standard_flags()
         self.cuda_diagnosis_flags = self._get_cuda_diagnosis_flags()
-        self.cuda_optimization_flags = self._get_cuda_optimization_flags()
+        self.cuda_optimization_flags = self._get_cuda_debug_flags() # TODO: Options to release/debug
         self.cuda_standard_flags = self._get_cuda_standard_flags()
         self.dace_include = Path(dace.__file__).parent / "runtime/include/"
         self.nvcc = nvcc
@@ -254,15 +254,18 @@ class Compiler:
     def _get_optimization_flags(self) -> list[str]:
         return "-O0 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off".split()
 
-    def _get_cuda_optimization_flags(self) -> list[str]:
-        return "-O3 -Xcompiler=-march=native -Xcompiler=-fno-strict-aliasing -Xcompiler=-fno-omit-frame-pointer -Xcompiler=-fno-fast-math -Xcompiler=-ffp-contract=off".split()
+    def _get_cuda_debug_flags(self) -> list[str]:
+        return "-O0 -Xcompiler=-march=native -Xcompiler=-fno-strict-aliasing -Xcompiler=-fno-omit-frame-pointer -Xcompiler=-fno-fast-math -Xcompiler=-ffp-contract=off -G --fmad=false --prec-div=true --prec-sqrt=true --ftz=false ".split()
+
+    def _get_cuda_release_flags(self) -> list[str]:
+        return "-O3 -Xcompiler=-O3 -Xcompiler=-march=native -Xcompiler=-fstrict-aliasing -Xcompiler=-fomit-frame-pointer -Xcompiler=-ffast-math -Xcompiler=-ffp-contract=on -lineinfo --fmad=true --prec-div=false --prec-sqrt=false --ftz=true --use-fast-math -Xptxas=-O3 -Xptxas=-v --restrict -dlto".split()
 
     def _get_standard_flags(self) -> list[str]:
         return "-fPIC -fopenmp".split()
 
     def _get_cuda_standard_flags(self) -> list[str]:
         CUDA_ARCH = os.getenv("CUDA_ARCH", "native")
-        return f"-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch={CUDA_ARCH} --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true -Xcompiler=-fPIC --compiler-options='-fPIC' -DGPU".split()
+        return f"-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch={CUDA_ARCH} --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true --compiler-options='-fPIC' -DGPU --relocatable-device-code=true".split()
 
     def _get_cpp_standard_flags(self) -> list[str]:
         return ["-std=c++20"]
@@ -271,7 +274,7 @@ class Compiler:
         return self.diagnosis_flags + self.optimization_flags + self.standard_flags
 
     def get_cuda_base_flags(self) -> list[str]:
-        return self.cuda_diagnosis_flags + self.cuda_optimization_flags + self.cuda_standard_flags
+        return self.cuda_diagnosis_flags + self.cuda_standard_flags + self.cuda_optimization_flags
 
     def _get_cuda_src_file_flag(self) -> str:
         return "-x=cu"
@@ -437,10 +440,10 @@ def consolidate_generated_code(
 
     combined_header = "\n".join(
         wrap_namespace(name, content).strip() for name, content in all_headers.items()
-    ).replace("__restrict__", "")
+    ).replace("**__restrict__", "*__restrict *__restrict__")
     combined_source = "\n".join(
         wrap_namespace(name, content).strip() for name, content in all_sources.items()
-    ).replace("__restrict__", "")
+    ).replace("**__restrict__", "*__restrict *__restrict__")
 
     store.mkdir(parents=True, exist_ok=True)
     header_path = store / CONSOLIDATED_HEADER
@@ -454,7 +457,7 @@ def consolidate_generated_code(
 
         combined_cuda_source = "\n".join(
             wrap_gpu_namespace(name, content).strip() for name, content in all_cuda_sources.items()
-        ).replace("__restrict__", "")
+        ).replace("**__restrict__", "*__restrict *__restrict__")
 
         store.mkdir(parents=True, exist_ok=True)
         cuda_source_path = store / CONSOLIDATED_CUDA_SOURCE
@@ -495,7 +498,17 @@ def consolidate_generated_code(
         ("DACE_EXPORTED", ""),
         ("const const", "const"),
         ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];",
-         "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;")
+         "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;"),
+         ("new double DACE_ALIGN(64)", "new (std::align_val_t(64)) double"),
+         ("new int DACE_ALIGN(64)", "new (std::align_val_t(64)) int"),
+         ("new float DACE_ALIGN(64)", "new (std::align_val_t(64)) float"),
+         ("new uint16_t DACE_ALIGN(64)", "new (std::align_val_t(64)) uint16_t"),
+         ("new unsigned char DACE_ALIGN(64)", "new (std::align_val_t(64)) unsigned char"),
+         ("new double DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) double"),
+         ("new int DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) int"),
+         ("new float DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) float"),
+         ("new uint16_t DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) uint16_t"),
+         ("new unsigned char DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) unsigned char"),
     ]
 
     # Format again after replacements
