@@ -7,6 +7,11 @@ from utils.codegen_from_sdfg import Mode
 from utils.gpu_offloading_wo_host_dev_copies import (
     gpu_offloading_wo_host_dev_copies,
 )
+from utils.set_transient_storage_to_persistent import (
+    set_transient_storage_to_persistent,
+    check_transients_in_nsdfgs,
+    clean_view_descs,
+)
 import argparse
 
 
@@ -15,7 +20,7 @@ STAGE_ID = 3
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
 
-    # === Sub-Phase 2: Offloading ===
+    # === Sub-Phase 1: Offloading ===
     # Add GPU copy-in and copy-out to the flattener/copy-in and deflattener/copy-out states
     # add_gpu_copies_to_flattener(g)
     # Perform the offloading with the assumption that all kernels purely run on the GPU
@@ -23,7 +28,13 @@ def optimization_action(g: SDFG):
     # Replaces the velocity tendencies tasklet accordingly
     gpu_offloading_wo_host_dev_copies(g)
     g.validate()
-    # === Sub-Phase 2: Offloading ===
+    # === Sub-Phase 1: Offloading ===
+
+    # === Sub-Phase 2: Allocation Optimizations ===
+    clean_view_descs(g)
+    set_transient_storage_to_persistent(g)
+    check_transients_in_nsdfgs(g)
+    # === Sub-Phase 2: Allocation Optimizations ===
 
     return g
 

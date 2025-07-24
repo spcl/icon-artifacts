@@ -833,7 +833,18 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
 
     reinject_velocity_shim_gpu(sdfg)
 
+    _set_zero_stream(sdfg)
+
     sdfg.validate()
+
+def _set_zero_stream(sdfg: dace.SDFG):
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.MapEntry) and n.map.schedule == dace.ScheduleType.GPU_Device:
+            n._cuda_stream = 0
+            n.map._cuda_stream = 0
+        if isinstance(n, dace.nodes.Tasklet) and "velocity_tendencies" in n.label:
+            n._cuda_stream = 0
+
 
 def _get_data_used_by_velocity(sdfg: dace.SDFG) -> Set[str]:
     velocity_tasklet = None,

@@ -153,6 +153,24 @@ out_p_prog = in_p_prog;
             cpp_code="exit_velocity_tendencies();",
         )
 
+    """
+    has_gpu_init_call = any([
+        re.search(r'\binit_velocity_tendencies_gpu\(.*?\);', v.as_string)
+        for v in g.init_code.values()
+    ])
+
+    has_cpu_init_call = any([
+        re.search(r'\binit_velocity_tendencies\(.*?\);', v.as_string)
+        for v in g.init_code.values()
+    ])
+    assert not has_gpu_init_call, "GPU init velocity tasklet should not be already here if calling this function."
+    assert not has_cpu_init_call, "CPU init velocity tasklet should not be already here if calling this function."
+    if not has_cpu_init_call:
+        g.append_init_code(
+            cpp_code="throw std::runtime_error(\"init_velocity_tendencies() is not supported in stage 0\");",
+        )
+    """
+
 #     t.code = CodeBlock(
 #         f"""
 # velocity_tendencies(

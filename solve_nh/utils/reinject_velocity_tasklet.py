@@ -1,3 +1,4 @@
+import re
 import dace
 import copy
 
@@ -342,6 +343,22 @@ def reinject_velocity_shim(
         sdfg.append_exit_code(
             cpp_code="exit_velocity_tendencies();",
         )
+    """
+    has_gpu_init_call = any([
+        re.search(r'\binit_velocity_tendencies_gpu\(.*?\);', v.as_string)
+        for v in sdfg.init_code.values()
+    ])
+
+    has_cpu_init_call = any([
+        re.search(r'\binit_velocity_tendencies\(.*?\);', v.as_string)
+        for v in sdfg.init_code.values()
+    ])
+    assert not has_gpu_init_call, "GPU init velocity tasklet should not be already here if calling this function."
+    if not has_cpu_init_call:
+        sdfg.append_init_code(
+            cpp_code=f"init_velocity_tendencies({input_args_str});",
+        )
+    """
 
 def reinject_velocity_shim_gpu(
     sdfg: dace.SDFG
@@ -479,3 +496,26 @@ def reinject_velocity_shim_gpu(
         sdfg.append_exit_code(
             cpp_code="exit_velocity_tendencies_gpu();",
         )
+    """
+    has_gpu_init_call = any([
+        re.search(r'\binit_velocity_tendencies_gpu\(.*?\);', v.as_string)
+        for v in sdfg.init_code.values()
+    ])
+
+    has_cpu_init_call = any([
+        re.search(r'\binit_velocity_tendencies\(.*?\);', v.as_string)
+        for v in sdfg.init_code.values()
+    ])
+    if has_cpu_init_call:
+        # Remove the CPU init call, we are replacing it with the GPU one
+        pattern = r'\binit_velocity_tendencies_gpu\s*\(.*?\);?'
+        sdfg.init_code = {
+            k: CodeBlock(re.sub(pattern, '', v.as_string))
+            for k, v in sdfg.init_code.items()
+        }
+
+    if not has_gpu_init_call:
+        sdfg.append_init_code(
+            cpp_code=f"init_velocity_tendencies_gpu({input_args_str});",
+        )
+    """
