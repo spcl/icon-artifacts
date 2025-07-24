@@ -105,8 +105,6 @@ velocity_shim_template = """
 
 #include "shared_struct_defs.h"
 #include <dace/dace.h>
-#include <thread>
-#include <mutex>
 
 #include "velocity{gpu_suffix}.h"
 
@@ -115,53 +113,45 @@ static velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *state_lvn_only_1_i
 static velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *state_lvn_only_0_istep_1 = nullptr;
 static velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *state_lvn_only_0_istep_2 = nullptr;
 
-static std::mutex velocity_tendencies_init_exit_mutex;
-
-void init_velocity_tendencies{gpu_suffix}(
-    {velocity_tendencies_args}
-) {{
-    std::lock_guard<std::mutex> lock(velocity_tendencies_init_exit_mutex);
-    if (state_lvn_only_1_istep_1 == nullptr) {{
-        state_lvn_only_1_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-            {velocity_lvn_only_1_istep_1_args}
-        );
-    }}
-    if (state_lvn_only_1_istep_2 == nullptr) {{
-        state_lvn_only_1_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-        {velocity_lvn_only_1_istep_2_args}
-        );
-    }}
-    if (state_lvn_only_0_istep_1 == nullptr) {{
-        state_lvn_only_0_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-        {velocity_lvn_only_0_istep_1_args}
-        );
-    }}
-    if (state_lvn_only_0_istep_2 == nullptr) {{
-        state_lvn_only_0_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-        {velocity_lvn_only_0_istep_2_args}
-        );
-    }}
-}}
-
 void velocity_tendencies{gpu_suffix}(
     {velocity_tendencies_args}
 ){{
     if (lvn_only == 1 && istep == 1) {{
+        if (state_lvn_only_1_istep_1 == nullptr) {{
+            state_lvn_only_1_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
+                {velocity_lvn_only_1_istep_1_args}
+            );
+        }}
         __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
             state_lvn_only_1_istep_1,
             {velocity_lvn_only_1_istep_1_args}
         );
     }} else if (lvn_only == 1 && istep == 2) {{
+        if (state_lvn_only_1_istep_2 == nullptr) {{
+            state_lvn_only_1_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
+            {velocity_lvn_only_1_istep_2_args}
+            );
+        }}
         __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
             state_lvn_only_1_istep_2,
             {velocity_lvn_only_1_istep_2_args}
         );
     }} else if (lvn_only == 0 && istep == 1) {{
+        if (state_lvn_only_0_istep_1 == nullptr) {{
+            state_lvn_only_0_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
+            {velocity_lvn_only_0_istep_1_args}
+            );
+        }}
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
             state_lvn_only_0_istep_1,
             {velocity_lvn_only_0_istep_1_args}
         );
     }} else if (lvn_only == 0 && istep == 2) {{
+        if (state_lvn_only_0_istep_2 == nullptr) {{
+            state_lvn_only_0_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
+            {velocity_lvn_only_0_istep_2_args}
+            );
+        }}
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
             state_lvn_only_0_istep_2,
             {velocity_lvn_only_0_istep_2_args}
@@ -169,8 +159,7 @@ void velocity_tendencies{gpu_suffix}(
     }}
 }}
 
-void exit_velocity_tendencies{gpu_suffix}() {{
-    std::lock_guard<std::mutex> lock(velocity_tendencies_init_exit_mutex);
+void exit_velocity_tendencies() {{
     if (state_lvn_only_1_istep_1 != nullptr) {{
         __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(state_lvn_only_1_istep_1);
         state_lvn_only_1_istep_1 = nullptr;
@@ -193,7 +182,6 @@ void exit_velocity_tendencies{gpu_suffix}() {{
 """
 
 
-
 def _has_velocity_tendencies(sdfg: dace.SDFG) -> bool:
     for state in sdfg.all_states():
         for node in state.nodes():
@@ -201,10 +189,6 @@ def _has_velocity_tendencies(sdfg: dace.SDFG) -> bool:
                 return True
     return False
 
-
-
-def gen_caller():
-    pass
 
 def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
                             sdfgs: List[dace.SDFG], typed_inputs):
@@ -621,5 +605,5 @@ if __name__ == "__main__":
 
     _generate_velocity_shim(header, header_shim_path, sdfgs, result)
 
-    move_closing_paren("include/velocity_shim_gpu.h")
-    move_closing_paren("include/velocity_shim_cpu.h")
+    move_closing_paren("include/velocity_gpu.h")
+    move_closing_paren("include/velocity.h")
