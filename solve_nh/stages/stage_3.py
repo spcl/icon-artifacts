@@ -12,6 +12,10 @@ from utils.set_transient_storage_to_persistent import (
     check_transients_in_nsdfgs,
     clean_view_descs,
 )
+from utils.profiling_patches import (
+    insert_timers_for_profiling,
+    insert_synchronization_for_profiling,
+)
 import argparse
 
 
@@ -35,6 +39,11 @@ def optimization_action(g: SDFG):
     set_transient_storage_to_persistent(g)
     check_transients_in_nsdfgs(g)
     # === Sub-Phase 2: Allocation Optimizations ===
+
+    # === Sub-Phase 3: Patches ===
+    insert_synchronization_for_profiling(g)
+    insert_timers_for_profiling(g)
+    # === Sub-Phase 3: Patches ===
 
     return g
 
