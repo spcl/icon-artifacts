@@ -9,7 +9,7 @@ if [[ "$1" == "--clean" ]]; then
 fi
 
 RELEASE_MODES=(FALSE TRUE)
-STAGES=(1 8)
+STAGES=(1 9)
 
 HOST=$(hostname)
 
