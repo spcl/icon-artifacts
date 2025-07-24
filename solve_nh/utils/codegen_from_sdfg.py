@@ -510,6 +510,7 @@ def consolidate_generated_code(
          ("new uint16_t DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) uint16_t"),
          ("new unsigned char DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) unsigned char"),
          ("DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));", "// disabled: DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));"),
+         ("__state->gpu_context->streams[0]", "nullptr"),
     ]
 
     # Format again after replacements
@@ -531,6 +532,7 @@ def consolidate_generated_code(
         replacements = [
             ("DACE_EXPORTED", ""),
             ("const const", "const"),
+            ("__state->gpu_context->streams[0]", "nullptr"),
         ]
 
         # Format again after replacements
