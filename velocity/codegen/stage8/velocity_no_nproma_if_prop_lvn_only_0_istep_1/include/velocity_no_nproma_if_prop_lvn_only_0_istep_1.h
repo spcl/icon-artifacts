@@ -49,6 +49,24 @@ double* w_concorr_c = {};
 };
 
 
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s = {};
+int __f2dace_SA_vn_d_1_s = {};
+int __f2dace_SA_vn_d_2_s = {};
+int __f2dace_SA_w_d_0_s = {};
+int __f2dace_SA_w_d_1_s = {};
+int __f2dace_SA_w_d_2_s = {};
+int __f2dace_SOA_vn_d_0_s = {};
+int __f2dace_SOA_vn_d_1_s = {};
+int __f2dace_SOA_vn_d_2_s = {};
+int __f2dace_SOA_w_d_0_s = {};
+int __f2dace_SOA_w_d_1_s = {};
+int __f2dace_SOA_w_d_2_s = {};
+double* vn = {};
+double* w = {};
+};
+
+
 struct t_nh_metrics {
     int __f2dace_SA_coeff1_dwdz_d_0_s = {};
 int __f2dace_SA_coeff1_dwdz_d_1_s = {};
@@ -350,24 +368,6 @@ int* nrdmax = {};
 int timer_intp = {};
 int timer_solve_nh_veltend = {};
 int timers_level = {};
-};
-
-
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s = {};
-int __f2dace_SA_vn_d_1_s = {};
-int __f2dace_SA_vn_d_2_s = {};
-int __f2dace_SA_w_d_0_s = {};
-int __f2dace_SA_w_d_1_s = {};
-int __f2dace_SA_w_d_2_s = {};
-int __f2dace_SOA_vn_d_0_s = {};
-int __f2dace_SOA_vn_d_1_s = {};
-int __f2dace_SOA_vn_d_2_s = {};
-int __f2dace_SOA_w_d_0_s = {};
-int __f2dace_SOA_w_d_1_s = {};
-int __f2dace_SOA_w_d_2_s = {};
-double* vn = {};
-double* w = {};
 };
 
 

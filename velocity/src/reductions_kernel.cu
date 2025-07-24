@@ -166,7 +166,7 @@ void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in,
       maxZ_temp_storage = nullptr;
     }
     temp_storage_bytes = 0;
-    cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, stream);
+    cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, nullptr);
     if (temp_storage_bytes != 0) {
       cudaMalloc(&maxZ_temp_storage, temp_storage_bytes);
     }
@@ -174,7 +174,7 @@ void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in,
   }
 
   // Call the reduction
-  cub::DeviceReduce::Max(maxZ_temp_storage, temp_storage_bytes, d_in, d_out, size, stream);
+  cub::DeviceReduce::Max(maxZ_temp_storage, temp_storage_bytes, d_in, d_out, size, nullptr);
 }
 
 // Manual cleanup function to call when done
@@ -229,7 +229,7 @@ void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in, double*__restri
 double reduce_maxZ_to_scalar_gpu(const double *__restrict__ d_in, int size, cudaStream_t stream)
 {
   thrust::device_ptr<const double> d_ptr = thrust::device_pointer_cast(d_in);
-  double maxval = thrust::reduce(thrust::cuda::par.on(stream), d_ptr, d_ptr + size, 0.0, thrust::maximum<double>());
+  double maxval = thrust::reduce(d_ptr, d_ptr + size, 0.0, thrust::maximum<double>());
   return maxval;
 }
 
@@ -270,7 +270,7 @@ void reduce_sum_to_address_gpu(const double *__restrict__ d_in,
       sum_temp_storage = nullptr;
     }
     temp_storage_bytes = 0;
-    cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, stream);
+    cub::DeviceReduce::Max(nullptr, temp_storage_bytes, d_in, d_out, size, nullptr);
     if (temp_storage_bytes != 0) {
       cudaMalloc(&sum_temp_storage, temp_storage_bytes);
     }
@@ -278,7 +278,7 @@ void reduce_sum_to_address_gpu(const double *__restrict__ d_in,
   }
 
   // Call the reduction
-  cub::DeviceReduce::Max(sum_temp_storage, temp_storage_bytes, d_in, d_out, size, stream);
+  cub::DeviceReduce::Max(sum_temp_storage, temp_storage_bytes, d_in, d_out, size, nullptr);
 }
 
 // Manual cleanup function to call when done
@@ -294,7 +294,7 @@ void cleanup_reduce_sum_gpu()
 int reduce_sum_to_scalar_gpu(const int *__restrict__ d_in, int size, cudaStream_t stream)
 {
   thrust::device_ptr<const int> d_ptr = thrust::device_pointer_cast(d_in);
-  int sumval = thrust::reduce(thrust::cuda::par.on(stream), d_ptr, d_ptr + size, 0, thrust::plus<int>());
+  int sumval = thrust::reduce(d_ptr, d_ptr + size, 0, thrust::plus<int>());
   return sumval;
 }
 
@@ -326,6 +326,6 @@ void reduce_segmented_to_address_gpu(const int *__restrict__ d_in, int*__restric
         dim3(1024, 1, 1),
         (void**)batched_reduce_sum_v2_args,
         0,
-        stream
+        nullptr
     );
 }

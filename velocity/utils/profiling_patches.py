@@ -108,19 +108,21 @@ def rm_state_and_reroute(sdfg:dace.SDFG, state_names):
         if state.label in state_names:
             src_edge = sdfg.in_edges(state)[0] if len(sdfg.in_edges(state)) == 1 else None
             dst_edge = sdfg.out_edges(state)[0] if len(sdfg.out_edges(state)) == 1 else None
-            sdfg.remove_state(state)
+            sdfg.remove_node(state)
             if src_edge is not None and dst_edge is not None:
                 nassignments = dict()
-                for k, v in src_edge.data.assignments:
+                for k, v in src_edge.data.assignments.items():
                     if k not in nassignments:
                         nassignments[k] = v
                     if k in nassignments:
-                        raise ValueError(f"Duplicate assignment for key {k} in edge {src_edge}")
-                for k, v in dst_edge.data.assignments:
+                        if nassignments[k] != v:
+                            raise ValueError(f"Duplicate assignment for key {k} in edge {src_edge}")
+                for k, v in dst_edge.data.assignments.items():
                     if k not in nassignments:
                         nassignments[k] = v
                     if k in nassignments:
-                        raise ValueError(f"Duplicate assignment for key {k} in edge {src_edge}")
+                        if nassignments[k] != v:
+                            raise ValueError(f"Duplicate assignment for key {k} in edge {dst_edge}")
                 sdfg.add_edge(src_edge.src, dst_edge.dst, dace.InterstateEdge(assignments=nassignments))
 
 def remove_sync_states(sdfg:dace.SDFG):
@@ -131,3 +133,38 @@ def set_default_stream(sdfg: dace.SDFG):
     for n, g in sdfg.all_nodes_recursive():
         if isinstance(n, dace.nodes.MapEntry) and n.map.schedule == dace.ScheduleType.GPU_Device:
             n._cuda_stream = "nullptr"
+            n.map._cuda_stream = "nullptr"
+
+def insert_synchronization_and_timers_for_profiling(sdfg: dace.SDFG):
+    insert_synchronization_for_profiling(sdfg)
+    insert_timers_for_profiling(sdfg)
+
+def remove_sync_and_profiling_states(sdfg: dace.SDFG):
+    remove_sync_states(sdfg)
+    remove_profiling_states(sdfg)
+
+def insert_program_entry_exit_syncs(sdfg: dace.SDFG):
+    last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
+    assert len(last_blocks) == 1, "Expected exactly one last block in the SDFG"
+    last_block = last_blocks[0]
+
+
+    sync_state1 = sdfg.add_state_before(state=sdfg.start_block, label="program_entry_sync")
+    sync_node1 = sync_state1.add_tasklet(
+        name="sync1",
+        code="dace_wait_device();",
+        inputs={},
+        outputs={},
+        language=dace.dtypes.Language.CPP,
+        code_global='#include "dace_wait_device.h"',
+    )
+
+    sync_state2 = sdfg.add_state_after(state=last_block, label="program_exit_sync")
+    sync_node2 = sync_state2.add_tasklet(
+        name="sync2",
+        code="dace_wait_device();",
+        inputs={},
+        outputs={},
+        language=dace.dtypes.Language.CPP,
+        # code_global='#include "dace_wait_device.h"', # skip include
+    )

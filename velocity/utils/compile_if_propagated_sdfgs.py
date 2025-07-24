@@ -126,6 +126,18 @@ def insert_measure_time_calls(path, sdfg: dace.SDFG, instrument: bool = False):
         script_dir = path
     _process_folder(script_dir, sdfg, instrument)
 
+def set_default_stream(file_path: str):
+    src = "__state->gpu_context->streams[0]"
+    dst = "nullptr"
+    with open(file_path, "r") as f:
+        code = f.read()
+
+    code = code.replace(src, dst)
+
+    with open(file_path, "w") as f:
+        f.write(code)
+
+
 def add_timers(file_path: str, gpu: bool, stage:int, use_openacc_stream: bool = False):
 
     with open(file_path, "r") as f:
@@ -378,7 +390,8 @@ def comment_out_syncs(filepath: str, gpu: bool):
     with open(filepath, "w") as file:
         for line in lines:
             if ("cudaStreamSynchronize" in line) or ("EventRecord" in line) or ("StreamWaitEvent" in line):
-                if ("stop" in line) or ("start" in line) or ("ExitStreamSync" in line) or ("EntryStreamSync" in line):
+                if ("stop" in line) or ("start" in line):
+                    # or ("ExitStreamSync" in line) or ("EntryStreamSync" in line)
                     line = line
                 else:
                     line = "//" + line
@@ -624,7 +637,7 @@ def compile_if_propagated_sdfgs(
             compiler.generate_program_folder(sdfg, program_objects, sdfg.build_folder)
 
             modify_files_in_directory(build_loc)
-            add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp", gpu, stage)
+            #add_timers(f"{build_loc}/src/cpu/{sdfg_name}.cpp", gpu, stage)
             # insert_measure_time_calls(build_loc, sdfg, instrument)
             #if fix_out_val_0:
             #      fix_out_val_0_call(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "out_val_0, &cfl_clipping")
@@ -678,6 +691,11 @@ def compile_if_propagated_sdfgs(
                     '#include "reductions_kernel.cuh"\n#include "reductions_cpu.h"\n#include "timer.h"\n'
                     + main_cu_code
                 )
+
+            if stage == 8 or stage == 9:
+                set_default_stream(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+                set_default_stream(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
         else:
             with open(f"{build_loc}/src/cpu/{sdfg_name}.cpp", "r") as file:

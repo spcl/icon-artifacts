@@ -7,6 +7,7 @@ from utils.input_to_gpu import input_to_gpu
 from utils.add_set_zero import add_set_zero
 from utils.make_flattened_data_to_input import make_flattened_data_to_non_transient_cpu_input, make_flattened_data_to_non_transient_gpu_input
 
+from utils.profiling_patches import remove_profiling_states, remove_sync_states, remove_sync_and_profiling_states, set_default_stream
 STAGE_ID = 9
 
 _allocation_names_to_comment_out = set()
@@ -34,6 +35,9 @@ def optimization_action(sdfg):
     if _build_for_integration:
         make_flattened_data_to_non_transient_gpu_input(sdfg)
         sdfg.validate()
+
+    set_default_stream(sdfg)
+    remove_sync_and_profiling_states(sdfg)
 
     return sdfg
 
