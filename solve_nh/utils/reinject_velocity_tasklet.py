@@ -333,8 +333,12 @@ def reinject_velocity_shim(
 
     velocity_tasklet.code = CodeBlock(code_str, language=dace.dtypes.Language.CPP)
 
-    has_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.values()])
-    if not has_exit_call:
+    # Reinjecting the old (struct only) velocity -> flattened velocity tasklet
+    # It means: if existing exit call, do not do anything else add it
+    has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) for v in sdfg.exit_code.values()])
+    has_cpu_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.values()])
+    assert not has_gpu_exit_call, "GPU reinject velocity tasklet should not be already here if calling this function."
+    if not has_cpu_exit_call:
         sdfg.append_exit_code(
             cpp_code="exit_velocity_tendencies();",
         )
@@ -463,8 +467,15 @@ def reinject_velocity_shim_gpu(
 
     velocity_tasklet.code = CodeBlock(code_str, language=dace.dtypes.Language.CPP)
 
-    has_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.values()])
-    if not has_exit_call:
+    # Reinjecting the CPU velocity -> GPU velocity
+    # It means: if existing remove CPU exit and add GPU exit if nto already there
+    has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) for v in sdfg.exit_code.values()])
+    has_cpu_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.values()])
+    if has_cpu_exit_call:
+        # Remove the CPU exit call, we are replacing it with the GPU one
+        sdfg.exit_code = {k: CodeBlock(v.as_string.replace("exit_velocity_tendencies();", "")) for k, v in sdfg.exit_code.items()}
+
+    if not has_gpu_exit_call:
         sdfg.append_exit_code(
-            cpp_code="exit_velocity_tendencies();",
+            cpp_code="exit_velocity_tendencies_gpu();",
         )

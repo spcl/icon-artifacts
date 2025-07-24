@@ -143,12 +143,15 @@ out_p_prog = in_p_prog;
         language=dtypes.Language.CPP,
     )
 
-    has_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in g.exit_code.values()])
-    if not has_exit_call:
+    # Injecting the first velocity tasklet, ensure no exit call is already there.
+    has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) for v in g.exit_code.values()])
+    has_cpu_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in g.exit_code.values()])
+    assert not has_gpu_exit_call, "GPU reinject velocity tasklet should not be already here if calling this function."
+    assert not has_cpu_exit_call, "CPU reinject velocity tasklet should not be already here if calling this function."
+    if not has_cpu_exit_call:
         g.append_exit_code(
             cpp_code="exit_velocity_tendencies();",
         )
-
 
 #     t.code = CodeBlock(
 #         f"""
