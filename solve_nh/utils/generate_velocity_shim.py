@@ -105,68 +105,63 @@ velocity_shim_template = """
 
 #include "shared_struct_defs.h"
 #include <dace/dace.h>
+#include <thread>
+#include <mutex>
 
-#if defined(GPU)
-
-#error "GPU Implementation TODO"
-
-#else
-
-#include "velocity.h"
+#include "velocity{gpu_suffix}.h"
 
 static velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *state_lvn_only_1_istep_1 = nullptr;
 static velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *state_lvn_only_1_istep_2 = nullptr;
 static velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *state_lvn_only_0_istep_1 = nullptr;
 static velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *state_lvn_only_0_istep_2 = nullptr;
 
-static void velocity_tendencies(
+static std::mutex velocity_tendencies_init_exit_mutex;
+
+void init_velocity_tendencies{gpu_suffix}(
+    {velocity_tendencies_args}
+) {{
+    std::lock_guard<std::mutex> lock(velocity_tendencies_init_exit_mutex);
+    if (state_lvn_only_1_istep_1 == nullptr) {{
+        state_lvn_only_1_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
+            {velocity_lvn_only_1_istep_1_args}
+        );
+    }}
+    if (state_lvn_only_1_istep_2 == nullptr) {{
+        state_lvn_only_1_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
+        {velocity_lvn_only_1_istep_2_args}
+        );
+    }}
+    if (state_lvn_only_0_istep_1 == nullptr) {{
+        state_lvn_only_0_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
+        {velocity_lvn_only_0_istep_1_args}
+        );
+    }}
+    if (state_lvn_only_0_istep_2 == nullptr) {{
+        state_lvn_only_0_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
+        {velocity_lvn_only_0_istep_2_args}
+        );
+    }}
+}}
+
+void velocity_tendencies{gpu_suffix}(
     {velocity_tendencies_args}
 ){{
-    static int lvn_only_1_istep_1_call_id = 0;
-    static int lvn_only_1_istep_2_call_id = 0;
-    static int lvn_only_0_istep_1_call_id = 0;
-    static int lvn_only_0_istep_2_call_id = 0;
-
     if (lvn_only == 1 && istep == 1) {{
-        if (lvn_only_1_istep_1_call_id == 0) {{
-            state_lvn_only_1_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-                {velocity_lvn_only_1_istep_1_args}
-            );
-        }}
-        lvn_only_1_istep_1_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
             state_lvn_only_1_istep_1,
             {velocity_lvn_only_1_istep_1_args}
         );
     }} else if (lvn_only == 1 && istep == 2) {{
-        if (lvn_only_1_istep_2_call_id == 0) {{
-            state_lvn_only_1_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-            {velocity_lvn_only_1_istep_2_args}
-            );
-        }}
-        lvn_only_1_istep_2_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
             state_lvn_only_1_istep_2,
             {velocity_lvn_only_1_istep_2_args}
         );
     }} else if (lvn_only == 0 && istep == 1) {{
-        if (lvn_only_0_istep_1_call_id == 0) {{
-            state_lvn_only_0_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-            {velocity_lvn_only_0_istep_1_args}
-            );
-        }}
-        lvn_only_0_istep_1_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
             state_lvn_only_0_istep_1,
             {velocity_lvn_only_0_istep_1_args}
         );
     }} else if (lvn_only == 0 && istep == 2) {{
-        if (lvn_only_0_istep_2_call_id == 0) {{
-            state_lvn_only_0_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-            {velocity_lvn_only_0_istep_2_args}
-            );
-        }}
-        lvn_only_0_istep_2_call_id++;
         __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
             state_lvn_only_0_istep_2,
             {velocity_lvn_only_0_istep_2_args}
@@ -174,99 +169,8 @@ static void velocity_tendencies(
     }}
 }}
 
-static void exit_velocity_tendencies() {{
-    if (state_lvn_only_1_istep_1 != nullptr) {{
-        __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(state_lvn_only_1_istep_1);
-        state_lvn_only_1_istep_1 = nullptr;
-    }}
-    if (state_lvn_only_1_istep_2 != nullptr) {{
-        __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_2(state_lvn_only_1_istep_2);
-        state_lvn_only_1_istep_2 = nullptr;
-    }}
-    if (state_lvn_only_0_istep_1 != nullptr) {{
-        __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_1(state_lvn_only_0_istep_1);
-        state_lvn_only_0_istep_1 = nullptr;
-    }}
-    if (state_lvn_only_0_istep_2 != nullptr) {{
-        __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_2(state_lvn_only_0_istep_2);
-        state_lvn_only_0_istep_2 = nullptr;
-    }}
-}}
-
-#endif // GPU
-#endif // __VELOCITY_SHIM_H__
-"""
-
-velocity_shim_template = """
-#ifndef __VELOCITY_SHIM_H__
-#define __VELOCITY_SHIM_H__
-
-#include "shared_struct_defs.h"
-#include <dace/dace.h>
-
-#include "velocity_gpu.h"
-
-static velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *state_lvn_only_1_istep_1 = nullptr;
-static velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *state_lvn_only_1_istep_2 = nullptr;
-static velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *state_lvn_only_0_istep_1 = nullptr;
-static velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *state_lvn_only_0_istep_2 = nullptr;
-
-static void velocity_tendencies_gpu(
-    {velocity_tendencies_args}
-){{
-    static int lvn_only_1_istep_1_call_id = 0;
-    static int lvn_only_1_istep_2_call_id = 0;
-    static int lvn_only_0_istep_1_call_id = 0;
-    static int lvn_only_0_istep_2_call_id = 0;
-
-    if (lvn_only == 1 && istep == 1) {{
-        if (lvn_only_1_istep_1_call_id == 0) {{
-            state_lvn_only_1_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-                {velocity_lvn_only_1_istep_1_args}
-            );
-        }}
-        lvn_only_1_istep_1_call_id++;
-        __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
-            state_lvn_only_1_istep_1,
-            {velocity_lvn_only_1_istep_1_args}
-        );
-    }} else if (lvn_only == 1 && istep == 2) {{
-        if (lvn_only_1_istep_2_call_id == 0) {{
-            state_lvn_only_1_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-            {velocity_lvn_only_1_istep_2_args}
-            );
-        }}
-        lvn_only_1_istep_2_call_id++;
-        __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
-            state_lvn_only_1_istep_2,
-            {velocity_lvn_only_1_istep_2_args}
-        );
-    }} else if (lvn_only == 0 && istep == 1) {{
-        if (lvn_only_0_istep_1_call_id == 0) {{
-            state_lvn_only_0_istep_1 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-            {velocity_lvn_only_0_istep_1_args}
-            );
-        }}
-        lvn_only_0_istep_1_call_id++;
-        __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
-            state_lvn_only_0_istep_1,
-            {velocity_lvn_only_0_istep_1_args}
-        );
-    }} else if (lvn_only == 0 && istep == 2) {{
-        if (lvn_only_0_istep_2_call_id == 0) {{
-            state_lvn_only_0_istep_2 = __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-            {velocity_lvn_only_0_istep_2_args}
-            );
-        }}
-        lvn_only_0_istep_2_call_id++;
-        __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
-            state_lvn_only_0_istep_2,
-            {velocity_lvn_only_0_istep_2_args}
-        );
-    }}
-}}
-
-static void exit_velocity_tendencies_gpu() {{
+void exit_velocity_tendencies{gpu_suffix}() {{
+    std::lock_guard<std::mutex> lock(velocity_tendencies_init_exit_mutex);
     if (state_lvn_only_1_istep_1 != nullptr) {{
         __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(state_lvn_only_1_istep_1);
         state_lvn_only_1_istep_1 = nullptr;
@@ -469,7 +373,8 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
         velocity_lvn_only_1_istep_1_args=call_args_ll[0],
         velocity_lvn_only_1_istep_2_args=call_args_ll[1],
         velocity_lvn_only_0_istep_1_args=call_args_ll[2],
-        velocity_lvn_only_0_istep_2_args=call_args_ll[3]
+        velocity_lvn_only_0_istep_2_args=call_args_ll[3],
+        gpu_suffix=""
     )
 
     with open(velocity_shim_output, 'w') as f:
@@ -645,11 +550,31 @@ def _generate_velocity_shim_gpu(velocity_header: str, velocity_shim_output: str,
         velocity_lvn_only_1_istep_1_args=call_args_ll[0],
         velocity_lvn_only_1_istep_2_args=call_args_ll[1],
         velocity_lvn_only_0_istep_1_args=call_args_ll[2],
-        velocity_lvn_only_0_istep_2_args=call_args_ll[3]
+        velocity_lvn_only_0_istep_2_args=call_args_ll[3],
+        gpu_suffix="_gpu"
     )
 
     with open(velocity_shim_output, 'w') as f:
         f.write(sstr)
+
+import sys
+
+def move_closing_paren(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+
+    updated_lines = []
+    for line in lines:
+        stripped = line.rstrip()
+        if stripped.endswith(');') and stripped.strip() != ');':
+            new_line = stripped[:-2].rstrip()  # Remove ');'
+            updated_lines.append(new_line + '\n')
+            updated_lines.append(');\n')
+        else:
+            updated_lines.append(line)
+
+    with open(filename, 'w') as f:
+        f.writelines(updated_lines)
 
 
 # Example usage
@@ -674,3 +599,27 @@ if __name__ == "__main__":
     sdfgs = [dace.SDFG.from_file(path) for path in sdfg_paths]
 
     _generate_velocity_shim_gpu(header, header_shim_path, sdfgs, result)
+
+    header_path = 'include/velocity.h'
+    header_shim_path = 'include/velocity_shim_cpu.h'
+    with open(header_path, 'r') as f:
+        header = f.read()
+    result = parse_function_arguments(header)
+    print("Parsed result:")
+    for func_name, args in result.items():
+        print(f"Function: {func_name}")
+        for arg_type, arg_name in args:
+            print(f"  {arg_type} -> {arg_name}")
+
+    sdfg_paths = [
+        "codegen/gpu_solve_nh_corrector_post_stage1.sdfgz",
+        "codegen/gpu_solve_nh_corrector_pre_stage1.sdfgz",
+        "codegen/gpu_solve_nh_predictor_pre_stage1.sdfgz",
+        "codegen/gpu_solve_nh_predictor_post_stage1.sdfgz",
+    ]
+    sdfgs = [dace.SDFG.from_file(path) for path in sdfg_paths]
+
+    _generate_velocity_shim(header, header_shim_path, sdfgs, result)
+
+    move_closing_paren("include/velocity_shim_gpu.h")
+    move_closing_paren("include/velocity_shim_cpu.h")
