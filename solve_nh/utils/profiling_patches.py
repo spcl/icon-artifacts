@@ -23,7 +23,7 @@ def insert_timers_for_profiling(sdfg: dace.SDFG):
         inputs={},
         outputs={},
         language=dace.dtypes.Language.CPP,
-        code_global='#include "dace_measure_timer.h"',
+        code_global='#include "dace_measure_time.h"',
     )
 
     timer_state2 = sdfg.add_state_after(state=last_block, label="program_exit_sync")
@@ -33,7 +33,7 @@ def insert_timers_for_profiling(sdfg: dace.SDFG):
         inputs={},
         outputs={},
         language=dace.dtypes.Language.CPP,
-        #code_global='#include "dace_measure_timer.h"',
+        #code_global='#include "dace_measure_time.h"',
     )
 
 
