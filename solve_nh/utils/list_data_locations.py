@@ -96,6 +96,50 @@ def list_data_locations():
                                     else:
                                         cpu_set.add(data_name)
 
+                if isinstance(node, dace.nodes.Tasklet) and "velocity_tendencies" in node.label:
+                    # This is a special case where we have a tasklet that computes velocity tendencies
+                    # and it uses some arrays that are not directly connected to the map.
+                    for e in state.in_edges(node):
+                        if e.data is not None:
+                            data_name = e.data.data
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Array):
+                                if sdfg.arrays[data_name].storage == dace.StorageType.GPU_Global:
+                                    gpu_set.add(data_name)
+                                if sdfg.arrays[data_name].storage == dace.StorageType.CPU_Heap:
+                                    cpu_set.add(data_name)
+                                if sdfg.arrays[data_name].storage == dace.StorageType.Default:
+                                    is_gpu = is_devicelevel_gpu(sdfg, state, node, False)
+                                    if is_gpu:
+                                        gpu_set.add(data_name)
+                                    else:
+                                        cpu_set.add(data_name)
+                                if sdfg.arrays[data_name].storage == dace.StorageType.Register:
+                                    is_gpu = is_devicelevel_gpu(sdfg, state, node, False)
+                                    if is_gpu:
+                                        gpu_set.add(data_name)
+                                    else:
+                                        cpu_set.add(data_name)
+                    for e in state.out_edges(node):
+                        if e.data is not None:
+                            data_name = e.data.data
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Array):
+                                if sdfg.arrays[data_name].storage == dace.StorageType.GPU_Global:
+                                    gpu_set.add(data_name)
+                                if sdfg.arrays[data_name].storage == dace.StorageType.CPU_Heap:
+                                    cpu_set.add(data_name)
+                                if sdfg.arrays[data_name].storage == dace.StorageType.Default:
+                                    is_gpu = is_devicelevel_gpu(sdfg, state, node, False)
+                                    if is_gpu:
+                                        gpu_set.add(data_name)
+                                    else:
+                                        cpu_set.add(data_name)
+                                if sdfg.arrays[data_name].storage == dace.StorageType.Register:
+                                    is_gpu = is_devicelevel_gpu(sdfg, state, node, False)
+                                    if is_gpu:
+                                        gpu_set.add(data_name)
+                                    else:
+                                        cpu_set.add(data_name)
+
             # Collect all data from interstate edges (to nsdfgs passing should be already ok - since we do it for only top leve
             # all of the data should be CPU)
             for e in sdfg.all_interstate_edges():
@@ -144,7 +188,7 @@ def list_data_locations():
         global_report_file.write("Data needed only on GPU (Pass to GPU):\n")
         for data in global_gpu_set - global_cpu_gpu_intersection:
             global_report_file.write(f"  {data}: {_demangle_name(data)}\n")
-        global_report_file.write("Data needed both on CPU (Pass to CPU):\n")
+        global_report_file.write("Data needed only on CPU (Pass to CPU):\n")
         for data in global_cpu_set - global_cpu_gpu_intersection:
             global_report_file.write(f"  {data}: {_demangle_name(data)}\n")
         if not (global_cpu_set - global_cpu_gpu_intersection):
