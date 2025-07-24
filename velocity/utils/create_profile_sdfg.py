@@ -49,7 +49,7 @@ static void dace_timer_stop(const char* label) {
     float milliseconds = 0.0f;
     cudaEventElapsedTime(&milliseconds, get_start_event(), get_stop_event());
 
-    printf("[CUDA TIMING] %s: %.5f us\n", label, milliseconds * 1000);
+    printf("[CUDA TIMING] %s: %.5f us\\n", label, milliseconds * 1000);
     cudaDeviceSynchronize();
 }
 \n\n
@@ -77,9 +77,27 @@ def create_profile_sdfg(sdfg: dace.SDFG):
 
     for node, state in sdfg.all_nodes_recursive():
         if isinstance(node, dace.nodes.MapEntry) and node.map.schedule == dace.ScheduleType.GPU_Device:
+            map_entry = node
+            map_exit = state.exit_node(node)
+            all_nodes = state.all_nodes_between(map_entry, map_exit)
+            all_nodes_rec = []
+            for n in all_nodes:
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    all_nodes_rec.extend([_n for _n, _g in n.sdfg.all_nodes_recursive()])
+                else:
+                    all_nodes_rec.append(n)
+            all_iedges = []
+            for n in all_nodes:
+                if isinstance(n, dace.nodes.NestedSDFG):
+                    all_iedges.extend([e for e in n.sdfg.all_interstate_edges()])
+            num_tasklets = len([n for n in all_nodes_rec if isinstance(n, dace.nodes.Tasklet)])
+            num_indirect_assignments = 0
+            for e in all_iedges:
+                num_indirect_assignments += len(e.data.assignments)
+
             # Put a start event before each map entry
             # Put a stop event after each map exit
-            map_identifier = node.label + "[" + ', '.join(node.map.params) + f"]({id})"
+            map_identifier = node.label + "[" + ', '.join(node.map.params) + f"][Num Tasklets: {num_tasklets}][Num IEdge Assignments: {num_indirect_assignments}](Profiler Id: {id})"
             if scl_name not in state.sdfg.arrays:
                 state.sdfg.add_datadesc(scl_name, copy.deepcopy(scl_desc))
 

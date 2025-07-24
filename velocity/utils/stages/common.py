@@ -52,8 +52,6 @@ def stage_outputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
 def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
                     allocation_names_to_comment_out: set,
                     use_openacc_stream: bool):
-  dace.config.Config.set('compiler', 'cuda', 'max_concurrent_streams', value="10")
-  dace.config.Config.set('compiler', 'cuda', 'default_block_size', value="256,1,1")
   dace.config.Config.set('compiler', 'default_data_types', value='C')
   release = os.getenv('_RELEASE', '0').lower() in ('1', 'true', 'yes')
   for name, g in sdfgs.items():

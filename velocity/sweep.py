@@ -2,11 +2,11 @@ import subprocess
 import os
 
 # Default parameters
-x_coarsenings = [1, 2, 4]
+x_coarsenings = [1, 2]
 y_coarsenings = [1, 2, 4]
-x_block_sizes = [32, 64, 128, 256]
-y_block_sizes = [1, 2, 4, 8]
-valid_products = [256, 512]
+x_block_sizes = [256, 128]
+y_block_sizes = [1, 2]
+valid_products = [256]
 y_unroll_factors = [1, 2]
 
 tested_log = "tested_params.log"
@@ -35,9 +35,12 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
     print(f"=== Running for {label} ===")
 
     env = os.environ.copy()
-    env["_RELEASE"] = "TRUE"
-    env["_USE_CUDA_EVENTS"] = "FALSE"
-    env["_USE_NVHPC"] = "FALSE"
+    env["_RELEASE"] = "1"
+    env["_USE_CUDA_EVENTS"] = "0"
+    env["_USE_NVHPC"] = "1"
+    env["_TILE"] = "1"
+    env["_PROFILE"] = "1"
+    env["_BUILD_FOR_SOLVE_NH_INTEGRATION"] = "0"
     env["X_COARSENING"] = str(x_c)
     env["Y_COARSENING"] = str(y_c)
     env["X_BLOCK_SIZE"] = str(x_bs)
@@ -55,22 +58,36 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
         return
 
     try:
+        env["REPS"] = "1"
+        subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
+    except subprocess.CalledProcessError:
+        print("❌ First execution failed for this config")
+
+    try:
+        subprocess.run(
+            ["python", "utils/compare_got_and_want.py", "--root=gotwant/data_nproma20480"],
+            check=True,
+            env=env
+        )
+    except subprocess.CalledProcessError:
+        print("❌ Numerical comparison crashed for this config")
+        return
+
+    try:
         with open("tile.log", "a") as logf:
             print(f"=== Running for {label} ===", file=logf)
             logf.flush()
-            subprocess.run(["./velocity_gpu.stage8", "7"], stdout=logf, check=True, env=env)
+            env["REPS"] = "50"
+            subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
             logf.flush()
     except subprocess.CalledProcessError:
-        print("❌ Execution failed for this config")
+        print("❌ Profiling execution failed for this config")
 
-run_config(1, 1, 256, 1, 1)
 
 # Run all other valid combinations
-for y_unroll in y_unroll_factors:
-    for x_c in x_coarsenings:
-        for y_c in y_coarsenings:
-            for x_bs in x_block_sizes:
-                for y_bs in y_block_sizes:
-                    if (x_c, y_c, x_bs, y_bs) == (1, 1, 256, 1):
-                        continue  # already handled
+for x_bs in x_block_sizes:
+    for y_bs in y_block_sizes:
+        for y_unroll in y_unroll_factors:
+            for x_c in x_coarsenings:
+                for y_c in y_coarsenings:
                     run_config(x_c, y_c, x_bs, y_bs, y_unroll)
