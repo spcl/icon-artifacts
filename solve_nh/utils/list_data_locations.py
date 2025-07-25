@@ -73,6 +73,8 @@ def list_data_locations():
                                         gpu_set.add(data_name)
                                     else:
                                         cpu_set.add(data_name)
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Scalar) and sdfg.arrays[data_name].transient is False:
+                                cpu_set.add(data_name)
 
                 if isinstance(node, dace.nodes.MapExit):
                     for oe in state.out_edges(node):
@@ -95,6 +97,8 @@ def list_data_locations():
                                         gpu_set.add(data_name)
                                     else:
                                         cpu_set.add(data_name)
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Scalar) and sdfg.arrays[data_name].transient is False:
+                                cpu_set.add(data_name)
 
                 if isinstance(node, dace.nodes.Tasklet) and "velocity_tendencies" in node.label:
                     # This is a special case where we have a tasklet that computes velocity tendencies
@@ -102,7 +106,7 @@ def list_data_locations():
                     for e in state.in_edges(node):
                         if e.data is not None:
                             data_name = e.data.data
-                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Array):
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Array) and sdfg.arrays[data_name].transient is False:
                                 if sdfg.arrays[data_name].storage == dace.StorageType.GPU_Global:
                                     gpu_set.add(data_name)
                                 if sdfg.arrays[data_name].storage == dace.StorageType.CPU_Heap:
@@ -119,6 +123,8 @@ def list_data_locations():
                                         gpu_set.add(data_name)
                                     else:
                                         cpu_set.add(data_name)
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Scalar) and sdfg.arrays[data_name].transient is False:
+                                cpu_set.add(data_name)
                     for e in state.out_edges(node):
                         if e.data is not None:
                             data_name = e.data.data
@@ -139,6 +145,8 @@ def list_data_locations():
                                         gpu_set.add(data_name)
                                     else:
                                         cpu_set.add(data_name)
+                            if data_name in sdfg.arrays and isinstance(sdfg.arrays[data_name], dace.data.Scalar) and sdfg.arrays[data_name].transient is False:
+                                cpu_set.add(data_name)
 
             # Collect all data from interstate edges (to nsdfgs passing should be already ok - since we do it for only top leve
             # all of the data should be CPU)
