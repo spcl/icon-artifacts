@@ -138,6 +138,16 @@ def set_default_stream(file_path: str):
         f.write(code)
 
 
+def repl_in_file(file_path: str, src:str, dst:str):
+    with open(file_path, "r") as f:
+        code = f.read()
+
+    code = code.replace(src, dst)
+
+    with open(file_path, "w") as f:
+        f.write(code)
+
+
 def add_timers(file_path: str, gpu: bool, stage:int, use_openacc_stream: bool = False):
 
     with open(file_path, "r") as f:
@@ -674,6 +684,8 @@ def compile_if_propagated_sdfgs(
                         '#include "reductions_device.cuh"\n#define __REDUCE_DEVICE__\n'
                         + main_cu_code
                     )
+                repl_in_file(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "const const", "const")
+                repl_in_file(f"{build_loc}/src/cpu/{sdfg_name}.cu", "const const", "const")
             #if fix_out_val_0:
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")

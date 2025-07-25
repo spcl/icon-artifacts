@@ -78,8 +78,8 @@ def make_flattened_data_to_non_transient_gpu_input(sdfg: dace.SDFG):
     assert flattener_state.out_degree(flattener_node) == 0
     assert deflattener_state.out_degree(deflattener_node) == 0
 
-    flatten_accesses = [ie.src for ie in flattener_state.in_edges(flattener_node)]
-    flatten_data = [n.data for n in flatten_accesses]
+    flatten_accesses = [ie.src for ie in flattener_state.in_edges(flattener_node)] + [oe.dst for oe in flattener_state.out_edges(flattener_node)]
+    flatten_data = [n.data for n in flatten_accesses if isinstance(n, dace.nodes.AccessNode)]
 
 
     for access in flatten_accesses:
@@ -92,8 +92,8 @@ def make_flattened_data_to_non_transient_gpu_input(sdfg: dace.SDFG):
         assert data_name in sdfg.arrays, f"Data {data_name} not found in SDFG arrays."
         sdfg.arrays[data_name].transient = False
 
-    deflatten_accesses = [ie.src for ie in deflattener_state.in_edges(deflattener_node)]
-    deflatten_data = [n.data for n in deflatten_accesses]
+    deflatten_accesses = [ie.src for ie in deflattener_state.in_edges(deflattener_node)] + [oe.dst for oe in deflattener_state.out_edges(deflattener_node)]
+    deflatten_data = [n.data for n in deflatten_accesses if isinstance(n, dace.nodes.AccessNode)]
 
     for access in deflatten_accesses:
         if deflattener_state.in_degree(access) == 0:
@@ -106,15 +106,16 @@ def make_flattened_data_to_non_transient_gpu_input(sdfg: dace.SDFG):
         sdfg.arrays[data_name].transient = False
 
 
-    #arr_to_rm = set()
+    arr_to_rm = set()
     for arr_name, arr in sdfg.arrays.items():
         if arr_name.startswith("gpu___CG") and isinstance(arr, dace.data.Array) and (not arr_name.endswith("uint8") and not arr_name.endswith("uint16")):
             if arr.transient is True:
-                arr.transient = False
-                print("Warning: GPU array", arr_name, "is transient, and not used, but make it non-transient still.")
-                #arr_to_rm.add(arr_name)
-    #for arr_name in arr_to_rm:
-    #    sdfg.remove_data(arr_name, validate=True)
+                #arr.transient = False
+                #print("Warning: GPU array", arr_name, "is transient, and not used, but make it non-transient still.")
+                print("Warning: GPU array", arr_name, "is transient, and not used: delete.")
+                arr_to_rm.add(arr_name)
+    for arr_name in arr_to_rm:
+        sdfg.remove_data(arr_name, validate=True)
 
-    sdfg.save(sdfg.name + "_flattened_data_to_gpu_input.sdfg")
+    # sdfg.save(sdfg.name + "_flattened_data_to_gpu_input.sdfg")
 

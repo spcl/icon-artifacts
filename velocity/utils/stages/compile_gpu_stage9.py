@@ -40,6 +40,7 @@ def optimization_action(sdfg):
     remove_sync_and_profiling_states(sdfg)
     insert_pre_reduction_sync(sdfg)
     rm_reduntant_copies(sdfg)
+
     return sdfg
 
 def main():
