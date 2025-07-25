@@ -173,41 +173,41 @@ struct solve_nh_corrector_post_state_t {
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_rho;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_exner;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_theta_v;
-  double *__restrict__ __0_gpu_z_rho_e;
-  double *__restrict__ __0_gpu_z_exner_expl;
-  double *__restrict__ __0_gpu_z_grad_rth;
-  double *__restrict__ __0_gpu_z_theta_v_fl_e;
-  double *__restrict__ __0_gpu_z_theta_v_e;
-  double *__restrict__ __0_gpu_z_rho_expl;
-  double *__restrict__ __0_gpu_z_vn_avg;
-  double *__restrict__ __0_gpu_z_dexner_dz_c;
-  double *__restrict__ __0_gpu_z_w_concorr_me;
-  double *__restrict__ __0_gpu_z_graddiv2_vn;
-  double *__restrict__ __0_gpu_z_flxdiv_theta;
-  double *__restrict__ __0_gpu_z_graddiv_vn;
-  double *__restrict__ __0_gpu_bdy_divdamp;
-  double *__restrict__ __0_gpu_z_w_concorr_mc;
-  double *__restrict__ __0_gpu_z_beta;
-  double *__restrict__ __0_gpu_z_rho_v;
-  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
-  double *__restrict__ __0_gpu_scal_divdamp;
-  double *__restrict__ __0_gpu_z_hydro_corr;
-  double *__restrict__ __0_gpu_z_theta_v_v;
-  double *__restrict__ __0_gpu_z_raylfac;
-  double *__restrict__ __0_gpu_z_contr_w_fl_l;
-  double *__restrict__ __0_gpu_z_kin_hor_e;
-  double *__restrict__ __0_gpu_z_alpha;
-  double *__restrict__ __0_gpu_z_flxdiv_mass;
   double *__restrict__ __0_gpu_z_exner_ic;
   double *__restrict__ __0_gpu_z_theta_v_pr_ic;
-  double *__restrict__ __0_gpu_z_exner_ex_pr;
-  double *__restrict__ __0_gpu_z_mflx_top;
-  double *__restrict__ __0_gpu_z_dwdz_dd;
-  double *__restrict__ __0_gpu_z_w_expl;
-  double *__restrict__ __0_gpu_z_vt_ie;
-  double *__restrict__ __0_gpu_z_gradh_exner;
-  double *__restrict__ __0_gpu_z_rth_pr;
   double *__restrict__ __0_gpu_z_q;
+  double *__restrict__ __0_gpu_z_exner_ex_pr;
+  double *__restrict__ __0_gpu_z_gradh_exner;
+  double *__restrict__ __0_gpu_z_kin_hor_e;
+  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
+  double *__restrict__ __0_gpu_z_rth_pr;
+  double *__restrict__ __0_gpu_z_beta;
+  double *__restrict__ __0_gpu_z_graddiv_vn;
+  double *__restrict__ __0_gpu_z_contr_w_fl_l;
+  double *__restrict__ __0_gpu_z_dwdz_dd;
+  double *__restrict__ __0_gpu_z_flxdiv_mass;
+  double *__restrict__ __0_gpu_z_alpha;
+  double *__restrict__ __0_gpu_z_raylfac;
+  double *__restrict__ __0_gpu_z_flxdiv_theta;
+  double *__restrict__ __0_gpu_z_w_concorr_me;
+  double *__restrict__ __0_gpu_z_rho_expl;
+  double *__restrict__ __0_gpu_z_w_concorr_mc;
+  double *__restrict__ __0_gpu_z_vt_ie;
+  double *__restrict__ __0_gpu_z_rho_e;
+  double *__restrict__ __0_gpu_z_w_expl;
+  double *__restrict__ __0_gpu_scal_divdamp;
+  double *__restrict__ __0_gpu_z_mflx_top;
+  double *__restrict__ __0_gpu_z_dexner_dz_c;
+  double *__restrict__ __0_gpu_z_grad_rth;
+  double *__restrict__ __0_gpu_z_rho_v;
+  double *__restrict__ __0_gpu_z_theta_v_fl_e;
+  double *__restrict__ __0_gpu_bdy_divdamp;
+  double *__restrict__ __0_gpu_z_hydro_corr;
+  double *__restrict__ __0_gpu_z_exner_expl;
+  double *__restrict__ __0_gpu_z_vn_avg;
+  double *__restrict__ __0_gpu_z_graddiv2_vn;
+  double *__restrict__ __0_gpu_z_theta_v_e;
+  double *__restrict__ __0_gpu_z_theta_v_v;
   int *__restrict__ __0_gpu___CG_global_data__m_ndyn_substeps_var;
   double *__restrict__ __0_gpu___CG_p_int__m_e_bln_c_s;
   double *__restrict__ __0_gpu___CG_p_int__m_e_flx_avg;
@@ -2102,7 +2102,7 @@ void __dace_runkernel_single_state_body_map_3_0_9(
                                               (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_3_0_9,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_3_0_9_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_3_0_9_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_3_0_9", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -2214,7 +2214,7 @@ void __dace_runkernel_single_state_body_map_5_0_7(
                                               (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_5_0_7,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_5_0_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_5_0_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_5_0_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -2353,7 +2353,7 @@ void __dace_runkernel_single_state_body_map_1_7_9(
                                               (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_1_7_9,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_1_7_9_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_1_7_9_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_1_7_9", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -2437,7 +2437,7 @@ void __dace_runkernel_single_state_body_map_8_0_4(solve_nh_corrector_post_state_
                                               (void *)&nlev};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_map_8_0_4, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(nlev, 1), 1),
-                     dim3(256, 1, 1), single_state_body_map_8_0_4_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_map_8_0_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_8_0_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(nlev, 1), 1,
                            256, 1, 1);
 }
@@ -2539,7 +2539,7 @@ void __dace_runkernel_single_state_body_map_15_0_5(solve_nh_corrector_post_state
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_15_0_5,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_15_0_5_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_15_0_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_15_0_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -2676,7 +2676,7 @@ void __dace_runkernel_single_state_body_map_13_2_10(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_13_2_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_13_2_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_13_2_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_13_2_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -2819,7 +2819,7 @@ void __dace_runkernel_single_state_body_map_17_2_7(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_17_2_7,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_17_2_7_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_17_2_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_17_2_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -2918,7 +2918,7 @@ void __dace_runkernel_single_state_body_map_28_0_11(
                                                 (void *)&tmp_struct_symbol_7,
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_28_0_11, dim3(int_ceil(int_ceil(nlev, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_28_0_11_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_28_0_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_28_0_11", int_ceil(int_ceil(nlev, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -3000,7 +3000,7 @@ void __dace_runkernel_single_state_body_map_26_3_10(solve_nh_corrector_post_stat
                                                 (void *)&tmp_struct_symbol_4,
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_26_3_10, dim3(int_ceil(int_ceil(nlev, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_26_3_10_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_26_3_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_26_3_10", int_ceil(int_ceil(nlev, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_31_0_11(
@@ -3098,7 +3098,7 @@ void __dace_runkernel_single_state_body_map_31_0_11(
                                                 (void *)&tmp_struct_symbol_7,
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_31_0_11, dim3(int_ceil(int_ceil(nlev, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_31_0_11_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_31_0_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_31_0_11", int_ceil(int_ceil(nlev, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_36_3_7(
@@ -3204,7 +3204,7 @@ void __dace_runkernel_single_state_body_map_36_3_7(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_36_3_7,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_36_3_7_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_36_3_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_36_3_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -3318,7 +3318,7 @@ void __dace_runkernel_single_state_body_0_map_36_4_5(solve_nh_corrector_post_sta
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_0_map_36_4_5,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(((-global_data__m_nflatlev_sym_0) + nlev), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_0_map_36_4_5_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_0_map_36_4_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_36_4_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(((-global_data__m_nflatlev_sym_0) + nlev), 1), 1), 1, 256, 1, 1);
 }
@@ -3390,7 +3390,7 @@ void __dace_runkernel_single_state_body_1_map_36_5_6(
                                                  (void *)&tmp_struct_symbol_69,
                                                  (void *)&tmp_struct_symbol_70};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_1_map_36_5_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_1_map_36_5_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_1_map_36_5_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_36_5_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_50_13_10(
@@ -3521,7 +3521,7 @@ void __dace_runkernel_single_state_body_map_50_13_10(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_50_13_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_50_13_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_50_13_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_50_13_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -3669,7 +3669,7 @@ void __dace_runkernel_single_state_body_map_52_0_15(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_52_0_15,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_52_0_15_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_52_0_15_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_52_0_15", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -3814,7 +3814,7 @@ void __dace_runkernel_single_state_body_map_54_0_12(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_54_0_12,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_54_0_12_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_54_0_12_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_54_0_12", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -4029,7 +4029,7 @@ void __dace_runkernel_single_state_body_0_map_50_14_13(
                                                    (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_50_14_13,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_0_map_50_14_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_0_map_50_14_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_50_14_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -4067,7 +4067,7 @@ void __dace_runkernel_single_state_body_1_map_50_15_4(solve_nh_corrector_post_st
                                                   (void *)&tmp_struct_symbol_62};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_1_map_50_15_4, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                     dim3(256, 1, 1), single_state_body_1_map_50_15_4_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_1_map_50_15_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_50_15_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -4139,7 +4139,7 @@ void __dace_runkernel_single_state_body_map_57_0_2(solve_nh_corrector_post_state
                                                (void *)&tmp_struct_symbol_51,
                                                (void *)&tmp_struct_symbol_52};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_57_0_2, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_57_0_2_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_57_0_2_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_57_0_2", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_58_0_6(
@@ -4258,7 +4258,7 @@ void __dace_runkernel_single_state_body_map_58_0_6(
                                                (void *)&tmp_struct_symbol_51,
                                                (void *)&tmp_struct_symbol_52};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_58_0_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_58_0_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_58_0_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_58_0_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_2_map_50_16_5(
@@ -4326,7 +4326,7 @@ void __dace_runkernel_single_state_body_2_map_50_16_5(
                                                   (void *)&tmp_struct_symbol_52};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_2_map_50_16_5, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                     dim3(256, 1, 1), single_state_body_2_map_50_16_5_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_2_map_50_16_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_50_16_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_3_map_50_16_20(
@@ -4555,7 +4555,7 @@ void __dace_runkernel_single_state_body_3_map_50_16_20(
                                                    (void *)&tmp_struct_symbol_74};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_3_map_50_16_20, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                     dim3(256, 1, 1), single_state_body_3_map_50_16_20_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_3_map_50_16_20_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_3_map_50_16_20", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_4_map_50_17_17(
@@ -4794,7 +4794,7 @@ void __dace_runkernel_single_state_body_4_map_50_17_17(
                                                    (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_4_map_50_17_17,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_4_map_50_17_17_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_4_map_50_17_17_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_50_17_17", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -4916,7 +4916,7 @@ void __dace_runkernel_single_state_body_map_60_0_10(solve_nh_corrector_post_stat
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_60_0_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_60_0_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_60_0_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_60_0_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -5197,7 +5197,7 @@ void __dace_runkernel_single_state_body_map_61_0_13(
                                                 (void *)&tmp_struct_symbol_61,
                                                 (void *)&tmp_struct_symbol_62};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_61_0_13, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_61_0_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_61_0_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_61_0_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -5273,7 +5273,7 @@ void __dace_runkernel_single_state_body_map_62_0_3(solve_nh_corrector_post_state
                                                (void *)&tmp_struct_symbol_61,
                                                (void *)&tmp_struct_symbol_62};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_62_0_3, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_62_0_3_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_62_0_3_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_62_0_3", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -5356,7 +5356,7 @@ void __dace_runkernel_single_state_body_map_64_2_4(solve_nh_corrector_post_state
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_64_2_4,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_64_2_4_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_64_2_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_64_2_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -5466,7 +5466,7 @@ void __dace_runkernel_single_state_body_map_67_2_6(solve_nh_corrector_post_state
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_67_2_6,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_67_2_6_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_67_2_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_67_2_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -5842,7 +5842,7 @@ void __dace_runkernel_single_state_body_5_map_50_18_23(
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_5_map_50_18_23,
                      dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-jk_start) + nlev) + 1), 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_5_map_50_18_23_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_5_map_50_18_23_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_5_map_50_18_23", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-jk_start) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -6211,7 +6211,7 @@ void __dace_runkernel_single_state_body_map_69_0_18(
                                                 (void *)&tmp_struct_symbol_59,
                                                 (void *)&tmp_struct_symbol_60};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_69_0_18, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_69_0_18_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_69_0_18_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_69_0_18", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -6313,7 +6313,7 @@ void __dace_runkernel_single_state_body_map_73_0_5(solve_nh_corrector_post_state
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_73_0_5,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_73_0_5_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_73_0_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_73_0_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -6506,7 +6506,7 @@ void __dace_runkernel_single_state_body_map_71_3_14(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_71_3_14,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_71_3_14_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_71_3_14_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_71_3_14", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -6632,7 +6632,7 @@ void __dace_runkernel_single_state_body_map_75_0_7(
                                                (void *)&tmp_struct_symbol_49,
                                                (void *)&tmp_struct_symbol_50};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_75_0_7, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_75_0_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_75_0_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_75_0_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_77_2_9(
@@ -6734,7 +6734,7 @@ void __dace_runkernel_single_state_body_map_77_2_9(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_77_2_9,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil((((-global_data__m_kstart_moist_sym_0) + nlev) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_77_2_9_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_77_2_9_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_77_2_9", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_kstart_moist_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -6921,7 +6921,7 @@ void __dace_runkernel_single_state_body_map_80_0_13(
                                                 (void *)&idyn_timestep,
                                                 (void *)&nshift};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_80_0_13, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_80_0_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_80_0_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_80_0_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -6986,7 +6986,7 @@ void __dace_runkernel_single_state_body_map_99_0_2(solve_nh_corrector_post_state
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_99_0_2,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(__f2dace_SA_mass_flx_ic_d_1_s_764_prep_adv_13, 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_99_0_2_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_99_0_2_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_99_0_2", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(__f2dace_SA_mass_flx_ic_d_1_s_764_prep_adv_13, 1), 1), 1, 256, 1, 1);
 }
@@ -7175,7 +7175,7 @@ void __dace_runkernel_single_state_body_map_97_3_11(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_97_3_11,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_97_3_11_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_97_3_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_97_3_11", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -7274,7 +7274,7 @@ void __dace_runkernel_single_state_body_map_101_0_5(solve_nh_corrector_post_stat
                                                 (void *)&i_startidx_local,
                                                 (void *)&r_nsubsteps};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_101_0_5, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_101_0_5_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_101_0_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_101_0_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 } // namespace corrector_post
@@ -7451,41 +7451,41 @@ struct solve_nh_corrector_pre_state_t {
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_rho;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_exner;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_theta_v;
-  double *__restrict__ __0_gpu_z_rho_e;
-  double *__restrict__ __0_gpu_z_exner_expl;
-  double *__restrict__ __0_gpu_z_grad_rth;
-  double *__restrict__ __0_gpu_z_theta_v_fl_e;
-  double *__restrict__ __0_gpu_z_theta_v_e;
-  double *__restrict__ __0_gpu_z_rho_expl;
-  double *__restrict__ __0_gpu_z_vn_avg;
-  double *__restrict__ __0_gpu_z_dexner_dz_c;
-  double *__restrict__ __0_gpu_z_w_concorr_me;
-  double *__restrict__ __0_gpu_z_graddiv2_vn;
-  double *__restrict__ __0_gpu_z_flxdiv_theta;
-  double *__restrict__ __0_gpu_z_graddiv_vn;
-  double *__restrict__ __0_gpu_bdy_divdamp;
-  double *__restrict__ __0_gpu_z_w_concorr_mc;
-  double *__restrict__ __0_gpu_z_beta;
-  double *__restrict__ __0_gpu_z_rho_v;
-  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
-  double *__restrict__ __0_gpu_scal_divdamp;
-  double *__restrict__ __0_gpu_z_hydro_corr;
-  double *__restrict__ __0_gpu_z_theta_v_v;
-  double *__restrict__ __0_gpu_z_raylfac;
-  double *__restrict__ __0_gpu_z_contr_w_fl_l;
-  double *__restrict__ __0_gpu_z_kin_hor_e;
-  double *__restrict__ __0_gpu_z_alpha;
-  double *__restrict__ __0_gpu_z_flxdiv_mass;
   double *__restrict__ __0_gpu_z_exner_ic;
   double *__restrict__ __0_gpu_z_theta_v_pr_ic;
-  double *__restrict__ __0_gpu_z_exner_ex_pr;
-  double *__restrict__ __0_gpu_z_mflx_top;
-  double *__restrict__ __0_gpu_z_dwdz_dd;
-  double *__restrict__ __0_gpu_z_w_expl;
-  double *__restrict__ __0_gpu_z_vt_ie;
-  double *__restrict__ __0_gpu_z_gradh_exner;
-  double *__restrict__ __0_gpu_z_rth_pr;
   double *__restrict__ __0_gpu_z_q;
+  double *__restrict__ __0_gpu_z_exner_ex_pr;
+  double *__restrict__ __0_gpu_z_gradh_exner;
+  double *__restrict__ __0_gpu_z_kin_hor_e;
+  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
+  double *__restrict__ __0_gpu_z_rth_pr;
+  double *__restrict__ __0_gpu_z_beta;
+  double *__restrict__ __0_gpu_z_graddiv_vn;
+  double *__restrict__ __0_gpu_z_contr_w_fl_l;
+  double *__restrict__ __0_gpu_z_dwdz_dd;
+  double *__restrict__ __0_gpu_z_flxdiv_mass;
+  double *__restrict__ __0_gpu_z_alpha;
+  double *__restrict__ __0_gpu_z_raylfac;
+  double *__restrict__ __0_gpu_z_flxdiv_theta;
+  double *__restrict__ __0_gpu_z_w_concorr_me;
+  double *__restrict__ __0_gpu_z_rho_expl;
+  double *__restrict__ __0_gpu_z_w_concorr_mc;
+  double *__restrict__ __0_gpu_z_vt_ie;
+  double *__restrict__ __0_gpu_z_rho_e;
+  double *__restrict__ __0_gpu_z_w_expl;
+  double *__restrict__ __0_gpu_scal_divdamp;
+  double *__restrict__ __0_gpu_z_mflx_top;
+  double *__restrict__ __0_gpu_z_dexner_dz_c;
+  double *__restrict__ __0_gpu_z_grad_rth;
+  double *__restrict__ __0_gpu_z_rho_v;
+  double *__restrict__ __0_gpu_z_theta_v_fl_e;
+  double *__restrict__ __0_gpu_bdy_divdamp;
+  double *__restrict__ __0_gpu_z_hydro_corr;
+  double *__restrict__ __0_gpu_z_exner_expl;
+  double *__restrict__ __0_gpu_z_vn_avg;
+  double *__restrict__ __0_gpu_z_graddiv2_vn;
+  double *__restrict__ __0_gpu_z_theta_v_e;
+  double *__restrict__ __0_gpu_z_theta_v_v;
   int *__restrict__ __0_gpu___CG_global_data__m_kstart_dd3d;
   double *__restrict__ __0_gpu___CG_p_int__m_c_lin_e;
   double *__restrict__ __0_gpu___CG_p_int__m_cells_aw_verts;
@@ -7700,9 +7700,9 @@ DACE_DFI void loop_body_22_0_29(
   int __f2dace_SOA_vn_d_2_s_560_p_nh_prog_nnew_15, int _for_it_50, int _for_it_51, int64_t _for_it_52, int tmp_struct_symbol_3, int tmp_struct_symbol_30,
   int tmp_struct_symbol_31, int tmp_struct_symbol_4) {
   double z_ddt_vn_cor_local;
-  double z_ddt_vn_apc_local;
   double z_ddt_vn_pgr_local;
   double z_ddt_vn_dyn_local;
+  double z_ddt_vn_apc_local;
   int tmp_index_965;
   int tmp_index_969;
   bool _if_cond_32;
@@ -8211,7 +8211,7 @@ DACE_DFI void loop_body_42_0_12(const int &__CG_p_nh__CG_diag__m_ddt_vn_dmp_is_a
                                 int __f2dace_SOA_ddt_vn_dyn_d_0_s_672_diag_p_nh_2, int __f2dace_SOA_ddt_vn_dyn_d_1_s_673_diag_p_nh_2,
                                 int __f2dace_SOA_ddt_vn_dyn_d_2_s_674_diag_p_nh_2, int __f2dace_SOA_vn_d_0_s_558_p_nh_prog_nnew_15,
                                 int __f2dace_SOA_vn_d_1_s_559_p_nh_prog_nnew_15, int __f2dace_SOA_vn_d_2_s_560_p_nh_prog_nnew_15, int _for_it_50,
-                                int _for_it_57, int _for_it_58, int tmp_struct_symbol_42, int tmp_struct_symbol_43) {
+                                int _for_it_57, int64_t _for_it_58, int tmp_struct_symbol_42, int tmp_struct_symbol_43) {
   double z_d_vn_dmp_local;
   int _if_cond_40;
   int _if_cond_41;
@@ -8447,7 +8447,7 @@ DACE_DFI void loop_body_57_0_12(const int &__CG_p_nh__CG_diag__m_ddt_vn_dmp_is_a
                                 int __f2dace_SOA_ddt_vn_dyn_d_0_s_672_diag_p_nh_2, int __f2dace_SOA_ddt_vn_dyn_d_1_s_673_diag_p_nh_2,
                                 int __f2dace_SOA_ddt_vn_dyn_d_2_s_674_diag_p_nh_2, int __f2dace_SOA_vn_d_0_s_558_p_nh_prog_nnew_15,
                                 int __f2dace_SOA_vn_d_1_s_559_p_nh_prog_nnew_15, int __f2dace_SOA_vn_d_2_s_560_p_nh_prog_nnew_15, int _for_it_50,
-                                int _for_it_61, int _for_it_62, int tmp_struct_symbol_63) {
+                                int _for_it_61, int64_t _for_it_62, int tmp_struct_symbol_63) {
   double z_d_vn_dmp_local;
   int _if_cond_46;
   int _if_cond_47;
@@ -8935,8 +8935,8 @@ __global__ void __launch_bounds__(256) single_state_body_map_1_2_38(
       if (_for_it_46 >= i_startidx_local && _for_it_46 < (i_endidx_local + 1)) {
         if (_for_it_45 >= 2) {
           {
-            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double wgt_nnew_rth_0_in = wgt_nnew_rth;
+            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double p_nh_prog_nnew_0_in_rho_0 = gpu___CG_p_nh_prog_nnew__m_rho[(
               ((((__f2dace_SA_rho_d_0_s_561_p_nh_prog_nnew_15 * __f2dace_SA_rho_d_1_s_562_p_nh_prog_nnew_15) *
                  ((-__f2dace_SOA_rho_d_2_s_563_p_nh_prog_nnew_15) + _for_it_44)) +
@@ -8959,8 +8959,8 @@ __global__ void __launch_bounds__(256) single_state_body_map_1_2_38(
             loop_body_z_rho_tavg_m1_local = z_rho_tavg_m1_out;
           }
           {
-            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double wgt_nnew_rth_0_in = wgt_nnew_rth;
+            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double p_nh_prog_nnew_0_in_theta_v_0 = gpu___CG_p_nh_prog_nnew__m_theta_v[(
               ((((__f2dace_SA_theta_v_d_0_s_567_p_nh_prog_nnew_15 * __f2dace_SA_theta_v_d_1_s_568_p_nh_prog_nnew_15) *
                  ((-__f2dace_SOA_theta_v_d_2_s_569_p_nh_prog_nnew_15) + _for_it_44)) +
@@ -9000,8 +9000,8 @@ __global__ void __launch_bounds__(256) single_state_body_map_1_2_38(
             loop_body_z_theta_v_pr_mc_m1_local = z_theta_v_pr_mc_m1_out;
           }
           {
-            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double wgt_nnew_rth_0_in = wgt_nnew_rth;
+            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double p_nh_prog_nnew_0_in_rho_0 = gpu___CG_p_nh_prog_nnew__m_rho[(
               ((((__f2dace_SA_rho_d_0_s_561_p_nh_prog_nnew_15 * __f2dace_SA_rho_d_1_s_562_p_nh_prog_nnew_15) *
                  ((-__f2dace_SOA_rho_d_2_s_563_p_nh_prog_nnew_15) + _for_it_44)) +
@@ -9024,8 +9024,8 @@ __global__ void __launch_bounds__(256) single_state_body_map_1_2_38(
             loop_body_z_rho_tavg_local = z_rho_tavg_out;
           }
           {
-            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double wgt_nnew_rth_0_in = wgt_nnew_rth;
+            double wgt_nnow_rth_0_in = wgt_nnow_rth;
             double p_nh_prog_nnew_0_in_theta_v_0 = gpu___CG_p_nh_prog_nnew__m_theta_v[(
               ((((__f2dace_SA_theta_v_d_0_s_567_p_nh_prog_nnew_15 * __f2dace_SA_theta_v_d_1_s_568_p_nh_prog_nnew_15) *
                  ((-__f2dace_SOA_theta_v_d_2_s_569_p_nh_prog_nnew_15) + _for_it_44)) +
@@ -9430,7 +9430,7 @@ void __dace_runkernel_single_state_body_map_1_2_38(
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_1_2_38,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_1_2_38_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_1_2_38_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_1_2_38", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -9563,7 +9563,7 @@ void __dace_runkernel_single_state_body_map_12_4_11(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_12_4_11,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil((((-global_data__m_kstart_dd3d_sym_0) + nlev) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_12_4_11_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_12_4_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_12_4_11", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_kstart_dd3d_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -9809,7 +9809,7 @@ void __dace_runkernel_single_state_body_map_22_0_30(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_22_0_30,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_22_0_30_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_22_0_30_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_22_0_30", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -9931,7 +9931,7 @@ void __dace_runkernel_single_state_body_map_36_0_10(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_36_0_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_36_0_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_36_0_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_36_0_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -10035,7 +10035,7 @@ void __dace_runkernel_single_state_body_map_39_0_7(
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_39_0_7,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_39_0_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_39_0_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_39_0_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -10138,7 +10138,7 @@ void __dace_runkernel_single_state_body_map_42_0_13(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_42_0_13,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_42_0_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_42_0_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_42_0_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -10255,7 +10255,7 @@ void __dace_runkernel_single_state_body_map_51_0_15(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_51_0_15,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_51_0_15_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_51_0_15_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_51_0_15", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -10361,7 +10361,7 @@ void __dace_runkernel_single_state_body_map_57_0_13(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_57_0_13,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_57_0_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_57_0_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_57_0_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -10475,7 +10475,7 @@ void __dace_runkernel_single_state_body_map_64_0_13(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_64_0_13,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_64_0_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_64_0_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_64_0_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -10592,7 +10592,7 @@ void __dace_runkernel_single_state_body_map_71_2_13(
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_map_71_2_13,
                      dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(global_data__m_nrdmax_sym_0, 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_map_71_2_13_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_map_71_2_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_71_2_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(global_data__m_nrdmax_sym_0, 1), 1), 1, 256, 1, 1);
 }
@@ -10772,41 +10772,41 @@ struct solve_nh_predictor_post_state_t {
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_rho;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_exner;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_theta_v;
-  double *__restrict__ __0_gpu_z_rho_e;
-  double *__restrict__ __0_gpu_z_exner_expl;
-  double *__restrict__ __0_gpu_z_grad_rth;
-  double *__restrict__ __0_gpu_z_theta_v_fl_e;
-  double *__restrict__ __0_gpu_z_theta_v_e;
-  double *__restrict__ __0_gpu_z_rho_expl;
-  double *__restrict__ __0_gpu_z_vn_avg;
-  double *__restrict__ __0_gpu_z_dexner_dz_c;
-  double *__restrict__ __0_gpu_z_w_concorr_me;
-  double *__restrict__ __0_gpu_z_graddiv2_vn;
-  double *__restrict__ __0_gpu_z_flxdiv_theta;
-  double *__restrict__ __0_gpu_z_graddiv_vn;
-  double *__restrict__ __0_gpu_bdy_divdamp;
-  double *__restrict__ __0_gpu_z_w_concorr_mc;
-  double *__restrict__ __0_gpu_z_beta;
-  double *__restrict__ __0_gpu_z_rho_v;
-  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
-  double *__restrict__ __0_gpu_scal_divdamp;
-  double *__restrict__ __0_gpu_z_hydro_corr;
-  double *__restrict__ __0_gpu_z_theta_v_v;
-  double *__restrict__ __0_gpu_z_raylfac;
-  double *__restrict__ __0_gpu_z_contr_w_fl_l;
-  double *__restrict__ __0_gpu_z_kin_hor_e;
-  double *__restrict__ __0_gpu_z_alpha;
-  double *__restrict__ __0_gpu_z_flxdiv_mass;
   double *__restrict__ __0_gpu_z_exner_ic;
   double *__restrict__ __0_gpu_z_theta_v_pr_ic;
-  double *__restrict__ __0_gpu_z_exner_ex_pr;
-  double *__restrict__ __0_gpu_z_mflx_top;
-  double *__restrict__ __0_gpu_z_dwdz_dd;
-  double *__restrict__ __0_gpu_z_w_expl;
-  double *__restrict__ __0_gpu_z_vt_ie;
-  double *__restrict__ __0_gpu_z_gradh_exner;
-  double *__restrict__ __0_gpu_z_rth_pr;
   double *__restrict__ __0_gpu_z_q;
+  double *__restrict__ __0_gpu_z_exner_ex_pr;
+  double *__restrict__ __0_gpu_z_gradh_exner;
+  double *__restrict__ __0_gpu_z_kin_hor_e;
+  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
+  double *__restrict__ __0_gpu_z_rth_pr;
+  double *__restrict__ __0_gpu_z_beta;
+  double *__restrict__ __0_gpu_z_graddiv_vn;
+  double *__restrict__ __0_gpu_z_contr_w_fl_l;
+  double *__restrict__ __0_gpu_z_dwdz_dd;
+  double *__restrict__ __0_gpu_z_flxdiv_mass;
+  double *__restrict__ __0_gpu_z_alpha;
+  double *__restrict__ __0_gpu_z_raylfac;
+  double *__restrict__ __0_gpu_z_flxdiv_theta;
+  double *__restrict__ __0_gpu_z_w_concorr_me;
+  double *__restrict__ __0_gpu_z_rho_expl;
+  double *__restrict__ __0_gpu_z_w_concorr_mc;
+  double *__restrict__ __0_gpu_z_vt_ie;
+  double *__restrict__ __0_gpu_z_rho_e;
+  double *__restrict__ __0_gpu_z_w_expl;
+  double *__restrict__ __0_gpu_scal_divdamp;
+  double *__restrict__ __0_gpu_z_mflx_top;
+  double *__restrict__ __0_gpu_z_dexner_dz_c;
+  double *__restrict__ __0_gpu_z_grad_rth;
+  double *__restrict__ __0_gpu_z_rho_v;
+  double *__restrict__ __0_gpu_z_theta_v_fl_e;
+  double *__restrict__ __0_gpu_bdy_divdamp;
+  double *__restrict__ __0_gpu_z_hydro_corr;
+  double *__restrict__ __0_gpu_z_exner_expl;
+  double *__restrict__ __0_gpu_z_vn_avg;
+  double *__restrict__ __0_gpu_z_graddiv2_vn;
+  double *__restrict__ __0_gpu_z_theta_v_e;
+  double *__restrict__ __0_gpu_z_theta_v_v;
   int *__restrict__ __0_gpu___CG_global_data__m_kstart_dd3d;
   double *__restrict__ __0_gpu___CG_p_int__m_e_bln_c_s;
   double *__restrict__ __0_gpu___CG_p_int__m_e_flx_avg;
@@ -12697,7 +12697,7 @@ void __dace_runkernel_single_state_body_map_1_5_18(
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_1_5_18,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_1_5_18_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_1_5_18_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_1_5_18", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -12836,7 +12836,7 @@ void __dace_runkernel_single_state_body_0_map_1_5_20(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_1_5_20,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_0_map_1_5_20_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_0_map_1_5_20_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_1_5_20", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -12979,7 +12979,7 @@ void __dace_runkernel_single_state_body_1_map_1_6_18(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_1_map_1_6_18,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_1_map_1_6_18_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_1_map_1_6_18_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_1_6_18", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -13207,7 +13207,7 @@ void __dace_runkernel_single_state_body_2_map_1_6_20(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_2_map_1_6_20,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_2_map_1_6_20_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_2_map_1_6_20_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_1_6_20", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -13318,7 +13318,7 @@ void __dace_runkernel_single_state_body_map_3_0_9(
                                               (void *)&tmp_struct_symbol_25,
                                               (void *)&tmp_struct_symbol_26};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_3_0_9, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_3_0_9_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_3_0_9_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_3_0_9", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_5_0_11(
@@ -13447,7 +13447,7 @@ void __dace_runkernel_single_state_body_map_5_0_11(
                                                (void *)&tmp_struct_symbol_25,
                                                (void *)&tmp_struct_symbol_26};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_5_0_11, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_5_0_11_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_5_0_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_5_0_11", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -13536,7 +13536,7 @@ void __dace_runkernel_single_state_body_map_16_0_8(solve_nh_predictor_post_state
                                                (void *)&tmp_struct_symbol_5,
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_16_0_8, dim3(int_ceil(int_ceil(nlev, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_16_0_8_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_16_0_8_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_16_0_8", int_ceil(int_ceil(nlev, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_18_3_7(
@@ -13642,7 +13642,7 @@ void __dace_runkernel_single_state_body_map_18_3_7(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_18_3_7,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_18_3_7_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_18_3_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_18_3_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -13756,7 +13756,7 @@ void __dace_runkernel_single_state_body_0_map_18_4_5(solve_nh_predictor_post_sta
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_0_map_18_4_5,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(((-global_data__m_nflatlev_sym_0) + nlev), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_0_map_18_4_5_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_0_map_18_4_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_18_4_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(((-global_data__m_nflatlev_sym_0) + nlev), 1), 1), 1, 256, 1, 1);
 }
@@ -13828,7 +13828,7 @@ void __dace_runkernel_single_state_body_1_map_18_5_6(
                                                  (void *)&tmp_struct_symbol_69,
                                                  (void *)&tmp_struct_symbol_70};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_1_map_18_5_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_1_map_18_5_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_1_map_18_5_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_18_5_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_32_11_10(
@@ -13959,7 +13959,7 @@ void __dace_runkernel_single_state_body_map_32_11_10(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_32_11_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_32_11_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_32_11_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_32_11_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -14144,7 +14144,7 @@ void __dace_runkernel_single_state_body_map_34_0_7(
                                                (void *)&tmp_struct_symbol_49,
                                                (void *)&tmp_struct_symbol_50};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_34_0_7, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_34_0_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_34_0_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_34_0_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_0_map_32_12_22(
@@ -14288,7 +14288,7 @@ void __dace_runkernel_single_state_body_0_map_32_12_22(
                                                    (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_32_12_22,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_0_map_32_12_22_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_0_map_32_12_22_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_32_12_22", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -14503,7 +14503,7 @@ void __dace_runkernel_single_state_body_1_map_32_12_24(
                                                    (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_1_map_32_12_24,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_1_map_32_12_24_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_1_map_32_12_24_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_32_12_24", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -14541,7 +14541,7 @@ void __dace_runkernel_single_state_body_2_map_32_13_4(solve_nh_predictor_post_st
                                                   (void *)&tmp_struct_symbol_62};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_2_map_32_13_4, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                     dim3(256, 1, 1), single_state_body_2_map_32_13_4_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_2_map_32_13_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_32_13_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -14613,7 +14613,7 @@ void __dace_runkernel_single_state_body_map_36_0_2(solve_nh_predictor_post_state
                                                (void *)&tmp_struct_symbol_51,
                                                (void *)&tmp_struct_symbol_52};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_36_0_2, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_36_0_2_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_36_0_2_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_36_0_2", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_37_0_6(
@@ -14732,7 +14732,7 @@ void __dace_runkernel_single_state_body_map_37_0_6(
                                                (void *)&tmp_struct_symbol_51,
                                                (void *)&tmp_struct_symbol_52};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_37_0_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_37_0_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_37_0_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_37_0_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_3_map_32_14_5(
@@ -14800,7 +14800,7 @@ void __dace_runkernel_single_state_body_3_map_32_14_5(
                                                   (void *)&tmp_struct_symbol_52};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_3_map_32_14_5, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                     dim3(256, 1, 1), single_state_body_3_map_32_14_5_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_3_map_32_14_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_3_map_32_14_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_4_map_32_14_20(
@@ -15029,7 +15029,7 @@ void __dace_runkernel_single_state_body_4_map_32_14_20(
                                                    (void *)&tmp_struct_symbol_74};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_4_map_32_14_20, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                     dim3(256, 1, 1), single_state_body_4_map_32_14_20_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_4_map_32_14_20_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_32_14_20", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_5_map_32_15_17(
@@ -15268,7 +15268,7 @@ void __dace_runkernel_single_state_body_5_map_32_15_17(
                                                    (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_5_map_32_15_17,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((nlev - 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_5_map_32_15_17_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_5_map_32_15_17_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_5_map_32_15_17", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((nlev - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -15390,7 +15390,7 @@ void __dace_runkernel_single_state_body_map_39_0_10(solve_nh_predictor_post_stat
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_39_0_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_39_0_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_39_0_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_39_0_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -15671,7 +15671,7 @@ void __dace_runkernel_single_state_body_map_40_0_13(
                                                 (void *)&tmp_struct_symbol_61,
                                                 (void *)&tmp_struct_symbol_62};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_40_0_13, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_40_0_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_40_0_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_40_0_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -15747,7 +15747,7 @@ void __dace_runkernel_single_state_body_map_41_0_3(solve_nh_predictor_post_state
                                                (void *)&tmp_struct_symbol_61,
                                                (void *)&tmp_struct_symbol_62};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_41_0_3, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_41_0_3_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_41_0_3_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_41_0_3", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -15830,7 +15830,7 @@ void __dace_runkernel_single_state_body_map_43_2_4(solve_nh_predictor_post_state
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_43_2_4,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_43_2_4_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_43_2_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_43_2_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -15940,7 +15940,7 @@ void __dace_runkernel_single_state_body_map_46_2_6(solve_nh_predictor_post_state
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_46_2_6,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_46_2_6_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_46_2_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_46_2_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((global_data__m_nrdmax_sym_0 - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -16316,7 +16316,7 @@ void __dace_runkernel_single_state_body_6_map_32_16_23(
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_6_map_32_16_23,
                      dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-jk_start) + nlev) + 1), 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_6_map_32_16_23_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_6_map_32_16_23_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_6_map_32_16_23", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-jk_start) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -16685,7 +16685,7 @@ void __dace_runkernel_single_state_body_map_48_0_18(
                                                 (void *)&tmp_struct_symbol_59,
                                                 (void *)&tmp_struct_symbol_60};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_48_0_18, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_48_0_18_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_48_0_18_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_48_0_18", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_50_2_7(
@@ -16791,7 +16791,7 @@ void __dace_runkernel_single_state_body_map_50_2_7(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_50_2_7,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil((((-global_data__m_kstart_dd3d_sym_0) + nlev) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_50_2_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_50_2_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_50_2_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_kstart_dd3d_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -16890,7 +16890,7 @@ void __dace_runkernel_single_state_body_map_53_2_4(solve_nh_predictor_post_state
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_53_2_4,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil((((-global_data__m_kstart_moist_sym_0) + nlev) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_53_2_4_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_53_2_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_53_2_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_kstart_moist_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -17213,7 +17213,7 @@ void __dace_runkernel_single_state_body_map_70_0_24(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_70_0_24,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_70_0_24_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_70_0_24_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_70_0_24", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -17284,7 +17284,7 @@ void __dace_runkernel_single_state_body_0_map_70_1_6(
                                                  (void *)&i_startidx_local,
                                                  (void *)&nlevp1};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_70_1_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_0_map_70_1_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_0_map_70_1_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_70_1_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_74_0_14(
@@ -17521,7 +17521,7 @@ void __dace_runkernel_single_state_body_map_74_0_14(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_74_0_14,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_74_0_14_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_74_0_14_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_74_0_14", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -17592,7 +17592,7 @@ void __dace_runkernel_single_state_body_0_map_74_1_6(
                                                  (void *)&i_startidx_local,
                                                  (void *)&nlevp1};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_74_1_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_0_map_74_1_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_0_map_74_1_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_74_1_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_77_2_7(
@@ -17698,7 +17698,7 @@ void __dace_runkernel_single_state_body_map_77_2_7(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_77_2_7,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil((((-global_data__m_kstart_dd3d_sym_0) + nlev) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_77_2_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_77_2_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_77_2_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_kstart_dd3d_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -17877,41 +17877,41 @@ struct solve_nh_predictor_pre_state_t {
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_rho;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_exner;
   double *__restrict__ __0___CG_p_nh_prog_nnew__m_theta_v;
-  double *__restrict__ __0_gpu_z_rho_e;
-  double *__restrict__ __0_gpu_z_exner_expl;
-  double *__restrict__ __0_gpu_z_grad_rth;
-  double *__restrict__ __0_gpu_z_theta_v_fl_e;
-  double *__restrict__ __0_gpu_z_theta_v_e;
-  double *__restrict__ __0_gpu_z_rho_expl;
-  double *__restrict__ __0_gpu_z_vn_avg;
-  double *__restrict__ __0_gpu_z_dexner_dz_c;
-  double *__restrict__ __0_gpu_z_w_concorr_me;
-  double *__restrict__ __0_gpu_z_graddiv2_vn;
-  double *__restrict__ __0_gpu_z_flxdiv_theta;
-  double *__restrict__ __0_gpu_z_graddiv_vn;
-  double *__restrict__ __0_gpu_bdy_divdamp;
-  double *__restrict__ __0_gpu_z_w_concorr_mc;
-  double *__restrict__ __0_gpu_z_beta;
-  double *__restrict__ __0_gpu_z_rho_v;
-  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
-  double *__restrict__ __0_gpu_scal_divdamp;
-  double *__restrict__ __0_gpu_z_hydro_corr;
-  double *__restrict__ __0_gpu_z_theta_v_v;
-  double *__restrict__ __0_gpu_z_raylfac;
-  double *__restrict__ __0_gpu_z_contr_w_fl_l;
-  double *__restrict__ __0_gpu_z_kin_hor_e;
-  double *__restrict__ __0_gpu_z_alpha;
-  double *__restrict__ __0_gpu_z_flxdiv_mass;
   double *__restrict__ __0_gpu_z_exner_ic;
   double *__restrict__ __0_gpu_z_theta_v_pr_ic;
-  double *__restrict__ __0_gpu_z_exner_ex_pr;
-  double *__restrict__ __0_gpu_z_mflx_top;
-  double *__restrict__ __0_gpu_z_dwdz_dd;
-  double *__restrict__ __0_gpu_z_w_expl;
-  double *__restrict__ __0_gpu_z_vt_ie;
-  double *__restrict__ __0_gpu_z_gradh_exner;
-  double *__restrict__ __0_gpu_z_rth_pr;
   double *__restrict__ __0_gpu_z_q;
+  double *__restrict__ __0_gpu_z_exner_ex_pr;
+  double *__restrict__ __0_gpu_z_gradh_exner;
+  double *__restrict__ __0_gpu_z_kin_hor_e;
+  double *__restrict__ __0_gpu_z_th_ddz_exner_c;
+  double *__restrict__ __0_gpu_z_rth_pr;
+  double *__restrict__ __0_gpu_z_beta;
+  double *__restrict__ __0_gpu_z_graddiv_vn;
+  double *__restrict__ __0_gpu_z_contr_w_fl_l;
+  double *__restrict__ __0_gpu_z_dwdz_dd;
+  double *__restrict__ __0_gpu_z_flxdiv_mass;
+  double *__restrict__ __0_gpu_z_alpha;
+  double *__restrict__ __0_gpu_z_raylfac;
+  double *__restrict__ __0_gpu_z_flxdiv_theta;
+  double *__restrict__ __0_gpu_z_w_concorr_me;
+  double *__restrict__ __0_gpu_z_rho_expl;
+  double *__restrict__ __0_gpu_z_w_concorr_mc;
+  double *__restrict__ __0_gpu_z_vt_ie;
+  double *__restrict__ __0_gpu_z_rho_e;
+  double *__restrict__ __0_gpu_z_w_expl;
+  double *__restrict__ __0_gpu_scal_divdamp;
+  double *__restrict__ __0_gpu_z_mflx_top;
+  double *__restrict__ __0_gpu_z_dexner_dz_c;
+  double *__restrict__ __0_gpu_z_grad_rth;
+  double *__restrict__ __0_gpu_z_rho_v;
+  double *__restrict__ __0_gpu_z_theta_v_fl_e;
+  double *__restrict__ __0_gpu_bdy_divdamp;
+  double *__restrict__ __0_gpu_z_hydro_corr;
+  double *__restrict__ __0_gpu_z_exner_expl;
+  double *__restrict__ __0_gpu_z_vn_avg;
+  double *__restrict__ __0_gpu_z_graddiv2_vn;
+  double *__restrict__ __0_gpu_z_theta_v_e;
+  double *__restrict__ __0_gpu_z_theta_v_v;
   double *__restrict__ __0_gpu___CG_p_int__m_c_lin_e;
   double *__restrict__ __0_gpu___CG_p_int__m_cells_aw_verts;
   double *__restrict__ __0_gpu___CG_p_int__m_e_bln_c_s;
@@ -17968,11 +17968,11 @@ struct solve_nh_predictor_pre_state_t {
   double *__restrict__ __0_gpu___CG_p_nh__CG_metrics__m_zdiff_gradp;
   double *__restrict__ __0_gpu___CG_p_nh__CG_ref__m_vn_ref;
   double *__restrict__ __0_gpu___CG_p_nh_prog_nnew__m_vn;
-  double *__restrict__ __0_gpu___CG_p_nh_prog_nnew__m_w;
   double *__restrict__ __0_gpu___CG_p_nh_prog_nnow__m_exner;
   double *__restrict__ __0_gpu___CG_p_nh_prog_nnow__m_rho;
   double *__restrict__ __0_gpu___CG_p_nh_prog_nnow__m_theta_v;
   double *__restrict__ __0_gpu___CG_p_nh_prog_nnow__m_vn;
+  double *__restrict__ __0_gpu___CG_p_nh_prog_nnow__m_w;
   int *__restrict__ __0_gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask;
   double *__restrict__ __0_gpu___CG_p_patch__CG_cells__m_area;
   int *__restrict__ __0_gpu___CG_p_patch__CG_cells__m_edge_blk;
@@ -19149,15 +19149,15 @@ DACE_DFI void loop_body_77_0_18(
   int _for_it_85, int64_t _for_it_86, int tmp_struct_symbol_3, int tmp_struct_symbol_33, int tmp_struct_symbol_34, int tmp_struct_symbol_36,
   int tmp_struct_symbol_37, int tmp_struct_symbol_4, int tmp_struct_symbol_6, int tmp_struct_symbol_7) {
   double z_ntdistv_bary_1_local;
+  double tmp_call_26;
+  double z_ntdistv_bary_2_local;
+  double distv_bary_1_local;
   double tmp_call_25;
   double tmp_call_23;
   double tmp_call_28;
-  double tmp_call_24;
-  double tmp_call_27;
-  double z_ntdistv_bary_2_local;
-  double tmp_call_26;
   int lvn_pos_local;
-  double distv_bary_1_local;
+  double tmp_call_27;
+  double tmp_call_24;
   int ilc0;
   int ibc0;
 
@@ -19549,8 +19549,8 @@ DACE_DFI void loop_body_77_0_18(
   }
 
   {
-    double tmp_call_30;
     double distv_bary_2_local;
+    double tmp_call_30;
     double tmp_call_29;
 
     {
@@ -21601,8 +21601,8 @@ loop_body_128_0_0(const double *__restrict__ gpu___CG_p_nh__CG_metrics__m_coeff_
 
   {
     double z_theta2_local;
-    double tmp_arg_38;
     double tmp_call_32;
+    double tmp_arg_38;
 
     {
       double p_nh_0_in_metrics_coeff_gradp_0 = gpu___CG_p_nh__CG_metrics__m_coeff_gradp[(
@@ -21712,12 +21712,12 @@ DACE_DFI void loop_body_138_0_11(const int *__restrict__ __CG_p_nh__CG_metrics__
                                  const double *__restrict__ gpu_z_hydro_corr, const int &nblks_gradp, const int &nproma_gradp, const int &npromz_gradp,
                                  double *__restrict__ gpu_z_gradh_exner, int __f2dace_SOA_pg_edgeblk_d_0_s_861_metrics_p_nh_4,
                                  int __f2dace_SOA_pg_edgeidx_d_0_s_860_metrics_p_nh_4, int __f2dace_SOA_pg_exdist_d_0_s_855_metrics_p_nh_4,
-                                 int __f2dace_SOA_pg_vertidx_d_0_s_862_metrics_p_nh_4, int _for_it_101, int64_t _for_it_102, int tmp_struct_symbol_30,
+                                 int __f2dace_SOA_pg_vertidx_d_0_s_862_metrics_p_nh_4, int _for_it_101, int _for_it_102, int tmp_struct_symbol_30,
                                  int tmp_struct_symbol_31, int tmp_struct_symbol_75) {
   int ishift_local;
   int nlen_gradp_local;
   bool _if_cond_57;
-  int64_t ie_var_254;
+  int ie_var_254;
   int tmp_index_2541;
   int tmp_index_2542;
   int tmp_index_2543;
@@ -22177,7 +22177,7 @@ void __dace_runkernel_single_state_body_map_12_1_1(solve_nh_predictor_pre_state_
   void *single_state_body_map_12_1_1_args[] = {(void *)&gpu_z_rth_pr, (void *)&tmp_arg_22, (void *)&tmp_struct_symbol_33, (void *)&tmp_struct_symbol_34,
                                                (void *)&tmp_struct_symbol_35};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_12_1_1, dim3(int_ceil(int_ceil(tmp_arg_22, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_12_1_1_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_12_1_1_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_12_1_1", int_ceil(int_ceil(tmp_arg_22, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_13_5_8(
@@ -22292,7 +22292,7 @@ void __dace_runkernel_single_state_body_map_13_5_8(
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_13_5_8,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_13_5_8_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_13_5_8_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_13_5_8", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -22319,7 +22319,7 @@ void __dace_runkernel_single_state_body_0_map_13_6_3(solve_nh_predictor_pre_stat
   void *single_state_body_0_map_13_6_3_args[] = {(void *)&gpu_z_exner_ex_pr,    (void *)&_for_it_66,           (void *)&nlevp1,
                                                  (void *)&tmp_struct_symbol_27, (void *)&tmp_struct_symbol_28, (void *)&tmp_struct_symbol_29};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_13_6_3, dim3(int_ceil(int_ceil(tmp_struct_symbol_27, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_0_map_13_6_3_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_0_map_13_6_3_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_13_6_3", int_ceil(int_ceil(tmp_struct_symbol_27, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -22383,7 +22383,7 @@ void __dace_runkernel_single_state_body_map_15_2_6(solve_nh_predictor_pre_state_
                                                (void *)&tmp_struct_symbol_67,
                                                (void *)&tmp_struct_symbol_68};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_15_2_6, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_15_2_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_15_2_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_15_2_6", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -22480,7 +22480,7 @@ void __dace_runkernel_single_state_body_0_map_15_3_5(solve_nh_predictor_pre_stat
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_0_map_15_3_5,
                      dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(((nlev - tmp_call_21) + 1), 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_0_map_15_3_5_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_0_map_15_3_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_15_3_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(((nlev - tmp_call_21) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -22570,7 +22570,7 @@ void __dace_runkernel_single_state_body_1_map_15_4_5(
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_1_map_15_4_5,
                      dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(((nlev - tmp_call_22) + 1), 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_1_map_15_4_5_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_1_map_15_4_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_15_4_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(((nlev - tmp_call_22) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -22703,7 +22703,7 @@ void __dace_runkernel_single_state_body_map_17_0_4(
                                                (void *)&tmp_struct_symbol_67,
                                                (void *)&tmp_struct_symbol_68};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_17_0_4, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_17_0_4_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_17_0_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_17_0_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_1_map_13_7_5(
@@ -22843,7 +22843,7 @@ void __dace_runkernel_single_state_body_1_map_13_7_5(
                                                  (void *)&tmp_struct_symbol_34,
                                                  (void *)&tmp_struct_symbol_35};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_1_map_13_7_5, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_1_map_13_7_5_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_1_map_13_7_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_13_7_5", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_19_0_12(
@@ -23259,7 +23259,7 @@ void __dace_runkernel_single_state_body_map_19_0_12(
                                                 (void *)&tmp_struct_symbol_65,
                                                 (void *)&tmp_struct_symbol_66};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_19_0_12, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_19_0_12_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_19_0_12_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_19_0_12", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_2_map_13_8_9(
@@ -23354,7 +23354,7 @@ void __dace_runkernel_single_state_body_2_map_13_8_9(
                                                  (void *)&tmp_struct_symbol_65,
                                                  (void *)&tmp_struct_symbol_66};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_2_map_13_8_9, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_2_map_13_8_9_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_2_map_13_8_9_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_13_8_9", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -23480,7 +23480,7 @@ void __dace_runkernel_single_state_body_map_21_2_7(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_21_2_7,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil((((-global_data__m_nflat_gradp_sym_0) + nlev) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_21_2_7_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_21_2_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_21_2_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_nflat_gradp_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -23636,7 +23636,7 @@ void __dace_runkernel_single_state_body_map_33_2_8(
                                                (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_33_2_8,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_33_2_8_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_33_2_8_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_33_2_8", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -23739,7 +23739,7 @@ void __dace_runkernel_single_state_body_map_44_1_6(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_44_1_6,
                                       dim3(int_ceil(int_ceil(((i_endidx_in_var_133_1 - i_startidx_var_63_0_1) + 1), 1), 256),
                                            int_ceil(int_ceil(__f2dace_SA_rho_d_1_s_626_p_nh_prog_nnow_14, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_44_1_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_44_1_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_44_1_6", int_ceil(int_ceil(((i_endidx_in_var_133_1 - i_startidx_var_63_0_1) + 1), 1), 256),
                            int_ceil(int_ceil(__f2dace_SA_rho_d_1_s_626_p_nh_prog_nnow_14, 1), 1), 1, 256, 1, 1);
 }
@@ -23844,7 +23844,7 @@ void __dace_runkernel_single_state_body_map_52_1_6(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_52_1_6,
                                       dim3(int_ceil(int_ceil(((i_endidx_in_var_133_0 - i_startidx_var_63_0_0) + 1), 1), 256),
                                            int_ceil(int_ceil(__f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_52_1_6_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_52_1_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_52_1_6", int_ceil(int_ceil(((i_endidx_in_var_133_0 - i_startidx_var_63_0_0) + 1), 1), 256),
                            int_ceil(int_ceil(__f2dace_SA_theta_v_d_1_s_632_p_nh_prog_nnow_14, 1), 1), 1, 256, 1, 1);
 }
@@ -23946,7 +23946,7 @@ void __dace_runkernel_single_state_body_map_63_2_6(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_63_2_6,
     dim3(int_ceil(int_ceil(((i_endidx_in_var_163_0_0 - i_startidx_var_223_0) + 1), 1), 256), int_ceil(int_ceil(tmp_struct_symbol_34, 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_63_2_6_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_63_2_6_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_63_2_6", int_ceil(int_ceil(((i_endidx_in_var_163_0_0 - i_startidx_var_223_0) + 1), 1), 256),
                            int_ceil(int_ceil(tmp_struct_symbol_34, 1), 1), 1, 256, 1, 1);
 }
@@ -23982,7 +23982,7 @@ void __dace_runkernel_single_state_body_0_map_72_1_1(solve_nh_predictor_pre_stat
   void *single_state_body_0_map_72_1_1_args[] = {(void *)&gpu_z_rho_e,         (void *)&tmp_arg_29,          (void *)&tmp_index_1685,
                                                  (void *)&tmp_struct_symbol_6, (void *)&tmp_struct_symbol_7, (void *)&tmp_struct_symbol_8};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_72_1_1, dim3(int_ceil(int_ceil(tmp_arg_29, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_0_map_72_1_1_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_0_map_72_1_1_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_72_1_1", int_ceil(int_ceil(tmp_arg_29, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_72_1_5(double *__restrict__ gpu_z_theta_v_e, int tmp_arg_30, int tmp_index_1688,
@@ -24017,7 +24017,7 @@ void __dace_runkernel_single_state_body_map_72_1_5(solve_nh_predictor_pre_state_
   void *single_state_body_map_72_1_5_args[] = {(void *)&gpu_z_theta_v_e,     (void *)&tmp_arg_30,          (void *)&tmp_index_1688,
                                                (void *)&tmp_struct_symbol_3, (void *)&tmp_struct_symbol_4, (void *)&tmp_struct_symbol_5};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_72_1_5, dim3(int_ceil(int_ceil(tmp_arg_30, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_72_1_5_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_72_1_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_72_1_5", int_ceil(int_ceil(tmp_arg_30, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -24052,7 +24052,7 @@ void __dace_runkernel_single_state_body_0_map_74_1_1(solve_nh_predictor_pre_stat
   void *single_state_body_0_map_74_1_1_args[] = {(void *)&gpu_z_rho_e, (void *)&tmp_arg_31, (void *)&tmp_struct_symbol_6, (void *)&tmp_struct_symbol_7,
                                                  (void *)&tmp_struct_symbol_8};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_0_map_74_1_1, dim3(int_ceil(int_ceil(tmp_arg_31, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_0_map_74_1_1_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_0_map_74_1_1_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_74_1_1", int_ceil(int_ceil(tmp_arg_31, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_74_1_5(double *__restrict__ gpu_z_theta_v_e, int tmp_arg_32, int tmp_struct_symbol_3,
@@ -24087,7 +24087,7 @@ void __dace_runkernel_single_state_body_map_74_1_5(solve_nh_predictor_pre_state_
   void *single_state_body_map_74_1_5_args[] = {(void *)&gpu_z_theta_v_e, (void *)&tmp_arg_32, (void *)&tmp_struct_symbol_3, (void *)&tmp_struct_symbol_4,
                                                (void *)&tmp_struct_symbol_5};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_74_1_5, dim3(int_ceil(int_ceil(tmp_arg_32, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_74_1_5_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_74_1_5_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_74_1_5", int_ceil(int_ceil(tmp_arg_32, 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_77_0_19(
@@ -24345,7 +24345,7 @@ void __dace_runkernel_single_state_body_map_77_0_19(
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_77_0_19,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_77_0_19_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_77_0_19_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_77_0_19", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -24612,7 +24612,7 @@ void __dace_runkernel_single_state_body_map_103_0_19(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_103_0_19,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_103_0_19_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_103_0_19_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_103_0_19", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -24680,7 +24680,7 @@ void __dace_runkernel_single_state_body_map_113_0_4(solve_nh_predictor_pre_state
                                                 (void *)&i_startidx_local,
                                                 (void *)&nshift};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_113_0_4, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_113_0_4_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_113_0_4_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_113_0_4", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_111_7_7(
@@ -24787,7 +24787,7 @@ void __dace_runkernel_single_state_body_map_111_7_7(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_111_7_7,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((global_data__m_nflatlev_sym_0 - 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_111_7_7_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_111_7_7_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_111_7_7", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((global_data__m_nflatlev_sym_0 - 1), 1), 1), 1, 256, 1, 1);
 }
@@ -24940,7 +24940,7 @@ void __dace_runkernel_single_state_body_map_116_2_10(
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_116_2_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                                            int_ceil(int_ceil(((global_data__m_nflat_gradp_sym_0 - global_data__m_nflatlev_sym_0) + 1), 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_116_2_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_116_2_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_116_2_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(((global_data__m_nflat_gradp_sym_0 - global_data__m_nflatlev_sym_0) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -25115,7 +25115,7 @@ void __dace_runkernel_single_state_body_0_map_116_3_11(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_0_map_116_3_11,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(((-global_data__m_nflat_gradp_sym_0) + nlev), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_0_map_116_3_11_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_0_map_116_3_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_116_3_11", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(((-global_data__m_nflat_gradp_sym_0) + nlev), 1), 1), 1, 256, 1, 1);
 }
@@ -25283,7 +25283,7 @@ void __dace_runkernel_single_state_body_map_121_2_10(
   gpuError_t __err = cudaLaunchKernel(
     (void *)single_state_body_map_121_2_10,
     dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1),
-    dim3(256, 1, 1), single_state_body_map_121_2_10_args, 0, __state->gpu_context->streams[0]);
+    dim3(256, 1, 1), single_state_body_map_121_2_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_121_2_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil((((-global_data__m_nflatlev_sym_0) + nlev) + 1), 1), 1), 1, 256, 1, 1);
 }
@@ -25473,7 +25473,7 @@ void __dace_runkernel_single_state_body_map_124_0_11(
                                                  (void *)&tmp_struct_symbol_75,
                                                  (void *)&tmp_struct_symbol_76};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_124_0_11, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_124_0_11_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_124_0_11_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_124_0_11", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_128_0_9(
@@ -25627,7 +25627,7 @@ void __dace_runkernel_single_state_body_map_128_0_9(
                                                 (void *)&tmp_struct_symbol_75,
                                                 (void *)&tmp_struct_symbol_76};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_128_0_9, dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1),
-                                      dim3(256, 1, 1), single_state_body_map_128_0_9_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_128_0_9_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_128_0_9", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), 1, 1, 256, 1, 1);
 }
 __global__ void __launch_bounds__(256)
@@ -25714,7 +25714,7 @@ void __dace_runkernel_single_state_body_map_138_0_12(solve_nh_predictor_pre_stat
                                                  (void *)&tmp_struct_symbol_76};
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_map_138_0_12, dim3(int_ceil(int_ceil(max_map_range, 1), 256), int_ceil(int_ceil(nblks_gradp, 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_map_138_0_12_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_map_138_0_12_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_138_0_12", int_ceil(int_ceil(max_map_range, 1), 256), int_ceil(int_ceil(nblks_gradp, 1), 1), 1, 256, 1,
                            1);
 }
@@ -25836,7 +25836,7 @@ void __dace_runkernel_single_state_body_map_145_5_10(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_145_5_10,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_145_5_10_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_145_5_10_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_145_5_10", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -25949,7 +25949,7 @@ void __dace_runkernel_single_state_body_map_147_0_8(solve_nh_predictor_pre_state
                                                 (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_147_0_8,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_147_0_8_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_147_0_8_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_147_0_8", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -26069,7 +26069,7 @@ void __dace_runkernel_single_state_body_map_149_2_8(
   gpuError_t __err =
     cudaLaunchKernel((void *)single_state_body_map_149_2_8,
                      dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(global_data__m_nrdmax_sym_0, 1), 1), 1),
-                     dim3(256, 1, 1), single_state_body_map_149_2_8_args, 0, __state->gpu_context->streams[0]);
+                     dim3(256, 1, 1), single_state_body_map_149_2_8_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_149_2_8", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(global_data__m_nrdmax_sym_0, 1), 1), 1, 256, 1, 1);
 }
@@ -26193,7 +26193,7 @@ void __dace_runkernel_single_state_body_map_159_3_13(
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_159_3_13,
                                       dim3(int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256), int_ceil(int_ceil(nlev, 1), 1), 1),
-                                      dim3(256, 1, 1), single_state_body_map_159_3_13_args, 0, __state->gpu_context->streams[0]);
+                                      dim3(256, 1, 1), single_state_body_map_159_3_13_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_159_3_13", int_ceil(int_ceil(((i_endidx_local - i_startidx_local) + 1), 1), 256),
                            int_ceil(int_ceil(nlev, 1), 1), 1, 256, 1, 1);
 }
@@ -26282,7 +26282,7 @@ void __dace_runkernel_single_state_body_map_172_0_16(
                                                  (void *)&loop_body_je_local,
                                                  (void *)&nlev};
   gpuError_t __err = cudaLaunchKernel((void *)single_state_body_map_172_0_16, dim3(int_ceil(int_ceil(nlev, 1), 256), 1, 1), dim3(256, 1, 1),
-                                      single_state_body_map_172_0_16_args, 0, __state->gpu_context->streams[0]);
+                                      single_state_body_map_172_0_16_args, 0, nullptr);
   DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_172_0_16", int_ceil(int_ceil(nlev, 1), 256), 1, 1, 256, 1, 1);
 }
 } // namespace predictor_pre

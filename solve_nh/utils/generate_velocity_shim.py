@@ -204,24 +204,7 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
     # If input argument is scalar (pass-by-copy, or pass-by-ref), the input can be either a scalar or a symbol
     # If input is a pass-by-ptr, then it has to be an array
 
-    starts_with_repl_rules = [
-        ("__CG_p_diag", "__CG_p_nh__CG_diag"),
-        ("__CG_p_metrics", "__CG_p_nh__CG_metrics"),
-        ("__CG_p_prog__m_vn", "__CG_p_nh_prog_nnew__m_vn"),
-        ("__CG_p_prog__m_w", "__CG_p_nh_prog_nnew__m_w"),
-    ]
 
-    struct_names_to_skip = [
-        "p_diag",
-        "p_metrics",
-        "p_prog"
-    ]
-
-    struct_name_mapping = {
-        "p_diag": "in_p_nh->diag",
-        "p_metrics": "in_p_nh->metrics",
-        "p_prog": "in_p_nh_prog_nnew",
-    }
 
     symbol_mapping = {
         "__f2dace_A_z_kin_hor_e_d_0_s" : "in_global_data->nproma",
@@ -256,22 +239,69 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
     unioned_arg_types_and_names = list()
     for func_name, args in results.items():
         for arg_type, arg_name in args:
-            if "__staet" in arg_name:
+            if "__state" in arg_name:
                 continue
             if (arg_type, arg_name) not in unioned_arg_types_and_names:
                 unioned_arg_types_and_names.append((arg_type, arg_name))
 
     for sdfg in sdfgs:
+        sdfg_name_mapping = dict()
         if not _has_velocity_tendencies(sdfg):
             continue
+
+        if "predictor_pre" in sdfg.name:
+            prefix = "predictor_pre"
+            starts_with_repl_rules = [
+                ("__CG_p_diag", "__CG_p_nh__CG_diag"),
+                ("__CG_p_metrics", "__CG_p_nh__CG_metrics"),
+                ("__CG_p_prog__m_vn", "__CG_p_nh_prog_nnow__m_vn"),
+                ("__CG_p_prog__m_w", "__CG_p_nh_prog_nnow__m_w"),
+                ("__CG_p_diag__m_max_vcfl_dyn", "__CG_p_nh__CG_diag__m_max_vcfl_dyn"),
+            ]
+
+            struct_names_to_skip = [
+                "p_diag",
+                "p_metrics",
+                "p_prog"
+            ]
+
+            struct_name_mapping = {
+                "p_diag": "in_p_nh->diag",
+                "p_metrics": "in_p_nh->metrics",
+                "p_prog": "in_p_nh_prog_nnow",
+            }
+        else:
+            assert "corrector_pre" in sdfg.name, f"Unexpected SDFG name {sdfg.name} for velocity tendencies generation"
+            prefix = "corrector_pre"
+            starts_with_repl_rules = [
+                ("__CG_p_diag", "__CG_p_nh__CG_diag"),
+                ("__CG_p_metrics", "__CG_p_nh__CG_metrics"),
+                ("__CG_p_prog__m_vn", "__CG_p_nh_prog_nnew__m_vn"),
+                ("__CG_p_prog__m_w", "__CG_p_nh_prog_nnew__m_w"),
+                ("__CG_p_diag__m_max_vcfl_dyn", "__CG_p_nh__CG_diag__m_max_vcfl_dyn"),
+            ]
+
+            struct_names_to_skip = [
+                "p_diag",
+                "p_metrics",
+                "p_prog"
+            ]
+
+            struct_name_mapping = {
+                "p_diag": "in_p_nh->diag",
+                "p_metrics": "in_p_nh->metrics",
+                "p_prog": "in_p_nh_prog_nnew",
+            }
+
         for arg_type, arg_name in unioned_arg_types_and_names:
             if arg_name in struct_names_to_skip:
-                name_mapping[arg_name] = struct_name_mapping[arg_name]
+                sdfg_name_mapping[arg_name] = struct_name_mapping[arg_name]
                 continue
             if arg_name in symbol_mapping:
-                name_mapping[arg_name] = symbol_mapping[arg_name]
+                sdfg_name_mapping[arg_name] = symbol_mapping[arg_name]
                 continue
             if arg_name in symbols_to_skip:
+                sdfg_name_mapping[arg_name] = "??"
                 continue
             if "__state" in arg_name:
                 continue
@@ -287,13 +317,15 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
                             #print(f"  Replacing {original_name} with {arg_name} in SDFG {sdfg.name}")
                     exhausted = True
 
-                assert arg_name in sdfg.arrays, f"Array {arg_name} not found in SDFG {sdfg.name}"
+                if arg_name not in sdfg.arrays:
+                    print(f"Array {arg_name} (original_name:{original_name}) not found in SDFG {sdfg.name}")
 
-                if original_name in name_mapping:
-                    assert name_mapping[original_name] == "in_" + arg_name, \
-                        f"Array {original_name} mapped to {name_mapping[original_name]} but found {arg_name} in SDFG {sdfg.name}"
+                if original_name in sdfg_name_mapping:
+                    if not(sdfg_name_mapping[original_name] == "in_" + arg_name):
+                        print(f"Array {original_name} mapped to {sdfg_name_mapping[original_name]} but found {arg_name} in SDFG {sdfg.name}")
+                    sdfg_name_mapping[original_name] = "in_" + arg_name
                 else:
-                    name_mapping[original_name] = "in_" + arg_name
+                    sdfg_name_mapping[original_name] = "in_" + arg_name
 
 
             else:
@@ -311,25 +343,31 @@ def _generate_velocity_shim(velocity_header: str, velocity_shim_output: str,
                 assert arg_name in sdfg.symbols or (arg_name in sdfg.arrays and isinstance(sdfg.arrays[arg_name], dace.data.Scalar)), f"Scalar/Symbol {arg_name} not found in SDFG {sdfg.name}"
 
                 assert arg_name not in sdfg.symbols
-                name_mapping[original_name] = "in_" + arg_name
+                sdfg_name_mapping[original_name] = "in_" + arg_name
 
 
-    # Now we know we can use the args as they are
-    print("Velocity Tendencies Function Arguments That Are Arrays and Scalars:")
-    for key, val in name_mapping.items():
-        print(f"  {key} (Velocity Tendencies Function Name) -> {val} (SDFG Name)")
+        # Now we know we can use the args as they are
+        print("Velocity Tendencies Function Arguments That Are Arrays and Scalars:")
+        for key, val in sdfg_name_mapping.items():
+            print(f"  {key} (Velocity Tendencies Function Name) -> {val} (SDFG Name)")
 
-    print("Symbols To Manually Fix:")
-    for key in symbols_to_skip:
-        print(f"  {key} (Manual) -> ?")
+        print("Symbols To Manually Fix:")
+        for key in symbols_to_skip:
+            print(f"  {key} (Manual) -> ?")
 
-    print("Args in Order of Velocity Tendencies:")
+        print("Args in Order of Velocity Tendencies:")
 
-    print("AS DICT:")
-    print("name_mapping = {")
-    for key, val in name_mapping.items():
-        print(f"  '{key}': '{val}',")
-    print("}")
+        print("AS DICT:")
+        print(f"name_mapping_{prefix}= {{")
+        for key, val in sdfg_name_mapping.items():
+            print(f"  '{key}': '{val}',")
+        print("}")
+
+        with open("name_mappings.py", 'a') as f:
+            f.write(f"name_mapping_{prefix} = {{\n")
+            for key, val in sdfg_name_mapping.items():
+                f.write(f"  '{key}': '{val}',\n")
+            f.write("}\n")
 
     velocity_tendencies_args_list = []
     for arg_type, arg_name in unioned_arg_types_and_names:
@@ -373,32 +411,11 @@ def _generate_velocity_shim_gpu(velocity_header: str, velocity_shim_output: str,
     velocity_lvn_only_1_istep_2_args = list()
     velocity_lvn_only_0_istep_1_args = list()
     velocity_lvn_only_0_istep_2_args = list()
-    name_mapping = dict()
 
     # For all functions ensure all variables except the state is available.
     # If input argument is scalar (pass-by-copy, or pass-by-ref), the input can be either a scalar or a symbol
     # If input is a pass-by-ptr, then it has to be an array
 
-    starts_with_repl_rules = [
-        ("__CG_p_diag", "__CG_p_nh__CG_diag"),
-        ("__CG_p_metrics", "__CG_p_nh__CG_metrics"),
-        ("gpu___CG_p_prog__m_vn", "gpu___CG_p_nh_prog_nnew__m_vn"),
-        ("gpu___CG_p_prog__m_w", "gpu___CG_p_nh_prog_nnew__m_w"),
-        ("gpu___CG_p_diag", "gpu___CG_p_nh__CG_diag"),
-        ("gpu___CG_p_metrics", "gpu___CG_p_nh__CG_metrics"),
-    ]
-
-    struct_names_to_skip = [
-        "p_diag",
-        "p_metrics",
-        "p_prog"
-    ]
-
-    struct_name_mapping = {
-        "p_diag": "in_p_nh->diag",
-        "p_metrics": "in_p_nh->metrics",
-        "p_prog": "in_p_nh_prog_nnew",
-    }
 
     symbol_mapping = {
         "__f2dace_A_z_kin_hor_e_d_0_s" : "in_global_data->nproma",
@@ -433,22 +450,68 @@ def _generate_velocity_shim_gpu(velocity_header: str, velocity_shim_output: str,
     unioned_arg_types_and_names = list()
     for func_name, args in results.items():
         for arg_type, arg_name in args:
-            if "__staet" in arg_name:
+            if "__state" in arg_name:
                 continue
             if (arg_type, arg_name) not in unioned_arg_types_and_names:
                 unioned_arg_types_and_names.append((arg_type, arg_name))
 
+
     for sdfg in sdfgs:
+        sdfg_name_mapping = dict()
         if not _has_velocity_tendencies(sdfg):
             continue
+        if "predictor_pre" in sdfg.name:
+            prefix = "predictor_pre"
+            starts_with_repl_rules = [
+                ("gpu___CG_p_diag", "gpu___CG_p_nh__CG_diag"),
+                ("gpu___CG_p_metrics", "gpu___CG_p_nh__CG_metrics"),
+                ("gpu___CG_p_prog__m_vn", "gpu___CG_p_nh_prog_nnow__m_vn"),
+                ("gpu___CG_p_prog__m_w", "gpu___CG_p_nh_prog_nnow__m_w"),
+                ("__CG_p_diag__m_max_vcfl_dyn", "__CG_p_nh__CG_diag__m_max_vcfl_dyn"),
+            ]
+
+            struct_names_to_skip = [
+                "p_diag",
+                "p_metrics",
+                "p_prog"
+            ]
+
+            struct_name_mapping = {
+                "p_diag": "in_p_nh->diag",
+                "p_metrics": "in_p_nh->metrics",
+                "p_prog": "in_p_nh_prog_nnow",
+            }
+        else:
+            prefix = "corrector_pre"
+            assert "corrector_pre" in sdfg.name, f"Unexpected SDFG name {sdfg.name} for velocity tendencies generation"
+            starts_with_repl_rules = [
+                ("gpu___CG_p_diag", "gpu___CG_p_nh__CG_diag"),
+                ("gpu___CG_p_metrics", "gpu___CG_p_nh__CG_metrics"),
+                ("gpu___CG_p_prog__m_vn", "gpu___CG_p_nh_prog_nnew__m_vn"),
+                ("gpu___CG_p_prog__m_w", "gpu___CG_p_nh_prog_nnew__m_w"),
+                ("__CG_p_diag__m_max_vcfl_dyn", "__CG_p_nh__CG_diag__m_max_vcfl_dyn"),
+            ]
+
+            struct_names_to_skip = [
+                "p_diag",
+                "p_metrics",
+                "p_prog"
+            ]
+
+            struct_name_mapping = {
+                "p_diag": "in_p_nh->diag",
+                "p_metrics": "in_p_nh->metrics",
+                "p_prog": "in_p_nh_prog_nnew",
+            }
         for arg_type, arg_name in unioned_arg_types_and_names:
             if arg_name in struct_names_to_skip:
-                name_mapping[arg_name] = struct_name_mapping[arg_name]
+                sdfg_name_mapping[arg_name] = struct_name_mapping[arg_name]
                 continue
             if arg_name in symbol_mapping:
-                name_mapping[arg_name] = symbol_mapping[arg_name]
+                sdfg_name_mapping[arg_name] = symbol_mapping[arg_name]
                 continue
             if arg_name in symbols_to_skip:
+                sdfg_name_mapping[arg_name] = "??"
                 continue
             if "__state" in arg_name:
                 continue
@@ -464,13 +527,14 @@ def _generate_velocity_shim_gpu(velocity_header: str, velocity_shim_output: str,
                             #print(f"  Replacing {original_name} with {arg_name} in SDFG {sdfg.name}")
                     exhausted = True
 
-                assert arg_name in sdfg.arrays, f"Array {arg_name} (original_name:{original_name}) not found in SDFG {sdfg.name}"
+                if arg_name not in sdfg.arrays:
+                    print(f"Array {arg_name} (original_name:{original_name}) not found in SDFG {sdfg.name}")
 
-                if original_name in name_mapping:
-                    assert name_mapping[original_name] == "in_" + arg_name, \
-                        f"Array {original_name} mapped to {name_mapping[original_name]} but found {arg_name} in SDFG {sdfg.name}"
+                if original_name in sdfg_name_mapping:
+                    if not(sdfg_name_mapping[original_name] == "in_" + arg_name):
+                        print(f"Array {original_name} mapped to {sdfg_name_mapping[original_name]} but found {arg_name} in SDFG {sdfg.name}")
                 else:
-                    name_mapping[original_name] = "in_" + arg_name
+                    sdfg_name_mapping[original_name] = "in_" + arg_name
 
 
             else:
@@ -488,25 +552,31 @@ def _generate_velocity_shim_gpu(velocity_header: str, velocity_shim_output: str,
                 assert arg_name in sdfg.symbols or (arg_name in sdfg.arrays and isinstance(sdfg.arrays[arg_name], dace.data.Scalar)), f"Scalar/Symbol {arg_name} not found in SDFG {sdfg.name}"
 
                 assert arg_name not in sdfg.symbols
-                name_mapping[original_name] = "in_" + arg_name
+                sdfg_name_mapping[original_name] = "in_" + arg_name
 
 
-    # Now we know we can use the args as they are
-    print("Velocity Tendencies Function Arguments That Are Arrays and Scalars:")
-    for key, val in name_mapping.items():
-        print(f"  {key} (Velocity Tendencies Function Name) -> {val} (SDFG Name)")
+        # Now we know we can use the args as they are
+        print("Velocity Tendencies Function Arguments That Are Arrays and Scalars:")
+        for key, val in sdfg_name_mapping.items():
+            print(f"  {key} (Velocity Tendencies Function Name) -> {val} (SDFG Name)")
 
-    print("Symbols To Manually Fix:")
-    for key in symbols_to_skip:
-        print(f"  {key} (Manual) -> ?")
+        print("Symbols To Manually Fix:")
+        for key in symbols_to_skip:
+            print(f"  {key} (Manual) -> ?")
 
-    print("Args in Order of Velocity Tendencies:")
+        print("Args in Order of Velocity Tendencies:")
 
-    print("AS DICT:")
-    print("name_mapping = {")
-    for key, val in name_mapping.items():
-        print(f"  '{key}': '{val}',")
-    print("}")
+        print("AS DICT:")
+        print(f"gpu_name_mapping_{prefix} = {{")
+        for key, val in sdfg_name_mapping.items():
+            print(f"  '{key}': '{val}',")
+        print("}")
+
+        with open("name_mappings.py", 'a') as f:
+            f.write(f"gpu_name_mapping_{prefix} = {{\n")
+            for key, val in sdfg_name_mapping.items():
+                f.write(f"  '{key}': '{val}',\n")
+            f.write("}\n")
 
     velocity_tendencies_args_list = []
     for arg_type, arg_name in unioned_arg_types_and_names:

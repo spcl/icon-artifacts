@@ -830,12 +830,14 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     # Add missing symbols
     _move_scalar_access_to_original_name(sdfg)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
+    sdfg.validate()
 
     reinject_velocity_shim_gpu(sdfg)
-
-    _set_zero_stream(sdfg)
-
     sdfg.validate()
+
+    # Is No-OP need to change generated source code
+    #_set_zero_stream(sdfg)
+    #sdfg.validate()
 
 def _set_zero_stream(sdfg: dace.SDFG):
     for n, g in sdfg.all_nodes_recursive():

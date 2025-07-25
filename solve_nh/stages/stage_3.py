@@ -36,13 +36,18 @@ def optimization_action(g: SDFG):
 
     # === Sub-Phase 2: Allocation Optimizations ===
     clean_view_descs(g)
+    g.validate()
     set_transient_storage_to_persistent(g)
+    g.validate()
     check_transients_in_nsdfgs(g)
+    g.validate()
     # === Sub-Phase 2: Allocation Optimizations ===
 
     # === Sub-Phase 3: Patches ===
     insert_synchronization_for_profiling(g)
+    g.validate()
     insert_timers_for_profiling(g)
+    g.validate()
     # === Sub-Phase 3: Patches ===
 
     return g

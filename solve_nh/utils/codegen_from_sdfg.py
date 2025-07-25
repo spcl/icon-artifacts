@@ -477,6 +477,10 @@ def consolidate_generated_code(
         ),
         ("t_int_state *in_p_int = p_int[0];", "t_int_state *in_p_int = p_int;"),
         ("t_patch *in_p_patch = p_patch[0];", "t_patch *in_p_patch = p_patch;"),
+        ("t_nh_prog *in_p_nh_prog_nnow = p_nh_prog_nnow[0];",
+         "t_nh_prog *in_p_nh_prog_nnow = p_nh_prog_nnow;"),
+        ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];",
+         "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;"),
         (
             "t_nh_prog *in_p_prog = p_nh_prog_nnew[0];",
             "t_nh_prog *in_p_prog = p_nh_prog_nnew;",
@@ -484,6 +488,14 @@ def consolidate_generated_code(
         (
             "t_nh_prog *in_p_prog = p_nh_prog_nnow[0];",
             "t_nh_prog *in_p_prog = p_nh_prog_nnow;",
+        ),
+        (
+            "t_nh_prog *in_p_prog_nnew = p_nh_prog_nnew[0];",
+            "t_nh_prog *in_p_prog_nnew = p_nh_prog_nnew;",
+        ),
+        (
+            "t_nh_prog *in_p_prog_nnow = p_nh_prog_nnow[0];",
+            "t_nh_prog *in_p_prog_nnow = p_nh_prog_nnow;",
         ),
         (
             "t_nh_state *in_p_nh = p_nh[0];",

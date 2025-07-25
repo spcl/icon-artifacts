@@ -102,11 +102,9 @@ __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
   int lvn_only,
   int ntnd
 );
-
 DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
   velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *__state
 );
-
 DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_1(
   velocity_no_nproma_if_prop_lvn_only_0_istep_1_state_t *__state,
   int *__restrict__ __CG_global_data__m_nflatlev,
@@ -272,8 +270,6 @@ __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
   int __f2dace_A_z_kin_hor_e_d_1_s,
   int __f2dace_A_z_vt_ie_d_0_s,
   int __f2dace_A_z_vt_ie_d_1_s,
-  int __f2dace_A_z_w_concorr_me_d_0_s,
-  int __f2dace_A_z_w_concorr_me_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_0_s,
   int __f2dace_OA_z_kin_hor_e_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_2_s,
@@ -287,11 +283,9 @@ __dace_init_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
   int lvn_only,
   int ntnd
 );
-
 DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
   velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state
 );
-
 DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
   velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state,
   int *__restrict__ __CG_global_data__m_nflatlev,
@@ -362,8 +356,6 @@ DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_0_istep_2(
   int __f2dace_A_z_kin_hor_e_d_1_s,
   int __f2dace_A_z_vt_ie_d_0_s,
   int __f2dace_A_z_vt_ie_d_1_s,
-  int __f2dace_A_z_w_concorr_me_d_0_s,
-  int __f2dace_A_z_w_concorr_me_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_0_s,
   int __f2dace_OA_z_kin_hor_e_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_2_s,
@@ -460,11 +452,9 @@ __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
   int lvn_only,
   int ntnd
 );
-
 DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
   velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state
 );
-
 DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_1(
   velocity_no_nproma_if_prop_lvn_only_1_istep_1_state_t *__state,
   int *__restrict__ __CG_global_data__m_nflatlev,
@@ -604,10 +594,6 @@ __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
   double &__CG_p_diag__m_max_vcfl_dyn,
   int __f2dace_A_z_kin_hor_e_d_0_s,
   int __f2dace_A_z_kin_hor_e_d_1_s,
-  int __f2dace_A_z_vt_ie_d_0_s,
-  int __f2dace_A_z_vt_ie_d_1_s,
-  int __f2dace_A_z_w_concorr_me_d_0_s,
-  int __f2dace_A_z_w_concorr_me_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_0_s,
   int __f2dace_OA_z_kin_hor_e_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_2_s,
@@ -618,11 +604,9 @@ __dace_init_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
   int lvn_only,
   int ntnd
 );
-
 DACE_EXPORTED int __dace_exit_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
   velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *__state
 );
-
 DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
   velocity_no_nproma_if_prop_lvn_only_1_istep_2_state_t *__state,
   int *__restrict__ __CG_global_data__m_nflatlev,
@@ -679,10 +663,6 @@ DACE_EXPORTED void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2(
   double &__CG_p_diag__m_max_vcfl_dyn,
   int __f2dace_A_z_kin_hor_e_d_0_s,
   int __f2dace_A_z_kin_hor_e_d_1_s,
-  int __f2dace_A_z_vt_ie_d_0_s,
-  int __f2dace_A_z_vt_ie_d_1_s,
-  int __f2dace_A_z_w_concorr_me_d_0_s,
-  int __f2dace_A_z_w_concorr_me_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_0_s,
   int __f2dace_OA_z_kin_hor_e_d_1_s,
   int __f2dace_OA_z_kin_hor_e_d_2_s,
