@@ -686,6 +686,8 @@ def compile_if_propagated_sdfgs(
                     )
                 repl_in_file(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "const const", "const")
                 repl_in_file(f"{build_loc}/src/cpu/{sdfg_name}.cu", "const const", "const")
+                repl_in_file(f"{build_loc}/src/cpu/{sdfg_name}.cu", "double __CG_p_diag__m_max_vcfl_dyn", "double &__CG_p_diag__m_max_vcfl_dyn")
+                repl_in_file(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "double __CG_p_diag__m_max_vcfl_dyn", "double &__CG_p_diag__m_max_vcfl_dyn")
             #if fix_out_val_0:
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")
