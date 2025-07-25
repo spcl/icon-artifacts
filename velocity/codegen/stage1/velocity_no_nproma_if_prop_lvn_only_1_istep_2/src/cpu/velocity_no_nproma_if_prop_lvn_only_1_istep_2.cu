@@ -443,13 +443,7 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2_internal(velocity_n
 
 
     il_size = __CG_global_data__m_nproma;
-   cudaDeviceSynchronize(); //EntryStreamSync
-      //cudaEvent_t start1, stop1;
-    //cudaEventCreate(&start1);
-    //cudaEventCreate(&stop1);
-    //cudaEventRecord(start1); 
- measure_time("Run");
- 
+
 
     nrdmax_jg = __CG_global_data__m_nrdmax[0];
     nflatlev_jg = __CG_global_data__m_nflatlev[0];
@@ -1319,15 +1313,6 @@ void __program_velocity_no_nproma_if_prop_lvn_only_1_istep_2_internal(velocity_n
         {
             double max_vcfl_dyn_var_152_0_in = max_vcfl_dyn_var_152;
             double p_diag_out_max_vcfl_dyn;
-  //cudaEventRecord(stop1);
-    //cudaEventSynchronize(stop1);
-    //float milliseconds1 = 0;
-    //cudaEventElapsedTime(&milliseconds1, start1, stop1);
-     measure_time("Host Based C++ Timer"); 
-  //cudaEventDestroy(start1);
-    //cudaEventDestroy(stop1);
-    //cudaDeviceSynchronize(); 
-  //std::cout << "CUDA Events Based Total time: " << milliseconds1*1000.0 << " us" << std::endl;
 
             ///////////////////
             // Tasklet code (T_l653_c653)
