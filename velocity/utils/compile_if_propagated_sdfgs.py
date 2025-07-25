@@ -764,9 +764,9 @@ def compile_if_propagated_sdfgs(
     cuda_arch = os.getenv('_CUDA_ARCH', 'native')
     if gpu:
         if release:
-            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch={cuda_arch} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp --relocatable-device-code=true -rdc=true -dlto -DNDEBUG"
+            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch={cuda_arch} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp --relocatable-device-code=true -rdc=true -dlto -DNDEBUG"
         else:
-            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch={cuda_arch} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch={cuda_arch} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
