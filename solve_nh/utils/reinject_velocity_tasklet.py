@@ -773,9 +773,10 @@ def reinject_velocity_shim_gpu(
 
     # Add all missing out connectors (full range), for non const data
     for key in non_const_data:
-        if key == "__CG_p_diag__m_max_vcfl_dyn":
-            continue  # This is a scalar, not an array
-        out_name = "out_" + velocity_gpu_name_mapping_local["gpu_" + key][3:]  # Remove 'in_' prefix
+        if key != "__CG_p_diag__m_max_vcfl_dyn":
+            out_name = "out_" + velocity_gpu_name_mapping_local["gpu_" + key][3:]  # Remove 'in_' prefix
+        else:
+            out_name = "out___CG_p_diag__m_max_vcfl_dyn"
         if out_name not in velocity_tasklet.out_connectors:
             new_velocity_tasklet.add_out_connector(out_name)
             data_name = "gpu_" + out_name[4:] if not out_name[4:].startswith("gpu_") else out_name[4:]  # Remove 'out_' prefix
@@ -790,6 +791,7 @@ def reinject_velocity_shim_gpu(
                     velocity_state.sdfg.arrays[data_name]
                 )
             )
+
 
 
     # Reinjecting the CPU velocity -> GPU velocity
