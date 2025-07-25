@@ -106,14 +106,15 @@ def make_flattened_data_to_non_transient_gpu_input(sdfg: dace.SDFG):
         sdfg.arrays[data_name].transient = False
 
 
-    arr_to_rm = set()
+    #arr_to_rm = set()
     for arr_name, arr in sdfg.arrays.items():
         if arr_name.startswith("gpu___CG") and isinstance(arr, dace.data.Array) and (not arr_name.endswith("uint8") and not arr_name.endswith("uint16")):
-            if arr.transient:
-                print("Warning: GPU array", arr_name, "is transient, and not used, removing it.")
-                arr_to_rm.add(arr_name)
-    for arr_name in arr_to_rm:
-        sdfg.remove_data(arr_name, validate=True)
+            if arr.transient is True:
+                arr.transient = False
+                print("Warning: GPU array", arr_name, "is transient, and not used, but make it non-transient still.")
+                #arr_to_rm.add(arr_name)
+    #for arr_name in arr_to_rm:
+    #    sdfg.remove_data(arr_name, validate=True)
 
     sdfg.save(sdfg.name + "_flattened_data_to_gpu_input.sdfg")
 
