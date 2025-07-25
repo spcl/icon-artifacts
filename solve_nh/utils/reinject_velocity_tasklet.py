@@ -779,7 +779,10 @@ def reinject_velocity_shim_gpu(
             out_name = "out___CG_p_diag__m_max_vcfl_dyn"
         if out_name not in velocity_tasklet.out_connectors:
             new_velocity_tasklet.add_out_connector(out_name)
-            data_name = "gpu_" + out_name[4:] if not out_name[4:].startswith("gpu_") else out_name[4:]  # Remove 'out_' prefix
+            if key != "__CG_p_diag__m_max_vcfl_dyn":
+                data_name = "gpu_" + out_name[4:] if not out_name[4:].startswith("gpu_") else out_name[4:]  # Remove 'out_' prefix
+            else:
+                data_name = "__CG_p_diag__m_max_vcfl_dyn"
             dataaccess = velocity_state.add_access(data_name)
             velocity_state.add_edge(
                 new_velocity_tasklet,
