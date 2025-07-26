@@ -711,6 +711,12 @@ def compile_if_propagated_sdfgs(
                     "double &__CG_p_diag__m_max_vcfl_dyn",
                     condition=lambda line: "double __CG_p_diag__m_max_vcfl_dyn" in line and "__CG_p_diag__m_max_vcfl_dyn;" not in line
                 )
+                repl_in_file_per_line_with_cond(
+                    f"{build_loc}/include/{sdfg_name}.h",
+                    "double __CG_p_diag__m_max_vcfl_dyn",
+                    "double &__CG_p_diag__m_max_vcfl_dyn",
+                    condition=lambda line: "double __CG_p_diag__m_max_vcfl_dyn" in line and "__CG_p_diag__m_max_vcfl_dyn;" not in line
+                )
             #if fix_out_val_0:
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_cfl_clipping")
             #    fix_out_val_0_call(f"{build_loc}/src/cuda/{sdfg.name}_cuda.cu", "gpu_out_val_0, &gpu_z_w_con_c")
