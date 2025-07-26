@@ -7,7 +7,7 @@ set -xeuo pipefail
 GIT_SOURCE_BRANCH="origin/new_sched_solve_nh"
 # Base path for the precompiled libraries within the git repository
 VELOCITY_SHARED_LIB_ROOT="velocity/shared_libs"
-MACHINE="local"
+MACHINE="primrose-pc"
 LIB_MODE="solve_nh_integration"
 BUILD_MODE="debug" # Options: debug, release
 
