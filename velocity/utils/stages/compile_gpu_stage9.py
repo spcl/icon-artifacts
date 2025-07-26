@@ -30,13 +30,14 @@ def optimization_action(sdfg):
     input_to_gpu(sdfg, "z_vt_ie")
     sdfg.validate()
 
-    _build_for_integration = os.getenv('_BUILD_LIB_FOR_SOLVE_NH', '0').lower() in ('1', 'true', 'yes')
-    assert _build_for_integration is True, "This stage is only for building the library for SolveNH integration."
+    #_build_for_integration = os.getenv('_BUILD_LIB_FOR_SOLVE_NH', '0').lower() in ('1', 'true', 'yes')
+    #assert _build_for_integration is True, "This stage is only for building the library for SolveNH integration."
+    _build_for_integration = True  # For now, we always build for integration
     if _build_for_integration:
         make_flattened_data_to_non_transient_gpu_input(sdfg)
         sdfg.validate()
 
-    set_default_stream(sdfg)
+    set_default_stream(sdfg) # Is No-op, codegen does the same again
     remove_sync_and_profiling_states(sdfg)
     insert_pre_reduction_sync(sdfg)
     rm_reduntant_copies(sdfg)

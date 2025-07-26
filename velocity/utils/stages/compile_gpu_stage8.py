@@ -117,7 +117,7 @@ def optimization_action(sdfg):
     #sdfg.simplify()
     # Sync first
     insert_synchronization_and_timers_for_profiling(sdfg)
-    set_default_stream(sdfg)
+    #set_default_stream(sdfg)
     sdfg.validate()
 
     do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')
