@@ -527,29 +527,11 @@ def reinject_velocity_shim(
 
     # Reinjecting the old (struct only) velocity -> flattened velocity tasklet
     # It means: if existing exit call, do not do anything else add it
-    has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) for v in sdfg.exit_code.values()])
-    has_cpu_exit_call = any([("exit_velocity_tendencies();" in v.as_string) for v in sdfg.exit_code.values()])
+    has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) if isinstance(v, CodeBlock) else ("exit_velocity_tendencies_gpu();" in v) for v in sdfg.exit_code.values()])
+    has_cpu_exit_call = any([("exit_velocity_tendencies();" in v.as_string) if isinstance(v, CodeBlock) else ("exit_velocity_tendencies();" in v) for v in sdfg.exit_code.values()])
     assert not has_gpu_exit_call, "GPU reinject velocity tasklet should not be already here if calling this function."
-    if not has_cpu_exit_call:
-        sdfg.append_exit_code(
-            cpp_code="exit_velocity_tendencies();",
-        )
-    """
-    has_gpu_init_call = any([
-        re.search(r'\binit_velocity_tendencies_gpu\(.*?\);', v.as_string)
-        for v in sdfg.init_code.values()
-    ])
+    assert has_cpu_exit_call, "CPU reinject velocity tasklet should be already here if calling this function."
 
-    has_cpu_init_call = any([
-        re.search(r'\binit_velocity_tendencies\(.*?\);', v.as_string)
-        for v in sdfg.init_code.values()
-    ])
-    assert not has_gpu_init_call, "GPU init velocity tasklet should not be already here if calling this function."
-    if not has_cpu_init_call:
-        sdfg.append_init_code(
-            cpp_code=f"init_velocity_tendencies({input_args_str});",
-        )
-    """
 
 def _add_array_and_copyin_copy_out(
     sdfg: dace.SDFG,
@@ -776,7 +758,7 @@ def reinject_velocity_shim_gpu(
         if key != "__CG_p_diag__m_max_vcfl_dyn":
             out_name = "out_" + velocity_gpu_name_mapping_local["gpu_" + key][3:]  # Remove 'in_' prefix
         else:
-            out_name = "out___CG_p_diag__m_max_vcfl_dyn"
+            out_name = "out___CG_p_nh__CG_diag__m_max_vcfl_dyn"
         if out_name not in velocity_tasklet.out_connectors:
             new_velocity_tasklet.add_out_connector(out_name)
             if key != "__CG_p_diag__m_max_vcfl_dyn":
@@ -795,8 +777,6 @@ def reinject_velocity_shim_gpu(
                 )
             )
 
-
-
     # Reinjecting the CPU velocity -> GPU velocity
     # It means: if existing remove CPU exit and add GPU exit if nto already there
     has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) if isinstance(v, CodeBlock) else ("exit_velocity_tendencies_gpu();" in v) for v in sdfg.exit_code.values()])
@@ -814,31 +794,6 @@ def reinject_velocity_shim_gpu(
         sdfg.append_exit_code(
             cpp_code="exit_velocity_tendencies_gpu();",
         )
-
-
-    """
-    has_gpu_init_call = any([
-        re.search(r'\binit_velocity_tendencies_gpu\(.*?\);', v.as_string)
-        for v in sdfg.init_code.values()
-    ])
-
-    has_cpu_init_call = any([
-        re.search(r'\binit_velocity_tendencies\(.*?\);', v.as_string)
-        for v in sdfg.init_code.values()
-    ])
-    if has_cpu_init_call:
-        # Remove the CPU init call, we are replacing it with the GPU one
-        pattern = r'\binit_velocity_tendencies_gpu\s*\(.*?\);?'
-        sdfg.init_code = {
-            k: CodeBlock(re.sub(pattern, '', v.as_string))
-            for k, v in sdfg.init_code.items()
-        }
-
-    if not has_gpu_init_call:
-        sdfg.append_init_code(
-            cpp_code=f"init_velocity_tendencies_gpu({input_args_str});",
-        )
-    """
 
     # velocity_tasklet.side_effects = True
     sdfg.validate()
