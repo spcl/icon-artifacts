@@ -699,6 +699,8 @@ def compile_if_propagated_sdfgs(
                     )
                 repl_in_file(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu", "const const", "const")
                 repl_in_file(f"{build_loc}/src/cpu/{sdfg_name}.cu", "const const", "const")
+
+            if stage == 9:
                 repl_in_file_per_line_with_cond(
                     f"{build_loc}/src/cpu/{sdfg_name}.cu",
                     "double __CG_p_diag__m_max_vcfl_dyn",
@@ -795,7 +797,7 @@ def compile_if_propagated_sdfgs(
         if release:
             flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch={cuda_arch} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -Xcompiler=-fopenmp --relocatable-device-code=true -rdc=true -dlto -DNDEBUG"
         else:
-            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch={cuda_arch} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG"
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch={cuda_arch} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
         if lib:
             flags += " -DNO_SERDE -std=c++17 -rdc=true -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
