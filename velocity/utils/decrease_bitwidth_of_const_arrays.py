@@ -316,7 +316,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
 
     # The check pattern to fill is the following:
     """
-    #ifndef DACE_VELOCITY_DEBUG
+    #if defined(DACE_VELOCITY_DEBUG)
     int32_t check_bounds_on_device_{c}(const int64_t* h_input, const int64_t* h_output, int64_t size, const std::string& array_name);
     #else
     int32_t check_bounds_on_device_{c}(const int64_t* h_input, const int64_t* h_output, int64_t size);
@@ -326,7 +326,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     """
     for (arr_name, arr) in sdfg.arrays.items(){
         if (bitwidth_scalar != 64){
-            #ifndef DACE_VELOCITY_DEBUG
+            #if defined(DACE_VELOCITY_DEBUG)
             bitwidth_scalar = check_bounds_on_device_{c}(<array.name>, <array.shape>, "<array.name>");
             #else
             bitwidth_scalar = check_bounds_on_device_{c}(<array.name>, <array.shape>);
@@ -340,7 +340,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         arr.total_size
         tasklet_code += f"""
         if (_internal_bitwidth_scalar != 64){{ // TODO: Replace 64 with 32
-            #ifndef DACE_VELOCITY_DEBUG
+            #if defined(DACE_VELOCITY_DEBUG)
             _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}), "{arr_name}");
             #else
             _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}));
@@ -354,7 +354,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
 #include <stdio.h>
 #include <stdexcept>
 #include <limits>
-#ifndef DACE_VELOCITY_DEBUG
+#if defined(DACE_VELOCITY_DEBUG)
 #include <thrust/device_ptr.h>
 #include <thrust/extrema.h>
 #include <thrust/execution_policy.h>
@@ -404,7 +404,7 @@ __global__ void check_bounds_kernel_{c}(const T* __restrict__ input, int32_t siz
 
 template <typename T>
 int32_t check_bounds_on_device_{c}(const T* d_input, int32_t size,
-#ifndef DACE_VELOCITY_DEBUG
+#if defined(DACE_VELOCITY_DEBUG)
 const std::string& array_name
 #endif
 ) {{
@@ -473,13 +473,13 @@ const std::string& array_name
     }} else {{
         num_bits = -1;
         throw std::runtime_error("No valid bounds found for " +
-        #ifndef DACE_VELOCITY_DEBUG
+        #if defined(DACE_VELOCITY_DEBUG)
         array_name +
         #endif
         " the input values." + "{{i16,ui16,i32}}: " + ", " + std::to_string(h_result[0]) + ", " + std::to_string(h_result[1]) + ", " + std::to_string(h_result[2]));
     }}
 
-    #ifndef DACE_VELOCITY_DEBUG
+    #if defined(DACE_VELOCITY_DEBUG)
     printf("Bitwidth for %s: %d bits {{%d, %d, %d}}\\n", array_name.c_str(), num_bits, h_result[0], h_result[1], h_result[2]);
     check_bounds_with_thrust_{c}(d_input, size, array_name);
     #endif
@@ -512,7 +512,7 @@ const std::string& array_name
             _out_bitwidth_scalar = 32;
         }}
         _out_bitwidth_check_done = 1;
-        #ifndef DACE_VELOCITY_DEBUG
+        #if defined(DACE_VELOCITY_DEBUG)
         printf("Bitwidth for {nproma_name}: %d bits\\n", _out_bitwidth_scalar);
         #endif
         """,

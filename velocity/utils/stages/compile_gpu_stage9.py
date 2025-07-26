@@ -40,7 +40,7 @@ def optimization_action(sdfg):
     set_default_stream(sdfg) # Is No-op, codegen does the same again
     remove_sync_and_profiling_states(sdfg)
     insert_pre_reduction_sync(sdfg)
-    rm_reduntant_copies(sdfg)
+    rm_reduntant_copies(sdfg) # z_h -> gpu_z_h becomes z_h -> z_h after moving inputs to the GPU do that
 
     return sdfg
 
