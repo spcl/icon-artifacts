@@ -1,39 +1,20 @@
 import re
 
 def extract_function_declarations(header_paths):
-    function_decls = []
-
-    # Regular expression to match function declarations.
-    # This assumes simple non-templated functions, not inside a class.
-    func_pattern = re.compile(r"""
-        ^                                  # Start of line
-        [\w:\*\&\s]+?                      # Return type (non-greedy)
-        \s+                                # At least one space
-        [\w:~]+                            # Function name
-        \s*                                # Optional space
-        \(                                 # Opening parenthesis
-        [^;{}]*                            # Parameters (no semicolon or braces allowed here)
-        \)                                 # Closing parenthesis
-        \s*                                # Optional space
-        (const)?                           # Optional const
-        \s*                                # Optional space
-        (;|$)                              # Ends with semicolon or EOL (if macro-generated)
-        """, re.VERBOSE)
+    matches = []
+    keywords = ("__dace_exit_", "__dace_init_", "__program_")
 
     for path in header_paths:
         try:
-            with open(path, 'r') as file:
-                for line in file:
-                    line = line.strip()
-                    if func_pattern.match(line):
-                        function_decls.append(line)
-        except FileNotFoundError:
-            print(f"File not found: {path}")
+            with open(path, 'r') as f:
+                for line in f:
+                    stripped = line.strip()
+                    if any(k in stripped for k in keywords) and stripped.endswith(';'):
+                        matches.append(stripped)
         except Exception as e:
             print(f"Error reading {path}: {e}")
 
-    return function_decls
-
+    return matches
 
 # Example usage:
 if __name__ == "__main__":
