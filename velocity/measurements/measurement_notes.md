@@ -201,7 +201,7 @@ Average of medians: 311.83 µs (timestep 1 skipped)
 ```
 
 
-## No-Tiling w. Clipping w. Bitwidth-Lowering w. Memset/Memcpy
+## No-Tiling w/o Clipping w. Bitwidth-Lowering w. Memset/Memcpy
 ### GH200
 ```bash
 export _RELEASE=TRUE
