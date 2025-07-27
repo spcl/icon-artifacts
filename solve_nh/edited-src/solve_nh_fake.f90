@@ -2218,13 +2218,22 @@ end if
           END DO
         END DO
         IF (lsave_mflx .AND. istep == 2) THEN
-          DO je = i_startidx, i_endidx
-            IF (p_patch % edges % refin_ctrl(je, jb) <= - 4 .AND. p_patch % edges % refin_ctrl(je, jb) >= - 6) THEN
-              DO jk = 1, nlev
-                p_nh % diag % mass_fl_e_sv(je, jk, jb) = p_nh % diag % mass_fl_e(je, jk, jb)
-              END DO
-            END IF
-          END DO
+! BEGIN: omp vs. openacc
+          ! omp: DO je = i_startidx, i_endidx
+          ! omp:   IF (p_patch % edges % refin_ctrl(je, jb) <= - 4 .AND. p_patch % edges % refin_ctrl(je, jb) >= - 6) THEN
+          ! omp:     DO jk = 1, nlev
+          ! omp:       p_nh % diag % mass_fl_e_sv(je, jk, jb) = p_nh % diag % mass_fl_e(je, jk, jb)
+          ! omp:     END DO
+          ! omp:   END IF
+          ! omp: END DO
+          DO jk=1,nlev  ! openacc
+            DO je = i_startidx, i_endidx  ! openacc
+              IF (p_patch%edges%refin_ctrl(je,jb) <= -4 .AND. p_patch%edges%refin_ctrl(je,jb) >= -6) THEN  ! openacc
+                p_nh%diag%mass_fl_e_sv(je,jk,jb) = p_nh%diag%mass_fl_e(je,jk,jb)  ! openacc
+              ENDIF  ! openacc
+            ENDDO  ! openacc
+          ENDDO  ! openacc
+! END: omp vs. openacc
         END IF
         IF (lprep_adv .AND. istep == 2) THEN
           IF (lclean_mflx) THEN
