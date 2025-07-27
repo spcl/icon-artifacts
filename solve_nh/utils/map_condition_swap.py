@@ -431,7 +431,7 @@ def rename(sdfg: dace.SDFG, conflict_counter=0, seen_names=set()):
             cfg._label = newn
             cfg.label = newn
             assert cfg.name == cfg.label and cfg.name == newn
-            print(f"Renamed {oldn} to {newn} ({cfg.name})")
+            #print(f"Renamed {oldn} to {newn} ({cfg.name})")
         seen_names.add(cfg.name)
 
     for state in sdfg.all_states():
@@ -465,7 +465,7 @@ def move_if_to_innermost_map(g: dace.SDFG):
                                     map_swap_candidates.append(candidate)
 
     for if_node, if_sdfg, inner_map_entry in map_swap_candidates:
-        print(f"Moving if {if_node.label} inside {inner_map_entry}")
+        #print(f"Moving if {if_node.label} inside {inner_map_entry}")
         make_map_body_nested(if_sdfg, if_node.label)
         ConditionMapInterchange().apply_to(if_sdfg, cond_block=if_node)
 
@@ -474,7 +474,7 @@ def move_if_to_innermost_map(g: dace.SDFG):
         # All state except should be empty, and inner_maP_entry should be the only one with nodes
         empty_states = [s for s in states if len(s.nodes()) == 0]
         non_empty_states = [s for s in states if len(s.nodes()) > 0]
-        print(non_empty_states)
+        #print(non_empty_states)
         non_empty_states_with_map_entries = [s for s in non_empty_states if any(isinstance(n, dace.nodes.MapEntry) for n in s.nodes())]
         assert len(non_empty_states_with_map_entries) == 1, f"There should be only one non-empty state with map entries {non_empty_states_with_map_entries}"
         non_empty_state = non_empty_states_with_map_entries[0]
@@ -496,7 +496,7 @@ def move_if_to_innermost_map(g: dace.SDFG):
             if state is non_empty_state:
                 state_map[state] = if_block
                 continue
-            print("Add state", state.label, "to inner map SDFG")
+            #print("Add state", state.label, "to inner map SDFG")
             ns = copy.deepcopy(state)
             state_map[state] = ns
             inner_map_sdfg.add_node(ns, is_start_block=True if i == 0 else False)
@@ -504,7 +504,7 @@ def move_if_to_innermost_map(g: dace.SDFG):
         for e in path:
             src = state_map[e.src]
             dst = state_map[e.dst]
-            print(f"Add edge from {src.label} to {dst.label} in inner map SDFG")
+            #print(f"Add edge from {src.label} to {dst.label} in inner map SDFG")
             assert src in inner_map_sdfg.nodes(), f"Source {src} not in inner map SDFG"
             assert dst in inner_map_sdfg.nodes(), f"Destination {dst} not in inner map SDFG"
             inner_map_sdfg.add_edge(src, dst, copy.deepcopy(e.data))

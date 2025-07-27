@@ -9,10 +9,10 @@ def _get_missing_symbols(nsdfg_node: dace.nodes.NestedSDFG) -> Set[str]:
     symbols = set(k for k in nsdfg.free_symbols if k not in nsdfg.in_connectors and k not in nsdfg.out_connectors)
     missing_symbols = [s for s in symbols if s not in nsdfg.symbol_mapping]
 
-    print(list(nsdfg_node.sdfg.all_interstate_edges()))
-    print(nsdfg_node.sdfg.nodes())
+    #print(list(nsdfg_node.sdfg.all_interstate_edges()))
+    #print(nsdfg_node.sdfg.nodes())
     for e in nsdfg_node.sdfg.all_interstate_edges():
-        print(e, e.data, e.data is None)
+        #print(e, e.data, e.data is None)
         if e.data is not None:
             def _get_all_symbols(expr):
                 symbols = {s for s in expr.atoms(sympy.Symbol)}
@@ -20,7 +20,7 @@ def _get_missing_symbols(nsdfg_node: dace.nodes.NestedSDFG) -> Set[str]:
                 return symbols.union(functions)
             for k, v in e.data.assignments.items():
                 syms = _get_all_symbols(dace.symbolic.SymExpr(v))
-                print(v)
+                #print(v)
                 for sym in syms:
                     sym_v_str = str(sym)
                     if sym_v_str not in nsdfg.symbol_mapping and sym_v_str not in nsdfg_node.in_connectors and sym_v_str not in nsdfg_node.out_connectors:
