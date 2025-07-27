@@ -15,7 +15,7 @@ from utils.clean_unused_data_from_nsdfg_connectors import (
 )
 from utils.manual_fixes import move_range_if_inside
 import argparse
-
+from utils.map_condition_swap import move_if_to_innermost_map
 
 STAGE_ID = 2
 
@@ -25,6 +25,11 @@ def optimization_action(g: SDFG):
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
+
+    # Move if condition inside a map if it has a parent map
+    move_if_to_innermost_map(g)
+    g.validate()
+
     # === Sub-Phase 1: Clean Unused Data and Symbols From NSDFGs ===
 
     # === Sub-Phase 2: InlineSDFG + MapCollapse For GPU Offloading ===
