@@ -67,11 +67,7 @@ def wrap_namespace(name: str, content: str) -> str:
     for line in lines:
         stripped = line.strip()
         # Collect header guard lines until we see first non-header-guard line
-        if in_header_guard and (
-            stripped.startswith("#ifndef")
-            or stripped.startswith("#define")
-            or stripped.startswith("#endif")
-        ):
+        if in_header_guard and any(stripped.startswith(p) for p in ["#ifndef", "#define", "#endif"]):
             header_guard_lines.append(line)
         elif stripped.startswith("#include"):
             include_lines.append(line)
@@ -115,6 +111,7 @@ namespace {name} {{
 """
     return wrapped.strip()
 
+
 def wrap_gpu_namespace(name: str, content: str) -> str:
     # Extract header guard (e.g. #ifndef ... #define ... #endif)
     # and includes (e.g. #include <...> or #include "...") at the top of the file.
@@ -129,11 +126,7 @@ def wrap_gpu_namespace(name: str, content: str) -> str:
     for line in lines:
         stripped = line.strip()
         # Collect header guard lines until we see first non-header-guard line
-        if in_header_guard and (
-            stripped.startswith("#ifndef")
-            or stripped.startswith("#define")
-            or stripped.startswith("#endif")
-        ):
+        if in_header_guard and any(stripped.startswith(p) for p in ["#ifndef", "#define", "#endif"]):
             header_guard_lines.append(line)
         elif stripped.startswith("#include"):
             include_lines.append(line)
@@ -178,6 +171,7 @@ namespace {name.replace("_cuda", "")} {{
 """
     return wrapped.strip()
 
+
 # --- Constants ---
 CC = "clang++" if platform.system() == "Darwin" else "g++"
 NVCC = "nvcc"
@@ -192,7 +186,6 @@ CONSOLIDATED_CUDA_SOURCE = "solve_nh_parts.cu"
 STANDALONE_INCLUDE_DIR = Path("include/")
 STANDALONE_MAIN_SRC = Path("main.cc")
 STANDALONE_CUDA_MAIN_SRC = Path("main.cc")
-
 
 
 def _run_command(command: list[str], env: dict | None = None) -> None:
@@ -216,19 +209,15 @@ class Compiler:
         self.optimization_flags = self._get_optimization_flags()
         self.standard_flags = self._get_standard_flags()
         self.cuda_diagnosis_flags = self._get_cuda_diagnosis_flags()
-        self.cuda_optimization_flags = self._get_cuda_debug_flags() # TODO: Options to release/debug
+        self.cuda_optimization_flags = self._get_cuda_debug_flags()  # TODO: Options to release/debug
         self.cuda_standard_flags = self._get_cuda_standard_flags()
         self.dace_include = Path(dace.__file__).parent / "runtime/include/"
         self.nvcc = nvcc
 
     def _get_diagnosis_flags(self) -> list[str]:
-        errlimit_flag = (
-            "-fmax-errors=1" if self.cc.startswith("g++") else "-ferror-limit=1"
-        )
+        errlimit_flag = "-fmax-errors=1" if self.cc.startswith("g++") else "-ferror-limit=1"
         clang_only_warnings = (
-            "-Wno-parentheses-equality -Wno-constant-logical-operand"
-            if self.cc.startswith("clang")
-            else ""
+            "-Wno-parentheses-equality -Wno-constant-logical-operand" if self.cc.startswith("clang") else ""
         )
         return (
             f"{errlimit_flag} -g -Wall -Wextra -Wno-unused-parameter "
@@ -237,9 +226,7 @@ class Compiler:
         ).split()
 
     def _get_cuda_diagnosis_flags(self) -> list[str]:
-        errlimit_flag = (
-            "-Xcompiler=-fmax-errors=1" if self.cc.startswith("g++") else "-Xcompiler=-ferror-limit=1"
-        )
+        errlimit_flag = "-Xcompiler=-fmax-errors=1" if self.cc.startswith("g++") else "-Xcompiler=-ferror-limit=1"
         clang_only_warnings = (
             "-Xcompiler=-Wno-parentheses-equality -Xcompiler=-Wno-constant-logical-operand"
             if self.cc.startswith("clang")
@@ -281,8 +268,10 @@ class Compiler:
 
     def get_velocity_linker_flags(self, stage: int) -> list[str]:
         # Search for existence of velocity library files intended for this stage
-        if any(Path(f).exists() for f in [
-            f"libvelocity_{stage}.so", f"libvelocity_{stage}.dylib", f"libvelocity_{stage}.a"]):
+        if any(
+            Path(f).exists()
+            for f in [f"libvelocity_{stage}.so", f"libvelocity_{stage}.dylib", f"libvelocity_{stage}.a"]
+        ):
             rpath_flag = '-Xcompiler="-Wl,-rpath,."' if stage >= GPU_STAGE_BEGINS else "-Wl,-rpath,."
             return ["-L.", f"-lvelocity_{stage}", rpath_flag]
         else:
@@ -306,7 +295,10 @@ class Compiler:
         return ["-shared"]
 
     def compile_object(
-        self, sources: list[Path], includes: list[Path], stage = 0,
+        self,
+        sources: list[Path],
+        includes: list[Path],
+        stage=0,
     ):
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
         if stage >= GPU_STAGE_BEGINS:
@@ -329,16 +321,15 @@ class Compiler:
         flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
         flags.extend(self.get_linker_flags(Mode.SHARED))
         flags.extend(self.get_velocity_linker_flags(stage))
-        cmd = ([self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, static_lib]
-               + flags
-               + self._get_cpp_standard_flags()
-               + ["-o", lib_name]
+        cmd = (
+            [self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, static_lib]
+            + flags
+            + self._get_cpp_standard_flags()
+            + ["-o", lib_name]
         )
         _run_command([str(c) for c in cmd if c])
 
-    def link_executable(
-        self, main_src: Path, static_lib: str, includes: list[Path], bin_name: str, stage: int
-    ):
+    def link_executable(self, main_src: Path, static_lib: str, includes: list[Path], bin_name: str, stage: int):
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
         flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
         flags.extend(self.get_linker_flags(Mode.EXEC))
@@ -353,7 +344,12 @@ class Compiler:
         _run_command([str(c) for c in cmd if c])
 
     def compile_gpu_executable(
-        self, main_src: Path, host_sources: list[Path], includes: list[Path], gpu_output_name: str, stage = 0,
+        self,
+        main_src: Path,
+        host_sources: list[Path],
+        includes: list[Path],
+        gpu_output_name: str,
+        stage=0,
     ):
         # sdfg_srcs, sdfg_cuda_srcs, sdfg_includes, EXEC_FILE, stage
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
@@ -363,7 +359,9 @@ class Compiler:
             gen_sources.append(self._get_cuda_src_file_flag())
             gen_sources.append(str(s))
         cmd = (
-            [self.nvcc,]
+            [
+                self.nvcc,
+            ]
             + gen_sources
             + [f"-I{i}" for i in all_includes]
             + self.get_cuda_base_flags()
@@ -385,9 +383,11 @@ def _fix_init_cuda(cuda_source_path: Path, host_source_path: Path) -> None:
                 if "int __dace_init_cuda(" in line and line.strip().endswith(";"):
                     key = re.search(r"int __dace_init_cuda\((\w+)", line).group(1)
                     assert key.endswith("_state_t")
-                    key = key[:-len("_state_t")]
+                    key = key[: -len("_state_t")]
                     cuda_inits[key] = line.strip().rstrip(";").strip()
-                    assert not cuda_inits[key].endswith(";"), f"Expected {cuda_inits[key]} to not end with a semicolon after processing"
+                    assert not cuda_inits[key].endswith(";"), (
+                        f"Expected {cuda_inits[key]} to not end with a semicolon after processing"
+                    )
 
         assert len(cuda_inits) == 4
 
@@ -398,7 +398,7 @@ def _fix_init_cuda(cuda_source_path: Path, host_source_path: Path) -> None:
             for line in lines:
                 if "int __dace_init_cuda(" in line:
                     key = re.search(r"int __dace_init_cuda\((\w+)", line).group(1)
-                    key = key[:-len("_state_t")]
+                    key = key[: -len("_state_t")]
                     assert key in cuda_inits, f"Expected {key} to be in cuda_inits"
                     newline = cuda_inits[key]
                     if line.strip().endswith(";"):
@@ -409,6 +409,7 @@ def _fix_init_cuda(cuda_source_path: Path, host_source_path: Path) -> None:
                         newline += " "
                     line = newline + "\n"
                 f.write(line)
+
 
 def consolidate_generated_code(
     sdfg_includes: list[Path], sdfg_srcs: list[Path], sdfg_cuda_srcs: list[Path], store: Path, stage: int
@@ -431,19 +432,15 @@ def consolidate_generated_code(
     :param sdfg_srcs: A list of paths to generated source files.
     :param store: The directory where the consolidated files will be stored.
     """
-    all_headers = {
-        f.stem[len("solve_nh_") :]: f.read_text()
-        for p in sdfg_includes
-        for f in p.glob("solve_nh_*.h")
-    }
+    all_headers = {f.stem[len("solve_nh_") :]: f.read_text() for p in sdfg_includes for f in p.glob("solve_nh_*.h")}
     all_sources = {f.stem[len("solve_nh_") :]: f.read_text() for f in sdfg_srcs}
 
-    combined_header = "\n".join(
-        wrap_namespace(name, content).strip() for name, content in all_headers.items()
-    ).replace("**__restrict__", "*__restrict *__restrict__")
-    combined_source = "\n".join(
-        wrap_namespace(name, content).strip() for name, content in all_sources.items()
-    ).replace("**__restrict__", "*__restrict *__restrict__")
+    combined_header = "\n".join(wrap_namespace(name, content).strip() for name, content in all_headers.items()).replace(
+        "**__restrict__", "*__restrict *__restrict__"
+    )
+    combined_source = "\n".join(wrap_namespace(name, content).strip() for name, content in all_sources.items()).replace(
+        "**__restrict__", "*__restrict *__restrict__"
+    )
 
     store.mkdir(parents=True, exist_ok=True)
     header_path = store / CONSOLIDATED_HEADER
@@ -477,10 +474,8 @@ def consolidate_generated_code(
         ),
         ("t_int_state *in_p_int = p_int[0];", "t_int_state *in_p_int = p_int;"),
         ("t_patch *in_p_patch = p_patch[0];", "t_patch *in_p_patch = p_patch;"),
-        ("t_nh_prog *in_p_nh_prog_nnow = p_nh_prog_nnow[0];",
-         "t_nh_prog *in_p_nh_prog_nnow = p_nh_prog_nnow;"),
-        ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];",
-         "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;"),
+        ("t_nh_prog *in_p_nh_prog_nnow = p_nh_prog_nnow[0];", "t_nh_prog *in_p_nh_prog_nnow = p_nh_prog_nnow;"),
+        ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];", "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;"),
         (
             "t_nh_prog *in_p_prog = p_nh_prog_nnew[0];",
             "t_nh_prog *in_p_prog = p_nh_prog_nnew;",
@@ -509,20 +504,22 @@ def consolidate_generated_code(
         ("p_nh[0] = out_p_nh;", "p_nh = out_p_nh;"),
         ("DACE_EXPORTED", ""),
         ("const const", "const"),
-        ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];",
-         "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;"),
-         ("new double DACE_ALIGN(64)", "new (std::align_val_t(64)) double"),
-         ("new int DACE_ALIGN(64)", "new (std::align_val_t(64)) int"),
-         ("new float DACE_ALIGN(64)", "new (std::align_val_t(64)) float"),
-         ("new uint16_t DACE_ALIGN(64)", "new (std::align_val_t(64)) uint16_t"),
-         ("new unsigned char DACE_ALIGN(64)", "new (std::align_val_t(64)) unsigned char"),
-         ("new double DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) double"),
-         ("new int DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) int"),
-         ("new float DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) float"),
-         ("new uint16_t DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) uint16_t"),
-         ("new unsigned char DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) unsigned char"),
-         ("DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));", "// disabled: DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));"),
-         ("__state->gpu_context->streams[0]", "nullptr"),
+        ("t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew[0];", "t_nh_prog *in_p_nh_prog_nnew = p_nh_prog_nnew;"),
+        ("new double DACE_ALIGN(64)", "new (std::align_val_t(64)) double"),
+        ("new int DACE_ALIGN(64)", "new (std::align_val_t(64)) int"),
+        ("new float DACE_ALIGN(64)", "new (std::align_val_t(64)) float"),
+        ("new uint16_t DACE_ALIGN(64)", "new (std::align_val_t(64)) uint16_t"),
+        ("new unsigned char DACE_ALIGN(64)", "new (std::align_val_t(64)) unsigned char"),
+        ("new double DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) double"),
+        ("new int DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) int"),
+        ("new float DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) float"),
+        ("new uint16_t DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) uint16_t"),
+        ("new unsigned char DACE_ALIGN(\n    64)", "new (std::align_val_t(64)) unsigned char"),
+        (
+            "DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));",
+            "// disabled: DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));",
+        ),
+        ("__state->gpu_context->streams[0]", "nullptr"),
     ]
 
     # Format again after replacements
@@ -557,7 +554,10 @@ def consolidate_generated_code(
 
 
 def compile_generated_code(
-    sdfg_includes: list[Path], sdfg_srcs: list[Path], mode: Mode, stage: int,
+    sdfg_includes: list[Path],
+    sdfg_srcs: list[Path],
+    mode: Mode,
+    stage: int,
 ) -> None:
     """
     Compiles the generated C++ code into a static library, shared library, or executable.
@@ -591,18 +591,16 @@ def compile_generated_code(
 
     if mode == Mode.SHARED:
         if stage >= GPU_STAGE_BEGINS:
-            print(f"Skipping shared library compilation for CUDA stage {GPU_STAGE_BEGINS} and above. Shared library feature needs to be implemented for CUDA stage 4.")
+            print(
+                f"Skipping shared library compilation for CUDA stage {GPU_STAGE_BEGINS} and above. Shared library feature needs to be implemented for CUDA stage 4."
+            )
         else:
             compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE, stage)
             print(f"Successfully created shared library: {SHARED_LIB_FILE}")
 
     if mode == Mode.EXEC:
         if stage >= GPU_STAGE_BEGINS:
-            compiler.compile_gpu_executable(
-                STANDALONE_MAIN_SRC, sdfg_srcs, sdfg_includes, EXEC_FILE, stage
-            )
+            compiler.compile_gpu_executable(STANDALONE_MAIN_SRC, sdfg_srcs, sdfg_includes, EXEC_FILE, stage)
         else:
-            compiler.link_executable(
-                STANDALONE_MAIN_SRC, STATIC_LIB_FILE, sdfg_includes, EXEC_FILE, stage
-            )
+            compiler.link_executable(STANDALONE_MAIN_SRC, STATIC_LIB_FILE, sdfg_includes, EXEC_FILE, stage)
         print(f"Successfully created executable: {EXEC_FILE}")
