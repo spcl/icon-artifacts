@@ -1770,6 +1770,12 @@ end if
               p_nh % diag % rho_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh_prog_nnow % rho(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh_prog_nnow % rho(jc, jk - 1, jb)
               z_rth_pr(1, jc, jk, jb) = p_nh_prog_nnow % rho(jc, jk, jb) - p_nh % metrics % rho_ref_mc(jc, jk, jb)
               z_rth_pr(2, jc, jk, jb) = p_nh_prog_nnow % theta_v(jc, jk, jb) - p_nh % metrics % theta_ref_mc(jc, jk, jb)
+! BEGIN: omp vs. openacc
+            ENDDO  ! openacc
+          ENDDO  ! openacc
+          DO jk = 2, nlev  ! openacc
+            DO jc = i_startidx, i_endidx  ! openacc
+! END: omp vs. openacc
               z_theta_v_pr_ic(jc, jk) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_rth_pr(2, jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_rth_pr(2, jc, jk - 1, jb)
               p_nh % diag % theta_v_ic(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * p_nh_prog_nnow % theta_v(jc, jk, jb) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * p_nh_prog_nnow % theta_v(jc, jk - 1, jb)
               z_th_ddz_exner_c(jc, jk, jb) = p_nh % metrics % vwind_expl_wgt(jc, jb) * p_nh % diag % theta_v_ic(jc, jk, jb) * (p_nh % diag % exner_pr(jc, jk - 1, jb) - p_nh % diag % exner_pr(jc, jk, jb)) / p_nh % metrics % ddqz_z_half(jc, jk, jb) + z_theta_v_pr_ic(jc, jk) * p_nh % metrics % d_exner_dz_ref_ic(jc, jk, jb)
@@ -2347,7 +2353,7 @@ end if
               p_nh%metrics%wgtfacq_c(jc,1,jb)*z_w_concorr_mc_m0 +         &
               p_nh%metrics%wgtfacq_c(jc,2,jb)*z_w_concorr_mc_m1 +       &
               p_nh%metrics%wgtfacq_c(jc,3,jb)*z_w_concorr_mc_m2  ! openacc
-          ENDDO. ! openacc
+          ENDDO  ! openacc
           ! omp: DO jk = nflatlev(jg) + 1, nlev
           ! omp:   DO jc = i_startidx, i_endidx
           ! omp:     p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc(jc, jk) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc(jc, jk - 1)
