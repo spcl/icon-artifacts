@@ -12,10 +12,8 @@ bash regen-sdfgs.sh
 # Regenerate all 4 serialization/deserialization modules
 bash regen-serde.sh
 
-# Fetch VT from the other branch and build it into one library
-bash regen-velocity-lib.sh
-# One can also fetch from a particular stage (default is 1).
-bash regen-velocity-lib.sh 4
+# Fetch precompiled VT shared libs from the other branch
+bash regen-velocity-lib.sh --machine ault23.cscs.ch --mode release
 ```
 
 ## Running a Stage
@@ -28,8 +26,6 @@ python -m stages.stage_0
 
 # Run only the SDFG optimization action
 python -m stages.stage_0 --optimize
-# Only on stage #0: You can also pass a `--shim` flag to inject the VT-calling library node.
-python -m stages.stage_0 --optimize --shim
 
 # Run only the code-generation action
 python -m stages.stage_0 --codegen
@@ -39,6 +35,20 @@ python -m stages.stage_0 --compile
 ```
 
 After the standalone compilation action, you should have a binary `./verify_solve_nh_parts` in this directory.
+
+### Special Case: Stage 0
+
+```bash
+# Only on stage #0: You can also pass a `--shim` flag alongside `--optimize` to inject the VT-calling library node.
+python -m stages.stage_0 --optimize --shim
+```
+
+### Special Case: Stage 3
+
+```bash
+# Only on stage #3: You can also pass a `--release` flag alongside `--compile` to compile with the highest level of optimizations.
+python -m stages.stage_3 --compile --release
+```
 
 ## Validating Numerically
 

@@ -1235,6 +1235,7 @@ MODULE fake_mo_solve_nonhydro
     REAL(KIND = 8), INTENT(INOUT) :: z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg
     REAL(KIND = 8), INTENT(INOUT) :: z_alpha(nproma, p_patch % nlevp1), z_beta(nproma, p_patch % nlev), z_q(nproma, p_patch % nlev), z_graddiv2_vn(nproma, p_patch % nlev), z_theta_v_pr_ic(nproma, p_patch % nlevp1), z_exner_ic(nproma, p_patch % nlevp1), z_w_concorr_mc(nproma, p_patch % nlev), z_flxdiv_mass(nproma, p_patch % nlev), z_flxdiv_theta(nproma, p_patch % nlev), z_hydro_corr(nproma, p_patch % nblks_e)
     REAL(KIND = 8), INTENT(INOUT) :: z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc
+    REAL(KIND = 8) :: z_w_concorr_mc_m0, z_w_concorr_mc_m1, z_w_concorr_mc_m2
     REAL(KIND = 8), INTENT(INOUT) :: z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr
     REAL(KIND = 8), INTENT(INOUT) :: dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew
     REAL(KIND = 8), INTENT(INOUT) :: z_raylfac(nrdmax(p_patch % id))
@@ -1308,19 +1309,19 @@ MODULE fake_mo_solve_nonhydro
     i_startblk = p_patch % cells % start_block(3)
     i_endblk = p_patch % cells % end_block(- 5)
     DO jb = i_startblk, i_endblk
-      CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 3, - 5)
-      DO jk = nflatlev(jg), nlev
-        DO jc = i_startidx, i_endidx
-          z_w_concorr_mc(jc, jk) = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
-        END DO
-      END DO
+      CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 3, (- 5))
       DO jk = nflatlev(jg) + 1, nlev
         DO jc = i_startidx, i_endidx
-          p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc(jc, jk) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc(jc, jk - 1)
+          z_w_concorr_mc_m1 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk - 1, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk - 1, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk - 1, p_patch % cells % edge_blk(jc, jb, 3))
+          z_w_concorr_mc_m0 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
+          p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc_m0 + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc_m1
         END DO
       END DO
       DO jc = i_startidx, i_endidx
-        p_nh % diag % w_concorr_c(jc, nlevp1, jb) = p_nh % metrics % wgtfacq_c(jc, 1, jb) * z_w_concorr_mc(jc, nlev) + p_nh % metrics % wgtfacq_c(jc, 2, jb) * z_w_concorr_mc(jc, nlev - 1) + p_nh % metrics % wgtfacq_c(jc, 3, jb) * z_w_concorr_mc(jc, nlev - 2)
+        z_w_concorr_mc_m2 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), nlev - 2, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), nlev - 2, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), nlev - 2, p_patch % cells % edge_blk(jc, jb, 3))
+        z_w_concorr_mc_m1 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), nlev - 1, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), nlev - 1, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), nlev - 1, p_patch % cells % edge_blk(jc, jb, 3))
+        z_w_concorr_mc_m0 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), nlev, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), nlev, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), nlev, p_patch % cells % edge_blk(jc, jb, 3))
+        p_nh % diag % w_concorr_c(jc, nlevp1, jb) = p_nh % metrics % wgtfacq_c(jc, 1, jb) * z_w_concorr_mc_m0 + p_nh % metrics % wgtfacq_c(jc, 2, jb) * z_w_concorr_mc_m1 + p_nh % metrics % wgtfacq_c(jc, 3, jb) * z_w_concorr_mc_m2
       END DO
     END DO
     IF (timers_level > 5) THEN
@@ -1766,6 +1767,7 @@ MODULE fake_mo_solve_nonhydro
     REAL(KIND = 8), INTENT(INOUT) :: z_theta_tavg_m1, z_theta_tavg, z_rho_tavg_m1, z_rho_tavg
     REAL(KIND = 8), INTENT(INOUT) :: z_alpha(nproma, p_patch % nlevp1), z_beta(nproma, p_patch % nlev), z_q(nproma, p_patch % nlev), z_graddiv2_vn(nproma, p_patch % nlev), z_theta_v_pr_ic(nproma, p_patch % nlevp1), z_exner_ic(nproma, p_patch % nlevp1), z_w_concorr_mc(nproma, p_patch % nlev), z_flxdiv_mass(nproma, p_patch % nlev), z_flxdiv_theta(nproma, p_patch % nlev), z_hydro_corr(nproma, p_patch % nblks_e)
     REAL(KIND = 8), INTENT(INOUT) :: z_a, z_b, z_c, z_g, z_gamma, z_w_backtraj, z_theta_v_pr_mc_m1, z_theta_v_pr_mc
+    REAL(KIND = 8) :: z_w_concorr_mc_m0, z_w_concorr_mc_m1, z_w_concorr_mc_m2
     REAL(KIND = 8), INTENT(INOUT) :: z_theta1, z_theta2, wgt_nnow_vel, wgt_nnew_vel, dt_shift, wgt_nnow_rth, wgt_nnew_rth, dthalf, r_nsubsteps, r_dtimensubsteps, scal_divdamp_o2, alin, dz32, df32, dz42, df42, bqdr, aqdr, zf, dzlin, dzqdr
     REAL(KIND = 8), INTENT(INOUT) :: dt_linintp_ubc, dt_linintp_ubc_nnow, dt_linintp_ubc_nnew
     REAL(KIND = 8), INTENT(INOUT) :: z_raylfac(nrdmax(p_patch % id))
@@ -1804,12 +1806,12 @@ MODULE fake_mo_solve_nonhydro
         END DO
       END DO
       IF (lsave_mflx .AND. .TRUE.) THEN
-        DO je = i_startidx, i_endidx
-          IF (p_patch % edges % refin_ctrl(je, jb) <= - 4 .AND. p_patch % edges % refin_ctrl(je, jb) >= - 6) THEN
-            DO jk = 1, nlev
+        DO jk = 1, nlev
+          DO je = i_startidx, i_endidx
+            IF (p_patch % edges % refin_ctrl(je, jb) <= - 4 .AND. p_patch % edges % refin_ctrl(je, jb) >= - 6) THEN
               p_nh % diag % mass_fl_e_sv(je, jk, jb) = p_nh % diag % mass_fl_e(je, jk, jb)
-            END DO
-          END IF
+            END IF
+          END DO
         END DO
       END IF
       IF (lprep_adv .AND. .TRUE.) THEN
@@ -1864,19 +1866,19 @@ MODULE fake_mo_solve_nonhydro
       i_startblk = p_patch % cells % start_block(3)
       i_endblk = p_patch % cells % end_block(- 5)
       DO jb = i_startblk, i_endblk
-        CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 3, - 5)
-        DO jk = nflatlev(jg), nlev
-          DO jc = i_startidx, i_endidx
-            z_w_concorr_mc(jc, jk) = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
-          END DO
-        END DO
+        CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 3, (- 5))
         DO jk = nflatlev(jg) + 1, nlev
           DO jc = i_startidx, i_endidx
-            p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc(jc, jk) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc(jc, jk - 1)
+            z_w_concorr_mc_m1 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk - 1, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk - 1, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk - 1, p_patch % cells % edge_blk(jc, jb, 3))
+            z_w_concorr_mc_m0 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
+            p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc_m0 + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc_m1
           END DO
         END DO
         DO jc = i_startidx, i_endidx
-          p_nh % diag % w_concorr_c(jc, nlevp1, jb) = p_nh % metrics % wgtfacq_c(jc, 1, jb) * z_w_concorr_mc(jc, nlev) + p_nh % metrics % wgtfacq_c(jc, 2, jb) * z_w_concorr_mc(jc, nlev - 1) + p_nh % metrics % wgtfacq_c(jc, 3, jb) * z_w_concorr_mc(jc, nlev - 2)
+          z_w_concorr_mc_m2 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), nlev - 2, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), nlev - 2, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), nlev - 2, p_patch % cells % edge_blk(jc, jb, 3))
+          z_w_concorr_mc_m1 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), nlev - 1, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), nlev - 1, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), nlev - 1, p_patch % cells % edge_blk(jc, jb, 3))
+          z_w_concorr_mc_m0 = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), nlev, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), nlev, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), nlev, p_patch % cells % edge_blk(jc, jb, 3))
+          p_nh % diag % w_concorr_c(jc, nlevp1, jb) = p_nh % metrics % wgtfacq_c(jc, 1, jb) * z_w_concorr_mc_m0 + p_nh % metrics % wgtfacq_c(jc, 2, jb) * z_w_concorr_mc_m1 + p_nh % metrics % wgtfacq_c(jc, 3, jb) * z_w_concorr_mc_m2
         END DO
       END DO
     END IF

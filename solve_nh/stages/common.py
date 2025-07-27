@@ -4,10 +4,11 @@ import dace
 from dace import SDFG
 from utils.unique_names import unique_names
 from utils.codegen_from_sdfg import (
+    OptimizationMode,
     generate_code_from_sdfg,
     compile_generated_code,
     consolidate_generated_code,
-    Mode,
+    ArtifactMode,
     GPU_STAGE_BEGINS
 )
 
@@ -81,9 +82,9 @@ def codegen_action(
     )
 
 
-def compile_action(stage: int, mode: Mode) -> None:
+def compile_action(stage: int, artifact_mode: ArtifactMode, optimization_mode: OptimizationMode = OptimizationMode.DEBUG) -> None:
     SDFG_INCLUDES = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")]
     SDFG_SRCS = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}/solve_nh_parts.cpp")]
     if stage >= GPU_STAGE_BEGINS:
         SDFG_SRCS.append(Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}/solve_nh_parts.cu"))
-    compile_generated_code(SDFG_INCLUDES, SDFG_SRCS, mode, stage)
+    compile_generated_code(SDFG_INCLUDES, SDFG_SRCS, artifact_mode, optimization_mode, stage)

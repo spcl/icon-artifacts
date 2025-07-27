@@ -2,7 +2,7 @@ import dace
 from dace import SDFG
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
-from utils.codegen_from_sdfg import Mode
+from utils.codegen_from_sdfg import ArtifactMode
 
 import argparse
 
@@ -27,10 +27,10 @@ def main():
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument(
         "--mode",
-        type=Mode,
-        choices=list(Mode),
+        type=ArtifactMode,
+        choices=list(ArtifactMode),
         required=False,
-        default=Mode.EXEC,
+        default=ArtifactMode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
     argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=False)
