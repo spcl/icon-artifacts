@@ -2301,22 +2301,54 @@ end if
         rl_end = -5
         i_startblk = p_patch % cells % start_block(3)
         i_endblk = p_patch % cells % end_block(-5)
+! BEGIN: omp vs. openacc
         DO jb = i_startblk, i_endblk
-          CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, 3, -5)
-          DO jk = nflatlev(jg), nlev
+          CALL get_indices_c(p_patch, jb, i_startblk, i_endblk, i_startidx, i_endidx, rl_start, rl_end)
+          ! omp: DO jk = nflatlev(jg), nlev
+          DO jk = nflatlev(jg)+1, nlev  ! openacc
             DO jc = i_startidx, i_endidx
-              z_w_concorr_mc(jc, jk) = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
+              ! omp: z_w_concorr_mc(jc, jk) = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
+              z_w_concorr_mc_m1 =  &
+                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),jk-1,ieblk(jc,jb,1)) + &
+                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),jk-1,ieblk(jc,jb,2)) + &
+                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk-1,ieblk(jc,jb,3))  ! openacc
+              z_w_concorr_mc_m0 =  &
+                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),jk,ieblk(jc,jb,1)) + &
+                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),jk,ieblk(jc,jb,2)) + &
+                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk,ieblk(jc,jb,3))  ! openacc
+              p_nh%diag%w_concorr_c(jc,jk,jb) =                                &
+                p_nh%metrics%wgtfac_c(jc,jk,jb)*z_w_concorr_mc_m0 +        &
+                (1._vp - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
             END DO
           END DO
-          DO jk = nflatlev(jg) + 1, nlev
-            DO jc = i_startidx, i_endidx
-              p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc(jc, jk) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc(jc, jk - 1)
-            END DO
-          END DO
-          DO jc = i_startidx, i_endidx
-            p_nh % diag % w_concorr_c(jc, nlevp1, jb) = p_nh % metrics % wgtfacq_c(jc, 1, jb) * z_w_concorr_mc(jc, nlev) + p_nh % metrics % wgtfacq_c(jc, 2, jb) * z_w_concorr_mc(jc, nlev - 1) + p_nh % metrics % wgtfacq_c(jc, 3, jb) * z_w_concorr_mc(jc, nlev - 2)
-          END DO
+          DO jc = i_startidx, i_endidx  ! openacc
+            z_w_concorr_mc_m2 =  &
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev-2,ieblk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev-2,ieblk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev-2,ieblk(jc,jb,3))  ! openacc
+            z_w_concorr_mc_m1 =  &
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev-1,ieblk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev-1,ieblk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev-1,ieblk(jc,jb,3))  ! openacc
+            z_w_concorr_mc_m0   =  &
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev,ieblk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev,ieblk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev,ieblk(jc,jb,3))  ! openacc
+            p_nh%diag%w_concorr_c(jc,nlevp1,jb) =                         &
+              p_nh%metrics%wgtfacq_c(jc,1,jb)*z_w_concorr_mc_m0 +         &
+              p_nh%metrics%wgtfacq_c(jc,2,jb)*z_w_concorr_mc_m1 +       &
+              p_nh%metrics%wgtfacq_c(jc,3,jb)*z_w_concorr_mc_m2  ! openacc
+          ENDDO. ! openacc
+          ! omp: DO jk = nflatlev(jg) + 1, nlev
+          ! omp:   DO jc = i_startidx, i_endidx
+          ! omp:     p_nh % diag % w_concorr_c(jc, jk, jb) = p_nh % metrics % wgtfac_c(jc, jk, jb) * z_w_concorr_mc(jc, jk) + (1.0D0 - p_nh % metrics % wgtfac_c(jc, jk, jb)) * z_w_concorr_mc(jc, jk - 1)
+          ! omp:   END DO
+          ! omp: END DO
+          ! omp: DO jc = i_startidx, i_endidx
+          ! omp:   p_nh % diag % w_concorr_c(jc, nlevp1, jb) = p_nh % metrics % wgtfacq_c(jc, 1, jb) * z_w_concorr_mc(jc, nlev) + p_nh % metrics % wgtfacq_c(jc, 2, jb) * z_w_concorr_mc(jc, nlev - 1) + p_nh % metrics % wgtfacq_c(jc, 3, jb) * z_w_concorr_mc(jc, nlev - 2)
+          ! omp: END DO
         END DO
+! END: omp vs. openacc
       END IF
       IF (timers_level > 5) THEN
         CALL timer_stop(timer_solve_nh_edgecomp)
