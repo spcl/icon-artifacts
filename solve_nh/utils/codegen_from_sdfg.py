@@ -210,16 +210,10 @@ def _run_command(command: list[str], env: dict | None = None) -> None:
 class Compiler:
     def __init__(self, cc: str = CC, nvcc: str = NVCC, optmode: OptimizationMode = OptimizationMode.DEBUG):
         self.cc = cc
-        self.diagnosis_flags = self._get_diagnosis_flags()
-        self.optimization_flags = self._get_optimization_flags()
-        self.standard_flags = self._get_standard_flags()
-        self.cuda_diagnosis_flags = self._get_cuda_diagnosis_flags()
-        self.cuda_optimization_flags = self._get_cuda_debug_flags()  # TODO: Options to release/debug
-        self.cuda_standard_flags = self._get_cuda_standard_flags()
-        self.dace_include = Path(dace.__file__).parent / "runtime/include/"
         self.nvcc = nvcc
+        self.dace_include = Path(dace.__file__).parent / "runtime/include/"
 
-    def _get_diagnosis_flags(self) -> list[str]:
+    def _get_diagnosis_flags_cpp(self) -> list[str]:
         errlimit_flag = "-fmax-errors=1" if self.cc.startswith("g++") else "-ferror-limit=1"
         clang_only_warnings = (
             "-Wno-parentheses-equality -Wno-constant-logical-operand" if self.cc.startswith("clang") else ""
@@ -230,7 +224,7 @@ class Compiler:
             f"-Wno-unused-but-set-parameter -Wno-sign-compare {clang_only_warnings}"
         ).split()
 
-    def _get_cuda_diagnosis_flags(self) -> list[str]:
+    def _get_diagnosis_flags_cuda(self) -> list[str]:
         errlimit_flag = "-Xcompiler=-fmax-errors=1" if self.cc.startswith("g++") else "-Xcompiler=-ferror-limit=1"
         clang_only_warnings = (
             "-Xcompiler=-Wno-parentheses-equality -Xcompiler=-Wno-constant-logical-operand"
@@ -243,7 +237,7 @@ class Compiler:
             f"-Xcompiler=-Wno-unused-but-set-parameter -Xcompiler=-Wno-sign-compare -Wno-deprecated-declarations {clang_only_warnings}"
         ).split()
 
-    def _get_optimization_flags(self) -> list[str]:
+    def _get_optimization_flags_cpp(self) -> list[str]:
         return "-O0 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off".split()
 
     def _get_cuda_debug_flags(self) -> list[str]:
@@ -252,21 +246,21 @@ class Compiler:
     def _get_cuda_release_flags(self) -> list[str]:
         return "-O3 -Xcompiler=-O3 -Xcompiler=-march=native -Xcompiler=-fstrict-aliasing -Xcompiler=-fomit-frame-pointer -Xcompiler=-ffast-math -Xcompiler=-ffp-contract=on -lineinfo --fmad=true --prec-div=false --prec-sqrt=false --ftz=true --use-fast-math -Xptxas=-O3 -Xptxas=-v --restrict -dlto".split()
 
-    def _get_standard_flags(self) -> list[str]:
+    def _get_standard_flags_cpp(self) -> list[str]:
         return "-fPIC -fopenmp".split()
 
-    def _get_cuda_standard_flags(self) -> list[str]:
+    def _get_standard_flags_cuda(self) -> list[str]:
         CUDA_ARCH = os.getenv("CUDA_ARCH", "native")
         return f"-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch={CUDA_ARCH} --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true --compiler-options='-fPIC' -DGPU --relocatable-device-code=true".split()
 
     def _get_cpp_standard_flags(self) -> list[str]:
         return ["-std=c++20"]
 
-    def get_base_flags(self) -> list[str]:
-        return self.diagnosis_flags + self.optimization_flags + self.standard_flags
+    def get_base_flags_cpp(self) -> list[str]:
+        return self._get_diagnosis_flags_cpp() + self._get_optimization_flags_cpp() + self._get_standard_flags_cpp()
 
-    def get_cuda_base_flags(self) -> list[str]:
-        return self.cuda_diagnosis_flags + self.cuda_standard_flags + self.cuda_optimization_flags
+    def get_base_flags_cuda(self) -> list[str]:
+        return self._get_diagnosis_flags_cuda() + self._get_standard_flags_cuda() + self._get_cuda_debug_flags()
 
     def _get_cuda_src_file_flag(self) -> str:
         return "-x=cu"
@@ -313,7 +307,7 @@ class Compiler:
                 [self.cc, "-c"]
                 + [str(s) for s in sources]
                 + [f"-I{i}" for i in all_includes]
-                + self.get_base_flags()
+                + self.get_base_flags_cpp()
                 + self._get_cpp_standard_flags()
             )
             _run_command([str(c) for c in cmd if c])
@@ -323,7 +317,7 @@ class Compiler:
         _run_command(cmd)
 
     def link_shared_library(self, static_lib: str, lib_name: str, stage: int):
-        flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
+        flags = self.get_base_flags_cpp() if stage < GPU_STAGE_BEGINS else self.get_base_flags_cuda()
         flags.extend(self.get_linker_flags(ArtifactMode.SHARED))
         flags.extend(self.get_velocity_linker_flags(stage))
         cmd = (
@@ -336,7 +330,7 @@ class Compiler:
 
     def link_executable(self, main_src: Path, static_lib: str, includes: list[Path], bin_name: str, stage: int):
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
-        flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
+        flags = self.get_base_flags_cpp() if stage < GPU_STAGE_BEGINS else self.get_base_flags_cuda()
         flags.extend(self.get_linker_flags(ArtifactMode.EXEC))
         flags.extend(self.get_velocity_linker_flags(stage))
         cmd = (
@@ -369,7 +363,7 @@ class Compiler:
             ]
             + gen_sources
             + [f"-I{i}" for i in all_includes]
-            + self.get_cuda_base_flags()
+            + self.get_base_flags_cuda()
             + self._get_cpp_standard_flags()
             + self.get_gpu_executable_linker_flags()
             + self.get_velocity_linker_flags(stage)
