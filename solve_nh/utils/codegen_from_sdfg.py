@@ -282,8 +282,8 @@ class Compiler:
         else:
             return []
 
-    def get_linker_flags(self, mode: Mode) -> list[str]:
-        if mode == Mode.SHARED:
+    def get_linker_flags(self, mode: ArtifactMode) -> list[str]:
+        if mode == ArtifactMode.SHARED:
             dyn_link = "-dynamiclib" if platform.system() == "Darwin" else "-shared"
             dyn_symbols = (
                 "-Wl,-undefined,dynamic_lookup"
@@ -324,7 +324,7 @@ class Compiler:
 
     def link_shared_library(self, static_lib: str, lib_name: str, stage: int):
         flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
-        flags.extend(self.get_linker_flags(Mode.SHARED))
+        flags.extend(self.get_linker_flags(ArtifactMode.SHARED))
         flags.extend(self.get_velocity_linker_flags(stage))
         cmd = (
             [self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, static_lib]
@@ -337,7 +337,7 @@ class Compiler:
     def link_executable(self, main_src: Path, static_lib: str, includes: list[Path], bin_name: str, stage: int):
         all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
         flags = self.get_base_flags() if stage < GPU_STAGE_BEGINS else self.get_cuda_base_flags()
-        flags.extend(self.get_linker_flags(Mode.EXEC))
+        flags.extend(self.get_linker_flags(ArtifactMode.EXEC))
         flags.extend(self.get_velocity_linker_flags(stage))
         cmd = (
             [self.cc if stage < GPU_STAGE_BEGINS else self.nvcc, str(main_src), static_lib]
@@ -561,7 +561,8 @@ def consolidate_generated_code(
 def compile_generated_code(
     sdfg_includes: list[Path],
     sdfg_srcs: list[Path],
-    mode: Mode,
+    artifact_mode: ArtifactMode,
+    optimization_mode: OptimizationMode,
     stage: int,
 ) -> None:
     """
@@ -570,9 +571,9 @@ def compile_generated_code(
     This function constructs and executes a compiler command (e.g., `clang++`) to
     compile the provided source files. The compilation is controlled by the
     `mode` parameter, which determines the output type:
-    - `Mode.STATIC`: A static library (`.a`).
-    - `Mode.SHARED`: A shared library (`.so` or `.dylib`).
-    - `Mode.EXEC`: An executable.
+    - `ArtifactMode.STATIC`: A static library (`.a`).
+    - `ArtifactMode.SHARED`: A shared library (`.so` or `.dylib`).
+    - `ArtifactMode.EXEC`: An executable.
 
     It automatically includes necessary DaCe runtime headers and sets
     various compiler flags for optimization, warnings, and C++ standards.
@@ -582,9 +583,9 @@ def compile_generated_code(
     :param sdfg_srcs: A list of paths to the C++ source files to compile.
     :param mode: The compilation mode, determining the output artifact.
     """
-    compiler = Compiler()
+    compiler = Compiler(optmode=optimization_mode)
 
-    if mode == Mode.STATIC or mode == Mode.SHARED or mode == Mode.EXEC:
+    if artifact_mode in [ArtifactMode.EXEC, ArtifactMode.STATIC, ArtifactMode.SHARED]:
         if stage >= GPU_STAGE_BEGINS:
             print(f"Skipping static library compilation for CUDA stage {GPU_STAGE_BEGINS} and above")
         else:
@@ -594,7 +595,7 @@ def compile_generated_code(
             compiler.archive_static_library(obj_files, STATIC_LIB_FILE)
             print(f"Successfully created static library: {STATIC_LIB_FILE}")
 
-    if mode == Mode.SHARED:
+    if artifact_mode == ArtifactMode.SHARED:
         if stage >= GPU_STAGE_BEGINS:
             print(
                 f"Skipping shared library compilation for CUDA stage {GPU_STAGE_BEGINS} and above. Shared library feature needs to be implemented for CUDA stage 4."
@@ -603,7 +604,7 @@ def compile_generated_code(
             compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE, stage)
             print(f"Successfully created shared library: {SHARED_LIB_FILE}")
 
-    if mode == Mode.EXEC:
+    if artifact_mode == ArtifactMode.EXEC:
         if stage >= GPU_STAGE_BEGINS:
             compiler.compile_gpu_executable(STANDALONE_MAIN_SRC, sdfg_srcs, sdfg_includes, EXEC_FILE, stage)
         else:
