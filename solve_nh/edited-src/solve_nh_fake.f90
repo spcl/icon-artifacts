@@ -1368,13 +1368,13 @@ end if
             DO jc = i_startidx, i_endidx
               ! omp: z_w_concorr_mc(jc, jk) = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
               z_w_concorr_mc_m1 =  &
-                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),jk-1,ieblk(jc,jb,1)) + &
-                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),jk-1,ieblk(jc,jb,2)) + &
-                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk-1,ieblk(jc,jb,3))  ! openacc
+                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),jk-1,p_patch%cells%edge_blk(jc,jb,1)) + &
+                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),jk-1,p_patch%cells%edge_blk(jc,jb,2)) + &
+                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),jk-1,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
               z_w_concorr_mc_m0 =  &
-                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),jk,ieblk(jc,jb,1)) + &
-                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),jk,ieblk(jc,jb,2)) + &
-                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk,ieblk(jc,jb,3))  ! openacc
+                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),jk,p_patch%cells%edge_blk(jc,jb,1)) + &
+                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),jk,p_patch%cells%edge_blk(jc,jb,2)) + &
+                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),jk,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
               p_nh%diag%w_concorr_c(jc,jk,jb) =                                &
                 p_nh%metrics%wgtfac_c(jc,jk,jb)*z_w_concorr_mc_m0 +        &
                 (1.0D0 - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
@@ -1382,17 +1382,17 @@ end if
           END DO
           DO jc = i_startidx, i_endidx  ! openacc
             z_w_concorr_mc_m2 =  &
-              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev-2,ieblk(jc,jb,1)) + &
-              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev-2,ieblk(jc,jb,2)) + &
-              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev-2,ieblk(jc,jb,3))  ! openacc
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),nlev-2,p_patch%cells%edge_blk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),nlev-2,p_patch%cells%edge_blk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),nlev-2,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
             z_w_concorr_mc_m1 =  &
-              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev-1,ieblk(jc,jb,1)) + &
-              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev-1,ieblk(jc,jb,2)) + &
-              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev-1,ieblk(jc,jb,3))  ! openacc
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),nlev-1,p_patch%cells%edge_blk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),nlev-1,p_patch%cells%edge_blk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),nlev-1,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
             z_w_concorr_mc_m0   =  &
-              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev,ieblk(jc,jb,1)) + &
-              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev,ieblk(jc,jb,2)) + &
-              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev,ieblk(jc,jb,3))  ! openacc
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),nlev,p_patch%cells%edge_blk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),nlev,p_patch%cells%edge_blk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),nlev,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
             p_nh%diag%w_concorr_c(jc,nlevp1,jb) =                         &
               p_nh%metrics%wgtfacq_c(jc,1,jb)*z_w_concorr_mc_m0 +         &
               p_nh%metrics%wgtfacq_c(jc,2,jb)*z_w_concorr_mc_m1 +       &
@@ -2356,13 +2356,13 @@ end if
             DO jc = i_startidx, i_endidx
               ! omp: z_w_concorr_mc(jc, jk) = p_int % e_bln_c_s(jc, 1, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 1), jk, p_patch % cells % edge_blk(jc, jb, 1)) + p_int % e_bln_c_s(jc, 2, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 2), jk, p_patch % cells % edge_blk(jc, jb, 2)) + p_int % e_bln_c_s(jc, 3, jb) * z_w_concorr_me(p_patch % cells % edge_idx(jc, jb, 3), jk, p_patch % cells % edge_blk(jc, jb, 3))
               z_w_concorr_mc_m1 =  &
-                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),jk-1,ieblk(jc,jb,1)) + &
-                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),jk-1,ieblk(jc,jb,2)) + &
-                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk-1,ieblk(jc,jb,3))  ! openacc
+                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),jk-1,p_patch%cells%edge_blk(jc,jb,1)) + &
+                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),jk-1,p_patch%cells%edge_blk(jc,jb,2)) + &
+                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),jk-1,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
               z_w_concorr_mc_m0 =  &
-                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),jk,ieblk(jc,jb,1)) + &
-                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),jk,ieblk(jc,jb,2)) + &
-                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk,ieblk(jc,jb,3))  ! openacc
+                p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),jk,p_patch%cells%edge_blk(jc,jb,1)) + &
+                p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),jk,p_patch%cells%edge_blk(jc,jb,2)) + &
+                p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),jk,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
               p_nh%diag%w_concorr_c(jc,jk,jb) =                                &
                 p_nh%metrics%wgtfac_c(jc,jk,jb)*z_w_concorr_mc_m0 +        &
                 (1.0D0 - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
@@ -2370,17 +2370,17 @@ end if
           END DO
           DO jc = i_startidx, i_endidx  ! openacc
             z_w_concorr_mc_m2 =  &
-              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev-2,ieblk(jc,jb,1)) + &
-              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev-2,ieblk(jc,jb,2)) + &
-              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev-2,ieblk(jc,jb,3))  ! openacc
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),nlev-2,p_patch%cells%edge_blk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),nlev-2,p_patch%cells%edge_blk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),nlev-2,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
             z_w_concorr_mc_m1 =  &
-              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev-1,ieblk(jc,jb,1)) + &
-              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev-1,ieblk(jc,jb,2)) + &
-              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev-1,ieblk(jc,jb,3))  ! openacc
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),nlev-1,p_patch%cells%edge_blk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),nlev-1,p_patch%cells%edge_blk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),nlev-1,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
             z_w_concorr_mc_m0   =  &
-              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(ieidx(jc,jb,1),nlev,ieblk(jc,jb,1)) + &
-              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(ieidx(jc,jb,2),nlev,ieblk(jc,jb,2)) + &
-              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),nlev,ieblk(jc,jb,3))  ! openacc
+              p_int%e_bln_c_s(jc,1,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,1),nlev,p_patch%cells%edge_blk(jc,jb,1)) + &
+              p_int%e_bln_c_s(jc,2,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,2),nlev,p_patch%cells%edge_blk(jc,jb,2)) + &
+              p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(p_patch%cells%edge_idx(jc,jb,3),nlev,p_patch%cells%edge_blk(jc,jb,3))  ! openacc
             p_nh%diag%w_concorr_c(jc,nlevp1,jb) =                         &
               p_nh%metrics%wgtfacq_c(jc,1,jb)*z_w_concorr_mc_m0 +         &
               p_nh%metrics%wgtfacq_c(jc,2,jb)*z_w_concorr_mc_m1 +       &
