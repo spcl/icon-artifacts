@@ -5,214 +5,6 @@
 #include <dace/dace.h>
 
 
-struct global_data_type {
-    int i_am_accel_node = {};
-    int lextra_diffu = {};
-    int* nflatlev = {};
-    int nproma = {};
-    int* nrdmax = {};
-    int timer_intp = {};
-    int timer_solve_nh_veltend = {};
-    int timers_level = {};
-};
-
-struct t_nh_metrics {
-    int __f2dace_SA_coeff1_dwdz_d_0_s = {};
-    int __f2dace_SA_coeff1_dwdz_d_1_s = {};
-    int __f2dace_SA_coeff1_dwdz_d_2_s = {};
-    int __f2dace_SA_coeff2_dwdz_d_0_s = {};
-    int __f2dace_SA_coeff2_dwdz_d_1_s = {};
-    int __f2dace_SA_coeff2_dwdz_d_2_s = {};
-    int __f2dace_SA_coeff_gradekin_d_0_s = {};
-    int __f2dace_SA_coeff_gradekin_d_1_s = {};
-    int __f2dace_SA_coeff_gradekin_d_2_s = {};
-    int __f2dace_SA_ddqz_z_full_e_d_0_s = {};
-    int __f2dace_SA_ddqz_z_full_e_d_1_s = {};
-    int __f2dace_SA_ddqz_z_full_e_d_2_s = {};
-    int __f2dace_SA_ddqz_z_half_d_0_s = {};
-    int __f2dace_SA_ddqz_z_half_d_1_s = {};
-    int __f2dace_SA_ddqz_z_half_d_2_s = {};
-    int __f2dace_SA_ddxn_z_full_d_0_s = {};
-    int __f2dace_SA_ddxn_z_full_d_1_s = {};
-    int __f2dace_SA_ddxn_z_full_d_2_s = {};
-    int __f2dace_SA_ddxt_z_full_d_0_s = {};
-    int __f2dace_SA_ddxt_z_full_d_1_s = {};
-    int __f2dace_SA_ddxt_z_full_d_2_s = {};
-    int __f2dace_SA_deepatmo_gradh_ifc_d_0_s = {};
-    int __f2dace_SA_deepatmo_gradh_mc_d_0_s = {};
-    int __f2dace_SA_deepatmo_invr_ifc_d_0_s = {};
-    int __f2dace_SA_deepatmo_invr_mc_d_0_s = {};
-    int __f2dace_SA_wgtfac_c_d_0_s = {};
-    int __f2dace_SA_wgtfac_c_d_1_s = {};
-    int __f2dace_SA_wgtfac_c_d_2_s = {};
-    int __f2dace_SA_wgtfac_e_d_0_s = {};
-    int __f2dace_SA_wgtfac_e_d_1_s = {};
-    int __f2dace_SA_wgtfac_e_d_2_s = {};
-    int __f2dace_SA_wgtfacq_e_d_0_s = {};
-    int __f2dace_SA_wgtfacq_e_d_1_s = {};
-    int __f2dace_SA_wgtfacq_e_d_2_s = {};
-    int __f2dace_SOA_coeff1_dwdz_d_0_s = {};
-    int __f2dace_SOA_coeff1_dwdz_d_1_s = {};
-    int __f2dace_SOA_coeff1_dwdz_d_2_s = {};
-    int __f2dace_SOA_coeff2_dwdz_d_0_s = {};
-    int __f2dace_SOA_coeff2_dwdz_d_1_s = {};
-    int __f2dace_SOA_coeff2_dwdz_d_2_s = {};
-    int __f2dace_SOA_coeff_gradekin_d_0_s = {};
-    int __f2dace_SOA_coeff_gradekin_d_1_s = {};
-    int __f2dace_SOA_coeff_gradekin_d_2_s = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_0_s = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_1_s = {};
-    int __f2dace_SOA_ddqz_z_full_e_d_2_s = {};
-    int __f2dace_SOA_ddqz_z_half_d_0_s = {};
-    int __f2dace_SOA_ddqz_z_half_d_1_s = {};
-    int __f2dace_SOA_ddqz_z_half_d_2_s = {};
-    int __f2dace_SOA_ddxn_z_full_d_0_s = {};
-    int __f2dace_SOA_ddxn_z_full_d_1_s = {};
-    int __f2dace_SOA_ddxn_z_full_d_2_s = {};
-    int __f2dace_SOA_ddxt_z_full_d_0_s = {};
-    int __f2dace_SOA_ddxt_z_full_d_1_s = {};
-    int __f2dace_SOA_ddxt_z_full_d_2_s = {};
-    int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s = {};
-    int __f2dace_SOA_deepatmo_gradh_mc_d_0_s = {};
-    int __f2dace_SOA_deepatmo_invr_ifc_d_0_s = {};
-    int __f2dace_SOA_deepatmo_invr_mc_d_0_s = {};
-    int __f2dace_SOA_wgtfac_c_d_0_s = {};
-    int __f2dace_SOA_wgtfac_c_d_1_s = {};
-    int __f2dace_SOA_wgtfac_c_d_2_s = {};
-    int __f2dace_SOA_wgtfac_e_d_0_s = {};
-    int __f2dace_SOA_wgtfac_e_d_1_s = {};
-    int __f2dace_SOA_wgtfac_e_d_2_s = {};
-    int __f2dace_SOA_wgtfacq_e_d_0_s = {};
-    int __f2dace_SOA_wgtfacq_e_d_1_s = {};
-    int __f2dace_SOA_wgtfacq_e_d_2_s = {};
-    double* coeff1_dwdz = {};
-    double* coeff2_dwdz = {};
-    double* coeff_gradekin = {};
-    double* ddqz_z_full_e = {};
-    double* ddqz_z_half = {};
-    double* ddxn_z_full = {};
-    double* ddxt_z_full = {};
-    double* deepatmo_gradh_ifc = {};
-    double* deepatmo_gradh_mc = {};
-    double* deepatmo_invr_ifc = {};
-    double* deepatmo_invr_mc = {};
-    double* wgtfac_c = {};
-    double* wgtfac_e = {};
-    double* wgtfacq_e = {};
-};
-
-struct t_nh_diag {
-    int __f2dace_SA_ddt_vn_apc_pc_d_0_s = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_1_s = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_2_s = {};
-    int __f2dace_SA_ddt_vn_apc_pc_d_3_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_0_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_1_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_2_s = {};
-    int __f2dace_SA_ddt_w_adv_pc_d_3_s = {};
-    int __f2dace_SA_vn_ie_d_0_s = {};
-    int __f2dace_SA_vn_ie_d_1_s = {};
-    int __f2dace_SA_vn_ie_d_2_s = {};
-    int __f2dace_SA_vt_d_0_s = {};
-    int __f2dace_SA_vt_d_1_s = {};
-    int __f2dace_SA_vt_d_2_s = {};
-    int __f2dace_SA_w_concorr_c_d_0_s = {};
-    int __f2dace_SA_w_concorr_c_d_1_s = {};
-    int __f2dace_SA_w_concorr_c_d_2_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_0_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_1_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_2_s = {};
-    int __f2dace_SOA_ddt_vn_apc_pc_d_3_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_0_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_1_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_2_s = {};
-    int __f2dace_SOA_ddt_w_adv_pc_d_3_s = {};
-    int __f2dace_SOA_vn_ie_d_0_s = {};
-    int __f2dace_SOA_vn_ie_d_1_s = {};
-    int __f2dace_SOA_vn_ie_d_2_s = {};
-    int __f2dace_SOA_vt_d_0_s = {};
-    int __f2dace_SOA_vt_d_1_s = {};
-    int __f2dace_SOA_vt_d_2_s = {};
-    int __f2dace_SOA_w_concorr_c_d_0_s = {};
-    int __f2dace_SOA_w_concorr_c_d_1_s = {};
-    int __f2dace_SOA_w_concorr_c_d_2_s = {};
-    double* ddt_vn_apc_pc = {};
-    double* ddt_w_adv_pc = {};
-    double max_vcfl_dyn = {};
-    double* vn_ie = {};
-    double* vt = {};
-    double* w_concorr_c = {};
-};
-
-struct t_int_state {
-    int __f2dace_SA_c_lin_e_d_0_s = {};
-    int __f2dace_SA_c_lin_e_d_1_s = {};
-    int __f2dace_SA_c_lin_e_d_2_s = {};
-    int __f2dace_SA_cells_aw_verts_d_0_s = {};
-    int __f2dace_SA_cells_aw_verts_d_1_s = {};
-    int __f2dace_SA_cells_aw_verts_d_2_s = {};
-    int __f2dace_SA_e_bln_c_s_d_0_s = {};
-    int __f2dace_SA_e_bln_c_s_d_1_s = {};
-    int __f2dace_SA_e_bln_c_s_d_2_s = {};
-    int __f2dace_SA_geofac_grdiv_d_0_s = {};
-    int __f2dace_SA_geofac_grdiv_d_1_s = {};
-    int __f2dace_SA_geofac_grdiv_d_2_s = {};
-    int __f2dace_SA_geofac_n2s_d_0_s = {};
-    int __f2dace_SA_geofac_n2s_d_1_s = {};
-    int __f2dace_SA_geofac_n2s_d_2_s = {};
-    int __f2dace_SA_geofac_rot_d_0_s = {};
-    int __f2dace_SA_geofac_rot_d_1_s = {};
-    int __f2dace_SA_geofac_rot_d_2_s = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_0_s = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_1_s = {};
-    int __f2dace_SA_rbf_vec_coeff_e_d_2_s = {};
-    int __f2dace_SOA_c_lin_e_d_0_s = {};
-    int __f2dace_SOA_c_lin_e_d_1_s = {};
-    int __f2dace_SOA_c_lin_e_d_2_s = {};
-    int __f2dace_SOA_cells_aw_verts_d_0_s = {};
-    int __f2dace_SOA_cells_aw_verts_d_1_s = {};
-    int __f2dace_SOA_cells_aw_verts_d_2_s = {};
-    int __f2dace_SOA_e_bln_c_s_d_0_s = {};
-    int __f2dace_SOA_e_bln_c_s_d_1_s = {};
-    int __f2dace_SOA_e_bln_c_s_d_2_s = {};
-    int __f2dace_SOA_geofac_grdiv_d_0_s = {};
-    int __f2dace_SOA_geofac_grdiv_d_1_s = {};
-    int __f2dace_SOA_geofac_grdiv_d_2_s = {};
-    int __f2dace_SOA_geofac_n2s_d_0_s = {};
-    int __f2dace_SOA_geofac_n2s_d_1_s = {};
-    int __f2dace_SOA_geofac_n2s_d_2_s = {};
-    int __f2dace_SOA_geofac_rot_d_0_s = {};
-    int __f2dace_SOA_geofac_rot_d_1_s = {};
-    int __f2dace_SOA_geofac_rot_d_2_s = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s = {};
-    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s = {};
-    double* c_lin_e = {};
-    double* cells_aw_verts = {};
-    double* e_bln_c_s = {};
-    double* geofac_grdiv = {};
-    double* geofac_n2s = {};
-    double* geofac_rot = {};
-    double* rbf_vec_coeff_e = {};
-};
-
-struct t_nh_prog {
-    int __f2dace_SA_vn_d_0_s = {};
-    int __f2dace_SA_vn_d_1_s = {};
-    int __f2dace_SA_vn_d_2_s = {};
-    int __f2dace_SA_w_d_0_s = {};
-    int __f2dace_SA_w_d_1_s = {};
-    int __f2dace_SA_w_d_2_s = {};
-    int __f2dace_SOA_vn_d_0_s = {};
-    int __f2dace_SOA_vn_d_1_s = {};
-    int __f2dace_SOA_vn_d_2_s = {};
-    int __f2dace_SOA_w_d_0_s = {};
-    int __f2dace_SOA_w_d_1_s = {};
-    int __f2dace_SOA_w_d_2_s = {};
-    double* vn = {};
-    double* w = {};
-};
-
 struct t_grid_domain_decomp_info {
     int __f2dace_SA_owner_mask_d_0_s = {};
     int __f2dace_SA_owner_mask_d_1_s = {};
@@ -414,6 +206,214 @@ struct t_patch {
     t_grid_vertices* verts = {};
 };
 
+struct t_nh_diag {
+    int __f2dace_SA_ddt_vn_apc_pc_d_0_s = {};
+    int __f2dace_SA_ddt_vn_apc_pc_d_1_s = {};
+    int __f2dace_SA_ddt_vn_apc_pc_d_2_s = {};
+    int __f2dace_SA_ddt_vn_apc_pc_d_3_s = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_0_s = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_1_s = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_2_s = {};
+    int __f2dace_SA_ddt_w_adv_pc_d_3_s = {};
+    int __f2dace_SA_vn_ie_d_0_s = {};
+    int __f2dace_SA_vn_ie_d_1_s = {};
+    int __f2dace_SA_vn_ie_d_2_s = {};
+    int __f2dace_SA_vt_d_0_s = {};
+    int __f2dace_SA_vt_d_1_s = {};
+    int __f2dace_SA_vt_d_2_s = {};
+    int __f2dace_SA_w_concorr_c_d_0_s = {};
+    int __f2dace_SA_w_concorr_c_d_1_s = {};
+    int __f2dace_SA_w_concorr_c_d_2_s = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_0_s = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_1_s = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_2_s = {};
+    int __f2dace_SOA_ddt_vn_apc_pc_d_3_s = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_0_s = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_1_s = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_2_s = {};
+    int __f2dace_SOA_ddt_w_adv_pc_d_3_s = {};
+    int __f2dace_SOA_vn_ie_d_0_s = {};
+    int __f2dace_SOA_vn_ie_d_1_s = {};
+    int __f2dace_SOA_vn_ie_d_2_s = {};
+    int __f2dace_SOA_vt_d_0_s = {};
+    int __f2dace_SOA_vt_d_1_s = {};
+    int __f2dace_SOA_vt_d_2_s = {};
+    int __f2dace_SOA_w_concorr_c_d_0_s = {};
+    int __f2dace_SOA_w_concorr_c_d_1_s = {};
+    int __f2dace_SOA_w_concorr_c_d_2_s = {};
+    double* ddt_vn_apc_pc = {};
+    double* ddt_w_adv_pc = {};
+    double max_vcfl_dyn = {};
+    double* vn_ie = {};
+    double* vt = {};
+    double* w_concorr_c = {};
+};
+
+struct t_nh_prog {
+    int __f2dace_SA_vn_d_0_s = {};
+    int __f2dace_SA_vn_d_1_s = {};
+    int __f2dace_SA_vn_d_2_s = {};
+    int __f2dace_SA_w_d_0_s = {};
+    int __f2dace_SA_w_d_1_s = {};
+    int __f2dace_SA_w_d_2_s = {};
+    int __f2dace_SOA_vn_d_0_s = {};
+    int __f2dace_SOA_vn_d_1_s = {};
+    int __f2dace_SOA_vn_d_2_s = {};
+    int __f2dace_SOA_w_d_0_s = {};
+    int __f2dace_SOA_w_d_1_s = {};
+    int __f2dace_SOA_w_d_2_s = {};
+    double* vn = {};
+    double* w = {};
+};
+
+struct t_int_state {
+    int __f2dace_SA_c_lin_e_d_0_s = {};
+    int __f2dace_SA_c_lin_e_d_1_s = {};
+    int __f2dace_SA_c_lin_e_d_2_s = {};
+    int __f2dace_SA_cells_aw_verts_d_0_s = {};
+    int __f2dace_SA_cells_aw_verts_d_1_s = {};
+    int __f2dace_SA_cells_aw_verts_d_2_s = {};
+    int __f2dace_SA_e_bln_c_s_d_0_s = {};
+    int __f2dace_SA_e_bln_c_s_d_1_s = {};
+    int __f2dace_SA_e_bln_c_s_d_2_s = {};
+    int __f2dace_SA_geofac_grdiv_d_0_s = {};
+    int __f2dace_SA_geofac_grdiv_d_1_s = {};
+    int __f2dace_SA_geofac_grdiv_d_2_s = {};
+    int __f2dace_SA_geofac_n2s_d_0_s = {};
+    int __f2dace_SA_geofac_n2s_d_1_s = {};
+    int __f2dace_SA_geofac_n2s_d_2_s = {};
+    int __f2dace_SA_geofac_rot_d_0_s = {};
+    int __f2dace_SA_geofac_rot_d_1_s = {};
+    int __f2dace_SA_geofac_rot_d_2_s = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_0_s = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_1_s = {};
+    int __f2dace_SA_rbf_vec_coeff_e_d_2_s = {};
+    int __f2dace_SOA_c_lin_e_d_0_s = {};
+    int __f2dace_SOA_c_lin_e_d_1_s = {};
+    int __f2dace_SOA_c_lin_e_d_2_s = {};
+    int __f2dace_SOA_cells_aw_verts_d_0_s = {};
+    int __f2dace_SOA_cells_aw_verts_d_1_s = {};
+    int __f2dace_SOA_cells_aw_verts_d_2_s = {};
+    int __f2dace_SOA_e_bln_c_s_d_0_s = {};
+    int __f2dace_SOA_e_bln_c_s_d_1_s = {};
+    int __f2dace_SOA_e_bln_c_s_d_2_s = {};
+    int __f2dace_SOA_geofac_grdiv_d_0_s = {};
+    int __f2dace_SOA_geofac_grdiv_d_1_s = {};
+    int __f2dace_SOA_geofac_grdiv_d_2_s = {};
+    int __f2dace_SOA_geofac_n2s_d_0_s = {};
+    int __f2dace_SOA_geofac_n2s_d_1_s = {};
+    int __f2dace_SOA_geofac_n2s_d_2_s = {};
+    int __f2dace_SOA_geofac_rot_d_0_s = {};
+    int __f2dace_SOA_geofac_rot_d_1_s = {};
+    int __f2dace_SOA_geofac_rot_d_2_s = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_0_s = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_1_s = {};
+    int __f2dace_SOA_rbf_vec_coeff_e_d_2_s = {};
+    double* c_lin_e = {};
+    double* cells_aw_verts = {};
+    double* e_bln_c_s = {};
+    double* geofac_grdiv = {};
+    double* geofac_n2s = {};
+    double* geofac_rot = {};
+    double* rbf_vec_coeff_e = {};
+};
+
+struct global_data_type {
+    int i_am_accel_node = {};
+    int lextra_diffu = {};
+    int* nflatlev = {};
+    int nproma = {};
+    int* nrdmax = {};
+    int timer_intp = {};
+    int timer_solve_nh_veltend = {};
+    int timers_level = {};
+};
+
+struct t_nh_metrics {
+    int __f2dace_SA_coeff1_dwdz_d_0_s = {};
+    int __f2dace_SA_coeff1_dwdz_d_1_s = {};
+    int __f2dace_SA_coeff1_dwdz_d_2_s = {};
+    int __f2dace_SA_coeff2_dwdz_d_0_s = {};
+    int __f2dace_SA_coeff2_dwdz_d_1_s = {};
+    int __f2dace_SA_coeff2_dwdz_d_2_s = {};
+    int __f2dace_SA_coeff_gradekin_d_0_s = {};
+    int __f2dace_SA_coeff_gradekin_d_1_s = {};
+    int __f2dace_SA_coeff_gradekin_d_2_s = {};
+    int __f2dace_SA_ddqz_z_full_e_d_0_s = {};
+    int __f2dace_SA_ddqz_z_full_e_d_1_s = {};
+    int __f2dace_SA_ddqz_z_full_e_d_2_s = {};
+    int __f2dace_SA_ddqz_z_half_d_0_s = {};
+    int __f2dace_SA_ddqz_z_half_d_1_s = {};
+    int __f2dace_SA_ddqz_z_half_d_2_s = {};
+    int __f2dace_SA_ddxn_z_full_d_0_s = {};
+    int __f2dace_SA_ddxn_z_full_d_1_s = {};
+    int __f2dace_SA_ddxn_z_full_d_2_s = {};
+    int __f2dace_SA_ddxt_z_full_d_0_s = {};
+    int __f2dace_SA_ddxt_z_full_d_1_s = {};
+    int __f2dace_SA_ddxt_z_full_d_2_s = {};
+    int __f2dace_SA_deepatmo_gradh_ifc_d_0_s = {};
+    int __f2dace_SA_deepatmo_gradh_mc_d_0_s = {};
+    int __f2dace_SA_deepatmo_invr_ifc_d_0_s = {};
+    int __f2dace_SA_deepatmo_invr_mc_d_0_s = {};
+    int __f2dace_SA_wgtfac_c_d_0_s = {};
+    int __f2dace_SA_wgtfac_c_d_1_s = {};
+    int __f2dace_SA_wgtfac_c_d_2_s = {};
+    int __f2dace_SA_wgtfac_e_d_0_s = {};
+    int __f2dace_SA_wgtfac_e_d_1_s = {};
+    int __f2dace_SA_wgtfac_e_d_2_s = {};
+    int __f2dace_SA_wgtfacq_e_d_0_s = {};
+    int __f2dace_SA_wgtfacq_e_d_1_s = {};
+    int __f2dace_SA_wgtfacq_e_d_2_s = {};
+    int __f2dace_SOA_coeff1_dwdz_d_0_s = {};
+    int __f2dace_SOA_coeff1_dwdz_d_1_s = {};
+    int __f2dace_SOA_coeff1_dwdz_d_2_s = {};
+    int __f2dace_SOA_coeff2_dwdz_d_0_s = {};
+    int __f2dace_SOA_coeff2_dwdz_d_1_s = {};
+    int __f2dace_SOA_coeff2_dwdz_d_2_s = {};
+    int __f2dace_SOA_coeff_gradekin_d_0_s = {};
+    int __f2dace_SOA_coeff_gradekin_d_1_s = {};
+    int __f2dace_SOA_coeff_gradekin_d_2_s = {};
+    int __f2dace_SOA_ddqz_z_full_e_d_0_s = {};
+    int __f2dace_SOA_ddqz_z_full_e_d_1_s = {};
+    int __f2dace_SOA_ddqz_z_full_e_d_2_s = {};
+    int __f2dace_SOA_ddqz_z_half_d_0_s = {};
+    int __f2dace_SOA_ddqz_z_half_d_1_s = {};
+    int __f2dace_SOA_ddqz_z_half_d_2_s = {};
+    int __f2dace_SOA_ddxn_z_full_d_0_s = {};
+    int __f2dace_SOA_ddxn_z_full_d_1_s = {};
+    int __f2dace_SOA_ddxn_z_full_d_2_s = {};
+    int __f2dace_SOA_ddxt_z_full_d_0_s = {};
+    int __f2dace_SOA_ddxt_z_full_d_1_s = {};
+    int __f2dace_SOA_ddxt_z_full_d_2_s = {};
+    int __f2dace_SOA_deepatmo_gradh_ifc_d_0_s = {};
+    int __f2dace_SOA_deepatmo_gradh_mc_d_0_s = {};
+    int __f2dace_SOA_deepatmo_invr_ifc_d_0_s = {};
+    int __f2dace_SOA_deepatmo_invr_mc_d_0_s = {};
+    int __f2dace_SOA_wgtfac_c_d_0_s = {};
+    int __f2dace_SOA_wgtfac_c_d_1_s = {};
+    int __f2dace_SOA_wgtfac_c_d_2_s = {};
+    int __f2dace_SOA_wgtfac_e_d_0_s = {};
+    int __f2dace_SOA_wgtfac_e_d_1_s = {};
+    int __f2dace_SOA_wgtfac_e_d_2_s = {};
+    int __f2dace_SOA_wgtfacq_e_d_0_s = {};
+    int __f2dace_SOA_wgtfacq_e_d_1_s = {};
+    int __f2dace_SOA_wgtfacq_e_d_2_s = {};
+    double* coeff1_dwdz = {};
+    double* coeff2_dwdz = {};
+    double* coeff_gradekin = {};
+    double* ddqz_z_full_e = {};
+    double* ddqz_z_half = {};
+    double* ddxn_z_full = {};
+    double* ddxt_z_full = {};
+    double* deepatmo_gradh_ifc = {};
+    double* deepatmo_gradh_mc = {};
+    double* deepatmo_invr_ifc = {};
+    double* deepatmo_invr_mc = {};
+    double* wgtfac_c = {};
+    double* wgtfac_e = {};
+    double* wgtfacq_e = {};
+};
+
 struct velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t {
     dace::cuda::Context *gpu_context;
     double * __restrict__ __0_gpu_z_w_con_c;
@@ -428,18 +428,18 @@ struct velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t {
     double * __restrict__ __0_gpu_z_w_con_c_full;
     double * __restrict__ __0_gpu_vcflmax;
     double * __restrict__ __0_vcflmax;
-    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16;
     uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16;
-    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16;
-    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16;
+    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16;
+    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16;
     uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16;
     uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16;
-    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16;
+    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16;
+    uint16_t * __restrict__ __0_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16;
     int __0_bitwidth_check_done;
     int __0_bitwidth_scalar;
-    uint8_t * __restrict__ __0_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8;
-    uint8_t * __restrict__ __0_gpu___CG_p_patch__CG_cells__m_edge_blk_uint8;
     uint8_t * __restrict__ __0_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8;
+    uint8_t * __restrict__ __0_gpu___CG_p_patch__CG_cells__m_edge_blk_uint8;
+    uint8_t * __restrict__ __0_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8;
     int __0_nblk_lowering_done;
 };
 
@@ -651,7 +651,7 @@ DACE_DFI void loop_body_31_3_5(const double * __restrict__ gpu___CG_p_int__m_e_b
 
 }
 
-DACE_DFI void loop_body_31_5_0(const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int _for_it_35, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+DACE_DFI void loop_body_31_5_0(const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int _for_it_35, int tmp_struct_symbol_14) {
 
 
     if ((1 == 1)) {
@@ -689,7 +689,7 @@ DACE_DFI void loop_body_31_5_0(const uint8_t * __restrict__ gpu_cfl_clipping, ui
 
                 ///////////////////
 
-                gpu_levmask[((_for_it_22 + (tmp_struct_symbol_13 * (_for_it_35 - 1))) - 1)] = out;
+                gpu_levmask[(((90 * _for_it_22) + _for_it_35) - 91)] = out;
             }
 
         }
@@ -814,7 +814,7 @@ DACE_DFI void loop_body_33_2_13(const double * __restrict__ gpu___CG_p_int__m_e_
 
 }
 
-DACE_DFI void loop_body_33_2_27(const double&  cfl_w_limit, const double&  dtime, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, const double&  scalfac_exdiff, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, int _for_it_44, int _for_it_45, int ntnd, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+DACE_DFI void loop_body_33_2_27(const double&  cfl_w_limit, const double&  dtime, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, const double&  scalfac_exdiff, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, int _for_it_44, int _for_it_45, int ntnd, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
     bool _if_cond_25;
     int _if_cond_24;
     int tmp_index_641;
@@ -827,7 +827,7 @@ DACE_DFI void loop_body_33_2_27(const double&  cfl_w_limit, const double&  dtime
 
 
     _if_cond_25 = (gpu_cfl_clipping[((_for_it_45 + (tmp_struct_symbol_14 * (_for_it_44 - 1))) - 1)] && gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[(((__f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3 * ((- __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3) + _for_it_22)) - __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3) + _for_it_45)]);
-    _if_cond_24 = gpu_levmask[((_for_it_22 + (tmp_struct_symbol_13 * (_for_it_44 - 1))) - 1)];
+    _if_cond_24 = gpu_levmask[(((90 * _for_it_22) + _for_it_44) - 91)];
 
     if (((_if_cond_24 == 1) && (_if_cond_25 == 1))) {
 
@@ -1433,7 +1433,7 @@ DACE_DFI void loop_body_96_2_13(const double * __restrict__ gpu___CG_p_int__m_e_
 
 }
 
-DACE_DFI void loop_body_96_2_27(const double&  cfl_w_limit, const double&  dtime, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, const double&  scalfac_exdiff, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, int _for_it_44, int _for_it_45, int ntnd, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+DACE_DFI void loop_body_96_2_27(const double&  cfl_w_limit, const double&  dtime, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, const double&  scalfac_exdiff, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, int _for_it_44, int _for_it_45, int ntnd, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
     bool _if_cond_25;
     int _if_cond_24;
     int tmp_index_641;
@@ -1446,7 +1446,7 @@ DACE_DFI void loop_body_96_2_27(const double&  cfl_w_limit, const double&  dtime
 
 
     _if_cond_25 = (gpu_cfl_clipping[((_for_it_45 + (tmp_struct_symbol_14 * (_for_it_44 - 1))) - 1)] && gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[(((__f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3 * ((- __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3) + _for_it_22)) - __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3) + _for_it_45)]);
-    _if_cond_24 = gpu_levmask[((_for_it_22 + (tmp_struct_symbol_13 * (_for_it_44 - 1))) - 1)];
+    _if_cond_24 = gpu_levmask[(((90 * _for_it_22) + _for_it_44) - 91)];
 
     if (((_if_cond_24 == 1) && (_if_cond_25 == 1))) {
 
@@ -1885,25 +1885,25 @@ DACE_EXPORTED void __dace_gpu_set_all_streams_1(velocity_no_nproma_if_prop_lvn_o
         __state->gpu_context->streams[i] = stream;
 }
 
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0(const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5) {
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4) {
     {
         {
             {
                 int i2 = (blockIdx.x * 256 + threadIdx.x);
                 int i1 = (blockIdx.y * 1 + threadIdx.y);
                 int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5) {
+                if (i2 < __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4) {
                     {
                         {
                             {
-                                int in = gpu___CG_p_patch__CG_verts__m_edge_blk[((((__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * i1)) + i0)];
+                                int in = gpu___CG_p_patch__CG_edges__m_quad_blk[((((__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * i1)) + i0)];
                                 uint8_t out;
 
                                 ///////////////////
                                 out = static_cast<uint8_t>(in);
                                 ///////////////////
 
-                                gpu___CG_p_patch__CG_verts__m_edge_blk_uint8[((((__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * i1)) + i0)] = out;
+                                gpu___CG_p_patch__CG_edges__m_quad_blk_uint8[((((__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * i1)) + i0)] = out;
                             }
                         }
                     }
@@ -1914,18 +1914,18 @@ __global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_ed
 }
 
 
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5)
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4)
 {
 
-    if ((int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, 1), 1)) == 0) {
+    if ((int_ceil(int_ceil(__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
 
         return;
     }
 
-    void  *copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0_args[] = { (void *)&gpu___CG_p_patch__CG_verts__m_edge_blk, (void *)&gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, (void *)&__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0, dim3(int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_0", int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, 1), 1), 256, 1, 1);
+    void  *copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_quad_blk, (void *)&gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, (void *)&__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0, dim3(int_ceil(int_ceil(__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_0", int_ceil(int_ceil(__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_cells__m_edge_blk_to_gpu___CG_p_patch__CG_cells__m_edge_blk_uint8_1_1_134_0_5(const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_blk_d_2_s_cells_p_patch_2) {
     {
@@ -1969,25 +1969,25 @@ void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_edge_blk_to_gpu___C
     gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_cells__m_edge_blk_to_gpu___CG_p_patch__CG_cells__m_edge_blk_uint8_1_1_134_0_5, dim3(int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_cells__m_edge_blk_to_gpu___CG_p_patch__CG_cells__m_edge_blk_uint8_1_1_134_0_5_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_cells__m_edge_blk_to_gpu___CG_p_patch__CG_cells__m_edge_blk_uint8_1_1_134_0_5", int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_cells_p_patch_2, 1), 1), 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4) {
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10(const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5) {
     {
         {
             {
                 int i2 = (blockIdx.x * 256 + threadIdx.x);
                 int i1 = (blockIdx.y * 1 + threadIdx.y);
                 int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4) {
+                if (i2 < __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5) {
                     {
                         {
                             {
-                                int in = gpu___CG_p_patch__CG_edges__m_quad_blk[((((__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * i1)) + i0)];
+                                int in = gpu___CG_p_patch__CG_verts__m_edge_blk[((((__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * i1)) + i0)];
                                 uint8_t out;
 
                                 ///////////////////
                                 out = static_cast<uint8_t>(in);
                                 ///////////////////
 
-                                gpu___CG_p_patch__CG_edges__m_quad_blk_uint8[((((__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4 * i1)) + i0)] = out;
+                                gpu___CG_p_patch__CG_verts__m_edge_blk_uint8[((((__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5 * i1)) + i0)] = out;
                             }
                         }
                     }
@@ -1998,62 +1998,20 @@ __global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_qu
 }
 
 
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, int __f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_blk_d_2_s_edges_p_patch_4)
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk, uint8_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, int __f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_blk_d_2_s_verts_p_patch_5)
 {
 
-    if ((int_ceil(int_ceil(__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
+    if ((int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, 1), 1)) == 0) {
 
         return;
     }
 
-    void  *copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_quad_blk, (void *)&gpu___CG_p_patch__CG_edges__m_quad_blk_uint8, (void *)&__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10, dim3(int_ceil(int_ceil(__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_quad_blk_to_gpu___CG_p_patch__CG_edges__m_quad_blk_uint8_1_1_134_0_10", int_ceil(int_ceil(__f2dace_SA_quad_blk_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_blk_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
+    void  *copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10_args[] = { (void *)&gpu___CG_p_patch__CG_verts__m_edge_blk, (void *)&gpu___CG_p_patch__CG_verts__m_edge_blk_uint8, (void *)&__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10, dim3(int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_verts__m_edge_blk_to_gpu___CG_p_patch__CG_verts__m_edge_blk_uint8_1_1_134_0_10", int_ceil(int_ceil(__f2dace_SA_edge_blk_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_blk_d_0_s_verts_p_patch_5, 1), 1), 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4) {
-    {
-        {
-            {
-                int i2 = (blockIdx.x * 256 + threadIdx.x);
-                int i1 = (blockIdx.y * 1 + threadIdx.y);
-                int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4) {
-                    {
-                        {
-                            {
-                                int in = gpu___CG_p_patch__CG_edges__m_quad_idx[((((__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * i1)) + i0)];
-                                uint16_t out;
-
-                                ///////////////////
-                                out = static_cast<uint16_t>(in);
-                                ///////////////////
-
-                                gpu___CG_p_patch__CG_edges__m_quad_idx_uint16[((((__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * i1)) + i0)] = out;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4)
-{
-
-    if ((int_ceil(int_ceil(__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
-
-        return;
-    }
-
-    void  *copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_quad_idx, (void *)&gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, (void *)&__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0, dim3(int_ceil(int_ceil(__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_0", int_ceil(int_ceil(__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4) {
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4) {
     {
         {
             {
@@ -2082,8 +2040,8 @@ __global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_ve
 }
 
 
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4)
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, int __f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4)
 {
 
     if ((int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
@@ -2091,29 +2049,29 @@ void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu__
         return;
     }
 
-    void  *copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_vertex_idx, (void *)&gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, (void *)&__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5, dim3(int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_5", int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
+    void  *copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_vertex_idx, (void *)&gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16, (void *)&__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0, dim3(int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_vertex_idx_to_gpu___CG_p_patch__CG_edges__m_vertex_idx_uint16_1_1_4_0_0", int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_vertex_idx_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10(const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2) {
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4) {
     {
         {
             {
                 int i2 = (blockIdx.x * 256 + threadIdx.x);
                 int i1 = (blockIdx.y * 1 + threadIdx.y);
                 int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2) {
+                if (i2 < __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4) {
                     {
                         {
                             {
-                                int in = gpu___CG_p_patch__CG_cells__m_neighbor_idx[((((__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * i1)) + i0)];
+                                int in = gpu___CG_p_patch__CG_edges__m_quad_idx[((((__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * i1)) + i0)];
                                 uint16_t out;
 
                                 ///////////////////
                                 out = static_cast<uint16_t>(in);
                                 ///////////////////
 
-                                gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16[((((__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * i1)) + i0)] = out;
+                                gpu___CG_p_patch__CG_edges__m_quad_idx_uint16[((((__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4 * i1)) + i0)] = out;
                             }
                         }
                     }
@@ -2124,146 +2082,20 @@ __global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_cells__m_ne
 }
 
 
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2)
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, int __f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_quad_idx_d_2_s_edges_p_patch_4)
 {
 
-    if ((int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, 1), 1)) == 0) {
+    if ((int_ceil(int_ceil(__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
 
         return;
     }
 
-    void  *copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10_args[] = { (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx, (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, (void *)&__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10, dim3(int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_10", int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, 1), 1), 256, 1, 1);
+    void  *copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_quad_idx, (void *)&gpu___CG_p_patch__CG_edges__m_quad_idx_uint16, (void *)&__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5, dim3(int_ceil(int_ceil(__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_quad_idx_to_gpu___CG_p_patch__CG_edges__m_quad_idx_uint16_1_1_4_0_5", int_ceil(int_ceil(__f2dace_SA_quad_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_quad_idx_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4) {
-    {
-        {
-            {
-                int i2 = (blockIdx.x * 256 + threadIdx.x);
-                int i1 = (blockIdx.y * 1 + threadIdx.y);
-                int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4) {
-                    {
-                        {
-                            {
-                                int in = gpu___CG_p_patch__CG_edges__m_cell_idx[((((__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * i1)) + i0)];
-                                uint16_t out;
-
-                                ///////////////////
-                                out = static_cast<uint16_t>(in);
-                                ///////////////////
-
-                                gpu___CG_p_patch__CG_edges__m_cell_idx_uint16[((((__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * i1)) + i0)] = out;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4)
-{
-
-    if ((int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
-
-        return;
-    }
-
-    void  *copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_cell_idx, (void *)&gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, (void *)&__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15, dim3(int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_15", int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20(const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2) {
-    {
-        {
-            {
-                int i2 = (blockIdx.x * 256 + threadIdx.x);
-                int i1 = (blockIdx.y * 1 + threadIdx.y);
-                int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2) {
-                    {
-                        {
-                            {
-                                int in = gpu___CG_p_patch__CG_cells__m_edge_idx[((((__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * i1)) + i0)];
-                                uint16_t out;
-
-                                ///////////////////
-                                out = static_cast<uint16_t>(in);
-                                ///////////////////
-
-                                gpu___CG_p_patch__CG_cells__m_edge_idx_uint16[((((__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * i1)) + i0)] = out;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2)
-{
-
-    if ((int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, 1), 1)) == 0) {
-
-        return;
-    }
-
-    void  *copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20_args[] = { (void *)&gpu___CG_p_patch__CG_cells__m_edge_idx, (void *)&gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, (void *)&__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20, dim3(int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_20", int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, 1), 1), 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25(const int * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5) {
-    {
-        {
-            {
-                int i2 = (blockIdx.x * 256 + threadIdx.x);
-                int i1 = (blockIdx.y * 1 + threadIdx.y);
-                int i0 = (blockIdx.z * 1 + threadIdx.z);
-                if (i2 < __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5) {
-                    {
-                        {
-                            {
-                                int in = gpu___CG_p_patch__CG_verts__m_cell_idx[((((__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * i1)) + i0)];
-                                uint16_t out;
-
-                                ///////////////////
-                                out = static_cast<uint16_t>(in);
-                                ///////////////////
-
-                                gpu___CG_p_patch__CG_verts__m_cell_idx_uint16[((((__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * i1)) + i0)] = out;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5)
-{
-
-    if ((int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, 1), 1)) == 0) {
-
-        return;
-    }
-
-    void  *copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25_args[] = { (void *)&gpu___CG_p_patch__CG_verts__m_cell_idx, (void *)&gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, (void *)&__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, (void *)&__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, (void *)&__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25, dim3(int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_25", int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, 1), 1), 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30(const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5) {
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10(const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5) {
     {
         {
             {
@@ -2292,8 +2124,8 @@ __global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_ed
 }
 
 
-DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5);
-void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5)
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_edge_idx_d_2_s_verts_p_patch_5)
 {
 
     if ((int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, 1), 1)) == 0) {
@@ -2301,9 +2133,177 @@ void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___C
         return;
     }
 
-    void  *copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30_args[] = { (void *)&gpu___CG_p_patch__CG_verts__m_edge_idx, (void *)&gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, (void *)&__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5 };
-    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30, dim3(int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_30", int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, 1), 1), 256, 1, 1);
+    void  *copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10_args[] = { (void *)&gpu___CG_p_patch__CG_verts__m_edge_idx, (void *)&gpu___CG_p_patch__CG_verts__m_edge_idx_uint16, (void *)&__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, (void *)&__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10, dim3(int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_verts__m_edge_idx_to_gpu___CG_p_patch__CG_verts__m_edge_idx_uint16_1_1_4_0_10", int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_verts_p_patch_5, 1), 1), 256, 1, 1);
+}
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15(const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2) {
+    {
+        {
+            {
+                int i2 = (blockIdx.x * 256 + threadIdx.x);
+                int i1 = (blockIdx.y * 1 + threadIdx.y);
+                int i0 = (blockIdx.z * 1 + threadIdx.z);
+                if (i2 < __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2) {
+                    {
+                        {
+                            {
+                                int in = gpu___CG_p_patch__CG_cells__m_edge_idx[((((__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * i1)) + i0)];
+                                uint16_t out;
+
+                                ///////////////////
+                                out = static_cast<uint16_t>(in);
+                                ///////////////////
+
+                                gpu___CG_p_patch__CG_cells__m_edge_idx_uint16[((((__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2 * i1)) + i0)] = out;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, int __f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_edge_idx_d_2_s_cells_p_patch_2)
+{
+
+    if ((int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, 1), 1)) == 0) {
+
+        return;
+    }
+
+    void  *copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15_args[] = { (void *)&gpu___CG_p_patch__CG_cells__m_edge_idx, (void *)&gpu___CG_p_patch__CG_cells__m_edge_idx_uint16, (void *)&__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15, dim3(int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_cells__m_edge_idx_to_gpu___CG_p_patch__CG_cells__m_edge_idx_uint16_1_1_4_0_15", int_ceil(int_ceil(__f2dace_SA_edge_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_edge_idx_d_0_s_cells_p_patch_2, 1), 1), 256, 1, 1);
+}
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20(const int * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5) {
+    {
+        {
+            {
+                int i2 = (blockIdx.x * 256 + threadIdx.x);
+                int i1 = (blockIdx.y * 1 + threadIdx.y);
+                int i0 = (blockIdx.z * 1 + threadIdx.z);
+                if (i2 < __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5) {
+                    {
+                        {
+                            {
+                                int in = gpu___CG_p_patch__CG_verts__m_cell_idx[((((__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * i1)) + i0)];
+                                uint16_t out;
+
+                                ///////////////////
+                                out = static_cast<uint16_t>(in);
+                                ///////////////////
+
+                                gpu___CG_p_patch__CG_verts__m_cell_idx_uint16[((((__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5) * i2) + (__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5 * i1)) + i0)] = out;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_2_s_verts_p_patch_5)
+{
+
+    if ((int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, 1), 1)) == 0) {
+
+        return;
+    }
+
+    void  *copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20_args[] = { (void *)&gpu___CG_p_patch__CG_verts__m_cell_idx, (void *)&gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, (void *)&__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, (void *)&__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, (void *)&__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20, dim3(int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_verts__m_cell_idx_to_gpu___CG_p_patch__CG_verts__m_cell_idx_uint16_1_1_4_0_20", int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_verts_p_patch_5, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, 1), 1), 256, 1, 1);
+}
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25(const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2) {
+    {
+        {
+            {
+                int i2 = (blockIdx.x * 256 + threadIdx.x);
+                int i1 = (blockIdx.y * 1 + threadIdx.y);
+                int i0 = (blockIdx.z * 1 + threadIdx.z);
+                if (i2 < __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2) {
+                    {
+                        {
+                            {
+                                int in = gpu___CG_p_patch__CG_cells__m_neighbor_idx[((((__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * i1)) + i0)];
+                                uint16_t out;
+
+                                ///////////////////
+                                out = static_cast<uint16_t>(in);
+                                ///////////////////
+
+                                gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16[((((__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2) * i2) + (__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2 * i1)) + i0)] = out;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2)
+{
+
+    if ((int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, 1), 1)) == 0) {
+
+        return;
+    }
+
+    void  *copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25_args[] = { (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx, (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, (void *)&__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25, dim3(int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_cells__m_neighbor_idx_to_gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16_1_1_4_0_25", int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_2_s_cells_p_patch_2, 1), 256), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, 1), 1), int_ceil(int_ceil(__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, 1), 1), 256, 1, 1);
+}
+__global__ void __launch_bounds__(256) copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30(const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4) {
+    {
+        {
+            {
+                int i2 = (blockIdx.x * 256 + threadIdx.x);
+                int i1 = (blockIdx.y * 1 + threadIdx.y);
+                int i0 = (blockIdx.z * 1 + threadIdx.z);
+                if (i2 < __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4) {
+                    {
+                        {
+                            {
+                                int in = gpu___CG_p_patch__CG_edges__m_cell_idx[((((__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * i1)) + i0)];
+                                uint16_t out;
+
+                                ///////////////////
+                                out = static_cast<uint16_t>(in);
+                                ///////////////////
+
+                                gpu___CG_p_patch__CG_edges__m_cell_idx_uint16[((((__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4) * i2) + (__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4 * i1)) + i0)] = out;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+DACE_EXPORTED void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4);
+void __dace_runkernel_copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const int * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx, uint16_t * __restrict__ gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, int __f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, int __f2dace_SA_cell_idx_d_2_s_edges_p_patch_4)
+{
+
+    if ((int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, 1), 256)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, 1), 1)) == 0 || (int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, 1), 1)) == 0) {
+
+        return;
+    }
+
+    void  *copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30_args[] = { (void *)&gpu___CG_p_patch__CG_edges__m_cell_idx, (void *)&gpu___CG_p_patch__CG_edges__m_cell_idx_uint16, (void *)&__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, (void *)&__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, (void *)&__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4 };
+    gpuError_t __err = cudaLaunchKernel((void*)copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30, dim3(int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, 1), 1)), dim3(256, 1, 1), copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "copy_map_gpu___CG_p_patch__CG_edges__m_cell_idx_to_gpu___CG_p_patch__CG_edges__m_cell_idx_uint16_1_1_4_0_30", int_ceil(int_ceil(__f2dace_SA_cell_idx_d_2_s_edges_p_patch_4, 1), 256), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_1_s_edges_p_patch_4, 1), 1), int_ceil(int_ceil(__f2dace_SA_cell_idx_d_0_s_edges_p_patch_4, 1), 1), 256, 1, 1);
 }
 __global__ void __launch_bounds__(256) single_state_body_map_1_1_8_1_5(const double * __restrict__ gpu___CG_p_int__m_cells_aw_verts, const uint16_t * __restrict__ gpu___CG_p_patch__CG_verts__m_cell_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, double * __restrict__ gpu_z_w_v, int __f2dace_SA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SA_cells_aw_verts_d_0_s_p_int_6, int __f2dace_SA_cells_aw_verts_d_1_s_p_int_6, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_cell_idx_d_0_s_verts_p_patch_5, int __f2dace_SOA_cell_idx_d_1_s_verts_p_patch_5, int __f2dace_SOA_cell_idx_d_2_s_verts_p_patch_5, int __f2dace_SOA_cells_aw_verts_d_0_s_p_int_6, int __f2dace_SOA_cells_aw_verts_d_1_s_p_int_6, int __f2dace_SOA_cells_aw_verts_d_2_s_p_int_6, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_0_0_0, int i_endidx_var_47_0_0, int i_startidx_var_46_0_0, int tmp_struct_symbol_6) {
     {
@@ -2428,71 +2428,7 @@ void __dace_runkernel_single_state_body_map_1_1_31_3_9(velocity_no_nproma_if_pro
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_map_1_1_31_3_9, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 90, 1), dim3(256, 1, 1), single_state_body_map_1_1_31_3_9_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_1_1_31_3_9", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 90, 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_3_map_1_1_31_4_4(uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13) {
-    {
-        int _for_it_34 = ((blockIdx.x * 256 + threadIdx.x) + Max(3, (nrdmax_jg - 2)));
-        if (_for_it_34 >= Max(3, (nrdmax_jg - 2)) && _for_it_34 < 88) {
-            {
-                uint8_t levmask_out_0;
-
-                ///////////////////
-                // Tasklet code (T_l544_c544)
-                levmask_out_0 = 0;
-                ///////////////////
-
-                gpu_levmask[((_for_it_22 + (tmp_struct_symbol_13 * (_for_it_34 - 1))) - 1)] = levmask_out_0;
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_single_state_body_3_map_1_1_31_4_4(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13);
-void __dace_runkernel_single_state_body_3_map_1_1_31_4_4(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13)
-{
-
-    if ((int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256)) == 0) {
-
-        return;
-    }
-
-    void  *single_state_body_3_map_1_1_31_4_4_args[] = { (void *)&gpu_levmask, (void *)&_for_it_22, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_13 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_3_map_1_1_31_4_4, dim3(int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1), dim3(256, 1, 1), single_state_body_3_map_1_1_31_4_4_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_3_map_1_1_31_4_4", int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1, 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) single_state_body_1_map_1_1_31_4_0(double * __restrict__ gpu_z_w_con_c, int i_endidx_var_149, int i_startidx_var_148, int tmp_struct_symbol_1) {
-    {
-        int _for_it_31 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_var_148);
-        if (_for_it_31 >= i_startidx_var_148 && _for_it_31 < (i_endidx_var_149 + 1)) {
-            {
-                double z_w_con_c_out_0;
-
-                ///////////////////
-                // Tasklet code (T_l536_c536)
-                z_w_con_c_out_0 = 0.0;
-                ///////////////////
-
-                gpu_z_w_con_c[((_for_it_31 + (90 * tmp_struct_symbol_1)) - 1)] = z_w_con_c_out_0;
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_single_state_body_1_map_1_1_31_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu_z_w_con_c, int i_endidx_var_149, int i_startidx_var_148, int tmp_struct_symbol_1);
-void __dace_runkernel_single_state_body_1_map_1_1_31_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu_z_w_con_c, int i_endidx_var_149, int i_startidx_var_148, int tmp_struct_symbol_1)
-{
-
-    if ((int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256)) == 0) {
-
-        return;
-    }
-
-    void  *single_state_body_1_map_1_1_31_4_0_args[] = { (void *)&gpu_z_w_con_c, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&tmp_struct_symbol_1 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_1_map_1_1_31_4_0, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 1, 1), dim3(256, 1, 1), single_state_body_1_map_1_1_31_4_0_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_1_1_31_4_0", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 1, 1, 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) single_state_body_2_map_1_1_31_4_9(const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1) {
+__global__ void __launch_bounds__(256) single_state_body_2_map_1_1_31_4_2(const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1) {
     {
         {
             int _for_it_33 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_var_148);
@@ -2518,8 +2454,8 @@ __global__ void __launch_bounds__(256) single_state_body_2_map_1_1_31_4_9(const 
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_2_map_1_1_31_4_9(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1);
-void __dace_runkernel_single_state_body_2_map_1_1_31_4_9(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1)
+DACE_EXPORTED void __dace_runkernel_single_state_body_2_map_1_1_31_4_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1);
+void __dace_runkernel_single_state_body_2_map_1_1_31_4_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1)
 {
 
     if ((int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256)) == 0 || (int_ceil(int_ceil((90 - nflatlev_jg), 1), 1)) == 0) {
@@ -2527,11 +2463,11 @@ void __dace_runkernel_single_state_body_2_map_1_1_31_4_9(velocity_no_nproma_if_p
         return;
     }
 
-    void  *single_state_body_2_map_1_1_31_4_9_args[] = { (void *)&gpu___CG_p_diag__m_w_concorr_c, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, (void *)&_for_it_22, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nflatlev_jg, (void *)&tmp_struct_symbol_1 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_2_map_1_1_31_4_9, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1), dim3(256, 1, 1), single_state_body_2_map_1_1_31_4_9_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_1_1_31_4_9", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1, 256, 1, 1);
+    void  *single_state_body_2_map_1_1_31_4_2_args[] = { (void *)&gpu___CG_p_diag__m_w_concorr_c, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, (void *)&_for_it_22, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nflatlev_jg, (void *)&tmp_struct_symbol_1 };
+    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_2_map_1_1_31_4_2, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1), dim3(256, 1, 1), single_state_body_2_map_1_1_31_4_2_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_1_1_31_4_2", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_31_4_19(const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
+__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_31_4_12(const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
     {
         {
             int _for_it_36 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_var_148);
@@ -2570,8 +2506,8 @@ __global__ void __launch_bounds__(256) single_state_body_4_map_1_1_31_4_19(const
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_31_4_19(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14);
-void __dace_runkernel_single_state_body_4_map_1_1_31_4_19(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14)
+DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_31_4_12(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14);
+void __dace_runkernel_single_state_body_4_map_1_1_31_4_12(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14)
 {
 
     if ((int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256)) == 0 || (int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1)) == 0) {
@@ -2579,22 +2515,22 @@ void __dace_runkernel_single_state_body_4_map_1_1_31_4_19(velocity_no_nproma_if_
         return;
     }
 
-    void  *single_state_body_4_map_1_1_31_4_19_args[] = { (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu_cfl_clipping, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_14 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_4_map_1_1_31_4_19, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1), dim3(256, 1, 1), single_state_body_4_map_1_1_31_4_19_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_1_1_31_4_19", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1, 256, 1, 1);
+    void  *single_state_body_4_map_1_1_31_4_12_args[] = { (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu_cfl_clipping, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_14 };
+    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_4_map_1_1_31_4_12, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1), dim3(256, 1, 1), single_state_body_4_map_1_1_31_4_12_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_1_1_31_4_12", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_31_5_6(const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_31_5_6(const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_14) {
     {
         int _for_it_35 = ((blockIdx.x * 256 + threadIdx.x) + Max(3, (nrdmax_jg - 2)));
         if (_for_it_35 >= Max(3, (nrdmax_jg - 2)) && _for_it_35 < 88) {
-            loop_body_31_5_0(&gpu_cfl_clipping[0], &gpu_levmask[0], _for_it_22, _for_it_35, tmp_struct_symbol_13, tmp_struct_symbol_14);
+            loop_body_31_5_0(&gpu_cfl_clipping[0], &gpu_levmask[0], _for_it_22, _for_it_35, tmp_struct_symbol_14);
         }
     }
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_31_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13, int tmp_struct_symbol_14);
-void __dace_runkernel_single_state_body_4_map_1_1_31_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13, int tmp_struct_symbol_14)
+DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_31_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_14);
+void __dace_runkernel_single_state_body_4_map_1_1_31_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_14)
 {
 
     if ((int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256)) == 0) {
@@ -2602,7 +2538,7 @@ void __dace_runkernel_single_state_body_4_map_1_1_31_5_6(velocity_no_nproma_if_p
         return;
     }
 
-    void  *single_state_body_4_map_1_1_31_5_6_args[] = { (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&_for_it_22, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_13, (void *)&tmp_struct_symbol_14 };
+    void  *single_state_body_4_map_1_1_31_5_6_args[] = { (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&_for_it_22, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_14 };
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_4_map_1_1_31_5_6, dim3(int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1), dim3(256, 1, 1), single_state_body_4_map_1_1_31_5_6_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_1_1_31_5_6", int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1, 256, 1, 1);
 }
@@ -2746,14 +2682,14 @@ void __dace_runkernel_single_state_body_0_map_1_1_33_2_11(velocity_no_nproma_if_
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_0_map_1_1_33_2_11, dim3(int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), 89, 1), dim3(256, 1, 1), single_state_body_0_map_1_1_33_2_11_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_1_1_33_2_11", int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), 89, 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_1_map_1_1_33_2_28(double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+__global__ void __launch_bounds__(256) single_state_body_1_map_1_1_33_2_28(double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
     {
         {
             int _for_it_45 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_2);
             int _for_it_44 = ((blockIdx.y * 1 + threadIdx.y) + Max(3, (nrdmax_jg - 2)));
             if (_for_it_45 >= i_startidx_2 && _for_it_45 < (i_endidx_2 + 1)) {
                 if (_for_it_44 >= Max(3, (nrdmax_jg - 2))) {
-                    loop_body_33_2_27(cfl_w_limit, dtime, &gpu___CG_p_int__m_geofac_n2s[0], &gpu___CG_p_metrics__m_ddqz_z_half[0], &gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[0], &gpu___CG_p_patch__CG_cells__m_area[0], &gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16[0], &gpu___CG_p_prog__m_w[0], &gpu_cfl_clipping[0], &gpu_levmask[0], &gpu_z_w_con_c[0], scalfac_exdiff, &gpu___CG_p_diag__m_ddt_w_adv_pc[0], __f2dace_SA_area_d_0_s_cells_p_patch_2, __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SA_geofac_n2s_d_0_s_p_int_6, __f2dace_SA_geofac_n2s_d_1_s_p_int_6, __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SA_w_d_0_s_p_prog_7, __f2dace_SOA_area_d_0_s_cells_p_patch_2, __f2dace_SOA_area_d_1_s_cells_p_patch_2, __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, __f2dace_SOA_w_d_0_s_p_prog_7, __f2dace_SOA_w_d_1_s_p_prog_7, __f2dace_SOA_w_d_2_s_p_prog_7, _for_it_22, _for_it_44, _for_it_45, ntnd, tmp_struct_symbol_1, tmp_struct_symbol_13, tmp_struct_symbol_14);
+                    loop_body_33_2_27(cfl_w_limit, dtime, &gpu___CG_p_int__m_geofac_n2s[0], &gpu___CG_p_metrics__m_ddqz_z_half[0], &gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[0], &gpu___CG_p_patch__CG_cells__m_area[0], &gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16[0], &gpu___CG_p_prog__m_w[0], &gpu_cfl_clipping[0], &gpu_levmask[0], &gpu_z_w_con_c[0], scalfac_exdiff, &gpu___CG_p_diag__m_ddt_w_adv_pc[0], __f2dace_SA_area_d_0_s_cells_p_patch_2, __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SA_geofac_n2s_d_0_s_p_int_6, __f2dace_SA_geofac_n2s_d_1_s_p_int_6, __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SA_w_d_0_s_p_prog_7, __f2dace_SOA_area_d_0_s_cells_p_patch_2, __f2dace_SOA_area_d_1_s_cells_p_patch_2, __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, __f2dace_SOA_w_d_0_s_p_prog_7, __f2dace_SOA_w_d_1_s_p_prog_7, __f2dace_SOA_w_d_2_s_p_prog_7, _for_it_22, _for_it_44, _for_it_45, ntnd, tmp_struct_symbol_1, tmp_struct_symbol_14);
                 }
             }
         }
@@ -2761,8 +2697,8 @@ __global__ void __launch_bounds__(256) single_state_body_1_map_1_1_33_2_28(doubl
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_1_map_1_1_33_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14);
-void __dace_runkernel_single_state_body_1_map_1_1_33_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14)
+DACE_EXPORTED void __dace_runkernel_single_state_body_1_map_1_1_33_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_14);
+void __dace_runkernel_single_state_body_1_map_1_1_33_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const uint16_t * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_14)
 {
 
     if ((int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256)) == 0 || (int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1)) == 0) {
@@ -2770,7 +2706,7 @@ void __dace_runkernel_single_state_body_1_map_1_1_33_2_28(velocity_no_nproma_if_
         return;
     }
 
-    void  *single_state_body_1_map_1_1_33_2_28_args[] = { (void *)&gpu___CG_p_diag__m_ddt_w_adv_pc, (void *)&gpu___CG_p_int__m_geofac_n2s, (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (void *)&gpu___CG_p_patch__CG_cells__m_area, (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, (void *)&gpu___CG_p_prog__m_w, (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_area_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, (void *)&__f2dace_SOA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_2_s_p_int_6, (void *)&__f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, (void *)&__f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_w_d_1_s_p_prog_7, (void *)&__f2dace_SOA_w_d_2_s_p_prog_7, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&dtime, (void *)&i_endidx_2, (void *)&i_startidx_2, (void *)&nrdmax_jg, (void *)&ntnd, (void *)&scalfac_exdiff, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_13, (void *)&tmp_struct_symbol_14 };
+    void  *single_state_body_1_map_1_1_33_2_28_args[] = { (void *)&gpu___CG_p_diag__m_ddt_w_adv_pc, (void *)&gpu___CG_p_int__m_geofac_n2s, (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (void *)&gpu___CG_p_patch__CG_cells__m_area, (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx_uint16, (void *)&gpu___CG_p_prog__m_w, (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_area_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, (void *)&__f2dace_SOA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_2_s_p_int_6, (void *)&__f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, (void *)&__f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_w_d_1_s_p_prog_7, (void *)&__f2dace_SOA_w_d_2_s_p_prog_7, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&dtime, (void *)&i_endidx_2, (void *)&i_startidx_2, (void *)&nrdmax_jg, (void *)&ntnd, (void *)&scalfac_exdiff, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_14 };
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_1_map_1_1_33_2_28, dim3(int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1), dim3(256, 1, 1), single_state_body_1_map_1_1_33_2_28_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_1_1_33_2_28", int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1, 256, 1, 1);
 }
@@ -2790,7 +2726,7 @@ __global__ void __launch_bounds__(256) single_state_body_0_map_1_1_7_0_62(uint8_
             }
             {
                 int in_size = loop_body_reduce_scan_size;
-                const uint8_t * in_arr = &gpu_levmask[((replaced_var_1 + (tmp_struct_symbol_13 * (_for_it_46 - 1))) - 1)];
+                const uint8_t * in_arr = &gpu_levmask[((_for_it_46 + (90 * replaced_var_1)) - 91)];
                 uint8_t out;
 
                 ///////////////////
@@ -3008,71 +2944,7 @@ void __dace_runkernel_single_state_body_map_1_1_94_3_9(velocity_no_nproma_if_pro
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_map_1_1_94_3_9, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 90, 1), dim3(256, 1, 1), single_state_body_map_1_1_94_3_9_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_map_1_1_94_3_9", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 90, 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_3_map_1_1_94_4_4(uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13) {
-    {
-        int _for_it_34 = ((blockIdx.x * 256 + threadIdx.x) + Max(3, (nrdmax_jg - 2)));
-        if (_for_it_34 >= Max(3, (nrdmax_jg - 2)) && _for_it_34 < 88) {
-            {
-                uint8_t levmask_out_0;
-
-                ///////////////////
-                // Tasklet code (T_l544_c544)
-                levmask_out_0 = 0;
-                ///////////////////
-
-                gpu_levmask[((_for_it_22 + (tmp_struct_symbol_13 * (_for_it_34 - 1))) - 1)] = levmask_out_0;
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_single_state_body_3_map_1_1_94_4_4(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13);
-void __dace_runkernel_single_state_body_3_map_1_1_94_4_4(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13)
-{
-
-    if ((int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256)) == 0) {
-
-        return;
-    }
-
-    void  *single_state_body_3_map_1_1_94_4_4_args[] = { (void *)&gpu_levmask, (void *)&_for_it_22, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_13 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_3_map_1_1_94_4_4, dim3(int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1), dim3(256, 1, 1), single_state_body_3_map_1_1_94_4_4_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_3_map_1_1_94_4_4", int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1, 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) single_state_body_1_map_1_1_94_4_0(double * __restrict__ gpu_z_w_con_c, int i_endidx_var_149, int i_startidx_var_148, int tmp_struct_symbol_1) {
-    {
-        int _for_it_31 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_var_148);
-        if (_for_it_31 >= i_startidx_var_148 && _for_it_31 < (i_endidx_var_149 + 1)) {
-            {
-                double z_w_con_c_out_0;
-
-                ///////////////////
-                // Tasklet code (T_l536_c536)
-                z_w_con_c_out_0 = 0.0;
-                ///////////////////
-
-                gpu_z_w_con_c[((_for_it_31 + (90 * tmp_struct_symbol_1)) - 1)] = z_w_con_c_out_0;
-            }
-        }
-    }
-}
-
-
-DACE_EXPORTED void __dace_runkernel_single_state_body_1_map_1_1_94_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu_z_w_con_c, int i_endidx_var_149, int i_startidx_var_148, int tmp_struct_symbol_1);
-void __dace_runkernel_single_state_body_1_map_1_1_94_4_0(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu_z_w_con_c, int i_endidx_var_149, int i_startidx_var_148, int tmp_struct_symbol_1)
-{
-
-    if ((int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256)) == 0) {
-
-        return;
-    }
-
-    void  *single_state_body_1_map_1_1_94_4_0_args[] = { (void *)&gpu_z_w_con_c, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&tmp_struct_symbol_1 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_1_map_1_1_94_4_0, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 1, 1), dim3(256, 1, 1), single_state_body_1_map_1_1_94_4_0_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_1_1_94_4_0", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), 1, 1, 256, 1, 1);
-}
-__global__ void __launch_bounds__(256) single_state_body_2_map_1_1_94_4_9(const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1) {
+__global__ void __launch_bounds__(256) single_state_body_2_map_1_1_94_4_2(const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1) {
     {
         {
             int _for_it_33 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_var_148);
@@ -3098,8 +2970,8 @@ __global__ void __launch_bounds__(256) single_state_body_2_map_1_1_94_4_9(const 
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_2_map_1_1_94_4_9(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1);
-void __dace_runkernel_single_state_body_2_map_1_1_94_4_9(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1)
+DACE_EXPORTED void __dace_runkernel_single_state_body_2_map_1_1_94_4_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1);
+void __dace_runkernel_single_state_body_2_map_1_1_94_4_2(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_diag__m_w_concorr_c, double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, int __f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, int _for_it_22, int i_endidx_var_149, int i_startidx_var_148, int nflatlev_jg, int tmp_struct_symbol_1)
 {
 
     if ((int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256)) == 0 || (int_ceil(int_ceil((90 - nflatlev_jg), 1), 1)) == 0) {
@@ -3107,11 +2979,11 @@ void __dace_runkernel_single_state_body_2_map_1_1_94_4_9(velocity_no_nproma_if_p
         return;
     }
 
-    void  *single_state_body_2_map_1_1_94_4_9_args[] = { (void *)&gpu___CG_p_diag__m_w_concorr_c, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, (void *)&_for_it_22, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nflatlev_jg, (void *)&tmp_struct_symbol_1 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_2_map_1_1_94_4_9, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1), dim3(256, 1, 1), single_state_body_2_map_1_1_94_4_9_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_1_1_94_4_9", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1, 256, 1, 1);
+    void  *single_state_body_2_map_1_1_94_4_2_args[] = { (void *)&gpu___CG_p_diag__m_w_concorr_c, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_0_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_1_s_p_diag_9, (void *)&__f2dace_SOA_w_concorr_c_d_2_s_p_diag_9, (void *)&_for_it_22, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nflatlev_jg, (void *)&tmp_struct_symbol_1 };
+    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_2_map_1_1_94_4_2, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1), dim3(256, 1, 1), single_state_body_2_map_1_1_94_4_2_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_2_map_1_1_94_4_2", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((90 - nflatlev_jg), 1), 1), 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_94_4_19(const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
+__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_94_4_12(const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
     {
         {
             int _for_it_36 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_var_148);
@@ -3150,8 +3022,8 @@ __global__ void __launch_bounds__(256) single_state_body_4_map_1_1_94_4_19(const
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_94_4_19(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14);
-void __dace_runkernel_single_state_body_4_map_1_1_94_4_19(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14)
+DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_94_4_12(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14);
+void __dace_runkernel_single_state_body_4_map_1_1_94_4_12(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, uint8_t * __restrict__ gpu_cfl_clipping, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int _for_it_22, const double cfl_w_limit, int i_endidx_var_149, int i_startidx_var_148, int nrdmax_jg, int tmp_struct_symbol_1, int tmp_struct_symbol_14)
 {
 
     if ((int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256)) == 0 || (int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1)) == 0) {
@@ -3159,22 +3031,22 @@ void __dace_runkernel_single_state_body_4_map_1_1_94_4_19(velocity_no_nproma_if_
         return;
     }
 
-    void  *single_state_body_4_map_1_1_94_4_19_args[] = { (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu_cfl_clipping, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_14 };
-    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_4_map_1_1_94_4_19, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1), dim3(256, 1, 1), single_state_body_4_map_1_1_94_4_19_args, 0, nullptr);
-    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_1_1_94_4_19", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1, 256, 1, 1);
+    void  *single_state_body_4_map_1_1_94_4_12_args[] = { (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu_cfl_clipping, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&i_endidx_var_149, (void *)&i_startidx_var_148, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_14 };
+    gpuError_t __err = cudaLaunchKernel((void*)single_state_body_4_map_1_1_94_4_12, dim3(int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1), dim3(256, 1, 1), single_state_body_4_map_1_1_94_4_12_args, 0, nullptr);
+    DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_1_1_94_4_12", int_ceil(int_ceil(((i_endidx_var_149 - i_startidx_var_148) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_94_5_6(const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+__global__ void __launch_bounds__(256) single_state_body_4_map_1_1_94_5_6(const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_14) {
     {
         int _for_it_35 = ((blockIdx.x * 256 + threadIdx.x) + Max(3, (nrdmax_jg - 2)));
         if (_for_it_35 >= Max(3, (nrdmax_jg - 2)) && _for_it_35 < 88) {
-            loop_body_31_5_0(&gpu_cfl_clipping[0], &gpu_levmask[0], _for_it_22, _for_it_35, tmp_struct_symbol_13, tmp_struct_symbol_14);
+            loop_body_31_5_0(&gpu_cfl_clipping[0], &gpu_levmask[0], _for_it_22, _for_it_35, tmp_struct_symbol_14);
         }
     }
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_94_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13, int tmp_struct_symbol_14);
-void __dace_runkernel_single_state_body_4_map_1_1_94_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_13, int tmp_struct_symbol_14)
+DACE_EXPORTED void __dace_runkernel_single_state_body_4_map_1_1_94_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_14);
+void __dace_runkernel_single_state_body_4_map_1_1_94_5_6(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, const uint8_t * __restrict__ gpu_cfl_clipping, uint8_t * __restrict__ gpu_levmask, int _for_it_22, int nrdmax_jg, int tmp_struct_symbol_14)
 {
 
     if ((int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256)) == 0) {
@@ -3182,7 +3054,7 @@ void __dace_runkernel_single_state_body_4_map_1_1_94_5_6(velocity_no_nproma_if_p
         return;
     }
 
-    void  *single_state_body_4_map_1_1_94_5_6_args[] = { (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&_for_it_22, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_13, (void *)&tmp_struct_symbol_14 };
+    void  *single_state_body_4_map_1_1_94_5_6_args[] = { (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&_for_it_22, (void *)&nrdmax_jg, (void *)&tmp_struct_symbol_14 };
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_4_map_1_1_94_5_6, dim3(int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1), dim3(256, 1, 1), single_state_body_4_map_1_1_94_5_6_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_4_map_1_1_94_5_6", int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 256), 1, 1, 256, 1, 1);
 }
@@ -3326,14 +3198,14 @@ void __dace_runkernel_single_state_body_0_map_1_1_96_2_11(velocity_no_nproma_if_
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_0_map_1_1_96_2_11, dim3(int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), 89, 1), dim3(256, 1, 1), single_state_body_0_map_1_1_96_2_11_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_0_map_1_1_96_2_11", int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), 89, 1, 256, 1, 1);
 }
-__global__ void __launch_bounds__(256) single_state_body_1_map_1_1_96_2_28(double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14) {
+__global__ void __launch_bounds__(256) single_state_body_1_map_1_1_96_2_28(double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_14) {
     {
         {
             int _for_it_45 = ((blockIdx.x * 256 + threadIdx.x) + i_startidx_2);
             int _for_it_44 = ((blockIdx.y * 1 + threadIdx.y) + Max(3, (nrdmax_jg - 2)));
             if (_for_it_45 >= i_startidx_2 && _for_it_45 < (i_endidx_2 + 1)) {
                 if (_for_it_44 >= Max(3, (nrdmax_jg - 2))) {
-                    loop_body_96_2_27(cfl_w_limit, dtime, &gpu___CG_p_int__m_geofac_n2s[0], &gpu___CG_p_metrics__m_ddqz_z_half[0], &gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[0], &gpu___CG_p_patch__CG_cells__m_area[0], &gpu___CG_p_patch__CG_cells__m_neighbor_idx[0], &gpu___CG_p_prog__m_w[0], &gpu_cfl_clipping[0], &gpu_levmask[0], &gpu_z_w_con_c[0], scalfac_exdiff, &gpu___CG_p_diag__m_ddt_w_adv_pc[0], __f2dace_SA_area_d_0_s_cells_p_patch_2, __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SA_geofac_n2s_d_0_s_p_int_6, __f2dace_SA_geofac_n2s_d_1_s_p_int_6, __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SA_w_d_0_s_p_prog_7, __f2dace_SOA_area_d_0_s_cells_p_patch_2, __f2dace_SOA_area_d_1_s_cells_p_patch_2, __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, __f2dace_SOA_w_d_0_s_p_prog_7, __f2dace_SOA_w_d_1_s_p_prog_7, __f2dace_SOA_w_d_2_s_p_prog_7, _for_it_22, _for_it_44, _for_it_45, ntnd, tmp_struct_symbol_1, tmp_struct_symbol_13, tmp_struct_symbol_14);
+                    loop_body_96_2_27(cfl_w_limit, dtime, &gpu___CG_p_int__m_geofac_n2s[0], &gpu___CG_p_metrics__m_ddqz_z_half[0], &gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask[0], &gpu___CG_p_patch__CG_cells__m_area[0], &gpu___CG_p_patch__CG_cells__m_neighbor_idx[0], &gpu___CG_p_prog__m_w[0], &gpu_cfl_clipping[0], &gpu_levmask[0], &gpu_z_w_con_c[0], scalfac_exdiff, &gpu___CG_p_diag__m_ddt_w_adv_pc[0], __f2dace_SA_area_d_0_s_cells_p_patch_2, __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SA_geofac_n2s_d_0_s_p_int_6, __f2dace_SA_geofac_n2s_d_1_s_p_int_6, __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SA_w_d_0_s_p_prog_7, __f2dace_SOA_area_d_0_s_cells_p_patch_2, __f2dace_SOA_area_d_1_s_cells_p_patch_2, __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, __f2dace_SOA_w_d_0_s_p_prog_7, __f2dace_SOA_w_d_1_s_p_prog_7, __f2dace_SOA_w_d_2_s_p_prog_7, _for_it_22, _for_it_44, _for_it_45, ntnd, tmp_struct_symbol_1, tmp_struct_symbol_14);
                 }
             }
         }
@@ -3341,8 +3213,8 @@ __global__ void __launch_bounds__(256) single_state_body_1_map_1_1_96_2_28(doubl
 }
 
 
-DACE_EXPORTED void __dace_runkernel_single_state_body_1_map_1_1_96_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14);
-void __dace_runkernel_single_state_body_1_map_1_1_96_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_13, int tmp_struct_symbol_14)
+DACE_EXPORTED void __dace_runkernel_single_state_body_1_map_1_1_96_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_14);
+void __dace_runkernel_single_state_body_1_map_1_1_96_2_28(velocity_no_nproma_if_prop_lvn_only_0_istep_2_state_t *__state, double * __restrict__ gpu___CG_p_diag__m_ddt_w_adv_pc, const double * __restrict__ gpu___CG_p_int__m_geofac_n2s, const double * __restrict__ gpu___CG_p_metrics__m_ddqz_z_half, const int * __restrict__ gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, const double * __restrict__ gpu___CG_p_patch__CG_cells__m_area, const int * __restrict__ gpu___CG_p_patch__CG_cells__m_neighbor_idx, const double * __restrict__ gpu___CG_p_prog__m_w, const uint8_t * __restrict__ gpu_cfl_clipping, const uint8_t * __restrict__ gpu_levmask, const double * __restrict__ gpu_z_w_con_c, int __f2dace_SA_area_d_0_s_cells_p_patch_2, int __f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SA_w_d_0_s_p_prog_7, int __f2dace_SOA_area_d_0_s_cells_p_patch_2, int __f2dace_SOA_area_d_1_s_cells_p_patch_2, int __f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, int __f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, int __f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, int __f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, int __f2dace_SOA_geofac_n2s_d_0_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_1_s_p_int_6, int __f2dace_SOA_geofac_n2s_d_2_s_p_int_6, int __f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, int __f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, int __f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, int __f2dace_SOA_w_d_0_s_p_prog_7, int __f2dace_SOA_w_d_1_s_p_prog_7, int __f2dace_SOA_w_d_2_s_p_prog_7, int _for_it_22, const double cfl_w_limit, const double dtime, int i_endidx_2, int i_startidx_2, int nrdmax_jg, int ntnd, const double scalfac_exdiff, int tmp_struct_symbol_1, int tmp_struct_symbol_14)
 {
 
     if ((int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256)) == 0 || (int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1)) == 0) {
@@ -3350,7 +3222,7 @@ void __dace_runkernel_single_state_body_1_map_1_1_96_2_28(velocity_no_nproma_if_
         return;
     }
 
-    void  *single_state_body_1_map_1_1_96_2_28_args[] = { (void *)&gpu___CG_p_diag__m_ddt_w_adv_pc, (void *)&gpu___CG_p_int__m_geofac_n2s, (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (void *)&gpu___CG_p_patch__CG_cells__m_area, (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx, (void *)&gpu___CG_p_prog__m_w, (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_area_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, (void *)&__f2dace_SOA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_2_s_p_int_6, (void *)&__f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, (void *)&__f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_w_d_1_s_p_prog_7, (void *)&__f2dace_SOA_w_d_2_s_p_prog_7, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&dtime, (void *)&i_endidx_2, (void *)&i_startidx_2, (void *)&nrdmax_jg, (void *)&ntnd, (void *)&scalfac_exdiff, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_13, (void *)&tmp_struct_symbol_14 };
+    void  *single_state_body_1_map_1_1_96_2_28_args[] = { (void *)&gpu___CG_p_diag__m_ddt_w_adv_pc, (void *)&gpu___CG_p_int__m_geofac_n2s, (void *)&gpu___CG_p_metrics__m_ddqz_z_half, (void *)&gpu___CG_p_patch__CG_cells__CG_decomp_info__m_owner_mask, (void *)&gpu___CG_p_patch__CG_cells__m_area, (void *)&gpu___CG_p_patch__CG_cells__m_neighbor_idx, (void *)&gpu___CG_p_prog__m_w, (void *)&gpu_cfl_clipping, (void *)&gpu_levmask, (void *)&gpu_z_w_con_c, (void *)&__f2dace_SA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_area_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_area_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_ddqz_z_half_d_0_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_1_s_p_metrics_8, (void *)&__f2dace_SOA_ddqz_z_half_d_2_s_p_metrics_8, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_0_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_1_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_2_s_p_diag_9, (void *)&__f2dace_SOA_ddt_w_adv_pc_d_3_s_p_diag_9, (void *)&__f2dace_SOA_geofac_n2s_d_0_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_1_s_p_int_6, (void *)&__f2dace_SOA_geofac_n2s_d_2_s_p_int_6, (void *)&__f2dace_SOA_neighbor_idx_d_0_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_1_s_cells_p_patch_2, (void *)&__f2dace_SOA_neighbor_idx_d_2_s_cells_p_patch_2, (void *)&__f2dace_SOA_owner_mask_d_0_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_owner_mask_d_1_s_decomp_info_cells_p_patch_3, (void *)&__f2dace_SOA_w_d_0_s_p_prog_7, (void *)&__f2dace_SOA_w_d_1_s_p_prog_7, (void *)&__f2dace_SOA_w_d_2_s_p_prog_7, (void *)&_for_it_22, (void *)&cfl_w_limit, (void *)&dtime, (void *)&i_endidx_2, (void *)&i_startidx_2, (void *)&nrdmax_jg, (void *)&ntnd, (void *)&scalfac_exdiff, (void *)&tmp_struct_symbol_1, (void *)&tmp_struct_symbol_14 };
     gpuError_t __err = cudaLaunchKernel((void*)single_state_body_1_map_1_1_96_2_28, dim3(int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1), dim3(256, 1, 1), single_state_body_1_map_1_1_96_2_28_args, 0, nullptr);
     DACE_KERNEL_LAUNCH_CHECK(__err, "single_state_body_1_map_1_1_96_2_28", int_ceil(int_ceil(((i_endidx_2 - i_startidx_2) + 1), 1), 256), int_ceil(int_ceil((88 - Max(3, (nrdmax_jg - 2))), 1), 1), 1, 256, 1, 1);
 }
@@ -3370,7 +3242,7 @@ __global__ void __launch_bounds__(256) single_state_body_0_map_1_1_70_0_62(uint8
             }
             {
                 int in_size = loop_body_reduce_scan_size;
-                const uint8_t * in_arr = &gpu_levmask[((replaced_var_1 + (tmp_struct_symbol_13 * (_for_it_46 - 1))) - 1)];
+                const uint8_t * in_arr = &gpu_levmask[((_for_it_46 + (90 * replaced_var_1)) - 91)];
                 uint8_t out;
 
                 ///////////////////

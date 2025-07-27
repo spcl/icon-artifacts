@@ -19,9 +19,11 @@ from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_a
 
 from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling, set_default_stream, insert_synchronization_and_timers_for_profiling
 
+from utils.detect_assignments_and_copies import AssignmentAndCopyKernelToMemcpyAndMemset
 from utils.create_profile_sdfg import create_profile_sdfg
 STAGE_ID = 8
 import os
+from utils.permute_array_dimensions import PermuteArrayDimensions, inverse_strides
 
 def optimization_action(sdfg):
     """ DEFINE THE OPTIMIZATION ACTION HERE """
@@ -35,6 +37,21 @@ def optimization_action(sdfg):
         ) + "}\n"
     )
     """
+    # Apply transformations
+    gpu_levmask_desc = sdfg.arrays.get("gpu_levmask")
+    print("gpu_levmask shape:", gpu_levmask_desc.shape, "strides:", gpu_levmask_desc.strides)
+    """
+    PermuteArrayDimensions(
+        permute_map={"gpu_levmask": [1, 0]},
+        add_permute_maps=False,
+    ).apply_pass(sdfg=sdfg, pipeline_results={})
+    """
+    inverse_strides(sdfg, "gpu_levmask")
+    sdfg.validate()
+    gpu_levmask_desc = sdfg.arrays.get("gpu_levmask")
+    print("gpu_levmask new shape:", gpu_levmask_desc.shape, "new strides:", gpu_levmask_desc.strides)
+    #raise Exception("DEBUG: PermuteArrayDimensions applied, check gpu_levmask shape and strides")
+
     do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '1').lower() in ('1', 'true', 'yes')
     if do_reduce_bitwidth:
         # nproma dependent ones
@@ -90,6 +107,10 @@ def optimization_action(sdfg):
     # start_block and end_blocks are between [0, nblks] -> usually 1 or 2 as we pass nblocks_c for the science config
     # Force start and end blks to int8?
     # TODO: force start_block and end_block to int8
+
+    # Rm copy/memset kernels with API calls
+    AssignmentAndCopyKernelToMemcpyAndMemset().apply_pass(sdfg, {})
+    #raise Exception("DEBUG: AssignmentAndCopyKernelToMemcpyAndMemset applied, check for memcpy and memset kernels")
 
 
     # TODO: GPU read-write has unit size of 32-bits, uint8_t won't help unless we tile
