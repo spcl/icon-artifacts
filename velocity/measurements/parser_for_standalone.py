@@ -20,9 +20,9 @@ def parse_timer_log_by_step(file_path):
         end = config_matches[i + 1].start() if i + 1 < len(config_matches) else len(content)
 
         block = content[start:end]
-        durations = [int(m.group(1)) for m in re.finditer(r'Timer Host Based C\+\+ Timer took (\d+) us', block)]
+        durations = [int(m.group(2)) for m in re.finditer(r'Timer (.*) took (\d+) us', block)]
         if len(durations) == 0:
-            durations = [float(m.group(1)) for m in re.finditer(r'CUDA Events Based Total time: ([\d.]+) us', block)]
+            durations = [float(m.group(2)) for m in re.finditer(r'CUDA Events Based Total time: ([\d.]+) us', block)]
         assert len(durations) > 0, f"No durations found for step {step_info[0]}"
 
         if durations:

@@ -200,6 +200,30 @@ Mean: 315.65 µs, Median: 315.00 µs, (timestep: 5701, istep: 1, lvn Only: 1)
 Average of medians: 311.83 µs (timestep 1 skipped)
 ```
 
+
+## No-Tiling w. Clipping w. Bitwidth-Lowering w. Memset/Memcpy
+### GH200
+```bash
+export _RELEASE=TRUE
+export _USE_NVHPC=TRUE
+export _USE_CUDA_EVENTS=TRUE
+# Jul 27
+Mean: 431.62 µs, Median: 417.00 µs, (timestep: 1, istep: 1, lvn Only: 0)
+Mean: 287.83 µs, Median: 283.00 µs, (timestep: 2, istep: 2, lvn Only: 0)
+Mean: 296.66 µs, Median: 292.00 µs, (timestep: 7, istep: 1, lvn Only: 1)
+Mean: 278.92 µs, Median: 277.00 µs, (timestep: 9, istep: 2, lvn Only: 0)
+Mean: 307.82 µs, Median: 293.00 µs, (timestep: 43, istep: 1, lvn Only: 1)
+Mean: 288.42 µs, Median: 286.00 µs, (timestep: 93, istep: 2, lvn Only: 0)
+Mean: 310.57 µs, Median: 308.00 µs, (timestep: 463, istep: 1, lvn Only: 1)
+Mean: 293.49 µs, Median: 292.00 µs, (timestep: 519, istep: 2, lvn Only: 0)
+Mean: 291.87 µs, Median: 289.00 µs, (timestep: 1140, istep: 2, lvn Only: 0)
+Mean: 291.61 µs, Median: 290.00 µs, (timestep: 1814, istep: 2, lvn Only: 0)
+Mean: 292.68 µs, Median: 292.00 µs, (timestep: 2593, istep: 1, lvn Only: 1)
+Mean: 294.34 µs, Median: 293.00 µs, (timestep: 5701, istep: 1, lvn Only: 1)
+Average of medians: 290.45 µs (timestep 1 skipped)
+Average of means: 305.49 µs
+```
+
 # Standlone Pipeline w. CUDA Event Timers
 ## No-Tiling w. Clipping
 
