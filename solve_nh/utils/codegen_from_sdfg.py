@@ -275,25 +275,91 @@ class Compiler:
         """
         # Limit host compiler errors.
         errlimit_flag = "-Xcompiler=-fmax-errors=1" if self.cc.startswith("g++") else "-Xcompiler=-ferror-limit=1"
-        clang_only_warnings = (
-            "-Xcompiler=-Wno-parentheses-equality -Xcompiler=-Wno-constant-logical-operand"
-            if self.cc.startswith("clang")
-            else ""
-        )
-        return (
-            f"{errlimit_flag} -Xcompiler=-g -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-Wno-unused-parameter "
-            f"-Xcompiler=-Wno-unused-variable -Xcompiler=-Wno-unused-function -Xcompiler=-Wno-unused-but-set-variable "
-            f"-Xcompiler=-Wno-unused-but-set-parameter -Xcompiler=-Wno-sign-compare -Wno-deprecated-declarations {clang_only_warnings}"
-        ).split()
+
+        flags = [
+            "-Xcompiler=-Wall",  # Host: All common warnings.
+            "-Xcompiler=-Wextra",  # Host: Extra warnings.
+            "-Xcompiler=-Wno-unused-parameter",  # Host: Suppress unused parameter warnings.
+            "-Xcompiler=-Wno-unused-variable",  # Host: Suppress unused variable warnings.
+            "-Xcompiler=-Wno-unused-function",  # Host: Suppress unused function warnings.
+            "-Xcompiler=-Wno-unused-but-set-variable",  # Host: Suppress variables set but not used.
+            "-Xcompiler=-Wno-unused-but-set-parameter",  # Host: Suppress parameters set but not used.
+            "-Xcompiler=-Wno-sign-compare",  # Host: Suppress signed/unsigned comparison warnings.
+            "-Wno-deprecated-declarations",  # CUDA: Suppress warnings for deprecated CUDA API usage.
+        ]
+
+        # Clang-specific warning suppressions for the host compiler.
+        if self.cc.startswith("clang"):
+            flags.extend(["-Xcompiler=-Wno-parentheses-equality", "-Xcompiler=-Wno-constant-logical-operand"])
+
+        if self.optmode == OptimizationMode.DEBUG:
+            flags.append("-Xcompiler=-g")  # Host debug symbols.
+            flags.append("-G")  # Device debug symbols (enables CUDA-GDB for kernel debugging).
+
+        return [errlimit_flag] + flags
 
     def _get_optimization_flags_cpp(self) -> list[str]:
-        return "-O0 -march=native -fno-strict-aliasing -fno-omit-frame-pointer -fno-fast-math -ffp-contract=off".split()
+        """
+        Returns a list of C++ compiler flags for optimization, based on `self.optmode`.
+        """
+        if self.optmode == OptimizationMode.DEBUG:
+            return [
+                "-O0",  # No optimization, crucial for effective debugging.
+                "-fno-strict-aliasing",  # Disables aggressive alias analysis, safer for complex pointer usage.
+                "-fno-omit-frame-pointer",  # Keeps frame pointers, essential for proper stack traces in debuggers.
+                "-fno-fast-math",  # Ensures strict IEEE 754 compliance for floating-point operations.
+                "-ffp-contract=off",  # Disables Fused Multiply-Add (FMA) instructions for precision.
+            ]
+        elif self.optmode == OptimizationMode.RELEASE:
+            return [
+                "-O3",  # Aggressive optimizations for maximum performance.
+                "-march=native",  # Optimize for the CPU architecture where compilation occurs.
+                "-fstrict-aliasing",  # Enables aggressive alias analysis for potentially faster code.
+                "-fomit-frame-pointer",  # Omits frame pointers to free a register (minor speedup, harder debugging).
+                "-ffast-math",  # Enables less strict floating-point optimizations (speed over strict IEEE 754).
+                "-ffp-contract=fast",  # Enables Fused Multiply-Add (FMA) instructions for performance.
+            ]
+        return []
 
-    def _get_cuda_debug_flags(self) -> list[str]:
-        return "-O0 -Xcompiler=-march=native -Xcompiler=-fno-strict-aliasing -Xcompiler=-fno-omit-frame-pointer -Xcompiler=-fno-fast-math -Xcompiler=-ffp-contract=off -G --fmad=false --prec-div=true --prec-sqrt=true --ftz=false ".split()
-
-    def _get_cuda_release_flags(self) -> list[str]:
-        return "-O3 -Xcompiler=-O3 -Xcompiler=-march=native -Xcompiler=-fstrict-aliasing -Xcompiler=-fomit-frame-pointer -Xcompiler=-ffast-math -Xcompiler=-ffp-contract=on -lineinfo --fmad=true --prec-div=false --prec-sqrt=false --ftz=true --use-fast-math -Xptxas=-O3 -Xptxas=-v --restrict -dlto".split()
+    def _get_optimization_flags_cuda(self) -> list[str]:
+        """
+        Returns a list of CUDA compiler flags for optimization, based on `self.optmode`.
+        These include both host compiler options and device code options.
+        """
+        if self.optmode == OptimizationMode.DEBUG:
+            return [
+                "-O0",  # Host compiler: No optimization.
+                "-Xcompiler=-O0",  # Host compiler: No optimization.
+                "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU.
+                "-Xcompiler=-fno-strict-aliasing",  # Host compiler: Safer aliasing.
+                "-Xcompiler=-fno-omit-frame-pointer",  # Host compiler: Keeps frame pointers.
+                "-Xcompiler=-fno-fast-math",  # Host compiler: Strict FP math.
+                "-Xcompiler=-ffp-contract=off",  # Host compiler: Disable FMA.
+                "--fmad=false",  # Device: Disable Fused Multiply-Add (FMA) for debug precision.
+                "--prec-div=true",  # Device: Use higher precision for division.
+                "--prec-sqrt=true",  # Device: Use higher precision for square root.
+                "--ftz=false",  # Device: Disable Flush-to-Zero for denormalized numbers (precision).
+            ]
+        elif self.optmode == OptimizationMode.RELEASE:
+            return [
+                "-O3",  # Host compiler: Aggressive optimizations.
+                "-Xcompiler=-O3",  # Host compiler: Aggressive optimizations.
+                "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU.
+                "-Xcompiler=-fstrict-aliasing",  # Host compiler: Strict aliasing.
+                "-Xcompiler=-fomit-frame-pointer",  # Host compiler: Omit frame pointers.
+                "-Xcompiler=-ffast-math",  # Host compiler: Fast FP math.
+                "-Xcompiler=-ffp-contract=on",  # Host compiler: Enable FMA.
+                "-lineinfo",  # Device: Include line information in the device binary for profiling.
+                "--fmad=true",  # Device: Enable Fused Multiply-Add (FMA) for performance.
+                "--prec-div=false",  # Device: Use less precise (faster) division.
+                "--prec-sqrt=false",  # Device: Use less precise (faster) square root.
+                "--ftz=true",  # Device: Enable Flush-to-Zero for denormalized numbers (performance).
+                "-Xptxas=-O3",  # Device: Pass -O3 to PTXAS (PTX assembler) for aggressive optimization.
+                "-Xptxas=-v",  # Device: Pass -v to PTXAS for verbose output.
+                "--restrict",  # Device: Treat pointers as restricted, enabling no-aliasing optimizations.
+                "-dlto",  # Device: Enable Device Link-Time Optimization for cross-file optimization.
+            ]
+        return []
 
     def _get_standard_flags_cpp(self) -> list[str]:
         """
@@ -305,8 +371,38 @@ class Compiler:
         ]
 
     def _get_standard_flags_cuda(self) -> list[str]:
-        CUDA_ARCH = os.getenv("CUDA_ARCH", "native")
-        return f"-Xcompiler=-fPIC -Xcompiler=-fopenmp -arch={CUDA_ARCH} --expt-relaxed-constexpr -Xcompiler=-fno-var-tracking-assignments -rdc=true --compiler-options='-fPIC' -DGPU --relocatable-device-code=true".split()
+        """
+        Returns standard CUDA compiler flags.
+        Includes host compiler flags and device code generation flags (e.g., architecture).
+        """
+        # Host compiler flags are passed to the underlying C++ compiler via -Xcompiler.
+        host_flags = [
+            "-Xcompiler=-fPIC",  # Host: Generate Position-Independent Code.
+            "-Xcompiler=-fopenmp",  # Host: Enable OpenMP.
+        ]
+
+        # Device architecture flags:
+        arch_flags = []
+        if self.cuda_arch == "native":
+            arch_flags.append("-arch=native")  # If 'native', nvcc targets host's GPU directly.
+        else:
+            # Assumes CUDA_ARCH is 'sm_XX'. Generates SASS for specific GPU and PTX for future compatibility.
+            compute_version_num = self.cuda_arch[3:]  # Extract 'XX' from 'sm_XX' (e.g., '86').
+            compute_version = f"compute_{compute_version_num}"  # Example: 'compute_86'.
+            sm_version = f"sm_{compute_version_num}"  # Example: 'sm_86'.
+            arch_flags.append(f"-gencode=arch={compute_version},code={sm_version}")  # Generate SASS.
+            arch_flags.append(f"-gencode=arch={compute_version},code={compute_version}")  # Generate PTX.
+
+        # Other CUDA specific flags:
+        cuda_specific_flags = [
+            "--expt-relaxed-constexpr",  # Allow more liberal use of `constexpr` in device code.
+            "-Xcompiler=-fno-var-tracking-assignments",  # Host: Helps with debugger issues or certain optimizations.
+            "-rdc=true",  # Relocatable Device Code: Essential for linking multiple CUDA object files.
+            "-DGPU",  # Define preprocessor macro 'GPU' for conditional compilation.
+            "--relocatable-device-code=true",  # Redundant with -rdc=true, but kept for legacy/clarity.
+        ]
+
+        return host_flags + arch_flags + cuda_specific_flags
 
     def _get_cpp_standard_flags(self) -> list[str]:
         """
@@ -322,7 +418,11 @@ class Compiler:
         return self._get_diagnosis_flags_cpp() + self._get_optimization_flags_cpp() + self._get_standard_flags_cpp()
 
     def get_base_flags_cuda(self) -> list[str]:
-        return self._get_diagnosis_flags_cuda() + self._get_standard_flags_cuda() + self._get_cuda_debug_flags()
+        """
+        Combines all CUDA compiler flags (diagnosis, optimization, standard CUDA features).
+        Flags are recomputed on each call to reflect potential dynamic changes.
+        """
+        return self._get_diagnosis_flags_cuda() + self._get_standard_flags_cuda() + self._get_optimization_flags_cuda()
 
     def _get_cuda_src_file_flag(self) -> str:
         """
@@ -374,24 +474,27 @@ class Compiler:
                 if platform.system() == "Darwin"
                 else "-Wl,--unresolved-symbols=ignore-all"  # Linux: Very permissive, allows linking with missing symbols.
             )
-            return [dyn_link, dyn_symbols]
-        return []
 
-    def get_gpu_executable_linker_flags(self) -> list[str]:
-        return []
+        return flags
 
-    def get_gpu_library_linker_flags(self) -> list[str]:
-        return ["-shared"]
+    def compile_object(self, sources: list[Path], includes: list[Path], stage: int = 0):
+        """
+        Compiles C++ source files into object files.
+        This method is designed for CPU (C++) compilation. GPU stage compilation for library
+        objects is currently not supported via this specific method (handled by nvcc linking).
 
-    def compile_object(
-        self,
-        sources: list[Path],
-        includes: list[Path],
-        stage=0,
-    ):
-        all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]
+        :param sources: A list of paths to C++ source files (.cpp, .cc).
+        :param includes: A list of additional directories to search for header files.
+        :param stage: The compilation stage. If `stage >= GPU_STAGE_BEGINS`, an exception
+                      is raised as this method is for CPU compilation.
+        :raises Exception: If `stage` indicates a GPU compilation stage.
+        """
+        all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]  # Global include path.
         if stage >= GPU_STAGE_BEGINS:
-            raise Exception("GPU stage compilation for library is not implemented yet.")
+            raise Exception(
+                "GPU stage compilation for individual library objects is not supported by `compile_object`. "
+                "GPU code is typically compiled and linked as part of a larger unit using `nvcc`."
+            )
         else:
             cmd = (
                 [self.cc, "-c"]  # Compile source files into object files without linking.
