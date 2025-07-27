@@ -1377,7 +1377,7 @@ end if
                 p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk,ieblk(jc,jb,3))  ! openacc
               p_nh%diag%w_concorr_c(jc,jk,jb) =                                &
                 p_nh%metrics%wgtfac_c(jc,jk,jb)*z_w_concorr_mc_m0 +        &
-                (1._vp - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
+                (1.0D0 - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
             END DO
           END DO
           DO jc = i_startidx, i_endidx  ! openacc
@@ -2365,7 +2365,7 @@ end if
                 p_int%e_bln_c_s(jc,3,jb)*z_w_concorr_me(ieidx(jc,jb,3),jk,ieblk(jc,jb,3))  ! openacc
               p_nh%diag%w_concorr_c(jc,jk,jb) =                                &
                 p_nh%metrics%wgtfac_c(jc,jk,jb)*z_w_concorr_mc_m0 +        &
-                (1._vp - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
+                (1.0D0 - p_nh%metrics%wgtfac_c(jc,jk,jb))*z_w_concorr_mc_m1  ! openacc
             END DO
           END DO
           DO jc = i_startidx, i_endidx  ! openacc
