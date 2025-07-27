@@ -4,7 +4,7 @@ from dace.sdfg.state import LoopRegion
 from dace.transformation.dataflow import MapCollapse
 from dace.transformation.interstate.loop_to_map import LoopToMap
 from stages import common
-from utils.codegen_from_sdfg import Mode
+from utils.codegen_from_sdfg import ArtifactMode
 from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
@@ -105,10 +105,10 @@ def main():
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument(
         "--mode",
-        type=Mode,
-        choices=list(Mode),
+        type=ArtifactMode,
+        choices=list(ArtifactMode),
         required=False,
-        default=Mode.EXEC,
+        default=ArtifactMode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
     args = argp.parse_args()

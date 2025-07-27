@@ -1,7 +1,7 @@
 import dace
 from dace import SDFG
 from stages import common
-from utils.codegen_from_sdfg import Mode
+from utils.codegen_from_sdfg import ArtifactMode
 
 import argparse
 
@@ -55,7 +55,7 @@ def main():
 
     if args.compile:
         print(f"Stage #{STAGE_ID}: Compiling SDFGs")
-        common.compile_action(STAGE_ID, Mode.SHARED)
+        common.compile_action(STAGE_ID, ArtifactMode.SHARED)
 
 
 if __name__ == "__main__":

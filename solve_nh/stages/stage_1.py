@@ -3,7 +3,7 @@ from dace import SDFG
 from dace.sdfg.state import LoopRegion
 from dace.transformation.passes.scalar_to_symbol import ScalarToSymbolPromotion
 from stages import common
-from utils.codegen_from_sdfg import Mode
+from utils.codegen_from_sdfg import ArtifactMode
 
 import argparse
 
@@ -314,10 +314,10 @@ def main():
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument(
         "--mode",
-        type=Mode,
-        choices=list(Mode),
+        type=ArtifactMode,
+        choices=list(ArtifactMode),
         required=False,
-        default=Mode.EXEC,
+        default=ArtifactMode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
     args = argp.parse_args()

@@ -15,13 +15,18 @@ import platform
 GPU_STAGE_BEGINS = 3
 
 
-class Mode(Enum):
+class ArtifactMode(Enum):
     STATIC = "static"
     SHARED = "shared"
     EXEC = "exec"
 
     def __str__(self) -> str:
         return self.value
+
+
+class OptimizationMode(Enum):
+    DEBUG = "debug"
+    RELEASE = "release"
 
 
 def generate_code_from_sdfg(g: SDFG) -> None:
@@ -203,7 +208,7 @@ def _run_command(command: list[str], env: dict | None = None) -> None:
 
 
 class Compiler:
-    def __init__(self, cc: str = CC, nvcc: str = NVCC):
+    def __init__(self, cc: str = CC, nvcc: str = NVCC, optmode: OptimizationMode = OptimizationMode.DEBUG):
         self.cc = cc
         self.diagnosis_flags = self._get_diagnosis_flags()
         self.optimization_flags = self._get_optimization_flags()
