@@ -195,7 +195,6 @@ def optimization_action(g: SDFG):
         # ("corrector_post", "_for_it_25", "FOR_l_1896_c_1896"),   # Can't
         ("corrector_post", "_for_it_42", "FOR_l_1965_c_1965"),     # OK - scalar
         # ("corrector_post", "_for_it_43", "FOR_l_1962_c_1962"),   # Can't
-        ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),     # OK - scalar
         # ("corrector_post", "_for_it_45", "FOR_l_1974_c_1974"),   # Can't
         ("corrector_post", "_for_it_45", "FOR_l_1982_c_1982"),     # OK
         ("corrector_post", "_for_it_54", "FOR_l_2017_c_2017"),     # OK - scalar
@@ -248,8 +247,10 @@ def optimization_action(g: SDFG):
         # ("predictor_pre", "_for_it_113", "FOR_l_1184_c_1184"),   # Can't
     }
     manually_transformed_count = 0
+    expected_transformed_count = 0
     for sdfg_name, loop_var, loop_label in manual_loop_to_map:
         if sdfg_name in g.name:
+            expected_transformed_count += 1
             for node, graph in g.all_nodes_recursive():
                 if isinstance(node, LoopRegion) and node.loop_variable == loop_var:
                     #assert node.label == loop_label
@@ -264,7 +265,7 @@ def optimization_action(g: SDFG):
     g.validate()
 
     count_loops(g, verbose=True, use_assert=False)
-    print(f"Stage #{STAGE_ID}: Manually transformed {manually_transformed_count} loops to maps for {g.name}")
+    print(f"Stage #{STAGE_ID}: Manually transformed {manually_transformed_count} out of {expected_transformed_count} loops to maps for {g.name}")
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
 
