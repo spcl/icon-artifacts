@@ -200,6 +200,8 @@ def optimization_action(g: SDFG):
         ("corrector_post", "_for_it_47", "FOR_l_1980_c_1980"),     # OK
         ("corrector_post", "_for_it_56", "FOR_l_2015_c_2015"),     # OK - scalar
         ("corrector_post", "_for_it_57", "FOR_l_2016_c_2016"),     # OK - scalar
+        ("corrector_post", "_for_it_54", "FOR_l_2017_c_2017"),
+        ("corrector_post", "_for_it_55", "FOR_l_2018_c_2018"),
         # ("corrector_post", "_for_it_62", "FOR_l_2050_c_2050"),   # Can't - BLK
 
         # solve_nh_corrector_pre - Stage #1

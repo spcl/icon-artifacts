@@ -830,6 +830,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     # Add missing symbols
     _move_scalar_access_to_original_name(sdfg)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
+    _remove_transient_arrays_from_parent_nsdfg(sdfg)
     sdfg.validate()
 
     reinject_velocity_shim_gpu(sdfg)
@@ -837,7 +838,18 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
 
     # Is No-OP need to change generated source code
     #_set_zero_stream(sdfg)
-    #sdfg.validate()
+    # sdfg.validate()
+
+from utils.clean_unused_data_from_nsdfg_connectors import rm_connection_of_desc_to_nsdfg_node
+
+def _remove_transient_arrays_from_parent_nsdfg(sdfg: dace.SDFG):
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.NestedSDFG):
+            datas = {arr_name for arr_name, arr_desc in n.sdfg.arrays.items() if arr_desc.transient}
+            transient_data_in_connector = {data for data in datas if data in n.in_connectors}
+            for in_conn in transient_data_in_connector:
+                rm_connection_of_desc_to_nsdfg_node(n, g, in_conn)
+
 
 def _set_zero_stream(sdfg: dace.SDFG):
     for n, g in sdfg.all_nodes_recursive():
