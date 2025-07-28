@@ -242,6 +242,13 @@ def transify_targeted_scalar(sdfg: dace.SDFG, desc_candidate_names: typing.Set[s
                         desc.transient = True
                         desc.storage = dace.dtypes.StorageType.Register
 
+#def transify_targeted_scalar_double_out():
+#    # Write -> AN -> Read1 (write-then-reuse)
+#    #          AN -> Read2
+#    # Make it so that we read AN in Read2
+#    # We write to scalar_AN and sue it, and write to AN Read1
+#    pass
+
 def retransify_scalar_with_local_prefix(root: dace.SDFG, sdfg: dace.SDFG):
     for arr_name, arr_desc in sdfg.arrays.items():
         if (arr_name.endswith("_local") and isinstance(arr_desc, dace.data.Scalar) and
