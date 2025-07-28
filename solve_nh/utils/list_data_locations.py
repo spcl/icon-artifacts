@@ -207,6 +207,21 @@ def list_data_locations():
         if not global_cpu_gpu_intersection:
             global_report_file.write("  (No data needed both on CPU and GPU.)\n")
 
+def list_scalar_locations():
+    with open("combined_non_transient_scalars.txt", 'w') as combined_report_file:
+        combined_report_file.write("Scalar locations:\n")
+        s = set()
+        for sdfg_path, report_path in zip(sdfg_paths, report_paths):
+            with open(report_path, 'w') as report_file:
+                scalars = {arr_name for arr_name, desc in dace.SDFG.from_file(sdfg_path).arrays.items() if isinstance(desc, dace.data.Scalar) and desc.transient is False}
+                for scalar_name in scalars:
+                    report_file.write(f"{scalar_name}: {_demangle_name(scalar_name)}\n")
+                    s.add((scalar_name, _demangle_name(scalar_name)))
+        for scalar_name, demangled_name in sorted(s):
+            combined_report_file.write(f"{scalar_name}: {demangled_name}\n")
+
+
 if __name__ == "__main__":
-    list_data_locations()
-    print("Data locations have been listed in 'data_locations_combined.txt' and individual reports.")
+    #list_data_locations()
+    #print("Data locations have been listed in 'data_locations_combined.txt' and individual reports.")
+    list_scalar_locations()

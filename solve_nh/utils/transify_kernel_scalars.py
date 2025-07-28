@@ -242,12 +242,168 @@ def transify_targeted_scalar(sdfg: dace.SDFG, desc_candidate_names: typing.Set[s
                         desc.transient = True
                         desc.storage = dace.dtypes.StorageType.Register
 
+def transify_targeted_array(sdfg: dace.SDFG, desc_candidate_names: typing.Set[str]):
+    # Filter candidate names to only include arrays
+    desc_names = set()
+    for name in desc_candidate_names:
+        if name in sdfg.arrays and isinstance(sdfg.arrays[name], dace.data.Array):
+            desc_names.add(name)
+
+    for snode, graph in sdfg.all_nodes_recursive():
+        # Only apply to SDFGs of LoopRegions (OMP Private => Means the SDFG within a For CFG in SDFG)
+        if isinstance(snode, LoopRegion):
+            cfg = snode # snode.sdfg is the parent SDFG
+
+            # cfg.all_control_flow_regions() -> should give states parent-first
+            # all_nodes_are_states = all(isinstance(node, dace.SDFGState) for node in cfg.nodes())
+            # if not all_nodes_are_states:
+            #    continue
+
+            path_graph = all(cfg.in_degree(node) <= 1 and cfg.out_degree(node) <= 1 for node in cfg.nodes())
+            assert path_graph, "Only path graphs (all top level nodes have in_degree <= 1  and out_degree <= 1) are supported for transifying scalars in LoopRegions."
+
+            # Build a replacement dictionary for the scalars
+            replace_dict = dict()
+            #print(f"Transifying targeted arrays in {snode.sdfg.name} for {snode.name} with candidates: {desc_names}")
+            for desc_name in desc_names:
+                # Check if the SDFG has the desc_name accessed in an access node
+                has_desc = any([node.data == desc_name for state in snode.all_states() for node in state.nodes() if isinstance(node, dace.nodes.AccessNode)])
+                # No access skip the rest
+                if not has_desc:
+                    continue
+
+                # Need to be write-first always to be a real private/threadlocal scalar
+                # BFS the states, the moment we see write-first or non-write-first access pattern then stop
+                # As if in state 0, it is written first, it does not matter what happens in state 1
+
+                # If CFG bfs recursively, what matters is the state
+                # If IfBlock is encountered, ensure it is write-first in all branches (if not writes None is accepted too)
+                desc_is_write_first = is_always_write_first(cfg, desc_name)
+
+                #print(f"Checking {desc_name} in {snode.sdfg.name} in {snode.name} for write-first: {desc_is_write_first}")
+
+                # Now for access nodes
+                for state in snode.all_states():
+                    for node in state.nodes():
+                        # If the node is access node to desc, then:
+                        # memlet1 -> AN -> memlet1
+                        #            AN -> memlet2
+                        # [0] -> scalar_AN -> [0]
+                        # and AN -> memlet2[1]
+                        if isinstance(node, dace.nodes.AccessNode) and node.data == desc_name:
+                            ies = {ie for ie in state.in_edges(node)}
+                            oes = {oe for oe in state.out_edges(node)}
+
+                            if len(ies) == 1 and len(oes) > 0: # Input needs to be always degree one
+                                matched_edges = set()
+                                matched_in_edges = set()
+                                matched_out_edges = set()
+                                for ie in ies:
+                                    if ie in matched_in_edges:
+                                        continue
+                                    for oe in oes:
+                                        if oe in matched_out_edges:
+                                            continue
+                                        # Normall it is nlev, where it is offset 1 if 3D and offset 0 if 2D
+                                        # exner_ic is special case, only in predictor pre tho
+                                        #if (ie.data.data == "z_exner_ic"):
+                                        #    print(ie.data.subset[1] == oe.data.subset[1], len(ie.data.subset), sdfg.label)
+                                        #    #raise Exception("Unexpected z_exner_ic access in transify_targeted_array, this is a bug.")
+                                        if ie.data.data == "z_exner_ic" and "predictor_pre" in sdfg.label:
+                                            if ie.data.subset[1] == oe.data.subset[1] and len(ie.data.subset) == 2:
+                                                matched_edges.add((ie, oe))
+                                                matched_in_edges.add(ie)
+                                                matched_out_edges.add(oe)
+                                        else:
+                                            if ie.data.data == oe.data.data and (
+                                            (ie.data.subset[1] == oe.data.subset[1] and len(ie.data.subset) == 3) or
+                                            (ie.data.subset[0] == oe.data.subset[0] and len(ie.data.subset) < 3)):
+                                                matched_edges.add((ie, oe))
+                                                matched_in_edges.add(ie)
+                                                matched_out_edges.add(oe)
+                                #sdfg.save("a.sdfgz", compress=True)
+                                assert ies - matched_in_edges == set(), f"Expected all in-edges ({len(ies)}) to be matched ({len(matched_edges)}), got unmatched: {ies - matched_in_edges}."
+
+                                unmatched_out_edges = oes - matched_out_edges
+                                assert len(matched_edges) == len(ies), f"Expected all in-edges ({len(ies)}) to be matched, got unmatched: {ies - matched_in_edges} ({ies})."
+                                assert len(unmatched_out_edges) == len(oes) - len(matched_out_edges)
+                                unmatched_in_edges = ies - matched_in_edges
+                                assert len(unmatched_in_edges) == 0
+
+                                #print()
+                                #print("==")
+                                #print(matched_edges)
+                                #print("==")
+                                #print(matched_in_edges)
+                                #print("==")
+                                #print(matched_out_edges)
+                                #print("==")
+                                #print(unmatched_out_edges)
+                                #print("==")
+                                #print()
+
+                                # replace with a scalar
+                                nds = set()
+                                for ie, oe in matched_edges:
+                                    nd = ie.dst
+                                    nds.add(nd)
+                                    n_name = f"{ie.data.data}_local"
+                                    if n_name not in state.sdfg.arrays:
+                                        n_desc = state.sdfg.add_scalar(
+                                            n_name, dtype=snode.sdfg.arrays[ie.data.data].dtype,
+                                            transient=True, storage=dace.dtypes.StorageType.Register
+                                        )
+                                    n_access = state.add_access(n_name)
+                                    assert isinstance(snode.sdfg.arrays[n_name], dace.data.Scalar), f"Expected {n_name} to be a scalar, got {type(snode.sdfg.arrays[n_name])}."
+                                    ie_data = dace.memlet.Memlet.from_array(
+                                        f"{ie.data.data}_local", snode.sdfg.arrays[n_name]
+                                    )
+                                    oe_data = dace.memlet.Memlet.from_array(
+                                        f"{ie.data.data}_local", snode.sdfg.arrays[n_name]
+                                    )
+                                    ie_dst = n_access
+                                    oe_src = n_access
+                                    if ie in state.edges():
+                                        state.remove_edge(ie)
+                                    if oe in state.edges():
+                                        state.remove_edge(oe)
+                                    state.add_edge(
+                                        ie.src, ie.src_conn, ie_dst, None, ie_data
+                                    )
+                                    state.add_edge(
+                                        oe_src, None, oe.dst, oe.dst_conn, oe_data
+                                    )
+                                    nds.add(nd)
+
+                                for nd in nds:
+                                    state.remove_node(nd)
+
+                                # For
+                                nds = set()
+                                for oe in unmatched_out_edges:
+                                    an = state.add_access(f"{oe.data.data}")
+                                    if oe in state.edges():
+                                        state.remove_edge(oe)
+                                    state.add_edge(
+                                        an, None, oe.dst, oe.dst_conn,
+                                        copy.deepcopy(oe.data)
+                                    )
+                                    nds.add(oe.src)
+                                for nd in nds:
+                                    if nd in state.nodes():
+                                        state.remove_node(nd)
+
+                #sdfg.save("sdfg_before.sdfgz", compress=True)
+                #raise Exception("uwu")
+    sdfg.validate()
+
 #def transify_targeted_scalar_double_out():
 #    # Write -> AN -> Read1 (write-then-reuse)
 #    #          AN -> Read2
 #    # Make it so that we read AN in Read2
 #    # We write to scalar_AN and sue it, and write to AN Read1
 #    pass
+
 
 def retransify_scalar_with_local_prefix(root: dace.SDFG, sdfg: dace.SDFG):
     for arr_name, arr_desc in sdfg.arrays.items():

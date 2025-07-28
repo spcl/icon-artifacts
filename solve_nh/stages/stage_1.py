@@ -38,6 +38,7 @@ from utils.transify_kernel_scalars import (
     transify_kernel_scalars,
     transify_targeted_scalar,
     retransify_scalar_with_local_prefix,
+    transify_targeted_array
 )
 
 from utils.add_data_preserver_tasklets import add_data_preserver_tasklets
@@ -171,6 +172,19 @@ def optimization_action(g: SDFG):
     # in-degree = 0 in state 1 but only written to state 0
     state_fusion_without_copyin_and_copyout(g)
     transify_targeted_scalar(g, thread_local_scalar_candidates)
+    thread_local_array_candidates = {
+        "__CG_p_nh_prog_nnew__m_w",
+        "__CG_p_nh__CG_diag__m_mass_fl_e",
+        "__CG_p_nh_prog_nnew__m_rho",
+        "__CG_p_nh_prog_nnew__m_exner",
+        "z_theta_v_pr_ic",
+        "__CG_p_nh__CG_diag__m_theta_v_ic",
+        "__CG_p_nh_prog_nnew__m_theta_v",
+        "z_exner_ic",
+        "z_theta_v_pr_ic",
+        "__CG_p_nh__CG_diag__m_grf_bdy_mflx",
+    }
+    transify_targeted_array(g, thread_local_array_candidates)
     # === Sub-Phase 6: Loop Preprocessing ===
 
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
