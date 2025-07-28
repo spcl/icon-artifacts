@@ -184,7 +184,8 @@ def optimization_action(g: SDFG):
         "z_theta_v_pr_ic",
         "__CG_p_nh__CG_diag__m_grf_bdy_mflx",
     }
-    transify_targeted_array(g, thread_local_array_candidates)
+    # TODO: This prevents new loops from becoming maps
+    #transify_targeted_array(g, thread_local_array_candidates)
     # === Sub-Phase 6: Loop Preprocessing ===
 
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
