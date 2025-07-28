@@ -764,6 +764,8 @@ def consolidate_generated_code(
             "// disabled: DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));",
         ),
         ("__state->gpu_context->streams[0]", "nullptr"),
+        ("i_startidx_in_var_162_0_0 = __CG_p_patch__CG_cells__m_start_index",
+         "const i_startidx_in_var_162_0_0 = __CG_p_patch__CG_cells__m_start_index")
     ]
 
     # Format again after replacements
@@ -786,6 +788,8 @@ def consolidate_generated_code(
             ("DACE_EXPORTED", ""),
             ("const const", "const"),
             ("__state->gpu_context->streams[0]", "nullptr"),
+            ("i_startidx_in_var_162_0_0 = __CG_p_patch__CG_cells__m_start_index",
+            "const i_startidx_in_var_162_0_0 = __CG_p_patch__CG_cells__m_start_index")
         ]
 
         # Format again after replacements

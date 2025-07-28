@@ -25,7 +25,8 @@ def _get_missing_symbols(nsdfg_node: dace.nodes.NestedSDFG) -> Set[str]:
                     sym_v_str = str(sym)
                     if sym_v_str not in nsdfg.symbol_mapping and sym_v_str not in nsdfg_node.in_connectors and sym_v_str not in nsdfg_node.out_connectors:
                         missing_symbols.append(sym_v_str)
-
+                if k not in nsdfg.symbol_mapping and k not in nsdfg_node.in_connectors and k not in nsdfg_node.out_connectors:
+                    missing_symbols.append(k)
     return set(missing_symbols)
 
 def add_missing_symbols_to_nsdfgs(sdfg: dace.SDFG):
@@ -131,7 +132,6 @@ def _insert_missing_data_through_parent_scopes(missing_data: Set[str],
 def add_missing_data_and_symbols(root: dace.SDFG, _parent_graph, _parent_sdfg: dace.SDFG, sdfg: dace.SDFG):
     # Get parent NSDFG node
     parent_nsdfg_node = sdfg.parent_nsdfg_node
-    print(f"Adding missing data and symbols to NSDFG {parent_nsdfg_node.label}")
     missing_symbols = _get_missing_symbols(parent_nsdfg_node)
     # Filter the missing data
     missing_data = set()
@@ -151,7 +151,8 @@ def add_missing_data_and_symbols(root: dace.SDFG, _parent_graph, _parent_sdfg: d
     assert parent_graph == _parent_graph, "Parent graph mismatch"
     assert parent_sdfg == _parent_sdfg, "Parent SDFG mismatch"
 
-    print(f"Adding missing data {missing_data} and symbols {missing_symbols} to NSDFG {parent_nsdfg_node.label}")
+    if missing_data != set():
+        print(f"Adding missing data {missing_data} and symbols {missing_symbols} to NSDFG {parent_nsdfg_node.label}")
 
     # Add missing data
     _insert_missing_data_through_parent_scopes(missing_data,
