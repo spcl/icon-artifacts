@@ -6,7 +6,7 @@ from dace.sdfg.state import ConditionalBlock, ControlFlowRegion
 from dace.sdfg.nodes import MapEntry, MapExit, NestedSDFG
 import copy
 
-from utils.add_missing_symbols import add_missing_data_and_symbols, add_missing_data_and_symbols_to_all_nsdfgs
+from utils.add_missing_symbols import add_missing_data_and_symbols, add_missing_data_and_symbols_to_all_nsdfgs, _insert_missing_data_through_parent_scopes
 
 
 def make_map_body_nested(sdfg: dace.SDFG, cond_block_name):
@@ -501,7 +501,11 @@ def move_if_to_innermost_map(g: dace.SDFG):
             state_map[state] = ns
             inner_map_sdfg.add_node(ns, is_start_block=True if i == 0 else False)
 
+        syms = set()
         for e in path:
+            for k, v in e.data.assignments.items():
+                syms.add(k)
+                syms.update({str(s) for s in dace.symbolic.SymExpr(v).free_symbols})
             src = state_map[e.src]
             dst = state_map[e.dst]
             #print(f"Add edge from {src.label} to {dst.label} in inner map SDFG")
@@ -512,14 +516,26 @@ def move_if_to_innermost_map(g: dace.SDFG):
         for state in empty_states:
             if_sdfg.remove_node(state)
 
+        for sym in syms:
+            if sym in parent_state.sdfg.arrays:
+                copydesc = copy.deepcopy(parent_state.sdfg.arrays[sym])
+                copydesc.transient = False
+                inner_map_sdfg.add_datadesc(sym, copydesc)
+                _insert_missing_data_through_parent_scopes(
+                    {sym},
+                    inner_map_sdfg.parent_nsdfg_node,
+                    parent_state,
+                    parent_state.sdfg,
+                )
+            elif sym in inner_map_sdfg.parent_nsdfg_node.free_symbols:
+                assert sym in parent_state.sdfg.symbols
+                inner_map_sdfg.parent_nsdfg_node.symbol_mapping[sym] = sym
+
         non_empty_state.is_start_block = True
         #s  = _find_state(g, if_sdfg.parent_nsdfg_node)
-        add_missing_data_and_symbols(g, non_empty_state, non_empty_state.sdfg, inner_map_sdfg)
+        #add_missing_data_and_symbols(g, non_empty_state, non_empty_state.sdfg, inner_map_sdfg)
 
-
-
-
-    g.save("g.sdfgz", compress=True)
+    g.validate()
+    #g.save("g.sdfgz", compress=True)
     #add_missing_data_and_symbols_to_all_nsdfgs(g)
-
     #rename(g)

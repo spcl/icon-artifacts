@@ -8,24 +8,6 @@ def _get_missing_symbols(nsdfg_node: dace.nodes.NestedSDFG) -> Set[str]:
     nsdfg = nsdfg_node
     symbols = set(k for k in nsdfg.free_symbols if k not in nsdfg.in_connectors and k not in nsdfg.out_connectors)
     missing_symbols = set(s for s in symbols if s not in nsdfg.symbol_mapping)
-
-    #print(list(nsdfg_node.sdfg.all_interstate_edges()))
-    #print(nsdfg_node.sdfg.nodes())
-    for e in nsdfg_node.sdfg.all_interstate_edges():
-        #print(e, e.data, e.data is None)
-        if e.data is not None:
-            def _get_all_symbols(expr):
-                symbols = {s for s in expr.atoms(sympy.Symbol)}
-                functions = {f.func for f in expr.atoms(sympy.Function)}
-                return symbols.union(functions)
-            for k, v in e.data.assignments.items():
-                syms = _get_all_symbols(dace.symbolic.SymExpr(v))
-                for sym in syms:
-                    sym_v_str = str(sym)
-                    if sym_v_str not in nsdfg.symbol_mapping and sym_v_str not in nsdfg_node.in_connectors and sym_v_str not in nsdfg_node.out_connectors:
-                        missing_symbols.add(sym_v_str)
-                if k not in nsdfg.symbol_mapping and k not in nsdfg_node.in_connectors and k not in nsdfg_node.out_connectors:
-                    missing_symbols.add(k)
     return set(missing_symbols)
 
 def add_missing_symbols_to_nsdfgs(sdfg: dace.SDFG):
@@ -164,18 +146,26 @@ def add_missing_data_and_symbols(root: dace.SDFG, _parent_graph, _parent_sdfg: d
 
     cp_missing_symbols = set() #copy.deepcopy(missing_symbols)
     for ms in missing_symbols:
-        if "__f2dace_SOA" in str(ms):
-            SA_ms = ms.replace("__f2dace_SOA", "__f2dace_SA")
-            cp_missing_symbols.add(SA_ms)
+        if "tmp_index" in ms:
+            continue
+
+        # Should not need this hack
+        #if "__f2dace_SOA" in str(ms):
+        #    SA_ms = ms.replace("__f2dace_SOA", "__f2dace_SA")
+        #    cp_missing_symbols.add(SA_ms)
 
         if str(ms).lower() != "and" and str(ms).lower() != "or":
             cp_missing_symbols.add(ms)
     missing_symbols = cp_missing_symbols
 
     for ms in missing_symbols:
-        parent_nsdfg_node.symbol_mapping[ms] = ms
-        assert ms in _parent_sdfg.symbols, f"Symbol {ms} not found in parent SDFG {parent_sdfg.name}"
-        sdfg.add_symbol(ms, _parent_sdfg.symbols[ms])
+        if ms in _parent_sdfg.symbols:
+            assert ms in _parent_sdfg.symbols, f"Symbol {ms} not found in parent SDFG {parent_sdfg.name}"
+            parent_nsdfg_node.symbol_mapping[ms] = ms
+            sdfg.add_symbol(ms, _parent_sdfg.symbols[ms])
+        else:
+            if ms not in sdfg.symbols:
+                sdfg.add_symbol(ms, dace.int32)
 
 def add_missing_data_and_symbols_to_all_nsdfgs(sdfg: dace.SDFG):
     for node, graph in sdfg.all_nodes_recursive():
