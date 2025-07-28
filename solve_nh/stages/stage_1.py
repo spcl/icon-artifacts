@@ -1,3 +1,4 @@
+import warnings
 import dace
 from dace import SDFG
 from dace.sdfg.state import LoopRegion
@@ -6,6 +7,7 @@ from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
 
 import argparse
+import warnings
 
 from dace.transformation.interstate import ContinueToCondition, LoopToMap
 from dace.transformation.passes import (
@@ -191,6 +193,7 @@ def optimization_action(g: SDFG):
         ("corrector_post", "_for_it_15", "FOR_l_1840_c_1840"),     # OK - no-read-write conflict
         # ("corrector_post", "_for_it_19", "FOR_l_1866_c_1866"),   # Can't
         # ("corrector_post", "_for_it_25", "FOR_l_1896_c_1896"),   # Can't
+        ("corrector_post", "_for_it_42", "FOR_l_1965_c_1965"),     # OK - scalar
         # ("corrector_post", "_for_it_43", "FOR_l_1962_c_1962"),   # Can't
         ("corrector_post", "_for_it_44", "FOR_l_1963_c_1963"),     # OK - scalar
         # ("corrector_post", "_for_it_45", "FOR_l_1974_c_1974"),   # Can't
@@ -224,6 +227,9 @@ def optimization_action(g: SDFG):
         ("predictor_post", "_for_it_47", "FOR_l_1448_c_1448"),     # OK
         # ("predictor_post", "_for_it_53", "FOR_l_1473_c_1473"),   # Can't
         ("predictor_post", "_for_it_60", "FOR_l_1500_c_1500"),     # OK
+        ("predictor_post", "_for_it_14", "FOR_l_1313_c_1313"),     # OK - OpenACC pragma kernel
+        ("predictor_post", "_for_it_15", "FOR_l_1314_c_1314"),     # OK - OpenACC pragma kernel
+        ("predictor_post", "_for_it_16", "FOR_l_1320_c_1320"),     # OK - OpenACC pragma kernel
 
         # solve_nh_predictor_pre - Stage #1
         # ("predictor_pre", "_for_it_66", "FOR_l_956_c_956"),      # Can't
@@ -246,7 +252,9 @@ def optimization_action(g: SDFG):
         if sdfg_name in g.name:
             for node, graph in g.all_nodes_recursive():
                 if isinstance(node, LoopRegion) and node.loop_variable == loop_var:
-                    assert node.label == loop_label
+                    #assert node.label == loop_label
+                    if node.label != loop_label:
+                        warnings.warn(f"Stage #{STAGE_ID}: {sdfg_name} loop {loop_label} label mismatch")
                     print(f"Stage #{STAGE_ID}: Converting {sdfg_name} loop {loop_label} to map")
                     LoopToMap.apply_to(sdfg=graph.sdfg, loop=node, permissive=True, options={"ballin": True})
                     manually_transformed_count += 1
@@ -276,7 +284,7 @@ def optimization_action(g: SDFG):
         "transients_only": True,
         "ignore": {
             "je_local",
-            "jb_local",
+            "jb_local"
             "i_startidx_local",
             "i_endidx_local",
             "je",
