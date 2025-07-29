@@ -38,7 +38,9 @@ from utils.transify_kernel_scalars import (
     transify_kernel_scalars,
     transify_targeted_scalar,
     retransify_scalar_with_local_prefix,
-    transify_targeted_array
+    transify_targeted_array,
+    transify_targeted_scalar_general_version,
+    identify_persistent_scalars_with_writes
 )
 
 from utils.add_data_preserver_tasklets import add_data_preserver_tasklets
@@ -172,6 +174,11 @@ def optimization_action(g: SDFG):
     # in-degree = 0 in state 1 but only written to state 0
     state_fusion_without_copyin_and_copyout(g)
     transify_targeted_scalar(g, thread_local_scalar_candidates)
+
+    SCALARS_ON_INTERFACE = identify_persistent_scalars_with_writes(g)
+    print(f"Stage #{STAGE_ID}: Transifying {len(SCALARS_ON_INTERFACE)} scalars on interface: {SCALARS_ON_INTERFACE}")
+    transify_targeted_scalar_general_version(g, SCALARS_ON_INTERFACE)
+
     thread_local_array_candidates = {
         "__CG_p_nh_prog_nnew__m_w",
         "__CG_p_nh__CG_diag__m_mass_fl_e",

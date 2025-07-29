@@ -1,8 +1,10 @@
 import dace
+from dace import SDFG
 from dace.sdfg.state import ControlFlowRegion, ConditionalBlock, LoopRegion
 from .get_num_parent_map_and_loop_scopes import get_num_parent_map_scopes
 import copy
 import typing
+from typing import Sequence
 from utils.rename import rename_on_if, rename_on_for
 
 def transify_kernel_scalars(sdfg: dace.SDFG, map_sched_type: dace.ScheduleType = dace.ScheduleType.GPU_Device):
@@ -241,6 +243,64 @@ def transify_targeted_scalar(sdfg: dace.SDFG, desc_candidate_names: typing.Set[s
                     if desc.transient is False:
                         desc.transient = True
                         desc.storage = dace.dtypes.StorageType.Register
+
+
+def identify_persistent_scalars_with_writes(g: SDFG) -> set[str]:
+    return {
+        a for a, d in g.arrays.items()
+        if isinstance(d, dace.data.Scalar)
+        and not d.transient
+        and any(n for n, st in g.all_nodes_recursive() 
+                if isinstance(n, dace.nodes.AccessNode) 
+                and n.data == a
+                and len(st.in_edges(n)) > 0)}
+
+def transify_targeted_scalar_general_version(g: SDFG, scalars: Sequence[str]):
+    # Transify scalars in the SDFG to be transient and local
+
+    # First, build a map of scalars to their new names
+    scalar_map = {}
+    for scalar in scalars:
+        if scalar not in g.arrays:
+            print(f"Warning: Scalar {scalar} not found in SDFG {g.name}. Skipping transification.")
+            continue
+        if not isinstance(g.arrays[scalar], dace.data.Scalar):
+            print(f"Warning: {scalar} is not a scalar in SDFG {g.name}. Skipping transification.")
+            continue
+        if g.arrays[scalar].transient:
+            print(f"Warning: {scalar} is already transient in SDFG {g.name}. Skipping transification.")
+            continue
+        # Create a new scalar with the same properties but transient
+        new_scalar_name = f"{scalar}_transified"
+        if new_scalar_name in g.arrays:
+            print(f"Warning: {new_scalar_name} already exists in SDFG {g.name}. Skipping transification.")
+            continue
+        new_scalar_desc = copy.deepcopy(g.arrays[scalar])
+        new_scalar_desc.transient = True
+        new_scalar_desc.storage = dace.dtypes.StorageType.Register
+        g.add_datadesc(new_scalar_name, new_scalar_desc)
+        scalar_map[scalar] = new_scalar_name
+
+    # Then, replace all occurrences of the scalar with the new scalar in one pass.
+    # Since we don't want to change the original scalar, we need to replace it using the `ControlFlowRegion` method.
+    for node in g.nodes():
+        node.replace_dict(scalar_map)
+    for edge in g.edges():
+        edge.data.replace_dict(scalar_map)
+
+    # Finally, initialize the new scalars in the SDFG
+    start_state = g.start_state
+    assert start_state is not None, f"Expected SDFG {g.name} to have a start state."
+    for scalar, new_scalar in scalar_map.items():
+        assert scalar in g.arrays, f"Expected {scalar} to be in SDFG {g.name} arrays."
+        assert new_scalar in g.arrays, f"Expected {new_scalar} to be in SDFG {g.name} arrays."
+        start_state.add_edge(
+            start_state.add_access(scalar),
+            None,
+            start_state.add_access(new_scalar),
+            None,
+            dace.memlet.Memlet.from_array(new_scalar, g.arrays[new_scalar])
+        )
 
 def transify_targeted_array(sdfg: dace.SDFG, desc_candidate_names: typing.Set[str]):
     # Filter candidate names to only include arrays
