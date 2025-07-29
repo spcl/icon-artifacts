@@ -365,7 +365,7 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
             for (p, (b2, e2, s2)) in range_list.items():
                 nb = nb.subs(p, b2)
                 ne = ne.subs(p, e2)
-                assert ns == 1 and s2 == 1, "Only step of 1 is supported for memcpy detection"
+                assert ns == 1 and s2 == 1, "Only step of 1 is supported for memcpy/memset detection"
             new_out_data_range.append((nb, ne, ns))
 
         new_in_data_subset = dace.subsets.Range(new_in_data_range) if in_edge.data.data is not None else None
@@ -379,7 +379,7 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
                 print(f"Input array {in_edge.data.data} is contiguous: {contig_subset}")
                 print(f"{new_in_data_range} vs {state.sdfg.arrays[in_edge.data.data].shape} with strides {state.sdfg.arrays[in_edge.data.data].strides}")
             if not contig_subset:
-                warnings.warn(f"Input array {in_edge.data.data} is not contiguous, cannot remove memcpy.", UserWarning)
+                warnings.warn(f"Input array {in_edge.data.data} is not contiguous, cannot remove memcpy/memset.", UserWarning)
                 return None, None, None
 
         if out_edge.data.data is not None:
@@ -388,7 +388,7 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
                 print(f"Output array {out_edge.data.data} is contiguous: {contig_subset}")
                 print(f"{new_out_data_range} vs {state.sdfg.arrays[out_edge.data.data].shape} with strides {state.sdfg.arrays[out_edge.data.data].strides}")
             if not contig_subset:
-                warnings.warn(f"Output array {out_edge.data.data} is not contiguous, cannot remove memcpy.", UserWarning)
+                warnings.warn(f"Output array {out_edge.data.data} is not contiguous, cannot remove memcpy/memset.", UserWarning)
                 return None, None, None
 
 

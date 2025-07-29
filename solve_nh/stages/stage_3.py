@@ -50,20 +50,29 @@ def optimization_action(g: SDFG):
     g.validate()
     # === Sub-Phase 2: Allocation Optimizations ===
 
-    # === Sub-Phase 3: Patches ===
+    # === Sub-Phase 3: Post-GPU Optimizations ===
+    # Catch kernels that can be replaced with memset and memcpy
+    AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(g, {})
+    g.validate()
+    # Make sure all connector types match with parent SDFG's symbol and data types, propagate inwards
+    # Also make all int64 symbols and top-level transients into int32
+    # I verbose print indicates that DyCore SDFGs are not plagued by the int64 vs int32 symbol typecasts
+    # and this function takes quite a while, so it can be later disabled
+    # And it can break codege
+    # int64_to_int32(g)
+    g.validate()
+    # === Sub-Phase 3: Post-GPU Optimizations ===
+
+    # === Sub-Phase 5: Bitwidth Lowering Transformations ===
+    # === Sub-Phase 5: Bitwidth Lowering Transformations ===
+
+
+    # === Sub-Phase 5: Profiling Patches (Make sure this is the last phase) ===
     insert_synchronization_for_profiling(g)
     g.validate()
     insert_timers_for_profiling(g)
     g.validate()
-    # === Sub-Phase 3: Patches ===
-
-    # === Sub-Phase 4: Post-GPU Optimizations ===
-    # Catch kernels that can be replaced with memset and memcpy
-    AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(g, {})
-    # Make sure all connector types match with parent SDFG's symbol and data types, propagate inwards
-    # Also make all int64 symbols and top-level transients into int32
-    int64_to_int32(g)
-    # === Sub-Phase 4: Post-GPU Optimizations ===
+    # === Sub-Phase 5: Profiling Patches (Make sure this is the last phase) ===
 
     return g
 

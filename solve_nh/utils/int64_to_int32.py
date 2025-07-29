@@ -80,8 +80,10 @@ def _int64_to_int32_impl(root: dace.SDFG, sdfg: dace.SDFG, mapping: Dict[str, da
     for nsdfg in nsdfgs:
         num_converted += _int64_to_int32_impl(sdfg, nsdfg, mapping, verbose)
 
+    return num_converted
+
 def int64_to_int32(sdfg: dace.SDFG):
-    verbose = os.getenv("VERBOSE", "0").lower() in ("1", "true", "yes")
+    verbose = os.getenv("VERBOSE", "1").lower() in ("1", "true", "yes")
     num_converted_types = _int64_to_int32_impl(sdfg, sdfg, dict(), verbose)
     if verbose:
         print(f"Total converted types: {num_converted_types}")
