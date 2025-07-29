@@ -86,7 +86,7 @@ def move_range_if_inside(sdfg: dace.SDFG, it_name: str):
     max_range_assign_state = map_state.parent_graph.add_state_before(
         map_state, "max_range_assign_state",
         assignments={
-            "max_map_range": "max(npromz_gradp, nproma_gradp)"
+            "max_map_range": "max(npromz_gradp_transified, nproma_gradp_transified)"
         }
     )
     # Add the symbol to both SDFGs
@@ -132,7 +132,7 @@ def move_range_if_inside(sdfg: dace.SDFG, it_name: str):
             kernel_state.remove_node(n)
 
     # Add the npromz_gradp, nproma_gradp to the map entry
-    for arr_name in ["npromz_gradp", "nproma_gradp", "nblks_gradp"]:
+    for arr_name in ["npromz_gradp_transified", "nproma_gradp_transified", "nblks_gradp_transified"]:
         if arr_name not in inner_kernel_body_sdfg.arrays:
             copydesc =  copy.deepcopy(map_state.sdfg.arrays[arr_name])
             copydesc.transient = False
