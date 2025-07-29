@@ -340,7 +340,7 @@
   SPAWN_WRITERS(prefix, z_graddiv2_vn, double *, namespc)                      \
   SPAWN_WRITERS(prefix, z_theta_v_pr_ic, double *, namespc)                    \
   SPAWN_WRITERS(prefix, z_exner_ic, double *, namespc)                         \
-  SPAWN_WRITERS(prefix, z_w_concorr_mc, double *, namespc)                     \
+  /*SPAWN_WRITERS(prefix, z_w_concorr_mc, double *, namespc)*/                 \
   SPAWN_WRITERS(prefix, z_flxdiv_mass, double *, namespc)                      \
   SPAWN_WRITERS(prefix, z_flxdiv_theta, double *, namespc)                     \
   SPAWN_WRITERS(prefix, z_hydro_corr, double *, namespc)                       \
