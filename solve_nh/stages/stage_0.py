@@ -1,5 +1,6 @@
 import dace
 from dace import SDFG
+from utils.stage0_hack_split_predictor_pre_omp_loop import split_predictor_pre_omp_loop
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
@@ -12,6 +13,7 @@ STAGE_ID = 0
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    split_predictor_pre_omp_loop(g)
     if velicity_shim:
         inject_velocity_shim(g)
     g.simplify()
