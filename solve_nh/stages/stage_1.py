@@ -207,6 +207,9 @@ def optimization_action(g: SDFG):
         # ("corrector_post", "_for_it_0", "FOR_l_1784_c_1784"),    # Can't
         ("corrector_post", "_for_it_15", "FOR_l_1842_c_1842"),     # OK - no-read-write conflict
         # ("corrector_post", "_for_it_19", "FOR_l_1866_c_1866"),   # Can't
+        ("corrector_post", "_for_it_20", "FOR_l_1870_c_1870"),   # Can't
+        ("corrector_post", "_for_it_21", "FOR_l_1871_c_1871"),   # Can't
+        ("corrector_post", "_for_it_22", "FOR_l_1872_c_1872"),   # Can't
         # ("corrector_post", "_for_it_25", "FOR_l_1896_c_1896"),   # Can't
         ("corrector_post", "_for_it_42", "FOR_l_1965_c_1965"),     # OK - scalar
         # ("corrector_post", "_for_it_43", "FOR_l_1962_c_1962"),   # Can't
