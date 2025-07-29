@@ -10,7 +10,7 @@ from typing import Dict, List, Set
 
 @properties.make_properties
 @transformation.explicit_cf_compatible
-class AssignmentAndCopyKernelToMemcpyAndMemset(ppl.Pass):
+class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
     """
     Title says it all.
     """
@@ -507,10 +507,24 @@ class AssignmentAndCopyKernelToMemcpyAndMemset(ppl.Pass):
             # Take input subset of tasklet replace expression with map range
             # For now, we will just use the original range
             # Needs to be done before removing the memset path
+            if map_entry not in state.nodes() or map_exit not in state.nodes() or tasklet not in state.nodes():
+                warnings.warn(f"Map entry, exit or tasklet not in state: {map_entry} ({map_entry in state.nodes()}), {map_exit} ({map_exit in state.nodes()}), {tasklet} ({tasklet in state.nodes()}). Skipping.", UserWarning)
+                continue
+            current_tasklets = {n for n in state.all_nodes_between(map_entry, map_exit) if isinstance(n, dace.nodes.Tasklet)}
+            if len(memset_paths) != len(current_tasklets):
+                warnings.warn(f"Number of memset paths {len(memset_paths)} does not match number of tasklets in map {len({n for n in state.all_nodes_between(map_entry, map_exit) if isinstance(n, dace.nodes.Tasklet)})}. Was removed before probably.", UserWarning)
+                if tasklet not in current_tasklets:
+                    warnings.warn(f"Tasklet {tasklet} is not in the current tasklets, skipping.", UserWarning)
+                    continue
+            #if "1928" in tasklet.label:
+            #    print(len(memset_paths))
+            #    print(memset_paths)
+            #    raise Exception("DEBUG: Check the memset paths and tasklet label")
+            #print(f"Removing memset path: {memset_path}")
             begin_subset, exit_subset, copy_length = self._get_write_begin_and_length(state, map_entry, tasklet)
 
             if begin_subset is None or exit_subset is None or copy_length is None:
-                warnings.warn(f"Could not determine begin or exit subset or copy length for memset removal (or they are not contiguous) in map {node.map.name}. Skipping.", UserWarning)
+                warnings.warn(f"Could not determine begin or exit subset or copy length for memset removal (or they are not contiguous) in map {map_entry.map}({map_entry.map.label}). Skipping.", UserWarning)
                 continue
 
             # We can now remove the memset path
@@ -523,12 +537,12 @@ class AssignmentAndCopyKernelToMemcpyAndMemset(ppl.Pass):
                 new_dst_access_node = dst_access_node
 
 
-            # Add a new memcpy tasklet
+            # Add a new memset tasklet
             tasklet = state.add_tasklet(
                 name=f"memset_0_{dst_access_node.data}",
                 inputs={},
                 outputs={"_out"},
-                code=f"cudaMemcpyAsync(_out, 0, {sym2cpp(copy_length)} * sizeof({dst_desc.dtype.ctype}), cudaMemcpyDeviceToDevice, nullptr);",
+                code=f"cudaMemsetAsync(_out, 0, {sym2cpp(copy_length)} * sizeof({dst_desc.dtype.ctype}), nullptr);",
                 language=dace.Language.CPP,
                 code_global=f"#include <cuda_runtime.h>\n"
             )
@@ -541,28 +555,35 @@ class AssignmentAndCopyKernelToMemcpyAndMemset(ppl.Pass):
 
 
     def apply_pass(self, sdfg: dace.SDFG, pipeline_res: Dict) -> Dict[int, Dict[dace.SDFGState, Set[dace.SDFGState]]]:
-        gpu_map_entries = set()
+        num_rmed_memcpies = 1
+        num_rmed_memsets = 1
 
-        for n, g in sdfg.all_nodes_recursive():
-            if isinstance(n, dace.nodes.MapEntry) and n.map.schedule == dace.ScheduleType.GPU_Device:
-                gpu_map_entries.add((n, g))
+        while num_rmed_memcpies > 0 or num_rmed_memsets > 0:
+            gpu_map_entries = set()
 
-        rmed_memcpies = dict()
-        rmed_memsets = dict()
+            for n, g in sdfg.all_nodes_recursive():
+                if isinstance(n, dace.nodes.MapEntry) and n.map.schedule == dace.ScheduleType.GPU_Device:
+                    gpu_map_entries.add((n, g))
 
-        for (node, state) in gpu_map_entries:
-            if self._get_num_tasklets_within_map(state, node) == 0:
-                continue
+            rmed_memcpies = dict()
+            rmed_memsets = dict()
 
-            rmed_memcpy = self.remove_memcpy_from_kernel(state, node)
+            for (node, state) in gpu_map_entries:
+                if self._get_num_tasklets_within_map(state, node) == 0:
+                    continue
 
-            # If the map is only used for 1 memcpy, then it might have been already removed
-            if node in state.nodes():
-                rmed_memset = self.remove_memset_from_kernel(state, node)
+                rmed_memcpy = self.remove_memcpy_from_kernel(state, node)
 
-            assert node not in rmed_memsets
-            assert node not in rmed_memcpies
-            rmed_memcpies[node] = rmed_memcpy
-            rmed_memsets[node] = rmed_memset
+                # If the map is only used for 1 memcpy, then it might have been already removed
+                if node in state.nodes():
+                    rmed_memset = self.remove_memset_from_kernel(state, node)
 
-        print(f"Removed {sum(rmed_memcpies.values())} contigous memcopies (_out = _in) and {sum(rmed_memsets.values())} contiguous memsets (_out = 0) from GPU maps.")
+                assert node not in rmed_memsets
+                assert node not in rmed_memcpies
+                rmed_memcpies[node] = rmed_memcpy
+                rmed_memsets[node] = rmed_memset
+
+            num_rmed_memcpies = sum(rmed_memcpies.values())
+            num_rmed_memsets = sum(rmed_memsets.values())
+
+            print(f"Removed {num_rmed_memcpies} contiguous memcopies (_out = _in) and {num_rmed_memsets} contiguous memsets (_out = 0) from GPU maps.")

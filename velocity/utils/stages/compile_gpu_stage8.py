@@ -19,7 +19,7 @@ from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_a
 
 from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling, set_default_stream, insert_synchronization_and_timers_for_profiling
 
-from utils.detect_assignments_and_copies import AssignmentAndCopyKernelToMemcpyAndMemset
+from utils.assignment_and_copy_kernel_to_memset_and_memcpy import AssignmentAndCopyKernelToMemsetAndMemcpy
 from utils.create_profile_sdfg import create_profile_sdfg
 STAGE_ID = 8
 import os
@@ -109,8 +109,7 @@ def optimization_action(sdfg):
     # TODO: force start_block and end_block to int8
 
     # Rm copy/memset kernels with API calls
-    AssignmentAndCopyKernelToMemcpyAndMemset().apply_pass(sdfg, {})
-    #raise Exception("DEBUG: AssignmentAndCopyKernelToMemcpyAndMemset applied, check for memcpy and memset kernels")
+    AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(sdfg, {})
 
 
     # TODO: GPU read-write has unit size of 32-bits, uint8_t won't help unless we tile
