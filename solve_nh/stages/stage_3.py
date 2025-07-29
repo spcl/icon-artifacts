@@ -19,6 +19,9 @@ from utils.profiling_patches import (
 from utils.assignment_and_copy_kernel_to_memset_and_memcpy import (
     AssignmentAndCopyKernelToMemsetAndMemcpy,
 )
+
+from utils.int64_to_int32 import int64_to_int32 as int64_to_int32
+
 import argparse
 
 
@@ -54,9 +57,13 @@ def optimization_action(g: SDFG):
     g.validate()
     # === Sub-Phase 3: Patches ===
 
-    # === Sub-Phase 3: Post-GPU Optimizations ===
+    # === Sub-Phase 4: Post-GPU Optimizations ===
+    # Catch kernels that can be replaced with memset and memcpy
     AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(g, {})
-    # === Sub-Phase 3: Post-GPU Optimizations ===
+    # Make sure all connector types match with parent SDFG's symbol and data types, propagate inwards
+    # Also make all int64 symbols and top-level transients into int32
+    int64_to_int32(g)
+    # === Sub-Phase 4: Post-GPU Optimizations ===
 
     return g
 
