@@ -3,6 +3,7 @@ from dace import SDFG
 from dace.sdfg.state import LoopRegion
 from dace.transformation.dataflow import MapCollapse
 from dace.transformation.interstate.loop_to_map import LoopToMap
+from dace.transformation.passes.constant_propagation import ConstantPropagation
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
 from dace.transformation.interstate import InlineSDFG
@@ -17,7 +18,8 @@ from utils.manual_fixes import move_range_if_inside
 import argparse
 from utils.map_condition_swap import move_if_to_innermost_map
 from utils.move_for_cfg_inside_map import move_for_cfg_inside_map_pass
-
+from utils.specialize_scalar import specialize_scalar
+from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 STAGE_ID = 2
 
 def optimization_action(g: SDFG):
@@ -26,8 +28,19 @@ def optimization_action(g: SDFG):
     num_applied = move_for_cfg_inside_map_pass(g)
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
+    g.validate()
     print(f"Stage #{STAGE_ID}: Moved {num_applied} for loops inside maps")
     # === Sub-Phase 0: Convert Loops to Maps ===
+
+    # === Sub-Phase 0.1: Specialize nlev and nlevp1 ===
+    num_applied = move_for_cfg_inside_map_pass(g)
+    specialize_scalar(g, g, "nlevp1", 91)
+    g.validate()
+    specialize_scalar(g, g, "nlev", 90)
+    g.validate()
+    ConstantPropagation().apply_pass(g, {})
+    state_fusion_without_copyin_and_copyout(g)
+    # === Sub-Phase 0.1: Specialize nlev and nlevp1  ===
 
     # === Sub-Phase 1: Clean Unused Data and Symbols From NSDFGs ===
     clean_unused_data_from_nsdfg(g)

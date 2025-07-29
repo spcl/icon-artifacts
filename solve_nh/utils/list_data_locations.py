@@ -207,6 +207,12 @@ def list_data_locations():
         if not global_cpu_gpu_intersection:
             global_report_file.write("  (No data needed both on CPU and GPU.)\n")
 
+    assert len(global_cpu_gpu_intersection) == 0
+    print("HOST FLATTEN LIST:")
+    for data in global_cpu_set - global_cpu_gpu_intersection:
+        if data.startswith("__CG"):
+            print('"' + data + '",')
+
 def list_scalar_locations():
     with open("combined_non_transient_scalars.txt", 'w') as combined_report_file:
         combined_report_file.write("Scalar locations:\n")
@@ -222,6 +228,6 @@ def list_scalar_locations():
 
 
 if __name__ == "__main__":
-    #list_data_locations()
-    #print("Data locations have been listed in 'data_locations_combined.txt' and individual reports.")
-    list_scalar_locations()
+    list_data_locations()
+    print("Data locations have been listed in 'data_locations_combined.txt' and individual reports.")
+    #list_scalar_locations()
