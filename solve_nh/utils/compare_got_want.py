@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import polars as pl
+from rich.live import Live
 
 # Ensure stdout is flushed line-by-line
 if isinstance(sys.stdout, io.TextIOWrapper):
@@ -48,9 +49,7 @@ def discover_timesteps(root: Path) -> List[int]:
     return sorted(ts_set)
 
 
-def find_comparable_files_at_timestep(
-    prefix: str, timestep: int, root: Path
-) -> List[Tuple[Path, Path]]:
+def find_comparable_files_at_timestep(prefix: str, timestep: int, root: Path) -> List[Tuple[Path, Path]]:
     pairs: List[Tuple[Path, Path]] = []
     for want in root.glob(f"{prefix}.*_{timestep}.want"):
         got = want.with_suffix(".got")
@@ -76,56 +75,55 @@ def compare_pair(
     rel_tol: np.float64 = np.finfo(np.float64).eps,
     verbose: bool = True,
 ) -> Tuple[Optional[str], Dict[str, Dict[str, Any]]]:
-    if verbose:
-        print(f"Comparing {got} vs. {want}")
-
     per_var: Dict[str, Dict[str, Any]] = {}
     current_var: str = got.stem.removeprefix(f"{got.stem.split('.')[0]}.")
 
-    for got_line, want_line in zip_longest(_stream_lines(got), _stream_lines(want)):
-        if got_line is None or want_line is None:
-            msg = "Different number of lines ❌"
-            if verbose:
-                print(msg)
-            return msg, per_var
+    with Live(refresh_per_second=4) as live:
+        if verbose:
+            live.update(f"Comparing {got} vs. {want}")
 
-        if got_line.startswith("# ") or want_line.startswith("# "):
-            if got_line != want_line:
-                msg = f"Different text ({got_line} vs. {want_line}) ❌"
+        for got_line, want_line in zip_longest(_stream_lines(got), _stream_lines(want)):
+            if got_line is None or want_line is None:
+                msg = "Different number of lines ❌"
                 if verbose:
                     print(msg)
                 return msg, per_var
-            tag = got_line.lstrip("# ").strip().split()[0]
-            if tag and tag not in KNOWN_METADATA:
-                per_var.setdefault(tag, {"ok": True, "max_abs": 0.0, "max_rel": 0.0})
-                current_var = tag
+
+            if got_line.startswith("# ") or want_line.startswith("# "):
+                if got_line != want_line:
+                    msg = f"Different text ({got_line} vs. {want_line}) ❌"
+                    if verbose:
+                        print(msg)
+                    return msg, per_var
+                tag = got_line.lstrip("# ").strip().split()[0]
+                if tag and tag not in KNOWN_METADATA:
+                    per_var.setdefault(tag, {"ok": True, "max_abs": 0.0, "max_rel": 0.0})
+                    current_var = tag
+                    if verbose:
+                        live.update(f"Checking: {current_var}")
+                continue
+
+            if got_line == want_line:
+                continue
+
+            try:
+                got_num = float(got_line)
+                want_num = float(want_line)
+            except ValueError:
+                msg = f"Non-numeric data for `{current_var}` ({got_line} & {want_line}) ❌"
                 if verbose:
-                    print(f"Checking: {current_var}")
-            continue
+                    print(msg)
+                return msg, per_var
 
-        if got_line == want_line:
-            continue
+            abs_diff = abs(got_num - want_num)
+            scale = max([abs(got_num), abs(want_num), abs_tol])
+            rel_diff = abs_diff / scale
 
-        try:
-            got_num = float(got_line)
-            want_num = float(want_line)
-        except ValueError:
-            msg = f"Non-numeric data for `{current_var}` ({got_line} & {want_line}) ❌"
-            if verbose:
-                print(msg)
-            return msg, per_var
-
-        abs_diff = abs(got_num - want_num)
-        scale = max([abs(got_num), abs(want_num), abs_tol])
-        rel_diff = abs_diff / scale
-
-        stats = per_var.setdefault(
-            current_var, {"ok": True, "max_abs": 0.0, "max_rel": 0.0}
-        )
-        stats["max_abs"] = max(stats["max_abs"], abs_diff)
-        stats["max_rel"] = max(stats["max_rel"], rel_diff)
-        if not math.isclose(got_num, want_num, rel_tol=rel_tol, abs_tol=abs_tol):
-            stats["ok"] = False
+            stats = per_var.setdefault(current_var, {"ok": True, "max_abs": 0.0, "max_rel": 0.0})
+            stats["max_abs"] = max(stats["max_abs"], abs_diff)
+            stats["max_rel"] = max(stats["max_rel"], rel_diff)
+            if not math.isclose(got_num, want_num, rel_tol=rel_tol, abs_tol=abs_tol):
+                stats["ok"] = False
 
     ok = all(v["ok"] for v in per_var.values())
     msg = None if ok else "Numerical differences found ❌"
@@ -134,9 +132,7 @@ def compare_pair(
     return msg, per_var
 
 
-def make_comparison_for_timestep(
-    prefix: str, ts: int, root: Path
-) -> Tuple[str, int, pl.DataFrame]:
+def make_comparison_for_timestep(prefix: str, ts: int, root: Path) -> Tuple[str, int, pl.DataFrame]:
     T = pl.DataFrame(schema=POLARS_SCHEMA)
     fpairs = find_comparable_files_at_timestep(prefix, ts, root)
     for got, want in fpairs:
@@ -148,9 +144,7 @@ def make_comparison_for_timestep(
         for var, st in per_var.items():
             status = "OK" if st["ok"] else "DIFF"
             if status == "DIFF":
-                print(
-                    f"  {var}: {status} | max_abs={st['max_abs']} | max_rel={st['max_rel']}"
-                )
+                print(f"  {var}: {status} | max_abs={st['max_abs']} | max_rel={st['max_rel']}")
             T.extend(
                 pl.DataFrame(
                     {
@@ -175,9 +169,7 @@ def wrapper(args: Tuple[str, int, str]) -> Tuple[str, int, pl.DataFrame]:
 
 
 if __name__ == "__main__":
-    argp = argparse.ArgumentParser(
-        description="Compare `.got` and `.want` files for numerical differences."
-    )
+    argp = argparse.ArgumentParser(description="Compare `.got` and `.want` files for numerical differences.")
     argp.add_argument(
         "-r",
         "--root",
