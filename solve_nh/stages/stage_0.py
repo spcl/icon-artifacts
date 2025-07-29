@@ -13,7 +13,8 @@ STAGE_ID = 0
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    split_predictor_pre_omp_loop(g)
+    if g.name == 'solve_nh_predictor_pre':
+        split_predictor_pre_omp_loop(g)
     if velicity_shim:
         inject_velocity_shim(g)
     g.simplify()
