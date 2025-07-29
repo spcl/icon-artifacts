@@ -16,6 +16,9 @@ from utils.profiling_patches import (
     insert_timers_for_profiling,
     insert_synchronization_for_profiling,
 )
+from utils.assignment_and_copy_kernel_to_memset_and_memcpy import (
+    AssignmentAndCopyKernelToMemsetAndMemcpy,
+)
 import argparse
 
 
@@ -50,6 +53,10 @@ def optimization_action(g: SDFG):
     insert_timers_for_profiling(g)
     g.validate()
     # === Sub-Phase 3: Patches ===
+
+    # === Sub-Phase 3: Post-GPU Optimizations ===
+    AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(g, {})
+    # === Sub-Phase 3: Post-GPU Optimizations ===
 
     return g
 
