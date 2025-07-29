@@ -177,10 +177,7 @@ def _is_always_write_first_impl_if(cfg: ControlFlowRegion, desc_name: str):
 def is_always_write_first(cfg: ControlFlowRegion, desc_name: str):
     return _is_always_write_first_impl_cfg(cfg, desc_name)
 
-call_counter = 0
 def transify_targeted_scalar(sdfg: dace.SDFG, desc_candidate_names: typing.Set[str]):
-    global call_counter
-    call_counter += 1
     # Filter candidate names to only include scalars
     desc_names = set()
     for name in desc_candidate_names:
@@ -223,7 +220,7 @@ def transify_targeted_scalar(sdfg: dace.SDFG, desc_candidate_names: typing.Set[s
                 if desc_is_write_first is not None and desc_is_write_first is True:
                     # Add the local transient to the SDFG
                     desc = snode.sdfg.arrays[desc_name]
-                    name = desc_name + f"_local_{call_counter}"
+                    name = desc_name + f"_local"
                     if name not in snode.sdfg.arrays:
                         copydesc = copy.deepcopy(desc)
                         copydesc.transient = True
