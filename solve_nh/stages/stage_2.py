@@ -1,14 +1,12 @@
-import dace
 from dace import SDFG
-from dace.sdfg.state import LoopRegion
 from dace.transformation.dataflow import MapCollapse
-from dace.transformation.interstate.loop_to_map import LoopToMap
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
 from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
+from utils.conditional_pruning import cleanup_conditionals
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
@@ -24,6 +22,10 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    # === Sub-Phase -1: Try to const-eval branch conditions ===
+    cleanup_conditionals(g)
+    # === Sub-Phase -1: Try to const-eval branch conditions ===
+
     # === Sub-Phase 0: Convert Loops to Maps ===
     num_applied = move_for_cfg_inside_map_pass(g)
     clean_unused_data_from_nsdfg(g)
