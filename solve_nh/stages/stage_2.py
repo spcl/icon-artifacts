@@ -34,9 +34,9 @@ def optimization_action(g: SDFG):
 
     # === Sub-Phase 0.1: Specialize nlev and nlevp1 ===
     num_applied = move_for_cfg_inside_map_pass(g)
-    specialize_scalar(g, g, "nlevp1", 91)
+    specialize_scalar(g, "nlevp1", 91)
     g.validate()
-    specialize_scalar(g, g, "nlev", 90)
+    specialize_scalar(g, "nlev", 90)
     g.validate()
     ConstantPropagation().apply_pass(g, {})
     state_fusion_without_copyin_and_copyout(g)
