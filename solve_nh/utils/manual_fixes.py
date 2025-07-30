@@ -66,7 +66,7 @@ def move_range_if_inside(sdfg: dace.SDFG, it_name: str):
     nsdfg_node = next(iter(dst_nodes))
 
     inner_sdfg = nsdfg_node.sdfg
-    assert len(inner_sdfg.nodes()) == 3
+    assert len(inner_sdfg.nodes()) == 3 or len(inner_sdfg.nodes()) == 2
 
     empty_state, if_block, kernel_state = inner_sdfg.bfs_nodes(inner_sdfg.start_block)
     edge_from_empty_to_if = next(iter(inner_sdfg.out_edges(empty_state)))

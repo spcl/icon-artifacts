@@ -38,7 +38,7 @@ def if_else_to_conditional_op(cfg: ConditionalBlock,
         name=cfg.label + "_cond_tasklet",
         inputs={"_in_true", "_in_false"},
         outputs={"_out"},
-        code=f"_out = ({cond}) ? _in_true : _in_false;",
+        code=f"_out = ({cond.as_string}) ? _in_true : _in_false;",
         language=dace.dtypes.Language.CPP,
     )
 
@@ -58,8 +58,8 @@ def if_else_to_coditional_op_pass(sdfg: dace.SDFG):
         branch2 = n.branches[1]
         cond1 = branch1[0]
         cond2 = branch2[0]
-        #if not ((cond1 is not None and "lvn_pos" in cond1.as_string) or (cond2 is not None and "lvn_pos" in cond2.as_string)):
-        #    continue
+        if not ((cond1 is not None and "lvn_pos" in cond1.as_string) or (cond2 is not None and "lvn_pos" in cond2.as_string)):
+            continue
         if cond1 != None and cond2 != None:
             #print(f"Converting if-else to ? operator in {n.label} with conditions {cond1} and {cond2}")
             raise Exception("Cannot convert if-else to ? operator with both conditions defined")

@@ -34,8 +34,8 @@ def optimization_action(g: SDFG):
     # }
     # then convert it to a tasklet with a conditional operator.
     # scalar = (cond) ? A[i] : B[j];
-    if_else_to_coditional_op_pass(g)
-    g.validate()
+    #if_else_to_coditional_op_pass(g)
+    #g.validate()
     push_interstate_edges_early(g)
     # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
     # === Sub-Phase 0.2: Try to const-eval branch conditions ===
@@ -122,6 +122,7 @@ def optimization_action(g: SDFG):
     # Handles a very specific pattern:
     # Map -> if 1 = range1, if2 = range 2 -> Map (range)
     # We make it into Map -> Map (max(range1, range2)) -> every thread checks the condition
+    g.save("before_move_range_if_inside.sdfgz", compress=True)
     if "predictor_pre" in g.name:
         move_range_if_inside(g, "_for_it_101")
     g.validate()
