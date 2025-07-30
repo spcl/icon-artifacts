@@ -23,7 +23,7 @@ __CG_global_data__m_iadv_rhotheta = global_data->iadv_rhotheta;
 
 __CG_global_data__m_igradp_method = global_data->igradp_method;
 
-gpu___CG_global_data__m_kstart_dd3d = global_data->kstart_dd3d;
+__CG_global_data__m_kstart_dd3d = global_data->kstart_dd3d;
 
 __CG_global_data__m_nproma = global_data->nproma;
 
@@ -41,7 +41,7 @@ __CG_global_data__m_timer_intp = global_data->timer_intp;
 
 __CG_global_data__m_nrdmax = global_data->nrdmax;
 
-gpu___CG_global_data__m_nflat_gradp = global_data->nflat_gradp;
+__CG_global_data__m_nflat_gradp = global_data->nflat_gradp;
 
 
 __CG_p_nh__CG_diag__m_ddt_vn_dyn_is_associated = p_nh->diag->ddt_vn_dyn_is_associated;
@@ -218,19 +218,19 @@ gpu___CG_p_nh__CG_metrics__m_d2dexdz2_fac1_mc = p_nh->metrics->d2dexdz2_fac1_mc;
 
 gpu___CG_p_nh__CG_metrics__m_d2dexdz2_fac2_mc = p_nh->metrics->d2dexdz2_fac2_mc;
 
-gpu___CG_p_nh__CG_metrics__m_pg_exdist = p_nh->metrics->pg_exdist;
+__CG_p_nh__CG_metrics__m_pg_exdist = p_nh->metrics->pg_exdist;
 
 gpu___CG_p_nh__CG_metrics__m_vertidx_gradp = p_nh->metrics->vertidx_gradp;
 
-gpu___CG_p_nh__CG_metrics__m_pg_edgeidx = p_nh->metrics->pg_edgeidx;
+__CG_p_nh__CG_metrics__m_pg_edgeidx = p_nh->metrics->pg_edgeidx;
 
-gpu___CG_p_nh__CG_metrics__m_pg_edgeblk = p_nh->metrics->pg_edgeblk;
+__CG_p_nh__CG_metrics__m_pg_edgeblk = p_nh->metrics->pg_edgeblk;
 
-gpu___CG_p_nh__CG_metrics__m_pg_vertidx = p_nh->metrics->pg_vertidx;
+__CG_p_nh__CG_metrics__m_pg_vertidx = p_nh->metrics->pg_vertidx;
 
-gpu___CG_p_nh__CG_metrics__m_bdy_mflx_e_idx = p_nh->metrics->bdy_mflx_e_idx;
+__CG_p_nh__CG_metrics__m_bdy_mflx_e_idx = p_nh->metrics->bdy_mflx_e_idx;
 
-gpu___CG_p_nh__CG_metrics__m_bdy_mflx_e_blk = p_nh->metrics->bdy_mflx_e_blk;
+__CG_p_nh__CG_metrics__m_bdy_mflx_e_blk = p_nh->metrics->bdy_mflx_e_blk;
 
 gpu___CG_p_nh__CG_metrics__m_deepatmo_gradh_mc = p_nh->metrics->deepatmo_gradh_mc;
 
@@ -304,11 +304,11 @@ __CG_p_patch__CG_cells__m_start_index = p_patch->cells->start_index;
 
 __CG_p_patch__CG_cells__m_end_index = p_patch->cells->end_index;
 
-gpu___CG_p_patch__CG_cells__m_start_blk = p_patch->cells->start_blk;
+__CG_p_patch__CG_cells__m_start_blk = p_patch->cells->start_blk;
 
 __CG_p_patch__CG_cells__m_start_block = p_patch->cells->start_block;
 
-gpu___CG_p_patch__CG_cells__m_end_blk = p_patch->cells->end_blk;
+__CG_p_patch__CG_cells__m_end_blk = p_patch->cells->end_blk;
 
 __CG_p_patch__CG_cells__m_end_block = p_patch->cells->end_block;
 
@@ -326,13 +326,21 @@ gpu___CG_p_patch__CG_edges__m_quad_idx = p_patch->edges->quad_idx;
 
 gpu___CG_p_patch__CG_edges__m_quad_blk = p_patch->edges->quad_blk;
 
-gpu___CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v1 = p_patch->edges->primal_normal_cell->t_tangent_vectors->v1;
+gpu___CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v1 = &p_patch->edges->primal_normal_cell->t_tangent_vectors[0]
 
-gpu___CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v2 = p_patch->edges->primal_normal_cell->t_tangent_vectors->v2;
+//gpu___CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v1 = p_patch->edges->primal_normal_cell->t_tangent_vectors->v1;
 
-gpu___CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v1 = p_patch->edges->dual_normal_cell->t_tangent_vectors->v1;
+gpu___CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v2 = &p_patch->edges->primal_normal_cell->t_tangent_vectors[((__f2dace_SA_primal_normal_cell_d_0_s_262_edges_p_patch_9 * __f2dace_SA_primal_normal_cell_d_1_s_263_edges_p_patch_9) * __f2dace_SA_primal_normal_cell_d_2_s_264_edges_p_patch_9)]
 
-gpu___CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v2 = p_patch->edges->dual_normal_cell->t_tangent_vectors->v2;
+//gpu___CG_p_patch__CG_edges__CA_primal_normal_cell__CG_t_tangent_vectors__m_v2 = p_patch->edges->primal_normal_cell->t_tangent_vectors->v2;
+
+gpu___CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v1 = &p_patch->edges->dual_normal_cell->t_tangent_vectors[0]
+
+//gpu___CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v1 = p_patch->edges->dual_normal_cell->t_tangent_vectors->v1;
+
+gpu___CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v2 = &p_patch->edges->dual_normal_cell->t_tangent_vectors[((__f2dace_SA_dual_normal_cell_d_0_s_265_edges_p_patch_9 * __f2dace_SA_dual_normal_cell_d_1_s_266_edges_p_patch_9) * __f2dace_SA_dual_normal_cell_d_2_s_267_edges_p_patch_9)]
+
+//gpu___CG_p_patch__CG_edges__CA_dual_normal_cell__CG_t_tangent_vectors__m_v2 = p_patch->edges->dual_normal_cell->t_tangent_vectors->v2;
 
 gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length = p_patch->edges->inv_primal_edge_length;
 
