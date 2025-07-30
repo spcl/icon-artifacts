@@ -14,9 +14,9 @@ from utils.codegen_from_sdfg import (
 
 STARTER_SDFG_FILES = [
     "solve_nh_predictor_pre.sdfgz",
-    #"solve_nh_predictor_post.sdfgz",
-    #"solve_nh_corrector_pre.sdfgz",
-    #"solve_nh_corrector_post.sdfgz",
+    "solve_nh_predictor_post.sdfgz",
+    "solve_nh_corrector_pre.sdfgz",
+    "solve_nh_corrector_post.sdfgz",
 ]
 
 DEFAULT_CODEGEN_DIR = "codegen"
