@@ -1,5 +1,12 @@
 import dace
 
+ENTRY_TIMER = "entry_timer"
+EXIT_TIMER = "exit_timer"
+PROFILE_START_SYNC = "profile_start_sync"
+PROFILE_STOP_SYNC = "profile_stop_sync"
+PROGRAM_EXIT_SYNC = "program_exit_sync"
+PROGRAM_ENTRY_SYNC = "program_entry_sync"
+
 def insert_timers_for_profiling(sdfg: dace.SDFG):
     deflatten_state = None
     deflatten_node = None
@@ -21,18 +28,18 @@ def insert_timers_for_profiling(sdfg: dace.SDFG):
     assert len(last_blocks) == 1, "Expected exactly one last block in the SDFG"
     last_block = last_blocks[0]
 
-    timer_sync_state1 = sdfg.add_state_after(state=flatten_state, label="entry_timer_sync")
+    timer_sync_state1 = sdfg.add_state_after(state=flatten_state, label=PROFILE_START_SYNC)
     timer_sync_node1 = timer_sync_state1.add_tasklet(
-        name="timer_wait1",
+        name="sync_tasklet_" + PROFILE_START_SYNC,
         code=f'dace_wait_device();',
         inputs={},
         outputs={},
         language=dace.dtypes.Language.CPP,
         code_global='#include "dace_wait_device.h"',
     )
-    timer_state1 = sdfg.add_state_after(state=timer_sync_state1, label="entry_timer")
+    timer_state1 = sdfg.add_state_after(state=timer_sync_state1, label=ENTRY_TIMER)
     timer_node1 = timer_state1.add_tasklet(
-        name="timer1",
+        name="timer_" + ENTRY_TIMER,
         code=f'dace_measure_time("{sdfg.name}");',
         inputs={},
         outputs={},
@@ -40,16 +47,15 @@ def insert_timers_for_profiling(sdfg: dace.SDFG):
         code_global='#include "dace_measure_time.h"',
     )
 
-    timer_state2 = sdfg.add_state_before(state=deflatten_state, label="exit_timer")
+    timer_state2 = sdfg.add_state_before(state=deflatten_state, label=EXIT_TIMER)
     timer_node2 = timer_state2.add_tasklet(
-        name="timer2",
+        name="timer_" + EXIT_TIMER,
         code=f'dace_measure_time("{sdfg.name}");',
         inputs={},
         outputs={},
         language=dace.dtypes.Language.CPP,
         #code_global='#include "dace_measure_time.h"',
     )
-
 
 def insert_synchronization_for_profiling(sdfg: dace.SDFG):
     deflatten_state = None
@@ -67,10 +73,9 @@ def insert_synchronization_for_profiling(sdfg: dace.SDFG):
     assert len(last_blocks) == 1, "Expected exactly one last block in the SDFG"
     last_block = last_blocks[0]
 
-
-    sync_state1 = sdfg.add_state_before(state=deflatten_state, label="profile_sync_state")
+    sync_state1 = sdfg.add_state_before(state=deflatten_state, label=PROFILE_STOP_SYNC)
     sync_node1 = sync_state1.add_tasklet(
-        name="sync1",
+        name="sync_tasklet_" + PROFILE_STOP_SYNC,
         code="dace_wait_device();",
         inputs={},
         outputs={},
@@ -78,29 +83,10 @@ def insert_synchronization_for_profiling(sdfg: dace.SDFG):
         code_global='#include "dace_wait_device.h"',
     )
 
-    sync_state2 = sdfg.add_state_after(state=last_block, label="program_exit_sync")
-    sync_node2 = sync_state2.add_tasklet(
-        name="sync2",
-        code="dace_wait_device();",
-        inputs={},
-        outputs={},
-        language=dace.dtypes.Language.CPP,
-        # code_global='#include "dace_wait_device.h"', # skip include
-    )
-
-    start_block = sdfg.start_block
-    sync_state3 = sdfg.add_state_before(start_block, label="profile_start_sync")
-    sync_node3 = sync_state3.add_tasklet(
-        name="sync0",
-        code="dace_wait_device();",
-        inputs={},
-        outputs={},
-        language=dace.dtypes.Language.CPP,
-        #code_global='#include "dace_wait_device.h"', # skip include
-    )
+    insert_program_entry_exit_syncs(sdfg)
 
 def remove_profiling_states(sdfg: dace.SDFG):
-    timer_state_names = {"entry_timer", "exit_timer"}
+    timer_state_names = {ENTRY_TIMER, EXIT_TIMER}
     rm_state_and_reroute(sdfg, timer_state_names)
 
 def rm_state_and_reroute(sdfg:dace.SDFG, state_names):
@@ -114,34 +100,19 @@ def rm_state_and_reroute(sdfg:dace.SDFG, state_names):
                 for k, v in src_edge.data.assignments.items():
                     if k not in nassignments:
                         nassignments[k] = v
-                    if k in nassignments:
-                        if nassignments[k] != v:
-                            raise ValueError(f"Duplicate assignment for key {k} in edge {src_edge}")
+                    if k in nassignments and v != nassignments[k]:
+                        raise ValueError(f"Duplicate assignment for key {k} in edge {src_edge}")
                 for k, v in dst_edge.data.assignments.items():
                     if k not in nassignments:
                         nassignments[k] = v
-                    if k in nassignments:
-                        if nassignments[k] != v:
-                            raise ValueError(f"Duplicate assignment for key {k} in edge {dst_edge}")
+                    if k in nassignments and v != nassignments[k]:
+                        raise ValueError(f"Duplicate assignment for key {k} in edge {src_edge}")
                 sdfg.add_edge(src_edge.src, dst_edge.dst, dace.InterstateEdge(assignments=nassignments))
 
 def remove_sync_states(sdfg:dace.SDFG):
-    sync_state_names = {"program_exit_sync", "profile_start_sync", "profile_sync_state", "entry_timer_sync"}
+    sync_state_names = {PROGRAM_ENTRY_SYNC, PROGRAM_EXIT_SYNC, PROFILE_START_SYNC, PROFILE_STOP_SYNC}
     rm_state_and_reroute(sdfg, sync_state_names)
 
-def set_default_stream(sdfg: dace.SDFG):
-    for n, g in sdfg.all_nodes_recursive():
-        if isinstance(n, dace.nodes.MapEntry) and n.map.schedule == dace.ScheduleType.GPU_Device:
-            n._cuda_stream = "nullptr"
-            n.map._cuda_stream = "nullptr"
-
-def insert_synchronization_and_timers_for_profiling(sdfg: dace.SDFG):
-    insert_synchronization_for_profiling(sdfg)
-    insert_timers_for_profiling(sdfg)
-
-def remove_sync_and_profiling_states(sdfg: dace.SDFG):
-    remove_sync_states(sdfg)
-    remove_profiling_states(sdfg)
 
 def insert_program_entry_exit_syncs(sdfg: dace.SDFG):
     last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
@@ -149,9 +120,9 @@ def insert_program_entry_exit_syncs(sdfg: dace.SDFG):
     last_block = last_blocks[0]
 
 
-    sync_state1 = sdfg.add_state_before(state=sdfg.start_block, label="program_entry_sync")
+    sync_state1 = sdfg.add_state_before(state=sdfg.start_block, label=PROGRAM_ENTRY_SYNC)
     sync_node1 = sync_state1.add_tasklet(
-        name="sync1",
+        name="sync_tasklet_" + PROGRAM_ENTRY_SYNC,
         code="dace_wait_device();",
         inputs={},
         outputs={},
@@ -159,45 +130,12 @@ def insert_program_entry_exit_syncs(sdfg: dace.SDFG):
         code_global='#include "dace_wait_device.h"',
     )
 
-    sync_state2 = sdfg.add_state_after(state=last_block, label="program_exit_sync")
+    sync_state2 = sdfg.add_state_after(state=last_block, label=PROGRAM_EXIT_SYNC)
     sync_node2 = sync_state2.add_tasklet(
-        name="sync2",
+        name="sync_tasklet_" + PROGRAM_EXIT_SYNC,
         code="dace_wait_device();",
         inputs={},
         outputs={},
         language=dace.dtypes.Language.CPP,
         # code_global='#include "dace_wait_device.h"', # skip include
     )
-
-def insert_pre_reduction_sync(sdfg: dace.SDFG):
-    last_blocks = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]
-    assert len(last_blocks) == 1, "Expected exactly one last block in the SDFG"
-    last_block = last_blocks[0]
-    sync_state2 = sdfg.add_state_before(state=last_block, label="pre_reduce_sync")
-    sync_node2 = sync_state2.add_tasklet(
-        name="sync0",
-        code="dace_wait_device();",
-        inputs={},
-        outputs={},
-        language=dace.dtypes.Language.CPP,
-        code_global='#include "dace_wait_device.h"',
-    )
-
-def rm_reduntant_copies(sdfg: dace.SDFG):
-    for state in sdfg.all_states():
-        for edge in state.edges():
-            if edge not in state.edges():
-                continue
-            if (isinstance(edge.src, dace.nodes.AccessNode) and
-                isinstance(edge.dst, dace.nodes.AccessNode) and
-                edge.src.data == edge.dst.data
-                ):
-                state.remove_edge(edge)
-                state.remove_node(edge.src)
-                state.remove_node(edge.dst)
-
-
-    for state in sdfg.all_states():
-        for node in state.nodes():
-            if isinstance(node, dace.nodes.NestedSDFG):
-                rm_reduntant_copies(node.sdfg)
