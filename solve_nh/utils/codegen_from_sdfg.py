@@ -357,7 +357,6 @@ class Compiler:
                 "-Xptxas=-O3",  # Device: Pass -O3 to PTXAS (PTX assembler) for aggressive optimization.
                 "-Xptxas=-v",  # Device: Pass -v to PTXAS for verbose output.
                 "--restrict",  # Device: Treat pointers as restricted, enabling no-aliasing optimizations.
-                "-dlto",  # Device: Enable Device Link-Time Optimization for cross-file optimization.
             ]
         return []
 
@@ -476,6 +475,9 @@ class Compiler:
             )
 
         return flags
+
+    def get_gpu_linker_flags(self) -> list[str]:
+        return ["-shared"]
 
     def compile_object(self, sources: list[Path], includes: list[Path], stage: int = 0):
         """
@@ -616,6 +618,35 @@ class Compiler:
         cmd = [self.nvcc] + gen_sources + [f"-I{i}" for i in all_includes] + flags + ["-o", gpu_output_name]
         _run_command([str(c) for c in cmd if c])
 
+    def compile_gpu_shared_lib(
+        self,
+        host_sources: list[Path],
+        includes: list[Path],
+        gpu_output_name: str,
+        stage: int = 0,
+    ):
+        """
+        Compiles and links CUDA (GPU) source files into a single shared library.
+        This method specifically targets GPU compilation with `nvcc`.
+        """
+        all_includes = includes + [self.dace_include, STANDALONE_INCLUDE_DIR]  # Global include path.
+        assert stage >= GPU_STAGE_BEGINS, f"GPU stage compilation requires stage >= {GPU_STAGE_BEGINS}"
+
+        gen_sources = []
+        for s in host_sources:
+            gen_sources.append(self._get_cuda_src_file_flag())  # Explicitly tell nvcc to treat them as .cu files.
+            gen_sources.append(str(s))
+
+        flags = (
+            self.get_base_flags_cuda()  # Get all base CUDA compiler flags.
+            + ["-DDYCORE_GPU_INTEGRATION"]
+            + self.get_gpu_linker_flags()  # Specific linker flags for shared library.
+            + self.get_velocity_linker_flags(stage)  # Linker flags for external 'velocity' library.
+            + self._get_cpp_standard_flags()  # C++ standard flag, applied to host code by nvcc.
+        )
+
+        cmd = [self.nvcc] + gen_sources + [f"-I{i}" for i in all_includes] + flags + ["-o", gpu_output_name]
+        _run_command([str(c) for c in cmd if c])
 
 def _fix_init_cuda(cuda_source_path: Path, host_source_path: Path) -> None:
     host_cuda_src_pairs = [(host_source_path, cuda_source_path)]
@@ -836,9 +867,7 @@ def compile_generated_code(
 
     if artifact_mode == ArtifactMode.SHARED:
         if stage >= GPU_STAGE_BEGINS:
-            print(
-                f"Skipping shared library compilation for CUDA stage {GPU_STAGE_BEGINS} and above. Shared library feature needs to be implemented for CUDA stage 4."
-            )
+            compiler.compile_gpu_shared_lib(sdfg_srcs, sdfg_includes, SHARED_LIB_FILE, stage)
         else:
             compiler.link_shared_library(STATIC_LIB_FILE, SHARED_LIB_FILE, stage)
             print(f"Successfully created shared library: {SHARED_LIB_FILE}")

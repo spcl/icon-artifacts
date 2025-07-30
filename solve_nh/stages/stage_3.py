@@ -12,7 +12,7 @@ from utils.set_transient_storage_to_persistent import (
     check_transients_in_nsdfgs,
     clean_view_descs,
 )
-from utils.profiling_patches import (
+from utils.profiling_and_sync_patches import (
     insert_timers_for_profiling,
     insert_synchronization_for_profiling,
 )

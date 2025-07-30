@@ -6,11 +6,42 @@ from utils.codegen_from_sdfg import ArtifactMode
 import argparse
 
 
+from utils.to_library_transformations import (
+    nontransient_inputs_to_gpu,
+    change_flatten_lib_to_shallow_copy
+)
+from utils.profiling_and_sync_patches import (
+    remove_profiling_states,
+    remove_sync_states,
+    insert_program_entry_exit_syncs
+)
+
 STAGE_ID = 4
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    # === Sub-Phase 0: Remove profiling timers and additional profiling sync ===
+    remove_profiling_states(g)
+    remove_sync_states(g)
+    insert_program_entry_exit_syncs(g)
+    g.append_global_code(
+        cpp_code="#define DYCORE_GPU_INTEGRATION"
+    )
     g.validate()
+    # === Sub-Phase 0: Remove profiling timers and additional profiling sync ===
+
+    # === Sub-Phase 1: Move inputs to GPU storage without changing the names ===
+    nontransient_inputs_to_gpu(g)
+    g.validate()
+    # === Sub-Phase 1: Move inputs to GPU storage without changing the names ===
+
+    # === Sub-Phase 2: Replace Flattening with shallow copy ===
+    # Important this requires flattening and deflattening code to be generated
+    # and in `solve_nh` folder (some are committed to the repository)
+    change_flatten_lib_to_shallow_copy(g)
+    g.validate()
+    # === Sub-Phase 2: Replace Flattening with shallow copy ===
+
     return g
 
 
