@@ -475,7 +475,7 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
         new_map_exit.add_in_connector("IN_" + an.data)
         new_map_exit.add_out_connector("OUT_" + an.data)
 
-    return new_if, nsdfg, if_assignment_state, if_inner_state
+    return new_if, nsdfg, if_inner_state
 
 def move_for_cfg_inside_map_from_iterator_set(sdfg: dace.SDFG, iterator_names: Set[str]):
     cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, LoopRegion) and n.loop_variable in iterator_names}
