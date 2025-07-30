@@ -6,7 +6,7 @@ from utils.codegen_from_sdfg import ArtifactMode
 from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
-from utils.conditional_pruning import cleanup_conditionals
+from utils.conditional_pruning import cleanup_conditionals, push_interstate_edges_early
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
@@ -23,9 +23,12 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    # === Sub-Phase 0: Try to const-eval branch conditions ===
+    # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
+    push_interstate_edges_early(g)
+    # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
+    # === Sub-Phase 0.2: Try to const-eval branch conditions ===
     cleanup_conditionals(g)
-    # === Sub-Phase 0: Try to const-eval branch conditions ===
+    # === Sub-Phase 0.2: Try to const-eval branch conditions ===
 
     # === Sub-Phase 1: Move Loops inside Maps ===
     # If we have `nlev [ nproma ]` where nlev is a loop and nproma is a map,
