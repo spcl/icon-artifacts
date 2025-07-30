@@ -257,9 +257,8 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     # Rm the previous map entry and exit
     if_block.parent_graph.remove_node(if_block)
     for e in if_block_ies:
-        # Will copy in in state assignments
         if_block.parent_graph.add_edge(
-            e.src, new_state, dace.InterstateEdge()
+            e.src, new_state, copy.deepcopy(e.data)
         )
     for e in if_block_oes:
         if_block.parent_graph.add_edge(
@@ -283,7 +282,7 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
 
     assert map_entry in state.nodes(), "Expected the map entry to be in the state"
     assert len(new_state.nodes()) == 0, "Expected the new state to be empty"
-    new_if, if_nsdfg, if_assignment_state, if_inner_state = _copy_if_cfg_with_a_new_inner_state(
+    new_if, if_nsdfg, if_inner_state = _copy_if_cfg_with_a_new_inner_state(
         state=new_state,
         old_if=if_block,
         cfg_call_id=cfg_call_id,
@@ -412,22 +411,9 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
         parent=state
     )
 
-    if_assignment_state = new_if_cfg.add_state(
-        label=f"{new_if.label}_if_cfg_{cfg_call_id}_assignment_state",
-        is_start_block=True
-    )
-
     if_inner_state = new_if_cfg.add_state(
         label=f"{state.label}_if_cfg_{cfg_call_id}_state",
         is_start_block=False
-    )
-
-    new_if_cfg.add_edge(
-        if_assignment_state,
-        if_inner_state,
-        data=dace.InterstateEdge(
-            assignments=copy.deepcopy(interstate_assignments),
-        )
     )
 
     # Connect all data to the new nested SDFG
@@ -510,6 +496,10 @@ def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
         if_cond = if_cfg_tup[0]
         if_cfg = if_cfg_tup[1]
         states = if_cfg.nodes()
+        if "_if_cond_56" in if_cond.as_string:
+            if verbose:
+                print(f"Skipping {n.label} ({if_cond.as_string}) as it is handled in a special case")
+            continue
         if len(states) != 1:
             if verbose:
                 print(f"Skipping {n.label} ({if_cond.as_string}) as it has more than one state in the if body region {len(states)}")

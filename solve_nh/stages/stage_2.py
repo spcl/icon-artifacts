@@ -6,7 +6,7 @@ from utils.codegen_from_sdfg import ArtifactMode
 from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
-from utils.conditional_pruning import cleanup_conditionals, push_interstate_edges_early
+from utils.conditional_pruning import cleanup_conditionals
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
@@ -23,12 +23,9 @@ STAGE_ID = 2
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
-    push_interstate_edges_early(g)
-    # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
-    # === Sub-Phase 0.2: Try to const-eval branch conditions ===
+    # === Sub-Phase 0: Try to const-eval branch conditions ===
     cleanup_conditionals(g)
-    # === Sub-Phase 0.2: Try to const-eval branch conditions ===
+    # === Sub-Phase 0: Try to const-eval branch conditions ===
 
     # === Sub-Phase 1: Move Loops inside Maps ===
     # If we have `nlev [ nproma ]` where nlev is a loop and nproma is a map,
@@ -91,8 +88,13 @@ def optimization_action(g: SDFG):
     # TODO: Make this pass be more selective (like a pass a list where we know the maps become fusable if we do it)
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
-    num_applied = move_if_cfg_inside_map_pass(g, verbose=True)
-    print(f"Stage #{STAGE_ID}: Moved {num_applied} ifs inside maps")
+    # In combination with predictor-pre this crashes. Skip for predictor pre. TODO: Fix it for predictor-pre
+    if "predictor_pre" in g.name:
+        print(f"Stage #{STAGE_ID}: Skipping moving ifs inside maps for {g.name} as it is predictor-pre. See TODOs.")
+        num_applied = 0
+    else:
+        num_applied = move_if_cfg_inside_map_pass(g, verbose=True)
+        print(f"Stage #{STAGE_ID}: Moved {num_applied} ifs inside maps")
     g.validate()
     # === Sub-Phase 6: Move ifs inside maps to enable more state fusion  ===
 
@@ -106,6 +108,9 @@ def optimization_action(g: SDFG):
     # We make it into Map -> Map (max(range1, range2)) -> every thread checks the condition
     if "predictor_pre" in g.name:
         move_range_if_inside(g, "_for_it_101")
+    g.validate()
+    g.reset_cfg_list()
+    g.reset_sdfg_list()
     # === Sub-Phase 7: Move to Range If Inside ===
 
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===
@@ -113,9 +118,13 @@ def optimization_action(g: SDFG):
     g.apply_transformations_repeated(
         InlineSDFG
     )
+    g.validate()
     g.apply_transformations_repeated(
         MapCollapse
     )
+    g.reset_cfg_list()
+    g.reset_sdfg_list()
+    g.validate()
     # TODO: MapFusion here
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
