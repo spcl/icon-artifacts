@@ -13,10 +13,16 @@ STAGE_ID = 0
 
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    # This map is split manually, because if this is the case in the front-end, f2dac crashes
     if g.name == 'solve_nh_predictor_pre':
         split_predictor_pre_omp_loop(g)
+    # Replaces velocity tendencies subgraph with a tasklet that expects struct-only input
+    # We do not build that library anymore and it needs to be replaced again to be able to compile
+    # Reinjection of velocity tendencies require finding a tasklet called `velocity_tendencies` thus
+    # you can't remove.
     if velicity_shim:
         inject_velocity_shim(g)
+    # Simplify does not much while we have structs and views
     g.simplify()
     return g
 

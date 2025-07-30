@@ -56,7 +56,9 @@ def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
     # === Sub-Phase 1: Flattening ===
     g.apply_transformations_repeated(ContinueToCondition)
+    # Frontend generates invalid view towers, if final view is a struct then that view node should not exist, clean
     clean_partial_view_towers(g)
+    # Flatten all structs to SOA, also generates code necessary for shallow copy in ICON
     StructToContainerGroups(
         validate=False,
         save_steps=False,
@@ -70,7 +72,10 @@ def optimization_action(g: SDFG):
         taskloop=False,
         dont_prune_unused_containers=True,
     ).apply_pass(g, {})
+    # Flattening transformation can result with DataContainer -> View -> X where View covers the DataContainer fully
+    # This is usuless while also breaking many many transformations, so clean it up
     clean_trivial_view_pattern(g)
+    # Replave velocity tendencies tasklet to use the flattened names
     reinject_velocity_shim(g)
     g.validate()
     # Until this point we numerically validate
@@ -79,7 +84,8 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 2: Simplify and Patch ===
     # Simplify results with NestedSDFGs having missing symbols
     g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
-    # Add missing symbols and data to NSDFGs to make it valid
+    # Add missing symbols and data to NSDFGs to make it valid, many transformations forget to update the symbols in the nested
+    # SDFGs
     add_missing_data_and_symbols_to_all_nsdfgs(g)
     g.validate()
     # === Sub-Phase 2: Simplify and Patch ===
@@ -89,20 +95,24 @@ def optimization_action(g: SDFG):
     SymbolPropagation().apply_pass(g, {})
     g.validate()
     # Until this point we numerically validate
+    # ArrayElimination, FuseStates and DeadDataflowElimination are the ones that almost always break
     g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
     # Do not fuse the copy-in or the copy-out state (flatten/deflatten access nodes being fused with the rest of the maps make
     # offloading much harder)
+    # State fusion tends to behave well if we exclude the states that copy-in structs to flattened types and copy-out flattened types to structs
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
     # === Sub-Phase 3: SymbolPropagation + Simplify + FuseState Without CopyIn/CopyOut ===
 
     # === Sub-Phase 4: ConstantPropagation ===
+    # ConstantPropagation works nicely after cleaning
     ConstantPropagation().apply_pass(g, {})
     g.validate()
     # === Sub-Phase 4: ConstantPropagation ===
 
     # === Sub-Phase 5: Loop Preprocessing ===
     # Ensure loop locality for ballin LoopToMap
+    # These scalars where omp private (...) and should be like that
     if g.name == "solve_nh_predictor_pre":
         make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1156_c_1156")
     elif g.name == "solve_nh_corrector_pre":
@@ -172,6 +182,7 @@ def optimization_action(g: SDFG):
     # First fuse as much as possible, as the heuristic to detect a scalar as transient
     # is based on the number of accesses to it, and if the states are not fused, it might have
     # in-degree = 0 in state 1 but only written to state 0
+    # All the names above are scalars that can become thread-local
     state_fusion_without_copyin_and_copyout(g)
     transify_targeted_scalar(g, thread_local_scalar_candidates)
 
@@ -192,10 +203,12 @@ def optimization_action(g: SDFG):
         "__CG_p_nh__CG_diag__m_grf_bdy_mflx",
     }
     # TODO: This prevents new loops from becoming maps
-    #transify_targeted_array(g, thread_local_array_candidates)
+    # transify_targeted_array(g, thread_local_array_candidates)
+    # Also it seems like it did not change the performance
     # === Sub-Phase 6: Loop Preprocessing ===
 
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
+    # Never set ballin to True
     g.apply_transformations_repeated(
         LoopToMap, permissive=False, options={"ballin": False}
     )
@@ -208,7 +221,8 @@ def optimization_action(g: SDFG):
 
     # Manually checked loops that can become maps:
     # SDFG Name | Loop Variable | Loop Label
-    # TODO: Probably no nproma map should be left.
+    # No nproma map should be left.
+    # LoopToMap does not catch many loops, force them to beecome maps this is the set
     manual_loop_to_map = {
         # solve_nh_corrector_post - Stage #1
         # ("corrector_post", "_for_it_0", "FOR_l_1784_c_1784"),    # Can't
@@ -271,6 +285,7 @@ def optimization_action(g: SDFG):
         # ("predictor_pre", "_for_it_110", "FOR_l_1168_c_1168"),   # Can't - BLK
         # ("predictor_pre", "_for_it_113", "FOR_l_1184_c_1184"),   # Can't
     }
+    # Loop that forces LoopToMap (by permissive=True and balling=True)
     manually_transformed_count = 0
     expected_transformed_count = 0
     for sdfg_name, loop_var, loop_label in manual_loop_to_map:
@@ -286,6 +301,7 @@ def optimization_action(g: SDFG):
                     manually_transformed_count += 1
     g.validate()
 
+    # Tries to make some scalars into thread-loacl
     retransify_scalar_with_local_prefix(g, g)
     g.validate()
 
@@ -305,7 +321,9 @@ def optimization_action(g: SDFG):
     # One final simplify to fuse states (there are many 2-state NestedSDFGs where first state and iedge are empty)
     # Even with side-effects on tasklet ScalarToSymbolPromotion removes "je_local" and then their parent array.
     # Call that separately
+    # Since everything is a map, simplify does much more but it also breaks more
     g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination", "ScalarToSymbolPromotion"], validate=False)
+    # These are the symbols that need to be excluded, otherswise scalar to symbol creates invalid SDFGs
     ScalarToSymbolPromotion().apply_pass(g, {
         "transients_only": True,
         "ignore": {
@@ -332,6 +350,7 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 7: Last Simplify + StateFusion ===
 
     # === Sub-Phase 8: Post Simplify Manual Fixes ===
+    # This map, (if it still exists after transify) prevents map collapse, manually massage it
     if "predictor_pre" in g.name:
         connect_ishift_to_map(g, "_state_l1132_c1132")
     # === Sub-Phase 8: Post Simplify Manual Fixes ===

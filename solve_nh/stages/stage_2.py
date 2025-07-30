@@ -27,7 +27,12 @@ def optimization_action(g: SDFG):
     # === Sub-Phase -1: Try to const-eval branch conditions ===
 
     # === Sub-Phase 0: Convert Loops to Maps ===
+    # If we have `nlev [ nproma ]` where nlev is a loop and nproma is a map,
+    # make it into `nproma [ nlev ]` where nlev is a loop and nproma is a map
+    # This should work, as nproma is independent already the dependency can be only
+    # due to nlev, otherwise both would be loop
     num_applied = move_for_cfg_inside_map_pass(g)
+    # It was written fastly, it generates unnecessary maps
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
@@ -35,11 +40,13 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 0: Convert Loops to Maps ===
 
     # === Sub-Phase 0.1: Specialize nlev and nlevp1 ===
+    # Specialize some scalars
     num_applied = move_for_cfg_inside_map_pass(g)
     specialize_scalar(g, "nlevp1", 91)
     g.validate()
     specialize_scalar(g, "nlev", 90)
     g.validate()
+    # Constprop with the new constants
     ConstantPropagation().apply_pass(g, {})
     state_fusion_without_copyin_and_copyout(g)
     # === Sub-Phase 0.1: Specialize nlev and nlevp1  ===
@@ -48,8 +55,7 @@ def optimization_action(g: SDFG):
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
-
-    # Move if condition inside a map if it has a parent map
+    # Move if condition inside a map if it has a parent map to enable collapsing
     move_if_to_innermost_map(g)
     g.validate()
     clean_unused_data_from_nsdfg(g)
