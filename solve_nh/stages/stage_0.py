@@ -42,7 +42,7 @@ def main():
         default=ArtifactMode.EXEC,
         help="Select the mode: static, shared, or exec",
     )
-    argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument("--shim", action=argparse.BooleanOptionalAction, default=True)
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True

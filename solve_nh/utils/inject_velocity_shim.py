@@ -108,8 +108,7 @@ def inject_velocity_shim(g: SDFG) -> None:
         vtst.remove_node(ed.dst)
         t.remove_out_connector(c)
 
-    t.code = CodeBlock(
-        f"""
+    CODE = f"""
 auto* in_p_diag = in_p_nh -> diag;
 auto* in_p_metrics = in_p_nh -> metrics;
 auto in_ldeepatmo = in_global_data -> ldeepatmo;
@@ -139,9 +138,11 @@ out_p_nh = in_p_nh;
 out_p_int = in_p_int;
 out_p_patch = in_p_patch;
 out_p_prog = in_p_prog;
-""".strip(),
-        language=dtypes.Language.CPP,
-    )
+""".strip()
+    # CodeGen cannot really handle comments in the codeblock, so we remove them.
+    CODE = re.sub(r"//.*?\n", "", CODE)
+    CODE = re.sub(r"/\*.*?\*/", "", CODE, flags=re.DOTALL)
+    t.code = CodeBlock(CODE, language=dtypes.Language.CPP)
 
     # Injecting the first velocity tasklet, ensure no exit call is already there.
     has_gpu_exit_call = any([("exit_velocity_tendencies_gpu();" in v.as_string) if isinstance(v, CodeBlock) else ("exit_velocity_tendencies_gpu();" in v) for v in g.exit_code.values()])
