@@ -16,32 +16,33 @@ from utils.manual_fixes import move_range_if_inside
 import argparse
 from utils.map_condition_swap import move_if_to_innermost_map
 from utils.move_for_cfg_inside_map import move_for_cfg_inside_map_pass
+from utils.move_if_cfg_inside_map import move_if_cfg_inside_map_pass
 from utils.specialize_scalar import specialize_scalar
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 STAGE_ID = 2
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
-    # === Sub-Phase -1: Try to const-eval branch conditions ===
-    cleanup_conditionals(g)
-    # === Sub-Phase -1: Try to const-eval branch conditions ===
+    # === Sub-Phase 0: Try to const-eval branch conditions ===
+    # cleanup_conditionals(g)
+    # === Sub-Phase 0: Try to const-eval branch conditions ===
 
-    # === Sub-Phase 0: Convert Loops to Maps ===
+    # === Sub-Phase 1: Move Loops inside Maps ===
     # If we have `nlev [ nproma ]` where nlev is a loop and nproma is a map,
     # make it into `nproma [ nlev ]` where nlev is a loop and nproma is a map
     # This should work, as nproma is independent already the dependency can be only
     # due to nlev, otherwise both would be loop
     num_applied = move_for_cfg_inside_map_pass(g)
+    g.validate()
     # It was written fastly, it generates unnecessary maps
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
     print(f"Stage #{STAGE_ID}: Moved {num_applied} for loops inside maps")
-    # === Sub-Phase 0: Convert Loops to Maps ===
+    # === Sub-Phase 1: Move Loops inside Maps ===
 
-    # === Sub-Phase 0.1: Specialize nlev and nlevp1 ===
+    # === Sub-Phase 2: Specialize nlev and nlevp1 ===
     # Specialize some scalars
-    num_applied = move_for_cfg_inside_map_pass(g)
     specialize_scalar(g, "nlevp1", 91)
     g.validate()
     specialize_scalar(g, "nlev", 90)
@@ -49,9 +50,9 @@ def optimization_action(g: SDFG):
     # Constprop with the new constants
     ConstantPropagation().apply_pass(g, {})
     state_fusion_without_copyin_and_copyout(g)
-    # === Sub-Phase 0.1: Specialize nlev and nlevp1  ===
+    # === Sub-Phase 2: Specialize nlev and nlevp1  ===
 
-    # === Sub-Phase 1: Clean Unused Data and Symbols From NSDFGs ===
+    # === Sub-Phase 3: Clean Unused Data and Symbols From NSDFGs ===
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
@@ -61,9 +62,9 @@ def optimization_action(g: SDFG):
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
-    # === Sub-Phase 1: Clean Unused Data and Symbols From NSDFGs ===
+    # === Sub-Phase 3: Clean Unused Data and Symbols From NSDFGs ===
 
-    # === Sub-Phase 2: InlineSDFG + MapCollapse For GPU Offloading ===
+    # === Sub-Phase 4: InlineSDFG + MapCollapse For GPU Offloading ===
     for _ in range(3): # TODO: Maybe 2 is enough
         g.apply_transformations_repeated(
             InlineSDFG
@@ -73,23 +74,38 @@ def optimization_action(g: SDFG):
         )
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
-    # === Sub-Phase 2: InlineSDFG + MapCollapse For GPU Offloading  ===
+    # === Sub-Phase 4: InlineSDFG + MapCollapse For GPU Offloading  ===
 
-    # === Sub-Phase 3: Clean Again ===
+    # === Sub-Phase 5: Clean Again ===
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
-    # === Sub-Phase 3: Clean Again ===
+    # === Sub-Phase 5: Clean Again ===
 
-    # === Sub-Phase 4: Move to Range If Inside ===
+
+    # === Sub-Phase 6: Move ifs inside maps to enable more state fusion ===
+    # Fused states as this transformation requires the body to have only one state
+    state_fusion_without_copyin_and_copyout(g)
+    g.validate()
+    num_applied = move_if_cfg_inside_map_pass(g, verbose=True)
+    print(f"Stage #{STAGE_ID}: Moved {num_applied} ifs inside maps")
+    g.validate()
+    # === Sub-Phase 6: Move ifs inside maps to enable more state fusion  ===
+
+
+    # === Sub-Phase 7: Move to Range If Inside ===
     # If pattern is Map -> NSDFG -> IF -> State (Map)
     # and inside'maps range depend on the if above
     # (that either of the value is the range of the inner map, then move in the if)
+    # Handles a very specific pattern:
+    # Map -> if 1 = range1, if2 = range 2 -> Map (range)
+    # We make it into Map -> Map (max(range1, range2)) -> every thread checks the condition
     if "predictor_pre" in g.name:
         move_range_if_inside(g, "_for_it_101")
-    # === Sub-Phase 4: Move to Range If Inside ===
+    # === Sub-Phase 7: Move to Range If Inside ===
 
-    # === Sub-Phase 5: Re-collapse After Manual Improvements ===
+    # === Sub-Phase 8: Re-collapse After Manual Improvements ===
+    # Also do MapFusion, StateFusion etc.
     g.apply_transformations_repeated(
         InlineSDFG
     )
@@ -98,7 +114,9 @@ def optimization_action(g: SDFG):
     )
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
-    # === Sub-Phase 5: Re-collapse After Manual Improvements ===
+    state_fusion_without_copyin_and_copyout(g)
+    g.validate()
+    # === Sub-Phase 8: Re-collapse After Manual Improvements ===
 
     return g
 

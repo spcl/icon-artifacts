@@ -1,11 +1,15 @@
-from tabnanny import verbose
 import dace
 import copy
 
-from dace.sdfg.state import ControlFlowRegion, LoopRegion
+from dace.properties import CodeBlock
+from dace.sdfg.state import ControlFlowRegion, LoopRegion, ConditionalBlock
+from utils.add_missing_symbols import (
+    add_missing_data_and_symbols_to_all_nsdfgs,
+    _insert_missing_data_through_parent_scopes,
+    _insert_missing_data_through_parent_out_scopes
+)
 
-from typing import Set
-from utils.add_missing_symbols import add_missing_data_and_symbols_to_all_nsdfgs
+from typing import Set, Tuple
 
 label_counter = 0
 
@@ -27,15 +31,21 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
     # Get all input and output data of the map
     srcs = {e.data.data for e in state.in_edges(map_entry)}
     dsts = {e.data.data for e in state.out_edges(map_exit)}
-    label_counter += 1
 
-    # If write -> An -> read, then the An does not have to be in the in/out edges
-    for n in state.nodes():
-        if isinstance(n, dace.nodes.AccessNode) and (not state.sdfg.arrays[n.data].transient):
-            if state.in_degree(n) > 0:
-                srcs.add(n.data)
-            if state.out_degree(n) > 0:
+    # This data needs to explicitly be added through the parent scopes
+    explicitly_add = set()  # Data that should be explicitly added to the map inner state
+
+    # If write -> An -> read, then the An does not have to be in the in/out edges, but if in nsdfg, we still
+    # will need to add it
+    for n in state.all_nodes_between(map_entry, map_exit):
+        if isinstance(n, dace.nodes.AccessNode):
+            if state.in_degree(n) > 0 and state.out_degree(n) > 0:
                 dsts.add(n.data)
+                srcs.add(n.data)
+                explicitly_add.add(n.data)
+    #if explicitly_add:
+    #    raise Exception(f"Explicitly adding {explicitly_add} data to the map inner state, this should not happen, check")
+    label_counter += 1
 
     # Use later for removing the original nodes
     all_inner_map_nodes = set(state.all_nodes_between(map_entry, map_exit))
@@ -85,28 +95,40 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
             src_conn = e.src_conn
         else:
             if e.data.data not in map_entry_accesses:
-                src = map_inner_state.add_access(e.data.data)
-                map_entry_accesses[e.data.data] = src
+                if e.data.data is not None:
+                    src = map_inner_state.add_access(e.data.data)
+                    map_entry_accesses[e.data.data] = src
+                else:
+                    src = None
             else:
-                src = map_entry_accesses[e.data.data]
-            assert e.src_conn is not None, "Expected no src conn for the map entry"
+                if e.data.data is not None:
+                    src = map_entry_accesses[e.data.data]
+            if src is not None:
+                assert e.src_conn is not None, "Expected no src conn for the map entry"
             src_conn = None
         if e.dst != map_exit:
             dst = node_map[e.dst]
             dst_conn = e.dst_conn
         else:
             if e.data.data not in map_exit_accesses:
-                dst = map_inner_state.add_access(e.data.data)
-                map_exit_accesses[e.data.data] = dst
+                if e.data.data is not None:
+                    dst = map_inner_state.add_access(e.data.data)
+                    map_exit_accesses[e.data.data] = dst
+                else:
+                    dst = None
             else:
-                dst = map_exit_accesses[e.data.data]
-            assert e.dst_conn is not None, "Expected no dst conn for the map exit"
+                if e.data.data is not None:
+                    dst = map_exit_accesses[e.data.data]
+            if dst is not None:
+                assert e.dst_conn is not None, "Expected no dst conn for the map exit"
             dst_conn = None
-        map_inner_state.add_edge(
-            src, src_conn,
-            dst, dst_conn,
-            copy.deepcopy(e.data)
-        )
+        if src is not None and dst is not None:
+            map_inner_state.add_edge(
+                src, src_conn,
+                dst, dst_conn,
+                copy.deepcopy(e.data)
+            )
+
 
 
     # Add nested SDFG between the map entry and exit, make sure all symbols that might be used are defined
@@ -155,44 +177,42 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
             )
         )
 
+    for src in srcs:
+        if src not in map_inner_nsdfg.in_connectors:
+            map_inner_nsdfg.add_in_connector(src)
+
     # Remove all the original nodes
     for nd in all_inner_map_nodes:
         state.remove_node(nd)
 
+    if explicitly_add:
+        print(f"Explicitly adding {len(explicitly_add)} ({explicitly_add}) data through parent scopes")
+        _insert_missing_data_through_parent_scopes(explicitly_add,
+                                                    map_inner_nsdfg,
+                                                    state,
+                                                    state.sdfg)
+        _insert_missing_data_through_parent_out_scopes(explicitly_add,
+                                                    map_inner_nsdfg,
+                                                    state,
+                                                    state.sdfg)
+
+    map_inner_sdfg.validate()
+
     return map_inner_nsdfg
 
-def _copy_nodes(state_src: dace.SDFGState, state_dst: dace.SDFGState):
-    node_map = dict()
-    assert len(state_dst.nodes()) == 0, "Expected the destination CFG to be empty"
-    for n in state_src.nodes():
-        cpynd = copy.deepcopy(n)
-        if not isinstance(cpynd, dace.nodes.AccessNode) and not isinstance(cpynd, dace.nodes.MapEntry) and not isinstance(cpynd, dace.nodes.MapExit):
-            cpynd.label += "_copy"
-        assert n not in node_map, f"Node {n} already in node map"
-        node_map[n] = cpynd
-        state_dst.add_node(cpynd)
-    for n in node_map.values():
-        if isinstance(n, dace.nodes.NestedSDFG):
-            n.sdfg.parent_graph = state_dst
-            n.sdfg.parent_sdfg = state_dst.sdfg
-    for e in state_src.edges():
-        src = node_map[e.src]
-        dst = node_map[e.dst]
-        assert src in state_dst.nodes(), f"Source node {src} not in destination CFG"
-        assert dst in state_dst.nodes(), f"Destination node {dst} not in destination CFG"
-        state_dst.add_edge(
-            src, e.src_conn,
-            dst, e.dst_conn,
-            copy.deepcopy(e.data)
-        )
-
-
 cfg_call_id = 0
-def move_for_cfg_inside_map(sdfg: dace.SDFG, cfg: LoopRegion):
+def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     global cfg_call_id
     cfg_call_id += 1
+    if not isinstance(if_block, ConditionalBlock):
+        print("Expected a ConditionalBlock")
+        return
+    if len(if_block.branches) != 1:
+        print("Expected exactly one branch in the conditional block")
+        return
+    cfg = if_block.branches[0][1]
     if len(cfg.nodes()) != 1:
-        print("Expected only one node in the loop region")
+        print("Expected only one node in the conditional block")
         return
     state: dace.SDFGState = cfg.nodes()[0]
     if not isinstance(state, dace.SDFGState):
@@ -236,16 +256,26 @@ def move_for_cfg_inside_map(sdfg: dace.SDFG, cfg: LoopRegion):
 
     # Create the new nestedSDFG with the ForCFG inside
     # NSDFGP
-    new_for, for_inner_state = _copy_for_cfg_with_a_new_inner_state(
+    ies = state.parent_graph.in_edges(state)
+    interstate_assignments = dict()
+    for e in ies:
+        if e.data is not None:
+            for k, v in e.data.assignments.items():
+                if k in interstate_assignments:
+                    raise Exception(f"Duplicate interstate assignment {k} in {e.data}, check")
+                interstate_assignments[k] = v
+            e.data.assignments = dict()
+    new_if, if_assignment_state, if_inner_state = _copy_if_cfg_with_a_new_inner_state(
         state=new_state,
-        cfg=cfg,
+        old_if=if_block,
         cfg_call_id=cfg_call_id,
         inputs=set(nsdfg.in_connectors.keys()),
         outputs=set(nsdfg.out_connectors.keys()),
         scope_entry_state=state,
         scope_entry=map_entry,
+        interstate_assignments=interstate_assignments
     )
-    _copy_in_nsdfg_to_state(nsdfg, for_inner_state, scope_entry=map_entry, scope_state=state)
+    _copy_in_nsdfg_to_state(nsdfg, if_inner_state, scope_entry=map_entry, scope_state=state)
 
     # The new nested SDFG is now fully connected
     cfg_ies = cfg.parent_graph.in_edges(cfg)
@@ -261,13 +291,12 @@ def move_for_cfg_inside_map(sdfg: dace.SDFG, cfg: LoopRegion):
             new_state, e.dst, copy.deepcopy(e.data)
         )
 
-    sdfg.validate()
 
 
-def move_for_cfg_inside_map_from_iterator_set(sdfg: dace.SDFG, iterator_names: Set[str]):
-    cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, LoopRegion) and n.loop_variable in iterator_names}
+def move_if_cfg_inside_map_from_labels(sdfg: dace.SDFG, labels: Set[str]):
+    cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, ConditionalBlock) and len(n.branches) == 1 and n.label in labels}
     for n in cfg_candidates:
-        move_for_cfg_inside_map(n.sdfg, n)
+        move_if_cfg_inside_map(n.sdfg, n)
 
 def _copy_in_nsdfg_to_state(nsdfg: dace.nodes.NestedSDFG, state: dace.SDFGState, scope_entry: dace.nodes.MapEntry, scope_state: dace.SDFGState):
     map_body_copy_nsdfg = copy.deepcopy(nsdfg)
@@ -322,8 +351,9 @@ def _copy_in_nsdfg_to_state(nsdfg: dace.nodes.NestedSDFG, state: dace.SDFGState,
         )
 
 
-def _copy_for_cfg_with_a_new_inner_state(state: dace.SDFGState, cfg: LoopRegion, cfg_call_id: int, inputs: Set[str], outputs: Set[str],
-                                         scope_entry_state: dace.SDFGState, scope_entry: dace.nodes.MapEntry):
+def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: ConditionalBlock, cfg_call_id: int, inputs: Set[str], outputs: Set[str],
+                                         scope_entry_state: dace.SDFGState, scope_entry: dace.nodes.MapEntry,
+                                         interstate_assignments: dict):
 
     new_sdfg = dace.SDFG(
         name=f"for_cfg_{cfg_call_id}",
@@ -344,17 +374,25 @@ def _copy_for_cfg_with_a_new_inner_state(state: dace.SDFGState, cfg: LoopRegion,
             find_new_name=False,
         )
 
-    new_for = LoopRegion(
-        label=f"{cfg.label}_cfg_{cfg_call_id}",
-        condition_expr=copy.deepcopy(cfg.loop_condition),
-        loop_var=copy.deepcopy(cfg.loop_variable),
-        initialize_expr=copy.deepcopy(cfg.init_statement),
-        update_expr=copy.deepcopy(cfg.update_statement),
-        inverted=copy.deepcopy(cfg.inverted),
+    new_if = ConditionalBlock(
+        label=f"{old_if.label}_if_{cfg_call_id}",
         sdfg=new_sdfg,
-        update_before_condition=copy.deepcopy(cfg.update_before_condition),
+        parent=new_sdfg,
     )
-    new_sdfg.add_node(new_for, is_start_block=True)
+
+    new_sdfg.add_node(new_if, is_start_block=True)
+
+    new_if_cfg = ControlFlowRegion(
+        label=f"{new_if.label}_if_body_{cfg_call_id}",
+    )
+    assert len(old_if.branches) == 1, "Expected exactly one branch in the if block"
+    old_branch = old_if.branches[0]
+    old_cond = old_branch[0]
+    old_cfg = old_branch[1]
+    new_if.add_branch(
+        condition=old_cond,
+        branch=new_if_cfg
+    )
 
     nsdfg = state.add_nested_sdfg(
         sdfg=new_sdfg,
@@ -363,14 +401,27 @@ def _copy_for_cfg_with_a_new_inner_state(state: dace.SDFGState, cfg: LoopRegion,
         parent=state
     )
 
-    for_inner_state = new_for.add_state(
-        label=f"{state.label}_for_cfg_{cfg_call_id}_state",
+    if_assignment_state = new_sdfg.add_state(
+        label=f"{new_if.label}_if_cfg_{cfg_call_id}_assignment_state",
         is_start_block=True
+    )
+
+    if_inner_state = new_if_cfg.add_state(
+        label=f"{state.label}_if_cfg_{cfg_call_id}_state",
+        is_start_block=False
+    )
+
+    new_if_cfg.add_edge(
+        if_assignment_state,
+        if_inner_state,
+        data=dace.InterstateEdge(
+            assignments=copy.deepcopy(interstate_assignments),
+        )
     )
 
     # Connect all data to the new nested SDFG
     new_map_entry, new_map_exit = state.add_map(
-        name=f"{scope_entry.label}_for_cfg_{cfg_call_id}_map",
+        name=f"{scope_entry.label}_if_cfg_{cfg_call_id}_map",
         ndrange={p: dace.subsets.Range([(b,e,s)]) for p, (b,e,s) in zip(scope_entry.map.params, scope_entry.map.range)},
         schedule=scope_entry.map.schedule,
         unroll= scope_entry.map.unroll,
@@ -427,54 +478,52 @@ def _copy_for_cfg_with_a_new_inner_state(state: dace.SDFGState, cfg: LoopRegion,
         new_map_exit.add_in_connector("IN_" + an.data)
         new_map_exit.add_out_connector("OUT_" + an.data)
 
-    return new_for, for_inner_state
+    return new_if, if_assignment_state, if_inner_state
 
 def move_for_cfg_inside_map_from_iterator_set(sdfg: dace.SDFG, iterator_names: Set[str]):
     cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, LoopRegion) and n.loop_variable in iterator_names}
     for n in cfg_candidates:
-        move_for_cfg_inside_map(n.sdfg, n)
+        move_if_cfg_inside_map(n.sdfg, n)
 
-def move_for_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
+def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
     num_applied = 0
-    cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, LoopRegion)}
+    cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, ConditionalBlock)}
     for n in cfg_candidates:
-        # If nlev inside For
-        # If map has startidx
-        # Then we can do it
-        if not ("nlev" in n.loop_variable or "nlev" not in str(n.loop_condition) or "nlev" not in str(n.init_statement) or "nlev" not in str(n.update_statement)):
-            if verbose:
-                print(f"Skipping {n.label} as it does not have nlev in the loop")
+        if len(n.branches) != 1:
+            #print(f"Skipping {n.label} as it has more than one branch")
             continue
-        states = list(n.all_states())
+        if not isinstance(n, ConditionalBlock):
+            #print(f"Skipping {n.label} as it is not a ConditionalBlock")
+            continue
+        if_cfg_tup : Tuple[CodeBlock, ControlFlowRegion] = n.branches[0]
+        if_cond = if_cfg_tup[0]
+        if_cfg = if_cfg_tup[1]
+        states = if_cfg.nodes()
         if len(states) != 1:
             if verbose:
-                print("Expected exactly one state in the loop region")
+                print(f"Skipping {n.label} ({if_cond.as_string}) as it has more than one state in the if body region {len(states)}")
             continue
         state = states[0]
         if not isinstance(state, dace.SDFGState):
             if verbose:
-                print("Expected a SDFG state")
+                print(f"Skipping {n.label} ({if_cond.as_string}) as the top level node in the body is not a SDFG state {state}: {type(state)}")
             continue
         map_entries = {n for n in state.nodes() if isinstance(n, dace.nodes.MapEntry)}
         if len(map_entries) != 1:
             if verbose:
-                print("Expected exactly one map entry in the state")
+                print(f"Skipping {n.label} ({if_cond.as_string})  as it has more/less than one map entry in the state got {len(map_entries)}")
             continue
         map_entry: dace.nodes.MapEntry = map_entries.pop()
         # If it has an edge that is none and between map entry and tasklet continue
-        for e in state.all_edges(*state.all_nodes_between(map_entry, state.exit_node(map_entry))):
-            if e.data.data is None and isinstance(e.src, dace.nodes.MapEntry) and isinstance(e.dst, dace.nodes.Tasklet):
-                if verbose:
-                    print(f"Skipping {n.label} as it has an edge with None data between map entry and tasklet")
-                continue
-
-        has_startidx = any( {("startidx" in str(b) or "startidx" in str(e) or "startidx" in str(s)) for (b,e,s) in map_entry.map.range} )
-        if not has_startidx:
+        if any((e.data.data is None and isinstance(e.src, dace.nodes.MapEntry) and isinstance(e.dst, dace.nodes.Tasklet))
+               for e in state.all_edges(*state.all_nodes_between(map_entry, state.exit_node(map_entry)))):
             if verbose:
-                print(f"Skipping {n.label} as it does not have startidx in the map range")
+                print(f"Skipping {n.label} ({if_cond.as_string}) as it has an edge with None data between map entry and tasklet")
             continue
         num_applied += 1
-        move_for_cfg_inside_map(n.sdfg, n)
+        if verbose:
+            print(f"Moving {n.label} ({if_cond.as_string}) inside map {map_entry.label}")
+        move_if_cfg_inside_map(n.sdfg, n)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
     sdfg.validate()
     return num_applied

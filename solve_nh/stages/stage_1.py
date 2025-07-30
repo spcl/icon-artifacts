@@ -310,7 +310,7 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 7: LoopToMap + LoopToMap-Patches ===
 
 
-    # === Sub-Phase 7: Last Simplify + StateFusion ===
+    # === Sub-Phase 8: Last Simplify + StateFusion ===
     # Simplify removes input scalars that are accessed only on interstate edges `je_local`, `jb_local` completely,
     # Adding a tasklet that reads these scalars to an useless tasklet can prevent their removal
     # In an SDFG (that has a parent nsdfg node), for all non-transient scalars that are not accessed through an access node -> add a preserver tasklet
@@ -347,13 +347,13 @@ def optimization_action(g: SDFG):
     g.validate()
 
     count_loops(g, verbose=False, use_assert=True)
-    # === Sub-Phase 7: Last Simplify + StateFusion ===
+    # === Sub-Phase 8: Last Simplify + StateFusion ===
 
-    # === Sub-Phase 8: Post Simplify Manual Fixes ===
+    # === Sub-Phase 9: Post Simplify Manual Fixes ===
     # This map, (if it still exists after transify) prevents map collapse, manually massage it
     if "predictor_pre" in g.name:
         connect_ishift_to_map(g, "_state_l1132_c1132")
-    # === Sub-Phase 8: Post Simplify Manual Fixes ===
+    # === Sub-Phase 9: Post Simplify Manual Fixes ===
 
     return g
 

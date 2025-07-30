@@ -7,6 +7,8 @@ from dace.sdfg.state import MultiConnectorEdge
 from .transify_kernel_scalars import transify_kernel_scalars
 from .get_num_parent_map_and_loop_scopes import get_num_parent_map_and_loop_scopes
 from .reinject_velocity_tasklet import reinject_velocity_shim_gpu
+from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes, add_missing_data_and_symbols_to_all_nsdfgs
+import copy
 
 openacc_data_names = """
    !$ACC DATA CREATE(z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e) &
@@ -105,9 +107,6 @@ def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str], verbose: 
         print()
         print()
     return writes_to_access_nodes
-
-import dace
-import copy
 
 def _add_gpu_copies_to_flattener(sdfg: dace.SDFG, gpu_arrays: Set[str]):
     flattener_lib_node, flattener_state = None, None
@@ -217,7 +216,6 @@ def _find_flattened_names(sdfg: dace.SDFG, names_to_check: Set[str]):
             assert name_to_check not in sdfg.arrays, f"Expected no array {name_to_check} in the SDFG."
     return name_dict
 
-
 def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: bool):
     if verbose:
         print("Copying non-transient arrays to GPU:")
@@ -277,7 +275,6 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
         print()
         print()
 
-
 def _get_data_used_by_map(map_entry: dace.nodes.MapEntry, state: dace.SDFGState):
     """
     Returns a set of data names used by the map entry node.
@@ -302,7 +299,6 @@ def _get_data_used_by_map(map_entry: dace.nodes.MapEntry, state: dace.SDFGState)
                 if isinstance(datadesc, dace.data.Array) and not isinstance(datadesc, dace.data.Scalar):
                     data_used.add(node.data)
     return data_used
-
 
 def _set_gpu_schedule(parent_map_counts: Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], int],
                       parent_map_count: int,
@@ -342,7 +338,6 @@ def _is_blk_map(map_node: dace.nodes.MapEntry, map_state: dace.SDFGState) -> boo
 def _additional_offload_condition(map_node: dace.nodes.MapEntry, map_state: dace.SDFGState) -> bool:
     return not _is_blk_map(map_node, map_state)
 
-
 def _replace_edge_data_with_gpu_data(
         root_sdfg: dace.SDFG,
         state: dace.SDFGState,
@@ -368,7 +363,6 @@ def _replace_edge_data_with_gpu_data(
                                     gpu_desc.storage = dace.dtypes.StorageType.GPU_Global
                                     state.sdfg.add_datadesc(gpu_data_name, gpu_desc)
                                 edge.data.data = gpu_data_name
-
 
 def _replace_connectors_and_nsdfg_desc(
     state: dace.SDFGState,
@@ -438,7 +432,6 @@ def _replace_connectors_and_nsdfg_desc(
                             # Keep the dst conn as is
                             pass
 
-
 def _replace_names_in_string(text, name_mapping):
     """
     Replace names in a string based on a dictionary mapping.
@@ -477,7 +470,6 @@ def _replace_gpu_data_on_interstate_edges(sdfg: dace.SDFG, names_to_replace: Set
                     new_assignments[new_k] = CodeBlock(new_v_str) if isinstance(v, CodeBlock) else new_v_str
                 edge.data.assignments = new_assignments
                 assert edge.data.condition is None or edge.data.condition.as_string == "1",  f"Expected no condition in interstate edge {edge}: {edge.data.condition.as_string}."
-
 
 def _replace_gpu_data_with_gpu_versions(
     sdfg: dace.SDFG,
@@ -531,8 +523,6 @@ def _replace_gpu_data_with_gpu_versions(
 
     for inner_sdfg in inner_sdfgs:
         _replace_gpu_data_with_gpu_versions(inner_sdfg, gpu_arrays, True)
-
-from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes, add_missing_data_and_symbols_to_all_nsdfgs
 
 def _repl(s: str, repldict):
     for k,v in repldict.items():
@@ -716,7 +706,6 @@ def _move_scalar_access_to_original_name(sdfg: dace.SDFG):
     for _inner_sdfg in nsdfgs:
         _move_scalar_access_to_original_name(_inner_sdfg)
 
-
 def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
                                             gpu_only_arrays: Set[str],
                                             duplicated_arrays: Set[str],
@@ -850,7 +839,6 @@ def _remove_transient_arrays_from_parent_nsdfg(sdfg: dace.SDFG):
             for in_conn in transient_data_in_connector:
                 rm_connection_of_desc_to_nsdfg_node(n, g, in_conn)
 
-
 def _set_zero_stream(sdfg: dace.SDFG):
     for n, g in sdfg.all_nodes_recursive():
         if isinstance(n, dace.nodes.MapEntry) and n.map.schedule == dace.ScheduleType.GPU_Device:
@@ -858,7 +846,6 @@ def _set_zero_stream(sdfg: dace.SDFG):
             n.map._cuda_stream = 0
         if isinstance(n, dace.nodes.Tasklet) and "velocity_tendencies" in n.label:
             n._cuda_stream = 0
-
 
 def _get_data_used_by_velocity(sdfg: dace.SDFG) -> Set[str]:
     velocity_tasklet = None,
@@ -906,6 +893,4 @@ def _get_data_used_by_velocity(sdfg: dace.SDFG) -> Set[str]:
             gpu_data_set.add(data_name)
 
     return gpu_data_set
-
-
 

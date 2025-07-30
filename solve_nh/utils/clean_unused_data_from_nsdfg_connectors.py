@@ -89,7 +89,7 @@ def rm_connection_of_desc_to_nsdfg_node(nsdfg_node: dace.nodes.NestedSDFG, state
             if state.degree(edge.dst) == 0:
                 state.remove_node(edge.dst)
 
-def clean_unused_data_from_nsdfg(sdfg: dace.SDFG):
+def clean_unused_data_from_nsdfg(sdfg: dace.SDFG, verbose: bool = False):
     nestedness_list = get_nsdfg_nestedness(sdfg=sdfg)
 
     # A list of (nsdfg_node, state, nestedness)
@@ -102,7 +102,7 @@ def clean_unused_data_from_nsdfg(sdfg: dace.SDFG):
         used_data = _get_used_data(sdfg=inner_sdfg)
         assert all((data_name in inner_sdfg.arrays) for data_name in used_data), "Expected all used data to be in the inner SDFG."
         unused_data = set(inner_sdfg.arrays.keys()) - used_data
-        if len (unused_data) > 0:
+        if len (unused_data) > 0 and verbose:
             print(f"nsdfg '{nsdfg_node.label}' (nestedness {nestedness}) has {len(unused_data)} unused data descriptor(s): {unused_data}")
 
         # Rm transient unused data from the nsdfg
@@ -117,7 +117,7 @@ def clean_unused_data_from_nsdfg(sdfg: dace.SDFG):
                     desc_name=data_name,
                 )
 
-def clean_unused_symbols_from_nsdfg(sdfg: dace.SDFG):
+def clean_unused_symbols_from_nsdfg(sdfg: dace.SDFG, verbose: bool = False):
     nestedness_list = get_nsdfg_nestedness(sdfg=sdfg)
 
     # A list of (nsdfg_node, state, nestedness)
@@ -131,7 +131,8 @@ def clean_unused_symbols_from_nsdfg(sdfg: dace.SDFG):
         used_symbols = inner_sdfg.used_symbols(all_symbols=False)
 
         unused_symbols = all_symbols - used_symbols
-        print(f"nsdfg '{nsdfg_node.label}' (nestedness {nestedness}) has {len(unused_symbols)} unused symbol(s): {unused_symbols}")
+        if verbose:
+            print(f"nsdfg '{nsdfg_node.label}' (nestedness {nestedness}) has {len(unused_symbols)} unused symbol(s): {unused_symbols}")
         for unused_sym in unused_symbols:
             if unused_sym in inner_sdfg.symbols:
                 inner_sdfg.remove_symbol(unused_sym)

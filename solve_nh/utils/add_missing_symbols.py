@@ -43,7 +43,9 @@ def _insert_missing_data_through_parent_scopes(missing_data: Set[str],
         # this transformation adds the complete array, this will be redundant, and
         # multiple edges to the same nSDFG inconnector is invalid.
         if data_access in nsdfg_node.in_connectors:
-            continue
+            if len(list(parent_nsdfg_node_state.in_edges_by_connector(nsdfg_node, data_access))) > 0:
+                #print(f"Data {data_access} already in NSDFG {nsdfg_node.label}, skipping")
+                continue
 
         if data_access in inner_sdfg.symbols:
             inner_sdfg.remove_symbol(data_access)
@@ -109,6 +111,92 @@ def _insert_missing_data_through_parent_scopes(missing_data: Set[str],
             f"OUT_{data_access}" if not isinstance(src, dace.nodes.AccessNode) else None
         )
         dst.add_in_connector(data_access if isinstance(dst, dace.nodes.NestedSDFG) else f"IN_{data_access}")
+
+def _insert_missing_data_through_parent_out_scopes(missing_data: Set[str],
+                                               nsdfg_node: dace.nodes.NestedSDFG,
+                                               parent_graph,
+                                               parent_sdfg: dace.SDFG):
+    # For each data access added, add the data descriptor and connecto to the parent NSDFG node
+    for data_access in missing_data:
+        # If array is not in parent graphs's sdfg's data containers add it
+        datadesc = parent_sdfg.arrays[data_access]
+        assert isinstance(parent_graph, dace.SDFGState), "Parent graph must be a SDFGState"
+        inner_sdfg: dace.SDFG = nsdfg_node.sdfg
+        # If data access is already in the parent graph's sdfg, we can continue
+        # Make it flow into the map entry, for it find the state the NSDFG node is in
+        parent_nsdfg_node_state: dace.SDFGState = parent_graph
+
+        # If this array has been already added to the nSDFG, we can skip, since
+        # this transformation adds the complete array, this will be redundant, and
+        # multiple edges to the same nSDFG outconnector is invalid.
+        if data_access in nsdfg_node.out_connectors:
+            if len(list(parent_nsdfg_node_state.out_edges_by_connector(nsdfg_node, data_access))) > 0:
+                #print(f"Data {data_access} already in NSDFG {nsdfg_node.label}, skipping")
+                continue
+
+        if data_access in inner_sdfg.symbols:
+            inner_sdfg.remove_symbol(data_access)
+        if data_access not in inner_sdfg.arrays:
+            copydesc = copy.deepcopy(datadesc)
+            copydesc.transient = False
+            inner_sdfg.add_datadesc(
+                name=data_access,
+                datadesc=copydesc,
+            )
+        if data_access not in nsdfg_node.sdfg.arrays:
+            copydesc = copy.deepcopy(datadesc)
+            copydesc.transient = False
+            inner_sdfg.add_datadesc(
+                name=data_access,
+                datadesc=copydesc,
+            )
+
+
+        # Get all parent scopes to detect how the data needs to flow (MapEntry -> NSDFG means AccessNode -> MapEntry -> NestedSDFG)
+        parent_scopes = []
+        cur_parent_scope = nsdfg_node
+        scope_dict = parent_nsdfg_node_state.scope_dict()
+        while scope_dict[cur_parent_scope] is not None:
+            parent_scopes.append(scope_dict[cur_parent_scope])
+            cur_parent_scope = scope_dict[cur_parent_scope]
+
+        # Need to add to exit only this time
+        an = parent_nsdfg_node_state.add_access(
+            data_access
+        )
+        dst = an
+        for parent_scope in reversed(parent_scopes):
+            parent_exit_scope = parent_nsdfg_node_state.exit_node(parent_scope)
+            src = parent_exit_scope
+            parent_nsdfg_node_state.add_edge(
+                src,
+                data_access if isinstance(src, dace.nodes.NestedSDFG) else f"OUT_{data_access}",
+                dst,
+                None if isinstance(dst, dace.nodes.AccessNode) else f"IN_{data_access}",
+                dace.memlet.Memlet.from_array(
+                    data_access,
+                    datadesc
+                )
+            )
+            if not isinstance(dst, dace.nodes.AccessNode):
+                dst.add_in_connector(f"IN_{data_access}")
+            if isinstance(src, dace.nodes.NestedSDFG):
+                src.add_out_connector(data_access)
+            else:
+                src.add_out_connector(f"OUT_{data_access}")
+            dst = parent_exit_scope
+        src = nsdfg_node
+        parent_nsdfg_node_state.add_edge(
+            src,
+            data_access,
+            dst,
+            None if isinstance(dst, dace.nodes.AccessNode) else f"IN_{data_access}",
+            dace.memlet.Memlet.from_array(
+                data_access,
+                datadesc
+            )
+        )
+        dst.add_in_connector(f"IN_{data_access}" if not isinstance(dst, dace.nodes.AccessNode) else None)
 
 def add_missing_data_and_symbols(root: dace.SDFG, _parent_graph, _parent_sdfg: dace.SDFG, sdfg: dace.SDFG):
     # Get parent NSDFG node

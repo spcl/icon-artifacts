@@ -63,9 +63,8 @@ def optimization_action(g: SDFG):
     g.validate()
     # === Sub-Phase 3: Post-GPU Optimizations ===
 
-    # === Sub-Phase 5: Bitwidth Lowering Transformations ===
-    # === Sub-Phase 5: Bitwidth Lowering Transformations ===
-
+    # === Sub-Phase 4: Bitwidth Lowering Transformations ===
+    # === Sub-Phase 4: Bitwidth Lowering Transformations ===
 
     # === Sub-Phase 5: Profiling Patches (Make sure this is the last phase) ===
     insert_synchronization_for_profiling(g)
