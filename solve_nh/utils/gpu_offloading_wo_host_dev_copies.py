@@ -1,13 +1,14 @@
 import dace
 import os
-from typing import Callable, Dict, Set, Tuple
+from typing import Callable, Dict, List, Set, Tuple
 from dace.codegen.common import CodeBlock
 from dace.sdfg import is_devicelevel_gpu
 from dace.sdfg.state import MultiConnectorEdge
 from .transify_kernel_scalars import transify_kernel_scalars
-from .get_num_parent_map_and_loop_scopes import get_num_parent_map_and_loop_scopes
+from .get_num_parent_map_and_loop_scopes import get_num_parent_map_and_loop_scopes, get_parent_maps
 from .reinject_velocity_tasklet import reinject_velocity_shim_gpu
 from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes, add_missing_data_and_symbols_to_all_nsdfgs
+from utils.clean_unused_data_from_nsdfg_connectors import rm_connection_of_desc_to_nsdfg_node
 import copy
 
 openacc_data_names = """
@@ -65,6 +66,8 @@ data_names_both = """
 nflatlev,nflat_gradp,kstart_dd3d,kstart_moist,nrdmax,
 z_raylfac,ndyn_substeps_var, scal_divdamp,bdy_divdamp,
 """
+
+i_know_is_gpu = {"refin_ctrl",}
 
 def gpu_offloading_wo_host_dev_copies(sdfg: dace.SDFG):
     names_gpu = {n.strip() for n in data_names_gpu.replace("\n", "").strip().split(",") if n != "," and n != ""}
@@ -529,40 +532,70 @@ def _repl(s: str, repldict):
         s = s.replace(k, v)
     return s
 
-def _state_in_gpu_scope(root_sdfg: dace.SDFG, state: dace.SDFGState):
-    if state.sdfg.parent_nsdfg_node is None:
-        return False
+def _find_state(sdfg: dace.SDFG, node: dace.nodes.Node):
+    for n, g in sdfg.all_nodes_recursive():
+        if n == node:
+            return g
+    return None
 
-    parent_nsdfg_node = state.sdfg.parent_nsdfg_node
+def _in_gpu_scope(root_sdfg: dace.SDFG, nsdfg: dace.nodes.NestedSDFG,
+                  parent_maps : Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], List[Tuple[dace.nodes.MapEntry, dace.SDFGState]]]
+                  ) -> bool:
+    assert isinstance(nsdfg, dace.nodes.NestedSDFG), f"Expected nsdfg to be a NestedSDFG node, got: {type(nsdfg)}"
     parent_graph = None
     for n, g in root_sdfg.all_nodes_recursive():
-        if n == parent_nsdfg_node:
+        if n == nsdfg:
             parent_graph = g
             break
-    assert parent_graph is not None, "Expected to find parent graph for the state."
+    assert parent_graph is not None, "Expected to find parent graph for the node."
     assert isinstance(parent_graph, dace.SDFGState), "Expected parent graph to be an SDFGState."
     parent_state : dace.SDFGState = parent_graph
+
+    first_parent_map_entry = None
+    cur_node = nsdfg
+    cur_state = parent_state
     scope_dict = parent_state.scope_dict()
 
-    cur_node = parent_nsdfg_node
     parent_map_schedules = set()
-    while scope_dict[cur_node] is not None:
-        if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
-            parent_map_schedules.add(scope_dict[cur_node].map.schedule)
-        cur_node = scope_dict[cur_node]
 
-    if dace.ScheduleType.GPU_Device in parent_map_schedules:
-        return True
+    while cur_node is not None:
+        while scope_dict[cur_node] is not None:
+            if isinstance(scope_dict[cur_node], dace.nodes.MapEntry):
+                parent_map_schedules.add((scope_dict[cur_node], cur_state))
+                if first_parent_map_entry is None:
+                    first_parent_map_entry = (scope_dict[cur_node], cur_state)
+            cur_node = scope_dict[cur_node]
+
+        parent_nsdfg_node = cur_state.sdfg.parent_nsdfg_node
+        cur_node = parent_nsdfg_node
+        if cur_node is not None:
+            cur_state = _find_state(root_sdfg, cur_node)
+            scope_dict = cur_state.scope_dict()
+
+    if first_parent_map_entry is not None:
+        if first_parent_map_entry[0].map.schedule == dace.ScheduleType.GPU_Device:
+            return True
+
+    if parent_maps is not None and first_parent_map_entry is not None:
+        for parent_map_entry in parent_maps[first_parent_map_entry]:
+            if parent_map_entry.map.schedule == dace.ScheduleType.GPU_Device:
+                return True
+
     return False
 
-def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Set[str]):
+def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Set[str],
+                         parent_maps : Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], List[Tuple[dace.nodes.MapEntry, dace.SDFGState]]]
+                         ):
     for edge in sdfg.all_interstate_edges():
         src: dace.ControlFlowRegion = edge.src
         dst: dace.ControlFlowRegion = edge.dst
         assert src.sdfg == dst.sdfg, "Expected interstate edge to be within the same SDFG."
         parent_nsdfg_node = src.sdfg.parent_nsdfg_node
         state = next(iter(src.sdfg.all_states()))
-        is_gpu_code = _state_in_gpu_scope(root_sdfg=root_sdfg, state=state)
+        if parent_nsdfg_node is None:
+            is_gpu_code = False
+        else:
+            is_gpu_code = _in_gpu_scope(root_sdfg=root_sdfg, nsdfg=parent_nsdfg_node, parent_maps=parent_maps)
 
         if parent_nsdfg_node is None:
             continue
@@ -590,11 +623,23 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
                         if "gpu_" in free_sym:
                             replacements[free_sym] = free_sym.replace("gpu_", "")
                             if free_sym in root_sdfg.arrays and not isinstance(root_sdfg.arrays[free_sym], dace.data.Scalar):
+                                print("G", is_gpu_code, parent_nsdfg_node)
+                                sdfg.save("c.sdfgz", compress=True)
+                                root_sdfg.save("c_root.sdfgz", compress=True)
                                 assert free_sym.replace('gpu_', '').split("_m_")[-1] in const_arrays, \
                                     f"Expected {free_sym.replace('gpu_', '').split("_m_")[-1]} to be in constant arrays\nConst arrays: {const_arrays}."
                             # replace this in the interstate edge
+                            if free_sym.replace("gpu_", "") not in root_sdfg.arrays:
+                                raise ValueError(
+                                    f"Expected {free_sym} to be in the root SDFG arrays, but it is not. "
+                                    f"Please ensure that the array is defined in the root SDFG."
+                                )
                             _insert_missing_data_through_parent_scopes(
-                                {free_sym.replace("gpu_", "")}, parent_nsdfg_node, parent_nsdfg_node_state, parent_nsdfg_node_sdfg
+                                {free_sym.replace("gpu_", "")},
+                                parent_nsdfg_node,
+                                parent_nsdfg_node_state,
+                                parent_nsdfg_node_sdfg,
+                                {root_sdfg.arrays[free_sym.replace("gpu_", "")]},
                             )
 
                     if replacements != dict():
@@ -614,7 +659,7 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
     for state in sdfg.all_states():
         for node in state.nodes():
             if isinstance(node, dace.nodes.NestedSDFG):
-                _add_interstate_data(root_sdfg, node.sdfg, const_arrays)
+                _add_interstate_data(root_sdfg, node.sdfg, const_arrays, parent_maps)
 
 def _clean_redundant_pass_through_access_node(sdfg: dace.SDFG):
     tmp_id = 0
@@ -742,6 +787,13 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
             if verbose:
                 print(f"    Map {node.label} [{node.map.range}] ({graph.label}) has {num_parent_maps} parent maps and loops.")
 
+    parent_maps = dict()
+    for node, graph in sdfg.all_nodes_recursive():
+        if isinstance(node, dace.nodes.MapEntry):
+            parent_maps[(node, graph)] = get_parent_maps(sdfg, node, graph)
+            if verbose:
+                print(f"    Map {node.label} [{node.map.range}] ({graph.label}) has {num_parent_maps} parent maps and loops.")
+
     # Create a set of arrays needed on the GPU (used by GPU maps)
     # And create a set of arrays that are needed on the host (used by CPU maps)
     # The intersection of this two set needs to be in the constant arrays that are duplicated both on the GPU and CPU
@@ -805,7 +857,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     _replace_gpu_data_with_gpu_versions(sdfg, gpu_arrays, False)
 
     # If we have GPU access on interstate edge on CPU scope, then convert to the CPU version, add the array, ensure it is constant data
-    _add_interstate_data(sdfg, sdfg, constant_arrays)
+    _add_interstate_data(sdfg, sdfg, constant_arrays, parent_maps)
 
     # Writing to non-transient scalar within a kernel is not allowed, try to fix that
     transify_kernel_scalars(sdfg)
@@ -829,7 +881,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     #_set_zero_stream(sdfg)
     # sdfg.validate()
 
-from utils.clean_unused_data_from_nsdfg_connectors import rm_connection_of_desc_to_nsdfg_node
+
 
 def _remove_transient_arrays_from_parent_nsdfg(sdfg: dace.SDFG):
     for n, g in sdfg.all_nodes_recursive():

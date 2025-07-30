@@ -33,11 +33,19 @@ def add_missing_symbols_to_nsdfgs(sdfg: dace.SDFG):
 def _insert_missing_data_through_parent_scopes(missing_data: Set[str],
                                                nsdfg_node: dace.nodes.NestedSDFG,
                                                parent_graph,
-                                               parent_sdfg: dace.SDFG):
+                                               parent_sdfg: dace.SDFG,
+                                               descs: Set[dace.data.Data] | None = None):
     # For each data access added, add the data descriptor and connecto to the parent NSDFG node
-    for data_access in missing_data:
+    descs = set()
+    if descs is None:
+        for _ in missing_data:
+            descs.add(None)
+    for data_access, desc in zip(missing_data, descs):
         # If array is not in parent graphs's sdfg's data containers add it
-        datadesc = parent_sdfg.arrays[data_access]
+        if desc is not None:
+            datadesc = desc
+        else:
+            datadesc = parent_sdfg.arrays[data_access]
         assert isinstance(parent_graph, dace.SDFGState), "Parent graph must be a SDFGState"
         inner_sdfg: dace.SDFG = nsdfg_node.sdfg
         # If data access is already in the parent graph's sdfg, we can continue
