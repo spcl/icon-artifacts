@@ -24,7 +24,7 @@ STAGE_ID = 2
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
     # === Sub-Phase 0: Try to const-eval branch conditions ===
-    # cleanup_conditionals(g)
+    cleanup_conditionals(g)
     # === Sub-Phase 0: Try to const-eval branch conditions ===
 
     # === Sub-Phase 1: Move Loops inside Maps ===
