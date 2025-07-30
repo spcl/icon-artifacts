@@ -352,6 +352,8 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 9: Post Simplify Manual Fixes ===
     # This map, (if it still exists after transify) prevents map collapse, manually massage it
     if "predictor_pre" in g.name:
+        # TODO make it to a pass that detects AN1 -> tasklet (out = in) -> AN2 -> mapEntry -> nestedSDFG
+        # Replaces it with AN1 -> MapEntry -> NestedSDFG
         connect_ishift_to_map(g, "_state_l1132_c1132")
     # === Sub-Phase 9: Post Simplify Manual Fixes ===
 
