@@ -44,7 +44,11 @@ int main(int argc, char *argv[]) {
   if (!std::filesystem::create_directories(DUMP, ec) && ec) {
     acerr() << "Failed to create directory: " << ec.message() << std::endl;
   }
-  acerr() << "Will be writing got and want files to: " << DUMP << std::endl;
+  if (rep > 1) {
+    acerr() << "We will repeat " << rep << " times. Since numerical comparison does not make sense with repetition, nothing will be written" << std::endl;
+  } else {
+    acerr() << "Will be writing got and want files to: " << DUMP << std::endl;
+  }
 
   std::vector<int> ns;
   for (const auto ts : args.positional()) {
@@ -102,7 +106,9 @@ int main(int argc, char *argv[]) {
       }
       acout() << "Step " << n << " done." << std::endl;
 
-      SPAWN_ALL_WRITERS(prepre, predictor_pre);
+      if (rep == 1) {
+        SPAWN_ALL_WRITERS(prepre, predictor_pre);
+      }
     }
 
     // PREDICTOR POST
@@ -152,7 +158,9 @@ int main(int argc, char *argv[]) {
       }
       acout() << "Step " << n << " done." << std::endl;
 
-      SPAWN_ALL_WRITERS(prepost, predictor_post);
+      if (rep == 1) {
+        SPAWN_ALL_WRITERS(prepost, predictor_post);
+      }
     }
 
     // CORRECTOR PRE
@@ -202,7 +210,9 @@ int main(int argc, char *argv[]) {
       }
       acout() << "Step " << n << " done." << std::endl;
 
-      SPAWN_ALL_WRITERS(corpre, corrector_pre);
+      if (rep == 1) {
+        SPAWN_ALL_WRITERS(corpre, corrector_pre);
+      }
     }
 
     // CORRECTOR POST
@@ -252,7 +262,9 @@ int main(int argc, char *argv[]) {
       }
       acout() << "Step " << n << " done." << std::endl;
 
-      SPAWN_ALL_WRITERS(corpost, corrector_post);
+      if (rep == 1) {
+        SPAWN_ALL_WRITERS(corpost, corrector_post);
+      }
     }
   }
   return EXIT_SUCCESS;
