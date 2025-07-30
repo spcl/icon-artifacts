@@ -19,11 +19,23 @@ from utils.move_for_cfg_inside_map import move_for_cfg_inside_map_pass
 from utils.move_if_cfg_inside_map import move_if_cfg_inside_map_pass
 from utils.specialize_scalar import specialize_scalar
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
+from utils.if_else_to_conditional_op import if_else_to_coditional_op_pass
 STAGE_ID = 2
 
 def optimization_action(g: SDFG):
+
     """DEFINE THE OPTIMIZATION ACTION HERE"""
     # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
+    # Also if you find the pattern:
+    # if (cond) {
+    #   scalar = A[i];
+    # } else {
+    #   scalar = B[j];
+    # }
+    # then convert it to a tasklet with a conditional operator.
+    # scalar = (cond) ? A[i] : B[j];
+    if_else_to_coditional_op_pass(g)
+    g.validate()
     push_interstate_edges_early(g)
     # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
     # === Sub-Phase 0.2: Try to const-eval branch conditions ===

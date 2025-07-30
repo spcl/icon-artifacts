@@ -48,10 +48,12 @@ struct global_data_type {
       {}; // predictor_pre, corrector_post, predictor_post, corrector_pre
 };
 
+#if !defined(DYCORE_GPU_INTEGRATION)
 struct t_tangent_vectors {
   double v1 = {};
   double v2 = {};
 };
+#endif
 
 struct t_grid_edges {
   int __f2dace_SA_area_edge_d_0_s = {};
@@ -145,7 +147,11 @@ struct t_grid_edges {
   double *area_edge = {};
   int *cell_blk = {};
   int *cell_idx = {};
+  #if defined(DYCORE_GPU_INTEGRATION)
+  double *dual_normal_cell = {};
+  #else
   t_tangent_vectors **dual_normal_cell = {};
+  #endif
   int *end_block = {};
   int *end_index = {};
   double *f_e = {};
@@ -153,7 +159,11 @@ struct t_grid_edges {
   double *ft_e = {};
   double *inv_dual_edge_length = {};
   double *inv_primal_edge_length = {};
+  #if defined(DYCORE_GPU_INTEGRATION)
+  double *primal_normal_cell = {};
+  #else
   t_tangent_vectors **primal_normal_cell = {};
+  #endif
   int *quad_blk = {};
   int *quad_idx = {};
   int *refin_ctrl = {};
