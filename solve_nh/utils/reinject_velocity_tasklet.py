@@ -522,6 +522,9 @@ def reinject_velocity_shim(
         output_assignments=output_assignments_str,
         gpu_suffix=""
     )
+    # CodeGen cannot really handle comments in the codeblock, so we remove them.
+    code_str = re.sub(r"//.*?\n", "", code_str)
+    code_str = re.sub(r"/\*.*?\*/", "", code_str, flags=re.DOTALL)
 
     velocity_tasklet.code = CodeBlock(code_str, language=dace.dtypes.Language.CPP)
 

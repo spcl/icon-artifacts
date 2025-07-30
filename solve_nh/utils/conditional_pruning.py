@@ -109,8 +109,6 @@ def dead_code_cleanup(g: SDFG):
             # If the conditional block reads from a data container into symbol, that's still considered a reader.
             if x in no_readers:
                 no_readers.remove(x)
-    if "lvn_pos_local" in no_readers:
-        breakpoint()
 
     # Now we can remove all the access nodes that have no readers.
     for node, st in g.all_nodes_recursive():
