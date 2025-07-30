@@ -5,9 +5,14 @@ import sympy
 
 
 def _get_missing_symbols(nsdfg_node: dace.nodes.NestedSDFG) -> Set[str]:
-    nsdfg = nsdfg_node
-    symbols = set(k for k in nsdfg.free_symbols if k not in nsdfg.in_connectors and k not in nsdfg.out_connectors)
-    missing_symbols = set(s for s in symbols if s not in nsdfg.symbol_mapping)
+    nsdfg = nsdfg_node.sdfg
+    connectors = nsdfg_node.in_connectors.keys() | nsdfg_node.out_connectors.keys()
+    #symbols = set(k for k in nsdfg.free_symbols if k not in connectors)
+    #missing_symbols = [s for s in symbols if s not in nsdfg_node.symbol_mapping]
+    #symbols = nsdfg.symbols
+    #symbol_mapping = nsdfg_node.symbol_mapping
+    symbols = set(k for k in nsdfg.used_symbols(all_symbols=False) if k not in connectors)
+    missing_symbols = [s for s in symbols if s not in nsdfg_node.symbol_mapping]
     return set(missing_symbols)
 
 def add_missing_symbols_to_nsdfgs(sdfg: dace.SDFG):

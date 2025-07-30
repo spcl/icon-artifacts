@@ -6,7 +6,8 @@ from dace.sdfg.state import ControlFlowRegion, LoopRegion, ConditionalBlock
 from utils.add_missing_symbols import (
     add_missing_data_and_symbols_to_all_nsdfgs,
     _insert_missing_data_through_parent_scopes,
-    _insert_missing_data_through_parent_out_scopes
+    _insert_missing_data_through_parent_out_scopes,
+    _get_missing_symbols
 )
 
 from typing import Set, Tuple
@@ -245,27 +246,44 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     #next_block = cfg.parent_graph.out_edges(cfg)[0].dst if len(cfg.parent_graph.out_edges(cfg)) > 0 else None
 
     # Nested State will have the NSDFGP [ForCFG [NSDFG]] inside
-    new_state = cfg.parent_graph.add_state(
+    new_state = if_block.parent_graph.add_state(
         label=f"{state.label}_cfg_{cfg_call_id}",
-        is_start_block=cfg.parent_graph.in_degree(cfg) == 0
+        is_start_block=if_block.parent_graph.in_degree(if_block) == 0
     )
     assert new_state is not None, "Expected to create a new state for the ForCFG"
+    # The new nested SDFG is now fully connected
+    if_block_ies = if_block.parent_graph.in_edges(if_block)
+    if_block_oes = if_block.parent_graph.out_edges(if_block)
+    # Rm the previous map entry and exit
+    if_block.parent_graph.remove_node(if_block)
+    for e in if_block_ies:
+        # Will copy in in state assignments
+        if_block.parent_graph.add_edge(
+            e.src, new_state, dace.InterstateEdge()
+        )
+    for e in if_block_oes:
+        if_block.parent_graph.add_edge(
+            new_state, e.dst, copy.deepcopy(e.data)
+        )
 
     # Copy over the map Nodes
     #_copy_nodes(state, new_state)
 
     # Create the new nestedSDFG with the ForCFG inside
     # NSDFGP
-    ies = state.parent_graph.in_edges(state)
-    interstate_assignments = dict()
+    ies = if_block_ies
     for e in ies:
         if e.data is not None:
+            interstate_assignments = dict()
             for k, v in e.data.assignments.items():
                 if k in interstate_assignments:
                     raise Exception(f"Duplicate interstate assignment {k} in {e.data}, check")
                 interstate_assignments[k] = v
             e.data.assignments = dict()
-    new_if, if_assignment_state, if_inner_state = _copy_if_cfg_with_a_new_inner_state(
+
+    assert map_entry in state.nodes(), "Expected the map entry to be in the state"
+    assert len(new_state.nodes()) == 0, "Expected the new state to be empty"
+    new_if, if_nsdfg, if_assignment_state, if_inner_state = _copy_if_cfg_with_a_new_inner_state(
         state=new_state,
         old_if=if_block,
         cfg_call_id=cfg_call_id,
@@ -277,20 +295,13 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     )
     _copy_in_nsdfg_to_state(nsdfg, if_inner_state, scope_entry=map_entry, scope_state=state)
 
-    # The new nested SDFG is now fully connected
-    cfg_ies = cfg.parent_graph.in_edges(cfg)
-    cfg_oes = cfg.parent_graph.out_edges(cfg)
-    # Rm the previous map entry and exit
-    cfg.parent_graph.remove_node(cfg)
-    for e in cfg_ies:
-        cfg.parent_graph.add_edge(
-            e.src, new_state, copy.deepcopy(e.data)
+    missing_symbols = _get_missing_symbols(if_nsdfg)
+    if missing_symbols:
+        print(f"Missing symbols in the new nested SDFG: {missing_symbols}")
+        add_missing_data_and_symbols_to_all_nsdfgs(
+            sdfg
         )
-    for e in cfg_oes:
-        cfg.parent_graph.add_edge(
-            new_state, e.dst, copy.deepcopy(e.data)
-        )
-
+        sdfg.validate()
 
 
 def move_if_cfg_inside_map_from_labels(sdfg: dace.SDFG, labels: Set[str]):
@@ -401,7 +412,7 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
         parent=state
     )
 
-    if_assignment_state = new_sdfg.add_state(
+    if_assignment_state = new_if_cfg.add_state(
         label=f"{new_if.label}_if_cfg_{cfg_call_id}_assignment_state",
         is_start_block=True
     )
@@ -478,7 +489,7 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
         new_map_exit.add_in_connector("IN_" + an.data)
         new_map_exit.add_out_connector("OUT_" + an.data)
 
-    return new_if, if_assignment_state, if_inner_state
+    return new_if, nsdfg, if_assignment_state, if_inner_state
 
 def move_for_cfg_inside_map_from_iterator_set(sdfg: dace.SDFG, iterator_names: Set[str]):
     cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, LoopRegion) and n.loop_variable in iterator_names}

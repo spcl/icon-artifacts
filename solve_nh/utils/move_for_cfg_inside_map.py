@@ -5,7 +5,7 @@ import copy
 from dace.sdfg.state import ControlFlowRegion, LoopRegion
 
 from typing import Set
-from utils.add_missing_symbols import add_missing_data_and_symbols_to_all_nsdfgs
+from utils.add_missing_symbols import add_missing_data_and_symbols_to_all_nsdfgs, _get_missing_symbols
 
 label_counter = 0
 
