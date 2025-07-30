@@ -6,6 +6,7 @@ from dace.sdfg.state import ConditionalBlock
 from dace.properties import CodeBlock
 from sympy.logic.boolalg import BooleanTrue, BooleanFalse
 from dace.transformation.passes.simplification.prune_empty_conditional_branches import PruneEmptyConditionalBranches
+from dace.transformation.passes.simplification.control_flow_raising import ControlFlowRaising
 from dace.sdfg.nodes import AccessNode
 from dace.sdfg.sdfg import InterstateEdge
 from dace.frontend.fortran.ast_utils import singular, atmost_one
