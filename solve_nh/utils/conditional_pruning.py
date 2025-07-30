@@ -7,7 +7,7 @@ from dace.properties import CodeBlock
 from sympy.logic.boolalg import BooleanTrue, BooleanFalse
 from dace.transformation.passes.simplification.prune_empty_conditional_branches import PruneEmptyConditionalBranches
 from dace.transformation.passes.simplification.control_flow_raising import ControlFlowRaising
-from dace.sdfg.nodes import AccessNode
+from dace.sdfg.nodes import AccessNode, Tasklet
 from dace.sdfg.sdfg import InterstateEdge
 from dace.frontend.fortran.ast_utils import singular, atmost_one
 
@@ -74,8 +74,64 @@ def push_interstate_edges_early(g: SDFG):
             )
             iedge_before.data.assignments[k] = iedge.assignments[k]
             remove_keys.add(k)
+        # Remove the pushed keys from the current edge.
         for k in remove_keys:
             del iedge.assignments[k]
+        # If we pushed something to the preceding edge, we need to (re-)queue that one.
         if remove_keys:
             edge_queue.append((iedge_before, st))
+    g.validate()
+
+
+def dead_code_cleanup(g: SDFG):
+    # Potentially all transient access nodes are dead code, so we start with all of them as candidates.
+    no_readers = set(
+        node.data for node, _ in g.all_nodes_recursive() if isinstance(node, AccessNode) and node.desc(sdfg=g).transient
+    )
+    for node, st in g.all_nodes_recursive():
+        if not isinstance(node, AccessNode) or node.data not in no_readers:
+            continue
+        # If the access node has a reader, we cannot remove it.
+        if st.out_degree(node) > 0:
+            no_readers.remove(node.data)
+    for edge, _ in g.all_edges_recursive():
+        if not isinstance(edge.data, InterstateEdge):
+            continue
+        iedge = edge.data
+        for sym in iedge.used_symbols():
+            # If the interstate edge reads from a data container into symbol, that's still considered a reader.
+            if sym in no_readers:
+                no_readers.remove(sym)
+    for node, st in g.all_nodes_recursive():
+        if not isinstance(node, ConditionalBlock):
+            continue
+        for x in node.free_symbols:
+            # If the conditional block reads from a data container into symbol, that's still considered a reader.
+            if x in no_readers:
+                no_readers.remove(x)
+    if "lvn_pos_local" in no_readers:
+        breakpoint()
+
+    # Now we can remove all the access nodes that have no readers.
+    for node, st in g.all_nodes_recursive():
+        if not isinstance(node, AccessNode) or node.data not in no_readers:
+            continue
+        in_edge = atmost_one(ed for ed in st.in_edges(node))
+        if not in_edge:
+            print(f"Node {node}: Removing dead access node {node.data}.")
+            st.remove_node(node)
+        # We leave the "transified" access nodes alone, to pass validation.
+        if isinstance(in_edge.src, AccessNode) and f"{in_edge.src.data}_transified" == node.data:
+            continue
+        print(f"Node {node}: Removing dead access node {node.data} and dangling path.")
+        st.remove_edge_and_connectors(in_edge)
+        st.remove_node(node)
+
+    # Clean up empty tasklets.
+    for node, st in g.all_nodes_recursive():
+        if not isinstance(node, Tasklet):
+            continue
+        if st.in_degree(node) == 0 and st.out_degree(node) == 0:
+            print(f"Node {node}: Removing dead tasklet {node.label}.")
+            st.remove_node(node)
     g.validate()
