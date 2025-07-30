@@ -85,6 +85,7 @@ def optimization_action(g: SDFG):
 
     # === Sub-Phase 6: Move ifs inside maps to enable more state fusion ===
     # Fused states as this transformation requires the body to have only one state
+    # TODO: Make this pass be more selective (like a pass a list where we know the maps become fusable if we do it)
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
     num_applied = move_if_cfg_inside_map_pass(g, verbose=True)
@@ -112,6 +113,7 @@ def optimization_action(g: SDFG):
     g.apply_transformations_repeated(
         MapCollapse
     )
+    # TODO: MapFusion here
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     state_fusion_without_copyin_and_copyout(g)
