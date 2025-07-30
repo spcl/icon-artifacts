@@ -186,7 +186,7 @@ def move_range_if_inside(sdfg: dace.SDFG, it_name: str):
     )
 
     # Copy nodes to inside of the IF
-    assert len(inner_kernel_bfs_nodes) == 3, "Expected exactly 3 nodes in the inner kernel body SDFG."
+    assert len(inner_kernel_bfs_nodes) == 2, "Expected exactly 2 nodes in the inner kernel body SDFG."
     node_map = {n: copy.deepcopy(n) for n in inner_kernel_bfs_nodes}
     for n in inner_kernel_bfs_nodes:
         if_cfg.add_node(node_map[n])
