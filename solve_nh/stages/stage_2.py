@@ -7,6 +7,7 @@ from dace.transformation.interstate import InlineSDFG
 from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
 from utils.conditional_pruning import cleanup_conditionals, push_interstate_edges_early, dead_code_cleanup
+from utils.transify_kernel_scalars import transify_sneaky_array_writes_inside_map
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
@@ -42,6 +43,9 @@ def optimization_action(g: SDFG):
     cleanup_conditionals(g)
     # === Sub-Phase 0.2: Try to const-eval branch conditions ===
     dead_code_cleanup(g)
+    # === Sub-Phase 0.3: Make the sneaky array writes inside maps explicit ===
+    transify_sneaky_array_writes_inside_map(g)
+    # === Sub-Phase 0.3: Make the sneaky array writes inside maps explicit ===
 
     # === Sub-Phase 1: Move Loops inside Maps ===
     # If we have `nlev [ nproma ]` where nlev is a loop and nproma is a map,

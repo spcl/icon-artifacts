@@ -1,11 +1,17 @@
 import dace
 from dace import SDFG
-from dace.sdfg.state import ControlFlowRegion, ConditionalBlock, LoopRegion
+from dace.data import Array
+from dace.memlet import Memlet
+from dace.sdfg.nodes import MapEntry, AccessNode, Node
+from dace.sdfg.state import ControlFlowRegion, ConditionalBlock, LoopRegion, SDFGState
+from dace.sdfg import utils
+from dace.sdfg.graph import Edge
 from .get_num_parent_map_and_loop_scopes import get_num_parent_map_scopes
 import copy
 import typing
 from typing import Sequence
 from utils.rename import rename_on_if, rename_on_for
+from dace.transformation.helpers import redirect_edge
 
 def transify_kernel_scalars(sdfg: dace.SDFG, map_sched_type: dace.ScheduleType = dace.ScheduleType.GPU_Device):
     kernel_id = 0
@@ -483,3 +489,68 @@ def retransify_scalar_with_local_prefix(root: dace.SDFG, sdfg: dace.SDFG):
         for node in state.nodes():
             if isinstance(node, dace.nodes.NestedSDFG):
                 retransify_scalar_with_local_prefix(root, node.sdfg)
+
+
+def add_copy_tasklet(st: SDFGState, acc: AccessNode, dst: Node, dst_conn: str | None, dst_memlet: str):
+    g = st.sdfg
+    t = st.add_tasklet('copyblind', {'inp'}, {'out'}, 'out = inp')
+    st.add_edge(acc, None, t, 'inp', g.make_array_memlet(acc.data))
+    st.add_edge(t, 'out', dst, dst_conn, Memlet(dst_memlet))
+
+def transify_sneaky_array_writes_inside_map(g: SDFG):
+    tCounter = 0 # Counter to disambiguate names
+    for st, _ in g.all_nodes_recursive():
+        if not isinstance(st, SDFGState):
+            continue
+        node_scopes = st.scope_dict()
+        for mE in utils.scope_aware_topological_sort(st, reverse=True):
+            if not isinstance(mE, MapEntry):
+                continue
+            mX = st.exit_node(mE)
+            out_data = [ed.data.data for ed in st.out_edges(mX) if isinstance(ed.data, Memlet) and ed.data.data]
+            array_accs = [n for n in st.all_nodes_between(mE, mX)
+                        if isinstance(n, AccessNode)
+                        and isinstance(n.desc(g), Array)
+                        and n.data not in out_data
+                        and node_scopes[n] is mE
+                        and st.in_degree(n) == 1]
+            if not array_accs:
+                continue
+            for acc in array_accs:
+                # Verify that the rewrite is valid.
+                in_set = None
+                for ed in st.in_edges(acc):
+                    in_set = ed.data.dst_subset
+                valid_rewrite = True
+                for ed in st.out_edges(acc):
+                    if ed.data.src_subset != in_set:
+                        valid_rewrite = False
+                        break
+                if not valid_rewrite:
+                    print(f"Transify ({mE}): The read offsets and write offsets are not the same for {acc.data}. Skipping.")
+                    continue
+
+                # Actual rewrite.
+                print(f"Transify ({mE}): Rewriting {acc.data} as a transient inside map.")
+                while f"{acc.data}_transified_{tCounter}" in g.arrays:
+                    tCounter += 1
+                acc_local, _ = g.add_scalar(f"{acc.data}_transified_{tCounter}", acc.desc(g).dtype, transient=True)
+                acc_local = st.add_access(acc_local)
+
+                for ed in st.in_edges(acc):
+                    redirect_edge(st, ed, new_dst=acc_local, new_memlet=g.make_array_memlet(acc_local.data))
+                for ed in st.out_edges(acc):
+                    redirect_edge(st, ed, new_src=acc_local, new_memlet=g.make_array_memlet(acc_local.data))
+                add_copy_tasklet(st, acc_local, mX, f"IN_{acc_local.data}", f"{acc.data}[{in_set}]")
+
+                cmE, cmX = mE, mX
+                while cmX:
+                    cmX.add_scope_connectors(acc_local.data)
+                    nmE = node_scopes[cmE]
+                    nmX = st.exit_node(nmE) if nmE else None
+                    if nmX:
+                        st.add_edge(cmX, f"OUT_{acc_local.data}", nmX, f"IN_{acc_local.data}", g.make_array_memlet(acc.data))
+                    else:
+                        st.add_edge(cmX, f"OUT_{acc_local.data}", acc, None, g.make_array_memlet(acc.data))
+                    cmE, cmX = nmE, nmX
+    g.validate()
