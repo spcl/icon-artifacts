@@ -8,6 +8,7 @@ from utils.count import count_map_dimensions
 from utils.count import count_uncollapsed_maps
 from utils.conditional_pruning import cleanup_conditionals, push_interstate_edges_early, dead_code_cleanup
 from utils.transify_kernel_scalars import transify_sneaky_array_writes_inside_map
+from utils.map_match_range_and_force_fuse import map_force_fuse_prescibed
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
@@ -154,12 +155,14 @@ def optimization_action(g: SDFG):
     g.reset_cfg_list()
     g.reset_sdfg_list()
     g.validate()
-    # TODO: MapFusion here
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===
+
+    # Fuse maps
+    map_force_fuse_prescibed(g)
 
     return g
 
