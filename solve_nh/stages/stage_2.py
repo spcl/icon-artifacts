@@ -59,10 +59,16 @@ def optimization_action(g: SDFG):
 
     # === Sub-Phase 2: Specialize nlev and nlevp1 ===
     # Specialize some scalars
-    specialize_scalar(g, "nlevp1", 91)
-    g.validate()
-    specialize_scalar(g, "nlev", 90)
-    g.validate()
+    # TODO: Verify that rayleigh_type, divdam_type are correct
+    # TODO: Extend this to other constants. Make sure the name matches fully to the data desc as it will call string replacements
+    for scalar_name, scalar_value in {
+        "nlevp1": 91,
+        "nlev": 90,
+        "__CG_global_data__m_rayleigh_type": 2,
+        "__CG_global_data__m_divdamp_type": 3,
+    }.items():
+        specialize_scalar(g, scalar_name, scalar_value)
+        g.validate()
     # Constprop with the new constants
     ConstantPropagation().apply_pass(g, {})
     state_fusion_without_copyin_and_copyout(g)

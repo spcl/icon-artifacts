@@ -227,10 +227,13 @@ def rename_on_if_conds(node: ConditionalBlock, src: str, dst: str):
 # having the name "if*" in this case we can be pretty sure it is if
 # access on what we want then I can assign the value on the interstate
 # edge and rely on simplify, I hope this will work
-def propagate_if_conditions(sdfg: dace.SDFG, replace_dict: None | Dict[str, int], verbose: bool):
+def propagate_if_conditions(sdfg: dace.SDFG, replace_dict: None | Dict[str, str], verbose: bool):
     propagate_if_cond_impl(sdfg, sdfg, replace_dict, verbose)
 
-def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | Dict[str, int], verbose: bool):
+c = 0
+def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | Dict[str, str], verbose: bool):
+    global c
+
     sdfg.validate()
 
     if replace_dict is not None:
@@ -352,7 +355,8 @@ def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None 
                         for n in body.nodes():
                             body.remove_node(n)
                         cfg.remove_branch(body)
-                        s = cfg.parent_graph.add_state("cond_repl")
+                        s = cfg.parent_graph.add_state(f"cond_repl_{c}")
+                        c += 1
                         for ie in cfg.parent_graph.in_edges(cfg):
                             cfg.parent_graph.add_edge(ie.src, s, copy.deepcopy(ie.data))
                         for oe in cfg.parent_graph.out_edges(cfg):
@@ -421,6 +425,7 @@ def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None 
                                 n.sdfg.parent_graph = copy_else_body
                                 n.sdfg.parent_sdfg = copy_else_body.sdfg
                     ncfg.add_branch(CodeBlock("1 == 1"), copy_else_body)
+                    copy_else_body.label += f"_else_{c}"
                 elif always_true:
                     copy_c_body = copy.deepcopy(c_body)
                     for s in copy_c_body.all_states():
@@ -429,6 +434,7 @@ def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None 
                                 n.sdfg.parent_graph = copy_c_body
                                 n.sdfg.parent_sdfg = copy_c_body.sdfg
                     ncfg.add_branch(CodeBlock("1 == 1"), copy_c_body)
+                    copy_c_body.label += f"_if_{c}"
 
                 if always_false or always_true:
                     ies = cfg.parent_graph.in_edges(cfg)

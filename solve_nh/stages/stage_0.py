@@ -4,6 +4,7 @@ from utils.stage0_hack_split_predictor_pre_omp_loop import split_predictor_pre_o
 from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
+from utils.propagate_if_conditions import propagate_if_conditions
 
 import argparse
 
@@ -14,6 +15,7 @@ STAGE_ID = 0
 def optimization_action(g: SDFG, velicity_shim: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
     # This map is split manually, because if this is the case in the front-end, f2dac crashes
+    # === Sub-phase 0: Fixes that should have been in the front-end (but it breaks) and inject velocity as a tasklet ===
     if g.name == 'solve_nh_predictor_pre':
         split_predictor_pre_omp_loop(g)
     # Replaces velocity tendencies subgraph with a tasklet that expects struct-only input
@@ -24,6 +26,20 @@ def optimization_action(g: SDFG, velicity_shim: bool):
         inject_velocity_shim(g)
     # Simplify does not much while we have structs and views
     g.simplify()
+    # === Sub-phase 0: Fixes that should have been in the front-end (but it breaks) and inject velocity as a tasklet ===
+
+    # === Sub-phase 1: Propagate if conditions ===
+    # Propagate special constants
+    # Commented out as you can also use `specialize_scalar in stage 2`
+    #config_constants = {
+    #    'divdamp_type': '3',
+    #    'rayleigh_type': '2',
+    #}
+    #propagate_if_conditions(
+    #    sdfg=g,
+    #    replace_dict=config_constants,
+    #    verbose=True)
+    # === Sub-phase 1: Propagate if conditions ===
     return g
 
 
