@@ -74,7 +74,7 @@ def optimization_action(g: SDFG):
     # Possible candidates I see:
     # __CG_p_nh__CG_metrics__m_bdy_mflx_e_idx
     # __CG_p_nh__CG_metrics__m_bdy_mflx_e_blk
-    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '1').lower() in ('1', 'true', 'yes')
+    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0').lower() in ('1', 'true', 'yes')
     if do_reduce_bitwidth:
         # This will not work with graphs that have velocity tendencies calls
         # TODO: This fails because we can't change data going into the velocity tendencies tasklets
