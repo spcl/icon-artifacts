@@ -7,7 +7,7 @@ from utils.input_to_gpu import input_to_gpu
 from utils.add_set_zero import add_set_zero
 from utils.make_flattened_data_to_input import make_flattened_data_to_non_transient_cpu_input, make_flattened_data_to_non_transient_gpu_input
 
-from utils.profiling_patches import remove_profiling_states, remove_sync_states, remove_sync_and_profiling_states, set_default_stream, insert_pre_reduction_sync, rm_reduntant_copies
+from utils.profiling_patches import remove_profiling_states, remove_sync_states, insert_program_entry_exit_syncs, rm_redundant_copies
 STAGE_ID = 9
 
 _allocation_names_to_comment_out = set()
@@ -37,10 +37,11 @@ def optimization_action(sdfg):
         make_flattened_data_to_non_transient_gpu_input(sdfg)
         sdfg.validate()
 
-    set_default_stream(sdfg) # Is No-op, codegen does the same again
-    remove_sync_and_profiling_states(sdfg)
-    insert_pre_reduction_sync(sdfg)
-    rm_reduntant_copies(sdfg) # z_h -> gpu_z_h becomes z_h -> z_h after moving inputs to the GPU do that
+    #set_default_stream(sdfg) # Is No-op, codegen does the same again
+    remove_profiling_states(sdfg)
+    remove_sync_states(sdfg)
+    insert_program_entry_exit_syncs(sdfg)
+    rm_redundant_copies(sdfg) # z_h -> gpu_z_h becomes z_h -> z_h after moving inputs to the GPU do that
 
     return sdfg
 

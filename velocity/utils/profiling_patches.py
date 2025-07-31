@@ -139,3 +139,16 @@ def insert_program_entry_exit_syncs(sdfg: dace.SDFG):
         language=dace.dtypes.Language.CPP,
         # code_global='#include "dace_wait_device.h"', # skip include
     )
+
+def rm_redundant_copies(sdfg: dace.SDFG):
+    for state in sdfg.all_states():
+        for edge in state.edges():
+            if isinstance(edge.src, dace.nodes.AccessNode) and isinstance(edge.dst, dace.nodes.AccessNode):
+                if edge.src.data == edge.dst.data:
+                    # Remove the copy edge
+                    state.remove_edge(edge)
+                    # Remove the copy node if it exists
+                    if state.degree(edge.src) == 0:
+                        state.remove_node(edge.src)
+                    if state.degree(edge.dst) == 0:
+                        state.remove_node(edge.dst)

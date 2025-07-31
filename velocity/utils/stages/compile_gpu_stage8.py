@@ -17,7 +17,7 @@ from utils.reshape_kernels import reshape_kernels, reshape_kernels_w_coarsening
 from utils.hacky_cfl_clipping_related_kernel_removal import hacky_cfl_clipping_related_kernel_removal
 from utils.decrease_bitwidth_of_const_arrays import decrease_bitwidth_of_const_arrays, force_decrease_bitwidth_of_nblk_arrays
 
-from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling, set_default_stream, insert_synchronization_and_timers_for_profiling
+from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling
 
 from utils.assignment_and_copy_kernel_to_memset_and_memcpy import AssignmentAndCopyKernelToMemsetAndMemcpy
 from utils.create_profile_sdfg import create_profile_sdfg
@@ -136,7 +136,8 @@ def optimization_action(sdfg):
     #tile_kernels(sdfg)
     #sdfg.simplify()
     # Sync first
-    insert_synchronization_and_timers_for_profiling(sdfg)
+    insert_synchronization_for_profiling(sdfg)
+    insert_timers_for_profiling(sdfg)
     #set_default_stream(sdfg)
     sdfg.validate()
 
