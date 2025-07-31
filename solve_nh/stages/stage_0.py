@@ -30,7 +30,7 @@ def optimization_action(g: SDFG, velicity_shim: bool):
 
     # === Sub-phase 1: Propagate if conditions ===
     # Propagate special constants
-    # Commented out as you can also use `specialize_scalar in stage 2`
+    # Commented out as you can also use `specialize_scalar in stage 2`, probably better to use that
     #config_constants = {
     #    'divdamp_type': '3',
     #    'rayleigh_type': '2',

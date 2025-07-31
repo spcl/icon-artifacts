@@ -61,6 +61,8 @@ def optimization_action(g: SDFG):
     # Specialize some scalars
     # TODO: Verify that rayleigh_type, divdam_type are correct
     # TODO: Extend this to other constants. Make sure the name matches fully to the data desc as it will call string replacements
+    # If you have the pattern (nlev) -> tasklet, then it will remove the nlev and remove the in connector of the tasklet
+    # then we will do (assign_tasklet) -> (__tmp_nlev) -> tasklet, such that we do not need to change in connectors
     for scalar_name, scalar_value in {
         "nlevp1": 91,
         "nlev": 90,
