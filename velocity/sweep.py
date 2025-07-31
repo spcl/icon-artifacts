@@ -53,7 +53,7 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
 
     try:
         subprocess.run(
-            ["python", "-m", "utils.stages.compile_gpu_stage8", "--compile"],
+            ["python", "-m", "utils.stages.compile_gpu_stage8"],
             check=True,
             env=env
         )
