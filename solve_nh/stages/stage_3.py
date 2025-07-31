@@ -76,61 +76,64 @@ def optimization_action(g: SDFG):
     # __CG_p_nh__CG_metrics__m_bdy_mflx_e_blk
     do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '1').lower() in ('1', 'true', 'yes')
     if do_reduce_bitwidth:
-        nproma_dependent_array_names={
-            "gpu___CG_p_patch__CG_cells__m_edge_idx",
-            #"gpu___CG_p_patch__CG_cells__m_end_index", #CPU Only
-            "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
-            #"gpu___CG_p_patch__CG_cells__m_start_index", #CPU Only
-            "gpu___CG_p_patch__CG_edges__m_cell_idx",
-            #"gpu___CG_p_patch__CG_edges__m_end_index", #CPU Only
-            "gpu___CG_p_patch__CG_edges__m_quad_idx",
-            #"gpu___CG_p_patch__CG_edges__m_start_index", #CPU Only
-            "gpu___CG_p_patch__CG_edges__m_vertex_idx",
-            "gpu___CG_p_patch__CG_verts__m_cell_idx",
-            "gpu___CG_p_patch__CG_verts__m_edge_idx",
-            #"gpu___CG_p_patch__CG_verts__m_end_index", #CPU Only
-            #"gpu___CG_p_patch__CG_verts__m_start_index", #CPU Only
-        }
-        nproma_name = "__CG_global_data__m_nproma"
-        g = decrease_bitwidth_of_const_arrays(
-            sdfg=g,
-            array_names=nproma_dependent_array_names,
-            nproma_name=nproma_name,
-            num_initial_states_to_skip=2,  # Skip copy_in, flatten
-            num_final_states_to_skip=2,  # Skip deflatetn, copy_out
-        )
-        g.validate()
-        multi_val_blk_array_names={
-            #"gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
-            "gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
-            #"gpu___CG_p_patch__CG_edges__m_cell_blk", #1
-            "gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
-            "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
-            #"gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
-            #"gpu___CG_p_patch__CG_verts__m_cell_blk", #1
-            "gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
-            #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
-        }
-        single_val_blk_array_names={
-            "gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
-            #"gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
-            "gpu___CG_p_patch__CG_edges__m_cell_blk", #1
-            #"gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
-            #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
-            "gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
-            "gpu___CG_p_patch__CG_verts__m_cell_blk", #1
-            #"gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
-            "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
-        }
-        g = force_decrease_bitwidth_of_nblk_arrays(
-            sdfg=g,
-            multi_val_array_names=multi_val_blk_array_names,
-            single_val_array_names=single_val_blk_array_names,
-            num_initial_states_to_skip=3,  # Skip copy_in, flatten, nblk_lowering
-            num_final_states_to_skip=2,  # Skip deflatetn, copy_out
-        )
-        g.save("rb2.sdfgz", compress=True)
-        g.validate()
+        # This will not work with graphs that have velocity tendencies calls
+        # TODO: This fails because we can't change data going into the velocity tendencies tasklets
+        # TODO: Run this only for post, or run make it ignore for velcoty
+        if "predictor_pre" in g.name or "corrector_pre" in g.name:
+            nproma_dependent_array_names={
+                "gpu___CG_p_patch__CG_cells__m_edge_idx",
+                #"gpu___CG_p_patch__CG_cells__m_end_index", #CPU Only
+                "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
+                #"gpu___CG_p_patch__CG_cells__m_start_index", #CPU Only
+                "gpu___CG_p_patch__CG_edges__m_cell_idx",
+                #"gpu___CG_p_patch__CG_edges__m_end_index", #CPU Only
+                "gpu___CG_p_patch__CG_edges__m_quad_idx",
+                #"gpu___CG_p_patch__CG_edges__m_start_index", #CPU Only
+                "gpu___CG_p_patch__CG_edges__m_vertex_idx",
+                "gpu___CG_p_patch__CG_verts__m_cell_idx",
+                "gpu___CG_p_patch__CG_verts__m_edge_idx",
+                #"gpu___CG_p_patch__CG_verts__m_end_index", #CPU Only
+                #"gpu___CG_p_patch__CG_verts__m_start_index", #CPU Only
+            }
+            nproma_name = "__CG_global_data__m_nproma"
+            g = decrease_bitwidth_of_const_arrays(
+                sdfg=g,
+                array_names=nproma_dependent_array_names,
+                nproma_name=nproma_name,
+                num_initial_states_to_skip=2,  # Skip copy_in, flatten
+                num_final_states_to_skip=2,  # Skip deflatetn, copy_out
+            )
+            g.validate()
+            multi_val_blk_array_names={
+                #"gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
+                "gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
+                #"gpu___CG_p_patch__CG_edges__m_cell_blk", #1
+                "gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
+                #"gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
+                #"gpu___CG_p_patch__CG_verts__m_cell_blk", #1
+                "gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
+                #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
+            }
+            single_val_blk_array_names={
+                "gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
+                #"gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_cell_blk", #1
+                #"gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
+                #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
+                "gpu___CG_p_patch__CG_verts__m_cell_blk", #1
+                #"gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
+            }
+            g = force_decrease_bitwidth_of_nblk_arrays(
+                sdfg=g,
+                multi_val_array_names=multi_val_blk_array_names,
+                single_val_array_names=single_val_blk_array_names,
+                num_initial_states_to_skip=3,  # Skip copy_in, flatten, nblk_lowering
+                num_final_states_to_skip=2,  # Skip deflatetn, copy_out
+            )
+            g.validate()
     # === Sub-Phase 4: Bitwidth Lowering Transformations ===
 
     # === Sub-Phase 5: Profiling Patches (Make sure this is the last phase) ===
