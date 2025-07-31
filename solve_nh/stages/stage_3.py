@@ -79,7 +79,7 @@ def optimization_action(g: SDFG):
         # This will not work with graphs that have velocity tendencies calls
         # TODO: This fails because we can't change data going into the velocity tendencies tasklets
         # TODO: Run this only for post, or run make it ignore for velcoty
-        if "predictor_pre" in g.name or "corrector_pre" in g.name:
+        if not ("predictor_pre" in g.name or "corrector_pre" in g.name):
             nproma_dependent_array_names={
                 "gpu___CG_p_patch__CG_cells__m_edge_idx",
                 #"gpu___CG_p_patch__CG_cells__m_end_index", #CPU Only
