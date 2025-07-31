@@ -608,7 +608,6 @@ def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_name
                         edge.data.assignments[key] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
 
 
-    reinsert_symbols_to_nsdfg_rec(new_sdfg)
     new_sdfg.validate()
 
     #raise Exception("This is a hacky solution, please fix it later.")
@@ -753,35 +752,3 @@ def replace_array_with_constsym(text: str, array_name: str) -> str:
             i += 1
 
     return ''.join(result)
-
-def reinsert_symbols_to_nsdfg_rec(graph: dace.SDFG):
-    # Why would this happen? This is a workaround for the issue where nested SDFGs do not have their symbols properly assigned.
-    for state in graph.all_states():
-        for node in state.nodes():
-            if isinstance(node, dace.nodes.NestedSDFG):
-                child_sdfg = node.sdfg
-                connectors = node.in_connectors.keys() | node.out_connectors.keys()
-                symbols = graph.free_symbols
-                #if symbol_mapping is None:
-                #    symbol_mapping = {s: s for s in symbols}
-                #    node.symbol_mapping = symbol_mapping
-
-                # Validate missing symbols
-                missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
-                if missing_symbols:
-                    # If symbols are missing, try to get them from the parent SDFG
-                    assert isinstance(state, dace.SDFGState), "State should be an SDFGState."
-                    parent_mapping = {s: s for s in missing_symbols if s in state.symbols_defined_at(node)}
-                    node.symbol_mapping.update(parent_mapping)
-                    missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
-                #if missing_symbols:
-                #    raise ValueError('Missing symbols on nested SDFG "%s": %s' % (node.sdfg.name, missing_symbols))
-                if missing_symbols:
-                    for missing_symbol in missing_symbols:
-                        #child_sdfg.add_symbol(missing_symbol, node.sdfg.symbols[missing_symbol] if missing_symbol in node.sdfg.symbols else dace.int32)
-                        #node.symbol_mapping[missing_symbol] = missing_symbol
-                        #print("Symbols", symbols)
-                        #print("Missing symbols", missing_symbols)
-                        child_sdfg.remove_symbol(missing_symbol, force=True)
-                        #node.symbol_mapping[missing_symbol] = missing_symbol
-                        #node.sdfg.add_symbol(missing_symbol, dace.int32)  # Default to int32, can be changed later

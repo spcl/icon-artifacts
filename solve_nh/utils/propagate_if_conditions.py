@@ -15,6 +15,7 @@ from dace.transformation.passes import DeadStateElimination, SymbolPropagation
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 import ast
 import operator as op
+from typing import Dict
 
 # Example usage (python AST as string)
 expr_str = "((1 - lvn_only) and 0)"
@@ -226,10 +227,10 @@ def rename_on_if_conds(node: ConditionalBlock, src: str, dst: str):
 # having the name "if*" in this case we can be pretty sure it is if
 # access on what we want then I can assign the value on the interstate
 # edge and rely on simplify, I hope this will work
-def propagate_if_conditions(sdfg: dace.SDFG, replace_dict: None | dict, verbose: bool):
+def propagate_if_conditions(sdfg: dace.SDFG, replace_dict: None | Dict[str, int], verbose: bool):
     propagate_if_cond_impl(sdfg, sdfg, replace_dict, verbose)
 
-def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | dict, verbose: bool):
+def propagate_if_cond_impl(root: dace.SDFG, sdfg: dace.SDFG, replace_dict: None | Dict[str, int], verbose: bool):
     sdfg.validate()
 
     if replace_dict is not None:
