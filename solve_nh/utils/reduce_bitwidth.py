@@ -1,13 +1,12 @@
 import dace
 import copy
-from typing import Set
+from typing import Set, List
 from dace.properties import CodeBlock
 from dace.codegen.control_flow import ConditionalBlock, ContinueBlock, ControlFlowBlock, ControlFlowRegion
 from dace.sdfg import InterstateEdge
 import dace.sdfg.utils as sdutil
 import re
 
-c = 0
 def _add_copy_map(state: dace.SDFGState, src_arr_name:str, src_arr:dace.data.Data, dst_arr_name:str, dst_arr:dace.data.Data,
                   dtype):
     """
@@ -112,49 +111,53 @@ def _lower_bidth_of_arrays_recursive(sdfg: dace.SDFG, array_names: Set[str], suf
     # Repl_dict does not work on nested SDFGs
     _repl_on_interstate_edges(sdfg, repl_dict)
 
-def _insert_lower_bidth_of_arrays_recursive(cfg: ControlFlowRegion, array_names: Set[str], suffix: str, new_dtype: dace.dtypes.typeclass,
+def _insert_lower_bidth_of_arrays_recursive(cfgs: List[ControlFlowRegion], array_names: Set[str], suffix: str, new_dtype: dace.dtypes.typeclass,
                                      ):
     if suffix == "int32":
         return
     repl_dict = {array_name: array_name + "_" + suffix for array_name in array_names}
     # Repl datadesc names
+    sdfg = cfgs[0].sdfg
+    assert all(cfg.sdfg == sdfg for cfg in cfgs), "All CFGs must belong to the same SDFG."
     for name in array_names:
-        if name in cfg.sdfg.arrays:
+        if name in sdfg.arrays:
             new_name = f"{name}_{suffix}"
-            copy_desc = copy.deepcopy(cfg.sdfg.arrays[name])
+            copy_desc = copy.deepcopy(sdfg.arrays[name])
             copy_desc.dtype = new_dtype
             copy_desc.lifetime = dace.AllocationLifetime.Persistent
             #sdfg.remove_data(name, validate=False)
-            cfg.sdfg.add_datadesc(new_name, copy_desc, find_new_name=False)
-            cfg.replace_dict(repl=repl_dict)
+            sdfg.add_datadesc(new_name, copy_desc, find_new_name=False)
+            for cfg in cfgs:
+                cfg.replace_dict(repl=repl_dict)
     # Repl in and out connectors of NSDFG node
     nsdfgs = set()
-    for state in cfg.all_states():
-        for node in state.nodes():
-            if isinstance(node, dace.nodes.NestedSDFG):
-                conn_pair = set()
-                for in_conn in node.in_connectors:
-                    if in_conn in array_names:
-                        new_in_conn = f"{in_conn}_{suffix}"
-                        old_in_conn = in_conn
-                        for ie in state.in_edges_by_connector(node, in_conn):
-                            ie.dst_conn = new_in_conn
-                        conn_pair.add((old_in_conn, new_in_conn))
-                for old_in_conn, new_in_conn in conn_pair:
-                    node.remove_in_connector(old_in_conn)
-                    node.add_in_connector(new_in_conn)
-                conn_pair.clear()
-                for out_conn in node.out_connectors:
-                    if out_conn in array_names:
-                        new_out_conn = f"{out_conn}_{suffix}"
-                        old_out_conn = out_conn
-                        for oe in state.out_edges_by_connector(node, out_conn):
-                            oe.src_conn = new_out_conn
-                        conn_pair.add((old_out_conn, new_out_conn))
-                for old_in_conn, new_in_conn in conn_pair:
-                    node.remove_out_connector(old_out_conn)
-                    node.add_out_connector(new_out_conn)
-                nsdfgs.add(node.sdfg)
+    for cfg in cfgs:
+        for state in cfg.all_states():
+            for node in state.nodes():
+                if isinstance(node, dace.nodes.NestedSDFG):
+                    conn_pair = set()
+                    for in_conn in node.in_connectors:
+                        if in_conn in array_names:
+                            new_in_conn = f"{in_conn}_{suffix}"
+                            old_in_conn = in_conn
+                            for ie in state.in_edges_by_connector(node, in_conn):
+                                ie.dst_conn = new_in_conn
+                            conn_pair.add((old_in_conn, new_in_conn))
+                    for old_in_conn, new_in_conn in conn_pair:
+                        node.remove_in_connector(old_in_conn)
+                        node.add_in_connector(new_in_conn)
+                    conn_pair.clear()
+                    for out_conn in node.out_connectors:
+                        if out_conn in array_names:
+                            new_out_conn = f"{out_conn}_{suffix}"
+                            old_out_conn = out_conn
+                            for oe in state.out_edges_by_connector(node, out_conn):
+                                oe.src_conn = new_out_conn
+                            conn_pair.add((old_out_conn, new_out_conn))
+                    for old_in_conn, new_in_conn in conn_pair:
+                        node.remove_out_connector(old_out_conn)
+                        node.add_out_connector(new_out_conn)
+                    nsdfgs.add(node.sdfg)
     # Now do the same replacedment in the NSDFG
     for nsdfg in nsdfgs:
         _lower_bidth_of_arrays_recursive(nsdfg, array_names, suffix, new_dtype)
@@ -193,11 +196,28 @@ def _fix_nsdfg_connectors(sdfg: dace.SDFG):
             if isinstance(node, dace.nodes.NestedSDFG):
                 _fix_nsdfg_connectors(node.sdfg)
 
-def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], enable_uint16: bool = True,
-                                      enable_int64: bool = False, nproma_name: str = None):
+
+def label(cfgs: List[ControlFlowRegion], suffix_label: str):
+    labeled = set()
+    for n in cfgs:
+        if n not in labeled:
+            n.label += suffix_label
+            labeled.add(n)
+        if not isinstance(n, dace.SDFGState):
+            for n2 in n.all_control_flow_regions():
+                if n2 not in labeled:
+                    n2.label += suffix_label
+                labeled.add(n2)
+
+
+c = 0
+def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str],
+                                      nproma_name: str = None,
+                                      num_initial_states_to_skip: int = 2,
+                                      num_final_states_to_skip: int = 2) -> dace.SDFG:
+    global c
     _fix_nsdfg_connectors(sdfg)
     sdfg.validate()
-    global c
     # Not all arrays might be in use, filter the set again
     new_array_names = set()
     for name in array_names:
@@ -220,26 +240,34 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         "All arrays must be constant arrays, i.e. written to at most once."
 
     # Duplicate NSDFG regions - one with original names and then replace the accesses with fp16 or fp32
-    if enable_int64:
-        copy_int64 = copy.deepcopy(sdfg)
-        sdutil.set_nested_sdfg_parent_references(copy_int64)
     copy_int32 = copy.deepcopy(sdfg)
     sdutil.set_nested_sdfg_parent_references(copy_int32)
-    if enable_uint16:
-        copy_uint16 = copy.deepcopy(sdfg)
-        sdutil.set_nested_sdfg_parent_references(copy_uint16)
+    copy_uint16 = copy.deepcopy(sdfg)
+    sdutil.set_nested_sdfg_parent_references(copy_uint16)
 
     sdfgs_and_suffixes = [
-                        (copy_int32, "int32", dace.dtypes.int32)]
-    if enable_uint16:
-        sdfgs_and_suffixes.append((copy_uint16, "uint16", dace.dtypes.uint16))
-    if enable_int64:
-        sdfgs_and_suffixes.append((copy_int64, "int64", dace.dtypes.int64))
-    if enable_int64:
-        copy_body_int64 = list(copy_int64.bfs_nodes(copy_int64.start_block))[1]
-    copy_body_int32 = list(copy_int32.bfs_nodes(copy_int32.start_block))[1]
-    if enable_uint16:
-        copy_body_uint16 = list(copy_uint16.bfs_nodes(copy_uint16.start_block))[1]
+                        (copy_int32, "int32", dace.dtypes.int32),
+                        (copy_uint16, "uint16", dace.dtypes.uint16)]
+
+    copy_map_int32 = dict()
+    copy_bodies_int32 = []
+    copy_map_uint16  = dict()
+    copy_bodies_uint16 = []
+    copy_edges_int32 = {e for e in copy_int32.edges()}
+    copy_edges_uint16 = {e for e in copy_uint16.edges()}
+    nodes = list(sdfg.bfs_nodes(sdfg.start_block))
+    for old_node, new_node in zip(
+        nodes[num_initial_states_to_skip:-num_final_states_to_skip],
+        list(copy_int32.bfs_nodes(copy_int32.start_block))[num_initial_states_to_skip:-num_final_states_to_skip]
+    ):
+        copy_map_int32[old_node] = new_node
+        copy_bodies_int32.append(new_node)
+    for old_node, new_node in zip(
+        nodes[num_initial_states_to_skip:-num_final_states_to_skip],
+        list(copy_uint16.bfs_nodes(copy_uint16.start_block))[num_initial_states_to_skip:-num_final_states_to_skip]
+    ):
+        copy_map_uint16[old_node] = new_node
+        copy_bodies_uint16.append(new_node)
 
     # Replace all arrays with the corresponding bitwidth suffix
     for copy_sdfg, suffix, dtype in sdfgs_and_suffixes:
@@ -257,20 +285,15 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     # We would need to find the point where all arrays have been defined
     new_sdfg = copy.deepcopy(sdfg)
     sdutil.set_nested_sdfg_parent_references(new_sdfg)
-    assert len(new_sdfg.nodes()) == 3 and len(list(new_sdfg.all_states())) == 3, f"Expected 3 nodes, got {len(new_sdfg.nodes())} and {len(list(new_sdfg.all_states()))} states got : {new_sdfg.nodes()}, {new_sdfg.all_states()}."
-    copy_in, body, copy_out = list(new_sdfg.bfs_nodes(new_sdfg.start_block))[:3]
-    #all_edges = new_sdfg.out_edges(copy_in) + new_sdfg.in_edges(copy_out)
-    assert len(new_sdfg.out_edges(copy_in)) + len(new_sdfg.in_edges(copy_out)) == 2, f"{new_sdfg.out_edges(copy_in)},{new_sdfg.in_edges(copy_out)}"
-    #new_edge_data = all_edges[0].data.assignments + all_edges[1].data.assignments
-    #new_sdfg.add_edge(src=copy_in, dst=copy_out, data=InterstateEdge(assignments=new_edge_data))
-    #check_state = new_sdfg.add_state_after(new_sdfg.start_state, "check_bitwidth")
+    nodes = list(new_sdfg.bfs_nodes(new_sdfg.start_block))
+    bodies  = nodes[num_initial_states_to_skip:-num_final_states_to_skip]
+    copy_in = nodes[num_initial_states_to_skip-1]
+    copy_out = nodes[-num_final_states_to_skip]
+
 
     # Add int16, int32 suffixed version of arrays to the SDFG
-    suffix_and_dtypes = [("int32", dace.dtypes.int32)]
-    if enable_uint16:
-        suffix_and_dtypes.append(("uint16", dace.dtypes.uint16))
-    if enable_int64:
-        suffix_and_dtypes.append(("int64", dace.dtypes.int64))
+    suffix_and_dtypes = [("int32", dace.dtypes.int32),
+                        ("uint16", dace.dtypes.uint16)]
     def add_datadesc_rec(sdfg: dace.SDFG, suffix_and_dtypes):
         for suffix, dtype in suffix_and_dtypes:
             if suffix == "int32":
@@ -290,8 +313,6 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
                     add_datadesc_rec(node.sdfg, suffix_and_dtypes)
     add_datadesc_rec(sdfg, suffix_and_dtypes)
 
-
-    #raise Exception("This is a hacky solution, please fix it later.")
 
     # CopyIn -> CheckBitwidth + CopyBitwidth -> AssignBitwidth -> Body -> CopyOut
     # IfCFG to CheckBitwidth
@@ -314,22 +335,6 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     new_sdfg.add_node(check_if)
     check_if.add_branch(condition=CodeBlock(code="bitwidth_check_done_sym == 0"), branch=check_cfg)
 
-    # The check pattern to fill is the following:
-    tasklet_code = " int32_t _internal_bitwidth_scalar = -1;\n"
-    for arr_name in array_names:
-        arr = new_sdfg.arrays[arr_name]
-        arr.total_size
-        tasklet_code += f"""
-        if (_internal_bitwidth_scalar != 64){{ // TODO: Replace 64 with 32
-            #if defined(DACE_VELOCITY_DEBUG)
-            _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}), "{arr_name}");
-            #else
-            _internal_bitwidth_scalar = check_bounds_on_device_{c}({arr_name}, {arr.total_size} * sizeof({arr.dtype.ctype}));
-            #endif
-        }}
-    """
-
-    tasklet_code += "_out_bitwidth_check_done = 1;\n _out_bitwidth_scalar = _internal_bitwidth_scalar;\n"
     t = check_state.add_tasklet(
         name="check_bitwidth_tasklet",
         inputs={"_in_" + nproma_name},
@@ -365,49 +370,24 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
     check_state.add_edge(t, "_out_bitwidth_check_done", an2, None, dace.Memlet.from_array("bitwidth_check_done", new_sdfg.arrays["bitwidth_check_done"]))
 
     copy_bit = ConditionalBlock(label="copy_bit", sdfg=check_cfg.sdfg, parent=check_cfg)
-    if enable_uint16:
-        copy_cfg_i16 = ControlFlowRegion(label="copy_bit_cfg_i16", sdfg=copy_bit.sdfg, parent=copy_bit)
+    copy_cfg_i16 = ControlFlowRegion(label="copy_bit_cfg_i16", sdfg=copy_bit.sdfg, parent=copy_bit)
     copy_cfg_i32 = ControlFlowRegion(label="copy_bit_cfg_i32", sdfg=copy_bit.sdfg, parent=copy_bit)
-    if enable_int64:
-        copy_cfg_i64 = ControlFlowRegion(label="copy_bit_cfg_i64", sdfg=copy_bit.sdfg, parent=copy_bit)
     # Copy over only the needed body state
-    if enable_uint16:
-        copy_state_i16 = dace.SDFGState(label="copy_i16", sdfg=copy_bit.sdfg)
+    copy_state_i16 = dace.SDFGState(label="copy_i16", sdfg=copy_bit.sdfg)
     copy_state_i32 = dace.SDFGState(label="copy_i32", sdfg=copy_bit.sdfg)
-    if enable_int64:
-        copy_state_i64 = dace.SDFGState(label="copy_i64", sdfg=copy_bit.sdfg)
-    if enable_uint16:
-        copy_cfg_i16.add_node(copy_state_i16, is_start_block=True)
+    copy_cfg_i16.add_node(copy_state_i16, is_start_block=True)
     copy_cfg_i32.add_node(copy_state_i32, is_start_block=True)
-    if enable_int64:
-        copy_cfg_i64.add_node(copy_state_i64, is_start_block=True)
-    if enable_uint16 and enable_int64:
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=copy_cfg_i16)
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32"), branch=copy_cfg_i32)
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 64"), branch=copy_cfg_i64)
-    elif enable_uint16:
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=copy_cfg_i16)
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32 or bitwidth_sym == 64"), branch=copy_cfg_i32)
-    elif enable_int64:
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32 or bitwidth_sym == 16"), branch=copy_cfg_i32)
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 64"), branch=copy_cfg_i64)
-    else:
-        copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym <= 64"), branch=copy_cfg_i32)
+    copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=copy_cfg_i16)
+    copy_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32"), branch=copy_cfg_i32)
     check_cfg.add_node(copy_bit, is_start_block=False)
     check_cfg.add_edge(check_state, copy_bit, dace.InterstateEdge(assignments={"bitwidth_sym": "bitwidth_scalar"}))
     # First add the array names for all bitwidthness
-    copy_list = [(copy_int32, dace.int32)]
-    if enable_uint16:
-        copy_list.append((copy_uint16, dace.uint16))
-    if enable_int64:
-        copy_list.append((copy_int64, dace.int16))
+    copy_list = [(copy_int32, dace.int32),
+                (copy_uint16, dace.uint16)]
 
     # Add copy-in maps for all data
-    ll = [(copy_state_i32, dace.dtypes.int32, "int32")]
-    if enable_uint16:
-        ll.append((copy_state_i16, dace.dtypes.uint16, "uint16"))
-    if enable_int64:
-        ll.append((copy_state_i64, dace.dtypes.int64, "int64"))
+    ll = [(copy_state_i32, dace.dtypes.int32, "int32"),
+          (copy_state_i16, dace.dtypes.uint16, "uint16")]
     for state, dst_dtype, suffix in ll:
         if suffix == "int32":
             continue
@@ -418,11 +398,8 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
                           dst_arr_name=f"{arr_name}_{suffix}",
                           dst_arr=new_sdfg.arrays[f"{arr_name}_{suffix}"],
                           dtype=dst_dtype)
-    if enable_uint16:
-        copy_state_i16.validate()
+    copy_state_i16.validate()
     copy_state_i32.validate()
-    if enable_int64:
-        copy_state_i64.validate()
 
     # Always read the value from the scalar
     for oe in new_sdfg.out_edges(copy_in):
@@ -435,46 +412,39 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         copy_edata.assignments["bitwidth_check_done_sym"] = "bitwidth_check_done"
         new_sdfg.add_edge(check_if, copy_out, copy_edata)
         new_sdfg.remove_edge(ie)
-    new_sdfg.remove_node(body)
+    for body in bodies:
+        new_sdfg.remove_node(body)
     # new_sdfg.save("n1.sdfgz", compress=True)
 
     switch_bit = ConditionalBlock(label="switch_bit", sdfg=new_sdfg, parent=new_sdfg)
-    if enable_uint16:
-        switch_cfg_i16 = ControlFlowRegion(label="switch_bit_cfg_i16", sdfg=switch_bit.sdfg, parent=switch_bit)
+    switch_cfg_i16 = ControlFlowRegion(label="switch_bit_cfg_i16", sdfg=switch_bit.sdfg, parent=switch_bit)
     switch_cfg_i32 = ControlFlowRegion(label="switch_bit_cfg_i32", sdfg=switch_bit.sdfg, parent=switch_bit)
-    if enable_int64:
-        switch_cfg_i64 = ControlFlowRegion(label="switch_bit_cfg_i64", sdfg=switch_bit.sdfg, parent=switch_bit)
     # Copy over only the needed body state
-    if enable_uint16:
-        switch_state_i16 = copy_body_uint16 #dace.SDFGState(label="switch_i16", sdfg=switch_bit.sdfg)
-    switch_state_i32 = copy_body_int32 #dace.SDFGState(label="switch_i32", sdfg=switch_bit.sdfg)
-    if enable_int64:
-        switch_state_i64 = copy_body_int64 #dace.SDFGState(label="switch_i64", sdfg=switch_bit.sdfg)
+    #switch_state_i16 = copy_bodies_uint16
+    #switch_state_i32 = copy_bodies_int32
     # Copy over needed arrays
-    if enable_uint16:
-        switch_state_i16.validate()
-    switch_state_i32.validate()
-    if enable_int64:
-        switch_state_i64.validate()
+    #switch_state_i16.validate()
+    #switch_state_i32.validate()
 
-    if enable_uint16:
-        switch_cfg_i16.add_node(switch_state_i16)
-    switch_cfg_i32.add_node(switch_state_i32)
-    if enable_int64:
-        switch_cfg_i64.add_node(switch_state_i64)
+    # Copy over nodes and edges
+    for switch_node_i16 in copy_bodies_uint16:
+        switch_cfg_i16.add_node(switch_node_i16)
+    for e in copy_edges_uint16:
+        if e.src in copy_bodies_uint16 and e.dst in copy_bodies_uint16:
+            switch_cfg_i16.add_edge(e.src, e.dst, copy.deepcopy(e.data))
+    for switch_node_i32 in copy_bodies_int32:
+        switch_cfg_i32.add_node(switch_node_i32)
+    for e in copy_edges_int32:
+        if e.src in copy_bodies_int32 and e.dst in copy_bodies_int32:
+            switch_cfg_i32.add_edge(e.src, e.dst, copy.deepcopy(e.data))
+
+    #label(copy_bodies_int32, "_int32")
+    #label(copy_bodies_uint16, "_uint16")
+
+
     new_sdfg.add_node(switch_bit)
-    if enable_uint16 and enable_int64:
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=switch_cfg_i16)
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32"), branch=switch_cfg_i32)
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 64"), branch=switch_cfg_i64)
-    elif enable_uint16:
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=switch_cfg_i16)
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32 or bitwidth_sym == 64"), branch=switch_cfg_i32)
-    elif enable_int64:
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32 or bitwidth_sym == 16"), branch=switch_cfg_i32)
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 64"), branch=switch_cfg_i64)
-    else:
-        switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym <= 64"), branch=switch_cfg_i32)
+    switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 16"), branch=switch_cfg_i16)
+    switch_bit.add_branch(condition=CodeBlock(code="bitwidth_sym == 32"), branch=switch_cfg_i32)
     for oe in new_sdfg.out_edges(check_if):
         copy_edata = copy.deepcopy(oe.data)
         copy_edata.assignments = {"bitwidth_sym": "bitwidth_scalar"}
@@ -484,11 +454,7 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
         new_sdfg.add_edge(switch_bit, copy_out, copy_edata)
         new_sdfg.remove_edge(ie)
     sdutil.set_nested_sdfg_parent_references(new_sdfg)
-    if enable_uint16:
-        switch_state_i16.validate()
-    switch_state_i32.validate()
-    if enable_int64:
-        switch_state_i64.validate()
+
 
     #new_sdfg.save("decreased_bitwidth.sdfgz", compress=True)
     for state in new_sdfg.all_states():
@@ -518,13 +484,8 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
                 if array.dtype != dace.int32:
                     array.dtype = dace.int32
                 assert array.dtype == dace.int32, f"Array {array_name} has dtype {array.dtype}, expected int32."
-            elif "int64" in array_name:
-                if array.dtype != dace.int64:
-                    array.dtype = dace.int64
-                assert array.dtype == dace.int64, f"Array {array_name} has dtype {array.dtype}, expected int64."
             else:
                 assert array.dtype != dace.uint16, f"Array {array_name} has dtype {array.dtype}, expected not uint16."
-                assert array.dtype != dace.int64, f"Array {array_name} has dtype {array.dtype}, expected not int64."
         for state in sdfg.all_states():
             for node in state.nodes():
                 if isinstance(node, dace.nodes.NestedSDFG):
@@ -535,9 +496,10 @@ def decrease_bitwidth_of_const_arrays(sdfg: dace.SDFG, array_names: Set[str], en
 
     return new_sdfg
 
-
 def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_names: Set[str],
-                                           single_val_array_names: Set[str]) -> dace.SDFG:
+                                           single_val_array_names: Set[str],
+                                           num_initial_states_to_skip: int,
+                                           num_final_states_to_skip: int) -> dace.SDFG:
     new_multi_val_array_names = set()
     for array_name in multi_val_array_names:
         if array_name not in sdfg.arrays:
@@ -555,44 +517,38 @@ def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_name
     new_sdfg = copy.deepcopy(sdfg)
     sdutil.set_nested_sdfg_parent_references(new_sdfg)
 
-    # Right now we have 4 top level nodes
-    # copy-in
     top_level_nodes = list(new_sdfg.bfs_nodes(new_sdfg.start_block))
-    # TODO: catch all edges after flattening, and before deflattening
-    # Find flatten node in bfs nodes, find deflatten node,
-    # Get bodies between these two and make replacement run on all body CFGs
-    assert len(top_level_nodes) == 4, f"Expected 4 top level nodes, got {len(top_level_nodes)}: {top_level_nodes}"
 
-    copy_in, lower_index_arrays, body, copy_out = top_level_nodes[:4]
+    # copy_in, flatten, nlbk_lowering, bodies, deflatetn, copy_out
+    bodies = top_level_nodes[num_initial_states_to_skip:-num_final_states_to_skip]
     # Will add a second lowering block, but in body all occurences of multi-val need to change
     # All single_val arrays need to be replaced with constants
+    copy_in = top_level_nodes[num_initial_states_to_skip-1]
+    copy_out = top_level_nodes[-num_final_states_to_skip]
     repl_dict = {array_name: array_name + "_uint8" for array_name in multi_val_array_names}
-    _insert_lower_bidth_of_arrays_recursive(body, multi_val_array_names, "uint8", dace.uint8)
+    _insert_lower_bidth_of_arrays_recursive(bodies, multi_val_array_names, "uint8", dace.uint8)
     _fix_nsdfg_connectors(new_sdfg)
     new_sdfg.validate()
 
     for array_name in single_val_array_names:
-        for edge, graph in body.all_edges_recursive():
-            if isinstance(edge.data, dace.InterstateEdge):
-                pass
-            elif isinstance(edge.data, dace.Memlet):
-                if edge.data.data == array_name:
-                    graph.remove_edge(edge)
-                    edge.src.remove_out_connector(edge.src_conn)
-                    edge.dst.remove_in_connector(edge.dst_conn)
-        for node, graph in body.all_nodes_recursive():
-            if isinstance(node, dace.nodes.AccessNode):
-                if node.data == array_name:
-                    graph.remove_node(node)
-            if isinstance(node, dace.nodes.NestedSDFG) and graph.parent_graph is not None:
-                if array_name in node.sdfg.arrays and node.sdfg.arrays[array_name].transient is False:
-                    node.sdfg.remove_data(array_name, False)
-
-    # Now go through all interstate edges if we see a const array
-    # of form <array_name>[...] then replace it with <array_name>_constsym
-
-    for array_name in single_val_array_names:
-        for edge, graph in body.all_edges_recursive():
+        for body in bodies:
+            for edge, graph in body.all_edges_recursive():
+                if isinstance(edge.data, dace.InterstateEdge):
+                    pass
+                elif isinstance(edge.data, dace.Memlet):
+                    if edge.data.data == array_name:
+                        graph.remove_edge(edge)
+                        edge.src.remove_out_connector(edge.src_conn)
+                        edge.dst.remove_in_connector(edge.dst_conn)
+            for node, graph in body.all_nodes_recursive():
+                if isinstance(node, dace.nodes.AccessNode):
+                    if node.data == array_name:
+                        graph.remove_node(node)
+                if isinstance(node, dace.nodes.NestedSDFG) and graph.parent_graph is not None:
+                    if array_name in node.sdfg.arrays and node.sdfg.arrays[array_name].transient is False:
+                        node.sdfg.remove_data(array_name, False)
+        for edge in new_sdfg.all_edges(*bodies):
+            graph = new_sdfg
             if isinstance(edge.data, dace.InterstateEdge):
                 if array_name in edge.data.assignments:
                     val = edge.data.assignments[array_name]
@@ -610,48 +566,49 @@ def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_name
                         valstr = replace_array_with_constsym(valstr, array_name)
                         edge.data.assignments[key] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
 
-    def reinsert_symbols_to_nsdfg_rec(graph: dace.SDFG):
-        # Why would this happen? This is a workaround for the issue where nested SDFGs do not have their symbols properly assigned.
-        for state in graph.all_states():
-            for node in state.nodes():
-                if isinstance(node, dace.nodes.NestedSDFG):
-                    child_sdfg = node.sdfg
-                    connectors = node.in_connectors.keys() | node.out_connectors.keys()
-                    symbols = sdfg.free_symbols
-                    #if symbol_mapping is None:
-                    #    symbol_mapping = {s: s for s in symbols}
-                    #    node.symbol_mapping = symbol_mapping
+    # Now go through all interstate edges if we see a const array
+    # of form <array_name>[...] then replace it with <array_name>_constsym
 
-                    # Validate missing symbols
-                    missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
-                    if missing_symbols:
-                        # If symbols are missing, try to get them from the parent SDFG
-                        assert isinstance(state, dace.SDFGState), "State should be an SDFGState."
-                        parent_mapping = {s: s for s in missing_symbols if s in state.symbols_defined_at(node)}
-                        node.symbol_mapping.update(parent_mapping)
-                        missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
-                    #if missing_symbols:
-                    #    raise ValueError('Missing symbols on nested SDFG "%s": %s' % (node.sdfg.name, missing_symbols))
-                    if missing_symbols:
-                        for missing_symbol in missing_symbols:
-                            #child_sdfg.add_symbol(missing_symbol, node.sdfg.symbols[missing_symbol] if missing_symbol in node.sdfg.symbols else dace.int32)
-                            #node.symbol_mapping[missing_symbol] = missing_symbol
-                            #print("Symbols", symbols)
-                            #print("Missing symbols", missing_symbols)
-                            child_sdfg.remove_symbol(missing_symbol, force=True)
-                            #node.symbol_mapping[missing_symbol] = missing_symbol
-                            #node.sdfg.add_symbol(missing_symbol, dace.int32)  # Default to int32, can be changed later
+    for array_name in single_val_array_names:
+        for body in bodies:
+            for edge, graph in body.all_edges_recursive():
+                if isinstance(edge.data, dace.InterstateEdge):
+                    if array_name in edge.data.assignments:
+                        val = edge.data.assignments[array_name]
+                        if isinstance(val, str):
+                            valstr = val
+                        elif isinstance(val, CodeBlock):
+                            valstr = val.as_string
+                        else:
+                            raise ValueError(f"Unexpected value {val} for assignment {array_name} in edge {edge}.")
+                        valstr = replace_array_with_constsym(valstr, array_name)
+                        edge.data.assignments[array_name] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
+                    for key, val in edge.data.assignments.items():
+                        valstr = val if isinstance(val, str) else val.as_string
+                        if array_name in valstr:
+                            valstr = replace_array_with_constsym(valstr, array_name)
+                            edge.data.assignments[key] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
+        for edge in new_sdfg.all_edges(*bodies):
+            graph = new_sdfg
+            if isinstance(edge.data, dace.InterstateEdge):
+                if array_name in edge.data.assignments:
+                    val = edge.data.assignments[array_name]
+                    if isinstance(val, str):
+                        valstr = val
+                    elif isinstance(val, CodeBlock):
+                        valstr = val.as_string
+                    else:
+                        raise ValueError(f"Unexpected value {val} for assignment {array_name} in edge {edge}.")
+                    valstr = replace_array_with_constsym(valstr, array_name)
+                    edge.data.assignments[array_name] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
+                for key, val in edge.data.assignments.items():
+                    valstr = val if isinstance(val, str) else val.as_string
+                    if array_name in valstr:
+                        valstr = replace_array_with_constsym(valstr, array_name)
+                        edge.data.assignments[key] = valstr if isinstance(val, str) else CodeBlock(code=valstr)
+
+
     reinsert_symbols_to_nsdfg_rec(new_sdfg)
-
-    new_sdfg.save("a.sdfgz", compress=True)
-    for node, graph in body.all_nodes_recursive():
-        if isinstance(node, dace.nodes.NestedSDFG) and graph.parent_graph is not None:
-            try:
-                node.sdfg.validate()
-            except Exception as e:
-                print(f"Validation failed for nested SDFG {node.sdfg.name}: {e}")
-                node.sdfg.save(f"inv.sdfgz", compress=True)
-                raise Exception(e)
     new_sdfg.validate()
 
     #raise Exception("This is a hacky solution, please fix it later.")
@@ -708,11 +665,11 @@ def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_name
     lower_blk_bits_if.add_branch(condition=CodeBlock(code="nblk_lowering_done_sym == 0"), branch=lower_blk_bits_cfg)
 
     new_sdfg.add_node(lower_blk_bits_if, is_start_block=False)
-    oes = new_sdfg.out_edges(first_state)
-    for oe in new_sdfg.out_edges(first_state):
+    oes = new_sdfg.out_edges(copy_in)
+    for oe in new_sdfg.out_edges(copy_in):
         oe_data = copy.deepcopy(oe.data)
         oe_data.assignments["nblk_lowering_done_sym"] = "nblk_lowering_done"
-        new_sdfg.add_edge(first_state, lower_blk_bits_if, oe_data)
+        new_sdfg.add_edge(copy_in, lower_blk_bits_if, oe_data)
         new_sdfg.add_edge(lower_blk_bits_if, oe.dst, InterstateEdge())
     for oe in oes:
         new_sdfg.remove_edge(oe)
@@ -751,7 +708,6 @@ def force_decrease_bitwidth_of_nblk_arrays(sdfg: dace.SDFG, multi_val_array_name
     #print(an_counter)
     #raise Exception(an_counter)
     return new_sdfg
-
 
 def replace_array_with_constsym(text: str, array_name: str) -> str:
     """
@@ -797,3 +753,35 @@ def replace_array_with_constsym(text: str, array_name: str) -> str:
             i += 1
 
     return ''.join(result)
+
+def reinsert_symbols_to_nsdfg_rec(graph: dace.SDFG):
+    # Why would this happen? This is a workaround for the issue where nested SDFGs do not have their symbols properly assigned.
+    for state in graph.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                child_sdfg = node.sdfg
+                connectors = node.in_connectors.keys() | node.out_connectors.keys()
+                symbols = graph.free_symbols
+                #if symbol_mapping is None:
+                #    symbol_mapping = {s: s for s in symbols}
+                #    node.symbol_mapping = symbol_mapping
+
+                # Validate missing symbols
+                missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
+                if missing_symbols:
+                    # If symbols are missing, try to get them from the parent SDFG
+                    assert isinstance(state, dace.SDFGState), "State should be an SDFGState."
+                    parent_mapping = {s: s for s in missing_symbols if s in state.symbols_defined_at(node)}
+                    node.symbol_mapping.update(parent_mapping)
+                    missing_symbols = [s for s in symbols if s not in node.symbol_mapping]
+                #if missing_symbols:
+                #    raise ValueError('Missing symbols on nested SDFG "%s": %s' % (node.sdfg.name, missing_symbols))
+                if missing_symbols:
+                    for missing_symbol in missing_symbols:
+                        #child_sdfg.add_symbol(missing_symbol, node.sdfg.symbols[missing_symbol] if missing_symbol in node.sdfg.symbols else dace.int32)
+                        #node.symbol_mapping[missing_symbol] = missing_symbol
+                        #print("Symbols", symbols)
+                        #print("Missing symbols", missing_symbols)
+                        child_sdfg.remove_symbol(missing_symbol, force=True)
+                        #node.symbol_mapping[missing_symbol] = missing_symbol
+                        #node.sdfg.add_symbol(missing_symbol, dace.int32)  # Default to int32, can be changed later
