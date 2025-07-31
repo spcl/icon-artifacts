@@ -44,6 +44,7 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
     env["_TILE"] = "1"
     env["_PROFILE"] = "1"
     env["_BUILD_FOR_SOLVE_NH_INTEGRATION"] = "0"
+    env["_REDUCE_BITWIDTH_TRANSFORMATION"] = "0"
     env["X_COARSENING"] = str(x_c)
     env["Y_COARSENING"] = str(y_c)
     env["X_BLOCK_SIZE"] = str(x_bs)
