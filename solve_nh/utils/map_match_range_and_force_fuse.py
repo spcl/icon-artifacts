@@ -111,10 +111,35 @@ def flip_connector(c: str) -> str:
     return c
 
 
+def disambiguate_connectors(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
+    def recon(m: MapEntry | MapExit, cID=0) -> int:
+        drops = set(m.in_connectors)
+        for c in drops:
+            cID += 1
+            m.add_in_connector(f"IN_rc{cID}")
+            for e in st.in_edges(m):
+                if e.dst_conn == c:
+                    redirect_edge(st, e, new_dst_conn=f"IN_rc{cID}")
+            c = flip_connector(c)
+            m.add_out_connector(f"OUT_rc{cID}")
+            for e in st.out_edges(m):
+                if e.src_conn == c:
+                    redirect_edge(st, e, new_src_conn=f"OUT_rc{cID}")
+        for c in drops:
+            m.remove_in_connector(c)
+            m.remove_out_connector(flip_connector(c))
+        return cID
+
+    cID = 0
+    for m in [mE1, mX1, mE2, mX2]:
+        cID = recon(m, cID)
+
+
 def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
     # g = st.sdfg
     # tCounter = 0  # Counter to disambiguate names
     rename_map_parameters(st, mE1.map, mE2.map, mE2)
+    disambiguate_connectors(st, mE1, mX1, mE2, mX2)
     P1 = [e.dst for e in st.out_edges(mX1)]
     P2 = [e.dst for e in st.out_edges(mX2)]
     P3 = [e.src for e in st.in_edges(mE2)]
@@ -161,7 +186,11 @@ PRESCRIBED_FUSIONS = {
     "solve_nh_corrector_post": [
         (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
         (("_for_it_42",), ("_for_it_44",)),
-    ]
+    ],
+    "solve_nh_predictor_post": [
+        (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
+        (("_for_it_35",), ("_for_it_37",)),
+    ],
 }
 
 
