@@ -1,6 +1,13 @@
 import dace
 import copy
-
+from copy import deepcopy
+from typing import Any
+from dace import SDFG, symbolic
+from dace.memlet import Memlet
+from dace.sdfg.state import SDFGState
+from dace.sdfg.nodes import Map, MapEntry, MapExit, AccessNode, Node, Tasklet
+from dace.frontend.fortran.ast_utils import singular, atmost_one
+from dace.transformation.helpers import redirect_edge
 from dace.sdfg.state import CodeBlock, ConditionalBlock, ControlFlowRegion
 
 def connect_ishift_to_map(sdfg: dace.SDFG, state_label:str):
@@ -282,3 +289,34 @@ def move_range_if_inside(sdfg: dace.SDFG, it_name: str):
 
     #==================
     sdfg.validate()
+
+
+def mapentry_copy_mapentry_cleanup(g: SDFG):
+    for mE1, st in g.all_nodes_recursive():
+        if not isinstance(mE1, MapEntry):
+            continue
+        cts = [ed.dst for ed in st.out_edges(mE1)
+               if isinstance(ed.dst, Tasklet)
+               and len(ed.dst.in_connectors) == 1
+               and len(ed.dst.out_connectors) == 1
+               and st.out_degree(ed.dst) == 1]
+        cts = [t for t in cts
+               if t.code.as_string.strip() == f"{singular(k for k in t.out_connectors.keys())} = {singular(k for k in t.in_connectors.keys())}"]
+        for ct in cts:
+            acc = singular(ed.dst for ed in st.out_edges(ct))
+            if not isinstance(acc, AccessNode) or not acc.desc(g).transient:
+                continue
+            if st.out_degree(acc) != 1:
+                continue
+            mE2_ed = singular(ed for ed in st.out_edges(acc))
+            mE2 = mE2_ed.dst
+            if not isinstance(mE2, MapEntry):
+                continue
+            ct_ed = singular(ed for ed in st.in_edges(ct))
+            print(f"Clearing the path: {mE1} => {ct} => {acc} => {mE2}")
+            for ed in st.memlet_tree(mE2_ed):
+                ed.data = Memlet.from_memlet(ct_ed.data)
+            redirect_edge(st, ct_ed, new_dst=mE2, new_dst_conn = mE2_ed.dst_conn)
+            st.remove_node(ct)
+            st.remove_node(acc)
+    g.validate()

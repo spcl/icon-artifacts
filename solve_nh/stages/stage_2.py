@@ -14,7 +14,7 @@ from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
     clean_unused_symbols_from_nsdfg,
 )
-from utils.manual_fixes import move_range_if_inside
+from utils.manual_fixes import mapentry_copy_mapentry_cleanup, move_range_if_inside
 import argparse
 from utils.map_condition_swap import move_if_to_innermost_map
 from utils.move_for_cfg_inside_map import move_for_cfg_inside_map_pass
@@ -143,6 +143,8 @@ def optimization_action(g: SDFG):
     g.reset_cfg_list()
     g.reset_sdfg_list()
     # === Sub-Phase 7: Move to Range If Inside ===
+
+    mapentry_copy_mapentry_cleanup(g)
 
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===
     # Also do MapFusion, StateFusion etc.
