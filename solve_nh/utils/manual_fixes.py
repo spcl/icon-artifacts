@@ -320,13 +320,12 @@ def mapentry_copy_mapentry_cleanup(g: SDFG):
             if not isinstance(mE2, MapEntry):
                 continue
             ct_ed = singular(ed for ed in st.in_edges(ct))
-            print(f"Clearing the path: {mE1} => {ct} => {acc} => {mE2}")
-            redirect_edge(st, ct_ed, new_dst=mE2, new_dst_conn = mE2_ed.dst_conn)
             mE2_ed_fwd = singular(e for e in st.out_edges_by_connector(mE2, flip_connector(mE2_ed.dst_conn)))
-            redirect_edge(st, singular(e for e in st.in_edges(acc)),
-                          new_src=mE2, new_src_conn = flip_connector(mE2_ed.dst_conn))
-            redirect_edge(st, singular(e for e in st.out_edges(acc)),
-                          new_dst=mE2_ed_fwd.dst, new_dst_conn = mE2_ed_fwd.dst_conn)
+            print(f"Clearing the path: {mE1} => {ct} => {acc} => {mE2} => ?? :: {mE1} => {mE2} => {ct} => {acc} => ??")
+            st.add_edge(mE1, ct_ed.src_conn, mE2, mE2_ed.dst_conn, Memlet.from_memlet(ct_ed.data))
+            st.add_edge(mE2, flip_connector(mE2_ed.dst_conn), ct, ct_ed.dst_conn, Memlet.from_memlet(ct_ed.data))
+            st.add_edge(acc, None, mE2_ed_fwd.dst, mE2_ed_fwd.dst_conn, Memlet.from_memlet(mE2_ed_fwd.data))
+            st.remove_edge(ct_ed)
+            st.remove_edge(mE2_ed)
             st.remove_edge(mE2_ed_fwd)
-            st.remove_node(ct)
     g.validate()
