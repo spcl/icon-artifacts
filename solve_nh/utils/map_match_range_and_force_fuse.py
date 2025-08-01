@@ -160,6 +160,7 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
 PRESCRIBED_FUSIONS = {
     "solve_nh_corrector_post": [
         (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
+        (("_for_it_42",), ("_for_it_44",)),
     ]
 }
 
