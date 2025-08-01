@@ -10,6 +10,13 @@ from dace.frontend.fortran.ast_utils import singular, atmost_one
 from dace.transformation.helpers import redirect_edge
 from dace.sdfg.state import CodeBlock, ConditionalBlock, ControlFlowRegion
 
+def flip_connector(c: str) -> str:
+    if c.startswith("IN_"):
+        return f"OUT_{c.removeprefix('IN_')}"
+    elif c.startswith("OUT_"):
+        return f"IN_{c.removeprefix('OUT_')}"
+    return c
+
 def connect_ishift_to_map(sdfg: dace.SDFG, state_label:str):
     state, parent_graph = None, None
     for n, g in sdfg.all_nodes_recursive():
@@ -314,9 +321,12 @@ def mapentry_copy_mapentry_cleanup(g: SDFG):
                 continue
             ct_ed = singular(ed for ed in st.in_edges(ct))
             print(f"Clearing the path: {mE1} => {ct} => {acc} => {mE2}")
-            for ed in st.memlet_tree(mE2_ed):
-                ed.data = Memlet.from_memlet(ct_ed.data)
             redirect_edge(st, ct_ed, new_dst=mE2, new_dst_conn = mE2_ed.dst_conn)
+            mE2_ed_fwd = singular(e for e in st.out_edges_by_connector(mE2, flip_connector(mE2_ed.dst_conn)))
+            redirect_edge(st, singular(e for e in st.in_edges(acc)),
+                          new_src=mE2, new_src_conn = flip_connector(mE2_ed.dst_conn))
+            redirect_edge(st, singular(e for e in st.out_edges(acc)),
+                          new_dst=mE2_ed_fwd.dst, new_dst_conn = mE2_ed_fwd.dst_conn)
+            st.remove_edge(mE2_ed_fwd)
             st.remove_node(ct)
-            st.remove_node(acc)
     g.validate()
