@@ -41,7 +41,7 @@ def optimization_action(g: SDFG):
     push_interstate_edges_early(g)
     # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
     # === Sub-Phase 0.2: Try to const-eval branch conditions ===
-    # cleanup_conditionals(g)
+    cleanup_conditionals(g)
     # === Sub-Phase 0.2: Try to const-eval branch conditions ===
     dead_code_cleanup(g)
     # === Sub-Phase 0.3: Make the sneaky array writes inside maps explicit ===
@@ -78,6 +78,7 @@ def optimization_action(g: SDFG):
         g.validate()
     # Constprop with the new constants
     ConstantPropagation().apply_pass(g, {})
+    cleanup_conditionals(g)
     state_fusion_without_copyin_and_copyout(g)
     # === Sub-Phase 2: Specialize nlev and nlevp1  ===
 

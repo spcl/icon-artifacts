@@ -2,7 +2,7 @@ import sympy
 import ast
 from collections import deque
 from dace import SDFG
-from dace.sdfg.state import ConditionalBlock
+from dace.sdfg.state import ConditionalBlock, SDFGState
 from dace.properties import CodeBlock
 from sympy.logic.boolalg import BooleanTrue, BooleanFalse
 from dace.transformation.passes.simplification.prune_empty_conditional_branches import PruneEmptyConditionalBranches
@@ -12,28 +12,134 @@ from dace.sdfg.sdfg import InterstateEdge
 from dace.frontend.fortran.ast_utils import singular, atmost_one
 
 
-def str_to_sympy(expr_str: str):
-    expr_str = expr_str.replace("== 1", "== true").replace("== 0", "false")
-    return sympy.sympify(expr_str, evaluate=False).simplify()
+class LiteralExpressionChecker(ast.NodeVisitor):
+    """
+    A visitor that checks if an AST is a "literal expression".
+    """
+
+    # Whitelist of safe AST node types.
+    # We allow constants, basic operations, and comparisons.
+    ALLOWED_NODE_TYPES = {
+        ast.Constant,  # e.g., 1, 'string', True, None
+        ast.BinOp,  # e.g., +, -, *, /
+        ast.UnaryOp,  # e.g., -, not
+        ast.BoolOp,  # e.g., and, or
+        ast.Compare,  # e.g., ==, >, <
+        ast.Expression,  # Top-level node for a single expression
+        ast.Tuple,  # Tuples of constants are often safe
+        ast.List,  # Lists of constants are often safe
+        # Operations
+        ast.Add,
+        ast.Sub,
+        ast.Mult,
+        ast.Div,
+        ast.FloorDiv,
+        ast.Mod,
+        ast.Pow,
+        ast.USub,
+        ast.UAdd,
+        ast.Invert,
+        # Comparisons
+        ast.Eq,
+        ast.NotEq,
+        ast.Lt,
+        ast.LtE,
+        ast.Gt,
+        ast.GtE,
+        ast.Is,
+        ast.IsNot,
+        ast.In,
+        ast.NotIn,
+        # Boolean operations
+        ast.And,
+        ast.Or,
+        ast.Not,
+    }
+
+    def __init__(self):
+        self.is_safe = True
+
+    def generic_visit(self, node):
+        # If the node's type is not in our whitelist, it's not safe.
+        if type(node) not in self.ALLOWED_NODE_TYPES:
+            self.is_safe = False
+            # We don't need to continue visiting, but we can't stop the traversal easily.
+            # We'll just rely on the flag.
+            return
+
+        # Continue visiting the child nodes.
+        super().generic_visit(node)
+
+
+def is_literal_expression(node):
+    checker = LiteralExpressionChecker()
+    checker.visit(node)
+    return checker.is_safe
+
+
+def evaluate_literal_expression(node):
+    # 1. First, get the actual expression node, regardless of the wrapper.
+    if isinstance(node, ast.Expr):
+        expression = node.value
+    else:
+        # If it's not an Expr, assume it's the expression itself.
+        expression = node
+
+    # 2. Perform the safety check on the expression.
+    if not is_literal_expression(expression):
+        return None, "Expression contains non-literal or unsafe elements."
+
+    # 3. Compile and evaluate safely.
+    try:
+        safe_globals = {"__builtins__": {}}
+        safe_locals = {}
+
+        # Compile the expression node, using the 'eval' mode.
+        compiled_code = compile(ast.Expression(expression), "<string>", "eval")
+
+        result = eval(compiled_code, safe_globals, safe_locals)
+        return result, "success"
+
+    except Exception as e:
+        return None, f"An error occurred during evaluation: {e}"
 
 
 def cleanup_conditionals(g: SDFG):
     ControlFlowRaising().apply_pass(g, {})
-    for node, _ in g.all_nodes_recursive():
+    for node, st in g.all_nodes_recursive():
         if not isinstance(node, ConditionalBlock):
             continue
-        for c, _ in node.branches:
-            if not isinstance(c, CodeBlock):
+        yep, nope = None, []
+        for i, (c, _) in enumerate(node.branches):
+            if not isinstance(c, CodeBlock) or not is_literal_expression(ast.parse(c.as_string, mode="eval").body):
                 continue
-            csym = str_to_sympy(c.as_string)
-            if isinstance(csym, BooleanTrue):
+            cval, _ = evaluate_literal_expression(ast.parse(c.as_string, mode="eval").body)
+            if cval is True:
                 print(f"Node {node}: Evaluating {c.as_string} to True, replacing with 1")
                 c.code = [ast.Expr(value=ast.Constant(value=1))]
-            elif isinstance(csym, BooleanFalse):
+                if yep is None:
+                    yep = i
+            elif cval is False:
                 print(f"Node {node}: Evaluating {c.as_string} to False, replacing with 0")
                 c.code = [ast.Expr(value=ast.Constant(value=0))]
+                nope.append(i)
             else:
                 continue
+        if yep is not None:
+            node._branches = node._branches[: yep + 1]
+        for n in reversed(nope):
+            if n < len(node._branches):
+                node._branches = node._branches[:n] + node._branches[n + 1 :]
+        if len(node._branches) == 0:
+            # Replace with an empty state.
+            dummyst = st.add_state("removed_conditional")
+            for e in st.in_edges(node):
+                st.add_edge(e.src, dummyst, e.data)
+                st.remove_edge(e)
+            for e in st.out_edges(node):
+                st.add_edge(dummyst, e.dst, e.data)
+                st.remove_edge(e)
+            st.remove_node(node)
     PruneEmptyConditionalBranches().apply_pass(g, {})
     g.validate()
 
