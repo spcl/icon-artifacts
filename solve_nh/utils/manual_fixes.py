@@ -311,9 +311,7 @@ def mapentry_copy_mapentry_cleanup(g: SDFG):
                if t.code.as_string.strip() == f"{singular(k for k in t.out_connectors.keys())} = {singular(k for k in t.in_connectors.keys())}"]
         for ct in cts:
             acc = singular(ed.dst for ed in st.out_edges(ct))
-            if not isinstance(acc, AccessNode) or not acc.desc(g).transient:
-                continue
-            if st.out_degree(acc) != 1:
+            if not isinstance(acc, AccessNode) or not acc.desc(g).transient or st.out_degree(acc) != 1:
                 continue
             mE2_ed = singular(ed for ed in st.out_edges(acc))
             mE2 = mE2_ed.dst

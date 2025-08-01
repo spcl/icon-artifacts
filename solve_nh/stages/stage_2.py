@@ -18,7 +18,7 @@ from utils.manual_fixes import mapentry_copy_mapentry_cleanup, move_range_if_ins
 import argparse
 from utils.map_condition_swap import move_if_to_innermost_map
 from utils.move_for_cfg_inside_map import move_for_cfg_inside_map_pass
-from utils.move_if_cfg_inside_map import move_if_cfg_inside_map_pass
+from utils.move_if_cfg_inside_map import move_if_cfg_inside_map_from_condition_var, move_if_cfg_inside_map_pass
 from utils.specialize_scalar import specialize_scalar
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 from utils.if_else_to_conditional_op import if_else_to_coditional_op_pass
@@ -105,6 +105,10 @@ def optimization_action(g: SDFG):
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     # === Sub-Phase 4: InlineSDFG + MapCollapse For GPU Offloading  ===
+
+    if 'predictor_pre' in g.name:
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_58'})
+    state_fusion_without_copyin_and_copyout(g)
 
     # === Sub-Phase 5: Clean Again ===
     clean_unused_data_from_nsdfg(g)

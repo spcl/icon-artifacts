@@ -1,6 +1,6 @@
 import dace
 import copy
-
+from dace import SDFG
 from dace.properties import CodeBlock
 from dace.sdfg.state import ControlFlowRegion, LoopRegion, ConditionalBlock
 from utils.add_missing_symbols import (
@@ -9,6 +9,7 @@ from utils.add_missing_symbols import (
     _insert_missing_data_through_parent_out_scopes,
     _get_missing_symbols
 )
+from dace.frontend.fortran.ast_utils import singular, atmost_one
 
 from typing import Set, Tuple
 
@@ -477,10 +478,12 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
 
     return new_if, nsdfg, if_inner_state
 
-def move_for_cfg_inside_map_from_iterator_set(sdfg: dace.SDFG, iterator_names: Set[str]):
-    cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, LoopRegion) and n.loop_variable in iterator_names}
-    for n in cfg_candidates:
-        move_if_cfg_inside_map(n.sdfg, n)
+def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
+    for cv in cond:
+        co = singular(n for n, _ in g.all_nodes_recursive()
+                          if isinstance(n, ConditionalBlock)
+                          and any(b is not None and cv in b.as_string for b, _ in n.branches))
+        move_if_cfg_inside_map(co.sdfg, co)
 
 def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
     num_applied = 0
