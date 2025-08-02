@@ -9,6 +9,7 @@ from utils.count import count_uncollapsed_maps
 from utils.conditional_pruning import cleanup_conditionals, push_interstate_edges_early, dead_code_cleanup
 from utils.transify_kernel_scalars import transify_sneaky_array_writes_inside_map
 from utils.map_match_range_and_force_fuse import map_force_fuse_prescibed
+from dace.transformation.passes.consolidate_edges import ConsolidateEdges
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
     clean_unused_data_from_nsdfg,
@@ -172,6 +173,7 @@ def optimization_action(g: SDFG):
 
     # Fuse maps
     map_force_fuse_prescibed(g)
+    ConsolidateEdges().apply_pass(g, {})
 
     return g
 
