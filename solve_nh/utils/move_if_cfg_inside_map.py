@@ -92,6 +92,7 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
     map_exit_accesses = dict()
     for e in state.all_edges(*all_inner_map_nodes):
         # If src or dst is a map entry/exit, use the data connection
+        src = None
         if e.src != map_entry:
             src = node_map[e.src]
             src_conn = e.src_conn
@@ -100,14 +101,13 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
                 if e.data.data is not None:
                     src = map_inner_state.add_access(e.data.data)
                     map_entry_accesses[e.data.data] = src
-                else:
-                    src = None
             else:
                 if e.data.data is not None:
                     src = map_entry_accesses[e.data.data]
             if src is not None:
                 assert e.src_conn is not None, "Expected no src conn for the map entry"
             src_conn = None
+        dst = None
         if e.dst != map_exit:
             dst = node_map[e.dst]
             dst_conn = e.dst_conn
@@ -116,8 +116,6 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
                 if e.data.data is not None:
                     dst = map_inner_state.add_access(e.data.data)
                     map_exit_accesses[e.data.data] = dst
-                else:
-                    dst = None
             else:
                 if e.data.data is not None:
                     dst = map_exit_accesses[e.data.data]
@@ -163,6 +161,14 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
                 state.sdfg.arrays[data]
             )
         )
+    if not map_entry.out_connectors:
+        state.add_edge(
+            map_entry,
+            None,
+            map_inner_nsdfg,
+            None,
+            dace.memlet.Memlet()
+        )
     for in_conn in map_exit.in_connectors:
         es = {e for e in state.in_edges_by_connector(map_exit, in_conn)}
         datas = {e.data.data for e in es}
@@ -177,6 +183,14 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
                 data,
                 state.sdfg.arrays[data]
             )
+        )
+    if not map_exit.in_connectors:
+        state.add_edge(
+            map_inner_nsdfg,
+            None,
+            map_exit,
+            None,
+            dace.memlet.Memlet()
         )
 
     for src in srcs:
@@ -198,6 +212,7 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
                                                     state,
                                                     state.sdfg)
 
+    add_missing_data_and_symbols_to_all_nsdfgs(state.sdfg)
     map_inner_sdfg.validate()
 
     return map_inner_nsdfg
@@ -272,9 +287,9 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     # Create the new nestedSDFG with the ForCFG inside
     # NSDFGP
     ies = if_block_ies
+    interstate_assignments = dict()
     for e in ies:
         if e.data is not None:
-            interstate_assignments = dict()
             for k, v in e.data.assignments.items():
                 if k in interstate_assignments:
                     raise Exception(f"Duplicate interstate assignment {k} in {e.data}, check")
@@ -425,6 +440,23 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
         unroll= scope_entry.map.unroll,
         debuginfo=scope_entry.map.debuginfo,
     )
+    if not nsdfg.in_connectors:
+        state.add_edge(
+            new_map_entry,
+            None,
+            nsdfg,
+            None,
+            dace.memlet.Memlet()
+        )
+    if not nsdfg.out_connectors:
+        state.add_edge(
+            nsdfg,
+            None,
+            new_map_exit,
+            None,
+            dace.memlet.Memlet()
+        )
+
     for in_conn in nsdfg.in_connectors:
         an = state.add_access(in_conn)
         state.add_edge(
@@ -484,6 +516,7 @@ def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
                           if isinstance(n, ConditionalBlock)
                           and any(b is not None and cv in b.as_string for b, _ in n.branches))
         move_if_cfg_inside_map(co.sdfg, co)
+    g.validate()
 
 def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
     num_applied = 0

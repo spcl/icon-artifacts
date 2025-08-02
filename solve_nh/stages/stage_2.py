@@ -108,6 +108,8 @@ def optimization_action(g: SDFG):
 
     if 'predictor_pre' in g.name:
         move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_58'})
+    elif 'corrector_post' in g.name:
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_6', '_if_cond_7', '_if_cond_10', '_if_cond_11'})
     state_fusion_without_copyin_and_copyout(g)
 
     # === Sub-Phase 5: Clean Again ===

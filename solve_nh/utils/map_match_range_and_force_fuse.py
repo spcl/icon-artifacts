@@ -183,9 +183,17 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
 
 
 PRESCRIBED_FUSIONS = {
+    "solve_nh_corrector_pre": [
+        (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
+    ],
     "solve_nh_corrector_post": [
         (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
         (("_for_it_42",), ("_for_it_44",)),
+        (("_for_it_9", "_for_it_10"), ("_for_it_11", "_for_it_12")),
+        (("_for_it_17",), ("_for_it_18",))
+    ],
+    "solve_nh_predictor_pre": [
+        (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
     ],
     "solve_nh_predictor_post": [
         (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
