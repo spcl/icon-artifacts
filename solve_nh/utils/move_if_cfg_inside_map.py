@@ -17,7 +17,7 @@ from typing import Set, Tuple
 
 label_counter = 0
 
-def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEntry):
+def move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEntry):
     global label_counter
     node_map = dict() # Used to deepcopy into the nested SDFG
     map_exit = state.exit_node(map_entry)
@@ -246,7 +246,7 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     nodes_inside = [n for n in state.all_nodes_between(map_entry, state.exit_node(map_entry))]
     assert len(nodes_inside) > 0
     if len(nodes_inside) != 1 or not isinstance(nodes_inside[0], NestedSDFG):
-        _move_map_body_into_nsdfg(state, map_entry)
+        move_map_body_into_nsdfg(state, map_entry)
     nodes_inside = [n for n in state.all_nodes_between(map_entry, state.exit_node(map_entry))]
     assert len(nodes_inside) == 1 and isinstance(nodes_inside[0], NestedSDFG)
     nsdfg, = nodes_inside

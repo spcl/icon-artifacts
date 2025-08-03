@@ -1,11 +1,13 @@
 from copy import deepcopy
 from typing import Any
 from dace import SDFG, symbolic, Memlet
-from dace.sdfg.state import SDFGState
+from dace.properties import CodeBlock
+from dace.sdfg.state import SDFGState, ConditionalBlock, ControlFlowRegion
 from dace.sdfg.nodes import Map, MapEntry, MapExit, AccessNode, Node, NestedSDFG
 from dace.frontend.fortran.ast_utils import singular, atmost_one
 from dace.transformation.helpers import redirect_edge
 from dace.sdfg.propagation import propagate_memlets_sdfg
+from utils.move_if_cfg_inside_map import move_map_body_into_nsdfg
 
 
 def find_parameter_remapping(
@@ -139,9 +141,45 @@ def disambiguate_connectors(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: Map
         cID = recon(m, cID)
 
 
+def extend_range(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
+    if mE1.range == mE2.range:
+        return
+    assert mE1.range.covers_precise(mE2.range) or mE2.range.covers_precise(mE1.range)
+    if not mE2.range.covers_precise(mE1.range):
+        return extend_range(st, mE2, mX2, mE1, mX1)
+    assert mE2.range.covers_precise(mE1.range)
+    move_map_body_into_nsdfg(st, mE1)
+    nodes_inside = [n for n in st.all_nodes_between(mE1, mX1)]
+    assert len(nodes_inside) == 1 and isinstance(nodes_inside[0], NestedSDFG)
+    ng, = nodes_inside
+
+    conds = []
+    for x, r1, r2 in zip(mE1.params, mE1.range, mE2.range):
+        rb1, re1, stride1 = r1
+        rb2, re2, stride2 = r2
+        assert stride1 == stride2
+        if rb1 != rb2:
+            conds.append(f"({x} >= {rb1})")
+        if re1 != re2:
+            conds.append(f"({x} <= {re1})")
+    assert conds
+    cblok = ConditionalBlock('range_extension')
+    cblok.add_branch(CodeBlock(f"{' and '.join(conds)}"), ControlFlowRegion('re_body'))
+    re_body = cblok.branches[0][1]
+    for x in ng.sdfg.nodes():
+        re_body.add_node(x)
+    for x in ng.sdfg.edges():
+        re_body.add_edge(x)
+    for x in ng.sdfg.nodes():
+        ng.sdfg.remove_node(x)
+    ng.sdfg.add_node(cblok)
+    mE1.range = deepcopy(mE2.range)
+
+
 def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
     # g = st.sdfg
     # tCounter = 0  # Counter to disambiguate names
+    extend_range(st, mE1, mX1, mE2, mX2)
     rename_map_parameters(st, mE1.map, mE2.map, mE2)
     disambiguate_connectors(st, mE1, mX1, mE2, mX2)
     P1 = [e.dst for e in st.out_edges(mX1)]
@@ -198,7 +236,9 @@ def map_force_fuse_prescibed(g: SDFG, what_to_fuse:list[tuple[tuple, tuple]]):
         )
         assert mE1_st, f"Missing map {u} specified for forced fusion."
         mE1, st = mE1_st
-        mE2 = singular(n for n, _ in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v)
+        mE2_st = singular((n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v)
+        mE2, ost = mE2_st
+        assert st is ost, f"Expected the two maps to be in the same state; got {st} and {ost} / {g}"
 
         print(f"Attempting a forced fusion of maps: {mE1} & {mE2}")
         map_force_fuse(st, mE1, st.exit_node(mE1), mE2, st.exit_node(mE2))
