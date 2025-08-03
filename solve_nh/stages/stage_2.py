@@ -1,5 +1,5 @@
 from dace import SDFG
-from dace.transformation.dataflow import MapCollapse
+from dace.transformation.dataflow import MapCollapse, MapFusion
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
@@ -9,6 +9,7 @@ from utils.count import count_uncollapsed_maps
 from utils.conditional_pruning import cleanup_conditionals, push_interstate_edges_early, dead_code_cleanup
 from utils.transify_kernel_scalars import transify_sneaky_array_writes_inside_map
 from utils.map_match_range_and_force_fuse import map_force_fuse_prescibed
+from dace.sdfg.propagation import propagate_memlets_sdfg
 from dace.transformation.passes.consolidate_edges import ConsolidateEdges
 
 from utils.clean_unused_data_from_nsdfg_connectors import (
@@ -28,6 +29,7 @@ STAGE_ID = 2
 def optimization_action(g: SDFG):
 
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+    propagate_memlets_sdfg(g)
     # === Sub-Phase 0.1: Push the interstate edge assignments as early as possible ===
     # Also if you find the pattern:
     # if (cond) {
@@ -174,6 +176,8 @@ def optimization_action(g: SDFG):
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     state_fusion_without_copyin_and_copyout(g)
+    state_fusion_without_copyin_and_copyout(g)
+    state_fusion_without_copyin_and_copyout(g)
     g.validate()
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===
 
@@ -183,8 +187,8 @@ def optimization_action(g: SDFG):
             (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
         ],
         "solve_nh_corrector_post": [
+            (("_for_it_7", "_for_it_8"), ("_for_it_9", "_for_it_10")),
             (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
-            (("_for_it_5", "_for_it_6"), ("_for_it_9", "_for_it_10")),
             (("_for_it_42",), ("_for_it_44",)),
             (("_for_it_17",), ("_for_it_18",))
         ],

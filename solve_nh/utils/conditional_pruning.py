@@ -1,15 +1,19 @@
 import sympy
 import ast
 from collections import deque
-from dace import SDFG
+from dace import SDFG, symbolic
 from dace.sdfg.state import ConditionalBlock, SDFGState
 from dace.properties import CodeBlock
 from sympy.logic.boolalg import BooleanTrue, BooleanFalse
 from dace.transformation.passes.simplification.prune_empty_conditional_branches import PruneEmptyConditionalBranches
 from dace.transformation.passes.simplification.control_flow_raising import ControlFlowRaising
+from dace.transformation.passes.dead_dataflow_elimination import DeadDataflowElimination
+from dace.transformation.passes.analysis.analysis import ControlFlowBlockReachability
 from dace.sdfg.nodes import AccessNode, Tasklet
 from dace.sdfg.sdfg import InterstateEdge
 from dace.frontend.fortran.ast_utils import singular, atmost_one
+from dace.sdfg.utils import remove_edge_and_dangling_path
+from dace.transformation.helpers import redirect_edge
 
 
 class LiteralExpressionChecker(ast.NodeVisitor):
@@ -145,6 +149,18 @@ def cleanup_conditionals(g: SDFG):
 
 
 def push_interstate_edges_early(g: SDFG):
+    single_assignment_symbols: dict[str, int] = {}
+    for edge, _ in g.all_edges_recursive():
+        if not isinstance(edge.data, InterstateEdge):
+            continue
+        iedge = edge.data
+        for k in iedge.assignments.keys():
+            if k not in single_assignment_symbols:
+                single_assignment_symbols[k] = 1
+            else:
+                single_assignment_symbols[k] += 1
+    single_assignment_symbols: set[str] = {k for k, v in single_assignment_symbols.items() if v == 1}
+
     # Go through all interstate edges (and push the assignments earlier).
     edge_queue = deque((edge, st) for edge, st in g.all_edges_recursive())
     while len(edge_queue) > 0:
@@ -156,36 +172,66 @@ def push_interstate_edges_early(g: SDFG):
         iedge = edge.data
         if not iedge.assignments:
             continue
-        # Only works when we have only one earlier edge to push towards.
-        if st.in_degree(edge.src) != 1:
-            continue
-        iedge_before = singular(ed for ed in st.in_edges(edge.src))
-        if not isinstance(iedge_before.data, InterstateEdge):
-            continue
         rset, wset = edge.src.read_and_write_sets()
-        # If the produced symbols are being read by the preceding state (at their previous version), we cannot push.
-        if any(k in rset for k in iedge.assignments.keys()):
-            continue
         # If the required symbols are being written by the preceding state, we cannot push.
         if any(k in wset for k in iedge.free_symbols):
             continue
-        # Replace all the required symbols set in the preceding edge into the current edge to avoid ambiguity.
-        iedge.replace_dict(iedge_before.data.assignments, replace_keys=False)
-        remove_keys = set()
-        for k in iedge.assignments.keys():
-            if k in iedge_before.data.used_symbols():
+        if st.in_degree(edge.src) == 1:
+            # This only works when we have only one earlier edge to push towards.
+            iedge_before = singular(ed for ed in st.in_edges(edge.src))
+            if not isinstance(iedge_before.data, InterstateEdge):
                 continue
-            print(
-                f"Node {edge.src}: Pushing interstate edge assignment of {k}: {iedge.assignments[k]} to the preceding edge."
-            )
-            iedge_before.data.assignments[k] = iedge.assignments[k]
-            remove_keys.add(k)
-        # Remove the pushed keys from the current edge.
-        for k in remove_keys:
-            del iedge.assignments[k]
-        # If we pushed something to the preceding edge, we need to (re-)queue that one.
-        if remove_keys:
-            edge_queue.append((iedge_before, st))
+            # Replace all the required symbols set in the preceding edge into the current edge to avoid ambiguity.
+            iedge.replace_dict(iedge_before.data.assignments, replace_keys=False)
+            remove_keys = set()
+            for k in iedge.assignments.keys():
+                # If the produced symbols are being read by the preceding state (at their previous version), we cannot push.
+                if k in iedge_before.data.used_symbols() or k in rset:
+                    continue
+                print(
+                    f"Node {edge.src}: Pushing interstate edge assignment of {k}: {iedge.assignments[k]} to the preceding edge."
+                )
+                iedge_before.data.assignments[k] = iedge.assignments[k]
+                remove_keys.add(k)
+            # Remove the pushed keys from the current edge.
+            for k in remove_keys:
+                del iedge.assignments[k]
+            # If we pushed something to the preceding edge, we need to (re-)queue that one.
+            if remove_keys:
+                edge_queue.append((iedge_before, st))
+        elif st.in_degree(edge.src) == 0:
+            # If we have no predecessors, we can try pushing above instead.
+            pst = st
+            while pst.parent_graph and pst.parent_graph.in_degree(pst) == 0:
+                pst = pst.parent_graph
+            # Again, this only works when we have only one earlier edge to push towards.
+            if pst.parent_graph is None or pst.parent_graph.in_degree(pst) != 1:
+                continue
+            iedge_above = singular(ed for ed in pst.parent_graph.in_edges(pst))
+            if not isinstance(iedge_above.data, InterstateEdge):
+                continue
+            # Replace all the required symbols set in the preceding edge into the current edge to avoid ambiguity.
+            iedge.replace_dict(iedge_above.data.assignments, replace_keys=False)
+            remove_keys = set()
+            for k, v in iedge.assignments.items():
+                access_less_arrays: set[str] = set(st.sdfg.arrays.keys()) - set(n.data for n, _ in st.sdfg.all_nodes_recursive() if isinstance(n, AccessNode))
+                need_syms = set(symbolic.symbols_in_ast(ast.parse(v)))
+                if not need_syms.issubset(access_less_arrays):
+                    continue
+                # If the produced symbols are being read by the preceding state (at their previous version), we cannot push.
+                if k in iedge_above.data.used_symbols() or k in rset:
+                    continue
+                print(
+                    f"Node {edge.src}: Pushing interstate edge assignment of {k}: {iedge.assignments[k]} to the preceding edge."
+                )
+                iedge_above.data.assignments[k] = iedge.assignments[k]
+                remove_keys.add(k)
+            # Remove the pushed keys from the current edge.
+            for k in remove_keys:
+                del iedge.assignments[k]
+            # If we pushed something to the preceding edge, we need to (re-)queue that one.
+            if remove_keys:
+                edge_queue.append((iedge_above, pst.parent_graph))
     g.validate()
 
 

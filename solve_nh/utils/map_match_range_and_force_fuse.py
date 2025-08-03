@@ -157,13 +157,13 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
         wed = singular(ed for ed in st.in_edges(acc))
         assert wed.src is mX1
         pwed = singular(ed for ed in st.in_edges_by_connector(mX1, flip_connector(wed.src_conn)))
-        st.add_edge(pwed.src, pwed.src_conn, acc, None, Memlet(f"{acc.data}"))
+        st.add_edge(pwed.src, pwed.src_conn, acc, None, Memlet.from_memlet(pwed.data))
         st.remove_edge(pwed)
 
         for red in st.out_edges(acc):
             assert red.dst is mE2
             for nred in st.out_edges_by_connector(mE2, flip_connector(red.dst_conn)):
-                st.add_edge(acc, None, nred.dst, nred.dst_conn, Memlet(f"{acc.data}"))
+                st.add_edge(acc, None, nred.dst, nred.dst_conn, Memlet.from_memlet(nred.data))
                 st.remove_edge(nred)
             st.remove_edge(red)
 
