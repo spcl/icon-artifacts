@@ -1,10 +1,11 @@
 from copy import deepcopy
 from typing import Any
-from dace import SDFG, symbolic
+from dace import SDFG, symbolic, Memlet
 from dace.sdfg.state import SDFGState
-from dace.sdfg.nodes import Map, MapEntry, MapExit, AccessNode, Node
+from dace.sdfg.nodes import Map, MapEntry, MapExit, AccessNode, Node, NestedSDFG
 from dace.frontend.fortran.ast_utils import singular, atmost_one
 from dace.transformation.helpers import redirect_edge
+from dace.sdfg.propagation import propagate_memlets_sdfg
 
 
 def find_parameter_remapping(
@@ -116,6 +117,9 @@ def disambiguate_connectors(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: Map
         drops = set(m.in_connectors)
         for c in drops:
             cID += 1
+            while f"IN_rc{cID}" in m.in_connectors:
+                cID += 1
+            assert f"OUT_rc{cID}" not in m.out_connectors
             m.add_in_connector(f"IN_rc{cID}")
             for e in st.in_edges(m):
                 if e.dst_conn == c:
@@ -145,7 +149,7 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
     P3 = [e.src for e in st.in_edges(mE2)]
     inb_accs = [n for n in P1 if n in P3]
     for acc in inb_accs:
-        # while f"{acc.data}_transified_{tCounter}" in g.arrays:
+        # while f"{acc.data}_ffused_{tCounter}" in g.arrays:
         #     tCounter += 1
         # acc_local, _ = g.add_scalar(f"{acc.data}_ffused_{tCounter}", acc.desc(g).dtype, transient=True)
         # acc_local = st.add_access(acc_local)
@@ -153,17 +157,22 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
         wed = singular(ed for ed in st.in_edges(acc))
         assert wed.src is mX1
         pwed = singular(ed for ed in st.in_edges_by_connector(mX1, flip_connector(wed.src_conn)))
-        # if acc.data not in [n.data for n in P2]:
-        #     redirect_edge(st, wed, new_src=mX2)
-        # else:
-        st.remove_edge(wed)
-        redirect_edge(st, pwed, new_dst=acc)
+        st.add_edge(pwed.src, pwed.src_conn, acc, None, Memlet(f"{acc.data}"))
+        st.remove_edge(pwed)
 
         for red in st.out_edges(acc):
             assert red.dst is mE2
             for nred in st.out_edges_by_connector(mE2, flip_connector(red.dst_conn)):
-                redirect_edge(st, nred, new_src=acc)
+                st.add_edge(acc, None, nred.dst, nred.dst_conn, Memlet(f"{acc.data}"))
+                st.remove_edge(nred)
             st.remove_edge(red)
+
+        # if acc.data in [n.data for n in P2]:
+        #     st.remove_node(acc)
+        # else:
+        # redirect_edge(st, wed, new_src=mX2)
+        st.remove_edge(wed)
+
     for ed in st.in_edges(mX1):
         mX2.add_in_connector(ed.dst_conn)
         redirect_edge(st, ed, new_dst=mX2)
@@ -182,32 +191,8 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
     st.remove_node(mE2)
 
 
-PRESCRIBED_FUSIONS = {
-    "solve_nh_corrector_pre": [
-        (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
-    ],
-    "solve_nh_corrector_post": [
-        (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
-        (("_for_it_42",), ("_for_it_44",)),
-        (("_for_it_9", "_for_it_10"), ("_for_it_11", "_for_it_12")),
-        (("_for_it_17",), ("_for_it_18",))
-    ],
-    "solve_nh_predictor_pre": [
-        (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
-    ],
-    "solve_nh_predictor_post": [
-        (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
-        (("_for_it_35",), ("_for_it_37",)),
-    ],
-}
-
-
-def map_force_fuse_prescibed(g: SDFG, what_to_fuse=PRESCRIBED_FUSIONS):
-    if g.name not in what_to_fuse:
-        print(f"No forced-fusion specified for {g.name}.")
-        return
-
-    for u, v in what_to_fuse[g.name]:
+def map_force_fuse_prescibed(g: SDFG, what_to_fuse:list[tuple[tuple, tuple]]):
+    for u, v in what_to_fuse:
         mE1_st = atmost_one(
             (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == u
         )

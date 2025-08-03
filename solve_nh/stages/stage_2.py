@@ -107,10 +107,16 @@ def optimization_action(g: SDFG):
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
     # === Sub-Phase 4: InlineSDFG + MapCollapse For GPU Offloading  ===
 
+    state_fusion_without_copyin_and_copyout(g)
     if 'predictor_pre' in g.name:
         move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_58'})
     elif 'corrector_post' in g.name:
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_6', '_if_cond_7', '_if_cond_10', '_if_cond_11'})
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_7', '_if_cond_10', '_if_cond_11'})
+        # We need to fuse and only then we can unlock `_if_cond_6`
+        map_force_fuse_prescibed(g, [
+            (("_for_it_9", "_for_it_10"), ("_for_it_11", "_for_it_12")),
+        ])
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_6',})
     state_fusion_without_copyin_and_copyout(g)
 
     # === Sub-Phase 5: Clean Again ===
@@ -172,7 +178,25 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===
 
     # Fuse maps
-    map_force_fuse_prescibed(g)
+    PRESCRIBED_FUSIONS = {
+        "solve_nh_corrector_pre": [
+            (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
+        ],
+        "solve_nh_corrector_post": [
+            (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
+            (("_for_it_5", "_for_it_6"), ("_for_it_9", "_for_it_10")),
+            (("_for_it_42",), ("_for_it_44",)),
+            (("_for_it_17",), ("_for_it_18",))
+        ],
+        "solve_nh_predictor_pre": [
+            (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
+        ],
+        "solve_nh_predictor_post": [
+            (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
+            (("_for_it_35",), ("_for_it_37",)),
+        ],
+    }
+    map_force_fuse_prescibed(g, PRESCRIBED_FUSIONS[g.name])
     ConsolidateEdges().apply_pass(g, {})
 
     return g
