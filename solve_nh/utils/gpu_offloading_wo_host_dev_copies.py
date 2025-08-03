@@ -374,66 +374,69 @@ def _replace_connectors_and_nsdfg_desc(
     gpu_arrays: Set[str]
 ):
     for edge in edges:
-        if edge.data is not None:
-            if edge.data.data is not None:
-                data_name = edge.data.data
-                no_gpu_data_name = data_name[4:] if data_name.startswith("gpu_") else data_name
-                if no_gpu_data_name in gpu_arrays:
-                    desc = state.sdfg.arrays[data_name]
-                    if isinstance(desc, dace.data.Array) and desc.storage == dace.dtypes.StorageType.GPU_Global:
-                        # If src_conn starts with "OUT_" (src is MapEntry or Exit)
-                        if isinstance(edge.src, (dace.nodes.MapExit, dace.nodes.MapEntry)):
-                            if edge.src_conn is not None and edge.src_conn.startswith("OUT_"):
-                                rmed = edge.src.remove_out_connector(edge.src_conn)
-                                assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
-                                edge.src_conn = "OUT_" + prefix + no_gpu_data_name
-                                edge.src.add_out_connector(edge.src_conn, force=True)
-                        # If src is NestedSDFG
-                        elif isinstance(edge.src, dace.nodes.NestedSDFG):
-                            assert edge.src_conn is not None, "Expected src_conn to be set for NestedSDFG."
-                            if edge.src_conn != data_name:
-                                edge.src.sdfg.remove_data(edge.src_conn, validate=False)
-                                if data_name not in edge.src.sdfg.arrays:
-                                    copydesc = copy.deepcopy(desc)
-                                    copydesc.storage = dace.dtypes.StorageType.GPU_Global
-                                    copydesc.transient = False
-                                    edge.src.sdfg.add_datadesc(data_name, copydesc)
-                            rmed = edge.src.remove_out_connector(edge.src_conn)
-                            assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
-                            edge.src_conn = data_name
-                            edge.src.add_out_connector(data_name, force=True)
-                        elif isinstance(edge.src, dace.nodes.AccessNode):
-                            edge.src.data = data_name
-                        else:
-                            # Keep the src conn as is
-                            pass
+        if edge.data is None or edge.data.data is None:
+            continue
+        data_name = edge.data.data
+        no_gpu_data_name = data_name[4:] if data_name.startswith("gpu_") else data_name
+        if no_gpu_data_name not in gpu_arrays:
+            continue
+        desc = state.sdfg.arrays[data_name]
+        if not isinstance(desc, dace.data.Array) or desc.storage != dace.dtypes.StorageType.GPU_Global:
+            continue
 
-                        # If dst is NestedSDFG
-                        if isinstance(edge.dst, (dace.nodes.MapExit, dace.nodes.MapEntry)):
-                            # If dst_conn starts with "IN_" (dst is MapExit or Entry)
-                            if edge.dst_conn is not None and edge.dst_conn.startswith("IN_"):
-                                rmed = edge.dst.remove_in_connector(edge.dst_conn)
-                                assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
-                                edge.dst_conn = "IN_" + prefix + no_gpu_data_name
-                                edge.dst.add_in_connector("IN_" + prefix + no_gpu_data_name, force=True)
-                        elif isinstance(edge.dst, dace.nodes.NestedSDFG):
-                            assert edge.dst_conn is not None, "Expected dst_conn to be set for NestedSDFG."
-                            if edge.dst_conn != data_name:
-                                edge.dst.sdfg.remove_data(edge.dst_conn, validate=False)
-                                if data_name not in edge.dst.sdfg.arrays:
-                                    copydesc = copy.deepcopy(desc)
-                                    copydesc.storage = dace.dtypes.StorageType.GPU_Global
-                                    copydesc.transient = False
-                                    edge.dst.sdfg.add_datadesc(data_name, copydesc)
-                            rmed =  edge.dst.remove_in_connector(edge.dst_conn)
-                            assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
-                            edge.dst_conn = data_name
-                            edge.dst.add_in_connector(data_name, force=True)
-                        elif isinstance(edge.dst, dace.nodes.AccessNode):
-                            edge.dst.data = data_name
-                        else:
-                            # Keep the dst conn as is
-                            pass
+        # If src_conn starts with "OUT_" (src is MapEntry or Exit)
+        if isinstance(edge.src, (dace.nodes.MapExit, dace.nodes.MapEntry)):
+            if edge.src_conn is not None and edge.src_conn.startswith("OUT_"):
+                rmed = edge.src.remove_out_connector(edge.src_conn)
+                assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
+                edge.src_conn = "OUT_" + prefix + no_gpu_data_name
+                edge.src.add_out_connector(edge.src_conn, force=True)
+        # If src is NestedSDFG
+        elif isinstance(edge.src, dace.nodes.NestedSDFG):
+            assert edge.src_conn is not None, "Expected src_conn to be set for NestedSDFG."
+            if edge.src_conn != data_name:
+                edge.src.sdfg.remove_data(edge.src_conn, validate=False)
+                if data_name not in edge.src.sdfg.arrays:
+                    copydesc = copy.deepcopy(desc)
+                    copydesc.storage = dace.dtypes.StorageType.GPU_Global
+                    copydesc.transient = False
+                    edge.src.sdfg.add_datadesc(data_name, copydesc)
+            rmed = edge.src.remove_out_connector(edge.src_conn)
+            assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
+            edge.src_conn = data_name
+            edge.src.add_out_connector(data_name, force=True)
+        elif isinstance(edge.src, dace.nodes.AccessNode):
+            edge.src.data = data_name
+        else:
+            # Keep the src conn as is
+            pass
+
+        # If dst is NestedSDFG
+        if isinstance(edge.dst, (dace.nodes.MapExit, dace.nodes.MapEntry)):
+            # If dst_conn starts with "IN_" (dst is MapExit or Entry)
+            if edge.dst_conn is not None and edge.dst_conn.startswith("IN_"):
+                rmed = edge.dst.remove_in_connector(edge.dst_conn)
+                assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
+                edge.dst_conn = "IN_" + prefix + no_gpu_data_name
+                edge.dst.add_in_connector(edge.dst_conn, force=True)
+        elif isinstance(edge.dst, dace.nodes.NestedSDFG):
+            assert edge.dst_conn is not None, "Expected dst_conn to be set for NestedSDFG."
+            if edge.dst_conn != data_name:
+                edge.dst.sdfg.remove_data(edge.dst_conn, validate=False)
+                if data_name not in edge.dst.sdfg.arrays:
+                    copydesc = copy.deepcopy(desc)
+                    copydesc.storage = dace.dtypes.StorageType.GPU_Global
+                    copydesc.transient = False
+                    edge.dst.sdfg.add_datadesc(data_name, copydesc)
+            rmed =  edge.dst.remove_in_connector(edge.dst_conn)
+            assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
+            edge.dst_conn = data_name
+            edge.dst.add_in_connector(data_name, force=True)
+        elif isinstance(edge.dst, dace.nodes.AccessNode):
+            edge.dst.data = data_name
+        else:
+            # Keep the dst conn as is
+            pass
 
 def _replace_names_in_string(text, name_mapping):
     """

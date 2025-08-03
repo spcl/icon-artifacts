@@ -2,6 +2,7 @@ import dace
 import copy
 from dace import SDFG
 from dace.properties import CodeBlock
+from dace.sdfg.nodes import NestedSDFG
 from dace.sdfg.state import ControlFlowRegion, LoopRegion, ConditionalBlock
 from utils.add_missing_symbols import (
     add_missing_data_and_symbols_to_all_nsdfgs,
@@ -10,6 +11,7 @@ from utils.add_missing_symbols import (
     _get_missing_symbols
 )
 from dace.frontend.fortran.ast_utils import singular, atmost_one
+from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 
 from typing import Set, Tuple
 
@@ -241,25 +243,13 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
         return
     map_entry: dace.nodes.MapEntry = map_entries.pop()
     # Map entry either should have only 1 nsdfg or no nested SDFG
-    nsdfgs = {n for n in state.all_nodes_between(map_entry, state.exit_node(map_entry)) if isinstance(n, dace.nodes.NestedSDFG)}
-    if len(nsdfgs) > 1:
-        print("Expected at most one nested SDFG in the map entry")
-        return
-    if len(nsdfgs) == 0:
-        # No nested SDFG, move the body into a new nested SDFG
-        nsdfg = _move_map_body_into_nsdfg(state, map_entry)
-    else:
-        nsdfg = nsdfgs.pop()
-    nsdfgs = {n for n in state.all_nodes_between(map_entry, state.exit_node(map_entry)) if isinstance(n, dace.nodes.NestedSDFG)}
-    assert len(nsdfgs) == 1, "Expected exactly one nested SDFG in the map entry after moving map body to a nested SDFG"
-
-    # Now we have a a ForCFG [State]
-    # In the state we have Map [NSDFG]
-    # We want it to be Map [NSDFGP] and in NSDFGP [ForCFG [NSDFG]]
-
-    # We will do this by adding a new block
-    #previous_block = cfg.parent_graph.in_edges(cfg)[0].src if len(cfg.parent_graph.in_edges(cfg)) > 0 else None
-    #next_block = cfg.parent_graph.out_edges(cfg)[0].dst if len(cfg.parent_graph.out_edges(cfg)) > 0 else None
+    nodes_inside = [n for n in state.all_nodes_between(map_entry, state.exit_node(map_entry))]
+    assert len(nodes_inside) > 0
+    if len(nodes_inside) != 1 or not isinstance(nodes_inside[0], NestedSDFG):
+        _move_map_body_into_nsdfg(state, map_entry)
+    nodes_inside = [n for n in state.all_nodes_between(map_entry, state.exit_node(map_entry))]
+    assert len(nodes_inside) == 1 and isinstance(nodes_inside[0], NestedSDFG)
+    nsdfg, = nodes_inside
 
     # Nested State will have the NSDFGP [ForCFG [NSDFG]] inside
     new_state = if_block.parent_graph.add_state(
@@ -286,15 +276,15 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
 
     # Create the new nestedSDFG with the ForCFG inside
     # NSDFGP
-    ies = if_block_ies
     interstate_assignments = dict()
-    for e in ies:
-        if e.data is not None:
-            for k, v in e.data.assignments.items():
-                if k in interstate_assignments:
-                    raise Exception(f"Duplicate interstate assignment {k} in {e.data}, check")
-                interstate_assignments[k] = v
-            e.data.assignments = dict()
+    for e in if_block_ies:
+        if e.data is None:
+            continue
+        for k, v in e.data.assignments.items():
+            if k in interstate_assignments:
+                raise Exception(f"Duplicate interstate assignment {k} in {e.data}, check")
+            interstate_assignments[k] = v
+        e.data.assignments = dict()
 
     assert map_entry in state.nodes(), "Expected the map entry to be in the state"
     assert len(new_state.nodes()) == 0, "Expected the new state to be empty"
@@ -516,6 +506,7 @@ def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
                           if isinstance(n, ConditionalBlock)
                           and any(b is not None and cv in b.as_string for b, _ in n.branches))
         move_if_cfg_inside_map(co.sdfg, co)
+    state_fusion_without_copyin_and_copyout(g)
     g.validate()
 
 def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
