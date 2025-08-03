@@ -7,6 +7,8 @@ from dace.sdfg.nodes import Map, MapEntry, MapExit, AccessNode, Node, NestedSDFG
 from dace.frontend.fortran.ast_utils import singular, atmost_one
 from dace.transformation.helpers import redirect_edge
 from dace.sdfg.propagation import propagate_memlets_sdfg
+from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
+from utils.conditional_pruning import push_interstate_edges_early
 from utils.move_if_cfg_inside_map import move_map_body_into_nsdfg
 
 
@@ -230,6 +232,8 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
 
 
 def map_force_fuse_prescibed(g: SDFG, what_to_fuse:list[tuple[tuple, tuple]]):
+    push_interstate_edges_early(g)
+    state_fusion_without_copyin_and_copyout(g)
     for u, v in what_to_fuse:
         mE1_st = atmost_one(
             (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == u

@@ -175,8 +175,7 @@ def optimization_action(g: SDFG):
     g.validate()
     count_map_dimensions(g)
     count_uncollapsed_maps(g, verbose=False, use_assert=True)
-    state_fusion_without_copyin_and_copyout(g)
-    state_fusion_without_copyin_and_copyout(g)
+    push_interstate_edges_early(g)
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===

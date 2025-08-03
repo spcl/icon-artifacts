@@ -1,10 +1,16 @@
 import dace
 
-def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG):
-    state_fusion_without_copyin_and_copyout_impl(sdfg, True)
+def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG) -> bool:
+    changed_something = state_fusion_without_copyin_and_copyout_impl(sdfg, True)
+    if not changed_something:
+        return False
+    while changed_something:
+        changed_something = state_fusion_without_copyin_and_copyout_impl(sdfg, True)
+    return True
 
-def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copyin_and_copyout: bool = True):
+def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copyin_and_copyout: bool = True) -> bool:
     from dace.transformation.interstate import StateFusion, BlockFusion  # Avoid import loop
+    changed_something = False
     if sdfg_with_copyin_and_copyout:
         copy_in = sdfg.start_block
         copy_out = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0][0]
@@ -44,6 +50,7 @@ def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copy
                         if bf.can_be_applied(cfg, 0, sd):
                             bf.apply(cfg, sd)
                             applied += 1
+                            changed_something = True
                             skip_nodes.add(u)
                             skip_nodes.add(v)
                 if applied == 0:
@@ -52,4 +59,5 @@ def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copy
     for s in sdfg.all_states():
         for n in s.nodes():
             if isinstance(n, dace.nodes.NestedSDFG):
-                state_fusion_without_copyin_and_copyout_impl(n.sdfg, sdfg_with_copyin_and_copyout=False)
+                changed_something = changed_something or state_fusion_without_copyin_and_copyout_impl(n.sdfg, sdfg_with_copyin_and_copyout=False)
+    return changed_something
