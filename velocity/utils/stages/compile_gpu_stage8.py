@@ -52,7 +52,7 @@ def optimization_action(sdfg):
     print("gpu_levmask new shape:", gpu_levmask_desc.shape, "new strides:", gpu_levmask_desc.strides)
     #raise Exception("DEBUG: PermuteArrayDimensions applied, check gpu_levmask shape and strides")
 
-    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '1').lower() in ('1', 'true', 'yes')
+    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0').lower() in ('1', 'true', 'yes')
     if do_reduce_bitwidth:
         # nproma dependent ones
         sdfg = decrease_bitwidth_of_const_arrays(sdfg,
