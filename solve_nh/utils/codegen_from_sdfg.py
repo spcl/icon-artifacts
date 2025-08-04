@@ -366,7 +366,8 @@ class Compiler:
         """
         return [
             "-fPIC",  # Generate Position-Independent Code, essential for shared libraries.
-            "-fopenmp",  # Enable OpenMP directives for parallel processing.
+            # DISABLED: No OpenMP for us.
+            # "-fopenmp",  # Enable OpenMP directives for parallel processing.
         ]
 
     def _get_standard_flags_cuda(self) -> list[str]:
@@ -377,7 +378,8 @@ class Compiler:
         # Host compiler flags are passed to the underlying C++ compiler via -Xcompiler.
         host_flags = [
             "-Xcompiler=-fPIC",  # Host: Generate Position-Independent Code.
-            "-Xcompiler=-fopenmp",  # Host: Enable OpenMP.
+            # DISABLED: No OpenMP for us.
+            # "-Xcompiler=-fopenmp",  # Host: Enable OpenMP.
         ]
 
         # Device architecture flags:
