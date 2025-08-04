@@ -798,20 +798,24 @@ def consolidate_generated_code(
         ),
         ("__state->gpu_context->streams[0]", "nullptr"),
     ]
-
-    # Format again after replacements
     _run_command(["clang-format", "-i", str(header_path), str(source_path)])
     print(f"Consolidated generated code into {header_path} and {source_path}")
 
     src_content = source_path.read_text()
     for old, new in replacements:
         src_content = src_content.replace(old, new)
+    # Then, we need to put back `extern "C"` for the actual interface functions.
+    for x in ["predictor_pre", "predictor_post", "corrector_pre", "corrector_post"]:
+        for look_for in [f"solve_nh_{x}_state_t *__dace_init_solve_nh_{x}(", f"void __program_solve_nh_{x}(", f"int __dace_exit_solve_nh_{x}("]:
+            src_content = src_content.replace(look_for, f'extern "C" {look_for}')
     source_path.write_text(src_content)
+    _run_command(["clang-format", "-i", str(source_path)])
 
     header_content = header_path.read_text()
     for old, new in replacements:
         header_content = header_content.replace(old, new)
     header_path.write_text(header_content)
+    _run_command(["clang-format", "-i", str(header_path)])
 
     if stage >= GPU_STAGE_BEGINS:
         # Apply specific replacements
@@ -821,13 +825,11 @@ def consolidate_generated_code(
             ("__state->gpu_context->streams[0]", "nullptr"),
         ]
 
-        # Format again after replacements
-        _run_command(["clang-format", "-i", str(cuda_source_path)])
-
         cuda_src_content = cuda_source_path.read_text()
         for old, new in replacements:
             cuda_src_content = cuda_src_content.replace(old, new)
         cuda_source_path.write_text(cuda_src_content)
+        _run_command(["clang-format", "-i", str(cuda_source_path)])
 
 
 def compile_generated_code(
