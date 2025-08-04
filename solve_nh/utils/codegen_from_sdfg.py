@@ -366,6 +366,7 @@ class Compiler:
         """
         return [
             "-fPIC",  # Generate Position-Independent Code, essential for shared libraries.
+            "-pthread",
             # DISABLED: No OpenMP for us.
             # "-fopenmp",  # Enable OpenMP directives for parallel processing.
         ]
@@ -378,6 +379,7 @@ class Compiler:
         # Host compiler flags are passed to the underlying C++ compiler via -Xcompiler.
         host_flags = [
             "-Xcompiler=-fPIC",  # Host: Generate Position-Independent Code.
+            "-Xcompiler=-pthread",  # Host: Enable pthread.
             # DISABLED: No OpenMP for us.
             # "-Xcompiler=-fopenmp",  # Host: Enable OpenMP.
         ]
