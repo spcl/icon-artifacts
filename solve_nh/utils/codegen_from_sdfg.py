@@ -723,25 +723,31 @@ def consolidate_generated_code(
 
     # WARNING: INSANE THINGS DONE HERE TO MAKE SHALLOW COPY WORK.
     import re
-    pattern_1 = re.compile(
-        r'\b(int\*|double\*)\s+(out___(.+?))\s*=\s*__state->__0___(.+?);',
-        re.DOTALL
-    )
-    pattern_2 = re.compile(
-        r'\b(int\*|double\*)\s+(out_gpu___(.+?))\s*=\s*__state->__0___(.+?);',
-        re.DOTALL
-    )
-    for pattern in [pattern_1, pattern_2]:
-        def replacer(match):
-            type_ptr, full_lhs, lhs_suffix, rhs_suffix = match.groups()
-            if lhs_suffix == rhs_suffix:
-                print(f"INSANITY: {type_ptr}__restrict__& {full_lhs} = __state->__0___{rhs_suffix};")
-                return f'{type_ptr}__restrict__& {full_lhs} = __state->__0___{rhs_suffix};'
-            else:
-                # keep original text unchanged
-                print(f"KEEPING: {lhs_suffix} / {rhs_suffix}")
-                return match.group(0)
-        combined_source = pattern.sub(replacer, combined_source)
+    patterns = [
+        (re.compile(
+            r'\b(int\*|double\*)\s+(out___(.+?))\s*=\s*__state->__0___(.+?);',
+            re.DOTALL),
+        '__0___'),
+
+        (re.compile(
+            r'\b(int\*|double\*)\s+(out_gpu___(.+?))\s*=\s*__state->__0_gpu___(.+?);',
+            re.DOTALL),
+        '__0_gpu___')
+    ]
+
+    for pattern, rhs_prefix in patterns:
+        def make_replacer(prefix):
+            def replacer(match):
+                type_ptr, full_lhs, lhs_suffix, rhs_suffix = match.groups()
+                if lhs_suffix == rhs_suffix:
+                    print(f"INSANITY: {type_ptr}__restrict__& {full_lhs} = __state->{prefix}{rhs_suffix};")
+                    return f'{type_ptr}__restrict__& {full_lhs} = __state->{prefix}{rhs_suffix};'
+                else:
+                    print(f"KEEPING: {lhs_suffix} / {rhs_suffix}")
+                    return match.group(0)
+            return replacer
+
+        combined_source = pattern.sub(make_replacer(rhs_prefix), combined_source)
 
     store.mkdir(parents=True, exist_ok=True)
     header_path = store / CONSOLIDATED_HEADER
