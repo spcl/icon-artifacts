@@ -721,6 +721,23 @@ def consolidate_generated_code(
         "**__restrict__", "*__restrict *__restrict__"
     )
 
+    # WARNING: INSANE THINGS DONE HERE TO MAKE SHALLOW COPY WORK.
+    import re
+    pattern = re.compile(
+        r'\b(int\*|double\*)\s+(out___(.+?))\s*=\s*__state->__0___(.+?);',
+        re.DOTALL
+    )
+    def replacer(match):
+        type_ptr, full_lhs, lhs_suffix, rhs_suffix = match.groups()
+        if lhs_suffix == rhs_suffix:
+            print(f"INSANITY: {type_ptr}__restrict__& {full_lhs} = __state->__0___{rhs_suffix};")
+            return f'{type_ptr}__restrict__& {full_lhs} = __state->__0___{rhs_suffix};'
+        else:
+            # keep original text unchanged
+            print(f"KEEPING: {lhs_suffix} / {rhs_suffix}")
+            return match.group(0)
+    combined_source = pattern.sub(replacer, combined_source)
+
     store.mkdir(parents=True, exist_ok=True)
     header_path = store / CONSOLIDATED_HEADER
     source_path = store / CONSOLIDATED_SOURCE
