@@ -1,4 +1,3 @@
-import os
 import dace
 from dace import SDFG
 from dace.sdfg.state import LoopRegion
@@ -23,10 +22,7 @@ from utils.assignment_and_copy_kernel_to_memset_and_memcpy import (
 
 from utils.int64_to_int32 import int64_to_int32 as int64_to_int32
 
-from utils.reduce_bitwidth import (
-    force_decrease_bitwidth_of_nblk_arrays,
-    decrease_bitwidth_of_const_arrays
-)
+from utils.reduce_bitwidth import force_decrease_bitwidth_of_nblk_arrays, decrease_bitwidth_of_const_arrays
 
 import argparse
 
@@ -34,7 +30,7 @@ import argparse
 STAGE_ID = 3
 
 
-def optimization_action(g: SDFG):
+def optimization_action(g: SDFG, use_bitwidth_opt: bool):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
 
     # === Sub-Phase 1: Offloading ===
@@ -74,26 +70,25 @@ def optimization_action(g: SDFG):
     # Possible candidates I see:
     # __CG_p_nh__CG_metrics__m_bdy_mflx_e_idx
     # __CG_p_nh__CG_metrics__m_bdy_mflx_e_blk
-    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0').lower() in ('1', 'true', 'yes')
-    if do_reduce_bitwidth:
+    if use_bitwidth_opt:
         # This will not work with graphs that have velocity tendencies calls
         # TODO: This fails because we can't change data going into the velocity tendencies tasklets
         # TODO: Run this only for post, or run make it ignore for velcoty
-        if not ("predictor_pre" in g.name or "corrector_pre" in g.name):
-            nproma_dependent_array_names={
+        if not any(x in g.name for x in ["predictor_pre", "corrector_pre"]):
+            nproma_dependent_array_names = {
                 "gpu___CG_p_patch__CG_cells__m_edge_idx",
-                #"gpu___CG_p_patch__CG_cells__m_end_index", #CPU Only
+                # "gpu___CG_p_patch__CG_cells__m_end_index", #CPU Only
                 "gpu___CG_p_patch__CG_cells__m_neighbor_idx",
-                #"gpu___CG_p_patch__CG_cells__m_start_index", #CPU Only
+                # "gpu___CG_p_patch__CG_cells__m_start_index", #CPU Only
                 "gpu___CG_p_patch__CG_edges__m_cell_idx",
-                #"gpu___CG_p_patch__CG_edges__m_end_index", #CPU Only
+                # "gpu___CG_p_patch__CG_edges__m_end_index", #CPU Only
                 "gpu___CG_p_patch__CG_edges__m_quad_idx",
-                #"gpu___CG_p_patch__CG_edges__m_start_index", #CPU Only
+                # "gpu___CG_p_patch__CG_edges__m_start_index", #CPU Only
                 "gpu___CG_p_patch__CG_edges__m_vertex_idx",
                 "gpu___CG_p_patch__CG_verts__m_cell_idx",
                 "gpu___CG_p_patch__CG_verts__m_edge_idx",
-                #"gpu___CG_p_patch__CG_verts__m_end_index", #CPU Only
-                #"gpu___CG_p_patch__CG_verts__m_start_index", #CPU Only
+                # "gpu___CG_p_patch__CG_verts__m_end_index", #CPU Only
+                # "gpu___CG_p_patch__CG_verts__m_start_index", #CPU Only
             }
             nproma_name = "__CG_global_data__m_nproma"
             g = decrease_bitwidth_of_const_arrays(
@@ -104,27 +99,27 @@ def optimization_action(g: SDFG):
                 num_final_states_to_skip=2,  # Skip deflatetn, copy_out
             )
             g.validate()
-            multi_val_blk_array_names={
-                #"gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
-                "gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
-                #"gpu___CG_p_patch__CG_edges__m_cell_blk", #1
-                "gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
-                "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
-                #"gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
-                #"gpu___CG_p_patch__CG_verts__m_cell_blk", #1
-                "gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
-                #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
+            multi_val_blk_array_names = {
+                # "gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
+                "gpu___CG_p_patch__CG_cells__m_edge_blk",  # 1,2
+                # "gpu___CG_p_patch__CG_edges__m_cell_blk", #1
+                "gpu___CG_p_patch__CG_edges__m_quad_blk",  # 1,2
+                "gpu___CG_p_patch__CG_edges__m_neighbor_blk",  # 1,2
+                # "gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
+                # "gpu___CG_p_patch__CG_verts__m_cell_blk", #1
+                "gpu___CG_p_patch__CG_verts__m_edge_blk",  # 1,2
+                # "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
             }
-            single_val_blk_array_names={
-                "gpu___CG_p_patch__CG_cells__m_neighbor_blk", #1
-                #"gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
-                "gpu___CG_p_patch__CG_edges__m_cell_blk", #1
-                #"gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
-                #"gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
-                "gpu___CG_p_patch__CG_edges__m_vertex_blk", #1
-                "gpu___CG_p_patch__CG_verts__m_cell_blk", #1
-                #"gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
-                "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1
+            single_val_blk_array_names = {
+                "gpu___CG_p_patch__CG_cells__m_neighbor_blk",  # 1
+                # "gpu___CG_p_patch__CG_cells__m_edge_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_cell_blk",  # 1
+                # "gpu___CG_p_patch__CG_edges__m_quad_blk", #1,2
+                # "gpu___CG_p_patch__CG_edges__m_neighbor_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_vertex_blk",  # 1
+                "gpu___CG_p_patch__CG_verts__m_cell_blk",  # 1
+                # "gpu___CG_p_patch__CG_verts__m_edge_blk", #1,2
+                "gpu___CG_p_patch__CG_edges__m_neighbor_blk",  # 1
             }
             g = force_decrease_bitwidth_of_nblk_arrays(
                 sdfg=g,
@@ -151,6 +146,7 @@ def main():
     argp.add_argument("--optimize", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument("--codegen", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument("--bitwidth", action=argparse.BooleanOptionalAction, default=True)
     argp.add_argument(
         "--mode",
         type=ArtifactMode,
@@ -183,7 +179,7 @@ def main():
             g.name = name
             g.validate()
 
-            g = optimization_action(g)
+            g = optimization_action(g, args.bitwidth)
 
             g.save(outfile, compress=True)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
