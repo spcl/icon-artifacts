@@ -159,6 +159,7 @@ def rm_redundant_copies(sdfg: dace.SDFG):
 # and copy them to the GPU.
 cpu_gpu_copies_to_keep = {
     "gpu___CG_global_data__m_ndyn_substeps_var",
+    "gpu___CG_global_data__m_kstart_dd3d",  # ADDED BY PRATYAI, AS PER BEN'S SUGGESTION.
 }
 
 def _find_flatten_node_and_state(sdfg: dace.SDFG):
