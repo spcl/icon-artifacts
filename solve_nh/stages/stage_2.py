@@ -198,6 +198,7 @@ def optimization_action(g: SDFG):
         "solve_nh_predictor_post": [
             (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
             (("_for_it_35",), ("_for_it_37",)),
+            (("_for_it_21", "_for_it_22"), ("_for_it_23", "_for_it_24")),
         ],
     }
     map_force_fuse_prescibed(g, PRESCRIBED_FUSIONS[g.name])

@@ -1,3 +1,4 @@
+from copy import deepcopy
 import sympy
 import ast
 from collections import deque
@@ -144,6 +145,15 @@ def cleanup_conditionals(g: SDFG):
                 st.add_edge(dummyst, e.dst, e.data)
                 st.remove_edge(e)
             st.remove_node(node)
+        if yep is not None and len(node._branches) == 1:
+            print(f"Node {node}: Condition is always true, so inlining entirely.")
+            node.inline()
+    for e, st in g.all_edges_recursive():
+        if not isinstance(e.data, InterstateEdge) or not e.data.condition:
+            continue
+        cval, _ = evaluate_literal_expression(ast.parse(e.data.condition.as_string, mode="eval").body)
+        if cval is False:
+            st.remove_edge(e)
     PruneEmptyConditionalBranches().apply_pass(g, {})
     g.validate()
 
@@ -181,6 +191,8 @@ def push_interstate_edges_early(g: SDFG):
             iedge_before = singular(ed for ed in st.in_edges(edge.src))
             if not isinstance(iedge_before.data, InterstateEdge):
                 continue
+            if iedge_before.src.label == 'entry_interface':
+                continue
             # Replace all the required symbols set in the preceding edge into the current edge to avoid ambiguity.
             iedge.replace_dict(iedge_before.data.assignments, replace_keys=False)
             remove_keys = set()
@@ -214,7 +226,8 @@ def push_interstate_edges_early(g: SDFG):
             iedge.replace_dict(iedge_above.data.assignments, replace_keys=False)
             remove_keys = set()
             for k, v in iedge.assignments.items():
-                access_less_arrays: set[str] = set(st.sdfg.arrays.keys()) - set(n.data for n, _ in st.sdfg.all_nodes_recursive() if isinstance(n, AccessNode))
+                access_less_arrays: set[str] = (set(st.sdfg.arrays.keys()) 
+                    - set(n.data for n, t in st.sdfg.all_nodes_recursive() if isinstance(n, AccessNode) if t.label not in {'entry_interface', 'exit_interface'}))
                 need_syms = set(symbolic.symbols_in_ast(ast.parse(v)))
                 if not need_syms.issubset(access_less_arrays):
                     continue
