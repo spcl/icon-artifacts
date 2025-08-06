@@ -181,6 +181,7 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 8: Re-collapse After Manual Improvements ===
 
     # Fuse maps
+    ConsolidateEdges().apply_pass(g, {})
     PRESCRIBED_FUSIONS = {
         "solve_nh_corrector_pre": [
             (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
@@ -188,7 +189,6 @@ def optimization_action(g: SDFG):
         "solve_nh_corrector_post": [
             (("_for_it_7", "_for_it_8"), ("_for_it_9", "_for_it_10")),
             (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
-            (("_for_it_42",), ("_for_it_44",)),
             (("_for_it_17",), ("_for_it_18",)),
             (("_for_it_37", "_for_it_38"), ("_for_it_39", "_for_it_40"))
         ],
@@ -197,8 +197,24 @@ def optimization_action(g: SDFG):
         ],
         "solve_nh_predictor_post": [
             (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
-            (("_for_it_35",), ("_for_it_37",)),
             (("_for_it_21", "_for_it_22"), ("_for_it_23", "_for_it_24")),
+            (("_for_it_30", "_for_it_31"), ("_for_it_32", "_for_it_33")),
+        ],
+    }
+    map_force_fuse_prescibed(g, PRESCRIBED_FUSIONS[g.name])
+    ConsolidateEdges().apply_pass(g, {})
+    PRESCRIBED_FUSIONS = {
+        "solve_nh_corrector_pre": [
+            # (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
+        ],
+        "solve_nh_corrector_post": [
+            (("_for_it_42",), ("_for_it_44",)),
+        ],
+        "solve_nh_predictor_pre": [
+            # (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
+        ],
+        "solve_nh_predictor_post": [
+            (("_for_it_35",), ("_for_it_37",)),
         ],
     }
     map_force_fuse_prescibed(g, PRESCRIBED_FUSIONS[g.name])
