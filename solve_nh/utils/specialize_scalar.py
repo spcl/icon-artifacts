@@ -121,16 +121,7 @@ def specialize_scalar_impl(root: dace.SDFG, sdfg: dace.SDFG, scalar_name: str, s
                     )
 
     for edge in sdfg.all_interstate_edges(recursive=True):
-        if edge.data is not None:
-            nassignments = dict()
-            for k, v in edge.data.assignments.items():
-                _k = k.replace(scalar_name, str(scalar_val))
-                if isinstance(v, CodeBlock):
-                    _v = CodeBlock(v.as_string().replace(scalar_name, str(scalar_val)))
-                else:
-                    _v = v.replace(scalar_name, str(scalar_val))
-                nassignments[_k] = _v
-            edge.data.assignments = nassignments
+        edge.data.replace_dict({f"{scalar_name}": f"{scalar_val}"})
 
     if root != sdfg:
         if scalar_name in sdfg.parent_nsdfg_node.symbol_mapping:
