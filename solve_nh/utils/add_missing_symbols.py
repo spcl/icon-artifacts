@@ -256,12 +256,10 @@ def add_missing_data_and_symbols(root: dace.SDFG, _parent_graph, _parent_sdfg: d
 
     for ms in missing_symbols:
         if ms in _parent_sdfg.symbols:
-            assert ms in _parent_sdfg.symbols, f"Symbol {ms} not found in parent SDFG {parent_sdfg.name}"
             parent_nsdfg_node.symbol_mapping[ms] = ms
             sdfg.add_symbol(ms, _parent_sdfg.symbols[ms])
-        else:
-            if ms not in sdfg.symbols:
-                sdfg.add_symbol(ms, dace.int32)
+        elif ms not in sdfg.symbols:
+            sdfg.add_symbol(ms, dace.int32)
 
 def add_missing_data_and_symbols_to_all_nsdfgs(sdfg: dace.SDFG):
     for node, graph in sdfg.all_nodes_recursive():
