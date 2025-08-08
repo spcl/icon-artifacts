@@ -9,7 +9,7 @@ from utils.codegen_from_sdfg import (
     compile_generated_code,
     consolidate_generated_code,
     ArtifactMode,
-    GPU_STAGE_BEGINS
+    GPU_STAGE_BEGINS,
 )
 
 STARTER_SDFG_FILES = [
@@ -26,7 +26,7 @@ def sdfg_names(verify: bool = False) -> list[str]:
     if verify:
         for f in STARTER_SDFG_FILES:
             assert Path(f).exists()
-    return list(sorted(Path(f).stem for f in STARTER_SDFG_FILES))
+    return list(Path(f).stem for f in STARTER_SDFG_FILES)
 
 
 def stage_input(name: str, stage: int, codegen_dir=DEFAULT_CODEGEN_DIR) -> str:
@@ -71,18 +71,20 @@ def codegen_action(
         g.build_folder = f"{DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
         generate_code_from_sdfg(g)
     SDFG_INCLUDES = [Path(g.build_folder) / "include/" for _, g in sdfgs.items()]
-    SDFG_SRCS = [
-        Path(g.build_folder) / "src/cpu" / f"{g.name}.cpp" for _, g in sdfgs.items()
-    ]
-    SDFG_CUDA_SRCS = [
-        Path(g.build_folder) / "src/cuda" / f"{g.name}_cuda.cu" for _, g in sdfgs.items()
-    ]
+    SDFG_SRCS = [Path(g.build_folder) / "src/cpu" / f"{g.name}.cpp" for _, g in sdfgs.items()]
+    SDFG_CUDA_SRCS = [Path(g.build_folder) / "src/cuda" / f"{g.name}_cuda.cu" for _, g in sdfgs.items()]
     consolidate_generated_code(
-        SDFG_INCLUDES, SDFG_SRCS, SDFG_CUDA_SRCS, Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}"), stage,
+        SDFG_INCLUDES,
+        SDFG_SRCS,
+        SDFG_CUDA_SRCS,
+        Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}"),
+        stage,
     )
 
 
-def compile_action(stage: int, artifact_mode: ArtifactMode, optimization_mode: OptimizationMode = OptimizationMode.DEBUG) -> None:
+def compile_action(
+    stage: int, artifact_mode: ArtifactMode, optimization_mode: OptimizationMode = OptimizationMode.DEBUG
+) -> None:
     SDFG_INCLUDES = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}")]
     SDFG_SRCS = [Path(f"{DEFAULT_CODEGEN_DIR}/stage{stage}/solve_nh_parts.cpp")]
     if stage >= GPU_STAGE_BEGINS:
