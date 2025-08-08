@@ -33,8 +33,8 @@ def move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEnt
     )
 
     # Get all input and output data of the map
-    srcs = {e.data.data for e in state.in_edges(map_entry)}
-    dsts = {e.data.data for e in state.out_edges(map_exit)}
+    srcs = {e.data.data for e in state.in_edges(map_entry) if e.dst_conn.startswith('IN_')}
+    dsts = {e.data.data for e in state.out_edges(map_exit) if e.src_conn.startswith('OUT_')}
 
     # This data needs to explicitly be added through the parent scopes
     explicitly_add = set()  # Data that should be explicitly added to the map inner state
@@ -42,11 +42,12 @@ def move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEnt
     # If write -> An -> read, then the An does not have to be in the in/out edges, but if in nsdfg, we still
     # will need to add it
     for n in state.all_nodes_between(map_entry, map_exit):
-        if isinstance(n, dace.nodes.AccessNode):
-            if state.in_degree(n) > 0 and state.out_degree(n) > 0:
-                dsts.add(n.data)
-                srcs.add(n.data)
-                explicitly_add.add(n.data)
+        if not isinstance(n, dace.nodes.AccessNode):
+            continue
+        if state.in_degree(n) > 0 and state.out_degree(n) > 0 and 'transified' not in n.data:
+            dsts.add(n.data)
+            srcs.add(n.data)
+            explicitly_add.add(n.data)
     #if explicitly_add:
     #    raise Exception(f"Explicitly adding {explicitly_add} data to the map inner state, this should not happen, check")
     label_counter += 1
@@ -135,6 +136,19 @@ def move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEnt
 
     # Add nested SDFG between the map entry and exit, make sure all symbols that might be used are defined
     needed_symbols = state.symbols_defined_at(map_entry)
+    matryoshka = [state]
+    while matryoshka[-1].parent_graph:
+        matryoshka.append(matryoshka[-1].parent_graph)
+    def dfs(_g, _u, seen):
+        assert _u not in seen
+        seen.add(_u)
+        for e in _g.in_edges(_u):
+            needed_symbols.update(e.data.new_symbols(_g.sdfg, needed_symbols))
+            if e.src not in seen:
+                dfs(_g, e.src, seen)
+    for st in reversed(matryoshka[:-1]):
+        seen = set()
+        dfs(st.parent_graph, st, seen)
     for sym_key, sym_val in needed_symbols.items():
         map_inner_sdfg.add_symbol(name=sym_key, stype=sym_val, find_new_name=False)
 
@@ -303,10 +317,8 @@ def move_if_cfg_inside_map(sdfg: dace.SDFG, if_block: ConditionalBlock):
     missing_symbols = _get_missing_symbols(if_nsdfg)
     if missing_symbols:
         print(f"Missing symbols in the new nested SDFG: {missing_symbols}")
-        add_missing_data_and_symbols_to_all_nsdfgs(
-            sdfg
-        )
-        sdfg.validate()
+        add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
+    sdfg.validate()
 
 
 def move_if_cfg_inside_map_from_labels(sdfg: dace.SDFG, labels: Set[str]):
@@ -505,6 +517,7 @@ def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
         co = singular(n for n, _ in g.all_nodes_recursive()
                           if isinstance(n, ConditionalBlock)
                           and any(b is not None and cv in b.as_string for b, _ in n.branches))
+        g.validate()
         move_if_cfg_inside_map(co.sdfg, co)
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
