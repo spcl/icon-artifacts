@@ -10,6 +10,7 @@ from dace.sdfg.propagation import propagate_memlets_sdfg
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 from utils.conditional_pruning import push_interstate_edges_early
 from utils.move_if_cfg_inside_map import move_map_body_into_nsdfg
+from dace.transformation.passes.constant_propagation import ConstantPropagation
 
 
 def find_parameter_remapping(
@@ -153,7 +154,7 @@ def extend_range(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2:
     move_map_body_into_nsdfg(st, mE1)
     nodes_inside = [n for n in st.all_nodes_between(mE1, mX1)]
     assert len(nodes_inside) == 1 and isinstance(nodes_inside[0], NestedSDFG)
-    ng, = nodes_inside
+    (ng,) = nodes_inside
 
     conds = []
     for x, r1, r2 in zip(mE1.params, mE1.range, mE2.range):
@@ -165,8 +166,8 @@ def extend_range(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2:
         if re1 != re2:
             conds.append(f"({x} <= {re1})")
     assert conds
-    cblok = ConditionalBlock('range_extension')
-    cblok.add_branch(CodeBlock(f"{' and '.join(conds)}"), ControlFlowRegion('re_body'))
+    cblok = ConditionalBlock("range_extension")
+    cblok.add_branch(CodeBlock(f"{' and '.join(conds)}"), ControlFlowRegion("re_body"))
     re_body = cblok.branches[0][1]
     for x in ng.sdfg.nodes():
         re_body.add_node(x)
@@ -231,16 +232,19 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
     st.remove_node(mE2)
 
 
-def map_force_fuse_prescibed(g: SDFG, what_to_fuse:list[tuple[tuple, tuple]]):
-    push_interstate_edges_early(g)
-    state_fusion_without_copyin_and_copyout(g)
+def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
     for u, v in what_to_fuse:
+        push_interstate_edges_early(g)
+        ConstantPropagation().apply_pass(g, {})
+        state_fusion_without_copyin_and_copyout(g)
         mE1_st = atmost_one(
             (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == u
         )
         assert mE1_st, f"Missing map {u} specified for forced fusion."
         mE1, st = mE1_st
-        mE2_st = singular((n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v)
+        mE2_st = singular(
+            (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v
+        )
         mE2, ost = mE2_st
         assert st is ost, f"Expected the two maps to be in the same state; got {st} and {ost} / {g}"
 
