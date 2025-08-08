@@ -13,72 +13,6 @@ from utils.move_if_cfg_inside_map import move_map_body_into_nsdfg
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 
 
-def find_parameter_remapping(
-    first_map: Map,
-    second_map: Map,
-) -> dict[str, str]:
-    # The parameter names
-    first_params: list[str] = first_map.params
-    second_params: list[str] = second_map.params
-    assert len(first_params) == len(second_params)
-
-    first_rngs: dict[str, tuple[Any, Any, Any]] = {
-        param: tuple(r for r in rng) for param, rng in zip(first_params, first_map.range)
-    }
-    second_rngs: dict[str, tuple[Any, Any, Any]] = {
-        param: tuple(r for r in rng) for param, rng in zip(second_params, second_map.range)
-    }
-
-    # Parameters of the second map that have not yet been matched to a parameter
-    #  of the first map and the parameters of the first map that are still free.
-    #  That we use a `list` instead of a `set` is intentional, because it counter
-    #  acts the issue that is described in the doc string. Using a list ensures
-    #  that they indexes are matched in order. This assume that in real world
-    #  code the order of the loop is not arbitrary but kind of matches.
-    unmapped_second_params: list[str] = list(second_params)
-    unused_first_params: list[str] = list(first_params)
-
-    # This is the result (`second_param -> first_param`), note that if no renaming
-    #  is needed then the parameter is not present in the mapping.
-    final_mapping: dict[str, str] = {}
-
-    # First we identify the parameters that already have the correct name.
-    for param in set(first_params).intersection(second_params):
-        first_rng = first_rngs[param]
-        second_rng = second_rngs[param]
-
-        if first_rng == second_rng:
-            # They have the same name and the same range, this is already a match.
-            #  Because the names are already the same, we do not have to enter them
-            #  in the `final_mapping`
-            unmapped_second_params.remove(param)
-            unused_first_params.remove(param)
-
-    # Check if no remapping is needed.
-    if len(unmapped_second_params) == 0:
-        return {}
-
-    # Now we go through all the parameters that we have not mapped yet.
-    #  All of them will result in a remapping.
-    for unmapped_second_param in unmapped_second_params:
-        second_rng = second_rngs[unmapped_second_param]
-        assert unmapped_second_param not in final_mapping
-
-        # Now look in all not yet used parameters of the first map which to use.
-        for candidate_param in list(unused_first_params):
-            candidate_rng = first_rngs[candidate_param]
-            if candidate_rng == second_rng:
-                final_mapping[unmapped_second_param] = candidate_param
-                unused_first_params.remove(candidate_param)
-                break
-        else:
-            raise ValueError("We did not find a candidate, so the remapping does not exist")
-
-    assert len(unused_first_params) == 0
-    assert len(final_mapping) == len(unmapped_second_params)
-    return final_mapping
-
-
 def rename_map_parameters(
     st: SDFGState,
     first_map: Map,
@@ -86,15 +20,7 @@ def rename_map_parameters(
     second_map_entry: MapEntry,
 ):
     # Compute the replacement dict.
-    repl_dict: dict[str, str] = find_parameter_remapping(
-        first_map=first_map,
-        second_map=second_map,
-    )
-
-    if repl_dict is None:
-        raise RuntimeError("The replacement does not exist")
-    if len(repl_dict) == 0:
-        return
+    repl_dict = {k: v for k, v in zip(second_map.params, first_map.params)}
 
     second_map_scope = st.scope_subgraph(entry_node=second_map_entry)
     # Why is this thing in symbolic and not in replace?
