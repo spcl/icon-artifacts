@@ -5,6 +5,17 @@
 #include <cuda_runtime.h>
 #include <dace/dace.h>
 
+#include <chrono>
+using namespace std::chrono;
+
+void measure_and_report(
+  const high_resolution_clock::time_point& t0,
+  const high_resolution_clock::time_point& t1,
+  const char* tag = "") {
+    const auto diff = duration_cast<microseconds>(t1 - t0).count();
+    std::cout << "[" << tag <<"]: " << diff << " µs\n";
+}
+
 namespace predictor_pre {
 /* DaCe AUTO-GENERATED FILE. DO NOT MODIFY */
 struct solve_nh_predictor_pre_state_t {
@@ -1807,6 +1818,8 @@ void __program_solve_nh_predictor_pre_internal(
     }
   }
 
+  high_resolution_clock::time_point t_beg = high_resolution_clock::now();
+
   {
 
     {
@@ -2960,6 +2973,9 @@ void __program_solve_nh_predictor_pre_internal(
     }
     // disabled: DACE_GPU_CHECK(cudaStreamSynchronize(nullptr));
   }
+
+  high_resolution_clock::time_point t_shallowcopy = high_resolution_clock::now();
+
   _if_cond_36 = (((__CG_global_data__m_itime_scheme >= 6) || l_init) || l_recompute);
   _if_cond_38 = (1 && ((__CG_global_data__m_igradp_method == 3) || (__CG_global_data__m_igradp_method == 5)));
   _if_cond_41 = (1 && ((jg > 1) || __CG_global_data__m_l_limited_area));
@@ -4426,6 +4442,11 @@ void __program_solve_nh_predictor_pre_internal(
       ///////////////////
     }
   }
+
+  high_resolution_clock::time_point t_end = high_resolution_clock::now();
+  measure_and_report(t_beg, t_shallowcopy, "PREPRE/sync,t0,copy;sync;t1(here)");
+  measure_and_report(t_beg, t_end, "PREPRE/sync,t0,copy;body;sync;t1(here)");
+
 }
 
 extern "C" void __program_solve_nh_predictor_pre(
@@ -7979,6 +8000,8 @@ void __program_solve_nh_predictor_post_internal(
     }
   }
 
+  high_resolution_clock::time_point t_beg = high_resolution_clock::now();
+
   {
 
     {
@@ -9025,6 +9048,9 @@ void __program_solve_nh_predictor_post_internal(
     }
     // disabled: DACE_GPU_CHECK(cudaStreamSynchronize(nullptr));
   }
+
+  high_resolution_clock::time_point t_shallowcopy = high_resolution_clock::now();
+
   tmp_index_6 = (__CG_p_patch__m_id - 1);
   _if_cond_4 = ((jg > 1) && (__CG_global_data__m_grf_intmethod_e == 6));
   _if_cond_6 = l_vert_nested;
@@ -10005,6 +10031,11 @@ void __program_solve_nh_predictor_post_internal(
       ///////////////////
     }
   }
+
+  high_resolution_clock::time_point t_end = high_resolution_clock::now();
+  measure_and_report(t_beg, t_shallowcopy, "PREPOST/sync,t0,copy;sync;t1(here)");
+  measure_and_report(t_beg, t_end, "PREPOST/sync,t0,copy;body;sync;t1(here)");
+
 }
 
 extern "C" void __program_solve_nh_predictor_post(
@@ -13201,6 +13232,8 @@ void __program_solve_nh_corrector_pre_internal(
     }
   }
 
+  high_resolution_clock::time_point t_beg = high_resolution_clock::now();
+
   {
 
     {
@@ -14367,6 +14400,9 @@ void __program_solve_nh_corrector_pre_internal(
     }
     // disabled: DACE_GPU_CHECK(cudaStreamSynchronize(nullptr));
   }
+
+  high_resolution_clock::time_point t_shallowcopy = high_resolution_clock::now();
+
   tmp_index_838 = (__CG_p_patch__m_id - 1);
   _if_cond_30 = (1 && (__CG_global_data__m_divdamp_type >= 3));
 
@@ -15031,6 +15067,11 @@ void __program_solve_nh_corrector_pre_internal(
       ///////////////////
     }
   }
+
+  high_resolution_clock::time_point t_end = high_resolution_clock::now();
+  measure_and_report(t_beg, t_shallowcopy, "CORPRE/sync,t0,copy;sync;t1(here)");
+  measure_and_report(t_beg, t_end, "CORPRE/sync,t0,copy;body;sync;t1(here)");
+
 }
 
 extern "C" void __program_solve_nh_corrector_pre(
@@ -18713,6 +18754,8 @@ void __program_solve_nh_corrector_post_internal(
     }
   }
 
+  high_resolution_clock::time_point t_beg = high_resolution_clock::now();
+
   {
 
     {
@@ -19760,6 +19803,9 @@ void __program_solve_nh_corrector_post_internal(
                                    cudaMemcpyHostToDevice, nullptr));
     // disabled: DACE_GPU_CHECK(cudaStreamSynchronize(nullptr));
   }
+
+  high_resolution_clock::time_point t_shallowcopy = high_resolution_clock::now();
+
   _if_cond_9 = ((jg > 1) && (__CG_global_data__m_grf_intmethod_e == 6));
   _if_cond_12 = (0 || (__CG_global_data__m_itime_scheme >= 5));
   _if_cond_14 = l_vert_nested;
@@ -20772,6 +20818,11 @@ void __program_solve_nh_corrector_post_internal(
       ///////////////////
     }
   }
+
+  high_resolution_clock::time_point t_end = high_resolution_clock::now();
+  measure_and_report(t_beg, t_shallowcopy, "CORPOST/sync,t0,copy;sync;t1(here)");
+  measure_and_report(t_beg, t_end, "CORPOST/sync,t0,copy;body;sync;t1(here)");
+
 }
 
 extern "C" void __program_solve_nh_corrector_post(
