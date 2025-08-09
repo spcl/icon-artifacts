@@ -1,7 +1,7 @@
 import dace
 from dace import SDFG
 from stages import common
-from utils.codegen_from_sdfg import ArtifactMode
+from utils.codegen_from_sdfg import ArtifactMode, OptimizationMode
 
 import argparse
 
@@ -52,6 +52,12 @@ def main():
     )
     argp.add_argument("--codegen", action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument("--compile", action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument(
+        "--release",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Enable release mode optimizations and hardening.",
+    )
     args = argp.parse_args()
     if not args.optimize and not args.codegen and not args.compile:
         args.optimize, args.codegen, args.compile = True, True, True
@@ -86,7 +92,7 @@ def main():
 
     if args.compile:
         print(f"Stage #{STAGE_ID}: Compiling SDFGs")
-        common.compile_action(STAGE_ID, ArtifactMode.SHARED)
+        common.compile_action(STAGE_ID, ArtifactMode.SHARED, OptimizationMode.RELEASE if args.release else OptimizationMode.DEBUG)
 
 
 if __name__ == "__main__":
