@@ -111,7 +111,7 @@ def optimization_action(g: SDFG):
 
     state_fusion_without_copyin_and_copyout(g)
     if 'predictor_pre' in g.name:
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_58'})
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_51', '_if_cond_58', '_if_cond_42', '_if_cond_43'})
     elif 'corrector_post' in g.name:
         move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_7', '_if_cond_10', '_if_cond_11'})
         # We need to fuse and only then we can unlock `_if_cond_6`
@@ -193,12 +193,14 @@ def optimization_action(g: SDFG):
             (("_for_it_37", "_for_it_38"), ("_for_it_39", "_for_it_40"))
         ],
         "solve_nh_predictor_pre": [
+            # DOES NOT WORK: (("_for_it_70", "_for_it_71"), ("_for_it_72", "_for_it_73")),
             (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
         ],
         "solve_nh_predictor_post": [
             (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
             (("_for_it_21", "_for_it_22"), ("_for_it_23", "_for_it_24")),
             (("_for_it_30", "_for_it_31"), ("_for_it_32", "_for_it_33")),
+            (("_for_it_18", "_for_it_19"), ("_for_it_21", "_for_it_22")),
         ],
     }
     map_force_fuse_prescibed(g, PRESCRIBED_FUSIONS[g.name])
