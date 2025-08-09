@@ -1,7 +1,10 @@
 from copy import deepcopy
-from typing import Any
-from dace import SDFG, symbolic, Memlet
+import sympy
+import dace
+from dace import SDFG, symbolic, Memlet, subsets
+from dace.subsets import Range
 from dace.properties import CodeBlock
+from dace.sdfg.sdfg import InterstateEdge
 from dace.sdfg.state import SDFGState, ConditionalBlock, ControlFlowRegion
 from dace.sdfg.nodes import Map, MapEntry, MapExit, AccessNode, Node, NestedSDFG
 from dace.frontend.fortran.ast_utils import singular, atmost_one
@@ -10,6 +13,8 @@ from dace.sdfg.propagation import propagate_memlets_sdfg
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 from utils.conditional_pruning import push_interstate_edges_early
 from utils.move_if_cfg_inside_map import move_map_body_into_nsdfg
+from dace.sdfg.replace import replace, replace_dict
+from dace.sdfg.state import StateSubgraphView
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 
 
@@ -70,47 +75,65 @@ def disambiguate_connectors(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: Map
         cID = recon(m, cID)
 
 
-def extend_range(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
-    if mE1.range == mE2.range:
-        return
-    assert mE1.range.covers_precise(mE2.range) or mE2.range.covers_precise(mE1.range)
-    if not mE2.range.covers_precise(mE1.range):
-        return extend_range(st, mE2, mX2, mE1, mX1)
-    assert mE2.range.covers_precise(mE1.range)
-    move_map_body_into_nsdfg(st, mE1)
-    nodes_inside = [n for n in st.all_nodes_between(mE1, mX1)]
-    assert len(nodes_inside) == 1 and isinstance(nodes_inside[0], NestedSDFG)
-    (ng,) = nodes_inside
-
-    conds = []
-    for x, r1, r2 in zip(mE1.params, mE1.range, mE2.range):
+def real_union(R1: Range, R2: Range) -> Range:
+    assert R1.dims() == R2.dims()
+    out = []
+    for r1, r2 in zip(R1, R2):
         rb1, re1, stride1 = r1
         rb2, re2, stride2 = r2
         assert stride1 == stride2
-        if rb1 != rb2:
-            conds.append(f"({x} >= {rb1})")
-        if re1 != re2:
-            conds.append(f"({x} <= {re1})")
-    assert conds
-    cblok = ConditionalBlock("range_extension")
-    cblok.add_branch(CodeBlock(f"{' and '.join(conds)}"), ControlFlowRegion("re_body"))
-    re_body = cblok.branches[0][1]
-    for x in ng.sdfg.nodes():
-        re_body.add_node(x)
-    for x in ng.sdfg.edges():
-        re_body.add_edge(x)
-    for x in ng.sdfg.nodes():
-        ng.sdfg.remove_node(x)
-    ng.sdfg.add_node(cblok)
-    mE1.range = deepcopy(mE2.range)
+        ob = rb1 if rb1 == rb2 else sympy.Min(rb1, rb2)
+        oe = re1 if re1 == re2 else sympy.Max(re1, re2)
+        out.append((ob, oe, stride1))
+    return Range(out)
+
+
+def extend_range(st: SDFGState, mE1: MapEntry, mE2: MapEntry):
+    if mE1.range == mE2.range:
+        return
+    target_range = real_union(mE1.range, mE2.range)
+
+    for mE in [mE1, mE2]:
+        if target_range == mE.range:
+            continue
+
+        move_map_body_into_nsdfg(st, mE)
+        nodes_inside = [n for n in st.all_nodes_between(mE, st.exit_node(mE))]
+        assert len(nodes_inside) == 1 and isinstance(nodes_inside[0], NestedSDFG)
+        (ng,) = nodes_inside
+
+        conds = []
+        for x, r1, r2 in zip(mE.params, mE.range, target_range):
+            rb1, re1, stride1 = r1
+            rb2, re2, stride2 = r2
+            assert stride1 == stride2
+            if rb1 != rb2:
+                conds.append(f"({x} >= {rb1})")
+            if re1 != re2:
+                conds.append(f"({x} <= {re1})")
+        assert conds
+        cblok = ConditionalBlock("range_extension")
+        cblok.add_branch(CodeBlock(f"{' and '.join(conds)}"), ControlFlowRegion("re_body"))
+        re_body = cblok.branches[0][1]
+        for x in ng.sdfg.nodes():
+            re_body.add_node(x)
+        for x in ng.sdfg.edges():
+            re_body.add_edge(x)
+        for x in ng.sdfg.nodes():
+            ng.sdfg.remove_node(x)
+        ng.sdfg.add_node(cblok)
+        mE.range = deepcopy(target_range)
 
 
 def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
-    # g = st.sdfg
+    g = st.sdfg
     # tCounter = 0  # Counter to disambiguate names
-    extend_range(st, mE1, mX1, mE2, mX2)
+    extend_range(st, mE1, mE2)
+    g.validate()
     rename_map_parameters(st, mE1.map, mE2.map, mE2)
+    g.validate()
     disambiguate_connectors(st, mE1, mX1, mE2, mX2)
+    g.validate()
     P1 = [e.dst for e in st.out_edges(mX1)]
     P2 = [e.dst for e in st.out_edges(mX2)]
     P3 = [e.src for e in st.in_edges(mE2)]
@@ -156,6 +179,50 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
     assert len(st.out_edges(mE2)) == 0
     st.remove_node(mX1)
     st.remove_node(mE2)
+    g.validate()
+
+
+def map_parameters_should_be_at_most_symbols(g: SDFG):
+    for mE, st in g.all_nodes_recursive():
+        if not isinstance(mE, MapEntry):
+            continue
+        param_conns = set(c for c in mE.in_connectors.keys() if not c.startswith("IN_"))
+        if not param_conns:
+            continue
+        print(f"Moving parameter connectors of {mE} to symbols: {param_conns}")
+        # if "_for_it_102" in str(mE):
+        #     g.save("foo.sdfgz", compress=True)
+        #     breakpoint()
+        for c in param_conns:
+            ied = singular(st.in_edges_by_connector(mE, c))
+            assert isinstance(ied.src, AccessNode)
+            same_acc = [ac for ac in st.nodes() if isinstance(ac, AccessNode) and ac.data == ied.src.data]
+            if any(len(st.in_edges(ac)) > 0 for ac in same_acc):
+                print(f"...however, {ied.src.data} is being written at the same state {st}, so cannot move.")
+                continue
+            st_ieds = [e for e in st.parent_graph.in_edges(st) if isinstance(e.data, InterstateEdge)]
+            if not st_ieds:
+                pst = st.parent_graph.add_state("syminit", is_start_block=True)
+                st_ieds.append(st.parent_graph.add_edge(pst, st, InterstateEdge()))
+
+            tCounter = 0
+
+            def _symname() -> str:
+                return f"{ied.src.data}_tosym_{tCounter}"
+
+            while any(_symname() in e.data.assignments for e in st_ieds) or _symname() in st.parent_graph.sdfg.symbols:
+                tCounter += 1
+
+            st.parent_graph.sdfg.add_symbol(_symname(), dace.int64)
+            for e in st_ieds:
+                e.data.assignments[_symname()] = ied.src.data
+            replace(StateSubgraphView(st, [mE]), c, _symname())
+            if st.out_degree(ied.src) == 1:
+                st.remove_node(ied.src)
+            else:
+                st.remove_edge(ied)
+            mE.remove_in_connector(c)
+        g.validate()
 
 
 def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
@@ -172,7 +239,12 @@ def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
             (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v
         )
         mE2, ost = mE2_st
-        assert st is ost, f"Expected the two maps to be in the same state; got {st} and {ost} / {g}"
+        if not (st is ost):
+            # POSSIBLY AN UNSTABLE ORDERING IN STATE FUSION PROBLEM
+            print(f"Expected the two maps ({u}, {v}) to be in the same state; got {st} and {ost} / {g}")
+            breakpoint()
+            continue
+        assert st is ost, f"Expected the two maps ({u}, {v}) to be in the same state; got {st} and {ost} / {g}"
 
         print(f"Attempting a forced fusion of maps: {mE1} & {mE2}")
         map_force_fuse(st, mE1, st.exit_node(mE1), mE2, st.exit_node(mE2))
