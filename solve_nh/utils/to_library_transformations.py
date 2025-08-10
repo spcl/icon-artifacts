@@ -20,6 +20,8 @@ def collect_to_gpu_nontransient_set(sdfg: dace.SDFG):
     for e in copy_in_state.edges():
         src = e.src
         dst = e.dst
+        if isinstance(dst, dace.nodes.Tasklet):
+            continue
         assert isinstance(src, dace.nodes.AccessNode) and isinstance(dst, dace.nodes.AccessNode), \
             "Copy-in and copy-out nodes must be AccessNodes"
         assert "gpu_"+src.data == dst.data, \
