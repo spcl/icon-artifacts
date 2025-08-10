@@ -1,7 +1,9 @@
 import dace
 from dace import SDFG
+from dace.sdfg.nodes import Tasklet
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode, OptimizationMode
+from dace.frontend.fortran.ast_utils import singular, atmost_one
 
 import argparse
 
@@ -20,6 +22,14 @@ STAGE_ID = 4
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
+
+    for n, st in g.all_nodes_recursive():
+        if not isinstance(n, Tasklet) or 'assert_nblks' not in n.label:
+            continue
+        ied = singular(e for e in st.in_edges(n))
+        st.remove_node(ied.src)
+        st.remove_node(ied.dst)
+
     # === Sub-Phase 0: Remove profiling timers and additional profiling sync ===
     remove_profiling_states(g)
     remove_sync_states(g)
