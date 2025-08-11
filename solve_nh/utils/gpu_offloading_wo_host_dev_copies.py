@@ -10,6 +10,9 @@ from .reinject_velocity_tasklet import reinject_velocity_shim_gpu
 from utils.add_missing_symbols import _insert_missing_data_through_parent_scopes, add_missing_data_and_symbols_to_all_nsdfgs
 from utils.clean_unused_data_from_nsdfg_connectors import rm_connection_of_desc_to_nsdfg_node
 import copy
+from dace.frontend.fortran.ast_utils import singular, atmost_one
+from dace.sdfg.nodes import CodeBlock, Tasklet, LibraryNode, AccessNode
+from dace.memlet import Memlet
 
 openacc_data_names = """
    !$ACC DATA CREATE(z_kin_hor_e,z_vt_ie,z_w_concorr_me,z_theta_v_fl_e) &
@@ -851,8 +854,6 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     arrays_added_to_flattener = _add_gpu_copies_to_flattener(sdfg, gpu_arrays)
     if verbose:
         print(f"Arrays added as copies to flattener/deflattener nodes: {arrays_added_to_flattener}")
-        print()
-        print()
     sdfg.validate()
 
     # Replace all arrays used by GPU maps with their GPU counterparts
@@ -878,6 +879,20 @@ def _gpu_offloading_wo_host_dev_copies_impl(sdfg: dace.SDFG,
     sdfg.validate()
 
     reinject_velocity_shim_gpu(sdfg)
+    # MORE SURGERY TO COVER UP THE MISTAKES IN REINJECTION.
+    vt_t_s = atmost_one((n, st) for n, st in sdfg.all_nodes_recursive()
+                            if isinstance(n, Tasklet) and  "velocity_tendencies" in n.label)
+    if vt_t_s:
+        vt_tasklet, vt_state = vt_t_s
+        assert isinstance(vt_tasklet, Tasklet)
+        ied = atmost_one(e for e in vt_state.in_edges_by_connector(vt_tasklet, 'in_lvn_only'))
+        if ied:
+            assert vt_state.degree(ied.src) == 1
+            assert isinstance(ied.src, AccessNode) and ied.src.data == 'lvn_only'
+            vt_state.remove_node(ied.src)
+            acc = vt_state.add_access('lvn_only_transified')
+            vt_state.add_edge(acc, None, vt_tasklet, 'in_lvn_only', Memlet(f"{acc}"))
+
     sdfg.validate()
 
     # Is No-OP need to change generated source code
