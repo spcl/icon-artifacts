@@ -19,9 +19,75 @@ if os.path.exists(tested_log):
 else:
     tested = set()
 
-def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
+
+def run_untiled():
+    label = f"UNTILED"
+    if f"=== DONE for {label} ===" in tested:
+        return
+
+    with open(tested_log, "a") as logf:
+        print(f"=== Running for {label} ===", file=logf)
+    with open(compare_log, "a") as comparef:
+        print(f"=== Running for {label} ===", file=comparef)
+    print(f"=== Running for {label} ===")
+
+    env = os.environ.copy()
+    env["_RELEASE"] = "1"
+    env["_USE_CUDA_EVENTS"] = "0"
+    env["_USE_NVHPC"] = "0"
+    env["_TILE"] = "0"
+    env["_PROFILE"] = "1"
+    env["_BUILD_FOR_SOLVE_NH_INTEGRATION"] = "0"
+    env["_REDUCE_BITWIDTH_TRANSFORMATION"] = "0"
+
+    try:
+        subprocess.run(
+            ["python", "-m", "utils.stages.compile_gpu_stage8"],
+            check=True,
+            env=env
+        )
+    except subprocess.CalledProcessError:
+        print("❌ Compilation failed for this config")
+        return
+
+    try:
+        with open(tested_log, "a") as logf:
+          env["REPS"] = "1"
+          subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
+    except subprocess.CalledProcessError:
+        print("❌ First execution failed for this config")
+
+    try:
+        with open(compare_log, "a") as comparef:
+          subprocess.run(
+              ["python", "utils/compare_got_and_want.py", "--root=gotwant/data_nproma20480"],
+              stdout=comparef,
+              check=True,
+              env=env
+          )
+    except subprocess.CalledProcessError:
+        print("❌ Numerical comparison crashed for this config")
+        return
+
+    try:
+        with open("logs/tile.log", "a") as logf:
+            print(f"=== Running for {label} ===", file=logf)
+            logf.flush()
+            env["REPS"] = "50"
+            subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
+            logf.flush()
+    except subprocess.CalledProcessError:
+        print("❌ Profiling execution failed for this config")
+
+    with open(tested_log, "a") as logf:
+        print(f"=== DONE for {label} ===", file=logf)
+    with open(compare_log, "a") as comparef:
+        print(f"=== DONE for {label} ===", file=comparef)
+    print(f"=== DONE for {label} ===")
+
+def run_config(x_c, y_c, x_bs, y_bs, y_unroll, tile=True):
     label = f"x_c={x_c}, y_c={y_c}, x_bs={x_bs}, y_bs={y_bs}, y_unroll={y_unroll}"
-    if f"=== Running for {label} ===" in tested:
+    if f"=== DONE for {label} ===" in tested:
         return
 
     total = x_bs * y_bs
@@ -40,7 +106,7 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
     env = os.environ.copy()
     env["_RELEASE"] = "1"
     env["_USE_CUDA_EVENTS"] = "0"
-    env["_USE_NVHPC"] = "1"
+    env["_USE_NVHPC"] = "0"
     env["_TILE"] = "1"
     env["_PROFILE"] = "1"
     env["_BUILD_FOR_SOLVE_NH_INTEGRATION"] = "0"
@@ -62,18 +128,20 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
         return
 
     try:
-        env["REPS"] = "1"
-        subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
+        with open(tested_log, "a") as logf:
+          env["REPS"] = "1"
+          subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
     except subprocess.CalledProcessError:
         print("❌ First execution failed for this config")
 
     try:
-        subprocess.run(
-            ["python", "utils/compare_got_and_want.py", "--root=gotwant/data_nproma20480"],
-            stdout=comparef,
-            check=True,
-            env=env
-        )
+        with open(compare_log, "a") as comparef:
+          subprocess.run(
+              ["python", "utils/compare_got_and_want.py", "--root=gotwant/data_nproma20480"],
+              stdout=comparef,
+              check=True,
+              env=env
+          )
     except subprocess.CalledProcessError:
         print("❌ Numerical comparison crashed for this config")
         return
@@ -84,12 +152,21 @@ def run_config(x_c, y_c, x_bs, y_bs, y_unroll):
             logf.flush()
             env["REPS"] = "50"
             subprocess.run(["./velocity_gpu.stage8_standalone_release"], stdout=logf, check=True, env=env)
+            print(f"=== Done for {label} ===", file=logf)
             logf.flush()
     except subprocess.CalledProcessError:
         print("❌ Profiling execution failed for this config")
 
+    with open(tested_log, "a") as logf:
+        print(f"=== DONE for {label} ===", file=logf)
+    with open(compare_log, "a") as comparef:
+        print(f"=== DONE for {label} ===", file=comparef)
+    print(f"=== DONE for {label} ===")
+
 
 # Run all other valid combinations
+run_untiled()  # Run the default config first
+
 for x_bs in x_block_sizes:
     for y_bs in y_block_sizes:
         for y_unroll in y_unroll_factors:

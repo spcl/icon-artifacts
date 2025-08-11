@@ -1,12 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=sweep_job
 #SBATCH --nodes=1
-#SBATCH --partition=debug
-#SBATCH --time=00:30:00
-#SBATCH --account=g34
+#SBATCH --partition=normal
+#SBATCH --time=0:59:00
 #SBATCH --output=logs/sweep_%j.out
 #SBATCH --error=logs/sweep_%j.err
 
-uenv start --view=default icon/25.2:v1@santis
-
-python sweep.py
+python3 sweep.py
+# python3 sweep_eval.py logs/tested_params.log
