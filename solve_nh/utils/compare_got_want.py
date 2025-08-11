@@ -102,6 +102,8 @@ def compare_pair(
                     if verbose:
                         live.update(f"Checking: {current_var}")
                 continue
+            elif current_var not in per_var:
+                per_var.setdefault(current_var, {"ok": True, "max_abs": 0.0, "max_rel": 0.0})
 
             if got_line == want_line:
                 continue
