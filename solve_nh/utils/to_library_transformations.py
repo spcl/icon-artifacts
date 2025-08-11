@@ -329,15 +329,15 @@ def change_flatten_lib_to_shallow_copy(sdfg: dace.SDFG) -> None:
 
     for input in inputs_set:
         # Add tasklet to not get unset transient warning (annoying)
-        t = flatten_state.add_tasklet(
-            name="setzero_" + input[len("in_"):],
-            inputs=set(),
-            outputs={"_out"},
-            code=f"_out = 0;"
-        )
+        # t = flatten_state.add_tasklet(
+        #     name="setzero_" + input[len("in_"):],
+        #     inputs=set(),
+        #     outputs={"_out"},
+        #     code=f"_out = _out;"
+        # )
         sdfg.arrays[input[len("in_"):]].lifetime = dace.dtypes.AllocationLifetime.SDFG
         src_access = flatten_state.add_access(input[len("in_"):])
-        flatten_state.add_edge(t, "_out", src_access, None, dace.Memlet.from_array(input[len("in_"):], sdfg.arrays[input[len("in_"):]]))
+        # flatten_state.add_edge(t, "_out", src_access, None, dace.Memlet.from_array(input[len("in_"):], sdfg.arrays[input[len("in_"):]]))
         flatten_state.add_edge(src_access, None, shallow_copy_tasklet, input, dace.Memlet.from_array(input[len("in_"):], sdfg.arrays[input[len("in_"):]]))
 
 
