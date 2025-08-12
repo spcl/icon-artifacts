@@ -632,8 +632,9 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
                                 print("G", is_gpu_code, parent_nsdfg_node)
                                 sdfg.save("c.sdfgz", compress=True)
                                 root_sdfg.save("c_root.sdfgz", compress=True)
-                                assert free_sym.replace('gpu_', '').split("_m_")[-1] in const_arrays, \
-                                    f"Expected {free_sym.replace('gpu_', '').split("_m_")[-1]} to be in constant arrays\nConst arrays: {const_arrays}."
+                                want_const_array = free_sym.replace('gpu_', '').split("_m_")[-1]
+                                assert want_const_array in const_arrays, \
+                                    f"Expected {want_const_array} to be in constant arrays\nConst arrays: {const_arrays}."
                             # replace this in the interstate edge
                             if free_sym.replace("gpu_", "") not in root_sdfg.arrays:
                                 raise ValueError(
