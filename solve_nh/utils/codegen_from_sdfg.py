@@ -400,9 +400,10 @@ class Compiler:
         cuda_specific_flags = [
             "--expt-relaxed-constexpr",  # Allow more liberal use of `constexpr` in device code.
             "-Xcompiler=-fno-var-tracking-assignments",  # Host: Helps with debugger issues or certain optimizations.
-            "-rdc=true",  # Relocatable Device Code: Essential for linking multiple CUDA object files.
             "-DGPU",  # Define preprocessor macro 'GPU' for conditional compilation.
-            "--relocatable-device-code=true",  # Redundant with -rdc=true, but kept for legacy/clarity.
+            # DIABLED: RDC
+            # "-rdc=true",  # Relocatable Device Code: Essential for linking multiple CUDA object files.
+            # "--relocatable-device-code=true",  # Redundant with -rdc=true, but kept for legacy/clarity.
         ]
 
         return host_flags + arch_flags + cuda_specific_flags
