@@ -6,6 +6,7 @@ import dace
 from dace import Tuple, properties
 from dace.codegen.common import sym2cpp
 from dace.transformation import pass_pipeline as ppl, transformation
+from dace.frontend.fortran.ast_utils import singular, atmost_one
 
 from typing import Dict, List, Set
 
@@ -145,94 +146,66 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
         return paths
 
     def _detect_contiguous_memset_paths(self, state: dace.SDFGState, node: dace.nodes.MapEntry):
-        # All tasklets within the map
-        all_tasklets = {n for n in state.all_nodes_between(node, state.exit_node(node)) if isinstance(n, dace.nodes.Tasklet)}
-
-        # Assignment tasklet: no in connector, but only out connector
-        possible_assignment_tasklets = {t for t in all_tasklets if len(t.in_connectors) == 0 and len(t.out_connectors) == 1 and state.in_degree(t) == 1 and state.out_degree(t) == 1}
-
-        paths = set()
-
-        path_candidate = []
-        in_edges_from_tasklets = {e for t in possible_assignment_tasklets for e in state.in_edges(t)}
-
         # If map range is not contigous, we can't do contiguous memset detection
         for (b, e, s) in node.map.range:
             if s != 1:
-                return set()
+                return []
+
+        # Assignment tasklet: no in connector, but only out connector
+        possible_assignment_tasklets = [
+            t for t in state.all_nodes_between(node, state.exit_node(node))
+            if isinstance(t, dace.nodes.Tasklet)
+            and len(t.in_connectors) == 0
+            and len(t.out_connectors) == 1
+            and state.in_degree(t) == 1
+            and state.out_degree(t) == 1
+            and t.language in [dace.Language.Python, dace.Language.CPP]
+        ]
+
+        paths = []
 
         # Create all possible paths
-        for e in in_edges_from_tasklets:
-            path_candidate.append(e)
-
+        for t in possible_assignment_tasklets:
+            e = singular(e for e in state.in_edges(t))
             if e.data.data is not None:
                 # If the data is not None, it is not an assignment
-                path_candidate = []
                 continue
 
-            if len(e.dst.out_connectors) != 1:
-                # If the destination has more than one out connector, it is not a contiguous memset
-                path_candidate = []
-                continue
+            path_candidate = [e]
 
             tasklet: dace.nodes.Tasklet = e.dst
             zero_literal_pattern = r"(0|0\.0|0\.0f|0\.f|0\.0d|0\.d)"
-            assert len(tasklet.out_connectors) == 1, "Tasklet must have exactly one out connector for contiguous copy detection"
-            out_conn = next(iter(tasklet.out_connectors))
-            tasklet_code_str = tasklet.code.as_string
-
-            if tasklet.language == dace.Language.Python:
-                if not re.fullmatch(rf"{re.escape(out_conn)} *= *{zero_literal_pattern}", tasklet_code_str.strip()):
-                    # Not a recognized zero assignment pattern
-                    path_candidate = []
-                    continue
-            elif tasklet.language == dace.Language.CPP:
-                if not re.fullmatch(rf"{re.escape(out_conn)} *= *{zero_literal_pattern};", tasklet_code_str.strip()):
-                    # Not a recognized zero assignment pattern
-                    path_candidate = []
-                    continue
-            else:
-                # Unsupported language, can't do it
-                warnings.warn(f"Unsupported tasklet language {tasklet.language} in contiguous copy detection, skipping.", UserWarning)
-                path_candidate = []
+            out_conn = singular(c for c in tasklet.out_connectors.keys())
+            DELIMITER = ';' if tasklet.language == dace.Language.CPP else ''
+            if not re.fullmatch(rf"{re.escape(out_conn)} *= *{zero_literal_pattern}{DELIMITER}", tasklet.code.as_string.strip()):
+                # Not a recognized zero assignment pattern
                 continue
 
-            tasklet_out_edges = {e for e in state.out_edges(tasklet)}
-            if len(tasklet_out_edges) != 1:
-                # More than one out edge, can't be a contiguous copy pattern we look for
-                path_candidate = []
-                continue
-
-            tasklet_out_edge = tasklet_out_edges.pop()
+            tasklet_out_edge = singular(e for e in state.out_edges(tasklet))
             path_candidate.append(tasklet_out_edge)
 
             map_exit = tasklet_out_edge.dst
             if not isinstance(map_exit, dace.nodes.MapExit) and map_exit != state.exit_node(node):
                 # Not a map exit, can't be a contiguous copy pattern we look for
-                path_candidate = []
                 continue
-
             map_exit_in_conn = tasklet_out_edge.dst_conn
             if not map_exit_in_conn.startswith("IN_"):
                 # This SDFG is not valid btw.
-                path_candidate = []
                 continue
             map_exit_out_conn = map_exit_in_conn.replace("IN_", "OUT_")
-            map_exit_out_edges = {e for e in state.out_edges_by_connector(map_exit, map_exit_out_conn)}
+            map_exit_out_edges = [e for e in state.out_edges_by_connector(map_exit, map_exit_out_conn)]
             if len(map_exit_out_edges) != 1:
                 # More than one out edge, can't be a contiguous copy pattern we look for
-                path_candidate = []
                 continue
 
             map_exit_out_edge = map_exit_out_edges.pop()
             path_candidate.append(map_exit_out_edge)
             if not isinstance(map_exit_out_edge.dst, dace.nodes.AccessNode):
                 # Not an access node, can't be a contiguous copy pattern we look for
-                path_candidate = []
                 continue
 
             # We found it finally!
-            paths.add(tuple(path_candidate))
+            paths.append(tuple(path_candidate))
 
         return paths
 
