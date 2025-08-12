@@ -16,7 +16,7 @@ HOST=$(hostname)
 for _R in "${RELEASE_MODES[@]}"; do
         export _USE_CUDA_EVENTS=0
         export _TILE=0
-        export _REDUCE_BITWIDTH_TRANSFORMATION=0
+        export _REDUCE_BITWIDTH_TRANSFORMATION=1
         export _RELEASE=${_R}
         export _BUILD_LIB_FOR_SOLVE_NH=1
         for STAGE in "${STAGES[@]}"; do
