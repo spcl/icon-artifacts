@@ -348,8 +348,12 @@ class Compiler:
             return [
                 "-O3",  # Host compiler: Aggressive optimizations.
                 "-Xcompiler=-O3",  # Host compiler: Aggressive optimizations.
-                "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU.
-                "-Xcompiler=-fstrict-aliasing",  # Host compiler: Strict aliasing.
+                "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU
+
+                # TODO: The following two flags can be reverted if safe on Jupiter.
+                "-Xcompiler=-fno-strict-aliasing",  # Host compiler: Safer aliasing.
+                "-Xcompiler=-fstack-protector-strong",
+
                 "-Xcompiler=-fomit-frame-pointer",  # Host compiler: Omit frame pointers.
                 "-Xcompiler=-ffast-math",  # Host compiler: Fast FP math.
                 "-Xcompiler=-ffp-contract=on",  # Host compiler: Enable FMA.
