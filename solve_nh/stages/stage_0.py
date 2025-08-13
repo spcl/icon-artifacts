@@ -5,6 +5,8 @@ from utils.inject_velocity_shim import inject_velocity_shim
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
 from utils.propagate_if_conditions import propagate_if_conditions
+from dace.frontend.fortran.ast_utils import singular, atmost_one
+from dace.properties import CodeBlock
 
 import argparse
 
@@ -40,6 +42,16 @@ def optimization_action(g: SDFG, velicity_shim: bool):
     #    replace_dict=config_constants,
     #    verbose=True)
     # === Sub-phase 1: Propagate if conditions ===
+    ''
+    t = atmost_one(n for n, _ in g.all_nodes_recursive()
+                 if isinstance(n, dace.nodes.Tasklet)
+                 and 'cpu_min_nproma__ret_out = ' in n.code.as_string)
+    if 'predictor_pre' in g.name:
+        assert t is not None
+        assert "cpu_min_nproma__ret_out = min(nproma_var_88_0_in, 256)" in t.code.as_string
+        print("Fixing the code of the tasklet that computes the minimum of nproma_var_88_0_in")
+        t.code = CodeBlock("cpu_min_nproma__ret_out = nproma_var_88_0_in")
+
     return g
 
 
