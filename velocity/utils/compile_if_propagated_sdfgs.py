@@ -800,15 +800,15 @@ def compile_if_propagated_sdfgs(
     export GENCODE_NUMBER=90 # for Daint, Jupiter
 
     You can also set GENCODE_ARCH environment variable to the desired architecture, e.g.:
-    export GENCODE_ARCH=compute_70,code=sm_70 # for Ault
-    export GENCODE_ARCH=compute_90,code=sm_90 # for Daint, Jupiter
+    export GENCODE_ARCH="arch=compute_70,code=sm_70" # for Ault
+    export GENCODE_ARCH="arch=compute_90,code=sm_90" # for Daint, Jupiter
     """)
-        GENCODE_ARCH = os.getenv('GENCODE_ARCH', f'compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}')
+        GENCODE_ARCH = os.getenv('GENCODE_ARCH', f'arch=compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}')
         print(f"Using GENCODE_ARCH: {GENCODE_ARCH}")
         if release:
-            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -gencode arch={GENCODE_ARCH} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -DNDEBUG"
+            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -gencode {GENCODE_ARCH} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -DNDEBUG"
         else:
-            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -gencode arch={GENCODE_ARCH} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -gencode {GENCODE_ARCH} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
         if lib:
             flags += " -DNO_SERDE -std=c++17 -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
