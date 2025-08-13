@@ -159,8 +159,8 @@ void reduce_maxZ_to_address_gpu(const double *__restrict__ d_in,
   static size_t temp_storage_bytes = 0;
   static int last_size = -1;
 
-  // Only allocate once, or if size has changed
-  if (maxZ_temp_storage == nullptr || size != last_size) {
+  // Allocate only if the size has increased.
+  if (size > last_size) {
     if (maxZ_temp_storage != nullptr) {
       cudaFree(maxZ_temp_storage);
       maxZ_temp_storage = nullptr;
