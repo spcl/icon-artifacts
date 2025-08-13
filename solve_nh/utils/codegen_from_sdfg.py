@@ -232,7 +232,6 @@ class Compiler:
         self.dace_include = (
             Path(dace.__file__).parent / "runtime/include/"
         )  # Points to DaCe's internal runtime headers.
-        self.cuda_arch = os.getenv("CUDA_ARCH", "native")  # Target CUDA architecture, 'native' by default.
 
     def _get_diagnosis_flags_cpp(self) -> list[str]:
         """
@@ -384,17 +383,21 @@ class Compiler:
             # "-Xcompiler=-fopenmp",  # Host: Enable OpenMP.
         ]
 
+        GENCODE_NUMBER = os.getenv('GENCODE_NUMBER', 0)
+        if not GENCODE_NUMBER and not os.getenv('GENCODE_ARCH', None):
+            raise ValueError(f"""GENCODE_NUMBER environment variable is not set. Please set it to the desired CUDA architecture version.
+    export GENCODE_NUMBER=70 # for Ault
+    export GENCODE_NUMBER=90 # for Daint, Jupiter
+
+    You can also set GENCODE_ARCH environment variable to the desired architecture, e.g.:
+    export GENCODE_ARCH="arch=compute_70,code=sm_70" # for Ault
+    export GENCODE_ARCH="arch=compute_90,code=sm_90" # for Daint, Jupiter
+    """)
+        GENCODE_ARCH = os.getenv('GENCODE_ARCH', f'arch=compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}')
+        print(f"Using GENCODE_ARCH: {GENCODE_ARCH}")
+
         # Device architecture flags:
-        arch_flags = []
-        if self.cuda_arch == "native":
-            arch_flags.append("-arch=native")  # If 'native', nvcc targets host's GPU directly.
-        else:
-            # Assumes CUDA_ARCH is 'sm_XX'. Generates SASS for specific GPU and PTX for future compatibility.
-            compute_version_num = self.cuda_arch[3:]  # Extract 'XX' from 'sm_XX' (e.g., '86').
-            compute_version = f"compute_{compute_version_num}"  # Example: 'compute_86'.
-            sm_version = f"sm_{compute_version_num}"  # Example: 'sm_86'.
-            arch_flags.append(f"-gencode=arch={compute_version},code={sm_version}")  # Generate SASS.
-            arch_flags.append(f"-gencode=arch={compute_version},code={compute_version}")  # Generate PTX.
+        arch_flags = ["-gencode", f"{GENCODE_ARCH}"]
 
         # Other CUDA specific flags:
         cuda_specific_flags = [
