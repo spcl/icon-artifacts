@@ -285,6 +285,10 @@ class Compiler:
             "-Xcompiler=-Wno-unused-but-set-parameter",  # Host: Suppress parameters set but not used.
             "-Xcompiler=-Wno-sign-compare",  # Host: Suppress signed/unsigned comparison warnings.
             "-Wno-deprecated-declarations",  # CUDA: Suppress warnings for deprecated CUDA API usage.
+            "--diag-suppress 20012",
+            "--diag-suppress 20208",
+            "--diag-suppress 177",
+            "--diag-suppress 550",
         ]
 
         # Clang-specific warning suppressions for the host compiler.
@@ -331,6 +335,7 @@ class Compiler:
                 "-Xcompiler=-O0",  # Host compiler: No optimization.
                 "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU.
                 "-Xcompiler=-fno-strict-aliasing",  # Host compiler: Safer aliasing.
+                "-Xcompiler=-fstack-protector-strong",
                 "-Xcompiler=-fno-omit-frame-pointer",  # Host compiler: Keeps frame pointers.
                 "-Xcompiler=-fno-fast-math",  # Host compiler: Strict FP math.
                 "-Xcompiler=-ffp-contract=off",  # Host compiler: Disable FMA.
