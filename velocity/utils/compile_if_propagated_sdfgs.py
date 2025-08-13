@@ -792,12 +792,23 @@ def compile_if_propagated_sdfgs(
         debuginfo_flags = "-g" if debuginfo else ""
     nvhpc_flags += "  " if use_nvhpc else ""
 
-    cuda_arch = os.getenv('_CUDA_ARCH', 'native')
+    GENCODE_NUMBER = os.getenv('GENCODE_NUMBER', 0)
+    if not GENCODE_NUMBER and not os.getenv('GENCODE_ARCH', None):
+        raise ValueError(f"""GENCODE_NUMBER environment variable is not set. Please set it to the desired CUDA architecture version.
+export GENCODE_NUMBER=70 # for Ault
+export GENCODE_NUMBER=90 # for Daint, Jupiter
+
+You can also set GENCODE_ARCH environment variable to the desired architecture, e.g.:
+export GENCODE_ARCH=compute_70,code=sm_70 # for Ault
+export GENCODE_ARCH=compute_90,code=sm_90 # for Daint, Jupiter
+""")
+    GENCODE_ARCH = os.getenv('GENCODE_ARCH', f'compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}')
+    print(f"Using GENCODE_ARCH: {GENCODE_ARCH}")
     if gpu:
         if release:
-            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -arch={cuda_arch} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -DNDEBUG"
+            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -gencode arch={GENCODE_ARCH} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -DNDEBUG"
         else:
-            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -arch={cuda_arch} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
+            flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -gencode arch={GENCODE_ARCH} -O0 -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
         if lib:
             flags += " -DNO_SERDE -std=c++17 -Xcompiler=-fPIC --compiler-options '-fPIC' --shared "
         else:
