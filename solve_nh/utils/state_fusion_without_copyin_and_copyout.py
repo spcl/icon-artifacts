@@ -1,5 +1,6 @@
 import dace
 
+
 def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG) -> bool:
     changed_something = state_fusion_without_copyin_and_copyout_impl(sdfg, True)
     if not changed_something:
@@ -8,9 +9,12 @@ def state_fusion_without_copyin_and_copyout(sdfg: dace.SDFG) -> bool:
         changed_something = state_fusion_without_copyin_and_copyout_impl(sdfg, True)
     return True
 
+
 def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copyin_and_copyout: bool = True) -> bool:
     from dace.transformation.interstate import StateFusion, BlockFusion  # Avoid import loop
+
     changed_something = False
+    copy_in, copy_out = None, None
     if sdfg_with_copyin_and_copyout:
         copy_in = sdfg.start_block
         copy_out = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0][0]
@@ -18,10 +22,9 @@ def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copy
         assert len([n for n in sdfg.nodes() if sdfg.out_degree(n) == 0]) == 1
         assert isinstance(copy_out, dace.SDFGState)
         assert any([n for n in copy_in.nodes() if n.label == "flatten" and isinstance(n, dace.sdfg.nodes.LibraryNode)])
-        assert any([n for n in copy_out.nodes() if n.label == "deflatten" and isinstance(n, dace.sdfg.nodes.LibraryNode)])
-    else:
-        copy_in = None
-        copy_out = None
+        assert any(
+            [n for n in copy_out.nodes() if n.label == "deflatten" and isinstance(n, dace.sdfg.nodes.LibraryNode)]
+        )
 
     for sd in sdfg.all_sdfgs_recursive():
         for cfg in sd.all_control_flow_regions():
@@ -61,5 +64,7 @@ def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copy
     for s in sdfg.all_states():
         for n in s.nodes():
             if isinstance(n, dace.nodes.NestedSDFG):
-                changed_something = changed_something or state_fusion_without_copyin_and_copyout_impl(n.sdfg, sdfg_with_copyin_and_copyout=False)
+                changed_something = changed_something or state_fusion_without_copyin_and_copyout_impl(
+                    n.sdfg, sdfg_with_copyin_and_copyout=False
+                )
     return changed_something
