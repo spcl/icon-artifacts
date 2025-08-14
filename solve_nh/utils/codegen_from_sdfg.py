@@ -285,10 +285,10 @@ class Compiler:
             "-Xcompiler=-Wno-unused-but-set-parameter",  # Host: Suppress parameters set but not used.
             "-Xcompiler=-Wno-sign-compare",  # Host: Suppress signed/unsigned comparison warnings.
             "-Wno-deprecated-declarations",  # CUDA: Suppress warnings for deprecated CUDA API usage.
-            "--diag-suppress 20012",
-            "--diag-suppress 20208",
-            "--diag-suppress 177",
-            "--diag-suppress 550",
+            "--diag-suppress=20012",
+            "--diag-suppress=20208",
+            "--diag-suppress=177",
+            "--diag-suppress=550",
         ]
 
         # Clang-specific warning suppressions for the host compiler.
