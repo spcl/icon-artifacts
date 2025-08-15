@@ -14,9 +14,10 @@ def _add_copy_map(state: dace.SDFGState, src_arr_name:str, src_arr:dace.data.Dat
     """
     assert src_arr.shape == dst_arr.shape, "Source and destination arrays must have the same shape."
     # Create a new map node
-    map_ranges = dict()
-    for dim, size in enumerate(src_arr.shape):
-        map_ranges[f"i{dim}"] = f"0:{size}"
+    map_ranges = []
+    for dim, size in reversed(list(enumerate(src_arr.shape))):
+        map_ranges.append((f"i{dim}", f"0:{size}"))
+    access_str = f", ".join([str(s) for s, _ in reversed(map_ranges)])
 
     map_entry, map_exit = state.add_map(name=f"copy_map_{src_arr_name}_to_{dst_arr_name}", ndrange=map_ranges)
 
@@ -45,7 +46,6 @@ def _add_copy_map(state: dace.SDFGState, src_arr_name:str, src_arr:dace.data.Dat
         code=f"out = static_cast<{dtype.ctype}>(in);",
         language=dace.Language.CPP)
 
-    access_str = f", ".join([str(s) for s in map_ranges.keys()])
     state.add_edge(map_entry, f"OUT_{src_arr_name}", tasklet, "in", dace.Memlet(expr=f"{src_arr_name}[{access_str}]"))
     state.add_edge(tasklet, "out", map_exit, f"IN_{dst_arr_name}", dace.Memlet(expr=f"{dst_arr_name}[{access_str}]"))
 
