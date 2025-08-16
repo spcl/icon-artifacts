@@ -510,7 +510,7 @@ def transify_sneaky_array_writes_inside_map(g: SDFG):
             out_data = [ed.data.data for ed in st.out_edges(mX) if isinstance(ed.data, Memlet) and ed.data.data]
             array_accs = [n for n in st.all_nodes_between(mE, mX)
                         if isinstance(n, AccessNode)
-                        and isinstance(n.desc(g), Array)
+                        and isinstance(n.desc(st.sdfg), Array)
                         and n.data not in out_data
                         and node_scopes[n] is mE
                         and st.in_degree(n) == 1]
@@ -532,15 +532,15 @@ def transify_sneaky_array_writes_inside_map(g: SDFG):
 
                 # Actual rewrite.
                 print(f"Transify ({mE}): Rewriting {acc.data} as a transient inside map.")
-                while f"{acc.data}_transified_{tCounter}" in g.arrays:
+                while f"{acc.data}_transified_{tCounter}" in st.sdfg.arrays:
                     tCounter += 1
-                acc_local, _ = g.add_scalar(f"{acc.data}_transified_{tCounter}", acc.desc(g).dtype, transient=True)
+                acc_local, _ = st.sdfg.add_scalar(f"{acc.data}_transified_{tCounter}", acc.desc(g).dtype, transient=True)
                 acc_local = st.add_access(acc_local)
 
                 for ed in st.in_edges(acc):
-                    redirect_edge(st, ed, new_dst=acc_local, new_memlet=g.make_array_memlet(acc_local.data))
+                    redirect_edge(st, ed, new_dst=acc_local, new_memlet=st.sdfg.make_array_memlet(acc_local.data))
                 for ed in st.out_edges(acc):
-                    redirect_edge(st, ed, new_src=acc_local, new_memlet=g.make_array_memlet(acc_local.data))
+                    redirect_edge(st, ed, new_src=acc_local, new_memlet=st.sdfg.make_array_memlet(acc_local.data))
                 add_copy_tasklet(st, acc_local, mX, f"IN_{acc_local.data}", f"{acc.data}[{in_set}]")
 
                 cmE, cmX = mE, mX
@@ -549,8 +549,8 @@ def transify_sneaky_array_writes_inside_map(g: SDFG):
                     nmE = node_scopes[cmE]
                     nmX = st.exit_node(nmE) if nmE else None
                     if nmX:
-                        st.add_edge(cmX, f"OUT_{acc_local.data}", nmX, f"IN_{acc_local.data}", g.make_array_memlet(acc.data))
+                        st.add_edge(cmX, f"OUT_{acc_local.data}", nmX, f"IN_{acc_local.data}", st.sdfg.make_array_memlet(acc.data))
                     else:
-                        st.add_edge(cmX, f"OUT_{acc_local.data}", acc, None, g.make_array_memlet(acc.data))
+                        st.add_edge(cmX, f"OUT_{acc_local.data}", acc, None, st.sdfg.make_array_memlet(acc.data))
                     cmE, cmX = nmE, nmX
     g.validate()
