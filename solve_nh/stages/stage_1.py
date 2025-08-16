@@ -227,10 +227,11 @@ def optimization_action(g: SDFG):
         # solve_nh_corrector_post - Stage #1
         # ("corrector_post", "_for_it_0", "FOR_l_1784_c_1784"),    # Can't
         ("corrector_post", "_for_it_15", "FOR_l_1842_c_1842"),     # OK - no-read-write conflict
-        # ("corrector_post", "_for_it_19", "FOR_l_1866_c_1866"),   # Can't
+        ("corrector_post", "_for_it_19", "FOR_l_1868_c_1868"),
         ("corrector_post", "_for_it_20", "FOR_l_1870_c_1870"),   # Can't
         ("corrector_post", "_for_it_21", "FOR_l_1871_c_1871"),   # Can't
         ("corrector_post", "_for_it_22", "FOR_l_1872_c_1872"),   # Can't
+        ("corrector_post", "_for_it_23", "FOR_l_1898_c_1898"),
         # ("corrector_post", "_for_it_25", "FOR_l_1896_c_1896"),   # Can't
         ("corrector_post", "_for_it_42", "FOR_l_1965_c_1965"),     # OK - scalar
         # ("corrector_post", "_for_it_43", "FOR_l_1962_c_1962"),   # Can't
@@ -244,9 +245,10 @@ def optimization_action(g: SDFG):
         # ("corrector_pre", "_for_it_44", "FOR_l_1570_c_1570"),    # Can't (scalar, 2->3 dim array)
         # ("corrector_pre", "_for_it_45", "FOR_l_1572_c_1572"),    # Can't (actual dep)
         # ("corrector_pre", "_for_it_46", "FOR_l_1573_c_1573"),    # Can't - BLK
-        # ("corrector_pre", "_for_it_47", "FOR_l_1597_c_1597"),    # Can't - BLK
+        ("corrector_pre", "_for_it_47", "FOR_l_1598_c_1598"),
         # ("corrector_pre", "_for_it_50", "FOR_l_1610_c_1610"),    # Can't - BLK
         ("corrector_pre", "_for_it_57", "FOR_l_1655_c_1655"),      # OK - scalar
+        ("corrector_pre", "_for_it_50", "FOR_l_1611_c_1611"),
         ("corrector_pre", "_for_it_58", "FOR_l_1656_c_1656"),      # OK - scalar
         ("corrector_pre", "_for_it_59", "FOR_l_1670_c_1670"),      # OK - scalar
         ("corrector_pre", "_for_it_60", "FOR_l_1671_c_1671"),      # OK - scalar
@@ -254,7 +256,7 @@ def optimization_action(g: SDFG):
         ("corrector_pre", "_for_it_62", "FOR_l_1684_c_1684"),      # OK - scalar
 
         # solve_nh_predictor_post - Stage #1
-        # ("predictor_post", "_for_it_0", "FOR_l_1253_c_1253"),    # Can't
+        ("predictor_post", "_for_it_0", "FOR_l_1253_c_1253"),
         # ("predictor_post", "_for_it_11", "FOR_l_1297_c_1297"),   # Can't
         # ("predictor_post", "_for_it_13", "FOR_l_1310_c_1310"),   # Can't
         # ("predictor_post", "_for_it_19", "FOR_l_1339_c_1339"),   # Can't
@@ -263,20 +265,22 @@ def optimization_action(g: SDFG):
         # ("predictor_post", "_for_it_38", "FOR_l_1415_c_1415"),   # Can't
         ("predictor_post", "_for_it_38", "FOR_l_1422_c_1422"),     # OK
         ("predictor_post", "_for_it_45", "FOR_l_1449_c_1449"),     # OK
+        ("predictor_post", "_for_it_51", "FOR_l_1474_c_1474"),
         # ("predictor_post", "_for_it_53", "FOR_l_1473_c_1473"),   # Can't
         ("predictor_post", "_for_it_58", "FOR_l_1501_c_1501"),     # OK
         ("predictor_post", "_for_it_14", "FOR_l_1313_c_1313"),     # OK - OpenACC pragma kernel
         ("predictor_post", "_for_it_15", "FOR_l_1314_c_1314"),     # OK - OpenACC pragma kernel
         ("predictor_post", "_for_it_16", "FOR_l_1320_c_1320"),     # OK - OpenACC pragma kernel
+        ("predictor_post", "_for_it_17", "FOR_l_1340_c_1340"),
 
         # solve_nh_predictor_pre - Stage #1
-        # ("predictor_pre", "_for_it_66", "FOR_l_956_c_956"),      # Can't
+        ("predictor_pre", "_for_it_66", "FOR_l_956_c_956"),
         # ("predictor_pre", "_for_it_76", "FOR_l_990_c_990"),      # Can't
         # ("predictor_pre", "_for_it_81", "FOR_l_1017_c_1017"),    # Can't - BLK
         # ("predictor_pre", "_for_it_84", "FOR_l_1050_c_1050"),    # Can't - BLK
         # ("predictor_pre", "_for_it_85", "FOR_l_1053_c_1053"),    # Can't - BLK
         # ("predictor_pre", "_for_it_86", "FOR_l_1054_c_1054"),    # Can't - BLK
-        # ("predictor_pre", "_for_it_89", "FOR_l_1079_c_1079"),    # Can't - BLK
+        ("predictor_pre", "_for_it_89", "FOR_l_1079_c_1079"),
         ("predictor_pre", "_for_it_99", "FOR_l_1110_c_1110"),      # OK - scalar
         ("predictor_pre", "_for_it_100", "FOR_l_1116_c_1116"),     # OK - scalar
         ("predictor_pre", "_for_it_101", "FOR_l_1126_c_1126"),     # OK - Parent map of _for_it102
