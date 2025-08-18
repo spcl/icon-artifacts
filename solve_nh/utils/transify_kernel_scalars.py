@@ -531,10 +531,11 @@ def transify_sneaky_array_writes_inside_map(g: SDFG):
                     continue
 
                 # Actual rewrite.
-                print(f"Transify ({mE}): Rewriting {acc.data} as a transient inside map.")
                 while f"{acc.data}_transified_{tCounter}" in st.sdfg.arrays:
                     tCounter += 1
-                acc_local, _ = st.sdfg.add_scalar(f"{acc.data}_transified_{tCounter}", acc.desc(g).dtype, transient=True)
+                tAccName = f"{acc.data}_transified_{tCounter}"
+                print(f"Transify ({mE}): Rewriting {acc.data} as a transient {tAccName} inside map.")
+                acc_local, _ = st.sdfg.add_scalar(tAccName, acc.desc(g).dtype, transient=True)
                 acc_local = st.add_access(acc_local)
 
                 for ed in st.in_edges(acc):
