@@ -235,9 +235,10 @@ def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
         )
         assert mE1_st, f"Missing map {u} specified for forced fusion."
         mE1, st = mE1_st
-        mE2_st = singular(
+        mE2_st = atmost_one(
             (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v
         )
+        assert mE2_st, f"Missing map {v} specified for forced fusion."
         mE2, ost = mE2_st
         if not (st is ost):
             # POSSIBLY AN UNSTABLE ORDERING IN STATE FUSION PROBLEM

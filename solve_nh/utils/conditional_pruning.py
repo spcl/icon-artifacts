@@ -255,7 +255,7 @@ def push_interstate_edges_early(g: SDFG):
 def dead_code_cleanup(g: SDFG):
     # Potentially all transient access nodes are dead code, so we start with all of them as candidates.
     no_readers = set(
-        node.data for node, _ in g.all_nodes_recursive() if isinstance(node, AccessNode) and node.desc(sdfg=g).transient
+        node.data for node, st in g.all_nodes_recursive() if isinstance(node, AccessNode) and node.desc(st.sdfg).transient
     )
     for node, st in g.all_nodes_recursive():
         if not isinstance(node, AccessNode) or node.data not in no_readers:
