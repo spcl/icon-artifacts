@@ -29,16 +29,16 @@ def _move_map_body_into_nsdfg(state: dace.SDFGState, map_entry: dace.nodes.MapEn
     dsts = {e.data.data for e in state.out_edges(map_exit)}
     label_counter += 1
 
+    # Use later for removing the original nodes
+    all_inner_map_nodes = set(state.all_nodes_between(map_entry, map_exit))
+
     # If write -> An -> read, then the An does not have to be in the in/out edges
-    for n in state.nodes():
-        if isinstance(n, dace.nodes.AccessNode) and (not state.sdfg.arrays[n.data].transient):
+    for n in all_inner_map_nodes:
+        if isinstance(n, dace.nodes.AccessNode) and not state.sdfg.arrays[n.data].transient:
             if state.in_degree(n) > 0:
                 srcs.add(n.data)
             if state.out_degree(n) > 0:
                 dsts.add(n.data)
-
-    # Use later for removing the original nodes
-    all_inner_map_nodes = set(state.all_nodes_between(map_entry, map_exit))
 
     # Genrated the map dict, copy nodes over, keep the mapping to be able to add edges later
     for nd in all_inner_map_nodes:
