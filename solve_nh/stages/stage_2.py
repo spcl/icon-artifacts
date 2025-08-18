@@ -60,6 +60,7 @@ def optimization_action(g: SDFG):
     g.validate()
     # It was written fastly, it generates unnecessary maps
     clean_unused_data_from_nsdfg(g)
+    g.validate()
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
     print(f"Stage #{STAGE_ID}: Moved {num_applied} for loops inside maps")
@@ -111,7 +112,7 @@ def optimization_action(g: SDFG):
 
     state_fusion_without_copyin_and_copyout(g)
     if 'predictor_pre' in g.name:
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_51', '_if_cond_58', '_if_cond_42', '_if_cond_43'})
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_51', '_if_cond_43'})
     elif 'corrector_post' in g.name:
         move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_7', '_if_cond_10', '_if_cond_11'})
         # We need to fuse and only then we can unlock `_if_cond_6`
@@ -129,6 +130,7 @@ def optimization_action(g: SDFG):
 
 
     # === Sub-Phase 6: Move ifs inside maps to enable more state fusion ===
+    cleanup_conditionals(g)
     # Fused states as this transformation requires the body to have only one state
     # TODO: Make this pass be more selective (like a pass a list where we know the maps become fusable if we do it)
     state_fusion_without_copyin_and_copyout(g)
@@ -190,16 +192,16 @@ def optimization_action(g: SDFG):
             (("_for_it_7", "_for_it_8"), ("_for_it_9", "_for_it_10")),
             (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
             (("_for_it_17",), ("_for_it_18",)),
-            (("_for_it_37", "_for_it_38"), ("_for_it_39", "_for_it_40"))
+            # (("_for_it_37", "_for_it_38"), ("_for_it_39", "_for_it_40"))
         ],
         "solve_nh_predictor_pre": [
             # DOES NOT WORK: (("_for_it_70", "_for_it_71"), ("_for_it_72", "_for_it_73")),
-            (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
+            # (("_for_it_104", "_for_it_105"), ("_for_it_106", "_for_it_107")),
         ],
         "solve_nh_predictor_post": [
             (("_for_it_1", "_for_it_2"), ("_for_it_3", "_for_it_4")),
             (("_for_it_21", "_for_it_22"), ("_for_it_23", "_for_it_24")),
-            (("_for_it_30", "_for_it_31"), ("_for_it_32", "_for_it_33")),
+            # (("_for_it_30", "_for_it_31"), ("_for_it_32", "_for_it_33")),
             (("_for_it_18", "_for_it_19"), ("_for_it_21", "_for_it_22")),
         ],
     }
