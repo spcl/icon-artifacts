@@ -116,6 +116,8 @@ def cleanup_conditionals(g: SDFG):
             continue
         yep, nope = None, []
         for i, (c, _) in enumerate(node.branches):
+            if c is None:
+                c = CodeBlock('(1 == 1)')
             if not isinstance(c, CodeBlock) or not is_literal_expression(ast.parse(c.as_string, mode="eval").body):
                 continue
             cval, _ = evaluate_literal_expression(ast.parse(c.as_string, mode="eval").body)
