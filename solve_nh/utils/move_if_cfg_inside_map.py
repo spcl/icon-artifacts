@@ -524,17 +524,10 @@ def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
 
 def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
     num_applied = 0
-    cfg_candidates = {n for n, g in sdfg.all_nodes_recursive() if isinstance(n, ConditionalBlock)}
-    for n in cfg_candidates:
-        if len(n.branches) != 1:
-            #print(f"Skipping {n.label} as it has more than one branch")
+    for n, _ in sdfg.all_nodes_recursive():
+        if not isinstance(n, ConditionalBlock) or len(n.branches) != 1:
             continue
-        if not isinstance(n, ConditionalBlock):
-            #print(f"Skipping {n.label} as it is not a ConditionalBlock")
-            continue
-        if_cfg_tup : Tuple[CodeBlock, ControlFlowRegion] = n.branches[0]
-        if_cond = if_cfg_tup[0]
-        if_cfg = if_cfg_tup[1]
+        if_cond, if_cfg = n.branches[0]
         states = if_cfg.nodes()
         if "_if_cond_56" in if_cond.as_string:
             if verbose:
