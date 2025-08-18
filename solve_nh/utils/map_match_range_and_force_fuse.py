@@ -50,21 +50,19 @@ def flip_connector(c: str) -> str:
 
 def disambiguate_connectors(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX2: MapExit):
     def recon(m: MapEntry | MapExit, cID=0) -> int:
-        drops = set(m.in_connectors)
+        drops = set(c for c in m.in_connectors if c.startswith("IN_") or c.startswith("OUT_"))
         for c in drops:
             cID += 1
             while f"IN_rc{cID}" in m.in_connectors:
                 cID += 1
             assert f"OUT_rc{cID}" not in m.out_connectors
             m.add_in_connector(f"IN_rc{cID}")
-            for e in st.in_edges(m):
-                if e.dst_conn == c:
-                    redirect_edge(st, e, new_dst_conn=f"IN_rc{cID}")
+            for e in st.in_edges_by_connector(m, c):
+                redirect_edge(st, e, new_dst_conn=f"IN_rc{cID}")
             c = flip_connector(c)
             m.add_out_connector(f"OUT_rc{cID}")
-            for e in st.out_edges(m):
-                if e.src_conn == c:
-                    redirect_edge(st, e, new_src_conn=f"OUT_rc{cID}")
+            for e in st.out_edges_by_connector(m, c):
+                redirect_edge(st, e, new_src_conn=f"OUT_rc{cID}")
         for c in drops:
             m.remove_in_connector(c)
             m.remove_out_connector(flip_connector(c))
@@ -170,8 +168,11 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
         mX2.add_out_connector(ed.src_conn)
         redirect_edge(st, ed, new_src=mX2)
     for ed in st.in_edges(mE2):
-        mE1.add_in_connector(ed.dst_conn)
-        redirect_edge(st, ed, new_dst=mE1)
+        if ed.dst_conn in mE1.in_connectors:
+            st.remove_edge(ed)
+        else:
+            mE1.add_in_connector(ed.dst_conn)
+            redirect_edge(st, ed, new_dst=mE1)
     for ed in st.out_edges(mE2):
         mE1.add_out_connector(ed.src_conn)
         redirect_edge(st, ed, new_src=mE1)
