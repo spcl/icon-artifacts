@@ -39,12 +39,7 @@ def make_map_body_nested(sdfg: dace.SDFG, cond_block_name):
                 continue
             if state.entry_node(node) is not None:
                 continue  # Node is part of a map
-            if all(
-                [
-                    isinstance(n, (MapEntry, MapExit))
-                    for n in set(state.successors(node)) | set(state.predecessors(node))
-                ]
-            ):
+            if all(isinstance(n, (MapEntry, MapExit)) for n in set(state.successors(node)) | set(state.predecessors(node))):
                 continue
 
             raise ValueError(
@@ -443,26 +438,28 @@ def rename(sdfg: dace.SDFG, conflict_counter=0, seen_names=set()):
 
 def move_if_to_innermost_map(g: dace.SDFG):
     map_swap_candidates = []
-    for node, graph in g.all_nodes_recursive():
-        if isinstance(node, ConditionalBlock) and len(graph.nodes()) <= 2:
-            # If it has a map inside
-            inner_sdfg = graph.sdfg
-            parent_nsdfg = inner_sdfg.parent_nsdfg_node
-            if parent_nsdfg is not None:
-                # Direct src needs to be a map entry
-                parent_state = _find_state(g, parent_nsdfg)
-                assert parent_state is not None, "Parent state not found"
-                srcs = {e.src for e in parent_state.in_edges(parent_nsdfg)}
-                if len(srcs) == 1 and isinstance(next(iter(srcs)), dace.nodes.MapEntry):
-                    # Parent is map, now check that we have a map inside
-                    if len(node.branches) == 1:
-                        branch = node.branches[0][1]
-                        for state in branch.all_states():
-                            for n in state.nodes():
-                                if isinstance(n, dace.nodes.MapEntry):
-                                    # Move the condition inside the map
-                                    candidate = (node, graph.sdfg, n)
-                                    map_swap_candidates.append(candidate)
+    for node, st in g.all_nodes_recursive():
+        if not isinstance(node, ConditionalBlock) or len(node.branches) > 2:
+            continue
+        # If it has a map inside
+        inner_sdfg = st.sdfg
+        parent_nsdfg = inner_sdfg.parent_nsdfg_node
+        if parent_nsdfg is None:
+            continue
+        # Direct src needs to be a map entry
+        parent_state = _find_state(g, parent_nsdfg)
+        assert parent_state is not None, "Parent state not found"
+        srcs = [e.src for e in parent_state.in_edges(parent_nsdfg)]
+        if len(srcs) != 1 or not isinstance(srcs[0], dace.nodes.MapEntry) or len(node.branches) != 1:
+            continue
+        # Parent is map, now check that we have a map inside
+        branch = node.branches[0][1]
+        for state in branch.all_states():
+            for n in state.nodes():
+                if isinstance(n, dace.nodes.MapEntry):
+                    # Move the condition inside the map
+                    candidate = (node, state.sdfg, n)
+                    map_swap_candidates.append(candidate)
 
     for if_node, if_sdfg, inner_map_entry in map_swap_candidates:
         #print(f"Moving if {if_node.label} inside {inner_map_entry}")
