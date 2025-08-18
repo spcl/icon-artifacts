@@ -7,15 +7,13 @@ def rename_on_if(cfg, src: str, dst: str, recursive=False):
         if not isinstance(node, ConditionalBlock):
             continue
 
-        for b in node.branches:
-            if b[0] is None:
+        for i, b in enumerate(node.branches):
+            cond, body = b
+            if cond is None:
                 continue
-            assert isinstance(b[0], dace.properties.CodeBlock), f"Branch {b[0]} is not a CodeBlock."
-            s = b[0].as_string.replace(src, dst)
-            b[0] = dace.properties.CodeBlock(
-                code=s,
-                language=b[0].language,
-            )
+            assert isinstance(cond, dace.properties.CodeBlock), f"Branch {i} condition {cond} is not a CodeBlock."
+            s = cond.as_string.replace(src, dst)
+            node.branches[i] = (dace.properties.CodeBlock(code=s, language=cond.language), body)
 
 def rename_on_for(cfg, src: str, dst: str, recursive=False):
     for _, node in enumerate([cfg] + cfg.nodes()) if not recursive else cfg.all_nodes_recursive():
