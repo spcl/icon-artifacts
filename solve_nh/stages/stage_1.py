@@ -5,6 +5,8 @@ from dace.sdfg.state import LoopRegion
 from dace.transformation.passes.scalar_to_symbol import ScalarToSymbolPromotion
 from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
+from utils.specialize_scalar import specialize_scalar
+from dace.transformation.interstate.loop_unroll import LoopUnroll
 
 import argparse
 import warnings
@@ -44,6 +46,8 @@ from utils.transify_kernel_scalars import (
 )
 
 from utils.add_data_preserver_tasklets import add_data_preserver_tasklets
+from dace.frontend.fortran.ast_utils import singular, atmost_one
+from dace.properties import CodeBlock
 
 from utils.manual_fixes import (
     connect_ishift_to_map,
@@ -81,6 +85,25 @@ def optimization_action(g: SDFG):
     # Until this point we numerically validate
     # === Sub-Phase 1: Flattening ===
 
+    for scalar_name, scalar_value in {
+        "nlevp1": 91,
+        "nlev": 90,
+        "jg": 1,
+        "__CG_global_data__m_rayleigh_type": 2,
+        "__CG_global_data__m_divdamp_type": 32,
+        "__CG_global_data__m_is_iau_active": 0,
+        "__CG_global_data__m_igradp_method": 3,
+        "__CG_global_data__m_itime_scheme": 4,
+        "__CG_global_data__m_iadv_rhotheta": 2,
+        "__CG_global_data__m_l_limited_area": 0,
+        "__CG_global_data__m_l_vert_nested": 0,
+    }.items():
+        specialize_scalar(g, scalar_name, scalar_value)
+        g.validate()
+    # Constprop with the new constants
+    ConstantPropagation().apply_pass(g, {})
+
+
     # === Sub-Phase 2: Simplify and Patch ===
     # Simplify results with NestedSDFGs having missing symbols
     g.simplify(skip=["ArrayElimination", "FuseStates", "DeadDataflowElimination"], validate=False)
@@ -113,11 +136,6 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 5: Loop Preprocessing ===
     # Ensure loop locality for ballin LoopToMap
     # These scalars where omp private (...) and should be like that
-    if g.name == "solve_nh_predictor_pre":
-        make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1156_c_1156")
-    elif g.name == "solve_nh_corrector_pre":
-        make_array_loop_local(g, "z_ddt_vn_ray", "FOR_l_1712_c_1712")
-    g.validate()
     # === Sub-Phase 5: Loop Preprocessing ===
 
     # === Sub-Phase 6: Loop Preprocessing ===
@@ -293,16 +311,17 @@ def optimization_action(g: SDFG):
     manually_transformed_count = 0
     expected_transformed_count = 0
     for sdfg_name, loop_var, loop_label in manual_loop_to_map:
-        if sdfg_name in g.name:
-            expected_transformed_count += 1
-            for node, graph in g.all_nodes_recursive():
-                if isinstance(node, LoopRegion) and node.loop_variable == loop_var:
-                    #assert node.label == loop_label
-                    if node.label != loop_label:
-                        warnings.warn(f"Stage #{STAGE_ID}: {sdfg_name} loop {loop_label} label mismatch")
-                    print(f"Stage #{STAGE_ID}: Converting {sdfg_name} loop {loop_label} to map")
-                    LoopToMap.apply_to(sdfg=graph.sdfg, loop=node, permissive=True, options={"ballin": True})
-                    manually_transformed_count += 1
+        if sdfg_name not in g.name:
+            continue
+        expected_transformed_count += 1
+        for node, graph in g.all_nodes_recursive():
+            if not isinstance(node, LoopRegion) or node.loop_variable != loop_var:
+                continue
+            if node.label != loop_label:
+                warnings.warn(f"Stage #{STAGE_ID}: {sdfg_name} loop {loop_label} label mismatch")
+            print(f"Stage #{STAGE_ID}: Converting {sdfg_name} loop {loop_label} to map")
+            LoopToMap.apply_to(sdfg=graph.sdfg, loop=node, permissive=True, options={"ballin": True})
+            manually_transformed_count += 1
     g.validate()
 
     # Tries to make some scalars into thread-loacl
