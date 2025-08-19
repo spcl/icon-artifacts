@@ -110,6 +110,7 @@ def evaluate_literal_expression(node):
 
 
 def cleanup_conditionals(g: SDFG):
+    g.reset_cfg_list()
     ControlFlowRaising().apply_pass(g, {})
     for node, st in g.all_nodes_recursive():
         if not isinstance(node, ConditionalBlock):
