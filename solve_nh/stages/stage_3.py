@@ -54,7 +54,8 @@ def optimization_action(g: SDFG, use_bitwidth_opt: bool):
 
     # === Sub-Phase 3: Post-GPU Optimizations ===
     # Catch kernels that can be replaced with memset and memcpy
-    AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(g, {})
+    # DISABLED UNTIL FIXED.
+    # AssignmentAndCopyKernelToMemsetAndMemcpy().apply_pass(g, {})
     g.validate()
     # Make sure all connector types match with parent SDFG's symbol and data types, propagate inwards
     # Also make all int64 symbols and top-level transients into int32
