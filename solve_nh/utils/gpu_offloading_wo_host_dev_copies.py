@@ -100,7 +100,7 @@ def _check_arrays_are_constant(sdfg: dace.SDFG, array_names: Set[str], verbose: 
     writes_to_access_nodes = dict()
     for graph in sdfg.all_states():
         for node in graph.nodes():
-            if isinstance(node, dace.nodes.AccessNode):
+            if isinstance(node, AccessNode):
                 if graph.in_degree(node) > 0 and any([ie.data is not None for ie in graph.in_edges(node)]):
                     if node.data not in writes_to_access_nodes:
                         writes_to_access_nodes[node.data] = 0
@@ -262,16 +262,14 @@ def _copy_nontransient_arrays_to_gpu(sdfg: dace.SDFG, name_dict: dict, verbose: 
 
         # Add copy-ins in the flattening state
         assert isinstance(first_state, dace.SDFGState), "Expected the first state to be an SDFGState."
-        has_access_node = {
-            n for n in first_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name
-        }
+        has_access_node = {n for n in first_state.nodes() if isinstance(n, AccessNode) and n.data == dst_name}
         assert not has_access_node
         an = first_state.add_access(dst_name)
         gpu_an = first_state.add_access(dst_gpu_name)
         first_state.add_edge(an, None, gpu_an, None, dace.memlet.Memlet.from_array(dst_name, gpu_datadesc))
 
         assert isinstance(last_state, dace.SDFGState), "Expected the last state to be an SDFGState."
-        has_access_node = {n for n in last_state.nodes() if isinstance(n, dace.nodes.AccessNode) and n.data == dst_name}
+        has_access_node = {n for n in last_state.nodes() if isinstance(n, AccessNode) and n.data == dst_name}
         assert not has_access_node, f"Expected no access node for {dst_name} in the last state."
         ret_an = last_state.add_access(dst_gpu_name)
         an = last_state.add_access(dst_name)
@@ -290,23 +288,25 @@ def _get_data_used_by_map(map_entry: dace.nodes.MapEntry, state: dace.SDFGState)
     """
     data_used = set()
     for edge in state.in_edges(map_entry):
-        if edge.data is not None:
-            datadesc = state.sdfg.arrays[edge.data.data]
-            if isinstance(datadesc, dace.data.Array):
-                data_used.add(edge.data.data)
+        if edge.data is None:
+            continue
+        datadesc = state.sdfg.arrays[edge.data.data]
+        if isinstance(datadesc, dace.data.Array):
+            data_used.add(edge.data.data)
     for edge in state.out_edges(state.exit_node(map_entry)):
-        if edge.data is not None:
-            datadesc = state.sdfg.arrays[edge.data.data]
-            if isinstance(datadesc, dace.data.Array):
-                data_used.add(edge.data.data)
+        if edge.data is None:
+            continue
+        datadesc = state.sdfg.arrays[edge.data.data]
+        if isinstance(datadesc, dace.data.Array):
+            data_used.add(edge.data.data)
     # All access nodes within the map entry that is not scalar
     nodes = state.all_nodes_between(map_entry, state.exit_node(map_entry))
     for node in nodes:
-        if isinstance(node, dace.nodes.AccessNode):
-            if node.data in state.sdfg.arrays:
-                datadesc = state.sdfg.arrays[node.data]
-                if isinstance(datadesc, dace.data.Array) and not isinstance(datadesc, dace.data.Scalar):
-                    data_used.add(node.data)
+        if not isinstance(node, dace.nodes.AccessNode) or node.data not in state.sdfg.arrays:
+            continue
+        datadesc = state.sdfg.arrays[node.data]
+        if isinstance(datadesc, dace.data.Array) and not isinstance(datadesc, dace.data.Scalar):
+            data_used.add(node.data)
     return data_used
 
 
@@ -412,7 +412,7 @@ def _replace_connectors_and_nsdfg_desc(
             assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
             edge.src_conn = data_name
             edge.src.add_out_connector(data_name, force=True)
-        elif isinstance(edge.src, dace.nodes.AccessNode):
+        elif isinstance(edge.src, AccessNode):
             edge.src.data = data_name
         else:
             # Keep the src conn as is
@@ -439,7 +439,7 @@ def _replace_connectors_and_nsdfg_desc(
             assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
             edge.dst_conn = data_name
             edge.dst.add_in_connector(data_name, force=True)
-        elif isinstance(edge.dst, dace.nodes.AccessNode):
+        elif isinstance(edge.dst, AccessNode):
             edge.dst.data = data_name
         else:
             # Keep the dst conn as is
@@ -473,20 +473,20 @@ def _replace_names_in_string(text, name_mapping):
 def _replace_gpu_data_on_interstate_edges(sdfg: dace.SDFG, names_to_replace: Set[str]):
     name_dict = {n: "gpu_" + n for n in names_to_replace}
     for edge in sdfg.all_interstate_edges():
-        if edge.data is not None:
-            if isinstance(edge.data, dace.InterstateEdge):
-                new_assignments = {}
-                for k, v in edge.data.assignments.items():
-                    assert isinstance(k, str)
-                    assert isinstance(v, (str, CodeBlock))
-                    v_str = v.as_string if isinstance(v, CodeBlock) else v
-                    new_k = _replace_names_in_string(k, name_dict)
-                    new_v_str = _replace_names_in_string(v_str, name_dict)
-                    new_assignments[new_k] = CodeBlock(new_v_str) if isinstance(v, CodeBlock) else new_v_str
-                edge.data.assignments = new_assignments
-                assert edge.data.condition is None or edge.data.condition.as_string == "1", (
-                    f"Expected no condition in interstate edge {edge}: {edge.data.condition.as_string}."
-                )
+        if not isinstance(edge, dace.sdfg.InterstateEdge):
+            continue
+        new_assignments = {}
+        for k, v in edge.data.assignments.items():
+            assert isinstance(k, str)
+            assert isinstance(v, (str, CodeBlock))
+            v_str = v.as_string if isinstance(v, CodeBlock) else v
+            new_k = _replace_names_in_string(k, name_dict)
+            new_v_str = _replace_names_in_string(v_str, name_dict)
+            new_assignments[new_k] = CodeBlock(new_v_str) if isinstance(v, CodeBlock) else new_v_str
+        edge.data.assignments = new_assignments
+        assert edge.data.condition is None or edge.data.condition.as_string == "1", (
+            f"Expected no condition in interstate edge {edge}: {edge.data.condition.as_string}."
+        )
 
 
 def _replace_gpu_data_with_gpu_versions(
@@ -515,7 +515,7 @@ def _replace_gpu_data_with_gpu_versions(
                     _replace_edge_data_with_gpu_data(sdfg, state, all_edges_between, gpu_arrays)
                     # Updates connectors to match the GPU data, also updates NSDFG descriptors and access nodes
                     _replace_connectors_and_nsdfg_desc(state, all_edges_between, "gpu_", gpu_arrays)
-                if isinstance(node, dace.nodes.NestedSDFG):
+                elif isinstance(node, dace.nodes.NestedSDFG):
                     # If node is NestedSDFG, then we need to replace all data descriptors in the inner SDFG
                     inner_sdfgs.add(node.sdfg)
     else:
@@ -984,9 +984,9 @@ def _get_data_used_by_velocity(sdfg: dace.SDFG) -> Set[str]:
         """
         return any(name.endswith(suffix) for suffix in host_data_suffixes)
 
-    access_set = {
-        ie.src.data for ie in velocity_state.in_edges(velocity_tasklet) if isinstance(ie.src, dace.nodes.AccessNode)
-    } | {ie.dst.data for ie in velocity_state.out_edges(velocity_tasklet) if isinstance(ie.dst, dace.nodes.AccessNode)}
+    access_set = {ie.src.data for ie in velocity_state.in_edges(velocity_tasklet) if isinstance(ie.src, AccessNode)} | {
+        ie.dst.data for ie in velocity_state.out_edges(velocity_tasklet) if isinstance(ie.dst, AccessNode)
+    }
 
     gpu_data_set = set()
     for data_name in access_set:
