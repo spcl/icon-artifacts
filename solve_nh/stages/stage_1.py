@@ -143,7 +143,7 @@ def pray_that_startblk_endblk_values_are_correct(g: SDFG):
         n.init_statement = CodeBlock(f"{n.loop_variable} = {startblk}")
         n.loop_condition = CodeBlock(f"({n.loop_variable} <= {endblk})")
 
-    g.apply_transformations_repeated(LoopUnroll)
+    # g.apply_transformations_repeated(LoopUnroll)
 
 
 def optimization_action(g: SDFG):
@@ -470,6 +470,8 @@ def optimization_action(g: SDFG):
         # Replaces it with AN1 -> MapEntry -> NestedSDFG
         connect_ishift_to_map(g, "_state_l1132_c1132")
     # === Sub-Phase 9: Post Simplify Manual Fixes ===
+
+    # g.apply_transformations_repeated(MapUnroll)
 
     return g
 
