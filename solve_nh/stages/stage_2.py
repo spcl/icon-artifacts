@@ -72,18 +72,19 @@ def optimization_action(g: SDFG):
     # TODO: Extend this to other constants. Make sure the name matches fully to the data desc as it will call string replacements
     # If you have the pattern (nlev) -> tasklet, then it will remove the nlev and remove the in connector of the tasklet
     # then we will do (assign_tasklet) -> (__tmp_nlev) -> tasklet, such that we do not need to change in connectors
-    for scalar_name, scalar_value in {
-        "nlevp1": 91,
-        "nlev": 90,
-        "__CG_global_data__m_rayleigh_type": 2,
-        "__CG_global_data__m_divdamp_type": 3,
-    }.items():
-        specialize_scalar(g, scalar_name, scalar_value)
-        g.validate()
-    # Constprop with the new constants
-    ConstantPropagation().apply_pass(g, {})
-    cleanup_conditionals(g)
-    state_fusion_without_copyin_and_copyout(g)
+    # for scalar_name, scalar_value in {
+    #     "nlevp1": 91,
+    #     "nlev": 90,
+    #     "__CG_global_data__m_rayleigh_type": 2,
+    #     "__CG_global_data__m_divdamp_type": 3,
+    # }.items():
+    #     specialize_scalar(g, scalar_name, scalar_value)
+    #     g.validate()
+    # # Constprop with the new constants
+    # ConstantPropagation().apply_pass(g, {})
+    # cleanup_conditionals(g)
+    # g.validate()
+    # state_fusion_without_copyin_and_copyout(g)
     # === Sub-Phase 2: Specialize nlev and nlevp1  ===
 
     # === Sub-Phase 3: Clean Unused Data and Symbols From NSDFGs ===
