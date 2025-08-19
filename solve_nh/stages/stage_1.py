@@ -175,6 +175,7 @@ def optimization_action(g: SDFG):
     # Until this point we numerically validate
     # === Sub-Phase 1: Flattening ===
 
+    pray_that_startblk_endblk_values_are_correct(g)
     for scalar_name, scalar_value in {
         "nlevp1": 91,
         "nlev": 90,
