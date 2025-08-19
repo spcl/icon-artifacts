@@ -593,75 +593,62 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
                          parent_maps : Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], List[Tuple[dace.nodes.MapEntry, dace.SDFGState]]]
                          ):
     for edge in sdfg.all_interstate_edges():
-        src: dace.ControlFlowRegion = edge.src
-        dst: dace.ControlFlowRegion = edge.dst
+        if edge.data is None:
+            continue
+        src, dst = edge.src, edge.dst
         assert src.sdfg == dst.sdfg, "Expected interstate edge to be within the same SDFG."
         parent_nsdfg_node = src.sdfg.parent_nsdfg_node
-        state = next(iter(src.sdfg.all_states()))
-        if parent_nsdfg_node is None:
-            is_gpu_code = False
-        else:
-            is_gpu_code = _in_gpu_scope(root_sdfg=root_sdfg, nsdfg=parent_nsdfg_node, parent_maps=parent_maps)
-
         if parent_nsdfg_node is None:
             continue
+        is_gpu_code = _in_gpu_scope(root_sdfg=root_sdfg, nsdfg=parent_nsdfg_node, parent_maps=parent_maps)
+        if is_gpu_code:
+            continue
+        free_gpu_syms = {s for s in edge.data.free_symbols if "gpu_" in s}
+        if not free_gpu_syms:
+            # If no free GPU symbols, we can skip this edge
+            continue
 
-        parent_nsdfg_node_state = None
-        parent_nsdfg_node_sdfg = None
-        for n, g in root_sdfg.all_nodes_recursive():
-            if n == parent_nsdfg_node:
-                parent_nsdfg_node_state = g
-                parent_nsdfg_node_sdfg = g.sdfg
-                break
+        parent_nsdfg_node_state, parent_nsdfg_node_sdfg = singular(
+            (g, g.sdfg) for n, g in root_sdfg.all_nodes_recursive() if n is parent_nsdfg_node)
         assert parent_nsdfg_node_state is not None, "Expected to find parent NSDFG node state."
         assert isinstance(parent_nsdfg_node_state, dace.SDFGState), "Expected parent NSDFG node state to be an SDFGState."
         assert parent_nsdfg_node_sdfg is not None, "Expected to find parent NSDFG node SDFG."
 
-        if edge.data is not None:
-            free_syms = edge.data.free_symbols
+        replacements = dict()
+        # Create replacements
+        for free_sym in free_gpu_syms:
+            replacements[free_sym] = free_sym.replace("gpu_", "")
+            if free_sym in root_sdfg.arrays and not isinstance(root_sdfg.arrays[free_sym], dace.data.Scalar):
+                want_const_array = replacements[free_sym].split("_m_")[-1]
+                assert want_const_array in const_arrays, \
+                    f"Expected {want_const_array} to be in constant arrays\nConst arrays: {const_arrays}."
+            # replace this in the interstate edge
+            if replacements[free_sym] not in root_sdfg.arrays:
+                raise ValueError(
+                    f"Expected {free_sym} to be in the root SDFG arrays, but it is not. "
+                    f"Please ensure that the array is defined in the root SDFG."
+                )
+            _insert_missing_data_through_parent_scopes(
+                {replacements[free_sym]},
+                parent_nsdfg_node,
+                parent_nsdfg_node_state,
+                parent_nsdfg_node_sdfg,
+                {root_sdfg.arrays[replacements[free_sym]]},
+            )
 
-            if any(("gpu_" in free_sym) for free_sym in free_syms):
-                #print(free_syms)
-                if not is_gpu_code:
-                    replacements = dict()
-                    # Create replacements
-                    for free_sym in free_syms:
-                        if "gpu_" in free_sym:
-                            replacements[free_sym] = free_sym.replace("gpu_", "")
-                            if free_sym in root_sdfg.arrays and not isinstance(root_sdfg.arrays[free_sym], dace.data.Scalar):
-                                print("G", is_gpu_code, parent_nsdfg_node)
-                                sdfg.save("c.sdfgz", compress=True)
-                                root_sdfg.save("c_root.sdfgz", compress=True)
-                                want_const_array = free_sym.replace('gpu_', '').split("_m_")[-1]
-                                assert want_const_array in const_arrays, \
-                                    f"Expected {want_const_array} to be in constant arrays\nConst arrays: {const_arrays}."
-                            # replace this in the interstate edge
-                            if free_sym.replace("gpu_", "") not in root_sdfg.arrays:
-                                raise ValueError(
-                                    f"Expected {free_sym} to be in the root SDFG arrays, but it is not. "
-                                    f"Please ensure that the array is defined in the root SDFG."
-                                )
-                            _insert_missing_data_through_parent_scopes(
-                                {free_sym.replace("gpu_", "")},
-                                parent_nsdfg_node,
-                                parent_nsdfg_node_state,
-                                parent_nsdfg_node_sdfg,
-                                {root_sdfg.arrays[free_sym.replace("gpu_", "")]},
-                            )
+        if replacements:
+            print(f"Found GPU access on interstate edge: replacing {replacements} in interstate edge {edge} ({src.sdfg.label}).")
+            print(f"Arrays are constant and can be duplicated on the Host and the GPU")
 
-                    if replacements != dict():
-                        print(f"Found GPU access on interstate edge: replacing {replacements} in interstate edge {edge} ({src.sdfg.label}).")
-                        print(f"Arrays are constant and can be duplicated on the Host and the GPU")
-
-                    new_assignments = dict()
-                    for k, v in edge.data.assignments.items():
-                        assert isinstance(k, str)
-                        assert isinstance(v, (str, CodeBlock))
-                        if isinstance(v, CodeBlock):
-                            new_assignments[_repl(k, replacements)] = CodeBlock(_repl(v.as_string, replacements))
-                        else:
-                            new_assignments[_repl(k, replacements)] = _repl(v, replacements)
-                    edge.data.assignments = new_assignments
+        new_assignments = dict()
+        for k, v in edge.data.assignments.items():
+            assert isinstance(k, str)
+            assert isinstance(v, (str, CodeBlock))
+            if isinstance(v, CodeBlock):
+                new_assignments[_repl(k, replacements)] = CodeBlock(_repl(v.as_string, replacements))
+            else:
+                new_assignments[_repl(k, replacements)] = _repl(v, replacements)
+        edge.data.assignments = new_assignments
 
     for state in sdfg.all_states():
         for node in state.nodes():
@@ -671,50 +658,53 @@ def _add_interstate_data(root_sdfg: dace.SDFG, sdfg: dace.SDFG, const_arrays: Se
 def _clean_redundant_pass_through_access_node(sdfg: dace.SDFG):
     tmp_id = 0
     for node, graph in sdfg.all_nodes_recursive():
-        if isinstance(node, dace.nodes.AccessNode):
-            assert node in graph.nodes()
-            assert isinstance(graph, dace.SDFGState), "Expected graph to be an SDFGState."
-            if graph.in_degree(node) == 1 and graph.out_degree(node) == 1:
-                ie = graph.in_edges(node)[0]
-                oe = graph.out_edges(node)[0]
-                entry = graph.scope_dict()[node]
-                if entry is None or not isinstance(entry, dace.nodes.MapEntry):
-                    continue
-                if (ie.data is not None and oe.data is not None and
-                    ie.data.subset == oe.data.subset and oe.data.data == ie.data.data and
-                    isinstance(graph.sdfg.arrays[node.data], dace.data.Array) and
-                    not graph.sdfg.arrays[node.data].transient and
-                    not isinstance(graph.sdfg.arrays[node.data], dace.data.Scalar)):
-                    assign_tasklet = graph.add_tasklet(
-                        f"assign_{node.data}",
-                        {"_in"},
-                        {"_out"},
-                        f"_out = _in;",
-                        language=dace.dtypes.Language.CPP
-                    )
-                    #raise Exception(ie, oe)
-                    scalar_name, scalar = graph.sdfg.add_scalar(
-                        f"tmp_{tmp_id}",
-                        graph.sdfg.arrays[node.data].dtype,
-                        transient=True,
-                        storage=dace.dtypes.StorageType.Register
-                    )
-                    old_arr_name = node.data
-                    # Use scalar for internal tasklet
-                    node.data = f"tmp_{tmp_id}"
-                    old_memlet_data = copy.deepcopy(oe.data)
-                    oe.data = dace.Memlet.from_array(node.data, scalar)
-                    ie.data = dace.Memlet.from_array(node.data, scalar)
-                    graph.add_edge(node, None, assign_tasklet, "_in", dace.Memlet.from_array(node.data, scalar))
-                    map_entry = graph.scope_dict()[node]
-                    assert isinstance(map_entry, dace.nodes.MapEntry), f"Expected map entry node {map_entry}."
-                    map_exit = graph.exit_node(map_entry)
-                    graph.add_edge(assign_tasklet, "_out", map_exit, "IN_" + old_arr_name, copy.deepcopy(old_memlet_data))
-                    an = graph.add_access(old_arr_name)
-                    graph.add_edge(map_exit, "OUT_" + old_arr_name, an, None, dace.Memlet.from_array(old_arr_name, graph.sdfg.arrays[old_arr_name]))
-                    map_exit.add_in_connector("IN_" + old_arr_name)
-                    map_exit.add_out_connector("OUT_" + old_arr_name)
-                    tmp_id += 1
+        if not isinstance(graph, AccessNode):
+            continue
+        assert node in graph.nodes()
+        assert isinstance(graph, dace.SDFGState), "Expected graph to be an SDFGState."
+        if graph.in_degree(node) != 1 or graph.out_degree(node) != 1:
+            continue
+        entry = graph.scope_dict()[node]
+        if entry is None or not isinstance(entry, dace.nodes.MapEntry):
+            continue
+
+        ie = singular(e for e in graph.in_edges(node))
+        oe = singular(e for e in graph.out_edges(node))
+        if ie.data is None or oe.data is None or ie.data.subset != oe.data.subset or ie.data.data != oe.data.data:
+            continue
+        if isinstance(graph.sdfg.arrays[node.data], dace.data.Array) and graph.sdfg.arrays[node.data].transient and isinstance(graph.sdfg.arrays[node.data], dace.data.Scalar):
+            continue
+
+        assign_tasklet = graph.add_tasklet(
+            f"assign_{node.data}",
+            {"_in"},
+            {"_out"},
+            f"_out = _in;",
+            language=dace.dtypes.Language.CPP
+        )
+        #raise Exception(ie, oe)
+        scalar_name, scalar = graph.sdfg.add_scalar(
+            f"tmp_{tmp_id}",
+            graph.sdfg.arrays[node.data].dtype,
+            transient=True,
+            storage=dace.dtypes.StorageType.Register
+        )
+        old_arr_name = node.data
+        # Use scalar for internal tasklet
+        node.data = f"tmp_{tmp_id}"
+        old_memlet_data = copy.deepcopy(oe.data)
+        oe.data = dace.Memlet.from_array(node.data, scalar)
+        ie.data = dace.Memlet.from_array(node.data, scalar)
+        graph.add_edge(node, None, assign_tasklet, "_in", dace.Memlet.from_array(node.data, scalar))
+        map_entry = graph.scope_dict()[node]
+        assert isinstance(map_entry, dace.nodes.MapEntry), f"Expected map entry node {map_entry}."
+        map_exit = graph.exit_node(map_entry)
+        graph.add_edge(assign_tasklet, "_out", map_exit, "IN_" + old_arr_name, copy.deepcopy(old_memlet_data))
+        an = graph.add_access(old_arr_name)
+        graph.add_edge(map_exit, "OUT_" + old_arr_name, an, None, dace.Memlet.from_array(old_arr_name, graph.sdfg.arrays[old_arr_name]))
+        map_exit.add_in_connector("IN_" + old_arr_name)
+        map_exit.add_out_connector("OUT_" + old_arr_name)
+        tmp_id += 1
 
 def _move_scalar_access_to_original_name(sdfg: dace.SDFG):
     nsdfgs = set()
