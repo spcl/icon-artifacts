@@ -473,7 +473,7 @@ def _replace_names_in_string(text, name_mapping):
 def _replace_gpu_data_on_interstate_edges(sdfg: dace.SDFG, names_to_replace: Set[str]):
     name_dict = {n: "gpu_" + n for n in names_to_replace}
     for edge in sdfg.all_interstate_edges():
-        if not isinstance(edge, dace.sdfg.InterstateEdge):
+        if not isinstance(edge.data, dace.sdfg.InterstateEdge):
             continue
         new_assignments = {}
         for k, v in edge.data.assignments.items():
