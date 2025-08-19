@@ -231,24 +231,15 @@ def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
         push_interstate_edges_early(g)
         ConstantPropagation().apply_pass(g, {})
         state_fusion_without_copyin_and_copyout(g)
-        mE1_st = atmost_one(
-            (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == u
-        )
-        assert mE1_st, f"Missing map {u} specified for forced fusion."
-        mE1, st = mE1_st
-        mE2_st = atmost_one(
-            (n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v
-        )
-        assert mE2_st, f"Missing map {v} specified for forced fusion."
-        mE2, ost = mE2_st
-        if not (st is ost):
-            # POSSIBLY AN UNSTABLE ORDERING IN STATE FUSION PROBLEM
-            print(f"Expected the two maps ({u}, {v}) to be in the same state; got {st} and {ost} / {g}")
-            breakpoint()
-            continue
-        assert st is ost, f"Expected the two maps ({u}, {v}) to be in the same state; got {st} and {ost} / {g}"
+        mE1_st_list = [(n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == u]
+        assert mE1_st_list, f"Missing map {u} specified for forced fusion."
+        for mE1, st in mE1_st_list:
+            mE2 = atmost_one(
+                n for n, _ in st.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == v
+            )
+            assert mE2, f"Missing map {v} specified for forced fusion in the same state as {u} / {g}."
 
-        print(f"Attempting a forced fusion of maps: {mE1} & {mE2}")
-        map_force_fuse(st, mE1, st.exit_node(mE1), mE2, st.exit_node(mE2))
+            print(f"Attempting a forced fusion of maps: {mE1} & {mE2}")
+            map_force_fuse(st, mE1, st.exit_node(mE1), mE2, st.exit_node(mE2))
 
-        g.validate()
+            g.validate()
