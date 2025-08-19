@@ -900,7 +900,6 @@ def _gpu_offloading_wo_host_dev_copies_impl(
     # gpu___CG_p_nh_prog_nnew__m_w access has a dependency where layer n+1 depends on n
 
     # Add missing symbols
-    sdfg.validate()
     _move_scalar_access_to_original_name(sdfg)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
     _remove_transient_arrays_from_parent_nsdfg(sdfg)
