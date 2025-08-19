@@ -143,7 +143,8 @@ def pray_that_startblk_endblk_values_are_correct(g: SDFG):
         n.init_statement = CodeBlock(f"{n.loop_variable} = {startblk}")
         n.loop_condition = CodeBlock(f"({n.loop_variable} <= {endblk})")
 
-    # g.apply_transformations_repeated(LoopUnroll)
+    g.apply_transformations_repeated(LoopUnroll)
+    g.validate()
 
 
 def optimization_action(g: SDFG):
