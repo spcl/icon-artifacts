@@ -24,6 +24,7 @@ from utils.move_if_cfg_inside_map import move_if_cfg_inside_map_from_condition_v
 from utils.specialize_scalar import specialize_scalar
 from utils.state_fusion_without_copyin_and_copyout import state_fusion_without_copyin_and_copyout
 from utils.if_else_to_conditional_op import if_else_to_coditional_op_pass
+from utils.add_missing_symbols import add_missing_data_and_symbols_to_all_nsdfgs
 STAGE_ID = 2
 
 def optimization_action(g: SDFG):
@@ -49,6 +50,7 @@ def optimization_action(g: SDFG):
     dead_code_cleanup(g)
     # === Sub-Phase 0.3: Make the sneaky array writes inside maps explicit ===
     transify_sneaky_array_writes_inside_map(g)
+    g.validate()
     # === Sub-Phase 0.3: Make the sneaky array writes inside maps explicit ===
 
     # === Sub-Phase 1: Move Loops inside Maps ===
@@ -64,27 +66,14 @@ def optimization_action(g: SDFG):
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
     print(f"Stage #{STAGE_ID}: Moved {num_applied} for loops inside maps")
-    # === Sub-Phase 1: Move Loops inside Maps ===
-
-    # === Sub-Phase 2: Specialize nlev and nlevp1 ===
-    # Specialize some scalars
-    # TODO: Verify that rayleigh_type, divdam_type are correct
-    # TODO: Extend this to other constants. Make sure the name matches fully to the data desc as it will call string replacements
-    # If you have the pattern (nlev) -> tasklet, then it will remove the nlev and remove the in connector of the tasklet
-    # then we will do (assign_tasklet) -> (__tmp_nlev) -> tasklet, such that we do not need to change in connectors
     for scalar_name, scalar_value in {
         "nlevp1": 91,
         "nlev": 90,
-        "__CG_global_data__m_rayleigh_type": 2,
-        "__CG_global_data__m_divdamp_type": 3,
     }.items():
         specialize_scalar(g, scalar_name, scalar_value)
+        add_missing_data_and_symbols_to_all_nsdfgs(g)
         g.validate()
-    # Constprop with the new constants
-    ConstantPropagation().apply_pass(g, {})
-    cleanup_conditionals(g)
-    state_fusion_without_copyin_and_copyout(g)
-    # === Sub-Phase 2: Specialize nlev and nlevp1  ===
+    # === Sub-Phase 1: Move Loops inside Maps ===
 
     # === Sub-Phase 3: Clean Unused Data and Symbols From NSDFGs ===
     clean_unused_data_from_nsdfg(g)

@@ -30,10 +30,15 @@ def specialize_scalar_impl(root: dace.SDFG, sdfg: dace.SDFG, scalar_name: str, s
     for state in sdfg.all_states():
         # Check dynamic inputs
         for e in state.edges():
+            if e not in state.edges():
+                continue
             if e.src in flattening_nodes or e.dst in flattening_nodes or e.data is None or e.data.data != scalar_name:
                 continue
-            state.remove_edge(e)
-            src, dst = e.src, e.dst
+
+            src = e.src
+            dst = e.dst
+
+            assert e.data.data == scalar_name
 
             if isinstance(e.dst, dace.nodes.Tasklet):
                 assign_tasklet = state.add_tasklet(
@@ -49,6 +54,10 @@ def specialize_scalar_impl(root: dace.SDFG, sdfg: dace.SDFG, scalar_name: str, s
                 copydesc.storage = dace.StorageType.Register
                 sdfg.add_datadesc(tmp_name, copydesc)
                 scl_an = state.add_access(tmp_name)
+                state.remove_edge(e)
+                state.add_edge(
+                    src, None, assign_tasklet, None, dace.memlet.Memlet()
+                )
                 state.add_edge(
                     assign_tasklet, "_out", scl_an, None, dace.memlet.Memlet.from_array(tmp_name, copydesc)
                 )
@@ -59,24 +68,24 @@ def specialize_scalar_impl(root: dace.SDFG, sdfg: dace.SDFG, scalar_name: str, s
                     src.remove_out_connector(e.src_conn)
             else:
                 state.remove_edge(e)
-                src: dace.nodes.Node = e.src
-                dst: dace.nodes.Node = e.dst
                 if e.src_conn is not None:
                     src.remove_out_connector(e.src_conn)
                 if e.dst_conn is not None:
                     dst.remove_in_connector(e.dst_conn)
 
-            if state.degree(src) == 0:
+            if state.out_degree(src) == 0:
                 if isinstance(src, dace.nodes.MapEntry):
                     # Add a dep edge
                     state.add_edge(src, None, dst, None, dace.memlet.Memlet())
                 else:
-                    state.remove_node(src)
-            if state.degree(dst) == 0:
+                    if state.degree(src) == 0:
+                        state.remove_node(src)
+            if state.in_degree(dst) == 0:
                 if isinstance(dst, dace.nodes.MapExit):
                     state.add_edge(src, None, dst, None, dace.memlet.Memlet())
                 else:
-                    state.remove_node(dst)
+                    if state.degree(dst) == 0:
+                        state.remove_node(dst)
 
         for node in state.nodes():
             if isinstance(node, dace.nodes.MapEntry):

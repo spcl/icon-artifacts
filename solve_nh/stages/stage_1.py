@@ -54,6 +54,8 @@ from utils.manual_fixes import (
     connect_ishift_to_map,
 )
 
+from utils.simplify_expressions import simplify_expressions
+
 STAGE_ID = 1
 
 
@@ -177,8 +179,6 @@ def optimization_action(g: SDFG):
 
     pray_that_startblk_endblk_values_are_correct(g)
     for scalar_name, scalar_value in {
-        "nlevp1": 91,
-        "nlev": 90,
         "jg": 1,
         "__CG_global_data__m_rayleigh_type": 2,
         "__CG_global_data__m_divdamp_type": 32,
@@ -187,13 +187,16 @@ def optimization_action(g: SDFG):
         "__CG_global_data__m_itime_scheme": 4,
         "__CG_global_data__m_iadv_rhotheta": 2,
         "__CG_global_data__m_l_limited_area": 0,
-        "__CG_global_data__m_l_vert_nested": 0,
+        "l_vert_nested": 0,
+        "l_child_vertnest": 0,
     }.items():
         specialize_scalar(g, scalar_name, scalar_value)
         g.validate()
     # Constprop with the new constants
     ConstantPropagation().apply_pass(g, {})
-
+    # simplify_expressions(g)
+    SymbolPropagation().apply_pass(g, {})
+    ConstantPropagation().apply_pass(g, {})
 
     # === Sub-Phase 2: Simplify and Patch ===
     # Simplify results with NestedSDFGs having missing symbols
