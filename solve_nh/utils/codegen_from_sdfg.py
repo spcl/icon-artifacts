@@ -349,11 +349,9 @@ class Compiler:
                 "-O3",  # Host compiler: Aggressive optimizations.
                 "-Xcompiler=-O3",  # Host compiler: Aggressive optimizations.
                 "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU
-
                 # TODO: The following two flags can be reverted if safe on Jupiter.
                 "-Xcompiler=-fno-strict-aliasing",  # Host compiler: Safer aliasing.
                 "-Xcompiler=-fstack-protector-strong",
-
                 "-Xcompiler=-fomit-frame-pointer",  # Host compiler: Omit frame pointers.
                 "-Xcompiler=-ffast-math",  # Host compiler: Fast FP math.
                 "-Xcompiler=-ffp-contract=on",  # Host compiler: Enable FMA.
@@ -392,8 +390,8 @@ class Compiler:
             # "-Xcompiler=-fopenmp",  # Host: Enable OpenMP.
         ]
 
-        GENCODE_NUMBER = os.getenv('GENCODE_NUMBER', 0)
-        if not GENCODE_NUMBER and not os.getenv('GENCODE_ARCH', None):
+        GENCODE_NUMBER = os.getenv("GENCODE_NUMBER", 0)
+        if not GENCODE_NUMBER and not os.getenv("GENCODE_ARCH", None):
             raise ValueError(f"""GENCODE_NUMBER environment variable is not set. Please set it to the desired CUDA architecture version.
     export GENCODE_NUMBER=70 # for Ault
     export GENCODE_NUMBER=90 # for Daint, Jupiter
@@ -402,7 +400,7 @@ class Compiler:
     export GENCODE_ARCH="arch=compute_70,code=sm_70" # for Ault
     export GENCODE_ARCH="arch=compute_90,code=sm_90" # for Daint, Jupiter
     """)
-        GENCODE_ARCH = os.getenv('GENCODE_ARCH', f'arch=compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}')
+        GENCODE_ARCH = os.getenv("GENCODE_ARCH", f"arch=compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}")
         print(f"Using GENCODE_ARCH: {GENCODE_ARCH}")
 
         # Device architecture flags:
@@ -665,6 +663,7 @@ class Compiler:
         cmd = [self.nvcc] + gen_sources + [f"-I{i}" for i in all_includes] + flags + ["-o", gpu_output_name]
         _run_command([str(c) for c in cmd if c])
 
+
 def _fix_init_cuda(cuda_source_path: Path, host_source_path: Path) -> None:
     host_cuda_src_pairs = [(host_source_path, cuda_source_path)]
 
@@ -736,28 +735,27 @@ def consolidate_generated_code(
 
     # WARNING: INSANE THINGS DONE HERE TO MAKE SHALLOW COPY WORK.
     import re
-    patterns = [
-        (re.compile(
-            r'\b(int\*|double\*)\s+(out___(.+?))\s*=\s*__state->__0___(.+?);',
-            re.DOTALL),
-        '__0___'),
 
-        (re.compile(
-            r'\b(int\*|double\*)\s+(out_gpu___(.+?))\s*=\s*__state->__0_gpu___(.+?);',
-            re.DOTALL),
-        '__0_gpu___')
+    patterns = [
+        (re.compile(r"\b(int\*|double\*)\s+(out___(.+?))\s*=\s*__state->__0___(.+?);", re.DOTALL), "__0___"),
+        (
+            re.compile(r"\b(int\*|double\*)\s+(out_gpu___(.+?))\s*=\s*__state->__0_gpu___(.+?);", re.DOTALL),
+            "__0_gpu___",
+        ),
     ]
 
     for pattern, rhs_prefix in patterns:
+
         def make_replacer(prefix):
             def replacer(match):
                 type_ptr, full_lhs, lhs_suffix, rhs_suffix = match.groups()
                 if lhs_suffix == rhs_suffix:
                     print(f"INSANITY: {type_ptr}__restrict__& {full_lhs} = __state->{prefix}{rhs_suffix};")
-                    return f'{type_ptr}__restrict__& {full_lhs} = __state->{prefix}{rhs_suffix};'
+                    return f"{type_ptr}__restrict__& {full_lhs} = __state->{prefix}{rhs_suffix};"
                 else:
                     print(f"KEEPING: {lhs_suffix} / {rhs_suffix}")
                     return match.group(0)
+
             return replacer
 
         combined_source = pattern.sub(make_replacer(rhs_prefix), combined_source)
@@ -841,6 +839,7 @@ def consolidate_generated_code(
         ),
         ("__state->gpu_context->streams[0]", "nullptr"),
         ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q")
+        ("const double *__restrict__ z_q", "double *__restrict__ z_q")
     ]
     _run_command(["clang-format", "-i", str(header_path), str(source_path)])
     print(f"Consolidated generated code into {header_path} and {source_path}")
@@ -850,7 +849,11 @@ def consolidate_generated_code(
         src_content = src_content.replace(old, new)
     # Then, we need to put back `extern "C"` for the actual interface functions.
     for x in ["predictor_pre", "predictor_post", "corrector_pre", "corrector_post"]:
-        for look_for in [f"solve_nh_{x}_state_t *__dace_init_solve_nh_{x}(", f"void __program_solve_nh_{x}(", f"int __dace_exit_solve_nh_{x}("]:
+        for look_for in [
+            f"solve_nh_{x}_state_t *__dace_init_solve_nh_{x}(",
+            f"void __program_solve_nh_{x}(",
+            f"int __dace_exit_solve_nh_{x}(",
+        ]:
             src_content = src_content.replace(look_for, f'extern "C" {look_for}')
     # TODO: WHY DOES CODEGEN DO THIS TO US???
     src_content = src_content.replace(
@@ -865,7 +868,11 @@ def consolidate_generated_code(
         header_content = header_content.replace(old, new)
     # Then, we need to put back `extern "C"` for the actual interface functions.
     for x in ["predictor_pre", "predictor_post", "corrector_pre", "corrector_post"]:
-        for look_for in [f"solve_nh_{x}_state_t *__dace_init_solve_nh_{x}(", f"void __program_solve_nh_{x}(", f"int __dace_exit_solve_nh_{x}("]:
+        for look_for in [
+            f"solve_nh_{x}_state_t *__dace_init_solve_nh_{x}(",
+            f"void __program_solve_nh_{x}(",
+            f"int __dace_exit_solve_nh_{x}(",
+        ]:
             header_content = header_content.replace(look_for, f'extern "C" {look_for}')
     header_path.write_text(header_content)
     _run_command(["clang-format", "-i", str(header_path)])
@@ -876,17 +883,13 @@ def consolidate_generated_code(
             ("DACE_EXPORTED", ""),
             ("const const", "const"),
             ("__state->gpu_context->streams[0]", "nullptr"),
-            ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q")
+            ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q"),
+            ("const double *__restrict__ z_q", "double *__restrict__ z_q")
         ]
 
         cuda_src_content = cuda_source_path.read_text()
         for old, new in replacements:
             cuda_src_content = cuda_src_content.replace(old, new)
-        # TODO: WHY DOES CODEGEN DO THIS TO US???
-        cuda_src_content = cuda_src_content.replace(
-            "const double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
-            "double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e"
-        )
         cuda_source_path.write_text(cuda_src_content)
         _run_command(["clang-format", "-i", str(cuda_source_path)])
 
