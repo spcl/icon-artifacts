@@ -838,8 +838,12 @@ def consolidate_generated_code(
             "// disabled: DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));",
         ),
         ("__state->gpu_context->streams[0]", "nullptr"),
-        ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q")
-        ("const double *__restrict__ z_q", "double *__restrict__ z_q")
+        ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q"),
+        ("const double *__restrict__ z_q", "double *__restrict__ z_q"),
+        (
+            "const double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
+            "double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
+        ),
     ]
     _run_command(["clang-format", "-i", str(header_path), str(source_path)])
     print(f"Consolidated generated code into {header_path} and {source_path}")
@@ -855,11 +859,6 @@ def consolidate_generated_code(
             f"int __dace_exit_solve_nh_{x}(",
         ]:
             src_content = src_content.replace(look_for, f'extern "C" {look_for}')
-    # TODO: WHY DOES CODEGEN DO THIS TO US???
-    src_content = src_content.replace(
-        "const double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
-        "double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e"
-    )
     source_path.write_text(src_content)
     _run_command(["clang-format", "-i", str(source_path)])
 
@@ -884,7 +883,11 @@ def consolidate_generated_code(
             ("const const", "const"),
             ("__state->gpu_context->streams[0]", "nullptr"),
             ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q"),
-            ("const double *__restrict__ z_q", "double *__restrict__ z_q")
+            ("const double *__restrict__ z_q", "double *__restrict__ z_q"),
+            (
+                "const double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
+                "double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
+            ),
         ]
 
         cuda_src_content = cuda_source_path.read_text()
