@@ -1,8 +1,10 @@
 import dace
 import os
+from dace import SDFG
 from typing import Callable, Dict, List, Set, Tuple
 from dace.codegen.common import CodeBlock
 from dace.sdfg import is_devicelevel_gpu
+from dace.sdfg.nodes import MapEntry, MapExit
 from dace.sdfg.state import MultiConnectorEdge
 from .transify_kernel_scalars import transify_kernel_scalars
 from .get_num_parent_map_and_loop_scopes import get_num_parent_map_and_loop_scopes, get_parent_maps
@@ -393,11 +395,12 @@ def _replace_connectors_and_nsdfg_desc(
 
         # If src_conn starts with "OUT_" (src is MapEntry or Exit)
         if isinstance(edge.src, (dace.nodes.MapExit, dace.nodes.MapEntry)):
-            if edge.src_conn is not None and edge.src_conn.startswith("OUT_"):
-                rmed = edge.src.remove_out_connector(edge.src_conn)
-                assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
-                edge.src_conn = "OUT_" + prefix + no_gpu_data_name
-                edge.src.add_out_connector(edge.src_conn, force=True)
+            pass
+            # if edge.src_conn is not None and edge.src_conn.startswith("OUT_"):
+            #     rmed = edge.src.remove_out_connector(edge.src_conn)
+            #     assert rmed, f"Expected to remove OUT connector {edge.src_conn} from {edge.src.label}."
+            #     edge.src_conn = "OUT_" + prefix + no_gpu_data_name
+            #     edge.src.add_out_connector(edge.src_conn, force=True)
         # If src is NestedSDFG
         elif isinstance(edge.src, dace.nodes.NestedSDFG):
             assert edge.src_conn is not None, "Expected src_conn to be set for NestedSDFG."
@@ -420,12 +423,14 @@ def _replace_connectors_and_nsdfg_desc(
 
         # If dst is NestedSDFG
         if isinstance(edge.dst, (dace.nodes.MapExit, dace.nodes.MapEntry)):
-            # If dst_conn starts with "IN_" (dst is MapExit or Entry)
-            if edge.dst_conn is not None and edge.dst_conn.startswith("IN_"):
-                rmed = edge.dst.remove_in_connector(edge.dst_conn)
-                assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
-                edge.dst_conn = "IN_" + prefix + no_gpu_data_name
-                edge.dst.add_in_connector(edge.dst_conn, force=True)
+            pass
+            # # If dst_conn starts with "IN_" (dst is MapExit or Entry)
+            # if edge.dst_conn is not None and edge.dst_conn.startswith("IN_"):
+            #     rmed = edge.dst.remove_in_connector(edge.dst_conn)
+            #     assert rmed, f"Expected to remove IN connector {edge.dst_conn} from {edge.dst.label}."
+            #     edge.dst_conn = "IN_" + prefix + no_gpu_data_name
+            #     edge.dst.add_in_connector(edge.dst_conn, force=True)
+            #     pray_for_death(state.sdfg)
         elif isinstance(edge.dst, dace.nodes.NestedSDFG):
             assert edge.dst_conn is not None, "Expected dst_conn to be set for NestedSDFG."
             if edge.dst_conn != data_name:
@@ -919,9 +924,7 @@ def _gpu_offloading_wo_host_dev_copies_impl(
 
 
     # Writing to non-transient scalar within a kernel is not allowed, try to fix that
-    sdfg.save("a.sdfgz", compress=True)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
-    sdfg.save("b.sdfgz", compress=True)
     transify_kernel_scalars(sdfg)
     # If subset1 -> non-transient-an -> subset2 where subset1 == subset2 and of size 1
     # then remove the access node and replace it with an assignment tasklet and transient scalar

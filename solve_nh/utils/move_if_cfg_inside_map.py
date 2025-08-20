@@ -514,11 +514,10 @@ def _copy_if_cfg_with_a_new_inner_state(state: dace.SDFGState, old_if: Condition
 
 def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
     for cv in cond:
-        co = singular(n for n, _ in g.all_nodes_recursive()
-                          if isinstance(n, ConditionalBlock)
-                          and any(b is not None and cv in b.as_string for b, _ in n.branches))
-        g.validate()
-        move_if_cfg_inside_map(co.sdfg, co)
+        co_list = [n for n, _ in g.all_nodes_recursive() if isinstance(n, ConditionalBlock) and any(b is not None and cv in b.as_string for b, _ in n.branches)]
+        for co in co_list:
+            move_if_cfg_inside_map(co.sdfg, co)
+            g.validate()
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
 

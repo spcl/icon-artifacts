@@ -7,6 +7,7 @@ from stages import common
 from utils.codegen_from_sdfg import ArtifactMode
 from utils.specialize_scalar import specialize_scalar
 from dace.transformation.interstate.loop_unroll import LoopUnroll
+from dace.transformation.dataflow import MapUnroll
 
 import argparse
 import warnings
@@ -56,6 +57,95 @@ from utils.manual_fixes import (
 STAGE_ID = 1
 
 
+def pray_that_startblk_endblk_values_are_correct(g: SDFG):
+    """
+    The line numbers are based on (and near, but slightly off from) the icon-clone that we have.
+# PREPRE
+801: i_startblk=1, i_endblk=1
+1158: i_startblk=1, i_endblk=1
+1219: i_startblk=2, i_endblk=2
+1234: i_startblk=1, i_endblk=2
+1348: NEVER HAPPENS ???
+1422: i_startblk=1, i_endblk=2
+1921: NEVER HAPPENS ???
+
+# PREPOST
+2440: i_startblk=1, i_endblk=2
+2745: i_startblk=1, i_endblk=1
+2871: i_startblk=1, i_endblk=1
+3369: NEVER HAPPENS ???
+
+# CORPRE
+4027: i_startblk=1, i_endblk=1
+4384: NEVER HAPPENS ???
+4445: NEVER HAPPENS ???
+4460: NEVER HAPPENS ???
+4610: i_startblk=1, i_endblk=2
+4648: i_startblk=1, i_endblk=2
+5147: NEVER HAPPENS ???
+
+# CORPOST
+5664: i_startblk=1, i_endblk=2
+5969: NEVER HAPPENS ???
+6095: i_startblk=1, i_endblk=1
+6593: NEVER HAPPENS ???
+6959: NEVER HAPPENS ???
+
+# DOES NOT MATTER; AFTER CORPOST
+6995: i_startblk=1, i_endblk=1
+    """
+    # PREPRE BLK LOOPS: [(LoopRegion (FOR_l_956_c_956), '_for_it_66'), (LoopRegion (FOR_l_1017_c_1017), '_for_it_81'), (LoopRegion (FOR_l_114_c_114), '_for_it_1_0_0'), (LoopRegion (FOR_l_114_c_114_0), '_for_it_1_0_1'), (LoopRegion (FOR_l_471_c_471), '_for_it_10_0'), (LoopRegion (FOR_l_1050_c_1050), '_for_it_84'), (LoopRegion (FOR_l_1079_c_1079), '_for_it_89'), (LoopRegion (FOR_l_1139_c_1139), '_for_it_103'), (LoopRegion (FOR_l_1168_c_1168), '_for_it_110')]
+    # FOR_l_114_c_114: CALLED IN SUBROUTINE, PROBABLY RELATED TO LINE: 1219
+    # FOR_l_114_c_114_0: CALLED IN SUBROUTINE, PROBABLY RELATED TO LINE: 1219
+    # FOR_l_471_c_471: CALLED IN SUBROUTINE, PROBABLY RELATED TO LINE: 1219
+    PREPRE = {
+        "_for_it_66": (1, 1), # LINE: 801
+        "_for_it_81": (1, 1), # LINE: 1158
+        "_for_it_84": (1, 2), # LINE: 1234
+        "_for_it_89": (1, 2), # LINE: 1422
+        "_for_it_103": (1, 2), # LINE: 1422
+        # "_for_it_110": LINE: 1921, NEVER HAPPENS
+    }
+    # PREPOST BLK LOOPS: [(LoopRegion (FOR_l_1254_c_1254), '_for_it_0'), (LoopRegion (FOR_l_1311_c_1311), '_for_it_13'), (LoopRegion (FOR_l_1340_c_1340), '_for_it_17'), (LoopRegion (FOR_l_1474_c_1474), '_for_it_51')]
+    PREPOST = {
+        "_for_it_0": (1, 2), # LINE: 2440
+        "_for_it_13": (1, 1), # LINE: 2745
+        "_for_it_17": (1, 1), # LINE: 2871
+        # "_for_it_51": LINE: 3369, NEVER HAPPENS
+    }
+    # CORPRE BLK LOOPS: [(LoopRegion (FOR_l_1571_c_1571), '_for_it_44'), (LoopRegion (FOR_l_1598_c_1598), '_for_it_47'), (LoopRegion (FOR_l_1611_c_1611), '_for_it_50')]
+    CORPRE = {
+        "_for_it_44": (1, 1), # LINE: 4027
+        "_for_it_47": (1, 2), # LINE: 4610
+        "_for_it_50": (1, 2), # LINE: 4648
+    }
+    # CORPOST BLK LOOPS: [(LoopRegion (FOR_l_1786_c_1786), '_for_it_0'), (LoopRegion (FOR_l_1868_c_1868), '_for_it_19'), (LoopRegion (FOR_l_1898_c_1898), '_for_it_23'), (LoopRegion (FOR_l_2052_c_2052), '_for_it_60')]
+    CORPOST = {
+        "_for_it_0": (1, 2), # LINE: 5664
+        # "_for_it_19": # LINE: 5969, NEVER HAPPENS
+        "_for_it_23": (1, 1), # LINE: 6095
+        "_for_it_60": (1, 1), # LINE: 6095
+    }
+    ITERATOR_TO_START_END_BLK = {
+        "predictor_pre": PREPRE,
+        "predictor_post": PREPOST,
+        "corrector_pre": CORPRE,
+        "corrector_post": CORPOST,
+    }
+
+    HACKS = singular(v for k, v in ITERATOR_TO_START_END_BLK.items() if k in g.name)
+    for n, st in g.all_nodes_recursive():
+        if not isinstance(n, LoopRegion) or n.loop_variable not in HACKS:
+            continue
+        startblk, endblk = HACKS[n.loop_variable]
+        assert n.init_statement.as_string == f"{n.loop_variable} = i_startblk"
+        assert n.loop_condition.as_string == f"({n.loop_variable} <= i_endblk)"
+        n.init_statement = CodeBlock(f"{n.loop_variable} = {startblk}")
+        n.loop_condition = CodeBlock(f"({n.loop_variable} <= {endblk})")
+
+    # g.apply_transformations_repeated(LoopUnroll)
+
+
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
     # === Sub-Phase 1: Flattening ===
@@ -85,6 +175,7 @@ def optimization_action(g: SDFG):
     # Until this point we numerically validate
     # === Sub-Phase 1: Flattening ===
 
+    pray_that_startblk_endblk_values_are_correct(g)
     for scalar_name, scalar_value in {
         "nlevp1": 91,
         "nlev": 90,
@@ -379,6 +470,8 @@ def optimization_action(g: SDFG):
         # Replaces it with AN1 -> MapEntry -> NestedSDFG
         connect_ishift_to_map(g, "_state_l1132_c1132")
     # === Sub-Phase 9: Post Simplify Manual Fixes ===
+
+    # g.apply_transformations_repeated(MapUnroll)
 
     return g
 
