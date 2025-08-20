@@ -317,6 +317,7 @@ class Compiler:
             return [
                 "-O3",  # Aggressive optimizations for maximum performance.
                 "-march=native",  # Optimize for the CPU architecture where compilation occurs.
+                "-mtune=native",
                 "-fstrict-aliasing",  # Enables aggressive alias analysis for potentially faster code.
                 "-fomit-frame-pointer",  # Omits frame pointers to free a register (minor speedup, harder debugging).
                 "-ffast-math",  # Enables less strict floating-point optimizations (speed over strict IEEE 754).
@@ -349,13 +350,14 @@ class Compiler:
                 "-O3",  # Host compiler: Aggressive optimizations.
                 "-Xcompiler=-O3",  # Host compiler: Aggressive optimizations.
                 "-Xcompiler=-march=native",  # Host compiler: Optimize for current CPU
+                "-Xcompiler=-mtune=native",
                 # TODO: The following two flags can be reverted if safe on Jupiter.
-                "-Xcompiler=-fno-strict-aliasing",  # Host compiler: Safer aliasing.
-                "-Xcompiler=-fstack-protector-strong",
+                "-Xcompiler=-fstrict-aliasing",  # Host compiler: Safer aliasing.
                 "-Xcompiler=-fomit-frame-pointer",  # Host compiler: Omit frame pointers.
                 "-Xcompiler=-ffast-math",  # Host compiler: Fast FP math.
                 "-Xcompiler=-ffp-contract=on",  # Host compiler: Enable FMA.
                 "-lineinfo",  # Device: Include line information in the device binary for profiling.
+                "--use-fast-math",
                 "--fmad=true",  # Device: Enable Fused Multiply-Add (FMA) for performance.
                 "--prec-div=false",  # Device: Use less precise (faster) division.
                 "--prec-sqrt=false",  # Device: Use less precise (faster) square root.
