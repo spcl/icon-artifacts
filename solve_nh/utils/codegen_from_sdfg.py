@@ -357,7 +357,6 @@ class Compiler:
                 "-Xcompiler=-ffast-math",  # Host compiler: Fast FP math.
                 "-Xcompiler=-ffp-contract=on",  # Host compiler: Enable FMA.
                 "-lineinfo",  # Device: Include line information in the device binary for profiling.
-                "--use-fast-math",
                 "--fmad=true",  # Device: Enable Fused Multiply-Add (FMA) for performance.
                 "--prec-div=false",  # Device: Use less precise (faster) division.
                 "--prec-sqrt=false",  # Device: Use less precise (faster) square root.
