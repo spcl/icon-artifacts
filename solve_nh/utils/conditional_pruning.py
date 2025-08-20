@@ -81,6 +81,36 @@ def is_literal_expression(node):
     checker.visit(node)
     return checker.is_safe
 
+def simplify_boolean_op(node):
+    if not isinstance(node, ast.BoolOp):
+        return node
+    simplified_values = []
+    for i, value in enumerate(node.values):
+        if is_literal_expression(value):
+            result, msg = evaluate_literal_expression(value)
+            if result is not None:
+                simplified_values.append(result)
+            else:
+                simplified_values.append(value)
+        else:
+            simplified_values.append(simplify_boolean_op(value))
+    if isinstance(node.op, ast.And) and any(v is False or v == 0 or (isinstance(v, ast.Constant) and v.value is False) for v in simplified_values):
+        return ast.Constant(value=False)
+    if isinstance(node.op, ast.Or) and any(v is True or v == 1 or (isinstance(v, ast.Constant) and v.value is True) for v in simplified_values):
+        return ast.Constant(value=True)
+    if isinstance(node.op, ast.And):
+        return ast.BoolOp(
+            op=node.op,
+            values=[v for v in simplified_values if v is not True]
+        )
+    elif isinstance(node.op, ast.Or):
+        return ast.BoolOp(
+            op=node.op,
+            values=[v for v in simplified_values if v is not False]
+        )
+    else:
+        return node
+
 
 def evaluate_literal_expression(node):
     # 1. First, get the actual expression node, regardless of the wrapper.
@@ -89,7 +119,9 @@ def evaluate_literal_expression(node):
     else:
         # If it's not an Expr, assume it's the expression itself.
         expression = node
-
+    # Try to take a shortcut for boolean operations.
+    if isinstance(expression, ast.BoolOp):
+        expression = simplify_boolean_op(expression)
     # 2. Perform the safety check on the expression.
     if not is_literal_expression(expression):
         return None, "Expression contains non-literal or unsafe elements."
@@ -100,7 +132,7 @@ def evaluate_literal_expression(node):
         safe_locals = {}
 
         # Compile the expression node, using the 'eval' mode.
-        compiled_code = compile(ast.Expression(expression), "<string>", "eval")
+        compiled_code = compile(ast.fix_missing_locations(ast.Expression(expression)), "<string>", "eval")
 
         result = eval(compiled_code, safe_globals, safe_locals)
         return result, "success"
@@ -156,6 +188,17 @@ def cleanup_conditionals(g: SDFG):
         cval, _ = evaluate_literal_expression(ast.parse(e.data.condition.as_string, mode="eval").body)
         if cval is False:
             st.remove_edge(e)
+            continue
+        eupd = {}
+        for k, v in e.data.assignments.items():
+            cval, _ = evaluate_literal_expression(ast.parse(v, mode="eval").body)
+            if cval is True:
+                eupd[k] = InterstateEdge._convert_assignment('1')
+                print(f"Node {e.src} -> {e.dst}: Evaluating interstate edge assignment of {k}: {v} to {eupd[k]}")
+            elif cval is False:
+                eupd[k] = InterstateEdge._convert_assignment('0')
+                print(f"Node {e.src} -> {e.dst}: Evaluating interstate edge assignment of {k}: {v} to {eupd[k]}")
+        e.data.assignments.update(eupd)
     PruneEmptyConditionalBranches().apply_pass(g, {})
     g.validate()
 
