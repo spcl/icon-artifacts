@@ -350,9 +350,21 @@ def _is_blk_map(map_node: dace.nodes.MapEntry, map_state: dace.SDFGState) -> boo
         return True
     return False
 
-
+def _scalar_range_leq_three(map_node: dace.nodes.MapEntry) -> bool:
+    if len(map_node.map.range) != 1:
+        return False
+    b,e,s = map_node.map.range[0]
+    try:
+        len_expr = (e + 1 - b) // s
+        len_int = int(len_expr)
+        if len_int <= 3:
+            return True
+    except Exception as ex:
+        return False
+    return False 
+ 
 def _additional_offload_condition(map_node: dace.nodes.MapEntry, map_state: dace.SDFGState) -> bool:
-    return not _is_blk_map(map_node, map_state)
+    return (not _is_blk_map(map_node, map_state)) and (not _scalar_range_leq_three(map_node))
 
 
 def _replace_edge_data_with_gpu_data(

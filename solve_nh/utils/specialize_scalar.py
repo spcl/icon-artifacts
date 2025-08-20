@@ -56,9 +56,6 @@ def specialize_scalar_impl(root: dace.SDFG, sdfg: dace.SDFG, scalar_name: str, s
                 scl_an = state.add_access(tmp_name)
                 state.remove_edge(e)
                 state.add_edge(
-                    src, None, assign_tasklet, None, dace.memlet.Memlet()
-                )
-                state.add_edge(
                     assign_tasklet, "_out", scl_an, None, dace.memlet.Memlet.from_array(tmp_name, copydesc)
                 )
                 state.add_edge(

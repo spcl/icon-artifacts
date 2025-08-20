@@ -5,38 +5,6 @@
 #include <dace/dace.h>
 
 
-struct t_prepare_adv {
-    int __f2dace_SA_mass_flx_ic_d_0_s_905 = {};
-int __f2dace_SA_mass_flx_ic_d_1_s_906 = {};
-int __f2dace_SA_mass_flx_ic_d_2_s_907 = {};
-int __f2dace_SA_mass_flx_me_d_0_s_902 = {};
-int __f2dace_SA_mass_flx_me_d_1_s_903 = {};
-int __f2dace_SA_mass_flx_me_d_2_s_904 = {};
-int __f2dace_SA_vn_traj_d_0_s_911 = {};
-int __f2dace_SA_vn_traj_d_1_s_912 = {};
-int __f2dace_SA_vn_traj_d_2_s_913 = {};
-int __f2dace_SA_vol_flx_ic_d_0_s_908 = {};
-int __f2dace_SA_vol_flx_ic_d_1_s_909 = {};
-int __f2dace_SA_vol_flx_ic_d_2_s_910 = {};
-int __f2dace_SOA_mass_flx_ic_d_0_s_905 = {};
-int __f2dace_SOA_mass_flx_ic_d_1_s_906 = {};
-int __f2dace_SOA_mass_flx_ic_d_2_s_907 = {};
-int __f2dace_SOA_mass_flx_me_d_0_s_902 = {};
-int __f2dace_SOA_mass_flx_me_d_1_s_903 = {};
-int __f2dace_SOA_mass_flx_me_d_2_s_904 = {};
-int __f2dace_SOA_vn_traj_d_0_s_911 = {};
-int __f2dace_SOA_vn_traj_d_1_s_912 = {};
-int __f2dace_SOA_vn_traj_d_2_s_913 = {};
-int __f2dace_SOA_vol_flx_ic_d_0_s_908 = {};
-int __f2dace_SOA_vol_flx_ic_d_1_s_909 = {};
-int __f2dace_SOA_vol_flx_ic_d_2_s_910 = {};
-double* mass_flx_ic = {};
-double* mass_flx_me = {};
-double* vn_traj = {};
-double* vol_flx_ic = {};
-};
-
-
 struct t_int_state {
     int __f2dace_SA_c_lin_e_d_0_s_101 = {};
 int __f2dace_SA_c_lin_e_d_1_s_102 = {};
@@ -124,32 +92,6 @@ double* geofac_rot = {};
 double* nudgecoeff_e = {};
 double* pos_on_tplane_e = {};
 double* rbf_vec_coeff_e = {};
-};
-
-
-struct global_data_type {
-    int grf_intmethod_e = {};
-int i_am_accel_node = {};
-int iadv_rhotheta = {};
-double iau_wgt_dyn = {};
-int igradp_method = {};
-int is_iau_active = {};
-int itime_scheme = {};
-int* kstart_dd3d = {};
-int l_limited_area = {};
-int ldeepatmo = {};
-int lextra_diffu = {};
-int lvert_nest = {};
-int* nflat_gradp = {};
-int* nflatlev = {};
-int nproma = {};
-int* nrdmax = {};
-int rayleigh_type = {};
-int timer_intp = {};
-int timer_solve_nh_cellcomp = {};
-int timer_solve_nh_veltend = {};
-int timer_solve_nh_vnupd = {};
-int timers_level = {};
 };
 
 
@@ -396,6 +338,32 @@ int nlev = {};
 int nlevp1 = {};
 int nshift = {};
 t_grid_vertices* verts = {};
+};
+
+
+struct global_data_type {
+    int grf_intmethod_e = {};
+int i_am_accel_node = {};
+int iadv_rhotheta = {};
+double iau_wgt_dyn = {};
+int igradp_method = {};
+int is_iau_active = {};
+int itime_scheme = {};
+int* kstart_dd3d = {};
+int l_limited_area = {};
+int ldeepatmo = {};
+int lextra_diffu = {};
+int lvert_nest = {};
+int* nflat_gradp = {};
+int* nflatlev = {};
+int nproma = {};
+int* nrdmax = {};
+int rayleigh_type = {};
+int timer_intp = {};
+int timer_solve_nh_cellcomp = {};
+int timer_solve_nh_veltend = {};
+int timer_solve_nh_vnupd = {};
+int timers_level = {};
 };
 
 
@@ -1031,6 +999,38 @@ double* rho = {};
 double* theta_v = {};
 double* vn = {};
 double* w = {};
+};
+
+
+struct t_prepare_adv {
+    int __f2dace_SA_mass_flx_ic_d_0_s_905 = {};
+int __f2dace_SA_mass_flx_ic_d_1_s_906 = {};
+int __f2dace_SA_mass_flx_ic_d_2_s_907 = {};
+int __f2dace_SA_mass_flx_me_d_0_s_902 = {};
+int __f2dace_SA_mass_flx_me_d_1_s_903 = {};
+int __f2dace_SA_mass_flx_me_d_2_s_904 = {};
+int __f2dace_SA_vn_traj_d_0_s_911 = {};
+int __f2dace_SA_vn_traj_d_1_s_912 = {};
+int __f2dace_SA_vn_traj_d_2_s_913 = {};
+int __f2dace_SA_vol_flx_ic_d_0_s_908 = {};
+int __f2dace_SA_vol_flx_ic_d_1_s_909 = {};
+int __f2dace_SA_vol_flx_ic_d_2_s_910 = {};
+int __f2dace_SOA_mass_flx_ic_d_0_s_905 = {};
+int __f2dace_SOA_mass_flx_ic_d_1_s_906 = {};
+int __f2dace_SOA_mass_flx_ic_d_2_s_907 = {};
+int __f2dace_SOA_mass_flx_me_d_0_s_902 = {};
+int __f2dace_SOA_mass_flx_me_d_1_s_903 = {};
+int __f2dace_SOA_mass_flx_me_d_2_s_904 = {};
+int __f2dace_SOA_vn_traj_d_0_s_911 = {};
+int __f2dace_SOA_vn_traj_d_1_s_912 = {};
+int __f2dace_SOA_vn_traj_d_2_s_913 = {};
+int __f2dace_SOA_vol_flx_ic_d_0_s_908 = {};
+int __f2dace_SOA_vol_flx_ic_d_1_s_909 = {};
+int __f2dace_SOA_vol_flx_ic_d_2_s_910 = {};
+double* mass_flx_ic = {};
+double* mass_flx_me = {};
+double* vn_traj = {};
+double* vol_flx_ic = {};
 };
 
 

@@ -143,6 +143,7 @@ def optimization_action(g: SDFG):
     # Map -> if 1 = range1, if2 = range 2 -> Map (range)
     # We make it into Map -> Map (max(range1, range2)) -> every thread checks the condition
     # g.save("before_move_range_if_inside.sdfgz", compress=True)
+    # TODO: maybe not good idea, but it lets add fuse 2 map dimensions
     if "predictor_pre" in g.name:
         move_range_if_inside(g, "_for_it_101")
     g.validate()
@@ -160,6 +161,9 @@ def optimization_action(g: SDFG):
     g.validate()
     g.apply_transformations_repeated(
         MapCollapse
+    )
+    g.apply_transformations_repeated(
+        MapFusion
     )
     g.reset_cfg_list()
     g.reset_sdfg_list()
@@ -179,7 +183,7 @@ def optimization_action(g: SDFG):
         ],
         "solve_nh_corrector_post": [
             # (("_for_it_7", "_for_it_8"), ("_for_it_9", "_for_it_10")),
-            (("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")),
+            #(("_for_it_5", "_for_it_6"), ("_for_it_7", "_for_it_8")), # Maps with vars 7-8 are not called anymore due to propagation
             # (("_for_it_17",), ("_for_it_18",)),
             # (("_for_it_37", "_for_it_38"), ("_for_it_39", "_for_it_40"))
         ],

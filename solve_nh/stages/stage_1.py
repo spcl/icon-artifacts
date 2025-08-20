@@ -177,6 +177,8 @@ def optimization_action(g: SDFG):
     # Until this point we numerically validate
     # === Sub-Phase 1: Flattening ===
 
+    from utils.clean_unused_data_from_nsdfg_connectors import clean_unused_symbols_from_nsdfg, clean_unused_data_from_nsdfg
+
     pray_that_startblk_endblk_values_are_correct(g)
     for scalar_name, scalar_value in {
         "jg": 1,
@@ -189,13 +191,24 @@ def optimization_action(g: SDFG):
         "__CG_global_data__m_l_limited_area": 0,
         "l_vert_nested": 0,
         "l_child_vertnest": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_dyn_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_dmp_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_adv_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_cor_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_pgr_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_phd_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_iau_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_ray_is_associated": 0,
+        "__CG_p_nh__CG_diag__m_ddt_vn_grf_is_associated": 0,
+        "lsave_mflx": 0,
+        "__CG_global_data__m_grf_intmethod_e": 0
     }.items():
         specialize_scalar(g, scalar_name, scalar_value)
+        add_missing_data_and_symbols_to_all_nsdfgs(g)
+        clean_unused_data_from_nsdfg(g)
+        clean_unused_symbols_from_nsdfg(g)
         g.validate()
     # Constprop with the new constants
-    ConstantPropagation().apply_pass(g, {})
-    # simplify_expressions(g)
-    SymbolPropagation().apply_pass(g, {})
     ConstantPropagation().apply_pass(g, {})
 
     # === Sub-Phase 2: Simplify and Patch ===
@@ -470,8 +483,14 @@ def optimization_action(g: SDFG):
     # This map, (if it still exists after transify) prevents map collapse, manually massage it
     if "predictor_pre" in g.name:
         # TODO make it to a pass that detects AN1 -> tasklet (out = in) -> AN2 -> mapEntry -> nestedSDFG
+        states_with_ishift = {
+            s for s, _ in g.all_nodes_recursive() if isinstance(s, dace.SDFGState) and 
+            any(isinstance(n, dace.nodes.AccessNode) and n.data == "ishift_local" for n in s.nodes())
+        }
+        assert len(states_with_ishift) == 1, f"Expected exactly one state with ishift, got {len(states_with_ishift)}"
+        state_with_ishift = next(iter(states_with_ishift))
         # Replaces it with AN1 -> MapEntry -> NestedSDFG
-        connect_ishift_to_map(g, "_state_l1132_c1132")
+        connect_ishift_to_map(g, state_with_ishift.label)
     # === Sub-Phase 9: Post Simplify Manual Fixes ===
 
     # g.apply_transformations_repeated(MapUnroll)
