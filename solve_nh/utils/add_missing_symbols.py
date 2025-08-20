@@ -33,11 +33,11 @@ def add_missing_symbols_to_nsdfgs(sdfg: dace.SDFG):
 
 
 def _insert_missing_data_through_parent_scopes(
-    missing_data: list[str],
+    missing_data: Set[str],
     nsdfg_node: dace.nodes.NestedSDFG,
     parent_graph,
     parent_sdfg: dace.SDFG,
-    descs: list[dace.data.Data] | None = None,
+    descs: Set[dace.data.Data] | None = None,
 ):
     # For each data access added, add the data descriptor and connecto to the parent NSDFG node
     descs = descs or ([None] * len(missing_data))

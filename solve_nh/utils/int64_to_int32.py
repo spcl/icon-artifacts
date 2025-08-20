@@ -82,8 +82,70 @@ def _int64_to_int32_impl(root: dace.SDFG, sdfg: dace.SDFG, mapping: Dict[str, da
 
     return num_converted
 
+
+def _int64_to_int32_no_connector_change_impl(root: dace.SDFG, 
+                                             sdfg: dace.SDFG,
+                                             mapping: Dict[str, dace.typeclass],
+                                             verbose: bool = False):
+    num_converted = 0
+
+    # Move all transient data of the SDFG from int64 type to int32
+    # (And non-transient of children SDFGs)
+    for arr_name, arr in sdfg.arrays.items():
+        if arr.transient:
+            if arr.dtype == dace.int64:
+                arr.dtype = dace.int32
+                num_converted += 1
+
+    # Move all transient (not free -> free symbols come from parent map) symbols from int64 to int 32
+    for sym_name, sym_type in sdfg.symbols.items():
+        if sym_name not in sdfg.free_symbols:
+            if sym_type == dace.int64:
+                sdfg.symbols[sym_name] = dace.int32
+                num_converted += 1
+
+    # For all nested SDFGs make sure types match
+    nsdfgs = set()
+    for state in sdfg.all_states():
+        for node in state.nodes():
+            if isinstance(node, dace.nodes.NestedSDFG):
+                # Make sure symbol types match
+                for name, dtype in mapping.items():
+                    if name in node.sdfg.symbols:
+                        if node.sdfg.symbols[name] != dtype:
+                            node.sdfg.symbols[name] = dtype
+                            if verbose:
+                                print(f"Converted nested SDFG symbol {name} from {node.sdfg.symbols[name]} to {dtype}.")
+                        num_converted += 1
+
+                # Make sure array taypes match
+                for arr_name, arr in node.sdfg.arrays.items():
+                    if arr.transient is False:
+                        parent_arr_names = {ie.data.data for ie in state.in_edges(node) if ie.dst_conn == arr_name}.union(
+                            {oe.data.data for oe in state.out_edges(node) if oe.src_conn == arr_name}
+                        )
+                        assert len(parent_arr_names) == 1
+                        parent_arr_name = next(iter(parent_arr_names))
+                        if sdfg.arrays[parent_arr_name].dtype != arr.dtype:
+                            arr.dtype = sdfg.arrays[parent_arr_name].dtype
+                            if verbose:
+                                print(f"Converted nested SDFG array {arr_name} to {dtype}.")
+                nsdfgs.add(node.sdfg)
+
+
+    for nsdfg in nsdfgs:
+        num_converted += _int64_to_int32_no_connector_change_impl(sdfg, nsdfg, mapping, verbose)
+
+    return num_converted
+
 def int64_to_int32(sdfg: dace.SDFG):
     verbose = os.getenv("VERBOSE", "1").lower() in ("1", "true", "yes")
     num_converted_types = _int64_to_int32_impl(sdfg, sdfg, dict(), verbose)
+    if verbose:
+        print(f"Total converted types: {num_converted_types}")
+
+def int64_to_int32_no_connector_change(sdfg: dace.SDFG):
+    verbose = os.getenv("VERBOSE", "1").lower() in ("1", "true", "yes")
+    num_converted_types = _int64_to_int32_no_connector_change_impl(sdfg, sdfg, dict(), verbose)
     if verbose:
         print(f"Total converted types: {num_converted_types}")

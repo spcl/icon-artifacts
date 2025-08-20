@@ -238,6 +238,8 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
 
 
     def _get_num_tasklets_within_map(self, state: dace.SDFGState, node: dace.nodes.MapEntry):
+        assert isinstance(node, dace.nodes.MapEntry)
+        assert node in state.nodes()
         n = {n for n in state.all_nodes_between(node, state.exit_node(node)) if isinstance(n, dace.nodes.Tasklet)}
         return len(n)
 
@@ -555,7 +557,14 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
             rmed_memsets = dict()
 
             for (node, state) in gpu_map_entries:
-                if self._get_num_tasklets_within_map(state, node) == 0:
+                failed = True
+                map_tasklets = 0
+                try:
+                    map_tasklets = self._get_num_tasklets_within_map(state, node) == 0
+                except Exception as e:
+                    failed = True
+
+                if failed or (map_tasklets == 0):
                     continue
 
                 rmed_memcpy = self.remove_memcpy_from_kernel(state, node)

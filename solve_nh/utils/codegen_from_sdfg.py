@@ -840,6 +840,7 @@ def consolidate_generated_code(
             "// disabled: DACE_GPU_CHECK(cudaStreamSynchronize(__state->gpu_context->streams[0]));",
         ),
         ("__state->gpu_context->streams[0]", "nullptr"),
+        ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q")
     ]
     _run_command(["clang-format", "-i", str(header_path), str(source_path)])
     print(f"Consolidated generated code into {header_path} and {source_path}")
@@ -875,6 +876,7 @@ def consolidate_generated_code(
             ("DACE_EXPORTED", ""),
             ("const const", "const"),
             ("__state->gpu_context->streams[0]", "nullptr"),
+            ("const double *__restrict__ gpu_z_q", "double *__restrict__ gpu_z_q")
         ]
 
         cuda_src_content = cuda_source_path.read_text()

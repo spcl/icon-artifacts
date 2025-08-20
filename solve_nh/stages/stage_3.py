@@ -20,7 +20,7 @@ from utils.assignment_and_copy_kernel_to_memset_and_memcpy import (
     AssignmentAndCopyKernelToMemsetAndMemcpy,
 )
 
-from utils.int64_to_int32 import int64_to_int32 as int64_to_int32
+from utils.int64_to_int32 import int64_to_int32 as int64_to_int32, int64_to_int32_no_connector_change
 
 from utils.reduce_bitwidth import force_decrease_bitwidth_of_nblk_arrays, decrease_bitwidth_of_const_arrays
 
@@ -60,8 +60,9 @@ def optimization_action(g: SDFG, use_bitwidth_opt: bool):
     # Also make all int64 symbols and top-level transients into int32
     # I verbose print indicates that DyCore SDFGs are not plagued by the int64 vs int32 symbol typecasts
     # and this function takes quite a while, so it can be later disabled
-    # And it can break codege
+    # And it can break codegen
     # int64_to_int32(g)
+    int64_to_int32_no_connector_change(g)
     g.validate()
     # === Sub-Phase 3: Post-GPU Optimizations ===
 

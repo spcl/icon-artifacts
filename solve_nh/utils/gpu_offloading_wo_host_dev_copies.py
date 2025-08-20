@@ -606,6 +606,7 @@ def _add_interstate_data(
     const_arrays: Set[str],
     parent_maps: Dict[Tuple[dace.nodes.MapEntry, dace.SDFGState], List[Tuple[dace.nodes.MapEntry, dace.SDFGState]]],
 ):
+    added_data = set()
     for edge in sdfg.all_interstate_edges():
         if edge.data is None:
             continue
@@ -646,13 +647,15 @@ def _add_interstate_data(
                     f"Expected {free_sym} to be in the root SDFG arrays, but it is not. "
                     f"Please ensure that the array is defined in the root SDFG."
                 )
-            _insert_missing_data_through_parent_scopes(
-                {replacements[free_sym]},
-                parent_nsdfg_node,
-                parent_nsdfg_node_state,
-                parent_nsdfg_node_sdfg,
-                {root_sdfg.arrays[replacements[free_sym]]},
-            )
+            if replacements[free_sym] not in added_data:
+                _insert_missing_data_through_parent_scopes(
+                    {replacements[free_sym]},
+                    parent_nsdfg_node,
+                    parent_nsdfg_node_state,
+                    parent_nsdfg_node_sdfg,
+                    {root_sdfg.arrays[replacements[free_sym]]},
+                )
+                added_data.add(replacements[free_sym])
 
         if replacements:
             print(
@@ -883,23 +886,55 @@ def _gpu_offloading_wo_host_dev_copies_impl(
     _replace_gpu_data_with_gpu_versions(sdfg, gpu_arrays, False)
 
     # If we have GPU access on interstate edge on CPU scope, then convert to the CPU version, add the array, ensure it is constant data
-    sdfg.save("boo.sdfgz", compress=True)
     _add_interstate_data(sdfg, sdfg, constant_arrays, parent_maps)
 
+    # Patch for access nodes going multiple times to a map entry
+    for node, parent in sdfg.all_nodes_recursive():
+        if isinstance(node, dace.SDFGState):
+            for snode in node.nodes():
+                if isinstance(snode, dace.nodes.MapEntry):
+                    for in_conn in snode.in_connectors:
+                        in_edges = list(node.in_edges_by_connector(snode, in_conn))
+                        if len(in_edges) == 2:
+                            in_edge_1 = in_edges[0]
+                            in_edge_2 = in_edges[1]
+                            #assert in_edge_1.data.data == in_edge_2.data.data, f"{in_edge_1.data.data} != {in_edge_2.data.data}"
+                            #assert in_edge_1.data.subset == in_edge_2.data.subset, f"{in_edge_1.data.subset} != {in_edge_2.data.subset}"
+                            assert in_edge_2.dst == in_edge_1.dst
+                            assert in_edge_2.dst_conn == in_edge_1.dst_conn
+                            assert in_edge_2.src == in_edge_1.src
+                            assert in_edge_2.src_conn == in_edge_1.src_conn
+                            for ie in in_edges:
+                                node.remove_edge(ie)
+                            node.add_edge(
+                                in_edge_1.src,
+                                in_edge_1.src_conn,
+                                in_edge_1.dst,
+                                in_edge_1.dst_conn,
+                                dace.memlet.Memlet.from_array(
+                                    in_edge_1.data.data,
+                                    parent.sdfg.arrays[in_edge_1.data.data],
+                                )
+                            )
+
+
     # Writing to non-transient scalar within a kernel is not allowed, try to fix that
-    sdfg.save("foo.sdfgz", compress=True)
-    sdfg.validate()
+    sdfg.save("a.sdfgz", compress=True)
+    add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
+    sdfg.save("b.sdfgz", compress=True)
     transify_kernel_scalars(sdfg)
     # If subset1 -> non-transient-an -> subset2 where subset1 == subset2 and of size 1
     # then remove the access node and replace it with an assignment tasklet and transient scalar
     # to avoid writing to data within the kernel
     _clean_redundant_pass_through_access_node(sdfg)
+    _move_scalar_access_to_original_name(sdfg) # Do this before validation -> related need to move scalars such as
+    # is_associated to the GPU
 
     # gpu___CG_p_nh_prog_nnew__m_w access has a dependency where layer n+1 depends on n
 
     # Add missing symbols
     sdfg.validate()
-    _move_scalar_access_to_original_name(sdfg)
+    #_move_scalar_access_to_original_name(sdfg)
     add_missing_data_and_symbols_to_all_nsdfgs(sdfg)
     _remove_transient_arrays_from_parent_nsdfg(sdfg)
     sdfg.validate()

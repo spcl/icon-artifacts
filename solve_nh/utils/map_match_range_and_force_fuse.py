@@ -244,7 +244,7 @@ def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
         if not (st is ost):
             # POSSIBLY AN UNSTABLE ORDERING IN STATE FUSION PROBLEM
             print(f"Expected the two maps ({u}, {v}) to be in the same state; got {st} and {ost} / {g}")
-            breakpoint()
+            #breakpoint()
             continue
         assert st is ost, f"Expected the two maps ({u}, {v}) to be in the same state; got {st} and {ost} / {g}"
 
