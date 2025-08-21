@@ -145,8 +145,6 @@ def pray_that_startblk_endblk_values_are_correct(g: SDFG):
         n.init_statement = CodeBlock(f"{n.loop_variable} = {startblk}")
         n.loop_condition = CodeBlock(f"({n.loop_variable} <= {endblk})")
 
-    # g.apply_transformations_repeated(LoopUnroll)
-
 
 def optimization_action(g: SDFG):
     """DEFINE THE OPTIMIZATION ACTION HERE"""
@@ -430,6 +428,10 @@ def optimization_action(g: SDFG):
             LoopToMap.apply_to(sdfg=graph.sdfg, loop=node, permissive=True, options={"ballin": True})
             manually_transformed_count += 1
     g.validate()
+
+    # Unroll any remaining loops that are not maps
+    # g.apply_transformations_repeated(LoopUnroll)
+    # g.validate()
 
     # Tries to make some scalars into thread-loacl
     retransify_scalar_with_local_prefix(g, g)
