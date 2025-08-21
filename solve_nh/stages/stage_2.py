@@ -101,14 +101,17 @@ def optimization_action(g: SDFG):
 
     state_fusion_without_copyin_and_copyout(g)
     if 'predictor_pre' in g.name:
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_51', '_if_cond_43'})
+        # See skip list
+        #move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_51', '_if_cond_43'})
+        pass
     elif 'corrector_post' in g.name:
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_7', '_if_cond_10', '_if_cond_11'})
+        # _if_cond_7 is related to assign map
+        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_10', '_if_cond_11'})
         # We need to fuse and only then we can unlock `_if_cond_6`
-        map_force_fuse_prescibed(g, [
-            (("_for_it_9", "_for_it_10"), ("_for_it_11", "_for_it_12")),
-        ])
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_6',})
+        #map_force_fuse_prescibed(g, [
+        #    (("_for_it_9", "_for_it_10"), ("_for_it_11", "_for_it_12")),
+        #])
+        #move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_6',})
     state_fusion_without_copyin_and_copyout(g)
 
     # === Sub-Phase 5: Clean Again ===
@@ -129,7 +132,16 @@ def optimization_action(g: SDFG):
         print(f"Stage #{STAGE_ID}: Skipping moving ifs inside maps for {g.name} as it is predictor-pre. See TODOs.")
         num_applied = 0
     else:
-        num_applied = move_if_cfg_inside_map_pass(g, verbose=True)
+        num_applied = 0
+        skip_list = [
+            ("corrector_post", "_if_cond_7"),
+            ("corrector_post", "_if_cond_24"),
+            ("corrector_pre", "_if_cond_42"),
+            ("predictor_post", "_if_cond_14"),
+            ("predictor_pre", "_if_cond_43"),
+            ("predictor_pre", "_if_cond_51"),
+        ]
+        num_applied = move_if_cfg_inside_map_pass(g, skip_list, verbose=True)
         print(f"Stage #{STAGE_ID}: Moved {num_applied} ifs inside maps")
     g.validate()
     # === Sub-Phase 6: Move ifs inside maps to enable more state fusion  ===
@@ -216,6 +228,10 @@ def optimization_action(g: SDFG):
     }
     map_force_fuse_prescibed(g, PRESCRIBED_FUSIONS[g.name])
     ConsolidateEdges().apply_pass(g, {})
+
+    g.apply_transformations_repeated(
+        InlineSDFG
+    )
 
     return g
 

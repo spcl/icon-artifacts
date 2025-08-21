@@ -521,13 +521,19 @@ def move_if_cfg_inside_map_from_condition_var(g: SDFG, cond: set[str]):
     state_fusion_without_copyin_and_copyout(g)
     g.validate()
 
-def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, verbose: bool = False) -> int:
+
+def move_if_cfg_inside_map_pass(sdfg: dace.SDFG, skip_list, verbose: bool = False) -> int:
     num_applied = 0
     for n, _ in sdfg.all_nodes_recursive():
         if not isinstance(n, ConditionalBlock) or len(n.branches) != 1:
             continue
         if_cond, if_cfg = n.branches[0]
         states = if_cfg.nodes()
+        for sdfg_name, if_cond_name in skip_list:
+            if sdfg_name in sdfg.name and if_cond_name in if_cond.as_string:
+                if verbose:
+                    print(f"Skipping {n.label} ({if_cond.as_string}) as it is in the skip list")
+                continue 
         if "_if_cond_56" in if_cond.as_string:
             if verbose:
                 print(f"Skipping {n.label} ({if_cond.as_string}) as it is handled in a special case")

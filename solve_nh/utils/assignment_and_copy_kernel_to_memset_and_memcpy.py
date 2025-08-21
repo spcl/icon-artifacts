@@ -1,12 +1,10 @@
 import re
-from tabnanny import verbose
 import warnings
 import dace
-
+import copy
 from dace import Tuple, properties
 from dace.codegen.common import sym2cpp
 from dace.transformation import pass_pipeline as ppl, transformation
-from dace.frontend.fortran.ast_utils import singular, atmost_one
 
 from typing import Dict, List, Set
 
@@ -146,66 +144,94 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
         return paths
 
     def _detect_contiguous_memset_paths(self, state: dace.SDFGState, node: dace.nodes.MapEntry):
+        # All tasklets within the map
+        all_tasklets = {n for n in state.all_nodes_between(node, state.exit_node(node)) if isinstance(n, dace.nodes.Tasklet)}
+
+        # Assignment tasklet: no in connector, but only out connector
+        possible_assignment_tasklets = {t for t in all_tasklets if len(t.in_connectors) == 0 and len(t.out_connectors) == 1 and state.in_degree(t) == 1 and state.out_degree(t) == 1}
+
+        paths = set()
+
+        path_candidate = []
+        in_edges_from_tasklets = {e for t in possible_assignment_tasklets for e in state.in_edges(t)}
+
         # If map range is not contigous, we can't do contiguous memset detection
         for (b, e, s) in node.map.range:
             if s != 1:
-                return []
-
-        # Assignment tasklet: no in connector, but only out connector
-        possible_assignment_tasklets = [
-            t for t in state.all_nodes_between(node, state.exit_node(node))
-            if isinstance(t, dace.nodes.Tasklet)
-            and len(t.in_connectors) == 0
-            and len(t.out_connectors) == 1
-            and state.in_degree(t) == 1
-            and state.out_degree(t) == 1
-            and t.language in [dace.Language.Python, dace.Language.CPP]
-        ]
-
-        paths = []
+                return set()
 
         # Create all possible paths
-        for t in possible_assignment_tasklets:
-            e = singular(e for e in state.in_edges(t))
+        for e in in_edges_from_tasklets:
+            path_candidate.append(e)
+
             if e.data.data is not None:
                 # If the data is not None, it is not an assignment
+                path_candidate = []
                 continue
 
-            path_candidate = [e]
+            if len(e.dst.out_connectors) != 1:
+                # If the destination has more than one out connector, it is not a contiguous memset
+                path_candidate = []
+                continue
 
             tasklet: dace.nodes.Tasklet = e.dst
             zero_literal_pattern = r"(0|0\.0|0\.0f|0\.f|0\.0d|0\.d)"
-            out_conn = singular(c for c in tasklet.out_connectors.keys())
-            DELIMITER = ';' if tasklet.language == dace.Language.CPP else ''
-            if not re.fullmatch(rf"{re.escape(out_conn)} *= *{zero_literal_pattern}{DELIMITER}", tasklet.code.as_string.strip()):
-                # Not a recognized zero assignment pattern
+            assert len(tasklet.out_connectors) == 1, "Tasklet must have exactly one out connector for contiguous copy detection"
+            out_conn = next(iter(tasklet.out_connectors))
+            tasklet_code_str = tasklet.code.as_string
+
+            if tasklet.language == dace.Language.Python:
+                if not re.fullmatch(rf"{re.escape(out_conn)} *= *{zero_literal_pattern}", tasklet_code_str.strip()):
+                    # Not a recognized zero assignment pattern
+                    path_candidate = []
+                    continue
+            elif tasklet.language == dace.Language.CPP:
+                if not re.fullmatch(rf"{re.escape(out_conn)} *= *{zero_literal_pattern};", tasklet_code_str.strip()):
+                    # Not a recognized zero assignment pattern
+                    path_candidate = []
+                    continue
+            else:
+                # Unsupported language, can't do it
+                warnings.warn(f"Unsupported tasklet language {tasklet.language} in contiguous copy detection, skipping.", UserWarning)
+                path_candidate = []
                 continue
 
-            tasklet_out_edge = singular(e for e in state.out_edges(tasklet))
+            tasklet_out_edges = {e for e in state.out_edges(tasklet)}
+            if len(tasklet_out_edges) != 1:
+                # More than one out edge, can't be a contiguous copy pattern we look for
+                path_candidate = []
+                continue
+
+            tasklet_out_edge = tasklet_out_edges.pop()
             path_candidate.append(tasklet_out_edge)
 
             map_exit = tasklet_out_edge.dst
             if not isinstance(map_exit, dace.nodes.MapExit) and map_exit != state.exit_node(node):
                 # Not a map exit, can't be a contiguous copy pattern we look for
+                path_candidate = []
                 continue
+
             map_exit_in_conn = tasklet_out_edge.dst_conn
             if not map_exit_in_conn.startswith("IN_"):
                 # This SDFG is not valid btw.
+                path_candidate = []
                 continue
             map_exit_out_conn = map_exit_in_conn.replace("IN_", "OUT_")
-            map_exit_out_edges = [e for e in state.out_edges_by_connector(map_exit, map_exit_out_conn)]
+            map_exit_out_edges = {e for e in state.out_edges_by_connector(map_exit, map_exit_out_conn)}
             if len(map_exit_out_edges) != 1:
                 # More than one out edge, can't be a contiguous copy pattern we look for
+                path_candidate = []
                 continue
 
             map_exit_out_edge = map_exit_out_edges.pop()
             path_candidate.append(map_exit_out_edge)
             if not isinstance(map_exit_out_edge.dst, dace.nodes.AccessNode):
                 # Not an access node, can't be a contiguous copy pattern we look for
+                path_candidate = []
                 continue
 
             # We found it finally!
-            paths.append(tuple(path_candidate))
+            paths.add(tuple(path_candidate))
 
         return paths
 
@@ -238,9 +264,14 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
 
 
     def _get_num_tasklets_within_map(self, state: dace.SDFGState, node: dace.nodes.MapEntry):
-        assert isinstance(node, dace.nodes.MapEntry)
-        assert node in state.nodes()
-        n = {n for n in state.all_nodes_between(node, state.exit_node(node)) if isinstance(n, dace.nodes.Tasklet)}
+        assert node in state.nodes(), f"Map entry {node} not in state {state}"
+        assert isinstance(node, dace.nodes.MapEntry), f"Node {node} is not a MapEntry"
+        assert state.exit_node(node) in state.nodes(), f"Map exit {state.exit_node(node)} not in state {state}"
+        try:
+            n = {n for n in state.all_nodes_between(node, state.exit_node(node)) if isinstance(n, dace.nodes.Tasklet)}
+        except Exception as e:
+            state.sdfg.save("debug_sdfg.sdfgz", compress=True)
+            raise Exception(e)
         return len(n)
 
     # [(b,e,s), ...] is the range
@@ -443,7 +474,18 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
             begin_subset, exit_subset, copy_length = self._get_write_begin_and_length(state, map_entry, tasklet, verbose)
 
             # We can now remove the memcpy path
+            dyn_inputs = {ie.dst_conn for ie in state.in_edges(map_entry) if not ie.dst_conn.startswith("IN_")}
+            in_edges = state.in_edges(map_entry)
             self._rm_path(state, memcpy_path)
+
+            if map_entry in state.nodes() and state.out_degree(map_entry) == 0:
+                state.remove_node(map_entry)
+            if map_exit in state.nodes() and state.in_degree(map_exit) == 0:
+                state.remove_node(map_exit)
+            # Remove left over nodes
+            for n in state.nodes():
+                if state.degree(n) == 0:
+                    state.remove_node(n)
 
             # If src / dst not in the graph anymore, add new ones
             if src_access_node not in state.nodes():
@@ -458,7 +500,7 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
             # Add a new memcpy tasklet
             tasklet = state.add_tasklet(
                 name=f"memcpy_{new_src_access_node.data}_{new_dst_access_node.data}",
-                inputs={"_in"},
+                inputs={"_in"}.union(dyn_inputs),
                 outputs={"_out"},
                 code=f"cudaMemcpyAsync(_out, _in, {sym2cpp(copy_length)} * sizeof({src_desc.storage.dtype.ctype}), cudaMemcpyDeviceToDevice, nullptr);",
                 language=dace.Language.CPP,
@@ -468,6 +510,12 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
                            dace.memlet.Memlet(subset=dace.subsets.Range(begin_subset), data=new_src_access_node.data))
             state.add_edge(tasklet, "_out", new_dst_access_node, None,
                            dace.memlet.Memlet(subset=dace.subsets.Range(exit_subset), data=new_dst_access_node.data))
+            for ie in in_edges:
+                if not ie.dst_conn.startswith("IN_"):
+                    _an = state.add_access(ie.data.data)
+                    state.add_edge(_an, None, tasklet, ie.dst_conn, copy.deepcopy(ie.data))
+                    tasklet.add_in_connector(ie.dst_conn)
+            
             rmed_count += 1
         return rmed_count
 
@@ -516,7 +564,19 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
                 continue
 
             # We can now remove the memset path
+            dyn_inputs = {ie.dst_conn for ie in state.in_edges(map_entry) if not ie.dst_conn.startswith("IN_")}
+            in_edges = state.in_edges(map_entry)
             self._rm_path(state, memset_path)
+
+            # If map entry is removed is OK, otherwise check degrees
+            if map_entry in state.nodes() and state.out_degree(map_entry) == 0:
+                state.remove_node(map_entry)
+            if map_exit in state.nodes() and state.in_degree(map_exit) == 0:
+                state.remove_node(map_exit)
+            # Remove left over nodes
+            for n in state.nodes():
+                if state.degree(n) == 0:
+                    state.remove_node(n)
 
             # If src / dst not in the graph anymore, add new ones
             if dst_access_node not in state.nodes():
@@ -524,11 +584,10 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
             else:
                 new_dst_access_node = dst_access_node
 
-
             # Add a new memset tasklet
             tasklet = state.add_tasklet(
                 name=f"memset_0_{dst_access_node.data}",
-                inputs={},
+                inputs=dyn_inputs,
                 outputs={"_out"},
                 code=f"cudaMemsetAsync(_out, 0, {sym2cpp(copy_length)} * sizeof({dst_desc.dtype.ctype}), nullptr);",
                 language=dace.Language.CPP,
@@ -538,6 +597,13 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
                            dace.memlet.Memlet(subset=dace.subsets.Range(exit_subset),
                                               data=new_dst_access_node.data)
                             )
+            # Redirect all dynamic input connectors
+            for ie in in_edges:
+                if not ie.dst_conn.startswith("IN_"):
+                    _an1 = state.add_access(ie.data.data)
+                    state.add_edge(_an1, None, tasklet, ie.dst_conn, copy.deepcopy(ie.data))
+                    tasklet.add_in_connector(ie.dst_conn)
+
             rmed_count += 1
         return rmed_count
 
@@ -557,21 +623,25 @@ class AssignmentAndCopyKernelToMemsetAndMemcpy(ppl.Pass):
             rmed_memsets = dict()
 
             for (node, state) in gpu_map_entries:
-                failed = True
-                map_tasklets = 0
+                sdfg.validate()
+                assert node in state.nodes(), f"Map entry {node} not in state {state}"
                 try:
-                    map_tasklets = self._get_num_tasklets_within_map(state, node) == 0
+                    _e = state.exit_node(node)
                 except Exception as e:
-                    failed = True
+                    state.sdfg.save("debug_sdfg.sdfgz", compress=True)
+                    raise Exception(e)
+                assert state.exit_node(node) in state.nodes(), f"Map exit {state.exit_node(node)} not in state {state}"
 
-                if failed or (map_tasklets == 0):
+                if self._get_num_tasklets_within_map(state, node) == 0:
                     continue
 
                 rmed_memcpy = self.remove_memcpy_from_kernel(state, node)
+                sdfg.validate()
 
                 # If the map is only used for 1 memcpy, then it might have been already removed
                 if node in state.nodes():
                     rmed_memset = self.remove_memset_from_kernel(state, node)
+                sdfg.validate()
 
                 assert node not in rmed_memsets
                 assert node not in rmed_memcpies
