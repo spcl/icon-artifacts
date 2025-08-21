@@ -24,6 +24,8 @@ from utils.int64_to_int32 import int64_to_int32 as int64_to_int32, int64_to_int3
 
 from utils.reduce_bitwidth import force_decrease_bitwidth_of_nblk_arrays, decrease_bitwidth_of_const_arrays
 
+from utils.specialize_scalar_copy import specialize_scalar_copy
+
 import argparse
 
 
@@ -138,6 +140,10 @@ def optimization_action(g: SDFG, use_bitwidth_opt: bool):
     insert_timers_for_profiling(g)
     g.validate()
     # === Sub-Phase 5: Profiling Patches (Make sure this is the last phase) ===
+
+    # === Sub-Phase 6: Specialize Scalar Copy ===
+    specialize_scalar_copy(g)
+    # === Sub-Phase 6: Specialize Scalar Copy ===
 
     return g
 

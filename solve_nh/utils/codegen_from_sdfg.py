@@ -891,6 +891,15 @@ def consolidate_generated_code(
                 "const double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
                 "double *__restrict__ gpu___CG_p_nh__CG_diag__m_mass_fl_e",
             ),
+            ("const double &dtime", "const double dtime"),
+            ("const int &ntl1", "const int ntl1"),
+            ("const int &ntl2", "const int ntl2"),
+            ("const double &dthalf", "const double dthalf"),
+            ("const int &nshift", "const int nshift"),
+            ("const double &wgt_nnew_vel", "const double wgt_nnew_vel"),
+            ("const double &wgt_nnow_vel", "const double wgt_nnow_vel"),
+            ("double &loop_body_z_d_vn_dmp_local", "double loop_body_z_d_vn_dmp_local"),
+            ("double &loop_body_loop_body_z_d_vn_dmp_local_0", "double loop_body_loop_body_z_d_vn_dmp_local_0"),
         ]
 
         cuda_src_content = cuda_source_path.read_text()
