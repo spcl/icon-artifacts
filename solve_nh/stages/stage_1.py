@@ -201,7 +201,7 @@ def optimization_action(g: SDFG):
         "__CG_p_nh__CG_diag__m_ddt_vn_ray_is_associated": 0,
         "__CG_p_nh__CG_diag__m_ddt_vn_grf_is_associated": 0,
         "lsave_mflx": 0,
-        "__CG_global_data__m_grf_intmethod_e": 0
+        "__CG_global_data__m_grf_intmethod_e": 6
     }.items():
         specialize_scalar(g, scalar_name, scalar_value)
         add_missing_data_and_symbols_to_all_nsdfgs(g)
