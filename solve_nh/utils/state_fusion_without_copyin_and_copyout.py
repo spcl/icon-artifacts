@@ -15,6 +15,7 @@ def state_fusion_without_copyin_and_copyout_impl(sdfg: dace.SDFG, sdfg_with_copy
 
     changed_something = False
     copy_in, copy_out = None, None
+    sdfg._cached_start_block = None  # Somehow this does not get cleared automatically
     if sdfg_with_copyin_and_copyout:
         copy_in = sdfg.start_block
         copy_out = [n for n in sdfg.nodes() if sdfg.out_degree(n) == 0][0]

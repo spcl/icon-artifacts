@@ -142,6 +142,7 @@ def evaluate_literal_expression(node):
 
 
 def cleanup_conditionals(g: SDFG):
+    g.reset_cfg_list()
     ControlFlowRaising().apply_pass(g, {})
     for node, st in g.all_nodes_recursive():
         if not isinstance(node, ConditionalBlock):
@@ -226,6 +227,7 @@ def push_interstate_edges_early(g: SDFG):
         if not iedge.assignments:
             continue
         rset, wset = edge.src.read_and_write_sets()
+        rset = rset | edge.src.free_symbols
         # If the required symbols are being written by the preceding state, we cannot push.
         if any(k in wset for k in iedge.free_symbols):
             continue
