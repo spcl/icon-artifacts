@@ -81,7 +81,7 @@ def optimization_action(g: SDFG):
     g.validate()
     # Move if condition inside a map if it has a parent map to enable collapsing
     move_if_to_innermost_map(g)
-    g.validate()
+    #g.validate()
     clean_unused_data_from_nsdfg(g)
     clean_unused_symbols_from_nsdfg(g)
     g.validate()
@@ -178,7 +178,7 @@ def optimization_action(g: SDFG):
     ConsolidateEdges().apply_pass(g, {})
     PRESCRIBED_FUSIONS = {
         "solve_nh_corrector_pre": [
-            (("_for_it_55", "_for_it_56"), ("_for_it_57", "_for_it_58")),
+            (("_for_it_51", "_for_it_52"), ("_for_it_57", "_for_it_58")),
         ],
         "solve_nh_corrector_post": [
             # (("_for_it_7", "_for_it_8"), ("_for_it_9", "_for_it_10")),
