@@ -183,6 +183,7 @@ def optimization_action(g: SDFG):
         "jg": 1,
         "__CG_global_data__m_rayleigh_type": 2,
         "__CG_global_data__m_divdamp_type": 32,
+        "__CG_global_data__m_divdamp_order": 24,
         "__CG_global_data__m_is_iau_active": 0,
         "__CG_global_data__m_igradp_method": 3,
         "__CG_global_data__m_itime_scheme": 4,
