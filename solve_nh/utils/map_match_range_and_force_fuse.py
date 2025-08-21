@@ -16,6 +16,7 @@ from utils.move_if_cfg_inside_map import move_map_body_into_nsdfg
 from dace.sdfg.replace import replace, replace_dict
 from dace.sdfg.state import StateSubgraphView
 from dace.transformation.passes.constant_propagation import ConstantPropagation
+from dace.transformation.passes.consolidate_edges import ConsolidateEdges
 
 
 def rename_map_parameters(
@@ -149,7 +150,7 @@ def map_force_fuse(st: SDFGState, mE1: MapEntry, mX1: MapExit, mE2: MapEntry, mX
         st.remove_edge(pwed)
 
         for red in st.out_edges(acc):
-            assert red.dst is mE2
+            assert red.dst is mE2, f"Expected {acc} to connect to only {mE2}, but got {red.dst}."
             for nred in st.out_edges_by_connector(mE2, flip_connector(red.dst_conn)):
                 st.add_edge(acc, None, nred.dst, nred.dst_conn, Memlet.from_memlet(nred.data))
                 st.remove_edge(nred)
@@ -230,6 +231,7 @@ def map_force_fuse_prescibed(g: SDFG, what_to_fuse: list[tuple[tuple, tuple]]):
     for u, v in what_to_fuse:
         push_interstate_edges_early(g)
         ConstantPropagation().apply_pass(g, {})
+        ConsolidateEdges().apply_pass(g, {})
         state_fusion_without_copyin_and_copyout(g)
         mE1_st_list = [(n, st) for n, st in g.all_nodes_recursive() if isinstance(n, MapEntry) and tuple(n.params) == u]
         assert mE1_st_list, f"Missing map {u} specified for forced fusion."

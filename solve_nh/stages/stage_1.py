@@ -8,6 +8,7 @@ from utils.codegen_from_sdfg import ArtifactMode
 from utils.specialize_scalar import specialize_scalar
 from dace.transformation.interstate.loop_unroll import LoopUnroll
 from dace.transformation.dataflow import MapUnroll
+from utils.conditional_pruning import cleanup_conditionals
 
 import argparse
 import warnings
@@ -235,6 +236,8 @@ def optimization_action(g: SDFG):
     # === Sub-Phase 4: ConstantPropagation ===
     # ConstantPropagation works nicely after cleaning
     ConstantPropagation().apply_pass(g, {})
+    g.validate()
+    cleanup_conditionals(g)
     g.validate()
     # === Sub-Phase 4: ConstantPropagation ===
 

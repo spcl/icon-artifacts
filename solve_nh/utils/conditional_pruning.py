@@ -162,8 +162,6 @@ def cleanup_conditionals(g: SDFG):
                 print(f"Node {node}: Evaluating {c.as_string} to False, replacing with 0")
                 c.code = [ast.Expr(value=ast.Constant(value=0))]
                 nope.append(i)
-            else:
-                continue
         if yep is not None:
             node._branches = node._branches[: yep + 1]
         for n in reversed(nope):
