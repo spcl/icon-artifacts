@@ -102,13 +102,6 @@ def optimization_action(g: SDFG):
     state_fusion_without_copyin_and_copyout(g)
     if 'predictor_pre' in g.name:
         move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_51', '_if_cond_43'})
-    elif 'corrector_post' in g.name:
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_7', '_if_cond_10', '_if_cond_11'})
-        # We need to fuse and only then we can unlock `_if_cond_6`
-        map_force_fuse_prescibed(g, [
-            (("_for_it_9", "_for_it_10"), ("_for_it_11", "_for_it_12")),
-        ])
-        move_if_cfg_inside_map_from_condition_var(g, {'_if_cond_6',})
     state_fusion_without_copyin_and_copyout(g)
 
     # === Sub-Phase 5: Clean Again ===
