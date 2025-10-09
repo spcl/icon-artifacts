@@ -1,0 +1,8 @@
+__pycache__
+*.sdfgz
+*.sdfg
+.dacecache
+_dacegraphs
+utils/config.py
+data_*/
+data/

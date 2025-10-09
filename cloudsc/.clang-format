@@ -1,0 +1,18 @@
+BasedOnStyle: Google
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 200
+BreakBeforeBraces: Attach
+AllowShortBlocksOnASingleLine: Never
+IndentPPDirectives: AfterHash
+AlignAfterOpenBracket: AlwaysBreak
+BinPackArguments: true
+BinPackParameters: true
+AllowAllArgumentsOnNextLine: true
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+ReflowComments: false
+SpaceBeforeParens: ControlStatements
+

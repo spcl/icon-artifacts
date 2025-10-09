@@ -1,0 +1,1 @@
+#define __HASH_gas_optics "9dd61858f3a98f581525bb547bb5f65ef532fd94ecfb48fdfc1f520abff9270f"
