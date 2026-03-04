@@ -89,6 +89,7 @@ def optimization_action(sdfg):
     ConstantPropagation().apply_pass(sdfg, {})
     sdfg.simplify()
     sdfg.validate()
+
     return sdfg
 
 def main():
@@ -120,7 +121,30 @@ def main():
     if args.compile:
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+        #common.compile_action(STAGE_ID, sdfgs, True, None, False)
+
+        nsdfgs = {}
+        for name, sdfg in sdfgs.items():
+            from sc26_layout.extract_kernel import add_timer_single_map
+            sdfg = add_timer_single_map(sdfg)
+            sdfg.validate()
+            nsdfgs[name] = sdfg
+
+        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_unpermuted")
+
+        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+        nsdfgs = {}
+        for name, sdfg in sdfgs.items():
+            from sc26_layout.extract_kernel import permute_single_map
+            sdfg = permute_single_map(sdfg)
+            sdfg.validate()
+            nsdfgs[name] = sdfg
+
+        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_permuted_single_map")
+
+
         common.compile_action(STAGE_ID, sdfgs, False, None, False)
+
 
 if __name__ == "__main__":
     main()

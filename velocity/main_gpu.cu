@@ -160,7 +160,8 @@ std::string get_root_path() {
         }
     }
 
-    return "data_nproma" + std::to_string(nproma);
+    return "data_r02b05"
+    //return "data_nproma" + std::to_string(nproma);
 }
 int get_reps() {
     const char* env_val = std::getenv("REPS");
@@ -188,7 +189,7 @@ int main(int argc, char* argv[]) {
   acerr() << "Will be writing got and want files to: " << DUMP << std::endl;
 
 
-  std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463, 519, 1140, 1814, 2593, 5701};
+  std::vector<int> ns = {1, 2, 7, 9, 43, 93, 463};
   int n1 = -1;
   int rep = get_reps();
 
