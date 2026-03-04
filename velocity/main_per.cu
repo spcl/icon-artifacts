@@ -7,7 +7,7 @@
 #include "flags.h"
 
 #include "serde_velocity_no_nproma.h"
-#include "velocity_tendencies_no_nproma.h"
+#include "velocity_tendencies_no_nproma_per.h"
 
 template <std::ostream& CS>
 struct AtomicStream {
@@ -288,6 +288,7 @@ int main(int argc, char* argv[]) {
           serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
           serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(2),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
           serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
@@ -322,6 +323,7 @@ int main(int argc, char* argv[]) {
           serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
           serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(2),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
           serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
@@ -380,6 +382,7 @@ int main(int argc, char* argv[]) {
           serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
           /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
           serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
+          serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(2),
           /*__f2dace_A_z_vt_ie_d_0_s_160=*/
           serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
           /*__f2dace_A_z_vt_ie_d_1_s_161=*/
@@ -415,6 +418,7 @@ int main(int argc, char* argv[]) {
             serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(0),
             /*__f2dace_A_z_kin_hor_e_d_1_s_158=*/
             serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(1),
+            serde::ARRAY_META_DICT_AT(z_kin_hor_e).size.at(2),
             /*__f2dace_A_z_vt_ie_d_0_s_160=*/
             serde::ARRAY_META_DICT_AT(z_vt_ie).size.at(0),
             /*__f2dace_A_z_vt_ie_d_1_s_161=*/

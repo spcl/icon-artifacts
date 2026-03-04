@@ -94,6 +94,7 @@ def main():
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         #common.compile_action(STAGE_ID, sdfgs, False, None, False)
 
+        """
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
             from sc26_layout.extract_kernel import add_timer_single_map
@@ -102,6 +103,7 @@ def main():
             nsdfgs[name] = sdfg
 
         common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_unpermuted")
+        """
 
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         nsdfgs = {}
@@ -111,9 +113,9 @@ def main():
             sdfg.validate()
             nsdfgs[name] = sdfg
 
-        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_permuted_single_map")
+        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_permuted_single_map", main_name="main_per.cu")
 
-        common.compile_action(STAGE_ID, sdfgs, False, None, False)
+        #common.compile_action(STAGE_ID, sdfgs, False, None, False)
 
 if __name__ == "__main__":
     main()

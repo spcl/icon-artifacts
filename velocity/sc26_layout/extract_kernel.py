@@ -141,6 +141,22 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=False):
     move_state_after(sdfg, permute_in_state, entry_interface_state)
     move_state_before(sdfg, permute_out_state, exit_interface_state)
 
+    # Change names back in interface states
+    permuted_names = {
+        "permuted_z_ekinh",
+        "permuted_z_kin_hor_e",
+        "permuted___GG_p_int__m_e_bln_c_s",
+        "permuted___CG_p_patch__CG_cells__m_edge_idx",
+        "permuted___CG_p_patch__CG_cells__m_edge_blk",
+    }
+    for s in {entry_interface_state, exit_interface_state}:
+        for e in s.edges():
+            if e.data.data in permuted_names:
+                e.data.data = e.data.data.removeprefix("permuted_")
+        for n in s.data_nodes():
+            if n.data in permuted_names:
+                n.data = n.data.removeprefix("permuted_")
+
     sdfg.save("moved.sdfgz", compress=True)
     sdfg.validate()
 
