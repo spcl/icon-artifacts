@@ -90,21 +90,6 @@ def main():
             sdfg.save(outfile, compress=True)
 
     if args.compile:
-        # Read back the written files as we prepare for compilation.
-        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        #common.compile_action(STAGE_ID, sdfgs, False, None, False)
-
-        """
-        nsdfgs = {}
-        for name, sdfg in sdfgs.items():
-            from sc26_layout.extract_kernel import add_timer_single_map
-            sdfg = add_timer_single_map(sdfg, True)
-            sdfg.validate()
-            nsdfgs[name] = sdfg
-
-        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_unpermuted")
-        """
-
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
@@ -115,6 +100,29 @@ def main():
 
         common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_permuted_single_map", main_name="main_per.cu")
 
+        import shutil
+        from pathlib import Path
+
+        base_dir = Path(__file__).resolve().parent
+
+        src = base_dir / "../../codegen/stage4"
+        dst = base_dir / "../../codegen/stage4_permuted"
+
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+
+
+        # Read back the written files as we prepare for compilation.
+        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+        nsdfgs = {}
+        for name, sdfg in sdfgs.items():
+            from sc26_layout.extract_kernel import add_timer_single_map
+            sdfg = add_timer_single_map(sdfg, True)
+            sdfg.validate()
+            nsdfgs[name] = sdfg
+
+        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_unpermuted", main_name="main_per.cu")
+
+        #sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         #common.compile_action(STAGE_ID, sdfgs, False, None, False)
 
 if __name__ == "__main__":

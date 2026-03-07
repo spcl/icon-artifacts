@@ -47,7 +47,7 @@ def find_map_state(sdfg: dace.SDFG, map_iterators: set[str]) -> typing.Tuple[dac
             return g, g.parent_graph
     raise ValueError(f"Map with iterators {map_iterators} not found.")
 
-def add_timer_around(sdfg: dace.SDFG, state: dace.SDFGState, host: bool = False):
+def add_timer_around_gpu(sdfg: dace.SDFG, state: dace.SDFGState):
     clock_in = sdfg.add_state_before(state, "clock_in")
     clock_out = sdfg.add_state_after(state, "clock_out")
 
@@ -89,24 +89,6 @@ static void gpu_timer_split() {
         cudaEventDestroy(start);
         cudaEventDestroy(stop);
         is_first_call = true; 
-    }
-}
-""" if host is False else
-"""
-static void gpu_timer_split() {
-    static std::chrono::high_resolution_clock::time_point start;
-    static bool is_first_call = true;
-    if (is_first_call) {
-        cudaDeviceSynchronize();
-        start = std::chrono::high_resolution_clock::now();
-        is_first_call = false;
-        std::cout << "[Timer] Start recorded..." << std::endl;
-    } else {
-        cudaDeviceSynchronize();
-        auto stop = std::chrono::high_resolution_clock::now();
-        double milliseconds = std::chrono::duration<double, std::milli>(stop - start).count();
-        std::cout << "[Timer] Elapsed time: " << milliseconds << " ms" << std::endl;
-        is_first_call = true;
     }
 }
 """
@@ -172,7 +154,7 @@ def add_symbols(sdfg: dace.SDFG):
 
     new_start.add_edge(new_tasklet, "_out", new_start.add_access(sname), None, dace.Memlet(f"{sname}[0]"))
 
-def add_print_after(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "z_ekinh", permuted: bool = False, host: bool = True):
+def add_print_after_gpu(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "z_ekinh", permuted: bool = False):
     """Print 8 hardcoded elements of array_name in a state before `state`."""
 
     # (nproma, nlev, nblocks) — nblocks=0, nlev<90, nproma<20000
@@ -208,61 +190,19 @@ def add_print_after(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "z
         side_effects=True,
     )
 
-    if host:
-        print_state.add_node(tasklet)
-
-        an = print_state.add_access(array_name)
-        for i, (np_i, nl_i, nb_i) in enumerate(indices):
-            if permuted:
-                # permute_map [1, 0, 2]: original [d0,d1,d2] -> permuted [d1,d0,d2]
-                idx = f"{nl_i}, {np_i}, {nb_i}"
-            else:
-                idx = f"{np_i}, {nl_i}, {nb_i}"
-
-            print_state.add_edge(
-                an, None, tasklet, f"_in_{i}",
-                dace.Memlet(f"{array_name}[{idx}]")
-            )
-    else:
-        copy_state = sdfg.add_state_before(print_state, "copy_for_print")
-        an_copy = copy_state.add_access(array_name)
-        raise Exception("Not implemented yet")
-
-def add_print_before(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "z_kin_hor_e", permuted: bool = False):
-    """Print 8 hardcoded elements of array_name in a state before `state`."""
-
-    # (nproma, nlev, nblocks) — nblocks=0, nlev<90, nproma<20000
-    indices = [
-        (0, 0, "(_for_it_22-1)"),
-        (1, 1, "(_for_it_22-1)"),
-        (10, 5, "(_for_it_22-1)"),
-        (100, 10, "(_for_it_22-1)"),
-        (500, 45, "(_for_it_22-1)"),
-        (1000, 10, "(_for_it_22-1)"),
-        (5000, 45, "(_for_it_22-1)"),
-        (7000, 60, "(_for_it_22-1)"),
-    ]
-
-    print_state = sdfg.add_state_before(state, "print_values")
-
-    inp_set = {f"_in_{i}" for i in range(len(indices))}
-    code_lines = ["#pragma omp critical", "{"]
-    code_lines.append(f'printf("[Print] {array_name}:\\n");')
-    for i, (np_i, nl_i, nb_i) in enumerate(indices):
-        if permuted:
-            code_lines.append(f'printf("  [{nl_i},{np_i},{nb_i}] = %.17e\\n", _in_{i});')
-        else:
-            code_lines.append(f'printf("  [{np_i},{nl_i},{nb_i}] = %.17e\\n", _in_{i});')
-    code_lines.append("fflush(stdout);")
-    code_lines.append("}")
-
-    tasklet = dace.nodes.Tasklet(
-        "print_elems", inputs=inp_set, outputs={},
-        code="\n".join(code_lines),
-        language=dace.dtypes.Language.CPP,
-        code_global='#include <cstdio>',
-        side_effects=True,
-    )
+    copy_state = sdfg.add_state_before(print_state, "copy_for_print")
+    an_copy = copy_state.add_access("gpu_" + array_name)
+    an2_copy = copy_state.add_access(array_name)
+    if array_name not in sdfg.arrays:
+        ddesc = copy.deepcopy(sdfg.arrays["gpu_" + array_name])
+        ddesc.storage = dace.StorageType.CPU_Heap
+        ddesc.transient = True
+        sdfg.add_datadesc(
+            array_name,
+            ddesc,
+            False
+        )
+    copy_state.add_edge(an_copy, None, an2_copy, None, dace.Memlet.from_array("gpu_" + array_name, sdfg.arrays["gpu_" + array_name]))
 
     print_state.add_node(tasklet)
 
@@ -280,8 +220,7 @@ def add_print_before(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "
         )
 
 
-
-def permute_single_map(sdfg: dace.SDFG, host:bool=True):
+def permute_single_map_gpu(sdfg: dace.SDFG):
     map, state =delete_all_maps_except(
         sdfg,
         {"_for_it_23", "_for_it_22", "_for_it_24"},
@@ -293,17 +232,27 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True):
 
     PermuteDimensions(
         permute_map={
-            "z_ekinh": [1, 0, 2],
-            "z_kin_hor_e": [1, 0, 2],
-            "__CG_p_int__m_e_bln_c_s": [1, 0, 2],
-            "__CG_p_patch__CG_cells__m_edge_idx": [2, 0, 1],
-            "__CG_p_patch__CG_cells__m_edge_blk": [2, 0, 1],
-            "z_w_con_c": [1, 0],
-            "__CG_p_prog__m_w": [1, 0, 2],
+            "gpu_z_ekinh": [1, 0, 2],
+            "gpu_z_kin_hor_e": [1, 0, 2],
+            "gpu___CG_p_int__m_e_bln_c_s": [1, 0, 2],
+            "gpu___CG_p_patch__CG_cells__m_edge_idx": [2, 0, 1],
+            "gpu___CG_p_patch__CG_cells__m_edge_blk": [2, 0, 1],
+            "gpu_z_w_con_c": [1, 0],
+            "gpu___CG_p_prog__m_w": [1, 0, 2],
         },
         add_permute_maps=True,
         column_major=True,
     ).apply_pass(sdfg, {})
+
+    inverse_permute_map={
+        "gpu_z_ekinh": [1, 0, 2],
+        "gpu_z_kin_hor_e": [1, 0, 2],
+        "gpu___CG_p_int__m_e_bln_c_s": [1, 0, 2],
+        "gpu___CG_p_patch__CG_cells__m_edge_idx": [1, 2, 0],
+        "gpu___CG_p_patch__CG_cells__m_edge_blk": [1, 2, 0],
+        "gpu_z_w_con_c": [1, 0],
+        "gpu___CG_p_prog__m_w": [1, 0, 2],
+    }
 
     sdfg.save("post_transform.sdfgz", compress=True)
     sdfg.validate()
@@ -318,11 +267,19 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True):
     move_state_before(sdfg, permute_out_state, exit_interface_state)
 
     # Change names back in interface states
-
     for s in {entry_interface_state, exit_interface_state}:
         for e in s.edges():
             if e.data.data is not None and e.data.data.startswith("permuted_"):
                 e.data.data = e.data.data.removeprefix("permuted_")
+                if e.data.data in inverse_permute_map:
+                                        
+                    # Permute the memlet subset with the inverse
+                    new_subset = []
+                    permute_indices = inverse_permute_map[e.data.data]
+                    for i in range(len(permute_indices)):
+                        new_subset.append(e.data.subset[permute_indices[i]])
+                    e.data.subset = dace.subsets.Range(new_subset)
+
         for n in s.data_nodes():
             if n.data is not None and n.data.startswith("permuted_"):
                 n.data = n.data.removeprefix("permuted_")
@@ -332,9 +289,8 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True):
 
     mstate, parent_sdfg = find_map_state(sdfg, {"_for_it_23", "_for_it_24"})
     assert mstate is not None
-    timer_state_before, timer_state_after = add_timer_around(parent_sdfg, mstate, host)
-    add_print_before(parent_sdfg, timer_state_before, "z_kin_hor_e", True)
-    add_print_after(parent_sdfg, timer_state_after, "z_ekinh", True, host)
+    timer_state_before, timer_state_after = add_timer_around_gpu(parent_sdfg, mstate)
+    add_print_after_gpu(parent_sdfg, timer_state_after, "z_ekinh", True)
 
     from dace.transformation.dataflow import MapDimShuffle
 
@@ -342,13 +298,13 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True):
 
     add_symbols(sdfg)
     sdfg.save("permuted.sdfgz", compress=True)
-
+    sdfg.validate()
     return sdfg
 
 
 
 
-def add_timer_single_map(sdfg: dace.SDFG, host:bool=True):
+def add_timer_single_map_gpu(sdfg: dace.SDFG):
     mstate, parent_sdfg = find_map_state(sdfg, {"_for_it_23", "_for_it_24"})
     map, state = delete_all_maps_except(
         sdfg,
@@ -356,35 +312,21 @@ def add_timer_single_map(sdfg: dace.SDFG, host:bool=True):
         {"_for_it_23", "_for_it_24"},
     )
     assert mstate is not None
-    timer_state_before, timer_state_after = add_timer_around(parent_sdfg, mstate, host)
-    add_print_before(parent_sdfg, timer_state_before, "z_kin_hor_e", False)
-    add_print_after(parent_sdfg, timer_state_after, "z_ekinh", False, host)
+    timer_state_before, timer_state_after = add_timer_around_gpu(parent_sdfg, mstate)
+    add_print_after_gpu(parent_sdfg, timer_state_after, "z_ekinh", False)
     add_symbols(sdfg)
 
     sdfg.save("with_timer.sdfgz", compress=True)
+    sdfg.validate()
     return sdfg
 
 import copy
 
 if __name__ == "__main__":
-    sdfg = dace.SDFG.from_file("../codegen/gpu_velocity_no_nproma_if_prop_lvn_only_0_istep_1_stage5.sdfgz")
+    sdfg = dace.SDFG.from_file("../codegen/gpu_velocity_no_nproma_if_prop_lvn_only_0_istep_1_stage6.sdfgz")
     old = copy.deepcopy(sdfg)
-    permuted_sdfg = permute_single_map(sdfg)
+    permuted_sdfg = permute_single_map_gpu(sdfg)
     permuted_sdfg.name = "permuted_" + sdfg.name
     #permuted_sdfg.compile()
-    add_timer_single_map(old)
+    add_timer_single_map_gpu(old)
     #old.compile()
-
-
-"""
-[Timer] Elapsed time: 37.035 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
-  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
-  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
-  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
-  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
-  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
-  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
-"""
