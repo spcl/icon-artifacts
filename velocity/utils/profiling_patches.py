@@ -57,6 +57,43 @@ def insert_timers_for_profiling(sdfg: dace.SDFG):
         #code_global='#include "dace_measure_time.h"',
     )
 
+def insert_event_timers_for_profiling(sdfg: dace.SDFG):
+    # Find the existing entry_timer and profile_stop_sync states
+    entry_timer_state = None
+    profile_stop_sync_state = None
+    for state in sdfg.all_states():
+        if state.label == ENTRY_TIMER:
+            entry_timer_state = state
+        if state.label == PROFILE_STOP_SYNC:
+            profile_stop_sync_state = state
+
+    if entry_timer_state is None:
+        raise ValueError(f"State '{ENTRY_TIMER}' not found in SDFG")
+    if profile_stop_sync_state is None:
+        raise ValueError(f"State '{PROFILE_STOP_SYNC}' not found in SDFG")
+
+    # Insert event start timer right after entry_timer
+    event_start_state = sdfg.add_state_after(state=entry_timer_state, label="event_timer_start")
+    event_start_state.add_tasklet(
+        name="event_timer_start",
+        code='dace_event_measure_time("CUDA Events");',
+        inputs={},
+        outputs={},
+        language=dace.dtypes.Language.CPP,
+        code_global='#include "dace_event_measure_time.cuh"',
+    )
+
+    # Insert event stop timer right before profile_stop_sync
+    event_stop_state = sdfg.add_state_before(state=profile_stop_sync_state, label="event_timer_stop")
+    event_stop_state.add_tasklet(
+        name="event_timer_stop",
+        code='dace_event_measure_time("CUDA Events");',
+        inputs={},
+        outputs={},
+        language=dace.dtypes.Language.CPP,
+        # code_global not needed, already included above
+    )
+
 def insert_synchronization_for_profiling(sdfg: dace.SDFG):
     deflatten_state = None
     deflatten_node = None
@@ -76,7 +113,7 @@ def insert_synchronization_for_profiling(sdfg: dace.SDFG):
     sync_state1 = sdfg.add_state_before(state=deflatten_state, label=PROFILE_STOP_SYNC)
     sync_node1 = sync_state1.add_tasklet(
         name="sync_tasklet_" + PROFILE_STOP_SYNC,
-        code="dace_wait_device();",
+        code="dace_wait_device(); ",
         inputs={},
         outputs={},
         language=dace.dtypes.Language.CPP,

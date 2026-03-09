@@ -122,8 +122,16 @@ def main():
 
         common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_unpermuted", main_name="main_per.cu")
 
-        #sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        #common.compile_action(STAGE_ID, sdfgs, False, None, False)
+
+        base_dir = Path(__file__).resolve().parent
+
+        src = base_dir / "../../codegen/stage6"
+        dst = base_dir / "../../codegen/stage6_unpermuted"
+
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+
+        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+        common.compile_action(STAGE_ID, sdfgs, False, None, False)
 
 if __name__ == "__main__":
     main()
