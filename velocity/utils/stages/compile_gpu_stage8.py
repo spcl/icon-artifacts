@@ -250,9 +250,9 @@ def permute_array_dimensions(sdfg: dace.SDFG):
         "gpu_z_w_concorr_mc":                 [1, 0],
         "gpu_z_w_con_c_full":                 [1, 0, 2],
         "gpu_z_w_con_c":                      [1, 0],
-        "gpu_maxvcfl_arr":                      [1, 0, 2],
-        "gpu_cfl_clipping":                     [1, 0],
-        "gpu_levmask":                      [1, 0],
+        "gpu_maxvcfl_arr":                    [1, 0, 2],
+        "gpu_cfl_clipping":                   [1, 0],
+        "gpu_levmask":                        [1, 0],
 
         # Prognostic fields — transform A
         "gpu___CG_p_prog__m_vn":                      [1, 0, 2],
@@ -261,11 +261,12 @@ def permute_array_dimensions(sdfg: dace.SDFG):
         # Diagnostic fields — transform A (3D and 4D)
         "gpu___CG_p_diag__m_vt":                      [1, 0, 2],
         "gpu___CG_p_diag__m_vn_ie":                   [1, 0, 2],
+        "gpu___CG_p_diag__m_vn_ie_ubc":               [1, 0, 2],
         "gpu___CG_p_diag__m_w_concorr_c":             [1, 0, 2],
         "gpu___CG_p_diag__m_ddt_vn_apc_pc":           [1, 0, 2, 3],
         "gpu___CG_p_diag__m_ddt_w_adv_pc":            [1, 0, 2, 3],
         "gpu___CG_p_diag__m_ddt_vn_cor_pc":           [1, 0, 2, 3],
-        "gpu___CG_p_diag__m_vn_ie_ubc":              [1, 0, 2],
+        "gpu___CG_p_diag__m_vn_ie_ubc":               [1, 0, 2],
 
         # Metric fields — transform A
         "gpu___CG_p_metrics__m_wgtfac_e":             [1, 0, 2],
@@ -278,23 +279,23 @@ def permute_array_dimensions(sdfg: dace.SDFG):
         "gpu___CG_p_metrics__m_coeff2_dwdz":          [1, 0, 2],
         # Metric fields — transform B: (nproma, N, nblks) → (N, nproma, nblks)
         "gpu___CG_p_metrics__m_wgtfacq_e":            [1, 0, 2],
-        "gpu___CG_p_metrics__m_coeff_gradekin":        [1, 0, 2],
+        "gpu___CG_p_metrics__m_coeff_gradekin":       [1, 0, 2],
 
         # Interpolation coefficients — transform B: (nproma, N, nblks) → (N, nproma, nblks)
-        "gpu___CG_p_int__m_e_bln_c_s":               [1, 0, 2],
+        "gpu___CG_p_int__m_e_bln_c_s":                [1, 0, 2],
         "gpu___CG_p_int__m_c_lin_e":                  [1, 0, 2],
         "gpu___CG_p_int__m_geofac_n2s":               [1, 0, 2],
         "gpu___CG_p_int__m_geofac_grdiv":             [1, 0, 2],
-        "gpu___CG_p_int__m_cell_aw_verts":             [1, 0, 2],
+        "gpu___CG_p_int__m_cells_aw_verts":            [1, 0, 2],
+        "gpu___CG_p_int__m_geofac_rot":               [1, 0, 2],
+
 
         # Connectivity tables — transform B: (nproma, nblks, N) → (N, nproma, nblks)
         "gpu___CG_p_patch__CG_edges__m_tangent_orientation":    [1, 0],
         "gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length": [1, 0],
         "gpu___CG_p_patch__CG_edges__m_area_edge":              [1, 0],
-        
-        
         "gpu___CG_p_patch__CG_verts__m_cell_blk":         [2, 0, 1],
-
+        "gpu___CG_p_patch__CG_edges__m_f_e":         [1, 0],
         "gpu___CG_p_patch__CG_edges__m_cell_idx":         [2, 0, 1],
         "gpu___CG_p_patch__CG_edges__m_cell_blk":         [2, 0, 1],
         "gpu___CG_p_patch__CG_cells__m_edge_idx":         [2, 0, 1],
