@@ -18,6 +18,8 @@ git checkout f2dace/staging
 git pull
 
 echo "Checking out dace/transformation/layout from yakup/dev..."
+git checkout yakup/dev -- dace/libraries/environments
+git checkout yakup/dev -- dace/libraries/standard/nodes/ttranspose.py
 git checkout yakup/dev -- dace/transformation/layout
 git checkout yakup/dev -- dace/sdfg/construction_utils.py
 git checkout yakup/dev -- dace/sdfg/tasklet_utils.py

@@ -11,7 +11,7 @@ if [ -n "$CUTENSOR_ROOT" ]; then
 fi
 
 set -ex
-nvcc -O3 -std=c++17 \
+nvcc -O3 -std=c++17 -arch=sm_86 \
     transpose_bench.cu \
     ${CUTENSOR_INC} \
     ${CUTENSOR_LIB} \

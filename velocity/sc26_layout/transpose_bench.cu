@@ -262,7 +262,7 @@ int main()
     CUDA_CHECK(cudaStreamCreate(&stream));
 
     constexpr int WARMUP = 10;
-    constexpr int REPS = 100;
+    constexpr int REPS = 250;
 
     // =====================================================================
     //  Custom kernel (float2 tiled transpose)
