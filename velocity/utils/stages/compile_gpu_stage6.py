@@ -13,6 +13,8 @@ from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
 from utils.segmented_reduction import to_segmented_reduction
 from utils.rm_segmented_reduce import rm_segmented_reduce
+from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling, insert_event_timers_for_profiling
+
 STAGE_ID = 6
 
 def optimization_action(sdfg):
@@ -68,7 +70,7 @@ def optimization_action(sdfg):
             arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
     sdfg.validate()
 
-
+    
     return sdfg
 
 def main():
@@ -104,6 +106,7 @@ def main():
         for name, sdfg in sdfgs.items():
             from sc26_layout.extract_gpu_kernel import permute_single_map_gpu
             sdfg = permute_single_map_gpu(sdfg)
+            insert_synchronization_for_profiling(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
 
@@ -117,6 +120,7 @@ def main():
         for name, sdfg in sdfgs.items():
             from sc26_layout.extract_gpu_kernel import add_timer_single_map_gpu
             sdfg = add_timer_single_map_gpu(sdfg)
+            insert_synchronization_for_profiling(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
 
@@ -125,12 +129,12 @@ def main():
                               stage_suffix="_unpermuted")
 
         # Read back the written files as we prepare for compilation.
-        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        for name, sdfg in sdfgs.items():
-            from sc26_layout.extract_gpu_kernel import add_symbols
-            add_symbols(sdfg)
-        common.compile_action(STAGE_ID, sdfgs, False, None, False, main_name="main_per.cu", tblock_dim="256,1,1",
-                              name_suffix="", stage_suffix="")
+        #sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+        #for name, sdfg in sdfgs.items():
+        #    from sc26_layout.extract_gpu_kernel import add_symbols
+        #    add_symbols(sdfg)
+        #common.compile_action(STAGE_ID, sdfgs, False, None, False, main_name="main_per.cu", tblock_dim="256,1,1",
+        #                      name_suffix="", stage_suffix="")
 
 if __name__ == "__main__":
     main()

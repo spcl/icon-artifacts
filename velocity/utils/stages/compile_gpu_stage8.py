@@ -492,7 +492,7 @@ def optimization_action(sdfg):
     # Sync first
     insert_synchronization_for_profiling(sdfg)
     insert_timers_for_profiling(sdfg)
-    insert_event_timers_for_profiling(sdfg)
+    #insert_event_timers_for_profiling(sdfg)
     #set_default_stream(sdfg)
     sdfg.validate()
 
