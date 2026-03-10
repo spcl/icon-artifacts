@@ -1,5 +1,7 @@
 import argparse
 from typing import List
+import shutil
+from pathlib import Path
 
 import dace
 from dace.transformation.passes import GPUKernelLaunchRestructure
@@ -494,16 +496,16 @@ def optimization_action(sdfg):
     #set_default_stream(sdfg)
     sdfg.validate()
 
-    do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')
-    if do_profile:
-        create_profile_sdfg(sdfg)
-
-
     # Permute arrays
     do_permute = os.getenv('_PERMUTE_DIMS', '0').lower() in ('1', 'true', 'yes')
 
     if do_permute:
         permute_array_dimensions(sdfg)
+
+    do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')
+    if do_profile:
+        create_profile_sdfg(sdfg)
+
 
     return sdfg
 
@@ -536,7 +538,8 @@ def main():
 
     if args.compile:
         # Read back the written files as we prepare for compilation.
-        
+        base_dir = Path(__file__).resolve().parent
+
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
@@ -544,27 +547,44 @@ def main():
             add_symbols(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
-            sdfg.save("v1.sdfgz", compress=True)
 
         do_permute = os.getenv('_PERMUTE_DIMS', '0').lower() in ('1', 'true', 'yes')
 
         if do_permute:
+            # Remove original directory if it exists
+            stage8_dir = base_dir / "../../codegen/stage8"
+            if stage8_dir.exists():
+                shutil.rmtree(stage8_dir)
+
             common.compile_action(STAGE_ID, nsdfgs, False, None, False,
             name_suffix="_dim_permuted", main_name="main_per.cu", tblock_dim="96,2,1")
-
-            import shutil
-            from pathlib import Path
-
-            base_dir = Path(__file__).resolve().parent
 
             src = base_dir / "../../codegen/stage8"
             dst = base_dir / "../../codegen/stage8_permuted"
 
             shutil.copytree(src, dst, dirs_exist_ok=True)
+            # Remove original directory if it exists
+            stage8_dir = base_dir / "../../codegen/stage8"
+            if stage8_dir.exists():
+                shutil.rmtree(stage8_dir)
 
         else:
+            # Remove original directory if it exists
+            stage8_dir = base_dir / "../../codegen/stage8"
+            if stage8_dir.exists():
+                shutil.rmtree(stage8_dir)
+
             common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="", main_name="main_per.cu", tblock_dim="256,1,1")
+            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1")
+
+            src = base_dir / "../../codegen/stage8"
+            dst = base_dir / "../../codegen/stage8_unpermuted"
+
+            shutil.copytree(src, dst, dirs_exist_ok=True)
+            # Remove original directory if it exists
+            stage8_dir = base_dir / "../../codegen/stage8"
+            if stage8_dir.exists():
+                shutil.rmtree(stage8_dir)
 
 if __name__ == "__main__":
     main()
