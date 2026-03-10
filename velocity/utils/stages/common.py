@@ -51,11 +51,13 @@ def stage_outputs(stage: int, codegen_dir=DEFAULT_CODEGEN_DIR):
 
 def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
                     allocation_names_to_comment_out: set,
-                    use_openacc_stream: bool, name_suffix: str = "", main_name=None, tblock_dim=None):
+                    use_openacc_stream: bool, name_suffix: str = "",
+                    main_name=None, tblock_dim=None,
+                    stage_suffix:str = ""):
   dace.config.Config.set('compiler', 'default_data_types', value='C')
   release = os.getenv('_RELEASE', '0').lower() in ('1', 'true', 'yes')
   for name, g in sdfgs.items():
-      g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}/{name}"
+      g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}{stage_suffix}/{name}"
   sdfgs = list(sdfgs.values())
   # Avoid name conflicts.
   unique_names(sdfgs)

@@ -1,5 +1,7 @@
 import argparse
 from typing import List
+import shutil
+from pathlib import Path
 
 import dace
 from dace.transformation.passes import GPUKernelLaunchRestructure
@@ -494,16 +496,16 @@ def optimization_action(sdfg):
     #set_default_stream(sdfg)
     sdfg.validate()
 
-    do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')
-    if do_profile:
-        create_profile_sdfg(sdfg)
-
-
     # Permute arrays
     do_permute = os.getenv('_PERMUTE_DIMS', '0').lower() in ('1', 'true', 'yes')
 
     if do_permute:
         permute_array_dimensions(sdfg)
+
+    do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')
+    if do_profile:
+        create_profile_sdfg(sdfg)
+
 
     return sdfg
 
@@ -535,8 +537,6 @@ def main():
             sdfg.save(outfile, compress=True)
 
     if args.compile:
-        # Read back the written files as we prepare for compilation.
-        
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
@@ -544,27 +544,19 @@ def main():
             add_symbols(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
-            sdfg.save("v1.sdfgz", compress=True)
 
         do_permute = os.getenv('_PERMUTE_DIMS', '0').lower() in ('1', 'true', 'yes')
 
         if do_permute:
             common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_dim_permuted", main_name="main_per.cu", tblock_dim="96,2,1")
-
-            import shutil
-            from pathlib import Path
-
-            base_dir = Path(__file__).resolve().parent
-
-            src = base_dir / "../../codegen/stage8"
-            dst = base_dir / "../../codegen/stage8_permuted"
-
-            shutil.copytree(src, dst, dirs_exist_ok=True)
-
+            name_suffix="_dim_permuted", main_name="main_per.cu", tblock_dim="96,2,1",
+            stage_suffix="_permuted")
         else:
             common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="", main_name="main_per.cu", tblock_dim="256,1,1")
+            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1",
+            stage_suffix="_unpermuted")
+
+
 
 if __name__ == "__main__":
     main()
