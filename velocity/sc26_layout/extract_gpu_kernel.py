@@ -57,6 +57,17 @@ def add_timer_around_gpu(sdfg: dace.SDFG, state: dace.SDFGState):
         language=dace.dtypes.Language.CPP,
         side_effects=True,
         code_global="""
+static int* d_flush_buf = nullptr;
+static const size_t L2_FLUSH_SIZE = 200 * 1024 * 1024;
+
+static void flush_l2() {
+    if (!d_flush_buf) {
+        cudaMalloc(&d_flush_buf, L2_FLUSH_SIZE);
+    }
+    cudaMemset(d_flush_buf, 0, L2_FLUSH_SIZE);
+    cudaDeviceSynchronize();
+}
+
 static void gpu_timer_split() {
     static cudaEvent_t start, stop;
     static bool is_first_call = true;
@@ -67,6 +78,8 @@ static void gpu_timer_split() {
 
         is_first_call = false;
         std::cout << "[Timer] Start recorded..." << std::endl;
+        // Flush L2 before measurement
+        flush_l2();
 
         cudaEventCreate(&start);
         cudaEventCreate(&stop);
@@ -85,6 +98,9 @@ static void gpu_timer_split() {
 
         std::cout << "[Timer] Elapsed time: " << milliseconds << " ms" << std::endl;
 
+        // Flush L2 before measurement
+        flush_l2();
+        
         // Clean up and reset for potential future use
         cudaEventDestroy(start);
         cudaEventDestroy(stop);

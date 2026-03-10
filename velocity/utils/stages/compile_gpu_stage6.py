@@ -106,20 +106,10 @@ def main():
             sdfg = permute_single_map_gpu(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
-            sdfg.save("v1.sdfgz", compress=True)
 
-        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_permuted_single_map", main_name="main_per.cu", tblock_dim="96,2,1")
-
-        import shutil
-        from pathlib import Path
-
-        base_dir = Path(__file__).resolve().parent
-
-        src = base_dir / "../../codegen/stage6"
-        dst = base_dir / "../../codegen/stage6_permuted"
-
-        shutil.copytree(src, dst, dirs_exist_ok=True)
-
+        common.compile_action(STAGE_ID, nsdfgs, False, None, False,
+                              name_suffix="_permuted_single_map", main_name="main_per.cu", tblock_dim="96,2,1",
+                              stage_suffix="_permuted_single_map")
 
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
@@ -130,49 +120,17 @@ def main():
             sdfg.validate()
             nsdfgs[name] = sdfg
 
-        common.compile_action(STAGE_ID, nsdfgs, False, None, False, name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1")
-
-        base_dir = Path(__file__).resolve().parent
-
-        src = base_dir / "../../codegen/stage6"
-        dst = base_dir / "../../codegen/stage6_unpermuted"
-
-        shutil.copytree(src, dst, dirs_exist_ok=True)
+        common.compile_action(STAGE_ID, nsdfgs, False, None, False,
+                              name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1",
+                              stage_suffix="_unpermuted")
 
         # Read back the written files as we prepare for compilation.
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        common.compile_action(STAGE_ID, sdfgs, False, None, False)
+        for name, sdfg in sdfgs.items():
+            from sc26_layout.extract_gpu_kernel import add_symbols
+            add_symbols(sdfg)
+        common.compile_action(STAGE_ID, sdfgs, False, None, False, main_name="main_per.cu", tblock_dim="256,1,1",
+                              name_suffix="", stage_suffix="")
 
 if __name__ == "__main__":
     main()
-
-
-"""
-# Unpermuted
-[Timer] Elapsed time: 0.018432 ms (between 0.016ms and 0.021ms)
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
-  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
-  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
-  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
-  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
-  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
-  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
-
-# Permuted
-[Timer] Elapsed time: 0.01616 ms (between 0.006144 and 0.1ms)
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
-  [5,10,(_for_it_22-1)] = 1.45012788975412751e-02
-  [10,100,(_for_it_22-1)] = 1.01763123945524558e+01
-  [45,500,(_for_it_22-1)] = 2.17530906554460245e+02
-  [10,1000,(_for_it_22-1)] = 2.09384216311808700e+02
-  [45,5000,(_for_it_22-1)] = 2.00852264216740394e+02
-  [60,7000,(_for_it_22-1)] = 2.88105312640896614e+02
-
-Iterations: 10000
-Total:      16.450 ms
-Per launch: 1.645 us (0.002 ms)
-"""

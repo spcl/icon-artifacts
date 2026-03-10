@@ -556,6 +556,5 @@ def main():
             name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1",
             stage_suffix="_unpermuted")
 
-
-
 if __name__ == "__main__":
+    main()
