@@ -557,7 +557,16 @@ def step_3(sdfg :dace.SDFG, target_state: dace.SDFGState):
             map_nsdfg.add_in_connector("out_val_0")
             map_state.add_edge(node, "OUT_5", map_nsdfg, "out_val_0", dace.Memlet(expr="out_val_0[_for_it_35 - 1]"))
 
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.AccessNode):
+            if g.in_degree(n) == 0 and g.out_degree(n) == 0:
+                g.remove_node(n)
+
+    sdfg.reset_cfg_list()
+    sdfg.save("x.sdfg")
+    
     sdfg.simplify(validate=False)
+    
     # sdfg.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     target_state.parent_graph.apply_transformations_repeated(MapCollapse, validate=False, permissive=True)
     node, parent = find_node_by_name(sdfg, "T_l562_c562")

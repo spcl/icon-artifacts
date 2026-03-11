@@ -46,6 +46,10 @@ def rm_segmented_reduce(sdfg: dace.SDFG):
             next_state.remove_node(node)
 
     next_state.sdfg.remove_data("out_val_0", False)
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.AccessNode):
+            if g.in_degree(n) == 0 and g.out_degree(n) == 0:
+                g.remove_node(n)
     sdfg.validate()
     sdfg.simplify()
     sdfg.validate()

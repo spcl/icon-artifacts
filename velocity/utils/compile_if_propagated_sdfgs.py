@@ -737,9 +737,10 @@ def compile_if_propagated_sdfgs(
                     + main_cu_code
                 )
 
-            if stage == 8 or stage == 9:
-                set_default_stream(f"{build_loc}/src/cpu/{sdfg_name}.cu")
-                set_default_stream(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+            # Dont do it for now
+            #if stage >= 6:
+            #    set_default_stream(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+            #    set_default_stream(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
 
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
         else:

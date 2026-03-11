@@ -148,6 +148,7 @@ int main(int argc, char* argv[]) {
   const flags::args args(argc, argv);
 
   const auto root = args.get<std::string>("data", "data_r02b05");
+  const auto reps = args.get<std::string>("reps", "20");
   const std::filesystem::path ROOT{root};
   acerr() << "Will be reading data from: " << ROOT << std::endl;
   const std::filesystem::path DUMP = std::filesystem::current_path() / "gotwant" / ROOT.filename();
@@ -165,7 +166,7 @@ int main(int argc, char* argv[]) {
     ns = {1, 2, 7, 9, 43, 93, 463};
   }
 
-  const int rep = 20;
+  const int rep = std::stoi(reps);
 
   for (int n : ns) {
     acerr() << "Reading data for " << n << "..." << std::endl;

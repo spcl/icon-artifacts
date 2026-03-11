@@ -22,6 +22,10 @@ def optimization_action(sdfg):
     add_gpu_copies_to_flattener(sdfg)
     sdfg.validate()
 
+    state = {s for s in sdfg.all_states() if s.label.startswith("entry_interface")}.pop()
+    sdfg.add_state_before(state, "predom_ei", is_start_block=True )
+    state.sdfg = sdfg
+    state.parent_graph = sdfg
     pre_gpu_fix(sdfg)
 
     sdfg.validate()
@@ -70,7 +74,8 @@ def optimization_action(sdfg):
             arr.lifetime = dace.dtypes.AllocationLifetime.SDFG
     sdfg.validate()
 
-    
+
+
     return sdfg
 
 def main():
