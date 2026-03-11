@@ -280,7 +280,8 @@ def permute_array_dimensions(sdfg: dace.SDFG):
         "gpu___CG_p_metrics__m_coeff1_dwdz":          [1, 0, 2],
         "gpu___CG_p_metrics__m_coeff2_dwdz":          [1, 0, 2],
         # Metric fields — transform B: (nproma, N, nblks) → (N, nproma, nblks)
-        "gpu___CG_p_metrics__m_wgtfacq_e":            [1, 0, 2],
+        # Only accessed on first layer, should be ok
+        #"gpu___CG_p_metrics__m_wgtfacq_e":            [1, 0, 2],
         "gpu___CG_p_metrics__m_coeff_gradekin":       [1, 0, 2],
 
         # Interpolation coefficients — transform B: (nproma, N, nblks) → (N, nproma, nblks)
