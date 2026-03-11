@@ -2,6 +2,7 @@ import argparse
 
 import dace
 
+from dace.properties import CodeBlock
 import utils.stages.common as common
 from utils.find import find_node_by_name
 from utils.move_scalar_to_array import _tmp_difcoef
@@ -12,6 +13,47 @@ from utils.merge_maps import merge_maps_in_sdfg
 from utils.change_array_dtypes import change_array_dtypes
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 STAGE_ID = 5
+
+
+def merge_its29_30_and_its31(sdfg: dace.SDFG):
+    mapentry1, state1 = {
+        (n, g) for n, g in sdfg.all_nodes_recursive() if isinstance(n, dace.nodes.MapEntry)
+        and "_for_it_29" in n.map.params and "_for_it_30" in n.map.params
+    }.pop()
+    mapentry2, state2 = {
+        (n, g) for n, g in sdfg.all_nodes_recursive() if isinstance(n, dace.nodes.MapEntry)
+        and "_for_it_31" in n.map.params
+    }.pop()
+
+    # Extend nlev range to be 1 more
+    mrange = mapentry1.map.range
+    mrange1 = mapentry1.map.range[1]
+    mrange = dace.subsets.Range([(1, 91, 1), (mrange1[0], mrange1[1], mrange1[2])])
+    mapentry1.map.range = mrange
+
+    # Find tasklet and change tasklet code
+    mapexit1 = state1.exit_node(mapentry1)
+    mapexit2 = state2.exit_node(mapentry2)
+    tasklets = list(state1.all_nodes_between(mapentry1, mapexit1))
+    assert len(tasklets) == 1 and isinstance(tasklets[0], dace.nodes.Tasklet)
+    tasklet: dace.nodes.Tasklet = tasklets[0]
+    
+    out_con = next(iter(tasklet.out_connectors.keys()))
+    in_con = next(iter(tasklet.in_connectors.keys()))
+
+    code = f"{out_con} = (_for_it_29 == 91)? 0.0: {in_con};"
+
+    tasklet.code = CodeBlock(
+        code, language=dace.dtypes.Language.CPP,
+    )
+
+    for n in state2.all_nodes_between(mapentry2, mapexit2):
+        state2.remove_node(n)
+    state2.remove_node(mapentry2)
+    state2.remove_node(mapexit2)
+
+    sdfg.validate()
+
 
 
 def optimization_action(sdfg):
@@ -77,6 +119,7 @@ def optimization_action(sdfg):
     sdfg.validate()
 
     merge_maps_in_sdfg(sdfg)
+    merge_its29_30_and_its31(sdfg)
     sdfg.validate()
 
     remove_unused_inconnectors_from_nestedsdfg(sdfg)

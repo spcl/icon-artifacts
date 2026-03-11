@@ -116,7 +116,7 @@ def main():
             nsdfgs[name] = sdfg
 
         common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-                              name_suffix="_permuted_single_map", main_name="main_per.cu", tblock_dim="96,2,1",
+                              name_suffix="_permuted_single_map", main_name="main_per.cu", tblock_dim="96,4,1",
                               stage_suffix="_permuted_single_map")
 
         # Read back the written files as we prepare for compilation.
@@ -134,12 +134,12 @@ def main():
                               stage_suffix="_unpermuted")
 
         # Read back the written files as we prepare for compilation.
-        #sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        #for name, sdfg in sdfgs.items():
-        #    from sc26_layout.extract_gpu_kernel import add_symbols
-        #    add_symbols(sdfg)
-        #common.compile_action(STAGE_ID, sdfgs, False, None, False, main_name="main_per.cu", tblock_dim="256,1,1",
-        #                      name_suffix="", stage_suffix="")
+        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+        for name, sdfg in sdfgs.items():
+            from sc26_layout.extract_gpu_kernel import add_symbols
+            add_symbols(sdfg)
+        common.compile_action(STAGE_ID, sdfgs, False, None, False, main_name="main_per.cu", tblock_dim="256,1,1",
+                              name_suffix="", stage_suffix="")
 
 if __name__ == "__main__":
     main()
