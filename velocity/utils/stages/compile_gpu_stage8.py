@@ -289,16 +289,16 @@ def permute_array_dimensions(sdfg: dace.SDFG):
         "gpu___CG_p_int__m_c_lin_e":                  [1, 0, 2],
         "gpu___CG_p_int__m_geofac_n2s":               [1, 0, 2],
         "gpu___CG_p_int__m_geofac_grdiv":             [1, 0, 2],
-        "gpu___CG_p_int__m_cells_aw_verts":            [1, 0, 2],
+        "gpu___CG_p_int__m_cells_aw_verts":           [1, 0, 2],
         "gpu___CG_p_int__m_geofac_rot":               [1, 0, 2],
 
 
         # Connectivity tables — transform B: (nproma, nblks, N) → (N, nproma, nblks)
-        "gpu___CG_p_patch__CG_edges__m_tangent_orientation":    [1, 0],
-        "gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length": [1, 0],
-        "gpu___CG_p_patch__CG_edges__m_area_edge":              [1, 0],
+        #"gpu___CG_p_patch__CG_edges__m_tangent_orientation":    [1, 0], # no need to switch nproma, nblks
+        #"gpu___CG_p_patch__CG_edges__m_inv_primal_edge_length": [1, 0], same
+        #"gpu___CG_p_patch__CG_edges__m_area_edge":              [1, 0], same
+        #"gpu___CG_p_patch__CG_edges__m_f_e":              [1, 0], same
         "gpu___CG_p_patch__CG_verts__m_cell_blk":         [2, 0, 1],
-        "gpu___CG_p_patch__CG_edges__m_f_e":         [1, 0],
         "gpu___CG_p_patch__CG_edges__m_cell_idx":         [2, 0, 1],
         "gpu___CG_p_patch__CG_edges__m_cell_blk":         [2, 0, 1],
         "gpu___CG_p_patch__CG_cells__m_edge_idx":         [2, 0, 1],
@@ -506,6 +506,9 @@ def optimization_action(sdfg):
     do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')
     if do_profile:
         create_profile_sdfg(sdfg)
+
+    #Breaks the codegen
+    #change_array_dtypes(sdfg, array_names={"levmask", "levelmask", "cfl_clipping", "gpu_levmask", "gpu_levelmask", "gpu_cfl_clipping"}, new_type=dace.uint8)
 
 
     return sdfg

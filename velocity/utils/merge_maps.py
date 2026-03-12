@@ -34,6 +34,11 @@ def merge_maps_in_sdfg(sdfg: dace.SDFG) -> None:
                     continue
                 if m1.map.range != m2.map.range:
                     continue
+                if ("_for_it_23" in m1.map.params or
+                    "_for_it_23" in m2.map.params or
+                    "_for_it_29" in m1.map.params or
+                    "_for_it_29" in m2.map.params):
+                    continue
 
                 # Check if the maps are independent
                 preds = set([m1])

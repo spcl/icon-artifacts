@@ -333,6 +333,47 @@ void reduce_segmented_to_address_gpu(const int *__restrict__ d_in, int*__restric
 
 // input:  arr[N][D], contiguous in N (col-major)
 // output: out[N] = sum of arr[i][start..end)
+__global__ void kernel_reduce_scan_last_dim(const int* __restrict__ arr,
+                                  int* __restrict__ out,
+                                  int start, int end, int D, int N) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= N) return;
+
+    int acc = 0;
+    for (int d = start; d < end; d++) {
+        acc = arr[i + d * N] > 0? 1: acc;
+    }
+    out[i] = acc;
+}
+
+// input:  arr[D][N], contiguous in D (col-major)
+// output: out[N] = sum of arr[start..end)[i]
+__global__ void kernel_reduce_scan_first_dim(const int* __restrict__ arr,
+                                 int* __restrict__ out,
+                                 int start, int end, int D, int N) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= N) return;
+
+    int acc = 0;
+    for (int d = start; d < end; d++) {
+        acc += arr[d + i * D] > 0? 1: acc;
+    }
+    out[i] = acc;
+}
+
+void reduce_scan_last_dim(const int* arr, int* out,
+                                  int start, int end, int D, int N) {
+    kernel_reduce_scan_last_dim<<<1, 96>>>(arr, out, start, end, D, N);
+}
+
+void reduce_scan_first_dim(const int* arr, int* out,
+                                   int start, int end, int D, int N) {
+    kernel_reduce_scan_first_dim<<<1, 96>>>(arr, out, start, end, D, N);
+}
+
+
+// input:  arr[N][D], contiguous in N (col-major)
+// output: out[N] = sum of arr[i][start..end)
 __global__ void kernel_reduce_scan_last_dim(const uint8_t* __restrict__ arr,
                                   uint8_t* __restrict__ out,
                                   int start, int end, int D, int N) {

@@ -738,9 +738,9 @@ def compile_if_propagated_sdfgs(
                 )
 
             # Dont do it for now
-            #if stage >= 6:
-            #    set_default_stream(f"{build_loc}/src/cpu/{sdfg_name}.cu")
-            #    set_default_stream(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
+            if stage >= 6:
+                set_default_stream(f"{build_loc}/src/cpu/{sdfg_name}.cu")
+                set_default_stream(f"{build_loc}/src/cuda/{sdfg_name}_cuda.cu")
 
             sources.add(f"{build_loc}/src/cpu/{sdfg.name}.cu")
         else:
@@ -807,7 +807,7 @@ def compile_if_propagated_sdfgs(
         GENCODE_ARCH = os.getenv('GENCODE_ARCH', f'arch=compute_{GENCODE_NUMBER},code=sm_{GENCODE_NUMBER}')
         print(f"Using GENCODE_ARCH: {GENCODE_ARCH}")
         if release:
-            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 -Xcompiler=-g -g --expt-relaxed-constexpr -gencode {GENCODE_ARCH} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -DNDEBUG"
+            flags = f" {nvhpc_flags} {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra  -Xcompiler=-O3 --expt-relaxed-constexpr -gencode {GENCODE_ARCH} --use_fast_math -O3 {debuginfo_flags} --ftz=true --prec-div=false --prec-sqrt=false --fmad=true -Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native -Xcompiler=-mtune=native --restrict -DNDEBUG"
         else:
             flags = f" {supress_flags} {no_nvhpc_flags_gpu} -DNDEBUG -Xcompiler=-Wall -Xcompiler=-Wextra --expt-relaxed-constexpr -gencode {GENCODE_ARCH} -O0 -Xcompiler=-g -g -Xcompiler=-O0 -G {debuginfo_flags} --fmad=false --prec-div=true --prec-sqrt=true --ftz=false -DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
         if lib:

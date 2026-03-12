@@ -30,3 +30,10 @@ void reduce_scan_first_dim(const uint8_t* __restrict__ arr,
 void reduce_scan_last_dim(const uint8_t* __restrict__ arr,
                                  uint8_t* __restrict__ out,
                                  int start, int end, int D, int N);
+
+void reduce_scan_first_dim(const int* __restrict__ arr,
+                                  int* __restrict__ out,
+                                  int start, int end, int D, int N);
+void reduce_scan_last_dim(const int* __restrict__ arr,
+                                 int* __restrict__ out,
+                                 int start, int end, int D, int N);
