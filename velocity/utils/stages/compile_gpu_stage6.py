@@ -233,7 +233,8 @@ def optimization_action(sdfg):
     flatten_lib, _ = find_node_by_name(sdfg, "flatten")
     deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
 
-    merge_its9_10_and_its15(sdfg)
+    # Do not merge I guess
+    #merge_its9_10_and_its15(sdfg)
 
     sdfg.validate()
     ToGPU(verbose=config.verbose, cpu_library_nodes=[flatten_lib, deflatten_lib], exclude=["vcflmax"]).apply_pass(sdfg, {})
@@ -280,68 +281,70 @@ def optimization_action(sdfg):
 
     return sdfg
 
+import sys
+
 def main():
     argp = argparse.ArgumentParser()
     argp.add_argument('--optimize', action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument('--compile', action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument('--unpermuted', action=argparse.BooleanOptionalAction, default=False)
+    argp.add_argument('--permutations', type=str, default=None,
+                      help='Comma-separated config names from PERMUTE_CONFIGS (default: single_map)')
     args = argp.parse_args()
     if not args.optimize and not args.compile:
         args.optimize, args.compile = True, True
-
     names = common.sdfg_names()
-
     if args.optimize:
         for name in names:
             infile = common.stage_input(name, STAGE_ID)
             outfile = common.stage_output(name, STAGE_ID)
-
             print(f"Stage #{STAGE_ID}: Optimising {name} from {infile}")
-
             sdfg = dace.SDFG.from_file(infile)
             sdfg.name = name
             sdfg.validate()
-
             sdfg = optimization_action(sdfg)
-
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
             sdfg.save(outfile, compress=True)
-
     if args.compile:
+        from sc26_layout.extract_gpu_kernel import permute_single_map_gpu, PERMUTE_CONFIGS
 
+        if args.permutations:
+            config_names = [c.strip() for c in args.permutations.split(",")]
+        else:
+            config_names = ["single_map"]
+
+        for config_name in config_names:
+            if config_name not in PERMUTE_CONFIGS:
+                print(f"Unknown config: {config_name}. Available: {list(PERMUTE_CONFIGS.keys())}")
+                sys.exit(1)
+
+            print(f"=== Compiling permuted config: {config_name} ===")
+            sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+            nsdfgs = {}
+            for name, sdfg in sdfgs.items():
+                sdfg = permute_single_map_gpu(sdfg, config_name=config_name)
+                insert_synchronization_for_profiling(sdfg)
+                sdfg.validate()
+                nsdfgs[name] = sdfg
+            suffix = f"_permuted_{config_name}"
+            common.compile_action(STAGE_ID, nsdfgs, False, None, False,
+                name_suffix=suffix, main_name="main_per.cu", tblock_dim="32,16,1",
+                stage_suffix=suffix)
+
+    if args.unpermuted:
+        from sc26_layout.extract_gpu_kernel import add_timer_single_map_gpu
+
+        print(f"=== Compiling unpermuted baseline ===")
         sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
-            from sc26_layout.extract_gpu_kernel import permute_single_map_gpu
-            sdfg = permute_single_map_gpu(sdfg)
-            insert_synchronization_for_profiling(sdfg)
-            sdfg.validate()
-            nsdfgs[name] = sdfg
-
-        common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-                              name_suffix="_permuted_single_map", main_name="main_per.cu", tblock_dim="96,4,1",
-                              stage_suffix="_permuted_single_map")
-
-        # Read back the written files as we prepare for compilation.
-        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        nsdfgs = {}
-        for name, sdfg in sdfgs.items():
-            from sc26_layout.extract_gpu_kernel import add_timer_single_map_gpu
             sdfg = add_timer_single_map_gpu(sdfg)
             insert_synchronization_for_profiling(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
-
         common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-                              name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1",
-                              stage_suffix="_unpermuted")
-
-        # Read back the written files as we prepare for compilation.
-        sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-        for name, sdfg in sdfgs.items():
-            from sc26_layout.extract_gpu_kernel import add_symbols
-            add_symbols(sdfg)
-        common.compile_action(STAGE_ID, sdfgs, False, None, False, main_name="main_per.cu", tblock_dim="256,1,1",
-                              name_suffix="", stage_suffix="")
+            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="32,16,1",
+            stage_suffix="_unpermuted")
 
 if __name__ == "__main__":
     main()

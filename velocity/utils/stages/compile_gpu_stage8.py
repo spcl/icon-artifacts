@@ -553,11 +553,11 @@ def main():
 
         if do_permute:
             common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_dim_permuted", main_name="main_per.cu", tblock_dim="96,2,1",
+            name_suffix="_dim_permuted", main_name="main_per.cu", tblock_dim="32,16,1",
             stage_suffix="_permuted")
         else:
             common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="256,1,1",
+            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="32,16,1",
             stage_suffix="_unpermuted")
 
 if __name__ == "__main__":
