@@ -267,19 +267,15 @@ def add_symbols(sdfg: dace.SDFG):
 
     new_start.add_edge(new_tasklet, "_out", new_start.add_access(sname), None, dace.Memlet(f"{sname}[0]"))
 
-def add_print_after_gpu(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "z_ekinh", permuted: bool = False):
+def add_print_after_gpu(sdfg: dace.SDFG, state: dace.SDFGState,
+                        array_name: str = "z_ekinh", permuted: bool = False):
     """Print 8 hardcoded elements of array_name in a state before `state`."""
 
     # (nproma, nlev, nblocks) — nblocks=0, nlev<90, nproma<20000
     indices = [
         (0, 0, "(_for_it_22-1)"),
         (1, 1, "(_for_it_22-1)"),
-        (10, 5, "(_for_it_22-1)"),
-        (100, 10, "(_for_it_22-1)"),
-        (500, 45, "(_for_it_22-1)"),
-        (1000, 10, "(_for_it_22-1)"),
-        (5000, 45, "(_for_it_22-1)"),
-        (7000, 60, "(_for_it_22-1)"),
+        (4, 4, "(_for_it_22-1)"),
     ]
 
     print_state = sdfg.add_state_after(state, "print_values")
@@ -713,7 +709,8 @@ PERMUTE_CONFIGS = {
     }),
 }
 
-def permute_single_map_gpu(sdfg: dace.SDFG, config_name: str = "single_map"):
+def permute_single_map_gpu(sdfg: dace.SDFG,
+                           config_name: str = "single_map"):
     cfg = PERMUTE_CONFIGS[config_name]
     map, state =delete_all_maps_except(
         sdfg,

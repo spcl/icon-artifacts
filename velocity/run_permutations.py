@@ -10,6 +10,7 @@ Total: 2 x 6 x 6 - 1 (identity) = 71 configs
 """
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -24,10 +25,12 @@ from sc26_layout.extract_gpu_kernel import PERMUTE_CONFIGS
 # Constants
 # ---------------------------------------------------------------------------
 
-COMPILE_CMD = "python -m utils.stages.compile_gpu_stage6"
-EXE_TEMPLATE = "./velocity_gpu.stage6_standalone_release_permuted_single_map"
-EXE_UNPERMUTED = "./velocity_gpu.stage6_standalone_release_unpermuted"
-OUT_DIR = Path("permutations")
+STAGE = os.getenv("_STAGE", "6")  # default to stage 1, can be overridden with env var
+COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}"
+
+EXE_TEMPLATE = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
+EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
+OUT_DIR = Path(f"permutations_{STAGE}")
 
 # ---------------------------------------------------------------------------
 # Compile & run helpers
@@ -46,9 +49,9 @@ def compile_config(name):
     return ret.returncode == 0
 
 
-def run_config(name, reps=40, ncu=False):
+def run_config(name, reps=50, ncu=False):
     ensure_out_dir()
-    exe = EXE_TEMPLATE
+    exe = EXE_TEMPLATE + f"_{name}"
     out_file = OUT_DIR / f"{name}.txt"
 
     print(f"[run] {exe} -> {out_file}")
@@ -79,7 +82,7 @@ def run_config(name, reps=40, ncu=False):
 
 
 def compile_unpermuted():
-    cmd = f"{COMPILE_CMD} --compile --unpermuted"
+    cmd = f"{COMPILE_CMD} --optimize --compile --permutations 'c012_e012_b021' --unpermuted"
     print(f"[compile] {cmd}")
     ret = subprocess.run(cmd, shell=True)
     if ret.returncode != 0:
@@ -185,19 +188,27 @@ def main():
             run_unpermuted(reps=args.reps, ncu=args.ncu)
 
     # Each permuted config
+    #raise Exception(selected)
     for name in selected:
         print(f"\n{'=' * 60}")
         print(f"Config: {name}")
         print(f"{'=' * 60}")
 
+        exe = EXE_TEMPLATE + f"_{name}"
+
         if not args.run_only:
-            ok = compile_config(name)
+            if os.path.exists(exe):
+                print(f"[skip] {name}: executable already exists ({exe})")
+                ok = True
+            else:
+                ok = compile_config(name)
             if not ok:
                 print(f"[skip] {name}: compile failed, skipping run")
                 continue
-
+        
         if not args.compile_only:
             run_config(name, reps=args.reps, ncu=args.ncu)
+
 
     # Final summary
     if not args.compile_only and not args.dry_run:

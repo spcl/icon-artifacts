@@ -3,6 +3,7 @@ import dace
 from dace.transformation.layout.permute_dimensions import PermuteDimensions
 from dace.sdfg.construction_utils import move_state_after, move_state_before
 
+from sc26_layout.extract_gpu_kernel import PERMUTE_CONFIGS
 
 def _rm_map(state: dace.SDFGState, entry_node: dace.nodes.MapEntry):
     exit_node = state.exit_node(entry_node)
@@ -179,12 +180,6 @@ def add_print_after(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "z
     indices = [
         (0, 0, "(_for_it_22-1)"),
         (1, 1, "(_for_it_22-1)"),
-        (10, 5, "(_for_it_22-1)"),
-        (100, 10, "(_for_it_22-1)"),
-        (500, 45, "(_for_it_22-1)"),
-        (1000, 10, "(_for_it_22-1)"),
-        (5000, 45, "(_for_it_22-1)"),
-        (7000, 60, "(_for_it_22-1)"),
     ]
 
     print_state = sdfg.add_state_after(state, "print_values")
@@ -235,12 +230,6 @@ def add_print_before(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "
     indices = [
         (0, 0, "(_for_it_22-1)"),
         (1, 1, "(_for_it_22-1)"),
-        (10, 5, "(_for_it_22-1)"),
-        (100, 10, "(_for_it_22-1)"),
-        (500, 45, "(_for_it_22-1)"),
-        (1000, 10, "(_for_it_22-1)"),
-        (5000, 45, "(_for_it_22-1)"),
-        (7000, 60, "(_for_it_22-1)"),
     ]
 
     print_state = sdfg.add_state_before(state, "print_values")
@@ -281,7 +270,7 @@ def add_print_before(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "
 
 
 
-def permute_single_map(sdfg: dace.SDFG, host:bool=True):
+def permute_single_map(sdfg: dace.SDFG, host:bool=True, config_name: str = "single_map"):
     map, state =delete_all_maps_except(
         sdfg,
         {"_for_it_23", "_for_it_22", "_for_it_24"},
@@ -291,21 +280,15 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True):
     assert state is not None
     sdfg.save("extracted.sdfgz", compress=True)
 
+    cfg = PERMUTE_CONFIGS[config_name]
+    pmap = cfg["permute_map"]
+    inverse_pmap = cfg["inverse_permute_map"]
     PermuteDimensions(
-        permute_map={
-            "z_ekinh": [1, 0, 2],
-            "z_kin_hor_e": [1, 0, 2],
-            "__CG_p_int__m_e_bln_c_s": [1, 0, 2],
-            "__CG_p_patch__CG_cells__m_edge_idx": [2, 0, 1],
-            "__CG_p_patch__CG_cells__m_edge_blk": [2, 0, 1],
-            "z_w_con_c": [1, 0],
-            "__CG_p_prog__m_w": [1, 0, 2],
-        },
+        permute_map=pmap,
         add_permute_maps=True,
         column_major=True,
     ).apply_pass(sdfg, {})
 
-    sdfg.save("post_transform.sdfgz", compress=True)
     sdfg.validate()
 
     permute_in_state = {s for s in sdfg.all_states() if s.label == "permute_in"}.pop()
