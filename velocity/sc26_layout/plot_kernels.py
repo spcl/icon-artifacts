@@ -6,20 +6,38 @@ Usage:
     python plot_kernels.py \
         --cpu-unpermuted r02b05_ln/cpu_unpermuted.txt \
         --cpu-permuted r02b05_ln/cpu_permuted.txt \
-        --gpu-unpermuted r02b05_ln/gpu_unpermuted.txt \
-        --gpu-permuted r02b05_ln/gpu_permuted.txt \
+        --gpu-unpermuted r02b05_ln/gpu_unpermuted_profile_stage6.txt \
+        --gpu-permuted r02b05_ln/gpu_permuted_profile_stage6.txt \
         --launch-overhead r02b05_ln/launch_overhead.txt \
         --title "R02B05" \
-        --warmup 5
+        --warmup 2
 
     python plot_kernels.py \
         --cpu-unpermuted r02b06_ln/cpu_unpermuted.txt \
         --cpu-permuted r02b06_ln/cpu_permuted.txt \
-        --gpu-unpermuted r02b06_ln/gpu_unpermuted.txt \
-        --gpu-permuted r02b06_ln/gpu_permuted.txt \
+        --gpu-unpermuted r02b06_ln/gpu_unpermuted_profile_stage6.txt \
+        --gpu-permuted r02b06_ln/gpu_permuted_profile_stage6.txt \
         --launch-overhead r02b06_ln/launch_overhead.txt \
         --title "R02B06" \
-        --warmup 5
+        --warmup 10
+
+    python sc26_layout/plot_kernels.py \
+        --cpu-unpermuted r02b05_ln/cpu_unpermuted.txt \
+        --cpu-permuted r02b05_ln/cpu_permuted.txt \
+        --gpu-unpermuted gpu_unpermuted_stage6_v2.txt \
+        --gpu-permuted gpu_permuted_stage6_v2.txt \
+        --title "R02B06" \
+        --launch-overhead r02b06_ln/launch_overhead.txt \
+        --warmup 2
+
+python sc26_layout/plot_kernels.py \
+    --cpu-unpermuted cpu_unpermuted_stage4.txt \
+    --cpu-permuted cpu_permuted_stage4.txt \
+    --gpu-unpermuted gpu_unpermuted_stage6.txt \
+    --gpu-permuted gpu_permuted_stage6.txt \
+    --title "R02B06" \
+    --launch-overhead r02b06_ln/launch_overhead.txt \
+    --warmup 2
 """
 
 import re
@@ -73,6 +91,7 @@ def violin_panel(ax, data_list, labels, colors, title):
 
     ax.set_xticks(positions)
     ax.set_xticklabels(labels)
+    ax.set_ylim(bottom=0)
     ax.set_ylabel("Elapsed time [ms]")
     ax.set_title(title)
     ax.grid(axis="y", alpha=0.3)
@@ -100,12 +119,12 @@ def main():
     cpu_perm   = parse_elapsed_times(args.cpu_permuted)[W:]
     gpu_unperm = parse_elapsed_times(args.gpu_unpermuted)[W:]
     gpu_perm   = parse_elapsed_times(args.gpu_permuted)[W:]
-    overhead   = parse_launch_overhead(args.launch_overhead)
+    #overhead   = parse_launch_overhead(args.launch_overhead)
 
     print(f"Samples after {W} warmup:  "
-          f"CPU unperm={len(cpu_unperm)}, CPU perm={len(cpu_perm)}, "
+          #f"CPU unperm={len(cpu_unperm)}, CPU perm={len(cpu_perm)}, "
           f"GPU unperm={len(gpu_unperm)}, GPU perm={len(gpu_perm)}")
-    print(f"Launch overhead: {overhead:.6f} ms\n")
+    #print(f"Launch overhead: {overhead:.6f} ms\n")
 
     # --- Two panels side by side ---
     fig, (ax_cpu, ax_gpu) = plt.subplots(1, 2, figsize=(10, 5))
@@ -122,9 +141,9 @@ def main():
     # GPU panel: raw + overhead-subtracted
     violin_panel(
         ax_gpu,
-        [gpu_unperm, gpu_perm, gpu_unperm - overhead, gpu_perm - overhead],
-        ["Unperm", "Perm", "Unperm\n−overhead", "Perm\n−overhead"],
-        ["#4C72B0", "#DD8452", "#55A868", "#C44E52"],
+        [gpu_unperm, gpu_perm],
+        ["Unperm", "Perm"],
+        ["#4C72B0", "#DD8452"],
         f"GPU kernel runtime ({args.title})",
     )
 
