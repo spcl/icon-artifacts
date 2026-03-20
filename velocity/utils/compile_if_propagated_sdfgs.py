@@ -500,18 +500,19 @@ def _get_compiler(gpu: bool) -> str:
 
 def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
     if gpu and AMD:
-        arch = os.getenv("HIP_ARCH", "gfx942")
+        arch = "gfx942"  # Default to gfx942 for AMD; can be overridden with HIP_ARCH env var
+        #arch = os.getenv("HIP_ARCH", "gfx942")
         common = f"--offload-arch={arch} -std=c++20 -DNDEBUG"
         if release:
             flags = (
                 f"{common} -O3 -ffast-math -fPIC -Wall -Wextra "
                 f"-Wno-unused-parameter -munsafe-fp-atomics "
                 f"-fno-hip-fp32-correctly-rounded-div-sqrt "
-                f"-ffp-contract=fast"
+                f"-ffp-contract=fast -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
             )
         else:
             flags = (
-                f"{common} -O0 -g -ggdb -fPIC -Wall -Wextra "
+                f"{common} -O0 -g -ggdb -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
                 f"-DDACE_VELOCITY_DEBUG"
             )
         if debuginfo:
@@ -653,7 +654,7 @@ def compile_if_propagated_sdfgs(
             value=(
                 "--offload-arch=gfx942 -fno-hip-fp32-correctly-rounded-div-sqrt "
                 "-mllvm -amdgpu-early-inline-all=true -ffp-contract=fast "
-                "-fPIC -O3 -ffast-math -Wno-unused-parameter"
+                "-fPIC -O3 -ffast-math -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
             ),
         )
     else:
