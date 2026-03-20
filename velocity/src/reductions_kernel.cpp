@@ -1,4 +1,5 @@
 #if __HIP_PLATFORM_AMD__ == 1
+
 #include "hip/hip_runtime.h"
 #include <hip/hip_runtime.h>
 #include <hipcub/hipcub.hpp>
@@ -9,17 +10,6 @@
 #define DEVICE_REDUCE hipcub::DeviceReduce
 #define LAUNCH_KERNEL(kernel, grid, block, stream, ...) \
     hipLaunchKernelGGL(kernel, grid, block, 0, stream, __VA_ARGS__)
-#else
-#include <cuda_runtime.h>
-#include <cub/cub.cuh>
-#define GPU_PREFIX(name) cuda##name
-#define gpuStream_t cudaStream_t
-#define gpuMalloc cudaMalloc
-#define gpuFree cudaFree
-#define DEVICE_REDUCE cub::DeviceReduce
-#define LAUNCH_KERNEL(kernel, grid, block, stream, ...) \
-    kernel<<<grid, block, 0, stream>>>(__VA_ARGS__)
-#endif
 
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
@@ -216,3 +206,5 @@ void reduce_scan_first_dim(const uint8_t *arr, uint8_t *out,
 {
     LAUNCH_KERNEL(kernel_reduce_scan_first_dim, 1, 96, 0, arr, out, start, end, D, N);
 }
+
+#endif
