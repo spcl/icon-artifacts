@@ -3,6 +3,8 @@
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=288
 #SBATCH --time=04:00:00
 #SBATCH --output=permutations/job_output.txt
 #SBATCH --error=permutations/job_error.txt
@@ -11,8 +13,14 @@ spack load gcc/76jw6nu
 spack load cuda@12.9
 export _RELEASE=1
 export GENCODE_NUMBER=90
+export OMP_NUM_THREADS=288
+export OMP_PROC_BIND=true
+export OMP_PLACES=cores
+export OMP_DISPLAY_ENV=TRUE
+export __HIP_PLATFORM_AMD__=0
+export HIP_PLATFORM_AMD=0
 
-mkdir -p permutations_${_STAGE:-6}
+mkdir -p permutations_${_STAGE:-4}
 
 # --- Configuration ---
 # Override via: sbatch --export=CONFIGS="c102_e012_b012,c102_e201_b201" run_sweep.sh

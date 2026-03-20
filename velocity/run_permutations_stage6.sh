@@ -4,6 +4,8 @@
 #SBATCH --partition=normal
 #SBATCH --exclusive
 #SBATCH --time=04:00:00
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=288
 #SBATCH --output=permutations/job_output.txt
 #SBATCH --error=permutations/job_error.txt
 
@@ -11,6 +13,12 @@ spack load gcc/76jw6nu
 spack load cuda@12.9
 export _RELEASE=1
 export GENCODE_NUMBER=90
+export OMP_NUM_THREADS=288
+export OMP_PROC_BIND=true
+export OMP_PLACES=cores
+export OMP_DISPLAY_ENV=TRUE
+export __HIP_PLATFORM_AMD__=0
+export HIP_PLATFORM_AMD=0
 
 mkdir -p permutations_${_STAGE:-6}
 
