@@ -3,7 +3,7 @@ import os
 import re
 import typing
 from pathlib import Path
-
+import sys
 from dace.sdfg import infer_types
 from utils.config import rm_syncs
 from utils.prune_names import prune_names, compare_structs
@@ -585,6 +585,11 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
                 f"-Wno-unused-parameter -Wno-unused-variable "
                 f"-Wno-unknown-pragmas -O0 -g -ggdb {debugflag}"
             )
+    
+    if AMD:
+        flags += " -D__HIP_PLATFORM_AMD__=1"
+        flags += " -DHIP_PLATFORM_AMD=1"
+
     return flags
 
 
@@ -606,16 +611,21 @@ def _compile_and_link(
     def compile_one(src):
         obj = os.path.splitext(src)[0] + ".o"
         cmd = f"{compiler} -c {src} {includes} {compile_flags} -o {obj}"
-        print(f"  [CC] {src}")
-        ret = subprocess.run(cmd, shell=True)
-        if ret.returncode != 0:
-            raise RuntimeError(f"FAILED: {cmd}")
-        return obj
+        ret = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        return src, obj, ret
 
     with ThreadPoolExecutor(max_workers=jobs) as pool:
         futures = {pool.submit(compile_one, src): src for src in sources}
         for fut in as_completed(futures):
-            objects.append(fut.result())  # raises on failure
+            src, obj, ret = fut.result()
+            print(f"  [CC] {src}")
+            if ret.stdout:
+                print(ret.stdout, end="")
+            if ret.stderr:
+                print(ret.stderr, end="", file=sys.stderr)
+            if ret.returncode != 0:
+                raise RuntimeError(f"FAILED: {src}")
+            objects.append(obj)
 
     link_flags = ""
     if lib:
