@@ -17,10 +17,15 @@ export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_pa
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 
+export __HIP_PLATFORM_AMD__=1
+export HIP_PLATFORM_AMD=1
+
 START_DIR=$(pwd)
-DACE_DIR=$(python3 -c "import dace; import os; print(os.path.dirname(os.path.dirname(dace.__file__)))")
+DACE_DIR=$(python3.13 -c "import dace; import os; print(os.path.dirname(os.path.dirname(dace.__file__)))")
 echo "dace found at: $DACE_DIR"
 cd "$DACE_DIR"
 git fetch origin
 git checkout f2dace/staging
+git submodule update --init --recursive
+git submodule update --init --recursive --remote
 cd "$START_DIR"

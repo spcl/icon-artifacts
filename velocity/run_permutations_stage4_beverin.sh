@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=velocity_gpu_perm_sweep
 #SBATCH --nodes=1
-#SBATCH --partition=mi300a
+#SBATCH --partition=mi300
 #SBATCH --exclusive
 #SBATCH --time=07:00:00
 #SBATCH --ntasks-per-node=1
