@@ -11,6 +11,8 @@ from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
 import argparse
 from utils.propagate_if_cond import propagate_if_cond
 from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
+import os
+
 STAGE_ID = 4
 
 
@@ -101,17 +103,21 @@ def main():
                 print(f"Unknown config: {config_name}. Available: {list(PERMUTE_CONFIGS.keys())}")
                 sys.exit(1)
 
-            print(f"=== Compiling permuted config: {config_name} ===")
-            sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-            nsdfgs = {}
-            for name, sdfg in sdfgs.items():
-                sdfg = permute_single_map(sdfg, config_name=config_name)
-                sdfg.validate()
-                nsdfgs[name] = sdfg
-            suffix = f"_permuted_{config_name}"
-            common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-                name_suffix=suffix, main_name="main_per.cu", tblock_dim="32,16,1",
-                stage_suffix=suffix)
+            for shuffle_map in [True, False]:
+                shuffle_label = "shuffled" if shuffle_map else "unshuffled"
+                print(f"=== Compiling permuted config: {config_name} ({shuffle_label}) ===")
+                sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+                nsdfgs = {}
+                for name, sdfg in sdfgs.items():
+                    sdfg = permute_single_map(sdfg, config_name=config_name, shuffle_map=shuffle_map)
+                    sdfg.validate()
+                    nsdfgs[name] = sdfg
+                suffix = f"_permuted_{config_name}_{shuffle_label}"
+                BEVERIN = os.getenv("BEVERIN", "0") == "1"
+                tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
+                common.compile_action(STAGE_ID, nsdfgs, False, None, False,
+                    name_suffix=suffix, main_name="main_per.cu", tblock_dim=tblock_dim,
+                    stage_suffix=suffix)
 
     if args.unpermuted:
         from sc26_layout.extract_kernel import add_timer_single_map

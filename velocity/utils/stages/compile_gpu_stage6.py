@@ -16,6 +16,7 @@ from utils.segmented_reduction import to_segmented_reduction
 from utils.rm_segmented_reduce import rm_segmented_reduce
 from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling, insert_event_timers_for_profiling
 import copy
+import os
 
 STAGE_ID = 6
 
@@ -318,18 +319,22 @@ def main():
                 print(f"Unknown config: {config_name}. Available: {list(PERMUTE_CONFIGS.keys())}")
                 sys.exit(1)
 
-            print(f"=== Compiling permuted config: {config_name} ===")
-            sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
-            nsdfgs = {}
-            for name, sdfg in sdfgs.items():
-                sdfg = permute_single_map_gpu(sdfg, config_name=config_name)
-                insert_synchronization_for_profiling(sdfg)
-                sdfg.validate()
-                nsdfgs[name] = sdfg
-            suffix = f"_permuted_{config_name}"
-            common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-                name_suffix=suffix, main_name="main_per.cu", tblock_dim="32,16,1",
-                stage_suffix=suffix)
+            for shuffle_map in [True, False]:
+                shuffle_label = "shuffled" if shuffle_map else "unshuffled"
+                print(f"=== Compiling permuted config: {config_name} ({shuffle_label}) ===")
+                sdfgs = {name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID)) for name in names}
+                nsdfgs = {}
+                for name, sdfg in sdfgs.items():
+                    sdfg = permute_single_map_gpu(sdfg, config_name=config_name, shuffle_map=shuffle_map)
+                    insert_synchronization_for_profiling(sdfg)
+                    sdfg.validate()
+                    nsdfgs[name] = sdfg
+                suffix = f"_permuted_{config_name}_{shuffle_label}"
+                BEVERIN = os.getenv("BEVERIN", "0") == "1"
+                tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
+                common.compile_action(STAGE_ID, nsdfgs, False, None, False,
+                    name_suffix=suffix, main_name="main_per.cu", tblock_dim=tblock_dim,
+                    stage_suffix=suffix)
 
     if args.unpermuted:
         from sc26_layout.extract_gpu_kernel import add_timer_single_map_gpu
@@ -342,8 +347,10 @@ def main():
             insert_synchronization_for_profiling(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
+        BEVERIN = os.getenv("BEVERIN", "0") == "1"
+        tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
         common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="32,16,1",
+            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim=tblock_dim,
             stage_suffix="_unpermuted")
 
 if __name__ == "__main__":

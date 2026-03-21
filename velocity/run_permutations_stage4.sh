@@ -26,7 +26,7 @@ mkdir -p permutations_${_STAGE:-4}
 # --- Configuration ---
 # Override via: sbatch --export=CONFIGS="c102_e012_b012,c102_e201_b201" run_sweep.sh
 CONFIGS="${CONFIGS:-}"          # empty = all 71
-REPS="${REPS:-50}"
+REPS="${REPS:-100}"
 
 # --- Build arguments ---
 ARGS="--reps ${REPS}"

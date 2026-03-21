@@ -49,11 +49,11 @@ def compile_config(name):
         print(f"[compile] FAILED for {name} (rc={ret.returncode})", file=sys.stderr)
     return ret.returncode == 0
 
-
-def run_config(name, reps=50, ncu=False):
+def run_config(name, shuffle_label, reps=100, ncu=False):
     ensure_out_dir()
-    exe = EXE_TEMPLATE + f"_{name}"
-    out_file = OUT_DIR / f"{name}.txt"
+    full_name = f"{name}_{shuffle_label}"
+    exe = EXE_TEMPLATE + f"_{full_name}"
+    out_file = OUT_DIR / f"{full_name}.txt"
 
     print(f"[run] {exe} -> {out_file}")
     with open(out_file, "w") as f:
@@ -62,13 +62,13 @@ def run_config(name, reps=50, ncu=False):
             stdout=f, stderr=subprocess.STDOUT,
         )
     if ret.returncode != 0:
-        print(f"[run] FAILED for {name} (rc={ret.returncode})", file=sys.stderr)
+        print(f"[run] FAILED for {full_name} (rc={ret.returncode})", file=sys.stderr)
         return False
 
     if ncu:
-        ncu_report = OUT_DIR / f"ncu_{name}"
-        ncu_log = OUT_DIR / f"ncu_{name}.txt"
-        print(f"[ncu] {name} -> {ncu_report}.ncu-rep")
+        ncu_report = OUT_DIR / f"ncu_{full_name}"
+        ncu_log = OUT_DIR / f"ncu_{full_name}.txt"
+        print(f"[ncu] {full_name} -> {ncu_report}.ncu-rep")
         ncu_cmd = [
             "ncu", "--set", "full",
             "--import-source", "yes",
@@ -195,21 +195,26 @@ def main():
         print(f"Config: {name}")
         print(f"{'=' * 60}")
 
-        exe = EXE_TEMPLATE + f"_{name}"
-
         if not args.run_only:
-            if os.path.exists(exe):
-                print(f"[skip] {name}: executable already exists ({exe})")
+            # compile_config produces both shuffled and unshuffled
+            ok = compile_config(name)
+            if not ok:
+                print(f"[skip] {name}: compile failed, skipping run")
+                continue
+            exe_s = EXE_TEMPLATE + f"_{name}_shuffled"
+            exe_u = EXE_TEMPLATE + f"_{name}_unshuffled"
+            if os.path.exists(exe_s) and os.path.exists(exe_u):
+                print(f"[skip] {name}: executables already exist")
                 ok = True
             else:
                 ok = compile_config(name)
             if not ok:
                 print(f"[skip] {name}: compile failed, skipping run")
                 continue
-        
-        if not args.compile_only:
-            run_config(name, reps=args.reps, ncu=args.ncu)
 
+        if not args.compile_only:
+            for shuffle_label in ["shuffled", "unshuffled"]:
+                run_config(name, shuffle_label, reps=args.reps, ncu=args.ncu)
 
     # Final summary
     if not args.compile_only and not args.dry_run:

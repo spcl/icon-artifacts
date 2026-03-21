@@ -18,9 +18,7 @@ export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=1
 export HIP_PLATFORM_AMD=1
 export _STAGE=4
-
-mkdir -p beverin_permutations_${_STAGE:-4}
-
+export BEVERIN=1
 export ROCM_HOME=/opt/rocm
 export HIP_PATH=$ROCM_HOME
 export HIPCC=$ROCM_HOME/bin/hipcc
@@ -32,13 +30,11 @@ export CFLAGS="-I$ROCM_HOME/include"
 export LDFLAGS="-L$ROCM_HOME/lib -L$ROCM_HOME/lib64"
 export CUPY_INSTALL_USE_HIP=1
 export HCC_AMDGPU_TARGET=gfx942
+export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"
 export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))"):${C_INCLUDE_PATH}"
-
-export HCC_AMDGPU_TARGET=gfx942
-export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 
 #START_DIR=$(pwd)
 #DACE_DIR=$(python3 -c "import dace; import os; print(os.path.dirname(os.path.dirname(dace.__file__)))")
@@ -47,11 +43,12 @@ export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 #git fetch origin
 #git checkout f2dace/staging
 #cd "$START_DIR"
+mkdir -p beverin_permutations_${_STAGE:-4}
 
 # --- Configuration ---
 # Override via: sbatch --export=CONFIGS="c102_e012_b012,c102_e201_b201" run_sweep.sh
 CONFIGS="${CONFIGS:-}"          # empty = all 71
-REPS="${REPS:-50}"
+REPS="${REPS:-100}"
 
 # --- Build arguments ---
 ARGS="--reps ${REPS}"
