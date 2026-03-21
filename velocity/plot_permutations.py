@@ -1,112 +1,46 @@
-import glob
-import re
+import re, glob, os, sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Regex to extract timing
-pattern = re.compile(r"\[Timer\] Elapsed time:\s*([0-9.]+)\s*ms")
+folder = sys.argv[1] if len(sys.argv) > 1 else "."
+pattern = re.compile(r"\[Timer\] Elapsed time: ([\d.]+) ms")
 
 data = {}
-files = sorted(glob.glob("permutations/*.txt"))
-
-for fname in files:
-    if "job_output" in fname or "job_error" in fname:
+for f in glob.glob(os.path.join(folder, "*.txt")):
+    name = os.path.basename(f).replace(".txt", "")
+    with open(f) as fh:
+        times = [float(m.group(1)) for line in fh if (m := pattern.search(line))]
+    if not times:
         continue
+    if name == "unpermuted":
+        cfg = "unpermuted"
+        data[cfg] = times
+    else:
+        data[name] = times
 
-    times = []
+configs = sorted(data.keys())
+vals = [data[cfg] for cfg in configs]
+colors = ["green" if cfg == "unpermuted" else "blue" for cfg in configs]
 
-    with open(fname, "r") as f:
-        for line in f:
-            m = pattern.search(line)
-            if m:
-                times.append(float(m.group(1)))
+baseline_median = np.median(data["unpermuted"]) if "unpermuted" in data else None
 
-    # Optional: drop first (warmup)
-    if len(times) > 1:
-        times = times[1:]
+fig, ax = plt.subplots()
+vp = ax.violinplot(vals, showmeans=True)
+for body, c in zip(vp["bodies"], colors):
+    body.set_facecolor(c)
+    body.set_edgecolor(c)
+    body.set_alpha(0.7)
 
-    if times:
-        key = fname.replace("permutations/", "").replace(".txt", "")
-        data[key] = times
+# Speedup annotations
+if baseline_median is not None:
+    for i, cfg in enumerate(configs):
+        med = np.median(data[cfg])
+        speedup = baseline_median / med
+        ax.text(i + 1, min(med * 1.2, med + 0.15), f"{speedup:.2f}x", ha="center", va="bottom", fontsize=8)
 
-# =========================
-# 📊 SORT BY MEDIAN
-# =========================
-sorted_items = sorted(data.items(), key=lambda x: np.median(x[1]))
-labels = [k for k, _ in sorted_items]
-values = [v for _, v in sorted_items]
-medians = np.array([np.median(v) for v in values])
-
-# =========================
-# 🎻 VIOLIN PLOT
-# =========================
-plt.figure(figsize=(16, 7))
-
-plt.violinplot(values, showmeans=True, showmedians=True)
-
-plt.xticks(range(1, len(labels) + 1), labels, rotation=90)
-plt.ylabel("Runtime (ms)")
-plt.title("Runtime Distribution per Configuration")
-
-# ---- GRID (major + minor) ----
-plt.grid(True, which='major', linestyle='-', linewidth=0.6, alpha=0.7)
-plt.grid(True, which='minor', linestyle='--', linewidth=0.4, alpha=0.5)
-plt.minorticks_on()
-
-plt.tight_layout()
-plt.savefig("permutations_stage6_violin.png", dpi=300)
-plt.close()
-
-# =========================
-# ⚡ SPEEDUP SCATTER (vs unpermuted)
-# =========================
-
-# Find baseline
-baseline_key = None
-for k in data.keys():
-    if "unpermuted" in k:
-        baseline_key = k
-        break
-
-if baseline_key is None:
-    raise ValueError("Could not find 'unpermuted' baseline!")
-
-baseline_median = np.median(data[baseline_key])
-
-# Compute medians and speedups
-labels = []
-speedups = []
-
-for k, v in data.items():
-    med = np.median(v)
-    sp = baseline_median / med
-    labels.append(k)
-    speedups.append(sp)
-
-# Sort by speedup (optional but recommended)
-sorted_items = sorted(zip(labels, speedups), key=lambda x: x[1], reverse=True)
-labels, speedups = zip(*sorted_items)
-
-# ---- Plot ----
-plt.figure(figsize=(16, 6))
-
-x = np.arange(len(labels))
-
-plt.scatter(x, speedups, s=120)  # thick dots
-
-plt.xticks(x, labels, rotation=90)
-plt.ylabel("Speedup vs Unpermuted (median)")
-plt.title("Speedup per Configuration")
-
-# Grid (nice + readable)
-plt.grid(True, which='major', linestyle='-', linewidth=0.6, alpha=0.7)
-plt.grid(True, which='minor', linestyle='--', linewidth=0.4, alpha=0.5)
-plt.minorticks_on()
-
-# Annotate values
-for xi, sp in zip(x, speedups):
-    plt.text(xi, sp, f"{sp:.2f}x", ha='center', va='bottom', fontsize=8)
-
-plt.tight_layout()
-plt.savefig("permutations_stage6_speedup_scatter.png", dpi=300)
-plt.close()
+ax.set_xticks(range(1, len(configs) + 1))
+ax.set_xticklabels(configs, rotation=90, ha="center", fontsize=7)
+ax.set_ylabel("Time (ms)")
+ax.grid(True, axis="both", linestyle="--", alpha=0.5)
+fig.tight_layout()
+fig.savefig("violin_plot.png", dpi=200)
