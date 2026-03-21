@@ -39,13 +39,13 @@ export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_pa
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 
-START_DIR=$(pwd)
-DACE_DIR=$(python3 -c "import dace; import os; print(os.path.dirname(os.path.dirname(dace.__file__)))")
-echo "dace found at: $DACE_DIR"
-cd "$DACE_DIR"
-git fetch origin
-git checkout f2dace/staging
-cd "$START_DIR"
+#START_DIR=$(pwd)
+#DACE_DIR=$(python3 -c "import dace; import os; print(os.path.dirname(os.path.dirname(dace.__file__)))")
+#echo "dace found at: $DACE_DIR"
+#cd "$DACE_DIR"
+#git fetch origin
+#git checkout f2dace/staging
+#cd "$START_DIR"
 
 # --- Configuration ---
 # Override via: sbatch --export=CONFIGS="c102_e012_b012,c102_e201_b201" run_sweep.sh
