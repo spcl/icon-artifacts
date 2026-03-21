@@ -507,7 +507,6 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             flags = (
                 f"{common} -O3 -ffast-math -fPIC -Wall -Wextra "
                 f"-Wno-unused-parameter -munsafe-fp-atomics "
-                f"-fno-hip-fp32-correctly-rounded-div-sqrt "
                 f"-ffp-contract=fast -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
             )
         else:
@@ -521,16 +520,9 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             flags += " -DNO_SERDE -fPIC -shared"
     elif gpu:
         # NVIDIA CUDA
-        gencode_num = os.getenv("GENCODE_NUMBER", "0")
-        gencode_arch = os.getenv(
-            "GENCODE_ARCH",
-            f"arch=compute_{gencode_num},code=sm_{gencode_num}",
-        )
-        if gencode_num == "0" and not os.getenv("GENCODE_ARCH"):
-            raise ValueError(
-                "Set GENCODE_NUMBER (e.g. 90) or GENCODE_ARCH "
-                "(e.g. arch=compute_90,code=sm_90)"
-            )
+        gencode_num = os.getenv("GENCODE_NUMBER", "90a")
+        if gencode_num == "0":
+            raise ValueError("Set GENCODE_NUMBER (e.g. 90)")
         nvhpc = "-ccbin=nvc++ " if USE_NVHPC else ""
         suppress = (
             "--diag-suppress 68 --diag-suppress 550 --diag-suppress 20208 "
@@ -543,12 +535,13 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             "-Xcompiler=-faligned-new"
         ) if not USE_NVHPC else ""
         debugflag = "-lineinfo" if debuginfo else ""
+        arch_flag = f"-arch=sm_{gencode_num}"
 
         if release:
             flags = (
                 f"{nvhpc}{suppress} {xcompiler_warns} -DNDEBUG -Xcompiler=-DNDEBUG "
                 f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-O3 "
-                f"--expt-relaxed-constexpr -gencode {gencode_arch} "
+                f"--expt-relaxed-constexpr {arch_flag} "
                 f"--use_fast_math -O3 {debugflag} --ftz=true "
                 f"--prec-div=false --prec-sqrt=false --fmad=true "
                 f"-Xptxas=-O3 -Xptxas=-v -Xcompiler=-march=native "
@@ -558,7 +551,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             flags = (
                 f"{suppress} {xcompiler_warns} -DNDEBUG "
                 f"-Xcompiler=-Wall -Xcompiler=-Wextra "
-                f"--expt-relaxed-constexpr -gencode {gencode_arch} "
+                f"--expt-relaxed-constexpr {arch_flag} "
                 f"-O0 -Xcompiler=-g -g -Xcompiler=-O0 -G {debugflag} "
                 f"--fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
                 f"-DDACE_VELOCITY_DEBUG -Xcompiler=-DDACE_VELOCITY_DEBUG"
@@ -662,7 +655,7 @@ def compile_if_propagated_sdfgs(
         dace.config.Config.set(
             "compiler", "cuda", "hip_args",
             value=(
-                "--offload-arch=gfx942 -fno-hip-fp32-correctly-rounded-div-sqrt "
+                "--offload-arch=gfx942 "
                 "-mllvm -amdgpu-early-inline-all=true -ffp-contract=fast "
                 "-fPIC -O3 -ffast-math -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
             ),
@@ -751,6 +744,9 @@ def compile_if_propagated_sdfgs(
                             condition=cond,
                         )
 
+            if AMD and stage > 5:
+                _write(gpu_file, _hipify(_read(gpu_file)))
+            
             if stage > 5:
                 sources.append(gpu_file)
 
@@ -767,6 +763,9 @@ def compile_if_propagated_sdfgs(
                 set_default_stream(cpu_file)
                 if stage > 5:
                     set_default_stream(gpu_file)
+
+            if AMD:
+                _write(cpu_file, _hipify(_read(cpu_file)))
 
             sources.append(cpu_file)
         else:
@@ -793,6 +792,11 @@ def compile_if_propagated_sdfgs(
 
     # Add main
     if main_name is not None:
+        if AMD and main_name.endswith(".cu"):
+            import shutil
+            new_name = main_name[:-3] + ".cpp"
+            shutil.copy2(main_name, new_name)
+            main_name = new_name
         sources.append(main_name)
     elif not lib:
         if gpu:
