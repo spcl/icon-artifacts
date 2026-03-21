@@ -20,6 +20,7 @@ export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
 export HIP_PLATFORM_AMD=0
 
+export _STAGE=6
 mkdir -p permutations_${_STAGE:-6}
 
 # --- Configuration ---
@@ -43,7 +44,6 @@ echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
 # Run unpermuted one
-export _STAGE=6
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}
 

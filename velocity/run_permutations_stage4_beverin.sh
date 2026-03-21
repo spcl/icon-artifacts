@@ -17,6 +17,7 @@ export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=1
 export HIP_PLATFORM_AMD=1
+export _STAGE=4
 
 mkdir -p beverin_permutations_${_STAGE:-4}
 
@@ -68,7 +69,6 @@ echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
 # Run unpermuted one
-export _STAGE=4
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}
 
