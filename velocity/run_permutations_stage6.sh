@@ -6,8 +6,8 @@
 #SBATCH --time=04:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --output=permutations/job_output.txt
-#SBATCH --error=permutations/job_error.txt
+#SBATCH --output=permutations_stage6_daint_output.txt
+#SBATCH --error=permutations_stage6_daint_error.txt
 
 spack load gcc/76jw6nu
 spack load cuda@12.9
