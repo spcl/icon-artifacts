@@ -710,7 +710,8 @@ PERMUTE_CONFIGS = {
 }
 
 def permute_single_map_gpu(sdfg: dace.SDFG,
-                           config_name: str = "single_map"):
+                           config_name: str = "single_map",
+                           shuffle_map: bool = True):
     cfg = PERMUTE_CONFIGS[config_name]
     map, state =delete_all_maps_except(
         sdfg,
@@ -769,7 +770,8 @@ def permute_single_map_gpu(sdfg: dace.SDFG,
 
     from dace.transformation.dataflow import MapDimShuffle
 
-    MapDimShuffle().apply_to(sdfg=state.sdfg, map_entry=map, options={"parameters": ["_for_it_24", "_for_it_23"]})
+    if shuffle_map:
+        MapDimShuffle().apply_to(sdfg=state.sdfg, map_entry=map, options={"parameters": ["_for_it_24", "_for_it_23"]})
 
     add_symbols(sdfg)
     #sdfg.save("permuted.sdfgz", compress=True)

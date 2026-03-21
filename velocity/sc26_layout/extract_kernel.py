@@ -270,7 +270,7 @@ def add_print_before(sdfg: dace.SDFG, state: dace.SDFGState, array_name: str = "
 
 
 
-def permute_single_map(sdfg: dace.SDFG, host:bool=True, config_name: str = "single_map"):
+def permute_single_map(sdfg: dace.SDFG, host:bool=True, config_name: str = "single_map", shuffle_map: bool = True):
     map, state =delete_all_maps_except(
         sdfg,
         {"_for_it_23", "_for_it_22", "_for_it_24"},
@@ -321,7 +321,8 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True, config_name: str = "sing
 
     from dace.transformation.dataflow import MapDimShuffle
 
-    MapDimShuffle().apply_to(sdfg=state.sdfg, map_entry=map, options={"parameters": ["_for_it_24", "_for_it_23"]})
+    if shuffle_map:
+        MapDimShuffle().apply_to(sdfg=state.sdfg, map_entry=map, options={"parameters": ["_for_it_24", "_for_it_23"]})
 
     add_symbols(sdfg)
     sdfg.save("permuted.sdfgz", compress=True)
