@@ -19,35 +19,107 @@ USE_NVHPC = os.getenv("_USE_NVHPC", "0").lower() in ("1", "true", "yes")
 
 # ─── CUDA ↔ HIP symbol mapping ───────────────────────────────────────
 _CUDA_TO_HIP = {
-    # Runtime
-    "cudaDeviceSynchronize":       "hipDeviceSynchronize",
-    "cudaStreamSynchronize":       "hipStreamSynchronize",
-    "cudaStreamCreateWithFlags":   "hipStreamCreateWithFlags",
-    "cudaStreamDestroy":           "hipStreamDestroy",
-    "cudaStream_t":                "hipStream_t",
-    # Events
-    "cudaEvent_t":                 "hipEvent_t",
-    "cudaEventCreate":             "hipEventCreate",
-    "cudaEventCreateWithFlags":    "hipEventCreateWithFlags",
-    "cudaEventRecord":             "hipEventRecord",
-    "cudaEventSynchronize":        "hipEventSynchronize",
-    "cudaEventElapsedTime":        "hipEventElapsedTime",
-    "cudaEventDestroy":            "hipEventDestroy",
-    # Memory
-    "cudaMalloc":                  "hipMalloc",
-    "cudaFree":                    "hipFree",
-    "cudaMemcpyAsync":             "hipMemcpyAsync",
-    "cudaMemcpyDeviceToHost":      "hipMemcpyDeviceToHost",
-    "cudaMemcpyHostToDevice":      "hipMemcpyHostToDevice",
-    "cudaMemcpyDeviceToDevice":    "hipMemcpyDeviceToDevice",
-    # Launch
-    "cudaLaunchKernel":            "hipLaunchKernel",
-    # Includes
-    "<cuda_runtime.h>":            "<hip/hip_runtime.h>",
-    '"cuda_runtime.h"':            "<hip/hip_runtime.h>",
-    "<openacc.h>":                 "<hip/hip_runtime.h>",
-    # Labels
-    "CUDA Events":                 "HIP Events",
+    # ── Runtime ──────────────────────────────────────────────────────
+    "cudaDeviceSynchronize":           "hipDeviceSynchronize",
+    "cudaDeviceReset":                 "hipDeviceReset",
+    "cudaGetDevice":                   "hipGetDevice",
+    "cudaSetDevice":                   "hipSetDevice",
+    "cudaGetDeviceCount":              "hipGetDeviceCount",
+    "cudaGetDeviceProperties":         "hipGetDeviceProperties",
+    "cudaDeviceGetAttribute":          "hipDeviceGetAttribute",
+    # ── Streams ──────────────────────────────────────────────────────
+    "cudaStreamCreate":                "hipStreamCreate",
+    "cudaStreamCreateWithFlags":       "hipStreamCreateWithFlags",
+    "cudaStreamCreateWithPriority":    "hipStreamCreateWithPriority",
+    "cudaStreamDestroy":               "hipStreamDestroy",
+    "cudaStreamSynchronize":           "hipStreamSynchronize",
+    "cudaStreamWaitEvent":             "hipStreamWaitEvent",
+    "cudaStreamQuery":                 "hipStreamQuery",
+    "cudaStream_t":                    "hipStream_t",
+    "cudaStreamDefault":               "hipStreamDefault",
+    "cudaStreamNonBlocking":           "hipStreamNonBlocking",
+    # ── Events ───────────────────────────────────────────────────────
+    "cudaEvent_t":                     "hipEvent_t",
+    "cudaEventCreate":                 "hipEventCreate",
+    "cudaEventCreateWithFlags":        "hipEventCreateWithFlags",
+    "cudaEventRecord":                 "hipEventRecord",
+    "cudaEventSynchronize":            "hipEventSynchronize",
+    "cudaEventElapsedTime":            "hipEventElapsedTime",
+    "cudaEventDestroy":                "hipEventDestroy",
+    "cudaEventQuery":                  "hipEventQuery",
+    "cudaEventDisableTiming":          "hipEventDisableTiming",
+    "cudaEventBlockingSync":           "hipEventBlockingSync",
+    # ── Memory allocation ────────────────────────────────────────────
+    "cudaMalloc":                      "hipMalloc",
+    "cudaMallocManaged":               "hipMallocManaged",
+    "cudaMallocHost":                  "hipHostMalloc",
+    "cudaHostAlloc":                   "hipHostMalloc",
+    "cudaMallocAsync":                 "hipMallocAsync",
+    "cudaFree":                        "hipFree",
+    "cudaFreeHost":                    "hipHostFree",
+    "cudaFreeAsync":                   "hipFreeAsync",
+    # ── Memory copy ──────────────────────────────────────────────────
+    "cudaMemcpy":                      "hipMemcpy",
+    "cudaMemcpyAsync":                 "hipMemcpyAsync",
+    "cudaMemcpy2D":                    "hipMemcpy2D",
+    "cudaMemcpy2DAsync":               "hipMemcpy2DAsync",
+    "cudaMemcpy3D":                    "hipMemcpy3D",
+    "cudaMemcpy3DAsync":               "hipMemcpy3DAsync",
+    "cudaMemcpyPeer":                  "hipMemcpyPeer",
+    "cudaMemcpyPeerAsync":             "hipMemcpyPeerAsync",
+    "cudaMemcpyToSymbol":              "hipMemcpyToSymbol",
+    "cudaMemcpyFromSymbol":            "hipMemcpyFromSymbol",
+    "cudaMemcpyDeviceToHost":          "hipMemcpyDeviceToHost",
+    "cudaMemcpyHostToDevice":          "hipMemcpyHostToDevice",
+    "cudaMemcpyDeviceToDevice":        "hipMemcpyDeviceToDevice",
+    "cudaMemcpyHostToHost":            "hipMemcpyHostToHost",
+    "cudaMemcpyDefault":               "hipMemcpyDefault",
+    # ── Memset ───────────────────────────────────────────────────────
+    "cudaMemset":                      "hipMemset",
+    "cudaMemsetAsync":                 "hipMemsetAsync",
+    "cudaMemset2D":                    "hipMemset2D",
+    "cudaMemset2DAsync":               "hipMemset2DAsync",
+    "cudaMemset3D":                    "hipMemset3D",
+    "cudaMemset3DAsync":               "hipMemset3DAsync",
+    # ── Memory info ──────────────────────────────────────────────────
+    "cudaMemGetInfo":                  "hipMemGetInfo",
+    "cudaMemPrefetchAsync":            "hipMemPrefetchAsync",
+    "cudaMemAdvise":                   "hipMemAdvise",
+    "cudaPointerGetAttributes":        "hipPointerGetAttributes",
+    # ── Error handling ───────────────────────────────────────────────
+    "cudaGetLastError":                "hipGetLastError",
+    "cudaPeekAtLastError":             "hipPeekAtLastError",
+    "cudaGetErrorString":              "hipGetErrorString",
+    "cudaGetErrorName":                "hipGetErrorName",
+    "cudaError_t":                     "hipError_t",
+    "cudaSuccess":                     "hipSuccess",
+    "cudaErrorNotReady":               "hipErrorNotReady",
+    "cudaErrorMemoryAllocation":       "hipErrorOutOfMemory",
+    # ── Launch ───────────────────────────────────────────────────────
+    "cudaLaunchKernel":                "hipLaunchKernel",
+    "cudaFuncSetAttribute":            "hipFuncSetAttribute",
+    "cudaFuncSetCacheConfig":          "hipFuncSetCacheConfig",
+    "cudaFuncGetAttributes":           "hipFuncGetAttributes",
+    "cudaOccupancyMaxActiveBlocksPerMultiprocessor":
+        "hipOccupancyMaxActiveBlocksPerMultiprocessor",
+    "cudaOccupancyMaxPotentialBlockSize":
+        "hipOccupancyMaxPotentialBlockSize",
+    # ── Texture / Surface (if used) ──────────────────────────────────
+    "cudaCreateTextureObject":         "hipCreateTextureObject",
+    "cudaDestroyTextureObject":        "hipDestroyTextureObject",
+    "cudaTextureObject_t":             "hipTextureObject_t",
+    # ── Host register ────────────────────────────────────────────────
+    "cudaHostRegister":                "hipHostRegister",
+    "cudaHostUnregister":              "hipHostUnregister",
+    "cudaHostGetDevicePointer":        "hipHostGetDevicePointer",
+    # ── Includes ─────────────────────────────────────────────────────
+    "<cuda_runtime.h>":                "<hip/hip_runtime.h>",
+    '"cuda_runtime.h"':                "<hip/hip_runtime.h>",
+    "<cuda_runtime_api.h>":            "<hip/hip_runtime_api.h>",
+    "<cuda.h>":                        "<hip/hip_runtime.h>",
+    "<openacc.h>":                     "<hip/hip_runtime.h>",
+    # ── Labels ───────────────────────────────────────────────────────
+    "CUDA Events":                     "HIP Events",
 }
 
 # Sort longest-first to avoid partial replacement (e.g. cudaFree before cudaFreeHost)
