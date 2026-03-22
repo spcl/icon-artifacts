@@ -44,6 +44,7 @@ export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_pa
 #git fetch origin
 #git checkout f2dace/staging
 #cd "$START_DIR"
+export BEVERIN=1
 mkdir -p beverin_permutations_${_STAGE:-6}
 
 # --- Configuration ---

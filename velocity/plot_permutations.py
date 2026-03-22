@@ -1,20 +1,9 @@
-import re, glob, os, sys, argparse
+import re, glob, os, argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
 pattern = re.compile(r"\[Timer\] Elapsed time: ([\d.]+) ms")
 
-def place_text(ax, positions):
-    """positions: list of (x, y, label) sorted by x. Nudges y to avoid overlaps."""
-    placed = []
-    for x, y, label in sorted(positions, key=lambda p: p[0]):
-        y_clear = y
-        for px, py, _ in placed:
-            if abs(px - x) < 0.6:  # same x-neighborhood
-                if abs(y_clear - py) < 1.2:  # overlap threshold (tune to your ms scale)
-                    y_clear = py + 1.2
-        placed.append((x, y_clear, label))
-        ax.text(x, y_clear, label, ha="center", va="bottom", fontsize=8)
 
 def load_folder(folder):
     violin_data = {}
@@ -31,62 +20,64 @@ def load_folder(folder):
             star_points[name] = np.median(times)
     return violin_data, star_points
 
-def plot_panel(ax, violin_data, star_points, title, label_order=None):
+
+def plot_panel(ax, violin_data, star_points, title, label_order, show_xticklabels=True):
     baseline_key = "unpermuted"
     baseline_median = (
         np.median(violin_data[baseline_key]) if baseline_key in violin_data else None
     )
 
-    if label_order is None:
-        other_violin = {k: v for k, v in violin_data.items() if k != baseline_key}
-        sorted_other = sorted(other_violin, key=lambda k: np.median(other_violin[k]))
-        sorted_stars = sorted(star_points.items(), key=lambda x: x[1])
-        label_order = (
-            ([baseline_key] if baseline_key in violin_data else [])
-            + sorted_other
-            + [k for k, _ in sorted_stars]
-        )
-
     configs = [l for l in label_order if l in violin_data]
     star_keys = [l for l in label_order if l in star_points]
 
-    vals = [violin_data[cfg] for cfg in configs]
-    if vals:
-        vp = ax.violinplot([violin_data[cfg] for cfg in configs],
-                           positions=[label_order.index(c) + 1 for c in configs],
-                           showmeans=True)
+    if configs:
+        vp = ax.violinplot(
+            [violin_data[cfg] for cfg in configs],
+            positions=[label_order.index(c) + 1 for c in configs],
+            showmeans=True,
+        )
         for body, cfg in zip(vp["bodies"], configs):
             color = "green" if cfg == baseline_key else "blue"
-            body.set_facecolor(color); body.set_edgecolor(color); body.set_alpha(0.7)
+            body.set_facecolor(color)
+            body.set_edgecolor(color)
+            body.set_alpha(0.7)
 
-    # --- collect all speedup annotations ---
+    for cfg in star_keys:
+        val = star_points[cfg]
+        x = label_order.index(cfg) + 1
+        ax.plot(x, val, marker="*", markersize=10, color="orange")
+
+    # Speedup: pick best non-baseline (first in sorted order = fastest)
     text_positions = []
-
     for cfg in configs:
+        if cfg == baseline_key:
+            continue
         med = np.median(violin_data[cfg])
         speedup = baseline_median / med if baseline_median else 1
         x = label_order.index(cfg) + 1
-        if speedup > 1:
-            text_positions.append((x, med * 1.1, speedup))
+        text_positions.append((x, med * 1.1, speedup))
 
     for cfg in star_keys:
         val = star_points[cfg]
         speedup = baseline_median / val if baseline_median else 1
         x = label_order.index(cfg) + 1
-        if speedup > 1:
-            text_positions.append((x, val * 1.1, speedup))
+        text_positions.append((x, val * 1.1, speedup))
 
     if text_positions:
-        best = text_positions[0]
-        ax.text(best[0], best[1], f"{best[2]:.2f}x", ha="center", va="bottom", fontsize=8)
+        # index 0 is baseline, offset 1 is the first non-baseline config
+        target = text_positions[0]
+        ax.text(target[0], target[1], f"{target[2]:.2f}x", ha="center", va="bottom", fontsize=8)
 
     ax.set_xticks(range(1, len(label_order) + 1))
-    ax.set_xticklabels(label_order, rotation=90, ha="center", fontsize=7)
+    if show_xticklabels:
+        ax.set_xticklabels(label_order, rotation=90, ha="center", fontsize=7)
+    else:
+        ax.set_xticklabels([])
+    ax.set_xlim(0.5, len(label_order) + 0.5)
+    ax.set_ylim(bottom=0)
     ax.set_ylabel("Time (ms)")
     ax.set_title(title)
     ax.grid(True, axis="both", linestyle="--", alpha=0.5)
-
-
 
 
 # ---- Argument parsing ----
@@ -98,55 +89,96 @@ parser.add_argument("--cpu",  default="beverin_permutations_4", metavar="DIR",
                     help="Folder with CPU results (vendor 1)")
 parser.add_argument("--gpu",  default="beverin_permutations_6", metavar="DIR",
                     help="Folder with GPU results (vendor 1)")
-parser.add_argument("--cpu2", default=None, metavar="DIR",
+parser.add_argument("--cpu2", default="permutations_4", metavar="DIR",
                     help="Folder with CPU results (vendor 2)")
-parser.add_argument("--gpu2", default=None, metavar="DIR",
+parser.add_argument("--gpu2", default="permutations_6", metavar="DIR",
                     help="Folder with GPU results (vendor 2)")
+parser.add_argument("--cpu-title",  default="AMD Zen 3 (96 Cores)",          metavar="STR")
+parser.add_argument("--gpu-title",  default="AMD MI300A",          metavar="STR")
+parser.add_argument("--cpu2-title", default="Grace CPU", metavar="STR")
+parser.add_argument("--gpu2-title", default="GH200 HBM3", metavar="STR")
 args = parser.parse_args()
 
-# Build ordered panel list: cpu1, gpu1, cpu2, gpu2
 panels = []
-if args.cpu:
-    panels.append((args.cpu,  "CPU"))
-if args.gpu:
-    panels.append((args.gpu,  "GPU"))
-if args.cpu2:
-    panels.append((args.cpu2, "CPU (Vendor 2)"))
-if args.gpu2:
-    panels.append((args.gpu2, "GPU (Vendor 2)"))
+if args.cpu:  panels.append((args.cpu,  args.cpu_title))
+if args.gpu:  panels.append((args.gpu,  args.gpu_title))
+if args.cpu2: panels.append((args.cpu2, args.cpu2_title))
+if args.gpu2: panels.append((args.gpu2, args.gpu2_title))
 
 if not panels:
     parser.error("Provide at least one of --cpu, --gpu, --cpu2, --gpu2.")
 
-# ---- Build figure ----
-# Load all data first
+# ---- Load all data ----
 panel_data = [(folder, title, *load_folder(folder)) for folder, title in panels]
 
-# Derive global label order from GPU vendor 1 (first --gpu panel)
-gpu1 = next(((vd, sp) for f, t, vd, sp in panel_data if t == "GPU"), None)
-if gpu1:
-    vd, sp = gpu1
-    baseline_key = "unpermuted"
-    other_violin = {k: v for k, v in vd.items() if k != baseline_key}
-    sorted_other = sorted(other_violin, key=lambda k: np.median(other_violin[k]))
-    sorted_stars = sorted(sp.items(), key=lambda x: x[1])
-    global_order = (
-        ([baseline_key] if baseline_key in vd else [])
-        + sorted_other
-        + [k for k, _ in sorted_stars]
-    )
+# ---- Intersection of configs across all panels ----
+def all_keys(vd, sp):
+    return set(vd.keys()) | set(sp.keys())
+
+common_keys = None
+for _, _, vd, sp in panel_data:
+    keys = all_keys(vd, sp)
+    common_keys = keys if common_keys is None else common_keys & keys
+
+if not common_keys:
+    raise ValueError("No configuration appears in all panels.")
+
+# ---- Global label order from GPU1 ----
+baseline_key = "unpermuted"
+
+gpu1_entry = next(((vd, sp) for _, t, vd, sp in panel_data if t == args.gpu_title), None)
+gpu1_vd, gpu1_sp = gpu1_entry if gpu1_entry else (panel_data[0][2], panel_data[0][3])
+
+other_violin  = {k: v for k, v in gpu1_vd.items() if k != baseline_key and k in common_keys}
+sorted_other  = sorted(other_violin, key=lambda k: np.median(other_violin[k]))
+common_stars  = {k: v for k, v in gpu1_sp.items() if k in common_keys}
+sorted_stars  = sorted(common_stars.items(), key=lambda x: x[1])
+
+global_order = (
+    ([baseline_key] if baseline_key in common_keys else [])
+    + sorted_other
+    + [k for k, _ in sorted_stars]
+)
+
+# ---- Layout ----
+has_two_vendors = bool(args.cpu2 or args.gpu2)
+
+if has_two_vendors:
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+    col0 = [(args.cpu_title,  args.cpu),  (args.gpu_title,  args.gpu)]
+    col1 = [(args.cpu2_title, args.cpu2), (args.gpu2_title, args.gpu2)]
+    data_map = {folder: (vd, sp) for folder, _, vd, sp in panel_data}
+
+    for col_idx, col_panels in enumerate([col0, col1]):
+        for row_idx, (title, folder) in enumerate(col_panels):
+            ax = axes[row_idx][col_idx]
+            vd, sp = data_map.get(folder, ({}, {}))
+            vd_f = {k: v for k, v in vd.items() if k in common_keys}
+            sp_f = {k: v for k, v in sp.items() if k in common_keys}
+            show_labels = (row_idx == 1)
+            if not vd_f and not sp_f:
+                ax.set_title(f"{title}  [no data]")
+                continue
+            plot_panel(ax, vd_f, sp_f, title, global_order, show_xticklabels=show_labels)
+
+    for col_idx in range(2):
+        axes[0][col_idx].sharex(axes[1][col_idx])
+        plt.setp(axes[0][col_idx].get_xticklabels(), visible=False)
+
 else:
-    global_order = None  # fallback: each panel sorts itself
-
-n = len(panels)
-fig, axes = plt.subplots(n, 1, figsize=(10, 5 * n))
-if n == 1:
-    axes = [axes]
-
-for ax, (folder, title, violin_data, star_points) in zip(axes, panel_data):
-    if not violin_data and not star_points:
-        ax.set_title(f"{title}  [no data found in {folder}]"); continue
-    plot_panel(ax, violin_data, star_points, title, label_order=global_order)
+    n = len(panel_data)
+    fig, axes_flat = plt.subplots(n, 1, figsize=(10, 5 * n))
+    if n == 1:
+        axes_flat = [axes_flat]
+    for i, (folder, title, vd, sp) in enumerate(panel_data):
+        ax = axes_flat[i]
+        vd_f = {k: v for k, v in vd.items() if k in common_keys}
+        sp_f = {k: v for k, v in sp.items() if k in common_keys}
+        show_labels = (i == n - 1)
+        if not vd_f and not sp_f:
+            ax.set_title(f"{title}  [no data]")
+            continue
+        plot_panel(ax, vd_f, sp_f, title, global_order, show_xticklabels=show_labels)
 
 fig.tight_layout()
 fig.savefig("violin_plot.png", dpi=200)
