@@ -19,6 +19,8 @@ export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
 export HIP_PLATFORM_AMD=0
+export RM_TIMERS=1
+export _TBLOCK_DIMS="32,16,1"
 
 export _STAGE=8
 mkdir -p permutations_${_STAGE:-8}
