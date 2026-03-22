@@ -29,7 +29,7 @@ from sc26_layout.permute_stage8 import PERMUTE_CONFIGS
 STAGE    = os.getenv("_STAGE", "8")
 BEVERIN  = os.getenv("BEVERIN", "0") == "1"
 
-COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}"
+COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}_v2"
 EXE_TEMPLATE   = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
 OUT_DIR        = Path(f"{'beverin_' if BEVERIN else ''}full_permutations_{STAGE}")
