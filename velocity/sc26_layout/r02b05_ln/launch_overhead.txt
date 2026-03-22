@@ -1,0 +1,4 @@
+Iterations: 10000
+Total:      40.101 ms
+Per launch: 4.010 us (0.004010 ms)
+CSV written to: launch_times.csv

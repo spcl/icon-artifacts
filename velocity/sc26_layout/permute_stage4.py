@@ -416,7 +416,7 @@ def add_timers_w_states(sdfg, copy_in_state: dace.SDFGState, copy_out_state: dac
     assert sdfg.parent_nsdfg_node is None
     clock_in  = sdfg.add_state_after(copy_in_state, "clock_in")
     clock_out = sdfg.add_state_before(copy_out_state,  "clock_out")
-    _flush_code_cpu = f"""
+    _flush_code = f"""
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>

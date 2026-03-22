@@ -20,13 +20,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-from sc26_layout.permute_stage8 import PERMUTE_CONFIGS
+from sc26_layout.permute_stage4 import PERMUTE_CONFIGS
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-STAGE    = os.getenv("_STAGE", "8")
+STAGE    = os.getenv("_STAGE", "4")
 BEVERIN  = os.getenv("BEVERIN", "0") == "1"
 
 COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}_v2"
@@ -148,7 +148,7 @@ def main():
     _NAMED = {"index_only", "nlev_first"}
     all_names = [k for k in PERMUTE_CONFIGS if k not in _NAMED]
 
-    ap = argparse.ArgumentParser(description="Run stage-8 layout permutation sweep")
+    ap = argparse.ArgumentParser(description="Run stage-4 layout permutation sweep")
     ap.add_argument("--configs", type=str, default=None,
                     help="Comma-separated config names (default: all 95 sweep configs)")
     ap.add_argument("--unpermuted", action="store_true", default=False,

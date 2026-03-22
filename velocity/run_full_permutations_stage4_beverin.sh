@@ -31,7 +31,7 @@ export CUPY_INSTALL_USE_HIP=1
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 export _STAGE=4
-export RM_TIMERS=1
+export RM_TIMERS=0
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"
@@ -45,7 +45,7 @@ export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_pa
 #git fetch origin
 #git checkout f2dace/staging
 #cd "$START_DIR"
-mkdir -p beverin_full_permutations_${_STAGE:-8}
+mkdir -p beverin_full_permutations_${_STAGE:-4}
 
 # --- Configuration ---
 CONFIGS="${CONFIGS:-}"          # empty = all
