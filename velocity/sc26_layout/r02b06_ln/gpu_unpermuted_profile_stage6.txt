@@ -1,0 +1,1202 @@
+Will be reading data from: "data_r02b05"
+Will be writing got and want files to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05"
+Reading data for 1...
+Reading from: "data_r02b05/p_int.1.data"
+Reading from: "data_r02b05/global_data.t0.1.data"
+Reading from: "data_r02b05/p_diag.t0.1.data"
+Reading from: "data_r02b05/p_patch.1.data"
+Reading from: "data_r02b05/global_data.t1.1.data"
+Reading from: "data_r02b05/p_metrics.t0.1.data"
+Reading from: "data_r02b05/p_metrics.t1.1.data"
+Reading from: "data_r02b05/p_diag.t1.1.data"
+Reading from: "data_r02b05/istep.1.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.1.data"
+Reading from: "data_r02b05/p_prog.t0.1.data"
+Reading from: "data_r02b05/ldeepatmo.1.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.1.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.1.data"
+Reading from: "data_r02b05/lvn_only.1.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.1.data"
+Reading from: "data_r02b05/p_prog.t1.1.data"
+Reading from: "data_r02b05/z_vt_ie.t1.1.data"
+Reading from: "data_r02b05/z_vt_ie.t0.1.data"
+Reading from: "data_r02b05/ntnd.1.data"
+Reading from: "data_r02b05/dt_linintp_ubc.1.data"
+Reading from: "data_r02b05/dtime.1.data"
+All data read...
+Step 1 variables, extra_diffu: 1, istep: 1, lvn_only: 0, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.84 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.127008 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.124704 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.119712 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.124352 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.120832 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.122624 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1264 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.119296 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12192 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1144 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.114048 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.120384 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.115808 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.120896 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.116384 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.117824 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.113888 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.114016 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.113152 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+Step 1 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_1.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_1.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_1.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_1.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_1.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_1.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_1.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_1.want"
+Reading data for 2...
+Reading from: "data_r02b05/global_data.t1.2.data"
+Reading from: "data_r02b05/p_diag.t0.2.data"
+Reading from: "data_r02b05/p_patch.2.data"
+Reading from: "data_r02b05/global_data.t0.2.data"
+Reading from: "data_r02b05/p_int.2.data"
+Reading from: "data_r02b05/p_diag.t1.2.data"
+Reading from: "data_r02b05/p_metrics.t0.2.data"
+Reading from: "data_r02b05/p_metrics.t1.2.data"
+Reading from: "data_r02b05/p_prog.t0.2.data"
+Reading from: "data_r02b05/istep.2.data"
+Reading from: "data_r02b05/z_vt_ie.t0.2.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.2.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.2.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.2.data"
+Reading from: "data_r02b05/p_prog.t1.2.data"
+Reading from: "data_r02b05/ldeepatmo.2.data"
+Reading from: "data_r02b05/z_vt_ie.t1.2.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.2.data"
+Reading from: "data_r02b05/lvn_only.2.data"
+Reading from: "data_r02b05/ntnd.2.data"
+Reading from: "data_r02b05/dt_linintp_ubc.2.data"
+Reading from: "data_r02b05/dtime.2.data"
+All data read...
+Step 2 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.543392 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.121408 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12192 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.126208 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.121728 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.111328 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.118016 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.123232 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.115808 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.113856 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12224 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12528 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.122496 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.116384 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.119904 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.109184 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11008 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.112704 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11728 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.111616 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.64528728797002179e-04
+  [1,1,(_for_it_22-1)] = 3.11340783604078120e-03
+  [10,5,(_for_it_22-1)] = 1.45055305904425412e-02
+  [100,10,(_for_it_22-1)] = 1.01760603159386847e+01
+  [500,45,(_for_it_22-1)] = 2.17531297510086631e+02
+  [1000,10,(_for_it_22-1)] = 2.09382724999268390e+02
+  [5000,45,(_for_it_22-1)] = 2.00851745575079434e+02
+  [7000,60,(_for_it_22-1)] = 2.88105390270665055e+02
+Step 2 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_2.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_2.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_2.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_2.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_2.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_2.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_2.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_2.want"
+Reading data for 7...
+Reading from: "data_r02b05/global_data.t1.7.data"
+Reading from: "data_r02b05/p_patch.7.data"
+Reading from: "data_r02b05/global_data.t0.7.data"
+Reading from: "data_r02b05/p_int.7.data"
+Reading from: "data_r02b05/p_prog.t0.7.data"
+Reading from: "data_r02b05/p_diag.t1.7.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.7.data"
+Reading from: "data_r02b05/p_prog.t1.7.data"
+Reading from: "data_r02b05/p_metrics.t0.7.data"
+Reading from: "data_r02b05/z_vt_ie.t0.7.data"
+Reading from: "data_r02b05/p_metrics.t1.7.data"
+Reading from: "data_r02b05/p_diag.t0.7.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.7.data"
+Reading from: "data_r02b05/istep.7.data"
+Reading from: "data_r02b05/ldeepatmo.7.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.7.data"
+Reading from: "data_r02b05/z_vt_ie.t1.7.data"
+Reading from: "data_r02b05/lvn_only.7.data"
+Reading from: "data_r02b05/ntnd.7.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.7.data"
+Reading from: "data_r02b05/dt_linintp_ubc.7.data"
+Reading from: "data_r02b05/dtime.7.data"
+All data read...
+Step 7 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.522912 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+Step 7 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_7.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_7.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_7.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_7.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_7.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_7.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_7.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_7.want"
+Reading data for 9...
+Reading from: "data_r02b05/global_data.t1.9.data"
+Reading from: "data_r02b05/p_int.9.data"
+Reading from: "data_r02b05/p_diag.t0.9.data"
+Reading from: "data_r02b05/global_data.t0.9.data"
+Reading from: "data_r02b05/p_diag.t1.9.data"
+Reading from: "data_r02b05/p_patch.9.data"
+Reading from: "data_r02b05/p_metrics.t0.9.data"
+Reading from: "data_r02b05/p_metrics.t1.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.9.data"
+Reading from: "data_r02b05/z_vt_ie.t0.9.data"
+Reading from: "data_r02b05/p_prog.t0.9.data"
+Reading from: "data_r02b05/p_prog.t1.9.data"
+Reading from: "data_r02b05/istep.9.data"
+Reading from: "data_r02b05/ldeepatmo.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.9.data"
+Reading from: "data_r02b05/z_vt_ie.t1.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.9.data"
+Reading from: "data_r02b05/lvn_only.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.9.data"
+Reading from: "data_r02b05/ntnd.9.data"
+Reading from: "data_r02b05/dt_linintp_ubc.9.data"
+Reading from: "data_r02b05/dtime.9.data"
+All data read...
+Step 9 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.137504 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12192 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.119072 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.119584 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.126016 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1232 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.120704 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.117376 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.116736 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.118752 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.110624 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.110304 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.112192 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.113248 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.118176 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.115008 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.113376 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11136 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11712 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.115168 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+  [10,5,(_for_it_22-1)] = 1.45012788975412751e-02
+  [100,10,(_for_it_22-1)] = 1.01763123945524558e+01
+  [500,45,(_for_it_22-1)] = 2.17530906554460245e+02
+  [1000,10,(_for_it_22-1)] = 2.09384216311808700e+02
+  [5000,45,(_for_it_22-1)] = 2.00852264216740394e+02
+  [7000,60,(_for_it_22-1)] = 2.88105312640896614e+02
+Step 9 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.want"
+Reading data for 43...
+Reading from: "data_r02b05/global_data.t0.43.data"
+Reading from: "data_r02b05/global_data.t1.43.data"
+Reading from: "data_r02b05/p_int.43.data"
+Reading from: "data_r02b05/p_diag.t0.43.data"
+Reading from: "data_r02b05/p_patch.43.data"
+Reading from: "data_r02b05/p_metrics.t1.43.data"
+Reading from: "data_r02b05/z_vt_ie.t0.43.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.43.data"
+Reading from: "data_r02b05/p_diag.t1.43.data"
+Reading from: "data_r02b05/p_metrics.t0.43.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.43.data"
+Reading from: "data_r02b05/z_vt_ie.t1.43.data"
+Reading from: "data_r02b05/istep.43.data"
+Reading from: "data_r02b05/p_prog.t0.43.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.43.data"
+Reading from: "data_r02b05/ldeepatmo.43.data"
+Reading from: "data_r02b05/p_prog.t1.43.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.43.data"
+Reading from: "data_r02b05/lvn_only.43.data"
+Reading from: "data_r02b05/ntnd.43.data"
+Reading from: "data_r02b05/dt_linintp_ubc.43.data"
+Reading from: "data_r02b05/dtime.43.data"
+All data read...
+Step 43 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.13216 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+Step 43 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_43.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_43.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_43.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_43.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_43.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_43.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_43.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_43.got"
+Reading data for 93...
+Reading from: "data_r02b05/p_int.93.data"
+Reading from: "data_r02b05/p_patch.93.data"
+Reading from: "data_r02b05/p_diag.t1.93.data"
+Reading from: "data_r02b05/global_data.t0.93.data"
+Reading from: "data_r02b05/global_data.t1.93.data"
+Reading from: "data_r02b05/z_vt_ie.t0.93.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.93.data"
+Reading from: "data_r02b05/p_prog.t0.93.data"
+Reading from: "data_r02b05/p_diag.t0.93.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.93.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.93.data"
+Reading from: "data_r02b05/p_metrics.t1.93.data"
+Reading from: "data_r02b05/istep.93.data"
+Reading from: "data_r02b05/ldeepatmo.93.data"
+Reading from: "data_r02b05/p_prog.t1.93.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.93.data"
+Reading from: "data_r02b05/z_vt_ie.t1.93.data"
+Reading from: "data_r02b05/lvn_only.93.data"
+Reading from: "data_r02b05/ntnd.93.data"
+Reading from: "data_r02b05/p_metrics.t0.93.data"
+Reading from: "data_r02b05/dt_linintp_ubc.93.data"
+Reading from: "data_r02b05/dtime.93.data"
+All data read...
+Step 93 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.130688 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.121376 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11792 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.113344 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.123488 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.122304 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.119072 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.120832 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12016 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11904 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.120192 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.12512 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11904 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.115616 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11744 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.128928 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.117984 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.11344 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.116288 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.115008 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 2.16621707243897492e-04
+  [1,1,(_for_it_22-1)] = 3.24262552959628898e-03
+  [10,5,(_for_it_22-1)] = 1.46130011797538980e-02
+  [100,10,(_for_it_22-1)] = 1.01764870522493798e+01
+  [500,45,(_for_it_22-1)] = 2.17534881450778897e+02
+  [1000,10,(_for_it_22-1)] = 2.09385720937004919e+02
+  [5000,45,(_for_it_22-1)] = 2.00856651736403649e+02
+  [7000,60,(_for_it_22-1)] = 2.88104062641370376e+02
+Step 93 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_93.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_93.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_93.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_93.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_93.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_93.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_93.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_93.want"
+Reading data for 463...
+Reading from: "data_r02b05/global_data.t0.463.data"
+Reading from: "data_r02b05/p_patch.463.data"
+Reading from: "data_r02b05/p_int.463.data"
+Reading from: "data_r02b05/global_data.t1.463.data"
+Reading from: "data_r02b05/p_metrics.t0.463.data"
+Reading from: "data_r02b05/p_diag.t0.463.data"
+Reading from: "data_r02b05/p_metrics.t1.463.data"
+Reading from: "data_r02b05/p_diag.t1.463.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.463.data"
+Reading from: "data_r02b05/istep.463.data"
+Reading from: "data_r02b05/p_prog.t0.463.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.463.data"
+Reading from: "data_r02b05/ldeepatmo.463.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.463.data"
+Reading from: "data_r02b05/p_prog.t1.463.data"
+Reading from: "data_r02b05/lvn_only.463.data"
+Reading from: "data_r02b05/z_vt_ie.t0.463.data"
+Reading from: "data_r02b05/z_vt_ie.t1.463.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.463.data"
+Reading from: "data_r02b05/ntnd.463.data"
+Reading from: "data_r02b05/dt_linintp_ubc.463.data"
+Reading from: "data_r02b05/dtime.463.data"
+All data read...
+Step 463 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
+MAIN PER
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.131584 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1,1,(_for_it_22-1)] = 0.00000000000000000e+00
+  [10,5,(_for_it_22-1)] = 0.00000000000000000e+00
+  [100,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [500,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [1000,10,(_for_it_22-1)] = 0.00000000000000000e+00
+  [5000,45,(_for_it_22-1)] = 0.00000000000000000e+00
+  [7000,60,(_for_it_22-1)] = 0.00000000000000000e+00
+Step 463 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_463.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_463.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_463.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_463.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_463.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_463.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_463.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_463.want"
