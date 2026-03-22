@@ -707,7 +707,6 @@ def permute_sdfg(
             if g == permute_in_state or g == permute_out_state or g == entry_interface_state or g == exit_interface_state:
                 continue
             if isinstance(n, dace.nodes.MapEntry):
-                assert len(n.map.params) <= 2, f"Expected only 1 or 2 map params, got {n.map.params} in node {n}"
                 if isinstance(n, dace.nodes.MapEntry) and len(n.map.params) == 2:
                     permuted_param_names = list(reversed(n.map.params))
                     MapDimShuffle().apply_to(
