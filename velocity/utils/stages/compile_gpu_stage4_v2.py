@@ -80,6 +80,7 @@ def main():
         args.optimize, args.compile = True, True
 
     names = common.sdfg_names()
+    _TBLOCK_DIM = "32,16,1"  # Needed even though not used
 
     # ------------------------------------------------------------------
     # Optimize

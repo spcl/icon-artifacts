@@ -488,10 +488,10 @@ static void cpu_timer_split()
     }}
 }}
 """
-    ct1 = dace.nodes.Tasklet("c1", {}, {}, "timer_split(__state);",
+    ct1 = dace.nodes.Tasklet("c1", {}, {}, "cpu_timer_split();",
                               language=dace.dtypes.Language.CPP,
                               side_effects=True, code_global=_flush_code)
-    ct2 = dace.nodes.Tasklet("c1", {}, {}, "timer_split(__state);",
+    ct2 = dace.nodes.Tasklet("c1", {}, {}, "cpu_timer_split();",
                               language=dace.dtypes.Language.CPP,
                               code_global="", side_effects=True)
     clock_in.add_node(ct1)
