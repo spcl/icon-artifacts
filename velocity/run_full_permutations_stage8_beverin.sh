@@ -32,6 +32,7 @@ export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 export _STAGE=8
 export RM_TIMERS=1
+export _TBLOCK_DIMS="32,16,1"
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"

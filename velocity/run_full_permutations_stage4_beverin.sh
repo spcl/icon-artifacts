@@ -6,8 +6,8 @@
 #SBATCH --time=10:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
-#SBATCH --output=permutations_stage8_beverin_output.txt
-#SBATCH --error=permutations_stage8_beverin_error.txt
+#SBATCH --output=permutations_stage4_beverin_output.txt
+#SBATCH --error=permutations_stage4_beverin_error.txt
 
 export _RELEASE=1
 export GENCODE_NUMBER=90
@@ -32,6 +32,7 @@ export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 export _STAGE=4
 export RM_TIMERS=0
+export _TBLOCK_DIM="32,16,1" # Needed even though not used
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"
