@@ -498,11 +498,7 @@ static void flush_all_caches_v2()
                               sizeof(double), cudaMemcpyDeviceToHost));
         hash+=val;
     }}
-    static bool printed=false;
-    if(!printed){{
-        std::cout<<"[flush] jacobi2d hash = "<<hash<<std::endl;
-        printed=true;
-    }}
+    std::cout<<"[flush] jacobi2d hash = "<<hash<<std::endl;
 }}
 
 static void gpu_timer_split({root_sdfg.label}_state_t* __state){{
