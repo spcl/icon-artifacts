@@ -168,6 +168,33 @@ def main():
             sdfg.save(outfile, compress=True)
 
     # ------------------------------------------------------------------
+    # Compile unpermuted baseline
+    # ------------------------------------------------------------------
+    if args.unpermuted:
+        from sc26_layout.permute_stage8 import add_timers
+
+        print(f"=== Compiling unpermuted baseline ===")
+        sdfgs = {
+            name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID))
+            for name in names
+        }
+        nsdfgs = {}
+        for name, sdfg in sdfgs.items():
+            add_timers(sdfg)
+            # insert_synchronization_for_profiling(sdfg)
+            sdfg.validate()
+            nsdfgs[name] = sdfg
+
+        common.compile_action(
+            STAGE_ID, nsdfgs, False, None, False,
+            name_suffix="_unpermuted",
+            main_name="main_per.cu",
+            tblock_dim=_TBLOCK_DIM,
+            stage_suffix="_unpermuted",
+        )
+        return
+
+    # ------------------------------------------------------------------
     # Compile permuted variants (both shuffled and unshuffled)
     # ------------------------------------------------------------------
     if args.compile:
@@ -215,31 +242,7 @@ def main():
                     stage_suffix=suffix,
                 )
 
-    # ------------------------------------------------------------------
-    # Compile unpermuted baseline
-    # ------------------------------------------------------------------
-    if args.unpermuted:
-        from sc26_layout.permute_stage8 import add_timers
 
-        print(f"=== Compiling unpermuted baseline ===")
-        sdfgs = {
-            name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID))
-            for name in names
-        }
-        nsdfgs = {}
-        for name, sdfg in sdfgs.items():
-            sdfg = add_timers(sdfg)
-            # insert_synchronization_for_profiling(sdfg)
-            sdfg.validate()
-            nsdfgs[name] = sdfg
-
-        common.compile_action(
-            STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_unpermuted",
-            main_name="main_per.cu",
-            tblock_dim=_TBLOCK_DIM,
-            stage_suffix="_unpermuted",
-        )
 
 
 if __name__ == "__main__":

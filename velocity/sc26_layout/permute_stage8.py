@@ -390,8 +390,25 @@ def _strip_gpu(pm: PermMap) -> PermMap:
     return {(k[4:] if k.startswith("gpu_") else k): v for k, v in pm.items()}
 
 def add_timers(sdfg: dace.SDFG):
-    permute_in_state  = {s for s in sdfg.all_states() if s.label == "permute_in"}.pop()
-    permute_out_state = {s for s in sdfg.all_states() if s.label == "permute_out"}.pop()
+    permute_in_states  = {s for s in sdfg.all_states() if s.label == "permute_in"}
+    if len(permute_in_states) != 1:
+        assert len(permute_in_states) == 0
+        # Do it after copy in
+        entry_interface_state = {
+            s for s in sdfg.all_states() if s.label == "entry_interface"}.pop()
+        permute_in_state = entry_interface_state
+    else:
+        permute_in_state = permute_in_states.pop()
+    permute_out_states = {s for s in sdfg.all_states() if s.label == "permute_out"}
+    if len(permute_out_states) != 1:
+        assert len(permute_out_states) == 0
+        # Do it before copy out
+        exit_interface_state  = {
+            s for s in sdfg.all_states()
+            if s.label == "block" and "deflatten" in {n.label for n in s.nodes()}}.pop()
+        permute_out_state = exit_interface_state
+    else:
+        permute_out_state = permute_out_states.pop()
     add_timers_w_states(sdfg, permute_in_state, permute_out_state)
 
 def add_timers_w_states(sdfg, copy_in_state: dace.SDFGState, copy_out_state: dace.SDFGState):
@@ -404,12 +421,25 @@ def add_timers_w_states(sdfg, copy_in_state: dace.SDFGState, copy_out_state: dac
 #include <cuda_runtime.h>
 #include <cstdlib>
 #include <cstdio>
+
+#define CCHECK(call)                                                        \\
+    do {{                                                                        \\
+        cudaError_t _e = (call);                                                \\
+        if (_e != cudaSuccess) {{                                                \\
+            fprintf(stderr, "[CUDA] %s:%d  %s\\n",                             \\
+                    __FILE__, __LINE__, cudaGetErrorString(_e));                \\
+            std::abort();                                                       \\
+        }}                                                                       \\
+    }} while (0)
+
 static constexpr int FLUSH_N       = 8192*4;
 static constexpr int FLUSH_STEPS   = 20;
 static constexpr int FLUSH_BLOCK_X = 32;
 static constexpr int FLUSH_BLOCK_Y = 8;
+
 static double* flush_A = nullptr;
 static double* flush_B = nullptr;
+
 static __global__ void jacobi2d_kernel(const double* __restrict__ src,
                                         double* __restrict__ dst, int N)
 {{
@@ -419,6 +449,7 @@ static __global__ void jacobi2d_kernel(const double* __restrict__ src,
         dst[i*N+j] = 0.25*(src[(i-1)*N+j]+src[(i+1)*N+j]+
                            src[i*N+(j-1)]+src[i*N+(j+1)]);
 }}
+
 static __global__ void jacobi2d_init_kernel(double* A, int N)
 {{
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
@@ -428,56 +459,78 @@ static __global__ void jacobi2d_init_kernel(double* A, int N)
         A[i]=(r==0||r==N-1||c==0||c==N-1)?1.0:0.0;
     }}
 }}
+
 static void flush_all_caches_v2()
 {{
     size_t bytes=(size_t)FLUSH_N*FLUSH_N*sizeof(double);
-    if(!flush_A){{ cudaMalloc(&flush_A,bytes); cudaMalloc(&flush_B,bytes); }}
+    if(!flush_A){{
+        CCHECK(cudaMalloc(&flush_A, bytes));
+        CCHECK(cudaMalloc(&flush_B, bytes));
+    }}
     int it=256, ib=(FLUSH_N*FLUSH_N+it-1)/it;
-    jacobi2d_init_kernel<<<ib,it>>>(flush_A,FLUSH_N);
-    jacobi2d_init_kernel<<<ib,it>>>(flush_B,FLUSH_N);
-    cudaDeviceSynchronize();
-    dim3 block(FLUSH_BLOCK_X,FLUSH_BLOCK_Y);
-    dim3 grid((FLUSH_N+block.x-1)/block.x,(FLUSH_N+block.y-1)/block.y);
+    jacobi2d_init_kernel<<<ib,it>>>(flush_A, FLUSH_N);
+    CCHECK(cudaGetLastError());
+    jacobi2d_init_kernel<<<ib,it>>>(flush_B, FLUSH_N);
+    CCHECK(cudaGetLastError());
+    CCHECK(cudaDeviceSynchronize());
+
+    dim3 block(FLUSH_BLOCK_X, FLUSH_BLOCK_Y);
+    dim3 grid((FLUSH_N+block.x-1)/block.x, (FLUSH_N+block.y-1)/block.y);
     double* src=flush_A; double* dst=flush_B;
-    for(int step=0;step<FLUSH_STEPS;++step){{
-        jacobi2d_kernel<<<grid,block>>>(src,dst,FLUSH_N);
+    for(int step=0; step<FLUSH_STEPS; ++step){{
+        jacobi2d_kernel<<<grid,block>>>(src, dst, FLUSH_N);
+        CCHECK(cudaGetLastError());
         double* tmp=src; src=dst; dst=tmp;
     }}
-    cudaDeviceSynchronize();
-    srand(42); int spots[4][2];
-    for(int k=0;k<4;++k){{
+    CCHECK(cudaDeviceSynchronize());
+
+    srand(42);
+    int spots[4][2];
+    for(int k=0; k<4; ++k){{
         spots[k][0]=1+rand()%(FLUSH_N-2);
         spots[k][1]=1+rand()%(FLUSH_N-2);
     }}
     double hash=0.0;
-    for(int k=0;k<4;++k){{
+    for(int k=0; k<4; ++k){{
         double val;
-        cudaMemcpy(&val,src+spots[k][0]*FLUSH_N+spots[k][1],
-                   sizeof(double),cudaMemcpyDeviceToHost);
+        CCHECK(cudaMemcpy(&val,
+                              src + spots[k][0]*FLUSH_N + spots[k][1],
+                              sizeof(double), cudaMemcpyDeviceToHost));
         hash+=val;
     }}
     static bool printed=false;
-    if(!printed){{ std::cout<<"[flush] jacobi2d hash = "<<hash<<std::endl; printed=true; }}
+    if(!printed){{
+        std::cout<<"[flush] jacobi2d hash = "<<hash<<std::endl;
+        printed=true;
+    }}
 }}
+
 static void gpu_timer_split({root_sdfg.label}_state_t* __state){{
-    static cudaEvent_t start,stop;
+    static cudaEvent_t start, stop;
     static bool is_first_call=true;
     cudaStream_t stream=__state->gpu_context->streams[0];
     if(is_first_call){{
-        cudaDeviceSynchronize(); cudaStreamSynchronize(stream);
+        CCHECK(cudaDeviceSynchronize());
+        CCHECK(cudaStreamSynchronize(stream));
         is_first_call=false;
-        cudaDeviceSynchronize(); flush_all_caches_v2(); cudaDeviceSynchronize();
+        CCHECK(cudaDeviceSynchronize());
+        flush_all_caches_v2();
+        CCHECK(cudaDeviceSynchronize());
         std::cout<<"[Timer] Start recorded..."<<std::endl;
-        cudaEventCreate(&start); cudaEventCreate(&stop);
-        cudaEventRecord(start,stream);
+        CCHECK(cudaEventCreate(&start));
+        CCHECK(cudaEventCreate(&stop));
+        CCHECK(cudaEventRecord(start, stream));
     }} else {{
-        cudaEventRecord(stop,stream);
-        cudaEventSynchronize(stop);
+        CCHECK(cudaEventRecord(stop, stream));
+        CCHECK(cudaEventSynchronize(stop));
         float ms=0;
-        cudaEventElapsedTime(&ms,start,stop);
+        CCHECK(cudaEventElapsedTime(&ms, start, stop));
         std::cout<<"[Timer] Elapsed time: "<<ms<<" ms"<<std::endl;
-        cudaDeviceSynchronize(); flush_all_caches_v2(); cudaDeviceSynchronize();
-        cudaEventDestroy(start); cudaEventDestroy(stop);
+        CCHECK(cudaDeviceSynchronize());
+        flush_all_caches_v2();
+        CCHECK(cudaDeviceSynchronize());
+        CCHECK(cudaEventDestroy(start));
+        CCHECK(cudaEventDestroy(stop));
         is_first_call=true;
     }}
 }}

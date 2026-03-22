@@ -164,11 +164,20 @@ def main():
     args = ap.parse_args()
 
     if args.list:
+        print("Sweep configs:")
         for name in all_names:
+            if name in _NAMED:
+                continue
             pm = PERMUTE_CONFIGS[name]["permute_map"]
             print(f"  {name:40s}  ({len(pm):2d} arrays permuted)")
-        print(f"\nTotal: {len(all_names)} configs  "
-              f"({len(all_names) * 2} executables including ms/mu variants)")
+        print(f"\nNamed configs:")
+        for name in _NAMED:
+            if name not in PERMUTE_CONFIGS:
+                continue
+            pm = PERMUTE_CONFIGS[name]["permute_map"]
+            print(f"  {name:40s}  ({len(pm):2d} arrays permuted)")
+        print(f"\nSweep total : {len(all_names) - len(_NAMED)} configs")
+        print(f"Named total : {len(_NAMED)} configs")
         return
 
     # Resolve selection
@@ -181,6 +190,8 @@ def main():
                 print(f"Use --list to see available configs", file=sys.stderr)
                 sys.exit(1)
             selected.append(c)
+    elif args.unpermuted:
+        selected = []   # --unpermuted alone: skip sweep entirely
     else:
         selected = all_names
 
