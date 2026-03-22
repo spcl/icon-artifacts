@@ -330,8 +330,9 @@ def main():
                     sdfg.validate()
                     nsdfgs[name] = sdfg
                 suffix = f"_permuted_{config_name}_{shuffle_label}"
-                BEVERIN = os.getenv("BEVERIN", "0") == "1"
-                tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
+                #BEVERIN = os.getenv("BEVERIN", "0") == "1"
+                #tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
+                tblock_dim = "32, 16, 1"
                 common.compile_action(STAGE_ID, nsdfgs, False, None, False,
                     name_suffix=suffix, main_name="main_per.cu", tblock_dim=tblock_dim,
                     stage_suffix=suffix)
@@ -347,8 +348,9 @@ def main():
             insert_synchronization_for_profiling(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
-        BEVERIN = os.getenv("BEVERIN", "0") == "1"
-        tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
+        #BEVERIN = os.getenv("BEVERIN", "0") == "1"
+        #tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
+        tblock_dim = "32, 16, 1"
         common.compile_action(STAGE_ID, nsdfgs, False, None, False,
             name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim=tblock_dim,
             stage_suffix="_unpermuted")
