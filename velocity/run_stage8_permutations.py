@@ -2,11 +2,16 @@
 """
 Generate all valid layout permutation configs, compile, and run.
 
-Compute arrays (z_ekinh, z_kin_hor_e): [0,1,2] or [1,0,2]
-Edge arrays (edge_idx, edge_blk): any permutation of [0,1,2]  (tied together)
-BLN array (e_bln_c_s): any permutation of [0,1,2]  (independent)
+Five groups:
+  cv  COMPUTE_VERT   binary [0,1,2] or [1,0,2]
+  ch  COMPUTE_HORIZ  binary [0,1,2] or [1,0,2]
+  f   FIELDS         binary [0,1,2] or [1,0,2]
+  s   STENCIL        binary [0,1,2] or [1,0,2]
+  n   CONN           all 6 permutations of [0,1,2]
 
-Total: 2 x 6 x 6 - 1 (identity) = 71 configs
+Total: 2 x 2 x 2 x 2 x 6 - 1 = 95 configs.
+Each config compiles to 2 executables: _ms (map-shuffled) and _mu (map-unshuffled).
+Output files are named {config}_{ms|mu}.txt  →  displayed as shuffled/unshuffled.
 """
 
 import argparse
@@ -15,45 +20,58 @@ import subprocess
 import sys
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Import configs from the same place permute_single_map_gpu uses them
-# ---------------------------------------------------------------------------
-
-from sc26_layout.extract_gpu_kernel import PERMUTE_CONFIGS
+from sc26_layout.permute_stage8 import PERMUTE_CONFIGS
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-STAGE = os.getenv("_STAGE", "8")  # default to stage 8, can be overridden with env var
-BEVERIN = os.getenv("BEVERIN", "0") == "1"
-COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}"
+STAGE    = os.getenv("_STAGE", "8")
+BEVERIN  = os.getenv("BEVERIN", "0") == "1"
 
-EXE_TEMPLATE = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
+COMPILE_CMD   = f"python -m utils.stages.compile_gpu_stage{STAGE}"
+EXE_TEMPLATE  = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
-OUT_DIR = Path(f"{'beverin_' if BEVERIN else ''}permutations_{STAGE}")
+OUT_DIR       = Path(f"{'beverin_' if BEVERIN else ''}permutations_{STAGE}")
+
+# Internal suffix → human label mapping
+_SHUFFLE_VARIANTS = [
+    ("ms", "shuffled"),
+    ("mu", "unshuffled"),
+]
 
 # ---------------------------------------------------------------------------
-# Compile & run helpers
+# Helpers
 # ---------------------------------------------------------------------------
 
 def ensure_out_dir():
     OUT_DIR.mkdir(exist_ok=True)
 
 
-def compile_config(name):
-    cmd = f"{COMPILE_CMD} --optimize --compile --permutations {name}"
+def compile_config(name: str) -> bool:
+    """Compile both ms and mu variants for *name* in one call."""
+    cmd = f"{COMPILE_CMD} --compile --permutations {name}"
     print(f"[compile] {cmd}")
     ret = subprocess.run(cmd, shell=True)
     if ret.returncode != 0:
         print(f"[compile] FAILED for {name} (rc={ret.returncode})", file=sys.stderr)
     return ret.returncode == 0
 
-def run_config(name, shuffle_label, reps=100, ncu=False):
+
+def _exe(name: str, suffix: str) -> str:
+    """Return the executable path for config *name* and shuffle suffix *suffix*."""
+    return EXE_TEMPLATE + f"_{name}_{suffix}"
+
+
+def _out_file(name: str, label: str) -> Path:
+    """Return the output txt path: {name}_{label}.txt  (label = shuffled|unshuffled)."""
+    return OUT_DIR / f"{name}_{label}.txt"
+
+
+def run_config(name: str, suffix: str, label: str, reps: int = 100, ncu: bool = False) -> bool:
     ensure_out_dir()
-    full_name = f"{name}_{shuffle_label}"
-    exe = EXE_TEMPLATE + f"_{full_name}"
-    out_file = OUT_DIR / f"{full_name}.txt"
+    exe      = _exe(name, suffix)
+    out_file = _out_file(name, label)
 
     print(f"[run] {exe} -> {out_file}")
     with open(out_file, "w") as f:
@@ -62,13 +80,13 @@ def run_config(name, shuffle_label, reps=100, ncu=False):
             stdout=f, stderr=subprocess.STDOUT,
         )
     if ret.returncode != 0:
-        print(f"[run] FAILED for {full_name} (rc={ret.returncode})", file=sys.stderr)
+        print(f"[run] FAILED for {name}/{label} (rc={ret.returncode})", file=sys.stderr)
         return False
 
     if ncu:
-        ncu_report = OUT_DIR / f"ncu_{full_name}"
-        ncu_log = OUT_DIR / f"ncu_{full_name}.txt"
-        print(f"[ncu] {full_name} -> {ncu_report}.ncu-rep")
+        ncu_report = OUT_DIR / f"ncu_{name}_{label}"
+        ncu_log    = OUT_DIR / f"ncu_{name}_{label}.txt"
+        print(f"[ncu] {name}/{label} -> {ncu_report}.ncu-rep")
         ncu_cmd = [
             "ncu", "--set", "full",
             "--import-source", "yes",
@@ -82,8 +100,8 @@ def run_config(name, shuffle_label, reps=100, ncu=False):
     return True
 
 
-def compile_unpermuted():
-    cmd = f"{COMPILE_CMD} --optimize --compile --permutations 'c012_e012_b021' --unpermuted"
+def compile_unpermuted() -> bool:
+    cmd = f"{COMPILE_CMD} --compile --unpermuted"
     print(f"[compile] {cmd}")
     ret = subprocess.run(cmd, shell=True)
     if ret.returncode != 0:
@@ -91,7 +109,7 @@ def compile_unpermuted():
     return ret.returncode == 0
 
 
-def run_unpermuted(reps=1, ncu=False):
+def run_unpermuted(reps: int = 1, ncu: bool = False):
     ensure_out_dir()
     out_file = OUT_DIR / "unpermuted.txt"
 
@@ -106,7 +124,7 @@ def run_unpermuted(reps=1, ncu=False):
 
     if ncu:
         ncu_report = OUT_DIR / "ncu_unpermuted"
-        ncu_log = OUT_DIR / "ncu_unpermuted.txt"
+        ncu_log    = OUT_DIR / "ncu_unpermuted.txt"
         print(f"[ncu] unpermuted -> {ncu_report}.ncu-rep")
         ncu_cmd = [
             "ncu", "--set", "full",
@@ -124,28 +142,31 @@ def run_unpermuted(reps=1, ncu=False):
 # ---------------------------------------------------------------------------
 
 def main():
-    all_names = list(PERMUTE_CONFIGS.keys())
+    # Named aliases excluded from the default sweep
+    _NAMED = {"shuffled", "index_only", "nlev_first"}
+    all_names = [k for k in PERMUTE_CONFIGS if k not in _NAMED]
 
-    ap = argparse.ArgumentParser(description="Run layout permutation sweep")
+    ap = argparse.ArgumentParser(description="Run stage-8 layout permutation sweep")
     ap.add_argument("--configs", type=str, default=None,
-                    help="Comma-separated config names (default: all 71)")
+                    help="Comma-separated config names (default: all 95 sweep configs)")
     ap.add_argument("--unpermuted", action="store_true", default=False,
                     help="Also compile and run the unpermuted baseline")
-    ap.add_argument("--reps", type=int, default=3)
-    ap.add_argument("--ncu", action="store_true", help="Run Nsight Compute")
+    ap.add_argument("--reps",         type=int,  default=3)
+    ap.add_argument("--ncu",          action="store_true", help="Run Nsight Compute")
     ap.add_argument("--compile-only", action="store_true")
-    ap.add_argument("--run-only", action="store_true")
-    ap.add_argument("--dry-run", action="store_true",
-                    help="Print configs without compiling or running")
-    ap.add_argument("--list", action="store_true",
+    ap.add_argument("--run-only",     action="store_true")
+    ap.add_argument("--dry-run",      action="store_true",
+                    help="Print what would be compiled/run without doing it")
+    ap.add_argument("--list",         action="store_true",
                     help="List all available config names and exit")
     args = ap.parse_args()
 
     if args.list:
         for name in all_names:
             pm = PERMUTE_CONFIGS[name]["permute_map"]
-            print(f"  {name:30s}  ({len(pm)} arrays permuted)")
-        print(f"\nTotal: {len(all_names)} configs")
+            print(f"  {name:40s}  ({len(pm):2d} arrays permuted)")
+        print(f"\nTotal: {len(all_names)} configs  "
+              f"({len(all_names) * 2} executables including ms/mu variants)")
         return
 
     # Resolve selection
@@ -163,14 +184,18 @@ def main():
 
     # Summary
     print(f"{'=' * 60}")
-    print(f"Layout permutation sweep: {len(selected)} configs")
+    print(f"Layout permutation sweep: {len(selected)} configs  "
+          f"({len(selected) * 2} executables)")
     if args.unpermuted:
         print(f"  + unpermuted baseline")
     print(f"Output directory: {OUT_DIR}/")
     print(f"{'=' * 60}")
     for name in selected:
         pm = PERMUTE_CONFIGS[name]["permute_map"]
-        print(f"  {name:30s}  ({len(pm)} arrays permuted)")
+        for suffix, label in _SHUFFLE_VARIANTS:
+            exe      = _exe(name, suffix)
+            out_file = _out_file(name, label)
+            print(f"  {name:40s}  [{label:10s}]  exe={exe}  out={out_file}")
     print()
 
     if args.dry_run:
@@ -178,7 +203,7 @@ def main():
 
     ensure_out_dir()
 
-    # Unpermuted baseline (compile + run first so it's available for comparison)
+    # Unpermuted baseline
     if args.unpermuted:
         print(f"\n{'=' * 60}")
         print(f"Unpermuted baseline")
@@ -189,32 +214,28 @@ def main():
             run_unpermuted(reps=args.reps, ncu=args.ncu)
 
     # Each permuted config
-    #raise Exception(selected)
     for name in selected:
         print(f"\n{'=' * 60}")
         print(f"Config: {name}")
         print(f"{'=' * 60}")
 
         if not args.run_only:
-            # compile_config produces both shuffled and unshuffled
-            ok = compile_config(name)
-            if not ok:
-                print(f"[skip] {name}: compile failed, skipping run")
-                continue
-            exe_s = EXE_TEMPLATE + f"_{name}_shuffled"
-            exe_u = EXE_TEMPLATE + f"_{name}_unshuffled"
-            if os.path.exists(exe_s) and os.path.exists(exe_u):
-                print(f"[skip] {name}: executables already exist")
-                ok = True
+            # Check if both executables already exist
+            both_exist = all(
+                os.path.exists(_exe(name, suffix))
+                for suffix, _ in _SHUFFLE_VARIANTS
+            )
+            if both_exist:
+                print(f"[skip] {name}: both executables already exist")
             else:
                 ok = compile_config(name)
-            if not ok:
-                print(f"[skip] {name}: compile failed, skipping run")
-                continue
+                if not ok:
+                    print(f"[skip] {name}: compile failed, skipping run")
+                    continue
 
         if not args.compile_only:
-            for shuffle_label in ["shuffled", "unshuffled"]:
-                run_config(name, shuffle_label, reps=args.reps, ncu=args.ncu)
+            for suffix, label in _SHUFFLE_VARIANTS:
+                run_config(name, suffix, label, reps=args.reps, ncu=args.ncu)
 
     # Final summary
     if not args.compile_only and not args.dry_run:
