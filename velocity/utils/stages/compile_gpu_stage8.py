@@ -137,7 +137,6 @@ def optimization_action(sdfg: dace.SDFG) -> dace.SDFG:
 
     return sdfg
 
-
 def main():
     argp = argparse.ArgumentParser()
     argp.add_argument('--optimize',     action=argparse.BooleanOptionalAction, default=False)
@@ -182,6 +181,7 @@ def main():
         for name, sdfg in sdfgs.items():
             add_timers(sdfg)
             # insert_synchronization_for_profiling(sdfg)
+            sdfg.validate()
             sdfg.validate()
             nsdfgs[name] = sdfg
 
@@ -230,6 +230,7 @@ def main():
                         shuffle_map=shuffle_map,
                     )
                     # insert_synchronization_for_profiling(sdfg)
+                    sdfg.validate()
                     sdfg.validate()
                     nsdfgs[name] = sdfg
 

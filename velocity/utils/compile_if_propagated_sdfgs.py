@@ -717,6 +717,21 @@ def compile_if_propagated_sdfgs(
 ):
     compare_structs(sdfgs)
 
+    do_rm_timers = os.environ.get("RM_TIMERS", "0") == "1"
+    if do_rm_timers:
+        def rm_timers(sdfg: dace.SDFG):
+            rmed = 0
+            for state in sdfg.all_states():
+                if state.label in {"profile_stop_sync", "entry_timer", "exit_timer", "profile_start_sync"}:
+                    nodes = state.nodes()
+                    assert len(nodes) == 1 and isinstance(nodes[0], dace.nodes.Tasklet)
+                    state.remove_node(nodes[0])
+                    rmed += 1
+            assert rmed == 4, f"Expected to remove 4 timer-related tasklets, but removed {rmed} in SDFG {sdfg.name}"
+        
+        for sdfg in sdfgs:
+            rm_timers(sdfg)  # Only need to remove from one SDFG since they are all the same
+
     dace.Config.set("compiler", "cuda", "max_concurrent_streams", value="1")
 
     if AMD:
