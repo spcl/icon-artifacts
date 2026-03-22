@@ -126,8 +126,9 @@ def optimization_action(sdfg: dace.SDFG) -> dace.SDFG:
             unroll_y_factor=y_unroll_factor,
         )
 
-    insert_synchronization_for_profiling(sdfg)
-    insert_timers_for_profiling(sdfg)
+    # Permutaiton adds that
+    #insert_synchronization_for_profiling(sdfg)
+    #insert_timers_for_profiling(sdfg)
     sdfg.validate()
 
     do_profile = os.getenv('_PROFILE', '0').lower() in ('1', 'true', 'yes')

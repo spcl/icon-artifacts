@@ -29,10 +29,10 @@ from sc26_layout.permute_stage8 import PERMUTE_CONFIGS
 STAGE    = os.getenv("_STAGE", "8")
 BEVERIN  = os.getenv("BEVERIN", "0") == "1"
 
-COMPILE_CMD   = f"python -m utils.stages.compile_gpu_stage{STAGE}"
-EXE_TEMPLATE  = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
+COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}"
+EXE_TEMPLATE   = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
-OUT_DIR       = Path(f"{'beverin_' if BEVERIN else ''}permutations_{STAGE}")
+OUT_DIR        = Path(f"{'beverin_' if BEVERIN else ''}full_permutations_{STAGE}")
 
 # Internal suffix → human label mapping
 _SHUFFLE_VARIANTS = [
@@ -68,38 +68,6 @@ def _out_file(name: str, label: str) -> Path:
     return OUT_DIR / f"{name}_{label}.txt"
 
 
-def run_config(name: str, suffix: str, label: str, reps: int = 100, ncu: bool = False) -> bool:
-    ensure_out_dir()
-    exe      = _exe(name, suffix)
-    out_file = _out_file(name, label)
-
-    print(f"[run] {exe} -> {out_file}")
-    with open(out_file, "w") as f:
-        ret = subprocess.run(
-            [exe] + (["9", f"--reps={reps}"] if reps > 1 else []),
-            stdout=f, stderr=subprocess.STDOUT,
-        )
-    if ret.returncode != 0:
-        print(f"[run] FAILED for {name}/{label} (rc={ret.returncode})", file=sys.stderr)
-        return False
-
-    if ncu:
-        ncu_report = OUT_DIR / f"ncu_{name}_{label}"
-        ncu_log    = OUT_DIR / f"ncu_{name}_{label}.txt"
-        print(f"[ncu] {name}/{label} -> {ncu_report}.ncu-rep")
-        ncu_cmd = [
-            "ncu", "--set", "full",
-            "--import-source", "yes",
-            "--clock-control", "none",
-            "-f", "-o", str(ncu_report),
-            exe, "9", f"--reps={reps}",
-        ]
-        with open(ncu_log, "w") as f:
-            subprocess.run(ncu_cmd, stdout=f, stderr=subprocess.STDOUT)
-
-    return True
-
-
 def compile_unpermuted() -> bool:
     cmd = f"{COMPILE_CMD} --compile --unpermuted"
     print(f"[compile] {cmd}")
@@ -109,32 +77,66 @@ def compile_unpermuted() -> bool:
     return ret.returncode == 0
 
 
-def run_unpermuted(reps: int = 1, ncu: bool = False):
+def run_config(name: str, suffix: str, label: str, reps: int = 100, ncu: bool = False) -> bool:
     ensure_out_dir()
-    out_file = OUT_DIR / "unpermuted.txt"
+    exe = _exe(name, suffix)
 
-    print(f"[run] {EXE_UNPERMUTED} -> {out_file}")
-    with open(out_file, "w") as f:
-        ret = subprocess.run(
-            [EXE_UNPERMUTED] + (["9", f"--reps={reps}"] if reps > 1 else []),
-            stdout=f, stderr=subprocess.STDOUT,
-        )
-    if ret.returncode != 0:
-        print(f"[run] unpermuted FAILED (rc={ret.returncode})", file=sys.stderr)
+    for step in [7, 9]:
+        out_file = OUT_DIR / f"{name}_{label}_step{step}.txt"
+        print(f"[run] {exe} step={step} -> {out_file}")
+        with open(out_file, "w") as f:
+            ret = subprocess.run(
+                [exe, str(step), f"--reps={reps}"],
+                stdout=f, stderr=subprocess.STDOUT,
+            )
+        if ret.returncode != 0:
+            print(f"[run] FAILED for {name}/{label}/step{step} (rc={ret.returncode})",
+                  file=sys.stderr)
+            return False
 
-    if ncu:
-        ncu_report = OUT_DIR / "ncu_unpermuted"
-        ncu_log    = OUT_DIR / "ncu_unpermuted.txt"
-        print(f"[ncu] unpermuted -> {ncu_report}.ncu-rep")
-        ncu_cmd = [
-            "ncu", "--set", "full",
-            "--import-source", "yes",
-            "--clock-control", "none",
-            "-f", "-o", str(ncu_report),
-            EXE_UNPERMUTED, "9", f"--reps={reps}",
-        ]
-        with open(ncu_log, "w") as f:
-            subprocess.run(ncu_cmd, stdout=f, stderr=subprocess.STDOUT)
+        if ncu:
+            ncu_report = OUT_DIR / f"ncu_{name}_{label}_step{step}"
+            ncu_log    = OUT_DIR / f"ncu_{name}_{label}_step{step}.txt"
+            print(f"[ncu] {name}/{label}/step{step} -> {ncu_report}.ncu-rep")
+            ncu_cmd = [
+                "ncu", "--set", "full",
+                "--import-source", "yes",
+                "--clock-control", "none",
+                "-f", "-o", str(ncu_report),
+                exe, str(step), f"--reps={reps}",
+            ]
+            with open(ncu_log, "w") as f:
+                subprocess.run(ncu_cmd, stdout=f, stderr=subprocess.STDOUT)
+
+    return True
+
+
+def run_unpermuted(reps: int = 100, ncu: bool = False):
+    ensure_out_dir()
+    for step in [7, 9]:
+        out_file = OUT_DIR / f"unpermuted_step{step}.txt"
+        print(f"[run] {EXE_UNPERMUTED} step={step} -> {out_file}")
+        with open(out_file, "w") as f:
+            ret = subprocess.run(
+                [EXE_UNPERMUTED, str(step), f"--reps={reps}"],
+                stdout=f, stderr=subprocess.STDOUT,
+            )
+        if ret.returncode != 0:
+            print(f"[run] unpermuted FAILED step={step} (rc={ret.returncode})",
+                  file=sys.stderr)
+
+        if ncu:
+            ncu_report = OUT_DIR / f"ncu_unpermuted_step{step}"
+            ncu_log    = OUT_DIR / f"ncu_unpermuted_step{step}.txt"
+            ncu_cmd = [
+                "ncu", "--set", "full",
+                "--import-source", "yes",
+                "--clock-control", "none",
+                "-f", "-o", str(ncu_report),
+                EXE_UNPERMUTED, str(step), f"--reps={reps}",
+            ]
+            with open(ncu_log, "w") as f:
+                subprocess.run(ncu_cmd, stdout=f, stderr=subprocess.STDOUT)
 
 
 # ---------------------------------------------------------------------------
