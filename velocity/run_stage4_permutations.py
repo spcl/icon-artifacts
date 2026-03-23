@@ -199,7 +199,8 @@ def main():
     elif args.unpermuted:
         selected = []   # --unpermuted alone: skip sweep entirely
     else:
-        selected = [n for n in all_names if "cv0" not in n]
+        selected = all_names
+        #selected = [n for n in all_names if "cv0" not in n]
 
     # Summary
     print(f"{'=' * 60}")

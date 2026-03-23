@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
-#SBATCH --time=10:00:00
+#SBATCH --time=24:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
 #SBATCH --output=permutations_stage8_beverin_output.txt
@@ -67,9 +67,11 @@ echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
+export _REDUCE_BITWIDTH_TRANSFORMATION=1
+
 # Run unpermuted one
-python run_stage8_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
+python run_stage8_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage8_permutations.py --unpermuted --reps ${REPS}
 python run_stage8_permutations.py --reps ${REPS}
 

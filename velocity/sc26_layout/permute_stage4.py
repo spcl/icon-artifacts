@@ -661,8 +661,6 @@ def permute_sdfg(
 
     if shuffle_map:
         for n, g in sdfg.all_nodes_recursive():
-            if g == permute_in_state or g == permute_out_state or g == entry_interface_state or g == exit_interface_state:
-                continue
             if isinstance(n, dace.nodes.MapEntry):
                 if isinstance(n, dace.nodes.MapEntry) and len(n.map.params) == 2:
                     permuted_param_names = list(reversed(n.map.params))

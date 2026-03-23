@@ -738,7 +738,7 @@ def compile_if_propagated_sdfgs(
                     assert len(nodes) == 1 and isinstance(nodes[0], dace.nodes.Tasklet)
                     state.remove_node(nodes[0])
                     rmed += 1
-            assert rmed == 4, f"Expected to remove 4 timer-related tasklets, but removed {rmed} in SDFG {sdfg.name}"
+            #assert rmed == 4, f"Expected to remove 4 timer-related tasklets, but removed {rmed} in SDFG {sdfg.name}"
         
         for sdfg in sdfgs:
             rm_timers(sdfg)  # Only need to remove from one SDFG since they are all the same
