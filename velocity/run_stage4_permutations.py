@@ -168,16 +168,22 @@ def main():
         for name in all_names:
             if name in _NAMED:
                 continue
+            if "cv0" in name:
+                continue
             pm = PERMUTE_CONFIGS[name]["permute_map"]
             print(f"  {name:40s}  ({len(pm):2d} arrays permuted)")
         print(f"\nNamed configs:")
         for name in _NAMED:
             if name not in PERMUTE_CONFIGS:
                 continue
+            if "cv0" in name:
+                continue
             pm = PERMUTE_CONFIGS[name]["permute_map"]
             print(f"  {name:40s}  ({len(pm):2d} arrays permuted)")
-        print(f"\nSweep total : {len(all_names) - len(_NAMED)} configs")
-        print(f"Named total : {len(_NAMED)} configs")
+        sweep_count = sum(1 for n in all_names if n not in _NAMED and "cv0" not in n)
+        named_count = sum(1 for n in _NAMED if n in PERMUTE_CONFIGS and "cv0" not in n)
+        print(f"\nSweep total : {sweep_count} configs")
+        print(f"Named total : {named_count} configs")
         return
 
     # Resolve selection
@@ -193,7 +199,7 @@ def main():
     elif args.unpermuted:
         selected = []   # --unpermuted alone: skip sweep entirely
     else:
-        selected = all_names
+        selected = [n for n in all_names if "cv0" not in n]
 
     # Summary
     print(f"{'=' * 60}")
