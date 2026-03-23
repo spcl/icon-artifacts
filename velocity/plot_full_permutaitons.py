@@ -91,35 +91,22 @@ def plot_panel(ax, violin_data, star_points, title, label_order, show_xticklabel
 
 
 # ---- Argument parsing ----
-def none_or_str(value):
-    return None if value.lower() == "none" else value
-
 parser = argparse.ArgumentParser(
     description="Violin plot for permuted/shuffled timing results.",
     formatter_class=argparse.RawTextHelpFormatter,
 )
-"""
-parser.add_argument("--cpu",  default="beverin_permutations_4", metavar="DIR", type=none_or_str,
+parser.add_argument("--cpu",  default="beverin_permutations_4", metavar="DIR",
                     help="Folder with CPU results (vendor 1)")
-parser.add_argument("--gpu",  default="beverin_permutations_6", metavar="DIR", type=none_or_str,
+parser.add_argument("--gpu",  default="beverin_permutations_6", metavar="DIR",
                     help="Folder with GPU results (vendor 1)")
-parser.add_argument("--cpu2", default="permutations_4", metavar="DIR", type=none_or_str,
+parser.add_argument("--cpu2", default="permutations_4", metavar="DIR",
                     help="Folder with CPU results (vendor 2)")
-parser.add_argument("--gpu2", default="permutations_6", metavar="DIR", type=none_or_str,
+parser.add_argument("--gpu2", default="permutations_6", metavar="DIR",
                     help="Folder with GPU results (vendor 2)")
-"""
-parser.add_argument("--cpu",  default=None, metavar="DIR", type=none_or_str,
-                    help="Folder with CPU results (vendor 1)")
-parser.add_argument("--gpu",  default=None, metavar="DIR", type=none_or_str,
-                    help="Folder with GPU results (vendor 1)")
-parser.add_argument("--cpu2", default=None, metavar="DIR", type=none_or_str,
-                    help="Folder with CPU results (vendor 2)")
-parser.add_argument("--gpu2", default=None, metavar="DIR", type=none_or_str,
-                    help="Folder with GPU results (vendor 2)")
-parser.add_argument("--cpu-title",  default="AMD Zen 3 (96 Cores)",   type=none_or_str,       metavar="STR")
-parser.add_argument("--gpu-title",  default="AMD MI300A",   type=none_or_str,       metavar="STR")
-parser.add_argument("--cpu2-title", default="Grace CPU", type=none_or_str, metavar="STR")
-parser.add_argument("--gpu2-title", default="GH200 HBM3", type=none_or_str, metavar="STR")
+parser.add_argument("--cpu-title",  default="AMD Zen 3 (96 Cores)",          metavar="STR")
+parser.add_argument("--gpu-title",  default="AMD MI300A",          metavar="STR")
+parser.add_argument("--cpu2-title", default="Grace CPU", metavar="STR")
+parser.add_argument("--gpu2-title", default="GH200 HBM3", metavar="STR")
 args = parser.parse_args()
 
 panels = []
