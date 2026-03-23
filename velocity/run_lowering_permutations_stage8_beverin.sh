@@ -46,7 +46,6 @@ export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_pa
 #git fetch origin
 #git checkout f2dace/staging
 #cd "$START_DIR"
-mkdir -p beverin_full_permutations_${_STAGE:-8}
 
 # --- Configuration ---
 CONFIGS="${CONFIGS:-}"          # empty = all
@@ -67,8 +66,9 @@ echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
-export _REDUCE_BITWIDTH_TRANSFORMATION=0
-export _SUFFIX=""
+export _REDUCE_BITWIDTH_TRANSFORMATION=1
+export _SUFFIX="lowering_"
+mkdir -p beverin_${_SUFFIX}_full_permutations_${_STAGE:-8}
 
 # Run unpermuted one
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
