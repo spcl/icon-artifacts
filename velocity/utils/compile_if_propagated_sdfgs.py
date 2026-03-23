@@ -692,10 +692,16 @@ def _compile_and_link(
                 raise RuntimeError(f"FAILED: {src}")
             objects.append(obj)
 
+    # Extract arch flag from compile_flags to pass during linking
+    import re as _re
+    arch_match = _re.search(r"-arch=sm_\w+", compile_flags)
+    arch_flag = arch_match.group(0) if arch_match else ""
+
     link_flags = ""
     if lib:
         link_flags = "-shared" if AMD or compiler == "c++" else "--shared -Xcompiler=-fPIC"
-    link_cmd = f"{compiler} {' '.join(objects)} {link_flags} -o {output}"
+
+    link_cmd = f"{compiler} {' '.join(objects)} {arch_flag} {link_flags} -o {output}"
     print(f"  [LD] {output}")
     ret = subprocess.run(link_cmd, shell=True)
     if ret.returncode != 0:
