@@ -577,9 +577,14 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         common = f"--offload-arch={arch} -std=c++20 -DNDEBUG"
         if release:
             flags = (
-                f"{common} -O3 -ffast-math -fPIC -Wall -Wextra "
-                f"-Wno-unused-parameter -munsafe-fp-atomics "
-                f"-ffp-contract=fast -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
+                f"{common} -Wall -Wextra "
+                "--offload-arch=gfx942 "
+                "-mllvm -amdgpu-early-inline-all=true "
+                "-mllvm -amdgpu-kernarg-preload-count=16 "
+                "-munsafe-fp-atomics "
+                "-ffp-contract=fast "
+                "-fPIC -O3 -ffast-math "
+                "-Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
             )
         else:
             flags = (
@@ -744,13 +749,17 @@ def compile_if_propagated_sdfgs(
         dace.config.Config.set("compiler", "cuda", "backend", value="hip")
         dace.config.Config.set("compiler", "cuda", "path", value="/opt/rocm")
         dace.config.Config.set("compiler", "cuda", "hip_arch", value="gfx942")
-        dace.config.Config.set("compiler", "cuda", "default_block_size", value="64,8,1")
+        dace.config.Config.set("compiler", "cuda", "default_block_size", value="32,16,1")
         dace.config.Config.set(
             "compiler", "cuda", "hip_args",
             value=(
                 "--offload-arch=gfx942 "
-                "-mllvm -amdgpu-early-inline-all=true -ffp-contract=fast "
-                "-fPIC -O3 -ffast-math -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
+                "-mllvm -amdgpu-early-inline-all=true "
+                "-mllvm -amdgpu-kernarg-preload-count=16 "
+                "-munsafe-fp-atomics "
+                "-ffp-contract=fast "
+                "-fPIC -O3 -ffast-math "
+                "-Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
             ),
         )
     else:

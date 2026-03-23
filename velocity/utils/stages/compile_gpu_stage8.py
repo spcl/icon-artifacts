@@ -166,11 +166,13 @@ def main():
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
             sdfg.save(outfile, compress=True)
 
+    do_reduce_bitwidth = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0').lower() in ('1', 'true', 'yes')
+
     # ------------------------------------------------------------------
     # Compile unpermuted baseline
     # ------------------------------------------------------------------
     if args.unpermuted:
-        from sc26_layout.permute_stage8 import add_timers
+        from sc26_layout.permute_stage8 import add_timers, add_timers_after_lowering
 
         print(f"=== Compiling unpermuted baseline ===")
         sdfgs = {
@@ -179,9 +181,11 @@ def main():
         }
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
-            add_timers(sdfg)
+            if not do_reduce_bitwidth:
+                add_timers(sdfg)
+            else:
+                add_timers_after_lowering(sdfg)
             # insert_synchronization_for_profiling(sdfg)
-            sdfg.validate()
             sdfg.validate()
             nsdfgs[name] = sdfg
 
@@ -201,12 +205,15 @@ def main():
         from sc26_layout.permute_stage8 import (
             PERMUTE_CONFIGS,
             permute_sdfg,
+            permute_sdfg_after_lowering,
         )
 
         if args.permutations:
             config_names = [c.strip() for c in args.permutations.split(",")]
         else:
             config_names = ["cv1_ch1_f1_s1_n201"]   # default: all-groups config
+
+
 
         for config_name in config_names:
             if config_name not in PERMUTE_CONFIGS:
@@ -224,11 +231,19 @@ def main():
                 }
                 nsdfgs = {}
                 for name, sdfg in sdfgs.items():
-                    sdfg = permute_sdfg(
-                        sdfg,
-                        config_name=config_name,
-                        shuffle_map=shuffle_map,
-                    )
+                    if not do_reduce_bitwidth:
+                        sdfg = permute_sdfg(
+                            sdfg,
+                            config_name=config_name,
+                            shuffle_map=shuffle_map,
+                        )
+                    else:
+                        #sdfg = permute_sdfg_after_lowering(
+                        sdfg = permute_sdfg_after_lowering(
+                            sdfg,
+                            config_name=config_name,
+                            shuffle_map=shuffle_map,
+                        )
                     # insert_synchronization_for_profiling(sdfg)
                     sdfg.validate()
                     sdfg.validate()

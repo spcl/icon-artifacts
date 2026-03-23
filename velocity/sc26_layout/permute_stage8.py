@@ -61,6 +61,7 @@ from itertools import permutations as _iter_perms
 from typing import Dict, List
 
 import dace
+from dace.codegen.control_flow import ConditionalBlock
 from dace.properties import CodeBlock
 from dace.transformation.layout.permute_dimensions import PermuteDimensions
 from dace.sdfg.construction_utils import move_state_after, move_state_before
@@ -389,6 +390,25 @@ def needs_reduction_change(config_name: str) -> bool:
 def _strip_gpu(pm: PermMap) -> PermMap:
     return {(k[4:] if k.startswith("gpu_") else k): v for k, v in pm.items()}
 
+def add_timers_after_lowering(sdfg: dace.SDFG):
+    # label: check_bitwidth_cond
+    matches = {n for n in sdfg.nodes() if n.label == "check_bitwidth_cond" and isinstance(n, ConditionalBlock)}
+    assert len(matches) == 1
+    check_bitwidth_cond = matches.pop()
+    permute_in_state = check_bitwidth_cond
+    permute_out_states = {s for s in sdfg.all_states() if s.label == "permute_out"}
+    if len(permute_out_states) != 1:
+        assert len(permute_out_states) == 0
+        # Do it before copy out
+        exit_interface_state  = {
+            s for s in sdfg.all_states()
+            if s.label == "block" and "deflatten" in {n.label for n in s.nodes()}}.pop()
+        permute_out_state = exit_interface_state
+    else:
+        permute_out_state = permute_out_states.pop()
+    add_timers_w_states(sdfg, permute_in_state, permute_out_state)
+
+
 def add_timers(sdfg: dace.SDFG):
     permute_in_states  = {s for s in sdfg.all_states() if s.label == "permute_in"}
     if len(permute_in_states) != 1:
@@ -432,7 +452,7 @@ def add_timers_w_states(sdfg, copy_in_state: dace.SDFGState, copy_out_state: dac
         }}                                                                       \\
     }} while (0)
 
-static constexpr int FLUSH_N       = 8192*4;
+static constexpr int FLUSH_N       = 8192;
 static constexpr int FLUSH_STEPS   = 20;
 static constexpr int FLUSH_BLOCK_X = 32;
 static constexpr int FLUSH_BLOCK_Y = 8;
@@ -718,7 +738,28 @@ def permute_sdfg(
     sdfg.validate()
     return sdfg
 
-
+def permute_sdfg_after_lowering(
+    sdfg: dace.SDFG,
+    config_name: str = "nlev_first",
+    shuffle_map: bool = True,
+    strip_gpu_prefix: bool = False,
+) -> dace.SDFG:
+    cfg = PERMUTE_CONFIGS[config_name]
+    pm = cfg["permute_map"]
+    extended = dict(pm)
+    for arr, perm in pm.items():
+        for suffix in ("_uint8", "_uint16"):
+            extended[arr + suffix] = perm
+    # Temporarily patch the config, call original, restore
+    orig = cfg["permute_map"]
+    orig_inv = cfg["inverse_permute_map"]
+    cfg["permute_map"] = extended
+    cfg["inverse_permute_map"] = {k: _inverse_perm(v) for k, v in extended.items()}
+    try:
+        return permute_sdfg(sdfg, config_name, shuffle_map, strip_gpu_prefix)
+    finally:
+        cfg["permute_map"] = orig
+        cfg["inverse_permute_map"] = orig_inv
 # ---------------------------------------------------------------------------
 # Sanity check
 # ---------------------------------------------------------------------------
