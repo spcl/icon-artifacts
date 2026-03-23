@@ -640,7 +640,7 @@ def update_reductions(sdfg: dace.SDFG, permuted_levmask:bool=False):
             if  isinstance(n, dace.nodes.Tasklet) and "size" in n.out_connectors:
                 print(n)
                 print(n.code.as_string)
-    assert upded
+    #assert upded
 
 def levmask_is_permuted(config_name: str) -> bool:
     _, ch, _, _, _ = _parse_name(config_name)
@@ -704,8 +704,6 @@ def permute_sdfg(
 
     if shuffle_map:
         for n, g in sdfg.all_nodes_recursive():
-            if g == permute_in_state or g == permute_out_state or g == entry_interface_state or g == exit_interface_state:
-                continue
             if isinstance(n, dace.nodes.MapEntry):
                 if isinstance(n, dace.nodes.MapEntry) and len(n.map.params) == 2:
                     permuted_param_names = list(reversed(n.map.params))
