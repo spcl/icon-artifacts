@@ -12,7 +12,7 @@
 export _RELEASE=1
 export GENCODE_NUMBER=90
 export OMP_NUM_THREADS=96
-export OMP_PROC_BIND=true
+export OMP_PROC_BIND=spread
 export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=1
@@ -33,6 +33,13 @@ export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 export _STAGE=8
 export RM_TIMERS=1
 export _TBLOCK_DIMS="32,16,1"
+
+
+export LLVM_HOME=/opt/rocm/llvm/
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LLVM_HOME/lib64:$LD_LIBRARY_PATH
+export CPATH=$LLVM_HOME/include:$CPATH
+export LIBRARY_PATH=$LLVM_HOME/lib:$LLVM_HOME/lib64:$LIBRARY_PATH
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"

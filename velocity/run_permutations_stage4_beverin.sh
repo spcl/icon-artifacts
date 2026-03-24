@@ -12,7 +12,7 @@
 export _RELEASE=1
 export GENCODE_NUMBER=90
 export OMP_NUM_THREADS=96
-export OMP_PROC_BIND=true
+export OMP_PROC_BIND=spread
 export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=1
@@ -31,6 +31,13 @@ export LDFLAGS="-L$ROCM_HOME/lib -L$ROCM_HOME/lib64"
 export CUPY_INSTALL_USE_HIP=1
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
+
+
+export LLVM_HOME=/opt/rocm/llvm/
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LLVM_HOME/lib64:$LD_LIBRARY_PATH
+export CPATH=$LLVM_HOME/include:$CPATH
+export LIBRARY_PATH=$LLVM_HOME/lib:$LLVM_HOME/lib64:$LIBRARY_PATH
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"
@@ -68,6 +75,8 @@ echo "========================="
 
 export _REDUCE_BITWIDTH_TRANSFORMATION=0
 export _SUFFIX=""
+export V2=0
+
 # Run unpermuted one
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}

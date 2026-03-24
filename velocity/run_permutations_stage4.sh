@@ -14,7 +14,7 @@ spack load cuda@12.9
 export _RELEASE=1
 export GENCODE_NUMBER=90
 export OMP_NUM_THREADS=288
-export OMP_PROC_BIND=true
+export OMP_PROC_BIND=spread
 export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
@@ -44,6 +44,8 @@ echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 export _REDUCE_BITWIDTH_TRANSFORMATION=0
 export _SUFFIX=""
+export V2=0
+
 # Run unpermuted one
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}
