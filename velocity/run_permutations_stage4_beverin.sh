@@ -68,6 +68,8 @@ echo "========================="
 
 export _REDUCE_BITWIDTH_TRANSFORMATION=0
 export _SUFFIX=""
+export V2=0
+
 # Run unpermuted one
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}

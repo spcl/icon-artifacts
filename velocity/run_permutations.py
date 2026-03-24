@@ -27,8 +27,13 @@ from sc26_layout.extract_gpu_kernel import PERMUTE_CONFIGS
 
 STAGE = os.getenv("_STAGE", "6")  # default to stage 6, can be overridden with env var
 BEVERIN = os.getenv("BEVERIN", "0") == "1"
-COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}"
 SUFFIX = os.getenv("_SUFFIX", "")
+
+V2 = os.getenv("V2", "0") == "1"
+if V2:
+    COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}_v2"
+else:
+    COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}"
 
 EXE_TEMPLATE = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"

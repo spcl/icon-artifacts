@@ -571,14 +571,24 @@ def _get_compiler(gpu: bool) -> str:
 
 
 def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
+    # ── OpenMP flags per backend ──
+    # hipcc wraps clang++, so -fopenmp goes directly.
+    # nvcc needs -Xcompiler=-fopenmp for host code.
+    # CPU compiler (g++/clang++) takes -fopenmp directly.
     if gpu and AMD:
-        arch = "gfx942"  # Default to gfx942 for AMD; can be overridden with HIP_ARCH env var
-        #arch = os.getenv("HIP_ARCH", "gfx942")
+        omp_flag = "-fopenmp"
+    elif gpu:
+        omp_flag = "-Xcompiler=-fopenmp"
+    else:
+        omp_flag = "-fopenmp"
+
+    if gpu and AMD:
+        arch = "gfx942"
         common = f"--offload-arch={arch} -std=c++20 -DNDEBUG"
         if release:
             flags = (
-                f"{common} -Wall -Wextra -fopenmp "
-                "--offload-arch=gfx942 "
+                f"{common} -Wall -Wextra {omp_flag} "
+                f"--offload-arch={arch} "
                 "-mllvm -amdgpu-early-inline-all=true "
                 "-munsafe-fp-atomics "
                 "-ffp-contract=fast "
@@ -587,8 +597,9 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             )
         else:
             flags = (
-                f"{common} -O0 -g -ggdb -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
-                f"-DDACE_VELOCITY_DEBUG -fopenmp "
+                f"{common} -O0 -g -ggdb -fPIC -Wall -Wextra {omp_flag} "
+                "-Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result "
+                "-DDACE_VELOCITY_DEBUG"
             )
         if debuginfo:
             flags += " -g"
@@ -616,7 +627,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         if release:
             flags = (
                 f"{nvhpc}{suppress} {xcompiler_warns} -DNDEBUG -Xcompiler=-DNDEBUG "
-                f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-O3 -Xcompiler=-fopenmp "
+                f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-O3 {omp_flag} "
                 f"--expt-relaxed-constexpr {arch_flag} "
                 f"--use_fast_math -O3 {debugflag} --ftz=true "
                 f"--prec-div=false --prec-sqrt=false --fmad=true "
@@ -626,7 +637,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         else:
             flags = (
                 f"{suppress} {xcompiler_warns} -DNDEBUG "
-                f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-fopenmp "
+                f"-Xcompiler=-Wall -Xcompiler=-Wextra {omp_flag} "
                 f"--expt-relaxed-constexpr {arch_flag} "
                 f"-O0 -Xcompiler=-g -g -Xcompiler=-O0 -G {debugflag} "
                 f"--fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
@@ -646,17 +657,17 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         if release:
             flags = (
                 f"{warns} {debugflag} -std=c++20 -Wall -Wextra "
-                f"-Wno-unused-parameter -Wno-unused-variable -O3 -DNDEBUG"
-                f"-fopenmp "
+                f"-Wno-unused-parameter -Wno-unused-variable -O3 -DNDEBUG "
+                f"{omp_flag}"
             )
         else:
             flags = (
                 f"{warns} -DDACE_VELOCITY_DEBUG -std=c++20 -Wall -Wextra "
                 f"-Wno-unused-parameter -Wno-unused-variable "
-                f"-Wno-unknown-pragmas -O0 -g -ggdb {debugflag}"
-                f"-fopenmp "
+                f"-Wno-unknown-pragmas -O0 -g -ggdb {debugflag} "
+                f"{omp_flag}"
             )
-    
+
     if AMD:
         flags += " -D__HIP_PLATFORM_AMD__=1"
         flags += " -DHIP_PLATFORM_AMD=1"
@@ -703,9 +714,18 @@ def _compile_and_link(
     arch_match = _re.search(r"-arch=sm_\w+", compile_flags)
     arch_flag = arch_match.group(0) if arch_match else ""
 
+    # Link flags
     link_flags = ""
     if lib:
         link_flags = "-shared" if AMD or compiler == "c++" else "--shared -Xcompiler=-fPIC"
+
+    # Add OpenMP to linker
+    if AMD:
+        link_flags += " -fopenmp"
+    elif "nvcc" in compiler:
+        link_flags += " -Xcompiler=-fopenmp -lgomp"
+    else:
+        link_flags += " -fopenmp"
 
     link_cmd = f"{compiler} {' '.join(objects)} {arch_flag} {link_flags} -o {output}"
     print(f"  [LD] {output}")
