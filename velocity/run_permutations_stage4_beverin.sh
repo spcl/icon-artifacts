@@ -6,8 +6,8 @@
 #SBATCH --time=07:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
-#SBATCH --output=permutations_stage4_beverin_output.txt
-#SBATCH --error=permutations_stage4_beverin_error.txt
+#SBATCH --output=sp_permutations_stage4_beverin_output.txt
+#SBATCH --error=sp_permutations_stage4_beverin_error.txt
 
 export _RELEASE=1
 export GENCODE_NUMBER=90
@@ -66,6 +66,8 @@ echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
+export _REDUCE_BITWIDTH_TRANSFORMATION=0
+export _SUFFIX=""
 # Run unpermuted one
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}

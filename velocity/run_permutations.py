@@ -34,6 +34,7 @@ EXE_TEMPLATE = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
 OUT_DIR = Path(f"{'beverin_' if BEVERIN else 'daint'}{SUFFIX}full_permutations_{STAGE}")
 
+
 # ---------------------------------------------------------------------------
 # Compile & run helpers
 # ---------------------------------------------------------------------------
