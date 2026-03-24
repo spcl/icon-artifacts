@@ -577,7 +577,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         common = f"--offload-arch={arch} -std=c++20 -DNDEBUG"
         if release:
             flags = (
-                f"{common} -Wall -Wextra "
+                f"{common} -Wall -Wextra -fopenmp "
                 "--offload-arch=gfx942 "
                 "-mllvm -amdgpu-early-inline-all=true "
                 "-munsafe-fp-atomics "
@@ -588,7 +588,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         else:
             flags = (
                 f"{common} -O0 -g -ggdb -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
-                f"-DDACE_VELOCITY_DEBUG"
+                f"-DDACE_VELOCITY_DEBUG -fopenmp "
             )
         if debuginfo:
             flags += " -g"
@@ -616,7 +616,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         if release:
             flags = (
                 f"{nvhpc}{suppress} {xcompiler_warns} -DNDEBUG -Xcompiler=-DNDEBUG "
-                f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-O3 "
+                f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-O3 -Xcompiler=-fopenmp "
                 f"--expt-relaxed-constexpr {arch_flag} "
                 f"--use_fast_math -O3 {debugflag} --ftz=true "
                 f"--prec-div=false --prec-sqrt=false --fmad=true "
@@ -626,7 +626,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         else:
             flags = (
                 f"{suppress} {xcompiler_warns} -DNDEBUG "
-                f"-Xcompiler=-Wall -Xcompiler=-Wextra "
+                f"-Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=-fopenmp "
                 f"--expt-relaxed-constexpr {arch_flag} "
                 f"-O0 -Xcompiler=-g -g -Xcompiler=-O0 -G {debugflag} "
                 f"--fmad=false --prec-div=true --prec-sqrt=true --ftz=false "
@@ -647,14 +647,14 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             flags = (
                 f"{warns} {debugflag} -std=c++20 -Wall -Wextra "
                 f"-Wno-unused-parameter -Wno-unused-variable -O3 -DNDEBUG"
-                f"-fopenmp"
+                f"-fopenmp "
             )
         else:
             flags = (
                 f"{warns} -DDACE_VELOCITY_DEBUG -std=c++20 -Wall -Wextra "
                 f"-Wno-unused-parameter -Wno-unused-variable "
                 f"-Wno-unknown-pragmas -O0 -g -ggdb {debugflag}"
-                f"-fopenmp"
+                f"-fopenmp "
             )
     
     if AMD:
