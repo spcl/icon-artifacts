@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=s8_p_low_sbfull
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
 #SBATCH --time=24:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
-#SBATCH --output=permutations_stage8_beverin_output.txt
-#SBATCH --error=permutations_stage8_beverin_error.txt
+#SBATCH --output=lowering_permutations_stage8_beverin_output.txt
+#SBATCH --error=lowering_permutations_stage8_beverin_error.txt
 
 export _RELEASE=1
 export GENCODE_NUMBER=90
@@ -67,8 +67,8 @@ echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
 export _REDUCE_BITWIDTH_TRANSFORMATION=1
-export _SUFFIX="lowering_"
-mkdir -p beverin_${_SUFFIX}_full_permutations_${_STAGE:-8}
+export _SUFFIX="lowered_"
+mkdir -p beverin_${_SUFFIX}full_permutations_${_STAGE:-8}
 
 # Run unpermuted one
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}

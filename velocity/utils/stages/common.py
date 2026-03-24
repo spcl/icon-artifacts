@@ -56,8 +56,10 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
                     stage_suffix:str = ""):
   dace.config.Config.set('compiler', 'default_data_types', value='C')
   release = os.getenv('_RELEASE', '0').lower() in ('1', 'true', 'yes')
+  lowered = os.getenv('_REDUCE_BITWIDTH_TRANSFORMATION', '0') == '1'
+  lowered_suffix = "_lowered" if lowered else ""
   for name, g in sdfgs.items():
-      g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}{stage_suffix}/{name}"
+      g.build_folder = f"{common.DEFAULT_CODEGEN_DIR}/stage{stage}{stage_suffix}{lowered_suffix}/{name}"
   sdfgs = list(sdfgs.values())
   # Avoid name conflicts.
   unique_names(sdfgs)
@@ -166,11 +168,13 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
   opt_suffix = '_release' if release else '_debug'
   _build_for_integration = os.getenv('_BUILD_LIB_FOR_SOLVE_NH', '0').lower() in ('1', 'true', 'yes')
   integration_suffix = '_solve_nh_integration' if _build_for_integration else '_standalone'
+  lowered = os.getenv("_REDUCE_BITWIDTH_TRANSFORMATION", "0") == "1"
+  lowered_suffix = "_lowered" if lowered else ""
   if stage == 1 or stage == 8:
       if not _build_for_integration:
-        binpath = Path('velocity_gpu')
+        binpath = Path(f'velocity_gpu{lowered_suffix}')
         assert binpath.exists()
-        binpath = binpath.rename(f"{binpath.name}.stage{stage}{integration_suffix}{opt_suffix}{name_suffix}")
+        binpath = binpath.rename(f"{binpath.name}.stage{stage}{integration_suffix}{opt_suffix}{name_suffix}{lowered_suffix}")
         print(f"Binary available: {binpath}")
       else:
         libpath = Path('libvelocity_gpu.so')
@@ -179,9 +183,9 @@ def compile_action(stage: int, sdfgs: Dict[str, dace.SDFG], lib,
         print(f"Library available: {libpath}")
   else:
     if not lib:
-      binpath = Path('velocity_gpu')
+      binpath = Path(f'velocity_gpu{lowered_suffix}')
       assert binpath.exists()
-      binpath = binpath.rename(f"{binpath.name}.stage{stage}{integration_suffix}{opt_suffix}{name_suffix}")
+      binpath = binpath.rename(f"{binpath.name}.stage{stage}{integration_suffix}{opt_suffix}{name_suffix}{lowered_suffix}")
       print(f"Binary available: {binpath}")
     else:
       libpath = Path('libvelocity_gpu.so')

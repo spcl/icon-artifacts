@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=s4_p_full
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
@@ -42,7 +42,8 @@ echo "REPS:       $REPS"
 echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
-
+export _REDUCE_BITWIDTH_TRANSFORMATION=0
+export _SUFFIX=""
 # Run unpermuted one
 python run_stage4_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage4_permutations.py --configs="nlev_first" --reps ${REPS}

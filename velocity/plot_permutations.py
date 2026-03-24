@@ -7,12 +7,13 @@ baseline_key = "unpermuted"
 
 
 def load_folder(folder, step=None):
-    """step=None -> all, step=7 -> only _step7, step=9 -> only _step9"""
+    """step=None -> all, step=7 -> only _step7, step=9 -> only _step9
+       Files without a _stepN suffix are always included."""
     raw: dict[str, list[float]] = {}
-
     for f in glob.glob(os.path.join(folder, "*.txt")):
         basename = os.path.basename(f).replace(".txt", "")
-        if step is not None:
+        has_step = re.search(r"_step\d+$", basename)
+        if step is not None and has_step:
             if not basename.endswith(f"_step{step}"):
                 continue
         name = re.sub(r"_step\d+$", "", basename)
@@ -21,7 +22,6 @@ def load_folder(folder, step=None):
         if not times:
             continue
         raw.setdefault(name, []).extend(times)
-
     violin_data, star_points = {}, {}
     for name, times in raw.items():
         if name == baseline_key or name.endswith("shuffled"):
@@ -31,9 +31,7 @@ def load_folder(folder, step=None):
                 violin_data[name] = times
             else:
                 star_points[name] = np.median(times)
-
     return violin_data, star_points
-
 
 def plot_panel(ax, violin_data, star_points, title, label_order, show_xticklabels=True):
     baseline_median = (

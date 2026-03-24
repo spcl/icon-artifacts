@@ -1,0 +1,5 @@
+sbatch run_full_permutations_stage8_beverin.sh
+#sbatch run_full_permutations_stage4_beverin.sh
+sbatch run_lowering_permutations_stage8_beverin.sh
+sbatch run_permutations_stage6_beverin.sh
+sbatch run_permutations_stage4_beverin.sh

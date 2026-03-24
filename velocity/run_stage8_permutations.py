@@ -28,11 +28,15 @@ from sc26_layout.permute_stage8 import PERMUTE_CONFIGS
 
 STAGE    = os.getenv("_STAGE", "8")
 BEVERIN  = os.getenv("BEVERIN", "0") == "1"
-
+LOWERED = os.getenv("_REDUCE_BITWIDTH_TRANSFORMATION", "0") == "1"
+LOWERED_PREFIX = "lowered_" if LOWERED else ""
+LOWERED_SUFFIX = "_lowered" if LOWERED else ""
 COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}"
-EXE_TEMPLATE   = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
-EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
-OUT_DIR        = Path(f"{'beverin_' if BEVERIN else ''}full_permutations_{STAGE}")
+
+
+EXE_TEMPLATE   = f"./velocity_gpu{LOWERED_SUFFIX}.stage{STAGE}_standalone_release_permuted"
+EXE_UNPERMUTED = f"./velocity_gpu{LOWERED_SUFFIX}.stage{STAGE}_standalone_release_unpermuted{LOWERED_SUFFIX}"
+OUT_DIR        = Path(f"{'beverin_' if BEVERIN else ''}{LOWERED_PREFIX}full_permutations_{STAGE}")
 
 # Internal suffix → human label mapping
 _SHUFFLE_VARIANTS = [
@@ -60,7 +64,7 @@ def compile_config(name: str) -> bool:
 
 def _exe(name: str, suffix: str) -> str:
     """Return the executable path for config *name* and shuffle suffix *suffix*."""
-    return EXE_TEMPLATE + f"_{name}_{suffix}"
+    return EXE_TEMPLATE + f"_{name}_{suffix}{LOWERED_SUFFIX}"
 
 
 def _out_file(name: str, label: str) -> Path:

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=s6_p_single
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
@@ -66,7 +66,8 @@ echo "REPS:       $REPS"
 echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
-
+export _REDUCE_BITWIDTH_TRANSFORMATION=0
+export _SUFFIX=""
 # Run unpermuted one
 python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}

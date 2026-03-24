@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=s8_p_full
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive

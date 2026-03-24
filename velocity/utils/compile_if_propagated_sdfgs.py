@@ -580,7 +580,6 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
                 f"{common} -Wall -Wextra "
                 "--offload-arch=gfx942 "
                 "-mllvm -amdgpu-early-inline-all=true "
-                "-mllvm -amdgpu-kernarg-preload-count=16 "
                 "-munsafe-fp-atomics "
                 "-ffp-contract=fast "
                 "-fPIC -O3 -ffast-math "
@@ -755,7 +754,6 @@ def compile_if_propagated_sdfgs(
             value=(
                 "--offload-arch=gfx942 "
                 "-mllvm -amdgpu-early-inline-all=true "
-                "-mllvm -amdgpu-kernarg-preload-count=16 "
                 "-munsafe-fp-atomics "
                 "-ffp-contract=fast "
                 "-fPIC -O3 -ffast-math "
@@ -775,8 +773,15 @@ def compile_if_propagated_sdfgs(
 
     from dace.codegen import codegen, compiler
 
+    lowered = os.getenv("_REDUCE_BITWIDTH_TRANSFORMATION", "0") == "1"
+    lowered_suffix = "_lowered" if lowered is True else ""
     for sdfg in sdfgs:
+        # Changing sdfg name changes state name, makes compiling fail
+        #if lowered:
+        #    sdfg.name += "_lowered"
         name = sdfg.name
+        if lowered and (not sdfg.build_folder.endswith("_lowered")):
+            sdfg.build_folder += "_lowered"
         build_loc = sdfg.build_folder
 
         if generate_code:
@@ -917,10 +922,12 @@ def compile_if_propagated_sdfgs(
         + headers
     )
 
+    lowered = os.getenv("_REDUCE_BITWIDTH_TRANSFORMATION", "0") == "1"
+    lowered_suffix = "_lowered" if lowered is True else ""
     if lib:
         output = "libvelocity_gpu.so" if gpu else "libvelocity_cpu.so"
     else:
-        output = "velocity_gpu" if gpu else "velocity_cpu"
+        output = f"velocity_gpu{lowered_suffix}" if gpu else f"velocity_cpu{lowered_suffix}"
 
     print(f"\nBackend: {'HIP (AMD)' if AMD else 'CUDA (NVIDIA)' if gpu else 'CPU'}")
     print(f"Compiler: {cc}")
