@@ -577,7 +577,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         common = f"--offload-arch={arch} -std=c++20 -DNDEBUG"
         if release:
             flags = (
-                f"{common} -Wall -Wextra -fopenmp "
+                f"{common} -Wall -Wextra "
                 "--offload-arch=gfx942 "
                 "-mllvm -amdgpu-early-inline-all=true "
                 "-munsafe-fp-atomics "
@@ -588,7 +588,7 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
         else:
             flags = (
                 f"{common} -O0 -g -ggdb -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-ignored-attributes -Wno-unused-result"
-                f"-DDACE_VELOCITY_DEBUG -fopenmp "
+                f"-DDACE_VELOCITY_DEBUG "
             )
         if debuginfo:
             flags += " -g"
