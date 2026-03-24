@@ -67,8 +67,8 @@ echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 
 export _REDUCE_BITWIDTH_TRANSFORMATION=1
-export _SUFFIX="lowered_"
-mkdir -p beverin_${_SUFFIX}full_permutations_${_STAGE:-8}
+export _SUFFIX="lowered_full_"
+mkdir -p beverin_${_SUFFIX}permutations_${_STAGE:-8}
 
 # Run unpermuted one
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
