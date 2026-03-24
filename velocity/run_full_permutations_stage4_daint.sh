@@ -43,7 +43,7 @@ echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
 export _REDUCE_BITWIDTH_TRANSFORMATION=0
-export _SUFFIX=""
+export _SUFFIX="full_"
 # Run unpermuted one
 python run_stage4_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage4_permutations.py --configs="nlev_first" --reps ${REPS}

@@ -6,8 +6,8 @@
 #SBATCH --time=07:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
-#SBATCH --output=permutations_stage6_beverin_output.txt
-#SBATCH --error=permutations_stage6_beverin_error.txt
+#SBATCH --output=sp_permutations_stage6_beverin_output.txt
+#SBATCH --error=sp_permutations_stage6_beverin_error.txt
 
 export _RELEASE=1
 export GENCODE_NUMBER=90
