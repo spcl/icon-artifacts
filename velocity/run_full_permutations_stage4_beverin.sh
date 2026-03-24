@@ -12,7 +12,7 @@
 export _RELEASE=1
 export GENCODE_NUMBER=90
 export OMP_NUM_THREADS=96
-export OMP_PROC_BIND=true
+export OMP_PROC_BIND=spread
 export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=1
@@ -22,7 +22,7 @@ export ROCM_HOME=/opt/rocm
 export HIP_PATH=$ROCM_HOME
 export HIPCC=$ROCM_HOME/bin/hipcc
 export PATH=$ROCM_HOME/bin:$PATH
-export LD_LIBRARY_PATH=$ROCM_HOME/lib:$ROCM_HOME/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/lib:$ROCM_HOME/lib:$ROCM_HOME/lib64:$LD_LIBRARY_PATH
 export CPATH=$ROCM_HOME/include:$CPATH
 export LIBRARY_PATH=$ROCM_HOME/lib:$ROCM_HOME/lib64:$LIBRARY_PATH
 export CFLAGS="-I$ROCM_HOME/include"
@@ -33,6 +33,13 @@ export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 export _STAGE=4
 export RM_TIMERS=0
 export _TBLOCK_DIM="32,16,1" # Needed even though not used
+
+
+export LLVM_HOME=/opt/rocm/llvm/
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LLVM_HOME/lib64:$LD_LIBRARY_PATH
+export CPATH=$LLVM_HOME/include:$CPATH
+export LIBRARY_PATH=$LLVM_HOME/lib:$LLVM_HOME/lib64:$LIBRARY_PATH
 
 spack load python@3.13.8
 export CFLAGS="-I$(python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))") ${CFLAGS}"

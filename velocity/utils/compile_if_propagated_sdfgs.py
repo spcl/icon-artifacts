@@ -723,7 +723,7 @@ def _compile_and_link(
     if AMD:
         link_flags += " -fopenmp"
     elif "nvcc" in compiler:
-        link_flags += " -Xcompiler=-fopenmp -lgomp"
+        link_flags += " -Xcompiler=-fopenmp"
     else:
         link_flags += " -fopenmp"
 

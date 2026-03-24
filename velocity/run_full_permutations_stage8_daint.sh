@@ -14,7 +14,7 @@ spack load cuda@12.9
 export _RELEASE=1
 export GENCODE_NUMBER=90a
 export OMP_NUM_THREADS=288
-export OMP_PROC_BIND=true
+export OMP_PROC_BIND=spread
 export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
