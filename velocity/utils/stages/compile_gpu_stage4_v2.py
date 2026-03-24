@@ -12,7 +12,7 @@ import argparse
 from utils.propagate_if_cond import propagate_if_cond
 from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
 import os
-
+from utils.offload_cpu import offload_cpu
 STAGE_ID = 4
 
 
@@ -113,6 +113,7 @@ def main():
             add_timers(sdfg)
             # insert_synchronization_for_profiling(sdfg)
             sdfg.validate()
+            offload_cpu(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
 
@@ -137,7 +138,7 @@ def main():
         if args.permutations:
             config_names = [c.strip() for c in args.permutations.split(",")]
         else:
-            config_names = ["cv1_ch1_f1_s1_n201"]   # default: all-groups config
+            config_names = []   # default: all-groups config
 
         for config_name in config_names:
             if config_name not in PERMUTE_CONFIGS:
@@ -162,6 +163,7 @@ def main():
                     )
                     # insert_synchronization_for_profiling(sdfg)
                     sdfg.validate()
+                    offload_cpu(sdfg)
                     sdfg.validate()
                     nsdfgs[name] = sdfg
 

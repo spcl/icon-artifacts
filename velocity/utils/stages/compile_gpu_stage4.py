@@ -12,7 +12,7 @@ import argparse
 from utils.propagate_if_cond import propagate_if_cond
 from utils.demote_symbol_to_scalar import demote_symbol_to_scalar
 import os
-
+from utils.offload_cpu import offload_cpu
 STAGE_ID = 4
 
 
@@ -86,6 +86,8 @@ def main():
             sdfg = dace.SDFG.from_file(infile)
             sdfg.name = name
             sdfg.validate()
+            offload_cpu(sdfg)
+            sdfg.validate()
             sdfg = optimization_action(sdfg)
             print(f"Stage #{STAGE_ID}: Saved as {outfile}")
             sdfg.save(outfile, compress=True)
@@ -96,7 +98,7 @@ def main():
         if args.permutations:
             config_names = [c.strip() for c in args.permutations.split(",")]
         else:
-            config_names = ["single_map"]
+            config_names = []
 
         for config_name in config_names:
             if config_name not in PERMUTE_CONFIGS:
@@ -110,6 +112,8 @@ def main():
                 nsdfgs = {}
                 for name, sdfg in sdfgs.items():
                     sdfg = permute_single_map(sdfg, config_name=config_name, shuffle_map=shuffle_map)
+                    sdfg.validate()
+                    offload_cpu(sdfg)
                     sdfg.validate()
                     nsdfgs[name] = sdfg
                 suffix = f"_permuted_{config_name}_{shuffle_label}"
@@ -127,6 +131,8 @@ def main():
         nsdfgs = {}
         for name, sdfg in sdfgs.items():
             sdfg = add_timer_single_map(sdfg)
+            sdfg.validate()
+            offload_cpu(sdfg)
             sdfg.validate()
             nsdfgs[name] = sdfg
         common.compile_action(STAGE_ID, nsdfgs, False, None, False,
