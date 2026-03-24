@@ -647,12 +647,14 @@ def _get_flags(gpu: bool, release: bool, lib: bool, debuginfo: bool) -> str:
             flags = (
                 f"{warns} {debugflag} -std=c++20 -Wall -Wextra "
                 f"-Wno-unused-parameter -Wno-unused-variable -O3 -DNDEBUG"
+                f"-fopenmp"
             )
         else:
             flags = (
                 f"{warns} -DDACE_VELOCITY_DEBUG -std=c++20 -Wall -Wextra "
                 f"-Wno-unused-parameter -Wno-unused-variable "
                 f"-Wno-unknown-pragmas -O0 -g -ggdb {debugflag}"
+                f"-fopenmp"
             )
     
     if AMD:
