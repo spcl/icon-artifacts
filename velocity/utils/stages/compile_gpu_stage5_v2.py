@@ -23,7 +23,8 @@ from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_incon
 from utils.merge_maps import merge_maps_in_sdfg
 from utils.change_array_dtypes import change_array_dtypes
 from dace.transformation.passes.constant_propagation import ConstantPropagation
-STAGE_ID = 4
+
+STAGE_ID = 5
 def merge_its29_30_and_its31(sdfg: dace.SDFG):
     mapentry1, state1 = {
         (n, g) for n, g in sdfg.all_nodes_recursive() if isinstance(n, dace.nodes.MapEntry)
@@ -188,7 +189,7 @@ def main():
     # ------------------------------------------------------------------
     if args.optimize:
         for name in names:
-            infile  = common.stage_input(name,  STAGE_ID)
+            infile  = common.stage_input(name,  STAGE_ID-1)
             outfile = common.stage_output(name, STAGE_ID)
             print(f"Stage #{STAGE_ID}: Optimising {name} from {infile}")
             sdfg = dace.SDFG.from_file(infile)

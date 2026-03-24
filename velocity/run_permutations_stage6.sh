@@ -19,7 +19,7 @@ export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
 export HIP_PLATFORM_AMD=0
-
+export V2=0
 export _STAGE=6
 mkdir -p permutations_${_STAGE:-6}
 

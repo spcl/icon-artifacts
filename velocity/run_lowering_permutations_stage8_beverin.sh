@@ -75,6 +75,7 @@ echo "========================="
 
 export _REDUCE_BITWIDTH_TRANSFORMATION=1
 export _SUFFIX="lowered_full_"
+export V2=0
 mkdir -p beverin_${_SUFFIX}permutations_${_STAGE:-8}
 
 # Run unpermuted one

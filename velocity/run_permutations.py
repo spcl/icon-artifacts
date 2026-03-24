@@ -31,6 +31,7 @@ SUFFIX = os.getenv("_SUFFIX", "")
 
 V2 = os.getenv("V2", "0") == "1"
 if V2:
+    V2STAGE = str(int(STAGE)-1)
     COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}_v2"
 else:
     COMPILE_CMD = f"python -m utils.stages.compile_gpu_stage{STAGE}"
@@ -38,7 +39,7 @@ else:
 EXE_TEMPLATE = f"./velocity_gpu.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu.stage{STAGE}_standalone_release_unpermuted"
 
-OUT_DIR = Path(f"{'beverin_' if BEVERIN else 'daint'}{SUFFIX}permutations_{STAGE}")
+OUT_DIR = Path(f"{'beverin_' if BEVERIN else 'daint_'}{SUFFIX}permutations_{STAGE}")
 
 
 # ---------------------------------------------------------------------------

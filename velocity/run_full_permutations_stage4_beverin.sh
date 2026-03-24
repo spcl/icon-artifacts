@@ -30,7 +30,6 @@ export LDFLAGS="-L$ROCM_HOME/lib -L$ROCM_HOME/lib64"
 export CUPY_INSTALL_USE_HIP=1
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
-export _STAGE=4
 export RM_TIMERS=0
 export _TBLOCK_DIM="32,16,1" # Needed even though not used
 
@@ -53,7 +52,8 @@ export C_INCLUDE_PATH="$(python3.13 -c "import sysconfig; print(sysconfig.get_pa
 #git fetch origin
 #git checkout f2dace/staging
 #cd "$START_DIR"
-mkdir -p beverin_full_permutations_${_STAGE:-4}
+export _STAGE=5
+mkdir -p beverin_full_permutations_${_STAGE:-5}
 
 # --- Configuration ---
 CONFIGS="${CONFIGS:-}"          # empty = all

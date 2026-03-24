@@ -76,7 +76,7 @@ echo "========================="
 
 export _REDUCE_BITWIDTH_TRANSFORMATION=0
 export _SUFFIX="full_"
-
+export V2=0
 # Run unpermuted one
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
 python run_stage8_permutations.py --configs="index_only" --reps ${REPS}

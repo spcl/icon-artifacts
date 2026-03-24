@@ -20,7 +20,7 @@ export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
 export HIP_PLATFORM_AMD=0
 export _STAGE=4
-
+export V2=0
 mkdir -p permutations_${_STAGE:-4}
 
 # --- Configuration ---
