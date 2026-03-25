@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=velocity_gpu_perm_sweep
 #SBATCH --nodes=1
-#SBATCH --partition=normal
+#SBATCH --partition=debug
 #SBATCH --exclusive
-#SBATCH --time=08:00:00
+#SBATCH --time=00:30:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
 #SBATCH --output=permutations_stage6_daint_output.txt
@@ -45,6 +45,7 @@ echo "========================="
 export _REDUCE_BITWIDTH_TRANSFORMATION=0
 export _SUFFIX=""
 # Run unpermuted one
-python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
-python run_permutations.py --reps ${REPS}
+python run_permutations.py --configs "c102_e201_b102" --reps ${REPS}
+#python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
+#python run_permutations.py --reps ${REPS}
 

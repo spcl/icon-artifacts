@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=cc
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --time=08:00:00
+#SBATCH --time=04:00:00
 #SBATCH --output=permutations_stage4_daint_output.txt
 #SBATCH --error=permutations_stage4_daint_error.txt
 
@@ -47,6 +47,7 @@ export _SUFFIX=""
 export V2=0
 
 # Run unpermuted one
-python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
-python run_permutations.py --reps ${REPS}
+python run_cpu_permutations.py --configs "c102_e201_b102" --reps ${REPS}
+python run_cpu_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
+python run_cpu_permutations.py --reps ${REPS}
 
