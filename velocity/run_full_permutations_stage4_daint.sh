@@ -3,11 +3,11 @@
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
-#SBATCH --time=08:00:00
+#SBATCH --time=16:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --output=permutations_stage4_output.txt
-#SBATCH --error=permutations_stage4_error.txt
+#SBATCH --output=full_permutations_stage4_output.txt
+#SBATCH --error=full_permutations_stage4_error.txt
 
 spack load gcc/76jw6nu
 spack load cuda@12.9
@@ -21,8 +21,8 @@ export __HIP_PLATFORM_AMD__=0
 export HIP_PLATFORM_AMD=0
 export _TBLOCK_DIMS="32,16,1"
 
-export _STAGE=4
-mkdir -p permutations_${_STAGE:-4}
+export _STAGE=5
+mkdir -p daint_full_permutations_${_STAGE:-5}
 
 # --- Configuration ---
 CONFIGS="${CONFIGS:-}"          # empty = all

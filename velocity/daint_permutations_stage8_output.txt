@@ -1,0 +1,6 @@
+=== Permutation sweep ===
+CONFIGS:    all
+REPS:       100
+NCU:        
+UNPERMUTED: 
+=========================

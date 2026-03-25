@@ -5,14 +5,14 @@
 #SBATCH --exclusive
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --time=04:00:00
+#SBATCH --time=08:00:00
 #SBATCH --output=permutations_stage4_daint_output.txt
 #SBATCH --error=permutations_stage4_daint_error.txt
 
 spack load gcc/76jw6nu
 spack load cuda@12.9
 export _RELEASE=1
-export GENCODE_NUMBER=90
+export GENCODE_NUMBER=90a
 export OMP_NUM_THREADS=288
 export OMP_PROC_BIND=spread
 export OMP_PLACES=cores
