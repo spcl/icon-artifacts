@@ -712,7 +712,7 @@ PERMUTE_CONFIGS = {
 }
 
 CPU_PERMUTE_CONFIGS = dict()
-for conf, d in PC.items():
+for conf, d in PERMUTE_CONFIGS.items():
     pmap = {k.replace("gpu_", ""): v for k,v in d["permute_map"].items()}
     ipmap = {k.replace("gpu_", "") for k,v in d["inverse_permute_map"].items()}
 
