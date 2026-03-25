@@ -711,6 +711,18 @@ PERMUTE_CONFIGS = {
     }),
 }
 
+CPU_PERMUTE_CONFIGS = dict()
+for conf, d in PC.items():
+    pmap = {k.replace("gpu_", ""): v for k,v in d["permute_map"].items()}
+    ipmap = {k.replace("gpu_", "") for k,v in d["inverse_permute_map"].items()}
+
+    nd = {
+        "permute_map": pmap,
+        "inverse_permute_map": ipmap,
+    }
+    CPU_PERMUTE_CONFIGS[conf] = nd
+
+
 def permute_single_map_gpu(sdfg: dace.SDFG,
                            config_name: str = "single_map",
                            shuffle_map: bool = True):

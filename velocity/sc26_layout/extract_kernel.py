@@ -3,7 +3,7 @@ import dace
 from dace.transformation.layout.permute_dimensions import PermuteDimensions
 from dace.sdfg.construction_utils import move_state_after, move_state_before
 
-from sc26_layout.extract_gpu_kernel import PERMUTE_CONFIGS
+from sc26_layout.extract_gpu_kernel import CPU_PERMUTE_CONFIGS
 
 def _rm_map(state: dace.SDFGState, entry_node: dace.nodes.MapEntry):
     exit_node = state.exit_node(entry_node)
@@ -280,7 +280,7 @@ def permute_single_map(sdfg: dace.SDFG, host:bool=True, config_name: str = "sing
     assert state is not None
     sdfg.save("extracted.sdfgz", compress=True)
 
-    cfg = PERMUTE_CONFIGS[config_name]
+    cfg = CPU_PERMUTE_CONFIGS[config_name]
     pmap = cfg["permute_map"]
     inverse_pmap = cfg["inverse_permute_map"]
     PermuteDimensions(

@@ -174,7 +174,7 @@ def main():
     argp.add_argument('--compile', action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument('--unpermuted', action=argparse.BooleanOptionalAction, default=False)
     argp.add_argument('--permutations', type=str, default=None,
-                      help='Comma-separated config names from PERMUTE_CONFIGS (default: single_map)')
+                      help='Comma-separated config names from CPU_PERMUTE_CONFIGS (default: single_map)')
     args = argp.parse_args()
     if not args.optimize and not args.compile:
         args.optimize, args.compile = True, True
@@ -194,7 +194,7 @@ def main():
             sdfg.save(outfile, compress=True)
     if args.compile:
         from sc26_layout.extract_kernel import permute_single_map
-        from sc26_layout.extract_gpu_kernel import PERMUTE_CONFIGS
+        from sc26_layout.extract_gpu_kernel import CPU_PERMUTE_CONFIGS
 
         if args.permutations:
             config_names = [c.strip() for c in args.permutations.split(",")]
@@ -202,8 +202,8 @@ def main():
             config_names = []
 
         for config_name in config_names:
-            if config_name not in PERMUTE_CONFIGS:
-                print(f"Unknown config: {config_name}. Available: {list(PERMUTE_CONFIGS.keys())}")
+            if config_name not in CPU_PERMUTE_CONFIGS:
+                print(f"Unknown config: {config_name}. Available: {list(CPU_PERMUTE_CONFIGS.keys())}")
                 sys.exit(1)
 
             for shuffle_map in [True, False]:
