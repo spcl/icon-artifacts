@@ -36,7 +36,7 @@ COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}"
 
 EXE_TEMPLATE   = f"./velocity_gpu{LOWERED_SUFFIX}.stage{STAGE}_standalone_release_permuted"
 EXE_UNPERMUTED = f"./velocity_gpu{LOWERED_SUFFIX}.stage{STAGE}_standalone_release_unpermuted{LOWERED_SUFFIX}"
-OUT_DIR        = Path(f"{'beverin_' if BEVERIN else ''}{LOWERED_PREFIX}full_permutations_{STAGE}")
+OUT_DIR        = Path(f"{'beverin_' if BEVERIN else 'daint_'}{LOWERED_PREFIX}full_permutations_{STAGE}")
 
 # Internal suffix → human label mapping
 _SHUFFLE_VARIANTS = [
