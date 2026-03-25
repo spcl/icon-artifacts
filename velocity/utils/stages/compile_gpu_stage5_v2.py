@@ -203,7 +203,7 @@ def main():
     # Compile unpermuted baseline
     # ------------------------------------------------------------------
     if args.unpermuted:
-        from sc26_layout.permute_stage4 import add_timers
+        from sc26_layout.permute_stage4 import add_timers, add_symbols
 
         print(f"=== Compiling unpermuted baseline ===")
         sdfgs = {
@@ -214,6 +214,7 @@ def main():
         for name, sdfg in sdfgs.items():
             add_timers(sdfg)
             # insert_synchronization_for_profiling(sdfg)
+            add_symbols(sdfg)
             sdfg.validate()
             offload_cpu(sdfg)
             sdfg.validate()
