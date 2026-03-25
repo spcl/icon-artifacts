@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
-#SBATCH --time=04:00:00
+#SBATCH --time=08:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
 #SBATCH --output=permutations_stage6_daint_output.txt
@@ -12,7 +12,7 @@
 spack load gcc/76jw6nu
 spack load cuda@12.9
 export _RELEASE=1
-export GENCODE_NUMBER=90
+export GENCODE_NUMBER=90a
 export OMP_NUM_THREADS=288
 export OMP_PROC_BIND=spread
 export OMP_PLACES=cores

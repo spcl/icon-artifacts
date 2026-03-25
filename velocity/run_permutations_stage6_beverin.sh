@@ -10,7 +10,7 @@
 #SBATCH --error=sp_permutations_stage6_beverin_error.txt
 
 export _RELEASE=1
-export GENCODE_NUMBER=90
+export GENCODE_NUMBER=90a
 export OMP_NUM_THREADS=96
 export OMP_PROC_BIND=spread
 export OMP_PLACES=cores

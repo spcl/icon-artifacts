@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=s8_p_low
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
+#SBATCH --time=16:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --time=08:00:00
-#SBATCH --output=permutations_stage4_daint_output.txt
-#SBATCH --error=permutations_stage4_daint_error.txt
+#SBATCH --output=lowering_permutations_stage8_output.txt
+#SBATCH --error=lowering_permutations_stage8_error.txt
 
 spack load gcc/76jw6nu
 spack load cuda@12.9
@@ -19,13 +19,14 @@ export OMP_PLACES=cores
 export OMP_DISPLAY_ENV=TRUE
 export __HIP_PLATFORM_AMD__=0
 export HIP_PLATFORM_AMD=0
-export _STAGE=4
-export V2=0
-mkdir -p permutations_${_STAGE:-4}
+export RM_TIMERS=1
+export _TBLOCK_DIMS="32,16,1"
+
+export _STAGE=8
+mkdir -p permutations_${_STAGE:-8}
 
 # --- Configuration ---
-# Override via: sbatch --export=CONFIGS="c102_e012_b012,c102_e201_b201" run_sweep.sh
-CONFIGS="${CONFIGS:-}"          # empty = all 71
+CONFIGS="${CONFIGS:-}"          # empty = all
 REPS="${REPS:-100}"
 
 # --- Build arguments ---
@@ -42,11 +43,13 @@ echo "REPS:       $REPS"
 echo "NCU:        $NCU"
 echo "UNPERMUTED: $UNPERMUTED"
 echo "========================="
-export _REDUCE_BITWIDTH_TRANSFORMATION=0
-export _SUFFIX=""
-export V2=0
 
+export _REDUCE_BITWIDTH_TRANSFORMATION=1
+export _SUFFIX="lowered_full_"
+export V2=0
 # Run unpermuted one
-python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
-python run_permutations.py --reps ${REPS}
+python run_stage8_permutations.py --unpermuted --reps ${REPS}
+python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
+python run_stage8_permutations.py --configs="index_only" --reps ${REPS}
+#python run_stage8_permutations.py --reps ${REPS}
 
