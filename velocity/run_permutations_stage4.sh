@@ -47,7 +47,16 @@ export _SUFFIX=""
 export V2=0
 
 # Run unpermuted one
+<<<<<<< HEAD
+python run_permutations.py --configs "c102_e102_b102" --reps ${REPS}
+python run_permutations.py --configs "c102_e201_b102" --reps ${REPS}
+python run_permutations.py --configs "c102_e021_b120" --reps ${REPS}
+python run_permutations.py --configs "c102_e021_b021" --reps ${REPS}
+python run_permutations.py --configs "c102_e021_b021" --unpermuted --reps ${REPS}
+python run_permutations.py --reps ${REPS}
+=======
 python run_cpu_permutations.py --configs "c102_e201_b102" --reps ${REPS}
 python run_cpu_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 python run_cpu_permutations.py --reps ${REPS}
+>>>>>>> 56bf9d769bc93c4d91fcfee75ead7a2e7077b614
 
