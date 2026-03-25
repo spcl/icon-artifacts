@@ -556,8 +556,8 @@ def update_reductions(sdfg: dace.SDFG, permuted_levmask:bool=False):
                 for nd in list(nds) + [n, exit_node]:
                     g.remove_node(nd)
                 
-                begin = "(replaced_var_3 - 1)"
-                end = "(replaced_var_2 - 1)"
+                begin = "(i_startblk_var_146 - 1)"
+                end = "(i_endblk_var_147)"
 
                 if permuted_levmask:
                     D = "90"
