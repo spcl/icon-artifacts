@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
-#SBATCH --time=16:00:00
+#SBATCH --time=6:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
 #SBATCH --output=full_permutations_stage4_output.txt

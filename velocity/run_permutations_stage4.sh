@@ -5,7 +5,7 @@
 #SBATCH --exclusive
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --time=08:00:00
+#SBATCH --time=05:30:00
 #SBATCH --output=permutations_stage4_daint_output.txt
 #SBATCH --error=permutations_stage4_daint_error.txt
 
@@ -47,6 +47,10 @@ export _SUFFIX=""
 export V2=0
 
 # Run unpermuted one
-python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
+python run_permutations.py --configs "c102_e102_b102" --reps ${REPS}
+python run_permutations.py --configs "c102_e201_b102" --reps ${REPS}
+python run_permutations.py --configs "c102_e021_b120" --reps ${REPS}
+python run_permutations.py --configs "c102_e021_b021" --reps ${REPS}
+python run_permutations.py --configs "c102_e021_b021" --unpermuted --reps ${REPS}
 python run_permutations.py --reps ${REPS}
 
