@@ -294,25 +294,25 @@ PERMUTE_CONFIGS["nlev_first"] = _make_config({
     "gpu___CG_p_metrics__m_coeff2_dwdz":            [1, 0, 2],
     "gpu___CG_p_metrics__m_coeff_gradekin":         [1, 0, 2],
     # Interp: (nproma, N, nblks) → [1,0,2] → (N, nproma, nblks)
-    "gpu___CG_p_int__m_e_bln_c_s":                  [1, 0, 2],
-    "gpu___CG_p_int__m_c_lin_e":                    [1, 0, 2],
-    "gpu___CG_p_int__m_geofac_n2s":                 [1, 0, 2],
-    "gpu___CG_p_int__m_geofac_grdiv":               [1, 0, 2],
-    "gpu___CG_p_int__m_cells_aw_verts":             [1, 0, 2],
-    "gpu___CG_p_int__m_geofac_rot":                 [1, 0, 2],
+    "gpu___CG_p_int__m_e_bln_c_s":                  [0, 1, 2],
+    "gpu___CG_p_int__m_c_lin_e":                    [0, 1, 2],
+    "gpu___CG_p_int__m_geofac_n2s":                 [0, 1, 2],
+    "gpu___CG_p_int__m_geofac_grdiv":               [0, 1, 2],
+    "gpu___CG_p_int__m_cells_aw_verts":             [0, 1, 2],
+    "gpu___CG_p_int__m_geofac_rot":                 [0, 1, 2],
     # Connectivity: (nproma, nblks, N) → [2,0,1] → (N, nproma, nblks)
     # [2,1,0] was WRONG: gives (N, nblks, nproma), stride for jc = N*nblks
-    "gpu___CG_p_patch__CG_verts__m_cell_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_cell_idx":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_cell_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_edge_idx":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_edge_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_vertex_idx":     [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_vertex_blk":     [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_quad_idx":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_quad_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_neighbor_idx":   [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_neighbor_blk":   [2, 0, 1],
+    "gpu___CG_p_patch__CG_verts__m_cell_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_cell_idx":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_cell_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_edge_idx":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_edge_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_vertex_idx":     [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_vertex_blk":     [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_quad_idx":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_quad_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_neighbor_idx":   [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_neighbor_blk":   [0, 2, 1],
 })
 
 # index_only: only connectivity + interp get N-first, everything else identity
@@ -321,24 +321,25 @@ PERMUTE_CONFIGS["index_only"] = _make_config({
     # Metrics: (nproma, nlev, nblks) — no neighbor dim, identity
     # Interp: (nproma, N, nblks) → [1,0,2] → (N, nproma, nblks)
     # [0,1,2] was WRONG: identity leaves nproma first, N not first
-    "gpu___CG_p_int__m_e_bln_c_s":                  [1, 0, 2],
-    "gpu___CG_p_int__m_c_lin_e":                    [1, 0, 2],
-    "gpu___CG_p_int__m_geofac_n2s":                 [1, 0, 2],
-    "gpu___CG_p_int__m_geofac_grdiv":               [1, 0, 2],
-    "gpu___CG_p_int__m_cells_aw_verts":             [1, 0, 2],
-    "gpu___CG_p_int__m_geofac_rot":                 [1, 0, 2],
-    # Connectivity: (nproma, nblks, N) → [2,0,1] → (N, nproma, nblks) ✓
-    "gpu___CG_p_patch__CG_verts__m_cell_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_cell_idx":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_cell_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_edge_idx":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_edge_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_vertex_idx":     [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_vertex_blk":     [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_quad_idx":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_edges__m_quad_blk":       [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_neighbor_idx":   [2, 0, 1],
-    "gpu___CG_p_patch__CG_cells__m_neighbor_blk":   [2, 0, 1],
+    "gpu___CG_p_int__m_e_bln_c_s":                  [0, 1, 2],
+    "gpu___CG_p_int__m_c_lin_e":                    [0, 1, 2],
+    "gpu___CG_p_int__m_geofac_n2s":                 [0, 1, 2],
+    "gpu___CG_p_int__m_geofac_grdiv":               [0, 1, 2],
+    "gpu___CG_p_int__m_cells_aw_verts":             [0, 1, 2],
+    "gpu___CG_p_int__m_geofac_rot":                 [0, 1, 2],
+    # Connectivity: (nproma, nblks, N) → [2,0,1] → (N, nproma, nblks)
+    # [2,1,0] was WRONG: gives (N, nblks, nproma), stride for jc = N*nblks
+    "gpu___CG_p_patch__CG_verts__m_cell_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_cell_idx":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_cell_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_edge_idx":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_edge_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_vertex_idx":     [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_vertex_blk":     [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_quad_idx":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_edges__m_quad_blk":       [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_neighbor_idx":   [0, 2, 1],
+    "gpu___CG_p_patch__CG_cells__m_neighbor_blk":   [0, 2, 1],
 })
 
 # ---------------------------------------------------------------------------

@@ -364,6 +364,8 @@ _EBLK    = "gpu___CG_p_patch__CG_cells__m_edge_blk"
 _COMPUTE = [_EKINH, _KINHOR]
 _EDGE    = [_EIDX, _EBLK]
 
+
+
 def _inverse_perm(p):
     inv = [0] * len(p)
     for i, v in enumerate(p):
