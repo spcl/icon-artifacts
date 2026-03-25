@@ -424,7 +424,7 @@ def add_timers_w_states(sdfg, copy_in_state: dace.SDFGState, copy_out_state: dac
 #include <chrono>
 #include <omp.h>
 
-static constexpr int FLUSH_N     = 8192*4;
+static constexpr int FLUSH_N     = 8192;
 static constexpr int FLUSH_STEPS = 20;
 
 static double* flush_A = nullptr;
