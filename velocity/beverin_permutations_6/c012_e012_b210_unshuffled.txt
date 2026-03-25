@@ -6,29 +6,58 @@ Reading from: "data_r02b05/global_data.t1.9.data"
 Reading from: "data_r02b05/global_data.t0.9.data"
 Reading from: "data_r02b05/p_patch.9.data"
 Reading from: "data_r02b05/p_diag.t0.9.data"
-Reading from: "data_r02b05/p_diag.t1.9.data"
-Reading from: "data_r02b05/p_metrics.t1.9.data"
 Reading from: "data_r02b05/p_metrics.t0.9.data"
+Reading from: "data_r02b05/p_diag.t1.9.data"
 Reading from: "data_r02b05/p_prog.t0.9.data"
-Reading from: "data_r02b05/z_kin_hor_e.t0.9.data"
-Reading from: "data_r02b05/istep.9.data"
-Reading from: "data_r02b05/z_kin_hor_e.t1.9.data"
+Reading from: "data_r02b05/p_metrics.t1.9.data"
 Reading from: "data_r02b05/p_prog.t1.9.data"
-Reading from: "data_r02b05/ldeepatmo.9.data"
 Reading from: "data_r02b05/z_vt_ie.t0.9.data"
-Reading from: "data_r02b05/lvn_only.9.data"
+Reading from: "data_r02b05/istep.9.data"
 Reading from: "data_r02b05/z_w_concorr_me.t0.9.data"
-Reading from: "data_r02b05/ntnd.9.data"
-Reading from: "data_r02b05/z_w_concorr_me.t1.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.9.data"
+Reading from: "data_r02b05/ldeepatmo.9.data"
 Reading from: "data_r02b05/z_vt_ie.t1.9.data"
+Reading from: "data_r02b05/lvn_only.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.9.data"
+Reading from: "data_r02b05/ntnd.9.data"
 Reading from: "data_r02b05/dt_linintp_ubc.9.data"
 Reading from: "data_r02b05/dtime.9.data"
 All data read...
 Step 9 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
 MAIN PER
+
+OPENMP DISPLAY ENVIRONMENT BEGIN
+   _OPENMP='201611'
+  [host] OMP_AFFINITY_FORMAT='OMP: pid %P tid %i thread %n bound to OS proc set {%A}'
+  [host] OMP_ALLOCATOR='omp_default_mem_alloc'
+  [host] OMP_CANCELLATION='FALSE'
+  [host] OMP_DEFAULT_DEVICE='0'
+  [host] OMP_DISPLAY_AFFINITY='FALSE'
+  [host] OMP_DISPLAY_ENV='TRUE'
+  [host] OMP_DYNAMIC='FALSE'
+  [host] OMP_MAX_ACTIVE_LEVELS='1'
+  [host] OMP_MAX_TASK_PRIORITY='0'
+  [host] OMP_NESTED: deprecated; max-active-levels-var=1
+  [host] OMP_NUM_TEAMS='0'
+  [host] OMP_NUM_THREADS='96'
+  [host] OMP_PLACES='cores'
+  [host] OMP_PROC_BIND='spread'
+  [host] OMP_SCHEDULE='static'
+  [host] OMP_STACKSIZE='64M'
+  [host] OMP_TARGET_OFFLOAD=DEFAULT
+  [host] OMP_TEAMS_THREAD_LIMIT='0'
+  [host] OMP_THREAD_LIMIT='2147483647'
+  [host] OMP_TOOL='enabled'
+  [host] OMP_TOOL_LIBRARIES: value is not defined
+  [host] OMP_TOOL_VERBOSE_INIT: value is not defined
+  [host] OMP_WAIT_POLICY='PASSIVE'
+OPENMP DISPLAY ENVIRONMENT END
+
+
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11001 ms
+[Timer] Elapsed time: 0.10956 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -37,7 +66,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10001 ms
+[Timer] Elapsed time: 0.10084 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -46,7 +75,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.099 ms
+[Timer] Elapsed time: 0.10208 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -55,7 +84,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09976 ms
+[Timer] Elapsed time: 0.10164 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -64,7 +93,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09956 ms
+[Timer] Elapsed time: 0.09824 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -73,7 +102,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09812 ms
+[Timer] Elapsed time: 0.1008 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -82,7 +111,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10008 ms
+[Timer] Elapsed time: 0.1002 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -91,7 +120,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10033 ms
+[Timer] Elapsed time: 0.09872 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -100,7 +129,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10105 ms
+[Timer] Elapsed time: 0.10096 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -109,7 +138,34 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09972 ms
+[Timer] Elapsed time: 0.10224 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10276 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09992 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.0988 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -127,7 +183,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1002 ms
+[Timer] Elapsed time: 0.09872 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -136,133 +192,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09976 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10032 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.09916 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10044 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10104 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10184 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.09892 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1002 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10024 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10272 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.09852 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1012 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10056 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10012 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10044 ms
+[Timer] Elapsed time: 0.09984 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -280,7 +210,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10016 ms
+[Timer] Elapsed time: 0.1028 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -289,7 +219,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09936 ms
+[Timer] Elapsed time: 0.09876 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -298,7 +228,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10253 ms
+[Timer] Elapsed time: 0.09792 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -307,7 +237,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10197 ms
+[Timer] Elapsed time: 0.10004 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -316,7 +246,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.0986 ms
+[Timer] Elapsed time: 0.10212 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -325,7 +255,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.101 ms
+[Timer] Elapsed time: 0.09928 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -334,7 +264,43 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09944 ms
+[Timer] Elapsed time: 0.10148 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1006 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10176 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10096 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -352,7 +318,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10033 ms
+[Timer] Elapsed time: 0.09916 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -361,7 +327,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10064 ms
+[Timer] Elapsed time: 0.09936 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -370,7 +336,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09944 ms
+[Timer] Elapsed time: 0.10024 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -379,7 +345,241 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09968 ms
+[Timer] Elapsed time: 0.10056 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10116 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10232 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10076 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10172 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09956 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09976 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10048 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10208 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10188 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09884 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.0984 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1008 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10368 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09976 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10028 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09948 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.0986 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10188 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09908 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09992 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09976 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09812 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10028 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -406,7 +606,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09944 ms
+[Timer] Elapsed time: 0.10156 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -415,7 +615,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09652 ms
+[Timer] Elapsed time: 0.10024 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -424,7 +624,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.09972 ms
+[Timer] Elapsed time: 0.10084 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -433,7 +633,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11272 ms
+[Timer] Elapsed time: 0.09768 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -442,7 +642,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10632 ms
+[Timer] Elapsed time: 0.10004 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -451,7 +651,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1092 ms
+[Timer] Elapsed time: 0.09908 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -460,7 +660,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11028 ms
+[Timer] Elapsed time: 0.10224 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -469,7 +669,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1086 ms
+[Timer] Elapsed time: 0.10004 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -478,7 +678,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11068 ms
+[Timer] Elapsed time: 0.1008 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -487,7 +687,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10933 ms
+[Timer] Elapsed time: 0.0998 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -496,7 +696,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1082 ms
+[Timer] Elapsed time: 0.10036 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -505,7 +705,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10904 ms
+[Timer] Elapsed time: 0.10008 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -514,7 +714,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10495 ms
+[Timer] Elapsed time: 0.09992 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -523,7 +723,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11341 ms
+[Timer] Elapsed time: 0.09948 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -532,7 +732,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10428 ms
+[Timer] Elapsed time: 0.09704 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -541,7 +741,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11144 ms
+[Timer] Elapsed time: 0.10336 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -550,7 +750,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10328 ms
+[Timer] Elapsed time: 0.10088 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -559,7 +759,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10524 ms
+[Timer] Elapsed time: 0.09992 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -568,7 +768,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11101 ms
+[Timer] Elapsed time: 0.10072 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -577,7 +777,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10944 ms
+[Timer] Elapsed time: 0.09908 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -586,7 +786,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10556 ms
+[Timer] Elapsed time: 0.10168 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -595,7 +795,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1038 ms
+[Timer] Elapsed time: 0.09768 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -604,7 +804,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1088 ms
+[Timer] Elapsed time: 0.10016 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -613,7 +813,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10676 ms
+[Timer] Elapsed time: 0.09772 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -622,7 +822,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11212 ms
+[Timer] Elapsed time: 0.09876 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -631,7 +831,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10844 ms
+[Timer] Elapsed time: 0.10024 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -640,7 +840,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11064 ms
+[Timer] Elapsed time: 0.09932 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -649,7 +849,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10416 ms
+[Timer] Elapsed time: 0.10128 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -658,7 +858,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10472 ms
+[Timer] Elapsed time: 0.10268 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -667,7 +867,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10888 ms
+[Timer] Elapsed time: 0.0996 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -676,7 +876,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10752 ms
+[Timer] Elapsed time: 0.10104 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -685,7 +885,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10753 ms
+[Timer] Elapsed time: 0.09752 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -694,7 +894,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10624 ms
+[Timer] Elapsed time: 0.09776 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -703,7 +903,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10424 ms
+[Timer] Elapsed time: 0.10244 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -712,7 +912,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10812 ms
+[Timer] Elapsed time: 0.09984 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -721,7 +921,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.10384 ms
+[Timer] Elapsed time: 0.10024 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -730,7 +930,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1082 ms
+[Timer] Elapsed time: 0.09876 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -739,7 +939,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.1078 ms
+[Timer] Elapsed time: 0.10012 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -748,178 +948,7 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 [Timer] Start recorded...
-[Timer] Elapsed time: 0.11408 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10769 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.11188 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.11148 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1164 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1068 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10904 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10886 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1086 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10968 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10644 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10936 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10781 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1068 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1064 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.1084 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.11012 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10501 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.10873 ms
-[Print] z_ekinh:
-  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
-start_block = 1, end_block = 1
-  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
-start_block = 1, end_block = 1
-  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
-start_block = 1, end_block = 1
-[Timer] Start recorded...
-[Timer] Elapsed time: 0.11313 ms
+[Timer] Elapsed time: 0.10112 ms
 [Print] z_ekinh:
   [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
 start_block = 1, end_block = 1
@@ -928,17 +957,17 @@ start_block = 1, end_block = 1
   [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
 start_block = 1, end_block = 1
 Step 9 done.
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.got"
 Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.want"
 Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.want"
 Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.got"
 Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.want"
