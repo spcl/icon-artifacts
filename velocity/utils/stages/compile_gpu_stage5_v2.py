@@ -23,6 +23,26 @@ from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_incon
 from utils.merge_maps import merge_maps_in_sdfg
 from utils.change_array_dtypes import change_array_dtypes
 from dace.transformation.passes.constant_propagation import ConstantPropagation
+import argparse
+import dace
+from dace.codegen.control_flow import CodeBlock, ConditionalBlock, ControlFlowRegion
+from dace.transformation.passes import GPUKernelLaunchRestructure
+from dace.transformation.passes.to_gpu import ToGPU
+import utils.config as config
+import utils.stages.common as common
+from utils.add_gpu_copies_to_flattener import add_gpu_copies_to_flattener
+from utils.find import find_node_by_name
+from utils.move_ifs_inside_maps import move_ifs_inside_maps
+from utils.move_lib_schedules import move_lib_schedules
+from utils.pre_gpu_fixes import pre_gpu_fix
+from utils.prune_unused_inputs_outputs import prune_unused_inputs_outputs
+from utils.remove_unused_inconnectors_from_nestedsdfg import remove_unused_inconnectors_from_nestedsdfg
+from utils.segmented_reduction import to_segmented_reduction
+from utils.rm_segmented_reduce import rm_segmented_reduce
+from utils.profiling_patches import insert_timers_for_profiling, insert_synchronization_for_profiling, insert_event_timers_for_profiling
+import copy
+import os
+from dace.transformation.dataflow import MapCollapse
 
 STAGE_ID = 5
 def merge_its29_30_and_its31(sdfg: dace.SDFG):
@@ -165,6 +185,23 @@ def optimization_action(sdfg):
     ConstantPropagation().apply_pass(sdfg, {})
     sdfg.simplify()
     sdfg.validate()
+
+    sdfg.validate()
+
+    state = {s for s in sdfg.all_states() if s.label.startswith("entry_interface")}.pop()
+    sdfg.add_state_before(state, "predom_ei", is_start_block=True )
+    state.sdfg = sdfg
+    state.parent_graph = sdfg
+    pre_gpu_fix(sdfg)
+
+    sdfg.validate()
+    move_ifs_inside_maps(sdfg)
+    flatten_lib, _ = find_node_by_name(sdfg, "flatten")
+    deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
+    InlineSDFGs().apply_pass(sdfg, {})
+    sdfg.apply_transformations_repeated(MapCollapse)
+    sdfg.validate()
+
     return sdfg
 
 import sys
