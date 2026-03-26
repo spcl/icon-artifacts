@@ -1,3 +1,872 @@
 Will be reading data from: "data_r02b05"
 Will be writing got and want files to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05"
 Reading data for 9...
+Reading from: "data_r02b05/global_data.t0.9.data"
+Reading from: "data_r02b05/p_int.9.data"
+Reading from: "data_r02b05/global_data.t1.9.data"
+Reading from: "data_r02b05/p_diag.t1.9.data"
+Reading from: "data_r02b05/p_metrics.t0.9.data"
+Reading from: "data_r02b05/p_patch.9.data"
+Reading from: "data_r02b05/p_metrics.t1.9.data"
+Reading from: "data_r02b05/p_diag.t0.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.9.data"
+Reading from: "data_r02b05/z_vt_ie.t0.9.data"
+Reading from: "data_r02b05/z_vt_ie.t1.9.data"
+Reading from: "data_r02b05/p_prog.t0.9.data"
+Reading from: "data_r02b05/istep.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.9.data"
+Reading from: "data_r02b05/p_prog.t1.9.data"
+Reading from: "data_r02b05/lvn_only.9.data"
+Reading from: "data_r02b05/ldeepatmo.9.data"
+Reading from: "data_r02b05/ntnd.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.9.data"
+Reading from: "data_r02b05/dtime.9.data"
+Reading from: "data_r02b05/dt_linintp_ubc.9.data"
+All data read...
+Step 9 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+MAIN PER
+
+OPENMP DISPLAY ENVIRONMENT BEGIN
+   _OPENMP='201611'
+  [host] OMP_AFFINITY_FORMAT='OMP: pid %P tid %i thread %n bound to OS proc set {%A}'
+  [host] OMP_ALLOCATOR='omp_default_mem_alloc'
+  [host] OMP_CANCELLATION='FALSE'
+  [host] OMP_DEFAULT_DEVICE='0'
+  [host] OMP_DISPLAY_AFFINITY='FALSE'
+  [host] OMP_DISPLAY_ENV='TRUE'
+  [host] OMP_DYNAMIC='FALSE'
+  [host] OMP_MAX_ACTIVE_LEVELS='1'
+  [host] OMP_MAX_TASK_PRIORITY='0'
+  [host] OMP_NESTED: deprecated; max-active-levels-var=1
+  [host] OMP_NUM_TEAMS='0'
+  [host] OMP_NUM_THREADS='288'
+  [host] OMP_PLACES='cores'
+  [host] OMP_PROC_BIND='spread'
+  [host] OMP_SCHEDULE='static'
+  [host] OMP_STACKSIZE='16M'
+  [host] OMP_TARGET_OFFLOAD=DEFAULT
+  [host] OMP_TEAMS_THREAD_LIMIT='0'
+  [host] OMP_THREAD_LIMIT='2147483647'
+  [host] OMP_TOOL='enabled'
+  [host] OMP_TOOL_LIBRARIES: value is not defined
+  [host] OMP_TOOL_VERBOSE_INIT: value is not defined
+  [host] OMP_WAIT_POLICY='PASSIVE'
+OPENMP DISPLAY ENVIRONMENT END
+
+
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.39227 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.63563 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.43317 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.05734 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.50942 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.39947 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.08422 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.49554 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.39202 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.05085 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.41989 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.37743 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.997184 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.49585 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.31653 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.975616 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.43883 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.32309 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.963201 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.43829 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.37739 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.96144 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.38875 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.32469 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.96416 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.46242 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.28284 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.976384 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.4301 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.32245 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.982336 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.49122 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.35535 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.29484 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.4419 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.31615 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.983648 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.43199 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.32936 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.983936 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.37189 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.35013 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.01565 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.38258 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.31967 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.980448 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.41083 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.31881 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.00653 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.40335 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.3446 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.961505 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.38536 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.29644 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.97344 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.56932 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.3276 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.00227 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.40181 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.27909 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.977856 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.39445 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.3198 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.0079 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.38908 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.33042 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.04217 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.38923 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.33308 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.958369 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.46504 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.36552 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.04374 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.40229 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.3262 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.990048 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.37695 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.27567 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.991039 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.43419 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.26287 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.04717 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.45682 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.23906 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.03603 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.3949 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.334 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.966561 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.41848 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.29327 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.05657 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.39035 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.414 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.959233 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.41326 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.29228 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.00154 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.3829 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.35298 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+[Print] z_kin_hor_e:
+  [0,0,(_for_it_22-1)] = 2.81836588006701154e-05
+  [1,1,(_for_it_22-1)] = 2.97386909807319938e-04
+[Timer] Start recorded...
+[Timer] Elapsed time: 1.03798 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+  [1,1,(_for_it_22-1)] = 3.12412518946396899e-03
+Step 9 done.
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_9.want"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.got"
+Writing to: "/capstor/scratch/cscs/ybudanaz/icon-artifacts/velocity/gotwant/data_r02b05/global_data_9.want"
