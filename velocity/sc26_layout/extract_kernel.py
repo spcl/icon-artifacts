@@ -54,67 +54,117 @@ def add_timer_around(sdfg: dace.SDFG, state: dace.SDFGState, host: bool = False)
 
     ct1 = dace.nodes.Tasklet(
         "c1", inputs={}, outputs={},
-        code="gpu_timer_split();",
+        code="cpu_timer_split();",
         language=dace.dtypes.Language.CPP,
         side_effects=True,
-        code_global="""
-static void gpu_timer_split() {
-    static cudaEvent_t start, stop;
+        code_global=f"""
+
+#include <iostream>
+#include <chrono>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
+static constexpr int FLUSH_N        = 8192*4;
+static constexpr int FLUSH_STEPS    = 20;
+
+static double* flush_A = nullptr;
+static double* flush_B = nullptr;
+
+static void jacobi2d_cpu(const double* __restrict__ src,
+                         double* __restrict__ dst,
+                         int N)
+{{
+    for (int i = 1; i < N - 1; ++i) {{
+        for (int j = 1; j < N - 1; ++j) {{
+            dst[i * N + j] = 0.25 * (src[(i - 1) * N + j] +
+                                      src[(i + 1) * N + j] +
+                                      src[i * N + (j - 1)] +
+                                      src[i * N + (j + 1)]);
+        }}
+    }}
+}}
+
+static void jacobi2d_init_cpu(double* A, int N)
+{{
+    for (int i = 0; i < N * N; ++i) {{
+        int r = i / N;
+        int c = i % N;
+        A[i] = (r == 0 || r == N - 1 || c == 0 || c == N - 1) ? 1.0 : 0.0;
+    }}
+}}
+
+static void flush_all_caches()
+{{
+    size_t total = (size_t)FLUSH_N * FLUSH_N;
+    size_t bytes = total * sizeof(double);
+
+    if (!flush_A) {{
+        flush_A = (double*)malloc(bytes);
+        flush_B = (double*)malloc(bytes);
+    }}
+
+    jacobi2d_init_cpu(flush_A, FLUSH_N);
+    jacobi2d_init_cpu(flush_B, FLUSH_N);
+
+    double* src = flush_A;
+    double* dst = flush_B;
+
+    for (int step = 0; step < FLUSH_STEPS; ++step) {{
+        jacobi2d_cpu(src, dst, FLUSH_N);
+        double* tmp = src;
+        src = dst;
+        dst = tmp;
+    }}
+
+    srand(42);
+    int spots[4][2];
+    for (int k = 0; k < 4; ++k) {{
+        spots[k][0] = 1 + rand() % (FLUSH_N - 2);
+        spots[k][1] = 1 + rand() % (FLUSH_N - 2);
+    }}
+
+    double hash = 0.0;
+    for (int k = 0; k < 4; ++k) {{
+        hash += src[spots[k][0] * FLUSH_N + spots[k][1]];
+    }}
+
+    static bool printed = false;
+    if (!printed) {{
+        std::cout << "[flush] jacobi2d hash = " << hash << std::endl;
+        printed = true;
+    }}
+}}
+
+
+static void cpu_timer_split() {{
+    static std::chrono::high_resolution_clock::time_point t_start;
     static bool is_first_call = true;
 
-    if (is_first_call) {
-        // Initialize events on the first call
-        cudaDeviceSynchronize();
-
+    if (is_first_call) {{
         is_first_call = false;
+        flush_all_caches();
+
         std::cout << "[Timer] Start recorded..." << std::endl;
 
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
+        t_start = std::chrono::high_resolution_clock::now();
+    }} else {{
+        auto t_stop = std::chrono::high_resolution_clock::now();
 
-        // Record the start point on the default stream
-        cudaEventRecord(start, 0);
-    } else {
-        // Record the stop point
-        cudaEventRecord(stop, 0);
-
-        // Wait for the GPU to actually reach the stop event
-        cudaEventSynchronize(stop);
-
-        float milliseconds = 0;
-        cudaEventElapsedTime(&milliseconds, start, stop);
+        double milliseconds = std::chrono::duration<double, std::milli>(t_stop - t_start).count();
 
         std::cout << "[Timer] Elapsed time: " << milliseconds << " ms" << std::endl;
 
-        // Clean up and reset for potential future use
-        cudaEventDestroy(start);
-        cudaEventDestroy(stop);
-        is_first_call = true; 
-    }
-}
-""" if host is False else
-"""
-static void gpu_timer_split() {
-    static std::chrono::high_resolution_clock::time_point start;
-    static bool is_first_call = true;
-    if (is_first_call) {
-        cudaDeviceSynchronize();
-        start = std::chrono::high_resolution_clock::now();
-        is_first_call = false;
-        std::cout << "[Timer] Start recorded..." << std::endl;
-    } else {
-        cudaDeviceSynchronize();
-        auto stop = std::chrono::high_resolution_clock::now();
-        double milliseconds = std::chrono::duration<double, std::milli>(stop - start).count();
-        std::cout << "[Timer] Elapsed time: " << milliseconds << " ms" << std::endl;
+        flush_all_caches();
+
         is_first_call = true;
-    }
-}
+    }}
+}}
 """
     )
     ct2 = dace.nodes.Tasklet(
         "c1", inputs={}, outputs={},
-        code="gpu_timer_split();",
+        code="cpu_timer_split();",
         language=dace.dtypes.Language.CPP,
         code_global="",
         side_effects=True,

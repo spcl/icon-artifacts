@@ -1,0 +1,960 @@
+Will be reading data from: "data_r02b05"
+Will be writing got and want files to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05"
+Reading data for 9...
+Reading from: "data_r02b05/p_int.9.data"
+Reading from: "data_r02b05/global_data.t0.9.data"
+Reading from: "data_r02b05/p_patch.9.data"
+Reading from: "data_r02b05/global_data.t1.9.data"
+Reading from: "data_r02b05/p_diag.t1.9.data"
+Reading from: "data_r02b05/p_diag.t0.9.data"
+Reading from: "data_r02b05/p_prog.t0.9.data"
+Reading from: "data_r02b05/p_metrics.t0.9.data"
+Reading from: "data_r02b05/p_metrics.t1.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t0.9.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.9.data"
+Reading from: "data_r02b05/z_vt_ie.t0.9.data"
+Reading from: "data_r02b05/z_w_concorr_me.t0.9.data"
+Reading from: "data_r02b05/z_vt_ie.t1.9.data"
+Reading from: "data_r02b05/ldeepatmo.9.data"
+Reading from: "data_r02b05/istep.9.data"
+Reading from: "data_r02b05/p_prog.t1.9.data"
+Reading from: "data_r02b05/lvn_only.9.data"
+Reading from: "data_r02b05/ntnd.9.data"
+Reading from: "data_r02b05/dt_linintp_ubc.9.data"
+Reading from: "data_r02b05/dtime.9.data"
+All data read...
+Step 9 variables, extra_diffu: 1, istep: 2, lvn_only: 0, ldeepatmo: 0
+MAIN PER
+
+OPENMP DISPLAY ENVIRONMENT BEGIN
+   _OPENMP='201611'
+  [host] OMP_AFFINITY_FORMAT='OMP: pid %P tid %i thread %n bound to OS proc set {%A}'
+  [host] OMP_ALLOCATOR='omp_default_mem_alloc'
+  [host] OMP_CANCELLATION='FALSE'
+  [host] OMP_DEFAULT_DEVICE='0'
+  [host] OMP_DISPLAY_AFFINITY='FALSE'
+  [host] OMP_DISPLAY_ENV='TRUE'
+  [host] OMP_DYNAMIC='FALSE'
+  [host] OMP_MAX_ACTIVE_LEVELS='1'
+  [host] OMP_MAX_TASK_PRIORITY='0'
+  [host] OMP_NESTED: deprecated; max-active-levels-var=1
+  [host] OMP_NUM_TEAMS='0'
+  [host] OMP_NUM_THREADS='96'
+  [host] OMP_PLACES='cores'
+  [host] OMP_PROC_BIND='spread'
+  [host] OMP_SCHEDULE='static'
+  [host] OMP_STACKSIZE='64M'
+  [host] OMP_TARGET_OFFLOAD=DEFAULT
+  [host] OMP_TEAMS_THREAD_LIMIT='0'
+  [host] OMP_THREAD_LIMIT='2147483647'
+  [host] OMP_TOOL='enabled'
+  [host] OMP_TOOL_LIBRARIES: value is not defined
+  [host] OMP_TOOL_VERBOSE_INIT: value is not defined
+  [host] OMP_WAIT_POLICY='PASSIVE'
+OPENMP DISPLAY ENVIRONMENT END
+
+
+[flush] jacobi2d hash = 0
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.850644 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10812 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10572 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10305 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10457 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10268 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10377 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10384 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10472 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10072 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10296 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1012 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10328 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10256 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10261 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10116 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10329 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10276 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10448 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10577 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10185 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10261 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10364 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10224 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10104 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10105 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10324 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10636 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09988 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10209 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10004 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10616 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10168 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10324 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10132 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10076 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10117 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1037 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10336 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10196 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.101 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10628 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10356 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10272 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10316 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1028 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1022 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09948 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10172 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10321 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10212 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10404 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1031 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10068 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.0998 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10572 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10212 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10416 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10356 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.09988 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10229 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10201 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10652 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10745 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10116 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10457 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10225 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1052 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10304 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10112 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10136 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.102 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10136 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10272 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.103 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10118 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10652 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10112 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10352 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1016 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10192 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10204 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10612 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10488 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1032 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.102 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10196 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10392 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10476 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10092 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10324 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10272 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.1034 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10436 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10032 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10294 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10044 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10076 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+[Timer] Start recorded...
+[Timer] Elapsed time: 0.10576 ms
+[Print] z_ekinh:
+  [0,0,(_for_it_22-1)] = 1.70281939464071198e-04
+start_block = 1, end_block = 1
+  [1,1,(_for_it_22-1)] = 3.12412518946396942e-03
+start_block = 1, end_block = 1
+  [4,4,(_for_it_22-1)] = 1.99536712157920362e-02
+start_block = 1, end_block = 1
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  map::at
