@@ -26,7 +26,7 @@ from utils.create_profile_sdfg import create_profile_sdfg
 
 STAGE_ID = 8
 BEVERIN = os.getenv("BEVERIN", "0") == "1"
-_TBLOCK_DIM = "32,16,1" if BEVERIN else "32,16,1"
+_TBLOCK_DIM = "32,4,1" if BEVERIN else "32,16,1"
 
 
 def get_used_and_const_arrays(sdfg: dace.SDFG):

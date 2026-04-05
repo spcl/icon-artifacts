@@ -219,9 +219,8 @@ def main():
                     nsdfgs[name] = sdfg
                 suffix = f"_permuted_{config_name}_{shuffle_label}"
                 BEVERIN = os.getenv("BEVERIN", "0") == "1"
-                tblock_dim = "32,16,1" if not BEVERIN else "64,8,1"
                 common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-                    name_suffix=suffix, main_name="main_per.cu", tblock_dim=tblock_dim,
+                    name_suffix=suffix, main_name="main_per.cu", tblock_dim="32,4,1",
                     stage_suffix=suffix)
 
     if args.unpermuted:
@@ -237,7 +236,7 @@ def main():
             sdfg.validate()
             nsdfgs[name] = sdfg
         common.compile_action(STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="32,16,1",
+            name_suffix="_unpermuted", main_name="main_per.cu", tblock_dim="32,4,1",
             stage_suffix="_unpermuted")
 
 if __name__ == "__main__":
