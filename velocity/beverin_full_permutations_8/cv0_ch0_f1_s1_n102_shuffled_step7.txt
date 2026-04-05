@@ -2,26 +2,26 @@ Will be reading data from: "data_r02b05"
 Will be writing got and want files to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05"
 Reading data for 7...
 Reading from: "data_r02b05/p_diag.t0.7.data"
-Reading from: "data_r02b05/global_data.t0.7.data"
-Reading from: "data_r02b05/p_diag.t1.7.data"
-Reading from: "data_r02b05/p_patch.7.data"
-Reading from: "data_r02b05/p_int.7.data"
-Reading from: "data_r02b05/p_metrics.t0.7.data"
-Reading from: "data_r02b05/p_metrics.t1.7.data"
 Reading from: "data_r02b05/global_data.t1.7.data"
-Reading from: "data_r02b05/p_prog.t1.7.data"
+Reading from: "data_r02b05/global_data.t0.7.data"
+Reading from: "data_r02b05/p_int.7.data"
+Reading from: "data_r02b05/p_patch.7.data"
+Reading from: "data_r02b05/p_metrics.t0.7.data"
+Reading from: "data_r02b05/p_diag.t1.7.data"
 Reading from: "data_r02b05/p_prog.t0.7.data"
-Reading from: "data_r02b05/z_kin_hor_e.t1.7.data"
+Reading from: "data_r02b05/p_metrics.t1.7.data"
 Reading from: "data_r02b05/z_kin_hor_e.t0.7.data"
-Reading from: "data_r02b05/istep.7.data"
-Reading from: "data_r02b05/z_vt_ie.t1.7.data"
-Reading from: "data_r02b05/ldeepatmo.7.data"
-Reading from: "data_r02b05/z_w_concorr_me.t1.7.data"
+Reading from: "data_r02b05/p_prog.t1.7.data"
 Reading from: "data_r02b05/z_vt_ie.t0.7.data"
 Reading from: "data_r02b05/z_w_concorr_me.t0.7.data"
+Reading from: "data_r02b05/istep.7.data"
+Reading from: "data_r02b05/z_kin_hor_e.t1.7.data"
+Reading from: "data_r02b05/z_vt_ie.t1.7.data"
+Reading from: "data_r02b05/ldeepatmo.7.data"
+Reading from: "data_r02b05/lvn_only.7.data"
+Reading from: "data_r02b05/z_w_concorr_me.t1.7.data"
 Reading from: "data_r02b05/ntnd.7.data"
 Reading from: "data_r02b05/dt_linintp_ubc.7.data"
-Reading from: "data_r02b05/lvn_only.7.data"
 Reading from: "data_r02b05/dtime.7.data"
 All data read...
 Step 7 variables, extra_diffu: 1, istep: 1, lvn_only: 1, ldeepatmo: 0
@@ -57,416 +57,403 @@ OPENMP DISPLAY ENVIRONMENT END
 
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.64818 ms
+[Timer] Elapsed time: 3.69696 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69991 ms
+[Timer] Elapsed time: 3.695 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68962 ms
+[Timer] Elapsed time: 3.60589 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73422 ms
+[Timer] Elapsed time: 3.71637 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.79696 ms
+[Timer] Elapsed time: 3.60639 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.66358 ms
+[Timer] Elapsed time: 3.66421 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70472 ms
+[Timer] Elapsed time: 3.70576 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.6811 ms
+[Timer] Elapsed time: 3.62161 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67945 ms
+[Timer] Elapsed time: 3.69961 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68271 ms
+[Timer] Elapsed time: 3.63799 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.654 ms
+[Timer] Elapsed time: 3.64177 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.75061 ms
+[Timer] Elapsed time: 3.64557 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.66547 ms
+[Timer] Elapsed time: 3.66389 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68739 ms
+[Timer] Elapsed time: 3.68913 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70362 ms
+[Timer] Elapsed time: 3.6383 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69484 ms
+[Timer] Elapsed time: 3.64154 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.74872 ms
+[Timer] Elapsed time: 3.6734 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69494 ms
+[Timer] Elapsed time: 3.63257 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70099 ms
+[Timer] Elapsed time: 3.63945 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70694 ms
+[Timer] Elapsed time: 3.58485 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71198 ms
+[Timer] Elapsed time: 3.5718 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68571 ms
+[Timer] Elapsed time: 3.67915 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.76818 ms
+[Timer] Elapsed time: 3.62787 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.65638 ms
+[Timer] Elapsed time: 3.67069 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69838 ms
+[Timer] Elapsed time: 3.64653 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.72102 ms
+[Timer] Elapsed time: 3.59583 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69674 ms
+[Timer] Elapsed time: 3.64734 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.72588 ms
+[Timer] Elapsed time: 3.6407 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71264 ms
+[Timer] Elapsed time: 3.60073 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68954 ms
+[Timer] Elapsed time: 3.62669 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.65562 ms
+[Timer] Elapsed time: 3.63596 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.72451 ms
+[Timer] Elapsed time: 3.72825 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67785 ms
+[Timer] Elapsed time: 3.6953 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67053 ms
+[Timer] Elapsed time: 3.67625 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.6965 ms
+[Timer] Elapsed time: 3.65921 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.76256 ms
+[Timer] Elapsed time: 3.67943 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.66875 ms
+[Timer] Elapsed time: 3.75538 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67999 ms
+[Timer] Elapsed time: 3.70225 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.7424 ms
+[Timer] Elapsed time: 3.71372 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.64458 ms
+[Timer] Elapsed time: 3.63553 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70174 ms
+[Timer] Elapsed time: 3.67322 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.72206 ms
+[Timer] Elapsed time: 3.70317 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67386 ms
+[Timer] Elapsed time: 3.68077 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73862 ms
+[Timer] Elapsed time: 3.59109 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71635 ms
+[Timer] Elapsed time: 3.6745 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.75384 ms
+[Timer] Elapsed time: 3.65641 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70378 ms
+[Timer] Elapsed time: 3.69426 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71128 ms
+[Timer] Elapsed time: 3.67457 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67666 ms
+[Timer] Elapsed time: 3.66321 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68348 ms
+[Timer] Elapsed time: 3.65625 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.74734 ms
+[Timer] Elapsed time: 3.65713 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68442 ms
+[Timer] Elapsed time: 3.69029 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70942 ms
+[Timer] Elapsed time: 3.66617 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.61827 ms
+[Timer] Elapsed time: 3.52551 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.74098 ms
+[Timer] Elapsed time: 3.71001 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73843 ms
+[Timer] Elapsed time: 3.69437 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73597 ms
+[Timer] Elapsed time: 3.68949 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70025 ms
+[Timer] Elapsed time: 3.64202 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73128 ms
+[Timer] Elapsed time: 3.61378 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69158 ms
+[Timer] Elapsed time: 3.65309 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.76821 ms
+[Timer] Elapsed time: 3.64145 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71496 ms
+[Timer] Elapsed time: 3.59427 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.66819 ms
+[Timer] Elapsed time: 3.53933 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.7061 ms
+[Timer] Elapsed time: 3.57357 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73294 ms
+[Timer] Elapsed time: 3.63659 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.77587 ms
+[Timer] Elapsed time: 3.65629 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.73344 ms
+[Timer] Elapsed time: 3.67201 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68231 ms
+[Timer] Elapsed time: 3.69509 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.76218 ms
+[Timer] Elapsed time: 3.67997 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.69919 ms
+[Timer] Elapsed time: 3.60998 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.64632 ms
+[Timer] Elapsed time: 3.66785 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.75994 ms
+[Timer] Elapsed time: 3.64625 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68287 ms
+[Timer] Elapsed time: 3.64657 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68114 ms
+[Timer] Elapsed time: 3.67897 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.64811 ms
+[Timer] Elapsed time: 3.70169 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68564 ms
+[Timer] Elapsed time: 3.70363 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.68658 ms
+[Timer] Elapsed time: 3.71342 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.65683 ms
+[Timer] Elapsed time: 3.69981 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.67738 ms
+[Timer] Elapsed time: 3.72649 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.66123 ms
+[Timer] Elapsed time: 3.55173 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70047 ms
+[Timer] Elapsed time: 3.65527 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.61742 ms
+[Timer] Elapsed time: 3.70237 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.65123 ms
+[Timer] Elapsed time: 3.67985 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.7004 ms
+[Timer] Elapsed time: 3.67005 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.81386 ms
+[Timer] Elapsed time: 3.69866 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.66574 ms
+[Timer] Elapsed time: 3.68369 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.6431 ms
+[Timer] Elapsed time: 3.608 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71292 ms
+[Timer] Elapsed time: 3.66885 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71388 ms
+[Timer] Elapsed time: 3.58073 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.59396 ms
+[Timer] Elapsed time: 3.67961 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.56502 ms
+[Timer] Elapsed time: 3.54961 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.75634 ms
+[Timer] Elapsed time: 3.56849 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.74455 ms
+[Timer] Elapsed time: 3.69036 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.70802 ms
+[Timer] Elapsed time: 3.65237 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.76317 ms
+[Timer] Elapsed time: 3.71233 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.75908 ms
+[Timer] Elapsed time: 3.65789 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.71736 ms
+[Timer] Elapsed time: 3.63195 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.76794 ms
+[Timer] Elapsed time: 3.60205 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.72595 ms
+[Timer] Elapsed time: 3.66177 ms
 [flush] jacobi2d hash = 0
 [flush] jacobi2d hash = 0
 [Timer] Start recorded...
-[Timer] Elapsed time: 3.75404 ms
+[Timer] Elapsed time: 3.68151 ms
 [flush] jacobi2d hash = 0
-Step 7 done.
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_7.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_diag_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/global_data_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/global_data_7.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_metrics_7.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_w_concorr_me_7.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_7.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_vt_ie_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/p_prog_7.want"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_7.got"
-Writing to: "/capstor/scratch/cscs/ybudanaz/beverin/icon-artifacts/velocity/gotwant/data_r02b05/z_kin_hor_e_7.want"
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  map::at
