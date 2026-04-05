@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=s4_p_single
+#SBATCH --job-name=s4_p1
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
-#SBATCH --time=07:00:00
+#SBATCH --time=10:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
 #SBATCH --output=sp_permutations_stage4_beverin_output.txt
@@ -31,7 +31,7 @@ export LDFLAGS="-L$ROCM_HOME/lib -L$ROCM_HOME/lib64"
 export CUPY_INSTALL_USE_HIP=1
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
-
+export _TBLOCK_DIMS="32,4,1"
 
 export LLVM_HOME=/opt/rocm/llvm/
 export PATH=$LLVM_HOME/bin:$PATH
@@ -78,7 +78,8 @@ export _SUFFIX=""
 export V2=0
 
 # Run unpermuted one
-python run_cpu_permutations.py --configs "c102_e201_b102" --reps ${REPS}
 python run_cpu_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
-python run_permutations.py --reps ${REPS}
+python run_cpu_permutations.py --configs "c102_e021_b012" --reps ${REPS}
+python run_cpu_permutations.py --configs "c102_e201_b102" --reps ${REPS}
+#python run_permutations.py --reps ${REPS}
 

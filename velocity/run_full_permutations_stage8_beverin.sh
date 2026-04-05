@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
-#SBATCH --time=24:00:00
+#SBATCH --time=18:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
 #SBATCH --output=permutations_stage8_beverin_output.txt
@@ -32,7 +32,7 @@ export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
 export _STAGE=8
 export RM_TIMERS=1
-export _TBLOCK_DIMS="32,16,1"
+export _TBLOCK_DIMS="32,4,1"
 
 
 export LLVM_HOME=/opt/rocm/llvm/
@@ -81,5 +81,5 @@ export V2=0
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
 python run_stage8_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage8_permutations.py --unpermuted --reps ${REPS}
-python run_stage8_permutations.py --reps ${REPS}
+#python run_stage8_permutations.py --reps ${REPS}
 

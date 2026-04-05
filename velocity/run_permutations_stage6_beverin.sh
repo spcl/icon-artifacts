@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
-#SBATCH --time=07:00:00
+#SBATCH --time=12:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
 #SBATCH --output=sp_permutations_stage6_beverin_output.txt
@@ -31,7 +31,7 @@ export LDFLAGS="-L$ROCM_HOME/lib -L$ROCM_HOME/lib64"
 export CUPY_INSTALL_USE_HIP=1
 export HCC_AMDGPU_TARGET=gfx942
 export CUPY_HIPCC_GENERATE_CODE=--offload-arch=gfx942
-
+export _TBLOCK_DIMS="32,4,1"
 
 export LLVM_HOME=/opt/rocm/llvm/
 export PATH=$LLVM_HOME/bin:$PATH
@@ -82,5 +82,5 @@ python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS
 
 #python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
 #python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
-#python run_permutations.py --reps ${REPS}
+python run_permutations.py --reps ${REPS}
 
