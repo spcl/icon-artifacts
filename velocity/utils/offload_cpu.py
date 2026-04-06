@@ -19,6 +19,8 @@ def offload_cpu(sdfg: dace.SDFG):
                 else:
                     # Block map continue
                     node.map.schedule = dace.ScheduleType.CPU_Multicore
+                    if len(node.map.params) > 1:
+                        node.map.collapse = 2
 
     nsdfgs = set()
     for state in sdfg.all_states():

@@ -26,7 +26,7 @@ from sc26_layout.permute_stage4 import PERMUTE_CONFIGS
 # Constants
 # ---------------------------------------------------------------------------
 
-STAGE    = os.getenv("_STAGE", "4")
+STAGE    = os.getenv("_STAGE", "5")
 BEVERIN  = os.getenv("BEVERIN", "0") == "1"
 
 COMPILE_CMD    = f"python -m utils.stages.compile_gpu_stage{STAGE}_v2"
@@ -50,7 +50,7 @@ def ensure_out_dir():
 
 def compile_config(name: str) -> bool:
     """Compile both ms and mu variants for *name* in one call."""
-    cmd = f"{COMPILE_CMD} --compile --permutations {name}"
+    cmd = f"{COMPILE_CMD} --compile --optimize --permutations {name}"
     print(f"[compile] {cmd}")
     ret = subprocess.run(cmd, shell=True)
     if ret.returncode != 0:
@@ -69,7 +69,7 @@ def _out_file(name: str, label: str) -> Path:
 
 
 def compile_unpermuted() -> bool:
-    cmd = f"{COMPILE_CMD} --compile --unpermuted"
+    cmd = f"{COMPILE_CMD} --compile --optimize --unpermuted"
     print(f"[compile] {cmd}")
     ret = subprocess.run(cmd, shell=True)
     if ret.returncode != 0:
