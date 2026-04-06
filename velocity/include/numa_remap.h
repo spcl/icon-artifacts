@@ -92,9 +92,8 @@ owned_ranges(int node, int num_nodes, size_t dim0, size_t dim1,
 // ---------------------------------------------------------------------------
 // numa_remap
 //
-//   Allocates a NUMA-distributed copy of the old array via mmap, copies data
-//   with first-touch placement, frees the old array (delete[]), and returns
-//   the new pointer.
+//   Allocates a NUMA-distributed copy via mmap, copies data with first-touch
+//   placement, frees the old array (delete[]), and returns the new pointer.
 //
 //   Usage:  arr = numa_remap(arr, dim0, dim1, nlist, num_nodes, dist);
 // ---------------------------------------------------------------------------
@@ -134,10 +133,17 @@ T* numa_remap(T *old_ptr,
 // ---------------------------------------------------------------------------
 // numa_unmap
 //
-//   Deallocates an mmap'd array.  Caller sets pointer to nullptr after.
-//   Usage:  numa_unmap(arr, dim0, dim1, nlist);  arr = nullptr;
+//   Copies data back from an mmap'd array into a fresh new[]-allocated buffer,
+//   then munmaps the mmap'd memory.  Returns the new[] pointer so that the
+//   normal DaCe cleanup (delete[]) is safe.
+//
+//   Usage:  arr = numa_unmap(arr, dim0, dim1, nlist);
 // ---------------------------------------------------------------------------
 template <typename T>
-void numa_unmap(T *ptr, size_t dim0, size_t dim1, size_t nlist) {
-  numa_dealloc(ptr, nlist * dim0 * dim1);
+T* numa_unmap(T *ptr, size_t dim0, size_t dim1, size_t nlist) {
+  const size_t total = nlist * dim0 * dim1;
+  T *heap = new T[total];
+  std::memcpy(heap, ptr, total * sizeof(T));
+  numa_dealloc(ptr, total);
+  return heap;
 }
