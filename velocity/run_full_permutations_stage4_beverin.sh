@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --partition=mi300
 #SBATCH --exclusive
-#SBATCH --time=10:00:00
+#SBATCH --time=16:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=192
 #SBATCH --output=permutations_stage4_beverin_output.txt
@@ -81,6 +81,5 @@ export V2=1
 python run_stage4_permutations.py --configs="nlev_first" --reps ${REPS}
 python run_stage4_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage4_permutations.py --unpermuted --reps ${REPS}
-
-#python run_stage4_permutations.py --reps ${REPS}
+python run_stage4_permutations.py --reps ${REPS}
 

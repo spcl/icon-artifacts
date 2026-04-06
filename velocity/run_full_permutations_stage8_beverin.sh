@@ -81,5 +81,5 @@ export V2=0
 python run_stage8_permutations.py --configs="nlev_first" --reps ${REPS}
 python run_stage8_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage8_permutations.py --unpermuted --reps ${REPS}
-#python run_stage8_permutations.py --reps ${REPS}
+python run_stage8_permutations.py --reps ${REPS}
 

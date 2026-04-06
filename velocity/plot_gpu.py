@@ -1,48 +1,56 @@
 #!/usr/bin/env python3
 """
-plot_gpu.py
+plot_stage8_gpu.py
 
-2×1 violin plot for stage-8 GPU permutation results.
-  rows       : AMD MI300A (Beverin)  /  NVIDIA GH200 (Daint)
-  x-elements : 4 violins per panel, grouped in 2 config pairs
-               [Original | Cost-Model]   [Original | Cost-Model]
-               ←─ lvn_only=0, istep=1 ─→ ←─ lvn_only=1, istep=2 ─→
-  color      : orange = Original Layout, blue = Cost-Model Suggested
+2×2 violin plot for stage-8 GPU results.
+  rows    : step7 (lvn_only=0, istep=1)  /  step9 (lvn_only=1, istep=2)
+  columns : Beverin (MI300A)             /  Daint (GH200)
+
+Only "unpermuted" and "nlev_first_shuffled" are plotted.
+
+Y-axis cap heuristic
+  - Collect all values in the panel.
+  - If max > OUTLIER_FACTOR × p95, cap at p95 × CAP_MARGIN  (outliers present).
+  - Otherwise let matplotlib choose its own upper limit, then scale it by
+    NATURAL_MARGIN to add a little breathing room.
 """
 
 import re, glob, os, argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
 from matplotlib.patches import Patch
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-PATTERN      = re.compile(r"\[Timer\] Elapsed time: ([\d.]+) ms")
-BASELINE_KEY = "unpermuted"
-TARGET_KEY   = "nlev_first_shuffled"
-KEEP_KEYS    = {BASELINE_KEY, TARGET_KEY}
+PATTERN       = re.compile(r"\[Timer\] Elapsed time: ([\d.]+) ms")
+BASELINE_KEY  = "unpermuted"
+TARGET_KEY    = "nlev_first_shuffled"
+KEEP_KEYS     = {BASELINE_KEY, TARGET_KEY}
+
+OUTLIER_FACTOR = 1.5   # if max > factor × p95 → outliers present
+CAP_MARGIN     = 1.10  # cap = p95 × this
+NATURAL_MARGIN = 1.05  # no outliers → matplotlib top × this
+
+STEP_CONFIG = {
+    7: "(lvn\_only=0, istep=1)",   # raw string used in titles
+    9: "(lvn\_only=1, istep=2)",
+}
 
 VCOL = {
-    BASELINE_KEY: "#e67e22",   # orange
+    BASELINE_KEY: "#555555",   # dark grey
     TARGET_KEY:   "#2980b9",   # blue
 }
 VLAB = {
-    BASELINE_KEY: "Original Layout",
-    TARGET_KEY:   "Cost-Model Suggested",
+    BASELINE_KEY: "Unpermuted (baseline)",
+    TARGET_KEY:   "nlev\_first\_shuffled",
 }
-
-# step → (x-group label, x positions for [baseline, target])
-CONFIGS = [
-    (7,  "Config. LVN Only=1", 1, 2),   # step, label, pos_base, pos_target
-    (9,  "Config. LVN Only=0", 4, 5),
-]
-GAP_CENTRE = 3   # visual gap between groups — no violin plotted here
 
 # ── Data loading ───────────────────────────────────────────────────────────────
 def load_folder(folder: str, step: int) -> dict[str, list[float]]:
+    """Return {name: [times]} keeping only KEEP_KEYS for the given step."""
     raw: dict[str, list[float]] = {}
     for f in glob.glob(os.path.join(folder, "*.txt")):
         basename = os.path.basename(f).replace(".txt", "")
+        # Filter by step suffix
         has_step = re.search(r"_step\d+$", basename)
         if has_step and not basename.endswith(f"_step{step}"):
             continue
@@ -50,197 +58,147 @@ def load_folder(folder: str, step: int) -> dict[str, list[float]]:
         if name not in KEEP_KEYS:
             continue
         with open(f) as fh:
-            times = [float(m.group(1))
-                     for line in fh if (m := PATTERN.search(line))]
+            times = [float(m.group(1)) for line in fh if (m := PATTERN.search(line))]
         if times:
             raw.setdefault(name, []).extend(times)
     return raw
 
 
+# ── Y-axis cap ─────────────────────────────────────────────────────────────────
+def compute_ylim(ax, all_values: list[float]) -> float | None:
+    """
+    Returns a cap value if outliers are detected, else None (let mpl decide).
+    Caller applies a small natural margin in the None case.
+    """
+    if not all_values:
+        return None
+    arr = np.array(all_values)
+    p95 = np.percentile(arr, 95)
+    vmax = arr.max()
+    if vmax > OUTLIER_FACTOR * p95:
+        return p95 * CAP_MARGIN
+    return None   # no bad outliers
+
+
 # ── Panel plotting ─────────────────────────────────────────────────────────────
-def plot_panel(ax, folder: str, platform_title: str) -> None:
-    # Collect all data for ylim computation
-    all_vals_global = []
-    plot_specs = []   # (key, pos, data_array)
-
-    for step, cfg_label, pos_base, pos_target in CONFIGS:
-        data = load_folder(folder, step)
-        for key, pos in [(BASELINE_KEY, pos_base), (TARGET_KEY, pos_target)]:
-            if key in data:
-                arr = np.array(data[key])
-                all_vals_global.extend(arr.tolist())
-                plot_specs.append((key, pos, arr, step))
-
-    if not plot_specs:
-        ax.set_title(f"{platform_title}\n[no data]")
-        return
+def plot_panel(ax, data: dict[str, list[float]], title: str) -> None:
+    plot_order = [k for k in [BASELINE_KEY, TARGET_KEY] if k in data]
+    positions  = list(range(1, len(plot_order) + 1))
 
     # ── Violins ────────────────────────────────────────────────────────────────
-    positions_list = [pos for _, pos, _, _ in plot_specs]
-    data_list      = [arr for _, _, arr, _ in plot_specs]
-    colors_list    = [VCOL[key] for key, _, _, _ in plot_specs]
+    if plot_order:
+        vp = ax.violinplot(
+            [data[k] for k in plot_order],
+            positions=positions,
+            showmeans=True,
+            showmedians=True,
+            showextrema=True,
+        )
+        for body, key in zip(vp["bodies"], plot_order):
+            body.set_facecolor(VCOL[key])
+            body.set_edgecolor("black")
+            body.set_alpha(0.75)
+        vp["cmeans"].set_color("black")
+        vp["cmedians"].set_color("white")
+        for part in ("cbars", "cmins", "cmaxes"):
+            if part in vp:
+                vp[part].set_color("black")
+                vp[part].set_linewidth(1.0)
 
-    vp = ax.violinplot(
-        data_list,
-        positions=positions_list,
-        showmeans=True,
-        showmedians=True,
-        showextrema=True,
-        widths=0.7,
-    )
-    for body, color in zip(vp["bodies"], colors_list):
-        body.set_facecolor(color)
-        body.set_edgecolor("black")
-        body.set_alpha(0.75)
-    vp["cmeans"].set_color("black")
-    vp["cmedians"].set_color("white")
-    for part in ("cbars", "cmins", "cmaxes"):
-        if part in vp:
-            vp[part].set_color("black")
-            vp[part].set_linewidth(1.0)
+    # ── Speedup annotation ─────────────────────────────────────────────────────
+    if BASELINE_KEY in data and TARGET_KEY in data:
+        base_med   = np.median(data[BASELINE_KEY])
+        target_med = np.median(data[TARGET_KEY])
+        if base_med > 0:
+            speedup = base_med / target_med
+            x = plot_order.index(TARGET_KEY) + 1
+            y = target_med
+            ax.text(x, y * 1.04, f"{speedup:.2f}×",
+                    ha="center", va="bottom", fontsize=10, fontweight="bold",
+                    color=VCOL[TARGET_KEY])
 
-    # ── Y limits: full data range, no forced zero, modest headroom ────────────
-    arr_all = np.array(all_vals_global)
-    vmin, vmax = arr_all.min(), arr_all.max()
-    margin = 0.2 * (vmax - vmin) if vmax > vmin else 1.0
-    if "AMD" in platform_title:
-        vmin -= 0.8
+    # ── Y-axis cap ─────────────────────────────────────────────────────────────
+    all_vals = [v for vals in data.values() for v in vals]
+    cap = compute_ylim(ax, all_vals)
+    if cap is not None:
+        ax.set_ylim(bottom=0, top=cap)
     else:
-        vmin -= 0.05
-    ax.set_ylim(bottom=vmin * 0.95 - margin * 0.3, top=vmax + margin * 2.0)
-    ylo, yhi = ax.get_ylim()
-    y_range  = yhi - ylo
-    # Store for post-draw tick unification
-    ax._data_ylo = ylo
-    ax._data_yhi = yhi
+        ax.set_ylim(bottom=0)
+        current_top = ax.get_ylim()[1]
+        ax.set_ylim(top=current_top * NATURAL_MARGIN)
 
-    # ── Per-violin annotations ─────────────────────────────────────────────────
-    for key, pos, arr, step in plot_specs:
-        med      = np.median(arr)
-        arr_max  = arr.max()
-        arr_min  = arr.min()
-        color    = VCOL[key]
-
-        # Median: above violin top, right-offset, italic
-        ax.text(pos - 0.45, arr_max + 0.01 * y_range,
-                f"med. {med:.3f} ms",
-                ha="left", va="bottom",
-                fontsize=9, color=color, fontstyle="italic")
-
-    # ── Speedup annotations per config group ───────────────────────────────────
-    for step, cfg_label, pos_base, pos_target in CONFIGS:
-        data = load_folder(folder, step)
-        if BASELINE_KEY in data and TARGET_KEY in data:
-            base_med   = np.median(data[BASELINE_KEY])
-            target_med = np.median(data[TARGET_KEY])
-            if base_med > 0 and target_med > 0:
-                speedup  = base_med / target_med
-                gap_ms   = base_med - target_med
-                arr_min  = np.array(data[TARGET_KEY]).min()
-                sign     = "−" if gap_ms > 0 else "+"
-                ax.text(pos_target + 0.04, arr_min - 0.018 * y_range,
-                        f"{speedup:.2f}×",
-                        ha="left", va="top",
-                        fontsize=10, fontweight="bold", fontstyle="italic",
-                        color=VCOL[TARGET_KEY])
-
-    # ── Baseline median reference line per config group ────────────────────────
-    for step, cfg_label, pos_base, pos_target in CONFIGS:
-        data = load_folder(folder, step)
-        if BASELINE_KEY in data:
-            base_med = np.median(data[BASELINE_KEY])
-            ax.hlines(base_med, pos_base - 0.35, pos_target + 0.35,
-                      colors=VCOL[BASELINE_KEY], linestyles="--",
-                      linewidth=1.8, alpha=0.5)
-
-    # ── X-axis: group labels centred under each pair ───────────────────────────
-    ax.set_xticks([])   # no individual ticks
-    ax.set_xticks([1.5, 4.5])
-    ax.set_xticklabels(["", ""])  # no tick labels, we'll add custom text
-    ax.set_xlim(0.5, 5.5)
-
-    for step, cfg_label, pos_base, pos_target in CONFIGS:
-        centre = (pos_base + pos_target) / 2
-        ax.text(centre, ylo - 0.06 * y_range, cfg_label,
-                ha="center", va="top",
-                fontsize=9, clip_on=False)
-
-    # Vertical separator between groups
-    ax.axvline(x=GAP_CENTRE, color="grey", linestyle=":", linewidth=1.0, alpha=0.5)
-
+    # ── Axes decoration ────────────────────────────────────────────────────────
+    ax.set_xticks(positions)
+    ax.set_xticklabels([VLAB[k] for k in plot_order], fontsize=10)
     ax.set_ylabel("Time (ms)")
-    ax.set_title(platform_title, fontsize=12)
-    ax.grid(True, axis="y", linestyle="--", alpha=0.35)
+    ax.set_title(title, fontsize=11)
+    ax.grid(True, axis="y", linestyle="--", alpha=0.4)
+    ax.set_xlim(0.5, len(plot_order) + 0.5)
 
 
-# ── CLI ────────────────────────────────────────────────────────────────────────
+# ── Main ───────────────────────────────────────────────────────────────────────
 def none_or_str(v):
     return None if v.lower() == "none" else v
 
 parser = argparse.ArgumentParser(
-    description="2×1 violin: stage-8 GPU layout comparison.",
+    description="2×2 violin plot: stage-8 GPU results (Beverin vs Daint, step7 vs step9).",
     formatter_class=argparse.RawTextHelpFormatter,
 )
-parser.add_argument("--gpu",        default="beverin_full_permutations_8", type=none_or_str)
-parser.add_argument("--gpu2",       default="daint_full_permutations_8",   type=none_or_str)
-parser.add_argument("--gpu-title",  default="AMD MI300A",                  type=none_or_str)
-parser.add_argument("--gpu2-title", default="NVIDIA GH200",                type=none_or_str)
-parser.add_argument("--out",        default="plots/violin_stage8_gpu.png")
+parser.add_argument("--gpu",        default="beverin_full_permutations_8", metavar="DIR", type=none_or_str)
+parser.add_argument("--gpu2",       default="daint_full_permutations_8",   metavar="DIR", type=none_or_str)
+parser.add_argument("--gpu-title",  default="AMD MI300A",                  metavar="STR")
+parser.add_argument("--gpu2-title", default="NVIDIA GH200",                metavar="STR")
+parser.add_argument("--out",        default="plots/violin_stage8_gpu.png", metavar="FILE")
 args = parser.parse_args()
 
 for attr, path in [("gpu", args.gpu), ("gpu2", args.gpu2)]:
     if not os.path.isdir(path):
         parser.error(f"Folder '{path}' not found (--{attr.replace('_','-')}).")
 
-# ── rcParams ───────────────────────────────────────────────────────────────────
 plt.rcParams.update({
-    "font.size":       12,
-    "axes.titlesize":  12,
-    "axes.labelsize":  11,
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
-    "legend.fontsize": 10,
+    "font.size": 12, "axes.titlesize": 11, "axes.labelsize": 11,
+    "xtick.labelsize": 10, "ytick.labelsize": 10, "legend.fontsize": 10,
 })
 
-fig, axes = plt.subplots(
-    2, 1,
-    figsize=(8*0.8, 6*0.8),
-    gridspec_kw={"hspace": 0.27},
-)
+fig, axes = plt.subplots(2, 2, figsize=(10, 8), sharey="row")
+fig.suptitle("Velocity Tendencies — Layout Permutation (Stage 8, GPU)",
+             fontsize=14, y=0.98)
 
-fig.suptitle("Memory Layout Impact on GPU Impl. Velocity Tendencies",
-             fontsize=13, y=0.97)
+STEP_ROW = [(7, 0), (9, 1)]
+PLATFORM_COL = [
+    (args.gpu,  args.gpu_title,  0),
+    (args.gpu2, args.gpu2_title, 1),
+]
 
-plot_panel(axes[0], args.gpu,  args.gpu_title)
-plot_panel(axes[1], args.gpu2, args.gpu2_title)
+# Map step → config string (no LaTeX escaping needed for mpl text)
+STEP_CFG_LABEL = {
+    7: "lvn_only=0, istep=1",
+    9: "lvn_only=1, istep=2",
+}
 
-# ── Unified tick count across both panels ──────────────────────────────────────
-from matplotlib.ticker import MaxNLocator
-N_TICKS = 6   # at least 6 ticks on both panels
-for ax in axes:
-    locator = MaxNLocator(nbins=N_TICKS, min_n_ticks=N_TICKS, steps=[1, 2, 2.5, 5, 10])
-    locator.set_axis(ax.yaxis)
-    ticks = locator.tick_values(ax._data_ylo, ax._data_yhi)
-    # Enforce minimum: if fewer than 6 returned, force nbins higher
-    if len(ticks) < N_TICKS:
-        locator = MaxNLocator(nbins=N_TICKS + 2, min_n_ticks=N_TICKS,
-                              steps=[1, 2, 2.5, 5, 10])
-        locator.set_axis(ax.yaxis)
-        ticks = locator.tick_values(ax._data_ylo, ax._data_yhi)
-    ax.set_yticks(ticks)
-    ax.set_ylim(ax._data_ylo, ax._data_yhi)
+for step, row in STEP_ROW:
+    for folder, plat_title, col in PLATFORM_COL:
+        ax    = axes[row][col]
+        data  = load_folder(folder, step)
+        title = f"{plat_title}  (step{step}: {STEP_CFG_LABEL[step]})"
+        if not data:
+            ax.set_title(f"{title}\n[no data]")
+            ax.set_visible(True)
+            continue
+        plot_panel(ax, data, title)
 
-# ── Legend ─────────────────────────────────────────────────────────────────────
+    # Share y-axis label only on left column
+    axes[row][1].set_ylabel("")
+
+# ── Legend (shared, bottom centre) ────────────────────────────────────────────
 handles = [
     Patch(facecolor=VCOL[BASELINE_KEY], edgecolor="black", label=VLAB[BASELINE_KEY]),
     Patch(facecolor=VCOL[TARGET_KEY],   edgecolor="black", label=VLAB[TARGET_KEY]),
 ]
 fig.legend(handles=handles, loc="lower center",
-           bbox_to_anchor=(0.5, -0.01), ncol=2, framealpha=0.9)
+           bbox_to_anchor=(0.5, 0.0), ncol=2, framealpha=0.9)
 
-fig.tight_layout(rect=[0, 0.05, 1, 0.5])
-os.makedirs(os.path.dirname(args.out) if os.path.dirname(args.out) else ".", exist_ok=True)
+fig.tight_layout(rect=[0, 0.05, 1, 0.97])
 fig.savefig(args.out, dpi=200, bbox_inches="tight")
-fig.savefig(args.out.replace(".png", ".pdf"), dpi=200, bbox_inches="tight")
 plt.close(fig)
 print(f"Saved {args.out}")
