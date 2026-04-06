@@ -933,7 +933,7 @@ def permute_sdfg(
 
     if numa:
         numa_remap_for_config(config_name, 4, sdfg)
-        numa_unmap_for_config(config_name, 4, sdfg)
+        numa_unmap_for_config(config_name, sdfg)
     #raise Exception("TODO")
 
     add_timers_w_states(sdfg, permute_in_state, permute_out_state)
