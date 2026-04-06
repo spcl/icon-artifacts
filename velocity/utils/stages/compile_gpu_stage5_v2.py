@@ -249,8 +249,7 @@ def main():
     # Compile unpermuted baseline (with and without NUMA)
     # ------------------------------------------------------------------
     if args.unpermuted:
-        from sc26_layout.permute_stage4 import add_timers, add_symbols, numa_remap_for_unpermuted
-
+        from sc26_layout.permute_stage4 import add_timers, add_symbols, numa_touch_for_unpermuted
         for use_numa in [True, False]:
             numa_label = "_wnuma" if use_numa is True else "_wonuma"
             print(f"=== Compiling unpermuted baseline{numa_label} ===")
@@ -264,7 +263,7 @@ def main():
                 add_timers(sdfg)
                 add_symbols(sdfg)
                 if use_numa:
-                    numa_remap_for_unpermuted(4, sdfg)
+                    numa_touch_for_unpermuted(False, sdfg)
                 sdfg.validate()
                 offload_cpu(sdfg)
                 sdfg.validate()
