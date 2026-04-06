@@ -603,11 +603,274 @@ def levmask_is_permuted(config_name: str) -> bool:
     _, ch, _, _, _ = _parse_name(config_name)
     return bool(ch)
 
+# Arrays whose middle or last dim is a small "N" (neighbor count).
+# Connectivity: original shape (nproma, nblks, N), N ∈ {2,3,4}
+# Interpolation: original shape (nproma, N, nblks)
+_INTERP_ARRAYS = {
+    "__CG_p_int__m_e_bln_c_s",
+    "__CG_p_int__m_c_lin_e",
+    "__CG_p_int__m_geofac_n2s",
+    "__CG_p_int__m_geofac_grdiv",
+    "__CG_p_int__m_cells_aw_verts",
+    "__CG_p_int__m_geofac_rot",
+}
+ 
+_FOUR_D_ARRAYS = {
+    "__CG_p_diag__m_ddt_vn_apc_pc",
+    "__CG_p_diag__m_ddt_w_adv_pc",
+    "__CG_p_diag__m_ddt_vn_cor_pc",
+}
+ 
+ 
+def _permuted_shape_3d(original_dims: Tuple[str, ...],
+                       perm: List[int]) -> Tuple[str, ...]:
+    """Apply permutation to symbolic dimension names."""
+    return tuple(original_dims[perm[i]] for i in range(len(perm)))
+ 
+ 
+def _dist_for_perm(perm: List[int]) -> str:
+    """perm[0]==0 → COL_WISE (first dim is huge nproma),
+       perm[0]==1 → ROW_WISE."""
+    if perm[0] == 0:
+        return "Distribution::COL_WISE"
+    elif perm[0] == 1:
+        return "Distribution::ROW_WISE"
+    else:
+        return "Distribution::BLOCK_1D"
+ 
+def numa_remap_for_config(config_name: str, num_nodes: int, sdfg: dace.SDFG):
+    """
+    Generate C++ numa_remap calls for every array in a permutation config,
+    reading actual shapes from sdfg.arrays["permuted_" + arr_name].
+ 
+    Shape convention: Fortran column-major — shape[0] is the fastest-varying
+    (contiguous) dimension, shape[-1] is the slowest (outermost).
+ 
+    C++ numa_remap(ptr, dim0, dim1, nlist, num_nodes, dist) uses row-major:
+      dim1 is contiguous.  So for Fortran (s0, s1, s2):
+        dim0 = s1,  dim1 = s0,  nlist = s2
+ 
+    Parameters
+    ----------
+    config_name : permutation config key
+    num_nodes   : number of NUMA domains
+    sdfg        : the SDFG (after PermuteDimensions has been applied)
+    """
+    cfg = PERMUTE_CONFIGS[config_name]
+    pm  = cfg["permute_map"]
+    conn_set = set(_CONN_ARRAYS)
+ 
+    codestr = ""
+    codestr += f"// ---- NUMA remap calls for config '{config_name}' ----\n"
+    codestr += f"// num_nodes = {num_nodes}\n\n"
+ 
+    for arr, perm in sorted(pm.items()):
+        permuted_name = "permuted_" + arr
+        if permuted_name not in sdfg.arrays:
+            codestr += f"// {arr}: permuted array '{permuted_name}' not found in SDFG, skipping\n\n"
+            continue
+ 
+        shape = sdfg.arrays[permuted_name].shape  # Fortran col-major: (fast, ..., slow)
+        ndim = len(shape)
+ 
+        # ── Connectivity / Interpolation: has small N dim → collapse ──
+        if arr in conn_set or arr in _INTERP_ARRAYS:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            codestr += f"// {arr}\n"
+            codestr += f"//   permuted Fortran shape: ({s0}, {s1}, {s2})\n"
+            codestr += f"//   N dim collapsed (small) → BLOCK_1D per block\n"
+            codestr += f"{arr} = numa_remap({arr}, ({s0}) * ({s1}), 1, {s2}, {num_nodes}, Distribution::BLOCK_1D);\n\n"
+            continue
+ 
+        # ── 4-D: ntnd and nblks are both blocking dims ─
+        if arr in _FOUR_D_ARRAYS:
+            assert ndim == 4
+            s0, s1, s2, s3 = shape[0], shape[1], shape[2], shape[3]
+            dist = _dist_for_perm(perm)
+            codestr += f"// {arr}\n"
+            codestr += f"//   permuted Fortran shape: ({s0}, {s1}, {s2}, {s3})\n"
+            codestr += f"//   nlist = ({s2}) * ({s3})  [nblks × ntnd]\n"
+            codestr += f"//   C row-major: dim0={s1}, dim1={s0} (contiguous)\n"
+            codestr += f"{arr} = numa_remap({arr}, {s1}, {s0}, ({s2}) * ({s3}), {num_nodes}, {dist});\n\n"
+            continue
+ 
+        # ── 3-D: standard (nproma/nlev, nlev/nproma, nblks) ─
+        if ndim == 3:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            dist = _dist_for_perm(perm)
+            codestr += f"// {arr}\n"
+            codestr += f"//   permuted Fortran shape: ({s0}, {s1}, {s2})\n"
+            codestr += f"//   C row-major: dim0={s1}, dim1={s0} (contiguous)\n"
+            codestr += f"{arr} = numa_remap({arr}, {s1}, {s0}, {s2}, {num_nodes}, {dist});\n\n"
+            continue
+ 
+        # ── 2-D: flat BLOCK_1D per block ────────────────────
+        if ndim == 2:
+            s0, s1 = shape[0], shape[1]
+            codestr += f"// {arr}\n"
+            codestr += f"//   permuted Fortran shape: ({s0}, {s1})\n"
+            codestr += f"{arr} = numa_remap({arr}, {s0}, 1, {s1}, {num_nodes}, Distribution::BLOCK_1D);\n\n"
+            continue
+ 
+        # ── Unhandled ──────────────────────────────────────────────────
+        codestr += f"// {arr}: ndim={ndim}, perm={perm}, shape={shape} — UNHANDLED\n\n"
+ 
+    print(codestr)
+    permute_in_states = {s for s in sdfg.all_states() if "permute_in" == s.label}
+    assert len(permute_in_states) == 1
+    s = permute_in_states.pop()
+    g = s.parent_graph
+    s2 = g.add_state_after(s, "mmap_in", False)
+ 
+    s2.add_tasklet(
+        "mmap_in_t", set(), set(),
+        code=codestr,
+        language=dace.dtypes.Language.CPP,
+        side_effects=True,
+        code_global='#include "numa_remap.h"'
+    )
+ 
+ 
+# ---------------------------------------------------------------------------
+# Matching unmap helper
+# ---------------------------------------------------------------------------
+ 
+def numa_unmap_for_config(config_name: str, sdfg: dace.SDFG):
+    """Generate the matching numa_unmap + nullptr calls."""
+    cfg = PERMUTE_CONFIGS[config_name]
+    pm  = cfg["permute_map"]
+    conn_set = set(_CONN_ARRAYS)
+ 
+    codestr = ""
+    codestr += f"// ---- NUMA unmap calls for config '{config_name}' ----\n"
+ 
+    for arr, perm in sorted(pm.items()):
+        permuted_name = "permuted_" + arr
+        if permuted_name not in sdfg.arrays:
+            codestr += f"// {arr}: not found, skipping\n"
+            continue
+ 
+        shape = sdfg.arrays[permuted_name].shape
+        ndim = len(shape)
+ 
+        if arr in conn_set or arr in _INTERP_ARRAYS:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            codestr += f"numa_unmap({arr}, ({s0}) * ({s1}), 1, {s2});\n"
+            codestr += f"{arr} = nullptr;\n"
+        elif arr in _FOUR_D_ARRAYS:
+            s0, s1, s2, s3 = shape[0], shape[1], shape[2], shape[3]
+            codestr += f"numa_unmap({arr}, {s1}, {s0}, ({s2}) * ({s3}));\n"
+            codestr += f"{arr} = nullptr;\n"
+        elif ndim == 3:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            codestr += f"numa_unmap({arr}, {s1}, {s0}, {s2});\n"
+            codestr += f"{arr} = nullptr;\n"
+        elif ndim == 2:
+            s0, s1 = shape[0], shape[1]
+            codestr += f"numa_unmap({arr}, {s0}, 1, {s1});\n"
+            codestr += f"{arr} = nullptr;\n"
+        else:
+            codestr += f"// {arr}: ndim={ndim} — UNHANDLED unmap\n"
+ 
+    print(codestr)
+    last_state = {s for s in sdfg.all_states() if sdfg.out_degree(s) == 0}.pop()
+    s2 = sdfg.add_state_after(last_state, "mmap_out", False)
+ 
+    s2.add_tasklet(
+        "mmap_out_t", set(), set(),
+        code=codestr,
+        language=dace.dtypes.Language.CPP,
+        side_effects=True,
+    )
+
+
+def numa_remap_for_unpermuted(num_nodes: int, sdfg: dace.SDFG):
+    """NUMA-distribute original (unpermuted) arrays. perm is identity → COL_WISE for 3D."""
+    conn_set = set(_CONN_ARRAYS)
+
+    # All arrays we'd ever permute, but with identity perm
+    all_arrays = {}
+    all_arrays.update({k: [0, 1, 2] for k in _COMPUTE_VERT_PERMUTED})
+    all_arrays.update({k: [0, 1, 2] for k in _COMPUTE_HORIZ_PERMUTED})
+    all_arrays.update({k: [0, 1, 2] for k in _FIELDS_PERMUTED})
+    all_arrays.update({k: [0, 1, 2] for k in _STENCIL_PERMUTED})
+    all_arrays.update({k: [0, 1, 2] for k in _CONN_ARRAYS})
+    all_arrays.update({k: [0, 1, 2] for k in _INTERP_ARRAYS})
+    # 4-D identity
+    for k in _FOUR_D_ARRAYS:
+        all_arrays[k] = [0, 1, 2, 3]
+    # 2-D arrays
+    for k in list(_COMPUTE_VERT_PERMUTED) + list(_COMPUTE_HORIZ_PERMUTED):
+        if len(_COMPUTE_VERT_PERMUTED.get(k, _COMPUTE_HORIZ_PERMUTED.get(k, []))) == 2:
+            all_arrays[k] = [0, 1]
+
+    codestr = f"// ---- NUMA remap (unpermuted) ----\n"
+
+    for arr, perm in sorted(all_arrays.items()):
+        if arr not in sdfg.arrays:
+            codestr += f"// {arr}: not found in SDFG, skipping\n"
+            continue
+
+        shape = sdfg.arrays[arr].shape
+        ndim = len(shape)
+
+        if arr in conn_set or arr in _INTERP_ARRAYS:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            codestr += f"{arr} = numa_remap({arr}, ({s0}) * ({s1}), 1, {s2}, {num_nodes}, Distribution::BLOCK_1D);\n"
+        elif arr in _FOUR_D_ARRAYS:
+            s0, s1, s2, s3 = shape[0], shape[1], shape[2], shape[3]
+            dist = _dist_for_perm(perm)
+            codestr += f"{arr} = numa_remap({arr}, {s1}, {s0}, ({s2}) * ({s3}), {num_nodes}, {dist});\n"
+        elif ndim == 3:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            dist = _dist_for_perm(perm)
+            codestr += f"{arr} = numa_remap({arr}, {s1}, {s0}, {s2}, {num_nodes}, {dist});\n"
+        elif ndim == 2:
+            s0, s1 = shape[0], shape[1]
+            codestr += f"{arr} = numa_remap({arr}, {s0}, 1, {s1}, {num_nodes}, Distribution::BLOCK_1D);\n"
+
+    print(codestr)
+
+    # Insert after entry_interface
+    entry = {s for s in sdfg.all_states() if s.label == "entry_interface"}.pop()
+    g = entry.parent_graph
+    s2 = g.add_state_after(entry, "mmap_in", False)
+    s2.add_tasklet("mmap_in_t", set(), set(), code=codestr,
+                   language=dace.dtypes.Language.CPP, side_effects=True,
+                   code_global='#include "numa_remap.h"')
+
+    # Unmap before exit
+    unmap_str = "// ---- NUMA unmap (unpermuted) ----\n"
+    for arr, perm in sorted(all_arrays.items()):
+        if arr not in sdfg.arrays:
+            continue
+        shape = sdfg.arrays[arr].shape
+        ndim = len(shape)
+        if arr in conn_set or arr in _INTERP_ARRAYS:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            unmap_str += f"numa_unmap({arr}, ({s0}) * ({s1}), 1, {s2});\n{arr} = nullptr;\n"
+        elif arr in _FOUR_D_ARRAYS:
+            s0, s1, s2, s3 = shape[0], shape[1], shape[2], shape[3]
+            unmap_str += f"numa_unmap({arr}, {s1}, {s0}, ({s2}) * ({s3}));\n{arr} = nullptr;\n"
+        elif ndim == 3:
+            s0, s1, s2 = shape[0], shape[1], shape[2]
+            unmap_str += f"numa_unmap({arr}, {s1}, {s0}, {s2});\n{arr} = nullptr;\n"
+        elif ndim == 2:
+            s0, s1 = shape[0], shape[1]
+            unmap_str += f"numa_unmap({arr}, {s0}, 1, {s1});\n{arr} = nullptr;\n"
+
+    print(unmap_str)
+    last_state = {s for s in sdfg.all_states() if sdfg.out_degree(s) == 0}.pop()
+    s3 = sdfg.add_state_after(last_state, "mmap_out", False)
+    s3.add_tasklet("mmap_out_t", set(), set(), code=unmap_str,
+                   language=dace.dtypes.Language.CPP, side_effects=True)
+
 def permute_sdfg(
     sdfg: dace.SDFG,
     config_name: str = "nlev_first",
     shuffle_map: bool = True,
     strip_prefix: bool = False,
+    numa:bool = False,
 ) -> dace.SDFG:
     if config_name not in PERMUTE_CONFIGS:
         sample = sorted(k for k in PERMUTE_CONFIGS
@@ -667,6 +930,11 @@ def permute_sdfg(
                     MapDimShuffle().apply_to(
                         sdfg=g.sdfg, map_entry=n,
                         options={"parameters": permuted_param_names})
+
+    if numa:
+        numa_remap_for_config(config_name, 4, sdfg)
+        numa_unmap_for_config(config_name, 4, sdfg)
+    #raise Exception("TODO")
 
     add_timers_w_states(sdfg, permute_in_state, permute_out_state)
     add_symbols(sdfg)

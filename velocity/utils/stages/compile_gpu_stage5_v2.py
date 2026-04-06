@@ -167,6 +167,11 @@ def optimization_action(sdfg):
         only=["out_val_0"],
         no_dim_change=True,
     )
+    for arrname in ["z_w_con_c", "z_w_concorr_mc", "levmask", "cfl_clipping",
+                    "z_v_grad_w", "z_ekinh", "zeta", "z_w_v", "z_w_con_c_full",
+                    "maxvcfl_arr", "out_val_0"]:
+        if arrname in sdfg.arrays:
+            sdfg.arrays[arrname].lifetime = dace.dtypes.AllocationLifetime.SDFG
     if "difcoef" in sdfg.arrays:
         _tmp_difcoef(sdfg)
     sdfg.validate()
@@ -192,15 +197,19 @@ def optimization_action(sdfg):
     sdfg.add_state_before(state, "predom_ei", is_start_block=True )
     state.sdfg = sdfg
     state.parent_graph = sdfg
-    pre_gpu_fix(sdfg)
+    #pre_gpu_fix(sdfg)
 
     sdfg.validate()
-    move_ifs_inside_maps(sdfg)
+    #move_ifs_inside_maps(sdfg)
     flatten_lib, _ = find_node_by_name(sdfg, "flatten")
     deflatten_lib, _ = find_node_by_name(sdfg, "deflatten")
     InlineSDFGs().apply_pass(sdfg, {})
     sdfg.apply_transformations_repeated(MapCollapse)
     sdfg.validate()
+
+    for n, g in sdfg.all_nodes_recursive():
+        if isinstance(n, dace.nodes.LibraryNode):
+            n.schedule = dace.dtypes.ScheduleType.Default
 
     return sdfg
 
@@ -237,37 +246,41 @@ def main():
             sdfg.save(outfile, compress=True)
 
     # ------------------------------------------------------------------
-    # Compile unpermuted baseline
+    # Compile unpermuted baseline (with and without NUMA)
     # ------------------------------------------------------------------
     if args.unpermuted:
-        from sc26_layout.permute_stage4 import add_timers, add_symbols
+        from sc26_layout.permute_stage4 import add_timers, add_symbols, numa_remap_for_unpermuted
 
-        print(f"=== Compiling unpermuted baseline ===")
-        sdfgs = {
-            name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID))
-            for name in names
-        }
-        nsdfgs = {}
-        for name, sdfg in sdfgs.items():
-            add_timers(sdfg)
-            # insert_synchronization_for_profiling(sdfg)
-            add_symbols(sdfg)
-            sdfg.validate()
-            offload_cpu(sdfg)
-            sdfg.validate()
-            nsdfgs[name] = sdfg
+        for use_numa in [True, False]:
+            numa_label = "_wnuma" if use_numa is True else "_wonuma"
+            print(f"=== Compiling unpermuted baseline{numa_label} ===")
 
-        common.compile_action(
-            STAGE_ID, nsdfgs, False, None, False,
-            name_suffix="_unpermuted",
-            main_name="main_per.cu",
-            tblock_dim=_TBLOCK_DIM,
-            stage_suffix="_unpermuted",
-        )
+            sdfgs = {
+                name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID))
+                for name in names
+            }
+            nsdfgs = {}
+            for name, sdfg in sdfgs.items():
+                add_timers(sdfg)
+                add_symbols(sdfg)
+                if use_numa:
+                    numa_remap_for_unpermuted(4, sdfg)
+                sdfg.validate()
+                offload_cpu(sdfg)
+                sdfg.validate()
+                nsdfgs[name] = sdfg
+
+            common.compile_action(
+                STAGE_ID, nsdfgs, False, None, False,
+                name_suffix=f"_unpermuted{numa_label}",
+                main_name="main_per.cu",
+                tblock_dim=_TBLOCK_DIM,
+                stage_suffix=f"_unpermuted{numa_label}",
+            )
         return
 
     # ------------------------------------------------------------------
-    # Compile permuted variants (both shuffled and unshuffled)
+    # Compile permuted variants (shuffled/unshuffled × numa/no-numa)
     # ------------------------------------------------------------------
     if args.compile:
         from sc26_layout.permute_stage4 import (
@@ -287,34 +300,36 @@ def main():
                 sys.exit(1)
 
             for shuffle_map in [True, False]:
-                shuffle_label = "ms" if shuffle_map else "mu"
-                print(f"=== Compiling config: {config_name} ({shuffle_label}) ===")
+                for use_numa in [False, True]:
+                    shuffle_label = "ms" if shuffle_map else "mu"
+                    numa_label = "_wnuma" if use_numa else "_wonuma"
+                    print(f"=== Compiling config: {config_name} ({shuffle_label}{numa_label}) ===")
 
-                sdfgs = {
-                    name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID))
-                    for name in names
-                }
-                nsdfgs = {}
-                for name, sdfg in sdfgs.items():
-                    sdfg = permute_sdfg(
-                        sdfg,
-                        config_name=config_name,
-                        shuffle_map=shuffle_map,
+                    sdfgs = {
+                        name: dace.SDFG.from_file(common.stage_output(name, STAGE_ID))
+                        for name in names
+                    }
+                    nsdfgs = {}
+                    for name, sdfg in sdfgs.items():
+                        sdfg = permute_sdfg(
+                            sdfg,
+                            config_name=config_name,
+                            shuffle_map=shuffle_map,
+                            numa=use_numa,
+                        )
+                        sdfg.validate()
+                        offload_cpu(sdfg)
+                        sdfg.validate()
+                        nsdfgs[name] = sdfg
+
+                    suffix = f"_permuted_{config_name}_{shuffle_label}{numa_label}"
+                    common.compile_action(
+                        STAGE_ID, nsdfgs, False, None, False,
+                        name_suffix=suffix,
+                        main_name="main_per.cu",
+                        tblock_dim=_TBLOCK_DIM,
+                        stage_suffix=suffix,
                     )
-                    # insert_synchronization_for_profiling(sdfg)
-                    sdfg.validate()
-                    offload_cpu(sdfg)
-                    sdfg.validate()
-                    nsdfgs[name] = sdfg
-
-                suffix = f"_permuted_{config_name}_{shuffle_label}"
-                common.compile_action(
-                    STAGE_ID, nsdfgs, False, None, False,
-                    name_suffix=suffix,
-                    main_name="main_per.cu",
-                    tblock_dim=_TBLOCK_DIM,
-                    stage_suffix=suffix,
-                )
 
 if __name__ == "__main__":
     main()

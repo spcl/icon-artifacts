@@ -721,13 +721,13 @@ def _compile_and_link(
 
     # Add OpenMP to linker
     if AMD:
-        link_flags += " -fopenmp"
+        link_flags += " -fopenmp "
     elif "nvcc" in compiler:
-        link_flags += " -Xcompiler=-fopenmp"
+        link_flags += " -Xcompiler=-fopenmp "
     else:
-        link_flags += " -fopenmp"
-
-    link_cmd = f"{compiler} {' '.join(objects)} {arch_flag} {link_flags} -o {output}"
+        link_flags += " -fopenmp "
+    
+    link_cmd = f"{compiler} {' '.join(objects)} {arch_flag}  {link_flags} -o {output} -lnuma"
     print(f"  [LD] {output}")
     ret = subprocess.run(link_cmd, shell=True)
     if ret.returncode != 0:
@@ -876,7 +876,7 @@ def compile_if_propagated_sdfgs(
             if AMD and stage > 5:
                 _write(gpu_file, _hipify(_read(gpu_file)))
             
-            if stage > 5:
+            if stage >= 5:
                 sources.append(gpu_file)
 
             # Prepend includes to cpu file
