@@ -1,13 +1,15 @@
 #!/bin/bash
-#SBATCH --job-name=velocity_gpu_perm_sweep
+#SBATCH --job-name=v6
 #SBATCH --nodes=1
-#SBATCH --partition=debug
+#SBATCH --partition=normal
 #SBATCH --exclusive
-#SBATCH --time=00:30:00
+#SBATCH --time=05:30:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
-#SBATCH --output=permutations_stage6_daint_output.txt
-#SBATCH --error=permutations_stage6_daint_error.txt
+#SBATCH --exclusive
+#SBATCH --account=g177-1
+#SBATCH --output=sp_permutations_stage6_daint_output.txt
+#SBATCH --error=sp_permutations_stage6_daint_error.txt
 
 spack load gcc/76jw6nu
 spack load cuda@12.9
@@ -46,6 +48,6 @@ export _REDUCE_BITWIDTH_TRANSFORMATION=0
 export _SUFFIX=""
 # Run unpermuted one
 python run_permutations.py --configs "c102_e201_b102" --reps ${REPS}
-#python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
-#python run_permutations.py --reps ${REPS}
+python run_permutations.py --configs "c102_e102_b102" --unpermuted --reps ${REPS}
+python run_permutations.py --reps ${REPS}
 

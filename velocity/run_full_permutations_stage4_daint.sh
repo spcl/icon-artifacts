@@ -3,9 +3,11 @@
 #SBATCH --nodes=1
 #SBATCH --partition=normal
 #SBATCH --exclusive
-#SBATCH --time=00:40:00
+#SBATCH --time=08:40:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=288
+#SBATCH --exclusive
+#SBATCH --account=g177-1
 #SBATCH --output=full_permutations_stage4_output.txt
 #SBATCH --error=full_permutations_stage4_error.txt
 
@@ -48,6 +50,7 @@ export V2=1
 
 # Run unpermuted one
 # "c102_e021_b012" -> nlev first
+python run_stage4_permutations.py --configs="c102_e021_b021" --reps ${REPS}
 python run_stage4_permutations.py --configs="index_only" --reps ${REPS}
 python run_stage4_permutations.py --configs="nlev_first" --reps ${REPS}
 python run_stage4_permutations.py --unpermuted --reps ${REPS}

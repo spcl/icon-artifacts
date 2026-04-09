@@ -149,9 +149,11 @@ def run_unpermuted(reps: int = 100, ncu: bool = False):
 
 def main():
     # Named aliases excluded from the default sweep
+    #_NAMED = {"index_only", "nlev_first"}
+    #all_names = [k for k in PERMUTE_CONFIGS if k not in _NAMED]
     _NAMED = {"index_only", "nlev_first"}
-    all_names = [k for k in PERMUTE_CONFIGS if k not in _NAMED]
-
+    all_names = [k for k in PERMUTE_CONFIGS if k not in _NAMED and "cv0" not in k]
+    
     ap = argparse.ArgumentParser(description="Run stage-8 layout permutation sweep")
     ap.add_argument("--configs", type=str, default=None,
                     help="Comma-separated config names (default: all 95 sweep configs)")
